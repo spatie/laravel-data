@@ -1,24 +1,25 @@
 {
-    "name": "vendor_slug/package_slug",
-    "description": ":package_description",
+    "name": "spatie/laravel-data",
+    "description": "Create unified resources and data transfer objects",
     "keywords": [
-        ":vendor_name",
+        "spatie",
         "laravel",
-        "package_slug"
+        "laravel-data"
     ],
-    "homepage": "https://github.com/vendor_slug/package_slug",
+    "homepage": "https://github.com/spatie/laravel-data",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Ruben Van Assche",
+            "email": "ruben@spatie.be",
             "role": "Developer"
         }
     ],
     "require": {
         "php": "^8.0",
-        "spatie/laravel-package-tools": "^1.4.3",
-        "illuminate/contracts": "^8.37"
+        "fakerphp/faker": "^1.14",
+        "illuminate/contracts": "^8.37",
+        "spatie/laravel-package-tools": "^1.4.3"
     },
     "require-dev": {
         "brianium/paratest": "^6.2",
@@ -30,13 +31,13 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories"
+            "Spatie\\LaravelData\\": "src",
+            "Spatie\\LaravelData\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests"
+            "Spatie\\LaravelData\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -50,11 +51,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
-            ],
-            "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\SkeletonFacade"
-            }
+                "Spatie\\LaravelData\\LaravelDataServiceProvider"
+            ]
         }
     },
     "minimum-stability": "dev",

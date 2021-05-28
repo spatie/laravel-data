@@ -1,10 +1,13 @@
 <?php
 
-namespace VendorName\Skeleton\Tests;
+namespace Spatie\LaravelData\Tests;
 
+use Faker\Factory as FakerFactory;
+use Faker\Generator;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
 use Orchestra\Testbench\TestCase as Orchestra;
-use VendorName\Skeleton\SkeletonServiceProvider;
+use Spatie\LaravelData\LaravelDataServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -12,15 +15,17 @@ class TestCase extends Orchestra
     {
         parent::setUp();
 
+        Model::unguard();
+
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Spatie\\Skeleton\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Spatie\\LaravelData\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 
     protected function getPackageProviders($app)
     {
         return [
-            SkeletonServiceProvider::class,
+            LaravelDataServiceProvider::class,
         ];
     }
 
@@ -29,8 +34,13 @@ class TestCase extends Orchestra
         config()->set('database.default', 'testing');
 
         /*
-        include_once __DIR__.'/../database/migrations/create_skeleton_table.php.stub';
+        include_once __DIR__.'/../database/migrations/create_laravel-data-resource_table.php.stub';
         (new \CreatePackageTable())->up();
         */
+    }
+
+    public function faker(): Generator
+    {
+        return FakerFactory::create();
     }
 }
