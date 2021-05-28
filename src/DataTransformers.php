@@ -7,7 +7,7 @@ use Spatie\LaravelData\Transformers\Transformer;
 
 class DataTransformers
 {
-    /** @var \Spatie\LaravelData\Transformers\Transformer[]  */
+    /** @var \Spatie\LaravelData\Transformers\Transformer[] */
     protected array $transformers = [];
 
     public function __construct(array $userTransformers)
@@ -22,8 +22,8 @@ class DataTransformers
 
     public function forValue(mixed $value): ?Transformer
     {
-        foreach ($this->transformers as $transformer){
-            if($transformer->canTransform($value)){
+        foreach ($this->transformers as $transformer) {
+            if ($transformer->canTransform($value)) {
                 return $transformer;
             }
         }

@@ -2,8 +2,6 @@
 
 namespace Spatie\LaravelData;
 
-use DateTime;
-use DateTimeImmutable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
@@ -12,9 +10,6 @@ use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionParameter;
 use ReflectionProperty;
-use Spatie\LaravelData\Transformers\DataTransformer;
-use Spatie\LaravelData\Transformers\DateTransformer;
-use Spatie\LaravelData\Transformers\LazyTransformer;
 
 /**
  * @method static array create()
@@ -87,7 +82,7 @@ abstract class Data implements Arrayable, Responsable
                 $value = $this->{$name};
 
                 if ($this->shouldIncludeProperty($name, $value, $includes)) {
-                    if($value instanceof Lazy){
+                    if ($value instanceof Lazy) {
                         $value = $value->resolve();
                     }
 
@@ -167,7 +162,7 @@ abstract class Data implements Arrayable, Responsable
 
     private function getPropertyValue(string $name, $value, array $includes): mixed
     {
-        if($value instanceof Lazy){
+        if ($value instanceof Lazy) {
             $value = $value->resolve();
         }
 

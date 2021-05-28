@@ -55,7 +55,7 @@ class DataResourceTest extends TestCase
     public function it_can_include_a_lazy_property()
     {
         $resource = new LazyResource(
-            Lazy::create(fn() => 'test')
+            Lazy::create(fn () => 'test')
         );
 
         $this->assertEquals([], $resource->toArray());

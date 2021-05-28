@@ -8,7 +8,7 @@ use Spatie\LaravelData\Lazy;
 class LazyResource extends Data
 {
     public function __construct(
-        public string|Lazy $name
+        public string | Lazy $name
     ) {
     }
 }
