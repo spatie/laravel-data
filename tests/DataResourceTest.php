@@ -4,7 +4,8 @@ namespace Spatie\LaravelData\Tests;
 
 use Illuminate\Foundation\Auth\User;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Tests\Fakes\LazyResource;
+use Spatie\LaravelData\Tests\Fakes\LazyData;
+use Spatie\LaravelData\Tests\Fakes\ParentData;
 use Spatie\LaravelData\Tests\Fakes\UserResource;
 
 class DataResourceTest extends TestCase
@@ -54,8 +55,8 @@ class DataResourceTest extends TestCase
     /** @test */
     public function it_can_include_a_lazy_property()
     {
-        $resource = new LazyResource(
-            Lazy::create(fn () => 'test')
+        $resource = new LazyData(
+            Lazy::create(fn() => 'test')
         );
 
         $this->assertEquals([], $resource->toArray());
@@ -66,9 +67,9 @@ class DataResourceTest extends TestCase
     }
 
     /** @test */
-    public function it_can_have_a_filled_in_lazy_property()
+    public function it_can_have_a_pre_filled_in_lazy_property()
     {
-        $resource = new LazyResource('test');
+        $resource = new LazyData('test');
 
         $this->assertEquals([
             'name' => 'test',
@@ -77,6 +78,49 @@ class DataResourceTest extends TestCase
         $this->assertEquals([
             'name' => 'test',
         ], $resource->include('name')->toArray());
+    }
+
+    /** @test */
+    public function it_can_include_a_nested_lazy_property()
+    {
+        $data = new ParentData(
+            Lazy::create(fn() => LazyData::create('Hello')),
+            Lazy::create(fn() => LazyData::collection([
+                'is', 'it', 'me', 'your', 'looking', 'for',
+            ])),
+        );
+
+        $this->assertEquals([], (clone $data)->toArray());
+
+        $this->assertEquals([
+            'data' => [],
+        ], (clone $data)->include('data')->toArray());
+
+        $this->assertEquals([
+            'data' => ['name' => 'Hello'],
+        ], (clone $data)->include('data.name')->toArray());
+
+        $this->assertEquals([
+            'collection' => [
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+            ],
+        ], (clone $data)->include('collection')->toArray());
+
+        $this->assertEquals([
+            'collection' => [
+                ['name' => 'is'],
+                ['name' => 'it'],
+                ['name' => 'me'],
+                ['name' => 'your'],
+                ['name' => 'looking'],
+                ['name' => 'for'],
+            ],
+        ], (clone $data)->include('collection.name')->toArray());
     }
 
     private function makeUser(): User

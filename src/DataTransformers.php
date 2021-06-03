@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData;
 
+use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 use Spatie\LaravelData\Transformers\DataTransformer;
 use Spatie\LaravelData\Transformers\Transformer;
 
@@ -40,7 +41,7 @@ class DataTransformers
     {
         return [
             DataTransformer::class,
-            DataCollection::class,
+            DataCollectionTransformer::class,
         ];
     }
 }

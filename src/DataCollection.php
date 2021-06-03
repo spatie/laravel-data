@@ -2,10 +2,11 @@
 
 namespace Spatie\LaravelData;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Collection;
 
-class DataCollection extends Collection implements Responsable
+class DataCollection implements Responsable, Arrayable
 {
     use ResponsableData;
 
@@ -13,9 +14,8 @@ class DataCollection extends Collection implements Responsable
 
     public function __construct(
         private string $dataClass,
-        Collection | array $items
+        private Collection | array $items
     ) {
-        parent::__construct($items);
     }
 
     public function include(string ...$includes): static
