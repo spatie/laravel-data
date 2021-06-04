@@ -4,51 +4,38 @@ namespace Spatie\LaravelData\Tests;
 
 use Illuminate\Foundation\Auth\User;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
+use Spatie\LaravelData\Tests\Fakes\EmptyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
+use Spatie\LaravelData\Tests\Fakes\LazyWhenData;
 use Spatie\LaravelData\Tests\Fakes\ParentData;
-use Spatie\LaravelData\Tests\Fakes\UserResource;
+use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 class DataResourceTest extends TestCase
 {
     /** @test */
     public function it_can_create_a_resource()
     {
-        $user = $this->makeUser();
-
-        $resource = UserResource::create($user);
+        $resource = SimpleData::create('Ruben');
 
         $this->assertEquals([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
+            'string' => 'Ruben',
         ], $resource->toArray());
     }
 
     /** @test */
     public function it_can_create_a_collection_of_resources()
     {
-        $collection = UserResource::collection(collect([
-            $user1 = $this->makeUser(),
-            $user2 = $this->makeUser(),
-            $user3 = $this->makeUser(),
+        $collection = SimpleData::collection(collect([
+            'Ruben',
+            'Freek',
+            'Brent',
         ]));
 
         $this->assertEquals([
-            [
-                "id" => $user1->id,
-                "name" => $user1->name,
-                "email" => $user1->email,
-            ],
-            [
-                "id" => $user2->id,
-                "name" => $user2->name,
-                "email" => $user2->email,
-            ],
-            [
-                "id" => $user3->id,
-                "name" => $user3->name,
-                "email" => $user3->email,
-            ],
+            ['string' => 'Ruben'],
+            ['string' => 'Freek'],
+            ['string' => 'Brent'],
         ], $collection->toArray());
     }
 
@@ -123,12 +110,71 @@ class DataResourceTest extends TestCase
         ], (clone $data)->include('collection.name')->toArray());
     }
 
-    private function makeUser(): User
+    /** @test */
+    public function it_can_have_conditional_lazy_data()
     {
-        return User::make([
-            'id' => $this->faker()->numberBetween(),
-            'name' => $this->faker()->name,
-            'email' => $this->faker()->email,
-        ]);
+        $data = LazyWhenData::create('Freek');
+
+        $this->assertEquals([], $data->toArray());
+
+        $data = LazyWhenData::create('Ruben');
+
+        $this->assertEquals(['name' => 'Ruben'], $data->toArray());
     }
+
+    /** @test */
+    public function it_can_have_conditional_lazy_data_manually_loaded()
+    {
+        $data = LazyWhenData::create('Freek');
+
+        $this->assertEquals(['name' => 'Freek'], $data->include('name')->toArray());
+    }
+
+    /** @test */
+    public function it_can_have_default_included_lazy_data()
+    {
+        $data = DefaultLazyData::create('Freek');
+
+        $this->assertEquals(['name' => 'Freek'], $data->toArray());
+    }
+
+    /** @test */
+    public function it_can_exclude_default_lazy_data()
+    {
+        $data = DefaultLazyData::create('Freek');
+
+        $this->assertEquals([], $data->exclude('name')->toArray());
+    }
+
+    /** @test */
+    public function it_can_get_the_empty_version_of_a_data_object()
+    {
+        $this->assertEquals([
+            'property' => null,
+            'lazyProperty' => null,
+            'array' => [],
+            'collection' => [],
+            'dataCollection' => [],
+            'data' => [
+                'string' => null
+            ],
+            'lazyData' => [
+                'string' => null
+            ],
+            'defaultProperty' => true
+        ], EmptyData::empty());
+    }
+
+    /** @test */
+    public function it_can_overwrite_properties_in_an_empty_version_of_a_data_object()
+    {
+        $this->assertEquals([
+            'string' => null
+        ], SimpleData::empty());
+
+        $this->assertEquals([
+            'string' => 'Ruben'
+        ], SimpleData::empty(['string' => 'Ruben']));
+    }
+
 }

@@ -11,9 +11,9 @@ class DataTransformer implements Transformer
         return $value instanceof Data;
     }
 
-    public function transform(mixed $value, array $includes): mixed
+    public function transform(mixed $value, array $includes, array $excludes): mixed
     {
         /** @var \Spatie\LaravelData\Data $value */
-        return $value->include(...$includes)->toArray();
+        return $value->include(...$includes)->exclude(...$excludes)->toArray();
     }
 }

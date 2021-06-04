@@ -8,9 +8,7 @@ use Illuminate\Support\Collection;
 
 class DataCollection implements Responsable, Arrayable
 {
-    use ResponsableData;
-
-    private array $includes = [];
+    use ResponsableData, IncludeableData;
 
     public function __construct(
         private string $dataClass,
@@ -18,20 +16,14 @@ class DataCollection implements Responsable, Arrayable
     ) {
     }
 
-    public function include(string ...$includes): static
-    {
-        $this->includes = array_merge($this->includes, $includes);
-
-        return $this;
-    }
-
     public function toArray(): array
     {
         return array_map(
             function ($item) {
-                $data = $this->dataClass::create($item);
-
-                return $data->include(...$this->includes)->toArray();
+                return $this->dataClass::create($item)
+                    ->include(...$this->includes)
+                    ->exclude(...$this->excludes)
+                    ->toArray();
             },
             $this->items instanceof Collection ? $this->items->all() : $this->items
         );

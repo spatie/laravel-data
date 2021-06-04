@@ -16,11 +16,9 @@ use ReflectionProperty;
  */
 abstract class Data implements Arrayable, Responsable
 {
-    use ResponsableData;
+    use ResponsableData, IncludeableData;
 
-    private array $includes = [];
-
-    public static function collection(Collection | array | LengthAwarePaginator $items): DataCollection | PaginatedDataCollection
+    public static function collection(Collection|array|LengthAwarePaginator $items): DataCollection|PaginatedDataCollection
     {
         if ($items instanceof LengthAwarePaginator) {
             return new PaginatedDataCollection(static::class, $items);
@@ -34,62 +32,37 @@ abstract class Data implements Arrayable, Responsable
         return [];
     }
 
-    public function include(string ...$includes): static
-    {
-        $this->includes = array_unique(array_merge($this->includes, $includes));
-
-        return $this;
-    }
-
     public function all(): array
     {
-        $reflection = new ReflectionClass($this);
-
-        $includes = $this->getIncludesForResource();
-        $endpoints = $this->endpoints();
-
-        $payload = [];
-
-        if (count($endpoints) > 0) {
-            $payload['endpoints'] = $endpoints;
-        }
-
-        foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            $name = $property->getName();
-            $value = $this->{$name};
-
-            if ($this->shouldIncludeProperty($name, $value, $includes)) {
-                $payload[$name] = $value;
-            }
-        }
-
-        return $payload;
+        // TODO: reimplement this obv `toArray`
     }
 
     public function toArray(): array
     {
         $reflection = new ReflectionClass($this);
 
-        $includes = $this->getIncludesForResource();
+        $includes = $this->getDirectivesForResource($this->includes);
+        $excludes = $this->getDirectivesForResource($this->excludes);
 
         /** @var \Spatie\LaravelData\DataTransformers $transformers */
         $transformers = app(DataTransformers::class);
 
         $payload = array_reduce(
             $reflection->getProperties(ReflectionProperty::IS_PUBLIC),
-            function (array $payload, ReflectionProperty $property) use ($transformers, $includes) {
+            function (array $payload, ReflectionProperty $property) use ($excludes, $transformers, $includes) {
                 $name = $property->getName();
                 $value = $this->{$name};
 
-                if ($this->shouldIncludeProperty($name, $value, $includes)) {
+                if ($this->shouldIncludeProperty($name, $value, $includes, $excludes)) {
                     if ($value instanceof Lazy) {
                         $value = $value->resolve();
                     }
 
                     $payload[$name] = $transformers->forValue($value)?->transform(
-                        $value,
-                        $includes[$name] ?? []
-                    ) ?? $value;
+                            $value,
+                            $includes[$name] ?? [],
+                            $excludes[$name] ?? [],
+                        ) ?? $value;
                 }
 
                 return $payload;
@@ -112,8 +85,8 @@ abstract class Data implements Arrayable, Responsable
 
         $defaultConstructorProperties = $reflection->hasMethod('__construct')
             ? collect($reflection->getMethod('__construct')->getParameters())
-                ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-                ->mapWithKeys(fn (ReflectionParameter $parameter) => [
+                ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+                ->mapWithKeys(fn(ReflectionParameter $parameter) => [
                     $parameter->name => $parameter->getDefaultValue(),
                 ])
                 ->toArray()
@@ -151,44 +124,46 @@ abstract class Data implements Arrayable, Responsable
         );
     }
 
-    private function shouldIncludeProperty(string $name, $value, array $includes): bool
-    {
+    private function shouldIncludeProperty(
+        string $name,
+        $value,
+        array $includes,
+        array $excludes
+    ): bool {
         if (! $value instanceof Lazy) {
+            return true;
+        }
+
+        if (array_key_exists($name, $excludes)) {
+            return false;
+        }
+
+        if ($value->shouldInclude() ) {
             return true;
         }
 
         return array_key_exists($name, $includes);
     }
 
-    private function getPropertyValue(string $name, $value, array $includes): mixed
+    private function getDirectivesForResource(array $directives): array
     {
-        if ($value instanceof Lazy) {
-            $value = $value->resolve();
-        }
+        return array_reduce($directives, function (array $directives, $directive) {
+            if (! Str::contains($directive, '.') && array_key_exists($directive, $directives) === false) {
+                $directives[$directive] = [];
 
-
-        return $value;
-    }
-
-    private function getIncludesForResource(): array
-    {
-        return array_reduce($this->includes, function (array $includes, $include) {
-            if (! Str::contains($include, '.') && array_key_exists($include, $includes) === false) {
-                $includes[$include] = [];
-
-                return $includes;
+                return $directives;
             }
 
-            $property = Str::before($include, '.');
-            $otherIncludes = Str::after($include, '.');
+            $property = Str::before($directive, '.');
+            $otherDirectives = Str::after($directive, '.');
 
-            if (array_key_exists($property, $includes)) {
-                $includes[$property][] = $otherIncludes;
+            if (array_key_exists($property, $directives)) {
+                $directives[$property][] = $otherDirectives;
             } else {
-                $includes[$property] = [$otherIncludes];
+                $directives[$property] = [$otherDirectives];
             }
 
-            return $includes;
+            return $directives;
         }, []);
     }
 }

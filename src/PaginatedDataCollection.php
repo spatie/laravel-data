@@ -9,22 +9,13 @@ use Illuminate\Support\Collection;
 
 class PaginatedDataCollection implements Arrayable, Responsable
 {
-    use ResponsableData;
-
-    private array $includes = [];
+    use ResponsableData, IncludeableData;
 
     public function __construct(
         /** @var \Spatie\LaravelData\Data */
         private string $dataClass,
         private Collection | LengthAwarePaginator $items
     ) {
-    }
-
-    public function include(string ...$includes): static
-    {
-        $this->includes = array_merge($this->includes, $includes);
-
-        return $this;
     }
 
     public function toArray()
@@ -38,11 +29,11 @@ class PaginatedDataCollection implements Arrayable, Responsable
     private function resolveData(): array
     {
         return array_map(
-            function (Model $model) {
-                /** @var \App\Support\Data\Data $data */
-                $data = $this->dataClass::create($model);
-
-                return $data->include(...$this->includes)->toArray();
+            function ($item) {
+                return $this->dataClass::create($item)
+                    ->include(...$this->includes)
+                    ->exclude(...$this->excludes)
+                    ->toArray();
             },
             $this->items->all()
         );

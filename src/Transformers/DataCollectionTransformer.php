@@ -11,9 +11,9 @@ class DataCollectionTransformer implements Transformer
         return $value instanceof DataCollection;
     }
 
-    public function transform(mixed $value, array $includes): mixed
+    public function transform(mixed $value, array $includes, array $excludes): mixed
     {
         /** @var \Spatie\LaravelData\DataCollection $value */
-        return $value->include(...$includes)->toArray();
+        return $value->include(...$includes)->exclude(...$excludes)->toArray();
     }
 }

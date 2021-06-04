@@ -51,7 +51,7 @@ class DataPropertyHelper
             return $name::empty();
         }
 
-        if (is_subclass_of($name, Collection::class)) {
+        if ($this->isCollectionProperty($name)) {
             return [];
         }
 
@@ -80,22 +80,10 @@ class DataPropertyHelper
         return null;
     }
 
-    public function isLazy(): bool
+    private function isCollectionProperty(string $name): bool
     {
-        $type = $this->property->getType();
-
-        if ($type === null || $type instanceof ReflectionNamedType) {
-            return false;
-        }
-
-        if ($type instanceof ReflectionUnionType) {
-            foreach ($type->getTypes() as $childtype) {
-                if ($childtype->getName() === Lazy::class) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return is_a($name, Collection::class, true)
+            || is_a($name, DataCollection::class, true)
+            || is_a($name, PaginatedDataCollection::class, true);
     }
 }

@@ -16,6 +16,7 @@ trait ResponsableData
     {
         if ($request->has('include')) {
             $this->include(...explode(',', $request->get('includes')));
+            $this->exclude(...explode(',', $request->get('excludes')));
         }
 
         return new JsonResponse($this->toArray());

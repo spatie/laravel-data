@@ -11,7 +11,7 @@ class DateTransformer implements Transformer
         return $value instanceof DateTimeInterface;
     }
 
-    public function transform(mixed $value, array $includes): mixed
+    public function transform(mixed $value, array $includes, array $excludes): mixed
     {
         /** @var \DateTimeInterface $value */
         return $value->format('Y-m-d H:i:s');
