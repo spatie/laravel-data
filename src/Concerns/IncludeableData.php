@@ -2,6 +2,8 @@
 
 namespace Spatie\LaravelData\Concerns;
 
+use Spatie\LaravelData\Support\PartialsParser;
+
 trait IncludeableData
 {
     protected array $includes = [];
@@ -35,5 +37,15 @@ trait IncludeableData
         $this->excludes = array_unique(array_merge($this->excludes, $excludes));
 
         return $this;
+    }
+
+    public function getInclusionTree(): array
+    {
+        return $this->inclusionTree ?? (new PartialsParser())->execute($this->includes);
+    }
+
+    public function getExclusionTree(): array
+    {
+        return $this->exclusionTree ?? (new PartialsParser())->execute($this->excludes);
     }
 }

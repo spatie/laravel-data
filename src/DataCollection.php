@@ -21,8 +21,8 @@ class DataCollection implements Responsable, Arrayable
 
     public function toArray(): array
     {
-        $includes = $this->inclusionTree ?? (new PartialsParser())->execute($this->includes);
-        $excludes = $this->exclusionTree ?? (new PartialsParser())->execute($this->excludes);
+        $includes = $this->getInclusionTree();
+        $excludes = $this->getExclusionTree();
 
         return array_map(
             function ($item) use ($excludes, $includes) {
