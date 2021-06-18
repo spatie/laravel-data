@@ -6,9 +6,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use ReflectionClass;
-use ReflectionParameter;
 use ReflectionProperty;
 
 /**
@@ -32,6 +30,19 @@ abstract class Data implements Arrayable, Responsable
         return [];
     }
 
+    public function append(): array
+    {
+        $endpoints = $this->endpoints();
+
+        if (count($endpoints) === 0) {
+            return [];
+        }
+
+        return [
+            'endpoints' => $endpoints,
+        ];
+    }
+
     public function all(): array
     {
         // TODO: reimplement this obv `toArray`
@@ -41,28 +52,31 @@ abstract class Data implements Arrayable, Responsable
     {
         $reflection = new ReflectionClass($this);
 
-        $includes = $this->getDirectivesForResource($this->includes);
-        $excludes = $this->getDirectivesForResource($this->excludes);
+        $inclusionTree = $this->inclusionTree ?? (new PartialsParser())->execute($this->includes);
+        $exclusionTree = $this->exclusionTree ?? (new PartialsParser())->execute($this->excludes);
 
         /** @var \Spatie\LaravelData\DataTransformers $transformers */
         $transformers = app(DataTransformers::class);
 
         $payload = array_reduce(
             $reflection->getProperties(ReflectionProperty::IS_PUBLIC),
-            function (array $payload, ReflectionProperty $property) use ($excludes, $transformers, $includes) {
+            function (array $payload, ReflectionProperty $property) use ($exclusionTree, $transformers, $inclusionTree) {
                 $name = $property->getName();
                 $value = $this->{$name};
 
-                if ($this->shouldIncludeProperty($name, $value, $includes, $excludes)) {
+                if ($this->shouldIncludeProperty($name, $value, $inclusionTree, $exclusionTree)) {
                     if ($value instanceof Lazy) {
                         $value = $value->resolve();
                     }
 
-                    $payload[$name] = $transformers->forValue($value)?->transform(
-                            $value,
-                            $includes[$name] ?? [],
-                            $excludes[$name] ?? [],
-                        ) ?? $value;
+                    if ($value instanceof Data || $value instanceof DataCollection || $value instanceof PaginatedDataCollection) {
+                        $payload[$name] = $value->withPartialsTrees(
+                            $inclusionTree[$name] ?? [],
+                            $exclusionTree[$name] ?? []
+                        )->toArray();
+                    } else {
+                        $payload[$name] = $transformers->forValue($value)?->transform($value) ?? $value;
+                    }
                 }
 
                 return $payload;
@@ -70,10 +84,10 @@ abstract class Data implements Arrayable, Responsable
             []
         );
 
-        $endpoints = $this->endpoints();
+        $appended = $this->append();
 
-        if (count($endpoints) > 0) {
-            $payload['endpoints'] = $endpoints;
+        if (count($appended) > 0) {
+            $payload = array_merge($payload, $appended);
         }
 
         return $payload;
@@ -83,45 +97,7 @@ abstract class Data implements Arrayable, Responsable
     {
         $reflection = new ReflectionClass(static::class);
 
-        $defaultConstructorProperties = $reflection->hasMethod('__construct')
-            ? collect($reflection->getMethod('__construct')->getParameters())
-                ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-                ->mapWithKeys(fn(ReflectionParameter $parameter) => [
-                    $parameter->name => $parameter->getDefaultValue(),
-                ])
-                ->toArray()
-            : [];
-
-        $defaults = array_merge(
-            $reflection->getDefaultProperties(),
-            $defaultConstructorProperties
-        );
-
-        return array_reduce(
-            $reflection->getProperties(ReflectionProperty::IS_PUBLIC),
-            function (array $payload, ReflectionProperty $property) use ($defaults, $extra) {
-                $name = $property->getName();
-
-                if (array_key_exists($name, $extra)) {
-                    $payload[$name] = $extra[$name];
-
-                    return $payload;
-                }
-
-                if (array_key_exists($name, $defaults)) {
-                    $payload[$name] = $defaults[$name];
-
-                    return $payload;
-                }
-
-                $propertyHelper = new DataPropertyHelper($property);
-
-                $payload[$name] = $propertyHelper->getEmptyValue();
-
-                return $payload;
-            },
-            []
-        );
+        return EmptyDataResolver::create($reflection)->get($extra);
     }
 
     private function shouldIncludeProperty(
@@ -134,36 +110,22 @@ abstract class Data implements Arrayable, Responsable
             return true;
         }
 
+        if ($excludes === ['*']) {
+            return false;
+        }
+
         if (array_key_exists($name, $excludes)) {
             return false;
         }
 
-        if ($value->shouldInclude() ) {
+        if ($includes === ['*']) {
+            return true;
+        }
+
+        if ($value->shouldInclude()) {
             return true;
         }
 
         return array_key_exists($name, $includes);
-    }
-
-    private function getDirectivesForResource(array $directives): array
-    {
-        return array_reduce($directives, function (array $directives, $directive) {
-            if (! Str::contains($directive, '.') && array_key_exists($directive, $directives) === false) {
-                $directives[$directive] = [];
-
-                return $directives;
-            }
-
-            $property = Str::before($directive, '.');
-            $otherDirectives = Str::after($directive, '.');
-
-            if (array_key_exists($property, $directives)) {
-                $directives[$property][] = $otherDirectives;
-            } else {
-                $directives[$property] = [$otherDirectives];
-            }
-
-            return $directives;
-        }, []);
     }
 }

@@ -18,11 +18,13 @@ class DataCollection implements Responsable, Arrayable
 
     public function toArray(): array
     {
+        $includes = $this->inclusionTree ?? (new PartialsParser())->execute($this->includes);
+        $excludes = $this->exclusionTree ?? (new PartialsParser())->execute($this->excludes);
+
         return array_map(
-            function ($item) {
+            function ($item) use ($excludes, $includes) {
                 return $this->dataClass::create($item)
-                    ->include(...$this->includes)
-                    ->exclude(...$this->excludes)
+                    ->withPartialsTrees($includes, $excludes)
                     ->toArray();
             },
             $this->items instanceof Collection ? $this->items->all() : $this->items

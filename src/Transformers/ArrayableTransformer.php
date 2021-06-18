@@ -11,7 +11,7 @@ class ArrayableTransformer implements Transformer
         return $value instanceof Arrayable;
     }
 
-    public function transform(mixed $value, array $includes, array $excludes): mixed
+    public function transform(mixed $value): mixed
     {
         /** @var \Illuminate\Contracts\Support\Arrayable $value */
         return $value->toArray();

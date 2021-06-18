@@ -17,7 +17,7 @@ class DataTransformers
             function (string $transformer) {
                 return app($transformer);
             },
-            array_merge($this->defaultTransformers(), $userTransformers)
+            array_merge($userTransformers)
         );
     }
 
@@ -35,13 +35,5 @@ class DataTransformers
     public function get(): array
     {
         return $this->transformers;
-    }
-
-    protected function defaultTransformers(): array
-    {
-        return [
-            DataTransformer::class,
-            DataCollectionTransformer::class,
-        ];
     }
 }

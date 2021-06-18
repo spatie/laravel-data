@@ -2,13 +2,15 @@
 
 namespace Spatie\LaravelData\Tests;
 
-use Illuminate\Foundation\Auth\User;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
+use Spatie\LaravelData\Tests\Fakes\DummyDto;
+use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\EmptyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
-use Spatie\LaravelData\Tests\Fakes\LazyWhenData;
-use Spatie\LaravelData\Tests\Fakes\ParentData;
+use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 class DataResourceTest extends TestCase
@@ -16,11 +18,15 @@ class DataResourceTest extends TestCase
     /** @test */
     public function it_can_create_a_resource()
     {
-        $resource = SimpleData::create('Ruben');
+        $data = new class('Ruben') extends Data {
+            public function __construct(public string $string)
+            {
+            }
+        };
 
         $this->assertEquals([
             'string' => 'Ruben',
-        ], $resource->toArray());
+        ], $data->toArray());
     }
 
     /** @test */
@@ -42,40 +48,59 @@ class DataResourceTest extends TestCase
     /** @test */
     public function it_can_include_a_lazy_property()
     {
-        $resource = new LazyData(
+        $data = new class(
             Lazy::create(fn() => 'test')
-        );
+        ) extends Data {
+            public function __construct(
+                public string|Lazy $name
+            ) {
+            }
+        };
 
-        $this->assertEquals([], $resource->toArray());
+        $this->assertEquals([], $data->toArray());
 
         $this->assertEquals([
             'name' => 'test',
-        ], $resource->include('name')->toArray());
+        ], $data->include('name')->toArray());
     }
 
     /** @test */
     public function it_can_have_a_pre_filled_in_lazy_property()
     {
-        $resource = new LazyData('test');
+        $data = new class(
+            'test'
+        ) extends Data {
+            public function __construct(
+                public string|Lazy $name
+            ) {
+            }
+        };
 
         $this->assertEquals([
             'name' => 'test',
-        ], $resource->toArray());
+        ], $data->toArray());
 
         $this->assertEquals([
             'name' => 'test',
-        ], $resource->include('name')->toArray());
+        ], $data->include('name')->toArray());
     }
 
     /** @test */
     public function it_can_include_a_nested_lazy_property()
     {
-        $data = new ParentData(
+        $data = new class(
             Lazy::create(fn() => LazyData::create('Hello')),
             Lazy::create(fn() => LazyData::collection([
                 'is', 'it', 'me', 'your', 'looking', 'for',
             ])),
-        );
+        ) extends Data {
+            public function __construct(
+                public Lazy|LazyData $data,
+                /** @var \Spatie\LaravelData\Tests\Fakes\LazyData[] */
+                public Lazy|DataCollection $collection
+            ) {
+            }
+        };
 
         $this->assertEquals([], (clone $data)->toArray());
 
@@ -111,13 +136,78 @@ class DataResourceTest extends TestCase
     }
 
     /** @test */
+    public function it_can_include_specific_nested_data()
+    {
+        $collection = Lazy::create(fn() => MultiLazyData::collection([
+            DummyDto::rick(),
+            DummyDto::bon(),
+        ]));
+
+        $data = new class($collection) extends Data {
+            public function __construct(
+                public Lazy|DataCollection $songs
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'songs' => [
+                ['name' => DummyDto::rick()->name],
+                ['name' => DummyDto::bon()->name],
+            ],
+        ], $data->include('songs.name')->toArray());
+
+        $this->assertEquals([
+            'songs' => [
+                [
+                    'name' => DummyDto::rick()->name,
+                    'artist' => DummyDto::rick()->artist,
+                ],
+                [
+                    'name' => DummyDto::bon()->name,
+                    'artist' => DummyDto::bon()->artist,
+                ],
+            ],
+        ], $data->include('songs.{name,artist}')->toArray());
+
+        $this->assertEquals([
+            'songs' => [
+                [
+                    'name' => DummyDto::rick()->name,
+                    'artist' => DummyDto::rick()->artist,
+                    'year' => DummyDto::rick()->year,
+                ],
+                [
+                    'name' => DummyDto::bon()->name,
+                    'artist' => DummyDto::bon()->artist,
+                    'year' => DummyDto::bon()->year,
+                ],
+            ],
+        ], $data->include('songs.*')->toArray());
+    }
+
+    /** @test */
     public function it_can_have_conditional_lazy_data()
     {
-        $data = LazyWhenData::create('Freek');
+        $blueprint = new class() extends Data {
+            public function __construct(
+                public string|Lazy|null $name = null
+            ) {
+            }
+
+            public static function create(string $name)
+            {
+                return new self(
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
+                );
+            }
+        };
+
+        $data = $blueprint::create('Freek');
 
         $this->assertEquals([], $data->toArray());
 
-        $data = LazyWhenData::create('Ruben');
+        $data = $blueprint::create('Ruben');
 
         $this->assertEquals(['name' => 'Ruben'], $data->toArray());
     }
@@ -125,15 +215,57 @@ class DataResourceTest extends TestCase
     /** @test */
     public function it_can_have_conditional_lazy_data_manually_loaded()
     {
-        $data = LazyWhenData::create('Freek');
+        $blueprint = new class() extends Data {
+            public function __construct(
+                public string|Lazy|null $name = null
+            ) {
+            }
+
+            public static function create(string $name)
+            {
+                return new self(
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
+                );
+            }
+        };
+
+        $data = $blueprint::create('Freek');
 
         $this->assertEquals(['name' => 'Freek'], $data->include('name')->toArray());
     }
 
     /** @test */
+    public function it_can_include_data_based_upon_relations_loaded()
+    {
+        /** @var \Illuminate\Database\Eloquent\Model $model */
+        $model = DummyModel::make();
+
+        $data = new class(
+            Lazy::whenLoaded('relation', $model, fn() => 'loaded')
+        ) extends Data {
+            public function __construct(
+                public string|Lazy $relation,
+            ) {
+            }
+        };
+
+        $this->assertEquals([], $data->toArray());
+
+        $model->setRelation('relation', []);
+
+        $this->assertEquals([
+            'relation' => 'loaded',
+        ], $data->toArray());
+    }
+
+    /** @test */
     public function it_can_have_default_included_lazy_data()
     {
-        $data = DefaultLazyData::create('Freek');
+        $data = new class ('Freek') extends Data {
+            public function __construct(public string|Lazy $name)
+            {
+            }
+        };
 
         $this->assertEquals(['name' => 'Freek'], $data->toArray());
     }
@@ -156,12 +288,12 @@ class DataResourceTest extends TestCase
             'collection' => [],
             'dataCollection' => [],
             'data' => [
-                'string' => null
+                'string' => null,
             ],
             'lazyData' => [
-                'string' => null
+                'string' => null,
             ],
-            'defaultProperty' => true
+            'defaultProperty' => true,
         ], EmptyData::empty());
     }
 
@@ -169,12 +301,26 @@ class DataResourceTest extends TestCase
     public function it_can_overwrite_properties_in_an_empty_version_of_a_data_object()
     {
         $this->assertEquals([
-            'string' => null
+            'string' => null,
         ], SimpleData::empty());
 
         $this->assertEquals([
-            'string' => 'Ruben'
+            'string' => 'Ruben',
         ], SimpleData::empty(['string' => 'Ruben']));
+    }
+
+    /** @test */
+    public function it_can_dynamically_include_data_based_upon_the_request()
+    {
+        $response = LazyData::create('Ruben')->toResponse(request());
+
+        $includedResponse = LazyData::create('Ruben')->toResponse(request()->merge([
+            'includes' => 'name',
+        ]));
+
+        $this->assertEquals([], $response->getData(true));
+
+        $this->assertEquals(['name' => 'Ruben'], $includedResponse->getData(true));
     }
 
 }

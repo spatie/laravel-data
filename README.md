@@ -30,19 +30,12 @@ We highly appreciate you sending us a postcard from your hometown, mentioning wh
 You can install the package via composer:
 
 ```bash
-composer require spatie/laravel-data-resource
-```
-
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --provider="Spatie\LaravelDataResource\LaravelDataResourceServiceProvider" --tag="laravel-data-resource-migrations"
-php artisan migrate
+composer require spatie/laravel-data
 ```
 
 You can publish the config file with:
 ```bash
-php artisan vendor:publish --provider="Spatie\LaravelDataResource\LaravelDataResourceServiceProvider" --tag="laravel-data-resource-config"
+php artisan vendor:publish --provider="Spatie\LaravelData\LaravelDataServiceProvider" --tag="laravel-data-config"
 ```
 
 This is the contents of the published config file:
@@ -54,98 +47,126 @@ return [
 
 ## Usage
 
-Data objects are structured entities within Sail that fullfill the role of a data transfer object and a resource.
-
-They have a few advantages:
-
-- One structure for both the resource and data
-- Can be lazy (=only send required data needed)
-- They are type safe
-- TypeScript transformer knows exactly what to do with them
-
-There are situations where the unified data objects aren't a good fit. For example when the structure of the DTO and resource differ too much or in the case where a DTO is required but a resource isn't. In such case you'd better create a seperate resource and/or dto.
-
-## Creating Data objects
-
 A data object extends from `Data` and looks like this:
 
 ```php
-class ContentThemeData extends Data
+class SongData extends Data
 {
     public function __construct(
-        public string $name
+        public string $name,
+        public string $artist,
     ) {
     }
 
-    public static function create(ContentTheme $theme): self
+    public static function create(Song $song): self
     {
         return new self(
-            $theme->name
+            $song->name,
+            $song->artist
         );
     }
 }
 
 ```
 
-In the constructor we define the properties associated with this data object. Each data object also should have a static `create` method that will create the object based upon a model. This is required for automatically creating collections of resources and logging activity.
+In the constructor we define the properties associated with this data object, only public properties will be included when converting the object to an array.
 
-## Using Data objects as dto
+Each data object also should have a static `create` method that will create the object based upon a model. This method will be called when the data object is created from a collection of models.
 
-Since the data objects are just simple PHP objects with some extra methods added to them, you can use them like regular PHP dto's:
+Now you can create the data object in multiple ways, one where you don't have a model yet:
 
 ```php
-$data = new ContentThemeResource('Hello world');
+new SongData('Rick Astley', 'Never gonna give you up');
 ```
 
-You probably going to create a dto when receiving data from a form in the frontend. There are going to be two points where this happens: when you create something and when you edit something. That's why we'll create the data object within the request:
+And one where you can use a model to create the data object:
 
 ```php
-class ContentThemeRequest extends Request
+SongData::create(Song::first());
+```
+
+If you have a collection of models then you can create a collection of data objects as such:
+
+```php
+SongData::collection(Song::all());
+```
+
+### Converting a data object to an array
+
+You can return a data object within a controller, it will automatically be converted to a JSON response:
+
+```php
+class SongsController
 {
-    public function rules(): array
-    {
-        return [
-            'name' => ['required', 'string'],
-        ];
-    }
-
-    public function getData(): ContentThemeData
-    {
-        $validated = $this->validated();
-
-        return new ContentThemeData(
-            $validated['name']
-        );
-    }
+	public function show(Song $song)
+	{
+		return SongData::create($song);
+	}
 }
 ```
 
-This has two advantages:
+This will return:
 
-- your validation rules and data objects will be created in the same class
-- you can create the same data object in different requests with slightly different properties
-
-Since PHP supports the spread operator, for simple data objects you could do the following:
-
-```php
-public function getData(): ContentThemeData
+```json
 {
-    return new ContentThemeData(...$this->validated());
+	name: 'Never gonna give you up',
+	artist: 'Rick Astley'
 }
 ```
 
-## Using Data objects as resource
-
-When creating a resource you'll probably have a model, so you can call the `create` method:
+You can also manually convert a data object to an array as such:
 
 ```php
-ContentThemeData::create($this->contentTheme);
+SongData::create(Song::first())->toArray();
 ```
 
-At the moment you're creating a new model, in this case the model is `null`, you can use the `empty` method:
+### Converting empty objects to an array
+
+When you're creating a new model, you don't have the required data to fill your data object. But sometimes you want to provide a blueprint for the data required to create a new model. For example:
+
+```json
+{
+	name: null,
+	artist: null
+}
+```
+
+You could make each property of the data object nullable like this:
 
 ```php
-ContentThemeData::empty();
+class SongData extends Data
+{
+    public function __construct(
+        public ?string $name,
+        public ?string $artist,
+    ) {
+    }
+
+	...
+}
+```
+
+This would work but we know as soon as our model is created, the properties won't be `null`.
+
+In such case you could return an empty representation of the data object:
+
+```php
+class SongsController
+{
+	public function create()
+	{
+		return SongData::empty();
+	}
+}
+```
+
+This will output the following JSON:
+
+```json
+{
+	name: null,
+	artist: null
+}
 ```
 
 This will return an array that follows the structure of the data object, it is possible to change the default values within this array by providing them in the constructor of the data object:

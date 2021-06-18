@@ -4,9 +4,24 @@ namespace Spatie\LaravelData;
 
 trait IncludeableData
 {
-    private array $includes = [];
+    protected array $includes = [];
 
-    private array $excludes = [];
+    protected array $excludes = [];
+
+    protected ?array $inclusionTree = null;
+
+    protected ?array $exclusionTree = null;
+
+    public function withPartialsTrees(
+        array $inclusionTree,
+        array $exclusionTree
+    ): static
+    {
+        $this->inclusionTree = $inclusionTree;
+        $this->exclusionTree = $exclusionTree;
+
+        return $this;
+    }
 
     public function include(string ...$includes): static
     {

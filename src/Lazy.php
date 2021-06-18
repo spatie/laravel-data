@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 
 class Lazy
 {
@@ -23,6 +24,14 @@ class Lazy
     public static function when(Closure $condition, Closure $value): self
     {
         return self::create($value)->condition($condition);
+    }
+
+    public static function whenLoaded(string $relation, Model $model, Closure $value)
+    {
+        return self::when(
+            fn() => $model->relationLoaded($relation),
+            $value
+        );
     }
 
     public function defaultIncluded(bool $defaultIncluded = true): self
