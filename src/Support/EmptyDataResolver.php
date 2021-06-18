@@ -13,7 +13,6 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\PaginatedDataCollection;
 
 class EmptyDataResolver
 {
@@ -145,7 +144,6 @@ class EmptyDataResolver
     private function isCollectionProperty(string $name): bool
     {
         return is_a($name, Collection::class, true)
-            || is_a($name, DataCollection::class, true)
-            || is_a($name, PaginatedDataCollection::class, true);
+            || is_a($name, DataCollection::class, true);
     }
 }

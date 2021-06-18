@@ -2,9 +2,10 @@
 
 namespace Spatie\LaravelData;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Collection;
 use ReflectionClass;
 use Spatie\LaravelData\Concerns\IncludeableData;
@@ -19,41 +20,9 @@ abstract class Data implements Arrayable, Responsable
 {
     use ResponsableData, IncludeableData;
 
-    public static function collection(Collection|array|LengthAwarePaginator $items): DataCollection|PaginatedDataCollection
+    public static function collection(Collection|array|AbstractPaginator|CursorPaginator $items): DataCollection
     {
-        if ($items instanceof LengthAwarePaginator) {
-            return new PaginatedDataCollection(static::class, $items);
-        }
-
         return new DataCollection(static::class, $items);
-    }
-
-    public function endpoints(): array
-    {
-        return [];
-    }
-
-    public function append(): array
-    {
-        $endpoints = $this->endpoints();
-
-        if (count($endpoints) === 0) {
-            return [];
-        }
-
-        return [
-            'endpoints' => $endpoints,
-        ];
-    }
-
-    public function all(): array
-    {
-        // TODO: reimplement this obv `toArray`
-    }
-
-    public function toArray(): array
-    {
-        return DataTransformer::create()->transform($this);
     }
 
     public static function empty(array $extra = []): array
@@ -61,5 +30,20 @@ abstract class Data implements Arrayable, Responsable
         $reflection = new ReflectionClass(static::class);
 
         return EmptyDataResolver::create($reflection)->get($extra);
+    }
+
+    public function all(): array
+    {
+        return DataTransformer::create()->withoutValueTransforming()->transform($this);
+    }
+
+    public function toArray(): array
+    {
+        return DataTransformer::create()->transform($this);
+    }
+
+    public function append(): array
+    {
+        return [];
     }
 }

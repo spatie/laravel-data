@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Http\JsonResponse;
 
-/** @mixin \Spatie\LaravelData\Data|\Spatie\LaravelData\DataCollection|\Spatie\LaravelData\PaginatedDataCollection */
+/** @mixin \Spatie\LaravelData\Data|\Spatie\LaravelData\DataCollection */
 trait ResponsableData
 {
     /**

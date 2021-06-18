@@ -7,16 +7,22 @@ use ReflectionProperty;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataTransformers;
 
-class DataTransformer implements Transformer
+class DataTransformer
 {
     private bool $withValueTransforming = true;
+
+    private DataTransformers $transformers;
 
     public static function create(): self
     {
         return new self();
+    }
+
+    public function __construct()
+    {
+        $this->transformers = app(DataTransformers::class);
     }
 
     public function withoutValueTransforming(): static
@@ -26,30 +32,16 @@ class DataTransformer implements Transformer
         return $this;
     }
 
-    public function canTransform(mixed $value): bool
+    public function transform(Data $data): array
     {
-        return $value instanceof Data;
+        return array_merge(
+            $this->resolvePayload($data),
+            $data->append()
+        );
     }
 
-    public function transform(mixed $value): mixed
+    private function resolvePayload(Data $data): array
     {
-        /** @var \Spatie\LaravelData\Data $value */
-
-        $payload = $this->resolvePayload($value, app(DataTransformers::class));
-
-        $appended = $value->append();
-
-        if (count($appended) > 0) {
-            $payload = array_merge($payload, $appended);
-        }
-
-        return $payload;
-    }
-
-    private function resolvePayload(
-        Data $data,
-        DataTransformers $transformers,
-    ): array {
         $reflection = new ReflectionClass($data);
 
         $inclusionTree = $data->getInclusionTree();
@@ -57,23 +49,15 @@ class DataTransformer implements Transformer
 
         return array_reduce(
             $reflection->getProperties(ReflectionProperty::IS_PUBLIC),
-            function (array $payload, ReflectionProperty $property) use ($data, $exclusionTree, $transformers, $inclusionTree) {
+            function (array $payload, ReflectionProperty $property) use ($data, $exclusionTree, $inclusionTree) {
                 $name = $property->getName();
-                $value = $data->{$name};
 
-                if ($this->shouldIncludeProperty($name, $value, $inclusionTree, $exclusionTree)) {
-                    if ($value instanceof Lazy) {
-                        $value = $value->resolve();
-                    }
-
-                    if ($value instanceof Data || $value instanceof DataCollection || $value instanceof PaginatedDataCollection) {
-                        $payload[$name] = $value->withPartialsTrees(
-                            $inclusionTree[$name] ?? [],
-                            $exclusionTree[$name] ?? []
-                        )->toArray();
-                    } else {
-                        $payload[$name] = $transformers->forValue($value)?->transform($value) ?? $value;
-                    }
+                if ($this->shouldIncludeProperty($name, $data->{$name}, $inclusionTree, $exclusionTree)) {
+                    $payload[$name] = $this->resolvePropertyValue(
+                        $data->{$name},
+                        $inclusionTree[$name] ?? [],
+                        $exclusionTree[$name] ?? []
+                    );
                 }
 
                 return $payload;
@@ -109,5 +93,27 @@ class DataTransformer implements Transformer
         }
 
         return array_key_exists($name, $includes);
+    }
+
+    private function resolvePropertyValue(
+        mixed $value,
+        array $nestedInclusionTree,
+        array $nestedExclusionTree,
+    ): mixed {
+        if ($value instanceof Lazy) {
+            $value = $value->resolve();
+        }
+
+        if ($value instanceof Data || $value instanceof DataCollection) {
+            $value->withPartialsTrees($nestedInclusionTree, $nestedExclusionTree);
+
+            return $this->withValueTransforming
+                ? $value->toArray()
+                : $value;
+        }
+
+        return $this->withValueTransforming
+            ? $this->transformers->transform($value)
+            : $value;
     }
 }

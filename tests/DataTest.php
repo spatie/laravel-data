@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Tests;
 
+use DateTime;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
@@ -13,7 +14,7 @@ use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
-class DataResourceTest extends TestCase
+class DataTest extends TestCase
 {
     /** @test */
     public function it_can_create_a_resource()
@@ -310,6 +311,20 @@ class DataResourceTest extends TestCase
     }
 
     /** @test */
+    public function it_will_use_transformers_to_convert_specific_types()
+    {
+        $date = new DateTime('16 may 1994');
+
+        $data = new class ($date) extends Data {
+            public function __construct(public DateTime $date)
+            {
+            }
+        };
+
+        $this->assertEquals(['date' => '1994-05-16 00:00:00'], $data->toArray());
+    }
+
+    /** @test */
     public function it_can_dynamically_include_data_based_upon_the_request()
     {
         $response = LazyData::create('Ruben')->toResponse(request());
@@ -323,4 +338,42 @@ class DataResourceTest extends TestCase
         $this->assertEquals(['name' => 'Ruben'], $includedResponse->getData(true));
     }
 
+    /** @test */
+    public function it_can_get_the_data_object_without_transforming()
+    {
+        $data = new class (
+            $dataObject = new SimpleData('Test'),
+            $dataCollection = SimpleData::collection([
+                new SimpleData('A'),
+                new SimpleData('B'),
+            ]),
+            Lazy::create(fn() => new SimpleData('Lazy')),
+            'Test',
+            $transformable = new DateTime('16 may 1994'),
+        ) extends Data {
+            public function __construct(
+                public SimpleData $data,
+                public DataCollection $dataCollection,
+                public Lazy|Data $lazy,
+                public string $string,
+                public DateTime $transformable
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'data' => $dataObject,
+            'dataCollection' => $dataCollection,
+            'string' => 'Test',
+            'transformable' => $transformable,
+        ], $data->all());
+
+        $this->assertEquals([
+            'data' => $dataObject,
+            'dataCollection' => $dataCollection,
+            'lazy' => (new SimpleData('Lazy'))->withPartialsTrees([], []),
+            'string' => 'Test',
+            'transformable' => $transformable,
+        ], $data->include('lazy')->all());
+    }
 }

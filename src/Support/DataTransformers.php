@@ -9,17 +9,22 @@ class DataTransformers
     /** @var \Spatie\LaravelData\Transformers\Transformer[] */
     protected array $transformers = [];
 
-    public function __construct(array $userTransformers)
+    public function __construct(array $transformers)
     {
         $this->transformers = array_map(
-            function (string $transformer) {
-                return app($transformer);
-            },
-            array_merge($userTransformers)
+            fn(string $transformer) => app($transformer),
+            $transformers
         );
     }
 
-    public function forValue(mixed $value): ?Transformer
+    public function transform(mixed $value): mixed
+    {
+        $transformer = $this->findTransformerForValue($value);
+
+        return $transformer?->transform($value) ?? $value;
+    }
+
+    protected function findTransformerForValue(mixed $value): ?Transformer
     {
         foreach ($this->transformers as $transformer) {
             if ($transformer->canTransform($value)) {
@@ -28,10 +33,5 @@ class DataTransformers
         }
 
         return null;
-    }
-
-    public function get(): array
-    {
-        return $this->transformers;
     }
 }
