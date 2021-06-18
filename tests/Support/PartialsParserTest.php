@@ -1,9 +1,10 @@
 <?php
 
-namespace Spatie\LaravelData\Tests;
+namespace Spatie\LaravelData\Tests\Support;
 
 use Generator;
-use Spatie\LaravelData\PartialsParser;
+use Spatie\LaravelData\Support\PartialsParser;
+use Spatie\LaravelData\Tests\TestCase;
 
 class PartialsParserTest extends TestCase
 {

@@ -8,6 +8,11 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionProperty;
+use Spatie\LaravelData\Concerns\IncludeableData;
+use Spatie\LaravelData\Concerns\ResponsableData;
+use Spatie\LaravelData\Support\DataTransformers;
+use Spatie\LaravelData\Support\EmptyDataResolver;
+use Spatie\LaravelData\Support\PartialsParser;
 
 /**
  * @method static array create()
@@ -55,7 +60,7 @@ abstract class Data implements Arrayable, Responsable
         $inclusionTree = $this->inclusionTree ?? (new PartialsParser())->execute($this->includes);
         $exclusionTree = $this->exclusionTree ?? (new PartialsParser())->execute($this->excludes);
 
-        /** @var \Spatie\LaravelData\DataTransformers $transformers */
+        /** @var \Spatie\LaravelData\Support\DataTransformers $transformers */
         $transformers = app(DataTransformers::class);
 
         $payload = array_reduce(

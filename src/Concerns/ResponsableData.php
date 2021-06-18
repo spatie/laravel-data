@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelData;
+namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Http\JsonResponse;
 

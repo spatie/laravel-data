@@ -1,9 +1,7 @@
 <?php
 
-namespace Spatie\LaravelData;
+namespace Spatie\LaravelData\Support;
 
-use Spatie\LaravelData\Transformers\DataCollectionTransformer;
-use Spatie\LaravelData\Transformers\DataTransformer;
 use Spatie\LaravelData\Transformers\Transformer;
 
 class DataTransformers

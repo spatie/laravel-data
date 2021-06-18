@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelData;
+namespace Spatie\LaravelData\Support;
 
 use Exception;
 use Illuminate\Support\Collection;
@@ -9,7 +9,11 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
+use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\PaginatedDataCollection;
 
 class EmptyDataResolver
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelData;
+namespace Spatie\LaravelData\Support;
 
 use Illuminate\Support\Str;
 

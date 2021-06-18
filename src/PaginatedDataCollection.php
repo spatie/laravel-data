@@ -6,6 +6,9 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Concerns\IncludeableData;
+use Spatie\LaravelData\Concerns\ResponsableData;
+use Spatie\LaravelData\Support\PartialsParser;
 
 class PaginatedDataCollection implements Arrayable, Responsable
 {

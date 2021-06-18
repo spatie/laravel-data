@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData;
 
+use Spatie\LaravelData\Support\DataTransformers;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 

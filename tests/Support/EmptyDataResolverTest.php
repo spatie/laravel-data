@@ -1,16 +1,17 @@
 <?php
 
-namespace Spatie\LaravelData\Tests;
+namespace Spatie\LaravelData\Tests\Support;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use ReflectionClass;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\EmptyDataResolver;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\PaginatedDataCollection;
+use Spatie\LaravelData\Support\EmptyDataResolver;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\TestCase;
 
 class EmptyDataResolverTest extends TestCase
 {
