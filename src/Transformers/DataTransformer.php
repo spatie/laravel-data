@@ -36,7 +36,7 @@ class DataTransformer
     {
         return array_merge(
             $this->resolvePayload($data),
-            $data->append()
+            $data->getAdditionalData()
         );
     }
 

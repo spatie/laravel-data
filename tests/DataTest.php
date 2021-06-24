@@ -376,4 +376,45 @@ class DataTest extends TestCase
             'transformable' => $transformable,
         ], $data->include('lazy')->all());
     }
+
+    /** @test */
+    public function it_can_append_data_via_method_overwrite()
+    {
+        $data = new class ('Freek') extends Data {
+            public function __construct(public string $name)
+            {
+            }
+
+            public function with(): array
+            {
+                return ['alt_name' => "{$this->name} from Spatie"];
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Freek',
+            'alt_name' => 'Freek from Spatie',
+        ], $data->toArray());
+    }
+
+    /** @test */
+    public function it_can_append_data_via_method_call()
+    {
+        $data = new class ('Freek') extends Data {
+            public function __construct(public string $name)
+            {
+            }
+        };
+
+        $transformed = $data->additional([
+            'company' => 'Spatie',
+            'alt_name' => fn(Data $data) => "{$data->name} from Spatie"
+        ])->toArray();
+
+        $this->assertEquals([
+            'name' => 'Freek',
+            'company' => 'Spatie',
+            'alt_name' => 'Freek from Spatie',
+        ], $transformed);
+    }
 }

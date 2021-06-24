@@ -30,7 +30,7 @@ class EmptyDataResolver
         $properties = $this->class->getProperties(ReflectionProperty::IS_PUBLIC);
         $defaults = $this->resolveDefaults($extra);
 
-        return array_reduce($properties, function (array $payload, ReflectionProperty $property) use ($defaults, $extra) {
+        return array_reduce($properties, function (array $payload, ReflectionProperty $property) use ($defaults) {
             $name = $property->getName();
 
             $payload[$name] = $defaults[$name] ?? $this->getValueForProperty($property);

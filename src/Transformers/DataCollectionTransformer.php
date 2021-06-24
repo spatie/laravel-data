@@ -32,22 +32,11 @@ class DataCollectionTransformer
     public function transform(): array
     {
         if (is_array($this->items)) {
-            $items = $this->filter
-                ? array_filter($this->items, $this->filter)
-                : $this->items;
-
-            return array_map(
-                $this->transformItemClosure(),
-                $items
-            );
+            return $this->transformCollection($this->items);
         }
 
         if ($this->items instanceof Collection) {
-            return $this->items
-                ->when($this->filter, fn(Collection $items) => $items->filter($this->filter))
-                ->map(
-                    $this->transformItemClosure()
-                )->all();
+            return $this->transformCollection($this->items->all());
         }
 
         $this->items->through(
@@ -59,18 +48,31 @@ class DataCollectionTransformer
             : $this->items->all();
     }
 
+    private function transformCollection(array $items): array
+    {
+        $items = array_map($this->transformItemClosure(), $items);
+
+        $items = $this->filter
+            ? array_values(array_filter($items, $this->filter))
+            : $items;
+
+        return $this->withValueTransforming
+            ? array_map(fn(Data $data) => $data->toArray(), $items)
+            : $items;
+    }
+
     private function transformItemClosure(): Closure
     {
         return function (mixed $item) {
-            if ($this->through) {
-                $item = ($this->through)($item);
-            }
-
             $item = $item instanceof Data
                 ? $item
                 : $this->dataClass::create($item)->withPartialsTrees($this->inclusionTree, $this->exclusionTree);
 
-            return $this->withValueTransforming ? $item->toArray() : $item;
+            if ($this->through) {
+                $item = ($this->through)($item);
+            }
+
+            return $item;
         };
     }
 }

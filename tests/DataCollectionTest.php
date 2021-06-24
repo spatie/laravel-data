@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Tests;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 class DataCollectionTest extends TestCase
@@ -33,9 +32,64 @@ class DataCollectionTest extends TestCase
 
         $collectionB = SimpleData::collection([
             'A',
-            'B'
+            'B',
         ]);
 
         $this->assertEquals($collectionB->toArray(), $collectionA->toArray());
+    }
+
+    /** @test */
+    public function a_collection_can_be_filtered()
+    {
+        $collection = SimpleData::collection(['A', 'B']);
+
+        $filtered = $collection->filter(fn(SimpleData $data) => $data->string === 'A')->toArray();
+
+        $this->assertEquals([
+            ['string' => 'A'],
+        ], $filtered);
+    }
+
+    /** @test */
+    public function a_paginated_collection_cannot_be_filtered()
+    {
+        $collection = SimpleData::collection(
+            new LengthAwarePaginator(['A', 'B'], 2, 15)
+        );
+
+        $filtered = $collection->filter(fn(SimpleData $data) => $data->string === 'A')->toArray();
+
+        $this->assertEquals([
+            ['string' => 'A'],
+            ['string' => 'B'],
+        ], $filtered['data']);
+    }
+
+    /** @test */
+    public function a_collection_can_be_transformed()
+    {
+        $collection = SimpleData::collection(['A', 'B']);
+
+        $filtered = $collection->through(fn(SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
+
+        $this->assertEquals([
+            ['string' => 'Ax'],
+            ['string' => 'Bx'],
+        ], $filtered);
+    }
+
+    /** @test */
+    public function a_paginated_collection_can_be_transformed()
+    {
+        $collection = SimpleData::collection(
+            new LengthAwarePaginator(['A', 'B'], 2, 15)
+        );
+
+        $filtered = $collection->through(fn(SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
+
+        $this->assertEquals([
+            ['string' => 'Ax'],
+            ['string' => 'Bx'],
+        ], $filtered['data']);
     }
 }
