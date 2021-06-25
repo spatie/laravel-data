@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Transformers;
 use Closure;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 
@@ -44,7 +45,7 @@ class DataCollectionTransformer
         );
 
         return $this->withValueTransforming
-            ? $this->items->toArray()
+            ? $this->wrapPaginatedArray($this->items->toArray())
             : $this->items->all();
     }
 
@@ -74,5 +75,16 @@ class DataCollectionTransformer
 
             return $item;
         };
+    }
+
+    private function wrapPaginatedArray(array $paginated): array
+    {
+        return [
+            'data' => $paginated['data'],
+            'meta' => Arr::except($paginated, [
+                'data',
+                'links',
+            ]),
+        ];
     }
 }

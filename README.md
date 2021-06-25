@@ -5,7 +5,7 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/spatie/laravel-data/Check%20&%20fix%20styling?label=code%20style)](https://github.com/spatie/laravel-data-resource/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-data.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-data-resource)
 
-This package allows you to creat data objects in Laravel that can also be used as resources:
+This package allows you to create data objects in Laravel that can also be used as resources:
 
 ```php
 class UserData extends Data
@@ -38,24 +38,35 @@ $userData = new UserData(
 );
 ```
 
-Or you can return convert the object just like a regular Laravel resource:
+And use this object through your application code:
+
+```php
+User::create([
+	'name' => $userData->name,
+	'email' => $userData->email,
+	'birth_date' => $userData->birth_date
+]);
+```
+
+Or you could transform the data object to a resource as such:
 
 ```php
 return UserData::create(Auth::user());
 ```
 
-This will be converrted to JSON:
+This will be transformed to a JSON version of the data object just like a Laravel resource:
 
 ```php
 {
-	name: 'Ruben Van Assche',
-	email: 'ruben@spatie.be',
-	birth_date: '1994-05-15T00:00:00+00:00'
+	"name": "Ruben Van Assche",
+	"email": "ruben@spatie.be",
+	"birth_date": "1994-05-15T00:00:00+00:00"
 }
 ```
 
-With this package you can lazy load values in resources, completely type your data flow between frontend and backend and automatically provide TypeScript types for your resources.
+This package allows you to make collections, nest, lazy load data objects. And it allows the automatic tranformation of data objects to TypeScript definitions.
 
+Though this package is perfect to create simple data transfer objects when communicating between backend and frontend. For more complicated case I recommend our [spatie/data-transfer-object](https://github.com/spatie/data-transfer-object) package.
 ## Support us
 
 [<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-data-resource.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-data-resource)
@@ -82,7 +93,7 @@ This is the contents of the published config file:
 ```php
 return [
     /*
-     * Transformers will take properties within your data objects and convert
+     * Transformers will take properties within your data objects and transform
      * them to types that can be JSON encoded.
      */
     'transformers' => [
@@ -115,7 +126,7 @@ class SongData extends Data
 }
 ```
 
-In the constructor we define the properties associated with this data object, only public properties will be included when converting the object to an array.
+In the constructor we define the properties associated with this data object, only public properties will be included when transforming the data object to a resource.
 
 Each data object also should have a static `create` method that will create the object based upon a model. This method will be called when the data object is created from a collection of models.
 
@@ -137,7 +148,7 @@ If you have a collection of models then you can create a collection of data obje
 SongData::collection(Song::all());
 ```
 
-### Converting a data object to an array
+### Transforming a data object
 
 You can return a data object within a controller, it will automatically be converted to a JSON response:
 
@@ -166,9 +177,16 @@ You can also manually convert a data object to an array as such:
 SongData::create(Song::first())->toArray();
 ```
 
+Or to JSON:
+
+```php
+SongData::create(Song::first())->toJson();
+```
+
+
 ### Converting empty objects to an array
 
-When you're creating a new model, you don't have the required data to fill your data object. But sometimes you want to provide a blueprint for the data required to create a new model. For example:
+When you're creating a new model, you probably want to provide a blueprint to the frontend with the required data to create a model. For example:
 
 ```json
 {
@@ -192,9 +210,9 @@ class SongData extends Data
 }
 ```
 
-This would work but we know as soon as our model is created, the properties won't be `null`.
+This would work but we know as soon as our model is created, the properties won't be `null` and this would not follow our data model. So it is considerd a bad practice. 
 
-In such case you could return an empty representation of the data object:
+That's why in shuch cases you can return an empty representation of the data object:
 
 ```php
 class SongsController
@@ -210,12 +228,12 @@ This will output the following JSON:
 
 ```json
 {
-	name: null,
-	artist: null
+	"name": null,
+	"artist": null
 }
 ```
 
-The `empty` method on a data object will return an array and for each property within your data object it tries to find a default empty value. 
+The `empty` method on a data object will return an array with default empty values for the properties in the data object. 
 
 It is possible to change the default values within this array by providing them in the constructor of the data object:
 
@@ -232,7 +250,16 @@ It is possible to change the default values within this array by providing them 
 }
  ```
 
-Or by passing defaults within the `empty` call:
+Now when we call `empty` our JSON looks like this:
+
+```json
+{
+	"name": "Name of the song here",
+	"artist": null
+}
+``` 
+
+You can also pass defaults within the `empty` call:
 
 
 ```php
@@ -249,18 +276,68 @@ You can easily create a collection of data objects as such:
 SongData::collection(Song::all());
 ```
 
-You can also provide a paginated collection:
+A collection can be returned in a controller and will automatically be transformed to JSON:
+
+```json
+[
+	{
+		"name" => "Never Gonna Give You Up",
+		"artist" => "Rick Astley"
+	},
+	{
+		"name" => "Giving Up on Love",
+		"artist" => "Rick Astley"
+	}
+	...
+]
+```
+
+A collection of data objects can also be transformed to an array:
+
+```php
+SongData::collection(Song::all())->toArray();
+```
+
+It is also possible to provide a paginated collection:
 
 ```php
 SongData::collection(Song::paginate());
 ```
 
-The data object is smart enough to create a paginated response from this with links to the next, previous, last, ... pages.
+The data object is smart enough to create a paginated response from this with links to the next, previous, last, ... pages:
+
+```json
+"data": [
+	{
+		"name" => "Never Gonna Give You Up",
+		"artist" => "Rick Astley"
+	},
+	{
+		"name" => "Giving Up on Love",
+		"artist" => "Rick Astley"
+	}
+	
+	...
+],
+"meta" : {
+    "current_page": 1
+    "first_page_url": "/?page=1"
+    "from": 1
+    "last_page": 7
+    "last_page_url": "/?page=7"
+    "next_page_url: "/?page=2"
+    "path": "/"
+    "per_page": 15
+    "prev_page_url": null
+    "to": 15
+    "total": 100
+}
+```
 
 It is possible to transform data objects in a collection:
 
 ```php
-SongData::collection(Song::all())->filter(function(SongData $song){
+SongData::collection(Song::all())->transform(function(SongData $song){
 	$song->artist = 'Abba';
 	
 	return $song;

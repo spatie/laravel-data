@@ -4,6 +4,7 @@ namespace Spatie\LaravelData;
 
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
@@ -13,7 +14,7 @@ use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 
-class DataCollection implements Responsable, Arrayable
+class DataCollection implements Responsable, Arrayable, Jsonable
 {
     use ResponsableData, IncludeableData;
 
@@ -49,6 +50,11 @@ class DataCollection implements Responsable, Arrayable
     public function toArray(): array
     {
         return $this->getTransformer()->transform();
+    }
+
+    public function toJson($options = 0)
+    {
+        return json_encode($this->toArray(), $options);
     }
 
     private function getTransformer(): DataCollectionTransformer

@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
@@ -17,7 +18,7 @@ use Spatie\LaravelData\Transformers\DataTransformer;
 /**
  * @method static array create()
  */
-abstract class Data implements Arrayable, Responsable
+abstract class Data implements Arrayable, Responsable, Jsonable
 {
     use ResponsableData, IncludeableData, AppendableData;
 
@@ -41,5 +42,10 @@ abstract class Data implements Arrayable, Responsable
     public function toArray(): array
     {
         return DataTransformer::create()->transform($this);
+    }
+
+    public function toJson($options = 0)
+    {
+        return json_encode($this->toArray(), $options);
     }
 }
