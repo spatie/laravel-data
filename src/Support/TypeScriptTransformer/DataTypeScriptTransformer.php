@@ -52,7 +52,7 @@ class DataTypeScriptTransformer extends DtoTransformer
                 $transformed = $this->typeToTypeScript(
                     $type,
                     $missingSymbols,
-                    $property->getDeclaringClass()?->getName()
+                    $property->getDeclaringClass()->getName()
                 );
 
                 return $this->isPropertyLazy($property)
@@ -63,7 +63,7 @@ class DataTypeScriptTransformer extends DtoTransformer
         );
     }
 
-    private function isPropertyLazy(ReflectionProperty $property)
+    private function isPropertyLazy(ReflectionProperty $property): bool
     {
         $type = $property->getType();
 

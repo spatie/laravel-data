@@ -22,7 +22,7 @@ class RemoveLazyTypeProcessor implements TypeProcessor
         }
 
         /** @var \Illuminate\Support\Collection $otherTypes */
-        [$lazyTypes, $otherTypes] = collect(iterator_to_array($type->getIterator()))
+        [, $otherTypes] = collect(iterator_to_array($type->getIterator()))
             ->partition(fn (Type $type) => $type instanceof Object_ && is_a((string) $type->getFqsen(), Lazy::class, true));
 
         if ($otherTypes->isEmpty()) {
