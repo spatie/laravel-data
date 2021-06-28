@@ -32,9 +32,9 @@ class PartialsParser
                 continue;
             }
 
-            if(array_key_exists($propertyDefinition, $payload) && $nested !== $propertyDefinition){
+            if (array_key_exists($propertyDefinition, $payload) && $nested !== $propertyDefinition) {
                 $payload[$propertyDefinition][] = $nested;
-            }else{
+            } else {
                 $payload[$propertyDefinition] = $nested === $propertyDefinition
                     ? []
                     : [$nested];

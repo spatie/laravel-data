@@ -78,15 +78,15 @@ class EmptyDataResolverTest extends TestCase
     public function it_will_return_the_base_type_for_lazy_types()
     {
         $this->assertEmptyPropertyValue(null, new class() {
-            public Lazy|string $property;
+            public Lazy | string $property;
         });
 
         $this->assertEmptyPropertyValue([], new class() {
-            public Lazy|array $property;
+            public Lazy | array $property;
         });
 
         $this->assertEmptyPropertyValue(['string' => null], new class() {
-            public Lazy|SimpleData $property;
+            public Lazy | SimpleData $property;
         });
     }
 
@@ -94,15 +94,15 @@ class EmptyDataResolverTest extends TestCase
     public function it_will_return_the_base_type_for_lazy_types_that_can_be_null()
     {
         $this->assertEmptyPropertyValue(null, new class() {
-            public Lazy|string|null $property;
+            public Lazy | string | null $property;
         });
 
         $this->assertEmptyPropertyValue([], new class() {
-            public Lazy|array|null $property;
+            public Lazy | array | null $property;
         });
 
         $this->assertEmptyPropertyValue(['string' => null], new class() {
-            public Lazy|SimpleData|null $property;
+            public Lazy | SimpleData | null $property;
         });
     }
 
@@ -112,7 +112,7 @@ class EmptyDataResolverTest extends TestCase
         $this->expectException(DataPropertyCanOnlyHaveOneType::class);
 
         $this->assertEmptyPropertyValue(null, new class() {
-            public int|string $property;
+            public int | string $property;
         });
     }
 
@@ -122,7 +122,7 @@ class EmptyDataResolverTest extends TestCase
         $this->expectException(DataPropertyCanOnlyHaveOneType::class);
 
         $this->assertEmptyPropertyValue(null, new class() {
-            public int|string|Lazy $property;
+            public int | string | Lazy $property;
         });
     }
 
@@ -132,7 +132,7 @@ class EmptyDataResolverTest extends TestCase
         $this->expectException(DataPropertyCanOnlyHaveOneType::class);
 
         $this->assertEmptyPropertyValue(null, new class() {
-            public int|string|Lazy|null $property;
+            public int | string | Lazy | null $property;
         });
     }
 

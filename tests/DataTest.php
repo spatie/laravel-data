@@ -49,11 +49,9 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_include_a_lazy_property()
     {
-        $data = new class(
-            Lazy::create(fn() => 'test')
-        ) extends Data {
+        $data = new class(Lazy::create(fn () => 'test')) extends Data {
             public function __construct(
-                public string|Lazy $name
+                public string | Lazy $name
             ) {
             }
         };
@@ -68,11 +66,9 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_have_a_pre_filled_in_lazy_property()
     {
-        $data = new class(
-            'test'
-        ) extends Data {
+        $data = new class('test') extends Data {
             public function __construct(
-                public string|Lazy $name
+                public string | Lazy $name
             ) {
             }
         };
@@ -89,16 +85,11 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_include_a_nested_lazy_property()
     {
-        $data = new class(
-            Lazy::create(fn() => LazyData::create('Hello')),
-            Lazy::create(fn() => LazyData::collection([
-                'is', 'it', 'me', 'your', 'looking', 'for',
-            ])),
-        ) extends Data {
+        $data = new class(Lazy::create(fn () => LazyData::create('Hello')), Lazy::create(fn () => LazyData::collection([ 'is', 'it', 'me', 'your', 'looking', 'for', ])),) extends Data {
             public function __construct(
-                public Lazy|LazyData $data,
+                public Lazy | LazyData $data,
                 /** @var \Spatie\LaravelData\Tests\Fakes\LazyData[] */
-                public Lazy|DataCollection $collection
+                public Lazy | DataCollection $collection
             ) {
             }
         };
@@ -139,14 +130,14 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_include_specific_nested_data()
     {
-        $collection = Lazy::create(fn() => MultiLazyData::collection([
+        $collection = Lazy::create(fn () => MultiLazyData::collection([
             DummyDto::rick(),
             DummyDto::bon(),
         ]));
 
         $data = new class($collection) extends Data {
             public function __construct(
-                public Lazy|DataCollection $songs
+                public Lazy | DataCollection $songs
             ) {
             }
         };
@@ -192,14 +183,14 @@ class DataTest extends TestCase
     {
         $blueprint = new class() extends Data {
             public function __construct(
-                public string|Lazy|null $name = null
+                public string | Lazy | null $name = null
             ) {
             }
 
             public static function create(string $name)
             {
                 return new self(
-                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
+                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
                 );
             }
         };
@@ -218,14 +209,14 @@ class DataTest extends TestCase
     {
         $blueprint = new class() extends Data {
             public function __construct(
-                public string|Lazy|null $name = null
+                public string | Lazy | null $name = null
             ) {
             }
 
             public static function create(string $name)
             {
                 return new self(
-                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
+                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
                 );
             }
         };
@@ -241,11 +232,9 @@ class DataTest extends TestCase
         /** @var \Illuminate\Database\Eloquent\Model $model */
         $model = DummyModel::make();
 
-        $data = new class(
-            Lazy::whenLoaded('relation', $model, fn() => 'loaded')
-        ) extends Data {
+        $data = new class(Lazy::whenLoaded('relation', $model, fn () => 'loaded')) extends Data {
             public function __construct(
-                public string|Lazy $relation,
+                public string | Lazy $relation,
             ) {
             }
         };
@@ -262,8 +251,8 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_have_default_included_lazy_data()
     {
-        $data = new class ('Freek') extends Data {
-            public function __construct(public string|Lazy $name)
+        $data = new class('Freek') extends Data {
+            public function __construct(public string | Lazy $name)
             {
             }
         };
@@ -315,7 +304,7 @@ class DataTest extends TestCase
     {
         $date = new DateTime('16 may 1994');
 
-        $data = new class ($date) extends Data {
+        $data = new class($date) extends Data {
             public function __construct(public DateTime $date)
             {
             }
@@ -341,20 +330,11 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class (
-            $dataObject = new SimpleData('Test'),
-            $dataCollection = SimpleData::collection([
-                new SimpleData('A'),
-                new SimpleData('B'),
-            ]),
-            Lazy::create(fn() => new SimpleData('Lazy')),
-            'Test',
-            $transformable = new DateTime('16 may 1994'),
-        ) extends Data {
+        $data = new class($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([ new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'),) extends Data {
             public function __construct(
                 public SimpleData $data,
                 public DataCollection $dataCollection,
-                public Lazy|Data $lazy,
+                public Lazy | Data $lazy,
                 public string $string,
                 public DateTime $transformable
             ) {
@@ -380,7 +360,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_append_data_via_method_overwrite()
     {
-        $data = new class ('Freek') extends Data {
+        $data = new class('Freek') extends Data {
             public function __construct(public string $name)
             {
             }
@@ -400,7 +380,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_append_data_via_method_call()
     {
-        $data = new class ('Freek') extends Data {
+        $data = new class('Freek') extends Data {
             public function __construct(public string $name)
             {
             }
@@ -408,7 +388,7 @@ class DataTest extends TestCase
 
         $transformed = $data->additional([
             'company' => 'Spatie',
-            'alt_name' => fn(Data $data) => "{$data->name} from Spatie"
+            'alt_name' => fn (Data $data) => "{$data->name} from Spatie",
         ])->toArray();
 
         $this->assertEquals([

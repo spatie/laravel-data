@@ -181,7 +181,7 @@ class PartialsParserTest extends TestCase
                 'posts.tags.*',
                 'identities.auth0.{name,email}',
                 'books.title',
-                'books.*'
+                'books.*',
             ],
             'expected' => [
                 'name' => [],
@@ -196,7 +196,7 @@ class PartialsParserTest extends TestCase
                         'email' => [],
                     ],
                 ],
-                'books' => ['*']
+                'books' => ['*'],
             ],
         ];
     }

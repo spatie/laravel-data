@@ -45,8 +45,8 @@ class EmptyDataResolver
 
         if ($this->class->hasMethod('__construct')) {
             $defaultConstructorProperties = collect($this->class->getMethod('__construct')->getParameters())
-                ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-                ->mapWithKeys(fn(ReflectionParameter $parameter) => [
+                ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+                ->mapWithKeys(fn (ReflectionParameter $parameter) => [
                     $parameter->name => $parameter->getDefaultValue(),
                 ])
                 ->toArray();
@@ -125,7 +125,7 @@ class EmptyDataResolver
         array $types,
         bool $allowsNull,
     ): void {
-        $types = array_map(fn(ReflectionNamedType $type) => $type->getName(), $types);
+        $types = array_map(fn (ReflectionNamedType $type) => $type->getName(), $types);
         $count = count($types);
 
         if (! in_array(Lazy::class, $types)) {

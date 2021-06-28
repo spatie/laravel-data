@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 
 class DataCollectionTransformer
@@ -17,7 +16,7 @@ class DataCollectionTransformer
         protected string $dataClass,
         protected array $inclusionTree,
         protected array $exclusionTree,
-        protected array|AbstractPaginator|AbstractCursorPaginator $items,
+        protected array | AbstractPaginator | AbstractCursorPaginator $items,
         protected ?Closure $through,
         protected ?Closure $filter,
     ) {
@@ -54,7 +53,7 @@ class DataCollectionTransformer
             : $items;
 
         return $this->withValueTransforming
-            ? array_map(fn(Data $data) => $data->toArray(), $items)
+            ? array_map(fn (Data $data) => $data->toArray(), $items)
             : $items;
     }
 

@@ -17,8 +17,7 @@ trait IncludeableData
     public function withPartialsTrees(
         array $inclusionTree,
         array $exclusionTree
-    ): static
-    {
+    ): static {
         $this->inclusionTree = $inclusionTree;
         $this->exclusionTree = $exclusionTree;
 

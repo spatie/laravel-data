@@ -21,17 +21,18 @@ use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 
 class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggregate, Countable, ArrayAccess
 {
-    use ResponsableData, IncludeableData;
+    use ResponsableData;
+    use IncludeableData;
 
     private ?Closure $through = null;
 
     private ?Closure $filter = null;
 
-    private array|AbstractPaginator|CursorPaginator $items;
+    private array | AbstractPaginator | CursorPaginator $items;
 
     public function __construct(
         private string $dataClass,
-        Collection|array|AbstractPaginator|CursorPaginator $items
+        Collection | array | AbstractPaginator | CursorPaginator $items
     ) {
         $this->items = $items instanceof Collection ? $items->all() : $items;
     }
@@ -50,7 +51,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         return $this;
     }
 
-    public function items(): Collection|array|AbstractPaginator|CursorPaginator
+    public function items(): Collection | array | AbstractPaginator | CursorPaginator
     {
         return $this->items;
     }

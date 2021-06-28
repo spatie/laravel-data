@@ -17,9 +17,9 @@ class MultiLazyData extends Data
     public static function create(DummyDto $model)
     {
         return new self(
-            Lazy::create(fn() => $model->artist),
-            Lazy::create(fn() => $model->name),
-            Lazy::create(fn() => $model->year),
+            Lazy::create(fn () => $model->artist),
+            Lazy::create(fn () => $model->name),
+            Lazy::create(fn () => $model->year),
         );
     }
 }

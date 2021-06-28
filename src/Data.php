@@ -8,7 +8,6 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Collection;
-use IteratorAggregate;
 use ReflectionClass;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
@@ -21,9 +20,11 @@ use Spatie\LaravelData\Transformers\DataTransformer;
  */
 abstract class Data implements Arrayable, Responsable, Jsonable
 {
-    use ResponsableData, IncludeableData, AppendableData;
+    use ResponsableData;
+    use IncludeableData;
+    use AppendableData;
 
-    public static function collection(Collection|array|AbstractPaginator|CursorPaginator $items): DataCollection
+    public static function collection(Collection | array | AbstractPaginator | CursorPaginator $items): DataCollection
     {
         return new DataCollection(static::class, $items);
     }

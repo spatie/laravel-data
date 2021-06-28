@@ -15,7 +15,7 @@ class LazyData extends Data
     public static function create(string $name)
     {
         return new self(
-            Lazy::create(fn() => $name)
+            Lazy::create(fn () => $name)
         );
     }
 }

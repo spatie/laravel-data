@@ -19,7 +19,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
     {
         $this->app->singleton(
             DataTransformers::class,
-            fn() => new DataTransformers(config('data.transformers'))
+            fn () => new DataTransformers(config('data.transformers'))
         );
     }
 }

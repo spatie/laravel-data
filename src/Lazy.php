@@ -29,7 +29,7 @@ class Lazy
     public static function whenLoaded(string $relation, Model $model, Closure $value)
     {
         return self::when(
-            fn() => $model->relationLoaded($relation),
+            fn () => $model->relationLoaded($relation),
             $value
         );
     }

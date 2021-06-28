@@ -12,7 +12,7 @@ class DataTransformers
     public function __construct(array $transformers)
     {
         $this->transformers = array_map(
-            fn(string $transformer) => app($transformer),
+            fn (string $transformer) => app($transformer),
             $transformers
         );
     }
