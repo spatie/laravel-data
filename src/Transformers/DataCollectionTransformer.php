@@ -17,7 +17,7 @@ class DataCollectionTransformer
         protected string $dataClass,
         protected array $inclusionTree,
         protected array $exclusionTree,
-        protected Collection|array|AbstractPaginator|AbstractCursorPaginator $items,
+        protected array|AbstractPaginator|AbstractCursorPaginator $items,
         protected ?Closure $through,
         protected ?Closure $filter,
     ) {
@@ -34,10 +34,6 @@ class DataCollectionTransformer
     {
         if (is_array($this->items)) {
             return $this->transformCollection($this->items);
-        }
-
-        if ($this->items instanceof Collection) {
-            return $this->transformCollection($this->items->all());
         }
 
         $this->items->through(

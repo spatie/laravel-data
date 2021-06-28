@@ -183,7 +183,6 @@ Or to JSON:
 SongData::create(Song::first())->toJson();
 ```
 
-
 ### Converting empty objects to an array
 
 When you're creating a new model, you probably want to provide a blueprint to the frontend with the required data to create a model. For example:
@@ -334,7 +333,7 @@ The data object is smart enough to create a paginated response from this with li
 }
 ```
 
-It is possible to transform data objects in a collection:
+It is possible to change data objects in a collection:
 
 ```php
 SongData::collection(Song::all())->transform(function(SongData $song){
@@ -452,7 +451,7 @@ We get the following JSON:
 
 ```json
 {
-	name: 'Together Forever'
+	"name": "Together Forever"
 }
 ```
 
@@ -505,7 +504,7 @@ Or you could combine these includes:
 AlbumData::create(Album::first())->include('songs.{name, artist}');
 ```
 
-If you want to include all the properties of a resource you can do the following:
+If you want to include all the properties of a data object you can do the following:
 
 ```php
 AlbumData::create(Album::first())->include('songs.*');
@@ -538,7 +537,6 @@ We can include properties of the data object just like we would with collections
 return UserData::create(Auth::user())->include('favorite_song.name');
 ```
 
-
 #### Conditional Lazy properties
 
 Sometimes you only want to include a property when a certain condition is true. This can be done with conditional lazy properties:
@@ -567,11 +565,41 @@ It is possible to mark a lazy property as default included:
 Lazy::create(fn() => SongData::collection($album->songs))->defaultIncluded();
 ```
 
-The property will now always be included when the data object is transformed, it is possible to exclude default included properties as such:
+The property will now always be included when the data object is transformed. You can explititly exlude properties that were default incuded as such:
 
 ```php
 AlbumData::create(Album::first())->exclude('songs')
 ```
+
+#### Include by query string
+
+It is possible to include or exclude lazy properties by the url query string:
+
+For example when we create a route `my-account`:
+
+```php
+// in web.php
+
+Route::get('my-account', fn() => UserData::create(User::first()));
+```
+
+Our JSON would look like this when we request `https://spatie.be/my-account`:
+
+```json
+{
+	"name": "Ruben Van Assche"
+}
+```
+
+We can include `favorite_song` by adding it to the query in the url as such:
+
+```
+https://spatie.be/my-account?includes=favorite_song
+```
+
+It is also possible to define excludes with the `excludes` key in the url query.
+
+Including and excluding lazy properties works for data objects and data collections.
 
 ### Appending properties
 
@@ -649,7 +677,7 @@ Now each converted data object contains an `endpoints` key with all the endpoint
 
 ### Transformers
 
-Each property of a data object should be converted into something that is usefull to communicate over json. For example a `Carbon` object, should it be converted to `16-05-1994` or `16-05-1994T00:00:00+00`?
+Each property of a data object should be converted into a type that is usefull to communicate via json. For example a `Carbon` object, should it be converted to `16-05-1994` or `16-05-1994T00:00:00+00`?
 
 With this package you're free to decide how this transformation is done by using  transformers. A transformer is a simple class that implements the `Transformer` interface:
 
@@ -675,7 +703,7 @@ You can add these transformers within the `data.php` config file. By default the
 
 ### Transforming without loss of types
 
-Sometimes you want to transform data object to an array without losing the types(transforming the types applicable for JSON). In such case you can do:
+You can get an array representation of the data object without running transformers and keeping nested data objects and collections as they are as such:
 
 ```php
 UserData::create(User::first())->all();
@@ -683,7 +711,7 @@ UserData::create(User::first())->all();
 
 In this case the `favorite_song` within the `UserData` will still be a `SongData` object instead of an array with the transformed song data object.
 
-You can do the same on collections:
+It is possible to do the same on data collections:
 
 ```php
 SongData::collection(Song::all())->toArray(); // Array of ['name' => '...', 'artist' => '...']
@@ -717,7 +745,7 @@ class DataObject extends Data{
 }
 ```
 
-Looks like this in TypeScript:
+Would be convertyed to the following TypeScript Type:
 
 ```tsx
 {
