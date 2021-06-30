@@ -1,3 +1,5 @@
+**Work in progress, do not use this unless you know what you're doing!**
+
 # This is my package LaravelDataResource
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-data.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-data-resource)
