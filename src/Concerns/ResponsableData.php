@@ -15,11 +15,11 @@ trait ResponsableData
     public function toResponse($request)
     {
         if ($request->has('includes')) {
-            $this->include(...explode(',', $request->get('includes')));
+            $this->include(...explode(',', $request->get('include')));
         }
 
         if ($request->has('excludes')) {
-            $this->exclude(...explode(',', $request->get('excludes')));
+            $this->exclude(...explode(',', $request->get('exclude')));
         }
 
         return new JsonResponse($this->toArray());

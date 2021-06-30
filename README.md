@@ -594,10 +594,10 @@ Our JSON would look like this when we request `https://spatie.be/my-account`:
 We can include `favorite_song` by adding it to the query in the url as such:
 
 ```
-https://spatie.be/my-account?includes=favorite_song
+https://spatie.be/my-account?include=favorite_song
 ```
 
-It is also possible to define excludes with the `excludes` key in the url query.
+It is also possible to define excludes with the `exclude` key in the url query.
 
 Including and excluding lazy properties works for data objects and data collections.
 
