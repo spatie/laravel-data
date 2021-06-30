@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Tests;
 
 use DateTime;
+use Illuminate\Support\Facades\Route;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
@@ -396,5 +397,18 @@ class DataTest extends TestCase
             'company' => 'Spatie',
             'alt_name' => 'Freek from Spatie',
         ], $transformed);
+    }
+
+    /** @test */
+    public function it_can_validate()
+    {
+        $this->withoutExceptionHandling();
+
+        Route::get('/example-route', function (SimpleData $data) {
+            dd($data);
+        });
+
+        $this->get('/example-route')
+            ->assertStatus(123);
     }
 }
