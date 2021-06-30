@@ -319,7 +319,7 @@ class DataTest extends TestCase
         $response = LazyData::create('Ruben')->toResponse(request());
 
         $includedResponse = LazyData::create('Ruben')->toResponse(request()->merge([
-            'includes' => 'name',
+            'include' => 'name',
         ]));
 
         $this->assertEquals([], $response->getData(true));

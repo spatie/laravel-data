@@ -183,7 +183,7 @@ class DataCollectionTest extends TestCase
         $response = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request());
 
         $includedResponse = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
-            'includes' => 'name',
+            'include' => 'name',
         ]));
 
         $this->assertEquals([

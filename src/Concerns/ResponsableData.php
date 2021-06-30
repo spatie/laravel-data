@@ -14,11 +14,11 @@ trait ResponsableData
      */
     public function toResponse($request)
     {
-        if ($request->has('includes')) {
+        if ($request->has('include')) {
             $this->include(...explode(',', $request->get('include')));
         }
 
-        if ($request->has('excludes')) {
+        if ($request->has('exclude')) {
             $this->exclude(...explode(',', $request->get('exclude')));
         }
 
