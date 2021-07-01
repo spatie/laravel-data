@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
@@ -24,7 +25,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable
     use IncludeableData;
     use AppendableData;
 
-    public static function collection(Collection | array | AbstractPaginator | CursorPaginator $items): DataCollection
+    public static function collection(Collection | array | AbstractPaginator | CursorPaginator | LengthAwarePaginator $items): DataCollection
     {
         return new DataCollection(static::class, $items);
     }
