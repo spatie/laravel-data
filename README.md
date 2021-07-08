@@ -58,7 +58,7 @@ return UserData::create(Auth::user());
 
 This will be transformed to a JSON version of the data object just like a Laravel resource:
 
-```php
+```json
 {
     "name": "Ruben Van Assche",
     "email": "ruben@spatie.be",
@@ -168,8 +168,8 @@ This will return:
 
 ```json
 {
-    name: 'Never gonna give you up',
-    artist: 'Rick Astley'
+    "name": "Never gonna give you up",
+    "artist": "Rick Astley"
 }
 ```
 
@@ -191,8 +191,8 @@ When you're creating a new model, you probably want to provide a blueprint to th
 
 ```json
 {
-    name: null,
-    artist: null
+    "name": null,
+    "artist": null
 }
 ```
 
@@ -207,7 +207,7 @@ class SongData extends Data
     ) {
     }
 
-    ...
+    // ...
 }
 ```
 
@@ -243,11 +243,11 @@ It is possible to change the default values within this array by providing them 
 {
     public function __construct(
         public string $name = 'Name of the song here',
-        public string $artist,
+        public string $artist = "An artist",
     ) {
     }
     
-    ...
+    // ...
 }
  ```
 
@@ -256,12 +256,11 @@ Now when we call `empty` our JSON looks like this:
 ```json
 {
     "name": "Name of the song here",
-    "artist": null
+    "artist": "An artist"
 }
 ``` 
 
 You can also pass defaults within the `empty` call:
-
 
 ```php
 SongData::empty([
@@ -282,13 +281,14 @@ A collection can be returned in a controller and will automatically be transform
 ```json
 [
     {
-        "name" => "Never Gonna Give You Up",
-        "artist" => "Rick Astley"
+        "name": "Never Gonna Give You Up",
+        "artist": "Rick Astley"
     },
     {
-        "name" => "Giving Up on Love",
-        "artist" => "Rick Astley"
-    }
+        "name": "Giving Up on Love",
+        "artist": "Rick Astley"
+    },
+    
     ...
 ]
 ```
@@ -308,30 +308,32 @@ SongData::collection(Song::paginate());
 The data object is smart enough to create a paginated response from this with links to the next, previous, last, ... pages:
 
 ```json
-"data": [
-    {
-        "name" => "Never Gonna Give You Up",
-        "artist" => "Rick Astley"
-    },
-    {
-        "name" => "Giving Up on Love",
-        "artist" => "Rick Astley"
+{
+    "data" : [
+        {
+            "name" : "Never Gonna Give You Up",
+            "artist" : "Rick Astley"
+        },
+        {
+            "name" : "Giving Up on Love",
+            "artist" : "Rick Astley"
+        },
+
+        ...
+    ],
+    "meta" : {
+        "current_page": 1,
+        "first_page_url": "https://spatie.be/?page=1",
+        "from": 1,
+        "last_page": 7,
+        "last_page_url": "https://spatie.be/?page=7",
+        "next_page_url": "https://spatie.be/?page=2",
+        "path": "https://spatie.be/",
+        "per_page": 15,
+        "prev_page_url": null,
+        "to": 15,
+        "total": 100
     }
-    
-    ...
-],
-"meta" : {
-    "current_page": 1
-    "first_page_url": "/?page=1"
-    "from": 1
-    "last_page": 7
-    "last_page_url": "/?page=7"
-    "next_page_url: "/?page=2"
-    "path": "/"
-    "per_page": 15
-    "prev_page_url": null
-    "to": 15
-    "total": 100
 }
 ```
 
@@ -570,7 +572,7 @@ Lazy::create(fn() => SongData::collection($album->songs))->defaultIncluded();
 The property will now always be included when the data object is transformed. You can explititly exlude properties that were default incuded as such:
 
 ```php
-AlbumData::create(Album::first())->exclude('songs')
+AlbumData::create(Album::first())->exclude('songs');
 ```
 
 #### Include by query string
@@ -610,35 +612,34 @@ It is possible to add some extra properties to your data objects when they are t
 ```php
 SongData::create(Song::first())->additional([
     'year' => 1987,
-])
+]);
 ```
 
 This will output the following JSON:
 
 ```json
 {
-    name: 'Never gonna give you up',
-    artist: 'Rick Astley',
-    year: 1987
+    "name": "Never gonna give you up",
+    "artist": "Rick Astley",
+    "year": 1987
 }
 ```
 
 When using a closure, you have access to the underlying data object:
 
-
 ```php
 SongData::create(Song::first())->additional([
     'slug' => fn(SongData $songData) => Str::slug($songData->name),
-])
+]);
 ```
 
 Which produces the following:
 
 ```json
 {
-    name: 'Never gonna give you up',
-    artist: 'Rick Astley',
-    slug: 'never-gonna-give-you-up'
+    "name": "Never gonna give you up",
+    "artist": "Rick Astley",
+    "slug": "never-gonna-give-you-up"
 }
 ```
 
@@ -649,8 +650,8 @@ class SongData extends Data
 {
     public function __construct(
         public int $id,
-        public string $name
-        public string $artist,
+        public string $name,
+        public string $artist
     ) {
     }
 
@@ -670,7 +671,7 @@ class SongData extends Data
                 'edit' => action([SongsController::class, 'edit'], $this->id),
                 'delete' => action([SongsController::class, 'delete'], $this->id),
             ]
-        ]
+        ];
     }
 }
 ```
@@ -747,7 +748,7 @@ class DataObject extends Data{
 }
 ```
 
-Would be convertyed to the following TypeScript Type:
+Would be converted to the following TypeScript Type:
 
 ```tsx
 {
