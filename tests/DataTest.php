@@ -398,17 +398,4 @@ class DataTest extends TestCase
             'alt_name' => 'Freek from Spatie',
         ], $transformed);
     }
-
-    /** @test */
-    public function it_can_validate()
-    {
-        $this->withoutExceptionHandling();
-
-        Route::get('/example-route', function (SimpleData $data) {
-            dd($data);
-        });
-
-        $this->get('/example-route')
-            ->assertStatus(123);
-    }
 }

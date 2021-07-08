@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 use ReflectionClass;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
+use Spatie\LaravelData\Concerns\RequestableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Support\EmptyDataResolver;
 use Spatie\LaravelData\Transformers\DataTransformer;
@@ -20,11 +21,12 @@ use Spatie\LaravelData\Transformers\DataTransformer;
 /**
  * @method static array create()
  */
-abstract class Data implements Arrayable, Responsable, Jsonable
+abstract class Data implements Arrayable, Responsable, Jsonable, RequestData
 {
     use ResponsableData;
     use IncludeableData;
     use AppendableData;
+    use RequestableData;
 
     public static function collection(Collection | array | AbstractPaginator | CursorPaginator | LengthAwarePaginator $items): DataCollection
     {
