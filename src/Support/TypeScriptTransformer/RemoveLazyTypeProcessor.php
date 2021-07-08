@@ -15,8 +15,11 @@ use Spatie\TypeScriptTransformer\TypeProcessors\TypeProcessor;
 
 class RemoveLazyTypeProcessor implements TypeProcessor
 {
-    public function process(Type $type, ReflectionParameter | ReflectionMethod | ReflectionProperty $reflection, MissingSymbolsCollection $missingSymbolsCollection): ?Type
-    {
+    public function process(
+        Type $type,
+        ReflectionParameter | ReflectionMethod | ReflectionProperty $reflection,
+        MissingSymbolsCollection $missingSymbolsCollection
+    ): ?Type {
         if (! $type instanceof Compound) {
             return $type;
         }
