@@ -65,6 +65,7 @@ The controller will transform this to a JSON version of the data object just lik
     "birth_date": "1994-05-15T00:00:00+00:00"
 }
 ```
+
 With this package, you can easily construct data objects, nest them, add them to collections, send specific lazy loaded versions as an API resource, and transform the data object's structure as a TypeScript definition and even more.
 
 Though this package is perfect to create simple data transfer objects when communicating between backend and frontend. For more complicated cases we recommend our [spatie/data-transfer-object](https://github.com/spatie/data-transfer-object) package.
@@ -735,20 +736,19 @@ You can add these transformers within the `data.php` config file. By default, th
 
 ### Transforming without loss of types
 
-You can get an array representation of the data object without running transformers and keeping nested data objects and collections as they are as such:
+If you call `toArray` on a `Data` object each nested object will be converted to an array as well.
 
 ```php
-UserData::create(User::first())->all();
+$allSongs = Song::all();
+
+SongData::collection($allSongs)->toArray(); // Array of ['name' => '...', 'artist' => '...']
 ```
 
-In this case, the `favorite_song` within the `UserData` will still be a `SongData` object instead of an array with the transformed song data object.
+If you want to keep all the types, use `all`.
 
-It is possible to do the same on data collections:
 
 ```php
-SongData::collection(Song::all())->toArray(); // Array of ['name' => '...', 'artist' => '...']
-
-SongData::collection(Song::all())->all(); // Array of SongData
+SongData::collection($allSongs)->all(); // Array with SongData objects
 ```
 
 ### Getting a TypeScript version of your data object
