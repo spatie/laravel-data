@@ -47,7 +47,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable
         return DataTransformer::create()->transform($this);
     }
 
-    public function toJson($options = 0)
+    public function toJson($options = 0): string
     {
         return json_encode($this->toArray(), $options);
     }

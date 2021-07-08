@@ -30,7 +30,7 @@ class Lazy
     {
         return self::when(
             fn () => $model->relationLoaded($relation),
-            $value
+            $value,
         );
     }
 
