@@ -44,8 +44,12 @@ class EmptyDataResolver
         $defaultConstructorProperties = [];
 
         if ($this->class->hasMethod('__construct')) {
-            $defaultConstructorProperties = collect($this->class->getMethod('__construct')->getParameters())
-                ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+            $defaultConstructorProperties = collect($this->class->getMethod('__construct')
+                ->getParameters())
+                ->filter(function (ReflectionParameter $parameter) {
+                        return $parameter->isPromoted() && $parameter->isDefaultValueAvailable();
+                    }
+                )
                 ->mapWithKeys(fn (ReflectionParameter $parameter) => [
                     $parameter->name => $parameter->getDefaultValue(),
                 ])
