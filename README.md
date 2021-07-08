@@ -1,4 +1,4 @@
-# Laravel Data
+# Typed resources for Laravel
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-data.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-data-resource)
 [![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/spatie/laravel-data/run-tests?label=tests)](https://github.com/spatie/laravel-data-resource/actions?query=workflow%3Arun-tests+branch%3Amain)
