@@ -22,9 +22,9 @@ class UserData extends Data
     public static function create(User $user): static
     {
         return new self(
-        	$user->name,
-        	$user->email,
-        	$user->birth_date
+            $user->name,
+            $user->email,
+            $user->birth_date
         );
     }
 }
@@ -34,9 +34,9 @@ You can now use this object as a data transfer object as such:
 
 ```php
 $userData = new UserData(
-	$request->input('name'),
-	$request->input('email'),
-	Carbon::make($request->input('birth_date')),
+    $request->input('name'),
+    $request->input('email'),
+    Carbon::make($request->input('birth_date')),
 );
 ```
 
@@ -44,9 +44,9 @@ And use this object through your application code:
 
 ```php
 User::create([
-	'name' => $userData->name,
-	'email' => $userData->email,
-	'birth_date' => $userData->birth_date
+    'name' => $userData->name,
+    'email' => $userData->email,
+    'birth_date' => $userData->birth_date
 ]);
 ```
 
@@ -60,9 +60,9 @@ This will be transformed to a JSON version of the data object just like a Larave
 
 ```php
 {
-	"name": "Ruben Van Assche",
-	"email": "ruben@spatie.be",
-	"birth_date": "1994-05-15T00:00:00+00:00"
+    "name": "Ruben Van Assche",
+    "email": "ruben@spatie.be",
+    "birth_date": "1994-05-15T00:00:00+00:00"
 }
 ```
 
@@ -157,10 +157,10 @@ You can return a data object within a controller, it will automatically be conve
 ```php
 class SongsController
 {
-	public function show(Song $song)
-	{
-		return SongData::create($song);
-	}
+    public function show(Song $song)
+    {
+        return SongData::create($song);
+    }
 }
 ```
 
@@ -168,8 +168,8 @@ This will return:
 
 ```json
 {
-	name: 'Never gonna give you up',
-	artist: 'Rick Astley'
+    name: 'Never gonna give you up',
+    artist: 'Rick Astley'
 }
 ```
 
@@ -191,8 +191,8 @@ When you're creating a new model, you probably want to provide a blueprint to th
 
 ```json
 {
-	name: null,
-	artist: null
+    name: null,
+    artist: null
 }
 ```
 
@@ -207,21 +207,21 @@ class SongData extends Data
     ) {
     }
 
-	...
+    ...
 }
 ```
 
-This would work but we know as soon as our model is created, the properties won't be `null` and this would not follow our data model. So it is considerd a bad practice. 
+This would work but we know as soon as our model is created, the properties won't be `null` and this would not follow our data model. So it is considerd a bad practice.
 
 That's why in shuch cases you can return an empty representation of the data object:
 
 ```php
 class SongsController
 {
-	public function create()
-	{
-		return SongData::empty();
-	}
+    public function create()
+    {
+        return SongData::empty();
+    }
 }
 ```
 
@@ -229,12 +229,12 @@ This will output the following JSON:
 
 ```json
 {
-	"name": null,
-	"artist": null
+    "name": null,
+    "artist": null
 }
 ```
 
-The `empty` method on a data object will return an array with default empty values for the properties in the data object. 
+The `empty` method on a data object will return an array with default empty values for the properties in the data object.
 
 It is possible to change the default values within this array by providing them in the constructor of the data object:
 
@@ -255,8 +255,8 @@ Now when we call `empty` our JSON looks like this:
 
 ```json
 {
-	"name": "Name of the song here",
-	"artist": null
+    "name": "Name of the song here",
+    "artist": null
 }
 ``` 
 
@@ -265,7 +265,7 @@ You can also pass defaults within the `empty` call:
 
 ```php
 SongData::empty([
-	'name' => 'Name of the song here',
+    'name' => 'Name of the song here',
 ]);
 ```
 
@@ -281,15 +281,15 @@ A collection can be returned in a controller and will automatically be transform
 
 ```json
 [
-	{
-		"name" => "Never Gonna Give You Up",
-		"artist" => "Rick Astley"
-	},
-	{
-		"name" => "Giving Up on Love",
-		"artist" => "Rick Astley"
-	}
-	...
+    {
+        "name" => "Never Gonna Give You Up",
+        "artist" => "Rick Astley"
+    },
+    {
+        "name" => "Giving Up on Love",
+        "artist" => "Rick Astley"
+    }
+    ...
 ]
 ```
 
@@ -309,16 +309,16 @@ The data object is smart enough to create a paginated response from this with li
 
 ```json
 "data": [
-	{
-		"name" => "Never Gonna Give You Up",
-		"artist" => "Rick Astley"
-	},
-	{
-		"name" => "Giving Up on Love",
-		"artist" => "Rick Astley"
-	}
-	
-	...
+    {
+        "name" => "Never Gonna Give You Up",
+        "artist" => "Rick Astley"
+    },
+    {
+        "name" => "Giving Up on Love",
+        "artist" => "Rick Astley"
+    }
+    
+    ...
 ],
 "meta" : {
     "current_page": 1
@@ -339,9 +339,9 @@ It is possible to change data objects in a collection:
 
 ```php
 SongData::collection(Song::all())->transform(function(SongData $song){
-	$song->artist = 'Abba';
-	
-	return $song;
+    $song->artist = 'Abba';
+    
+    return $song;
 });
 ```
 
@@ -349,7 +349,7 @@ You can also filter non-paginated collections:
 
 ```php
 SongData::collection(Song::all())->filter(
-	fn(SongData $song) => $song->artist === 'Rick Astley'
+    fn(SongData $song) => $song->artist === 'Rick Astley'
 );
 ```
 
@@ -431,7 +431,7 @@ class AlbumData extends Data
     ) {
     }
     
-	public static function create(Album $album): self
+    public static function create(Album $album): self
     {
         return new self(
             $album->name,
@@ -453,7 +453,7 @@ We get the following JSON:
 
 ```json
 {
-	"name": "Together Forever"
+    "name": "Together Forever"
 }
 ```
 
@@ -589,7 +589,7 @@ Our JSON would look like this when we request `https://spatie.be/my-account`:
 
 ```json
 {
-	"name": "Ruben Van Assche"
+    "name": "Ruben Van Assche"
 }
 ```
 
@@ -609,7 +609,7 @@ It is possible to add some extra properties to your data objects when they are t
 
 ```php
 SongData::create(Song::first())->additional([
-	'year' => 1987,
+    'year' => 1987,
 ])
 ```
 
@@ -617,9 +617,9 @@ This will output the following JSON:
 
 ```json
 {
-	name: 'Never gonna give you up',
-	artist: 'Rick Astley',
-	year: 1987
+    name: 'Never gonna give you up',
+    artist: 'Rick Astley',
+    year: 1987
 }
 ```
 
@@ -628,7 +628,7 @@ When using a closure, you have access to the underlying data object:
 
 ```php
 SongData::create(Song::first())->additional([
-	'slug' => fn(SongData $songData) => Str::slug($songData->name),
+    'slug' => fn(SongData $songData) => Str::slug($songData->name),
 ])
 ```
 
@@ -636,9 +636,9 @@ Which produces the following:
 
 ```json
 {
-	name: 'Never gonna give you up',
-	artist: 'Rick Astley',
-	slug: 'never-gonna-give-you-up'
+    name: 'Never gonna give you up',
+    artist: 'Rick Astley',
+    slug: 'never-gonna-give-you-up'
 }
 ```
 
@@ -664,13 +664,13 @@ class SongData extends Data
     }
     
     public function with(){
-    	return [
-    		'endpoints' => [
-    			'show' => action([SongsController::class, 'show'], $this->id),
-    			'edit' => action([SongsController::class, 'edit'], $this->id),
-    			'delete' => action([SongsController::class, 'delete'], $this->id),
-    		]
-    	]
+        return [
+            'endpoints' => [
+                'show' => action([SongsController::class, 'show'], $this->id),
+                'edit' => action([SongsController::class, 'edit'], $this->id),
+                'delete' => action([SongsController::class, 'delete'], $this->id),
+            ]
+        ]
     }
 }
 ```
@@ -751,15 +751,15 @@ Would be convertyed to the following TypeScript Type:
 
 ```tsx
 {
-	nullable: number | null;
-	int: number;
-	bool: boolean;
-	string: string;
-	float: number;
-	array: Array<string>;
-	lazy?: string;
-	simpleData: SimpleData;
-	dataCollection: Array<SimpleData>;
+    nullable: number | null;
+    int: number;
+    bool: boolean;
+    string: string;
+    float: number;
+    array: Array<string>;
+    lazy?: string;
+    simpleData: SimpleData;
+    dataCollection: Array<SimpleData>;
 }
 ```
 
@@ -791,3 +791,4 @@ Please review [our security policy](../../security/policy) on how to report secu
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+
