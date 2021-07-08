@@ -48,8 +48,8 @@ class EmptyDataResolver
                 ->getParameters())
                 ->filter(
                     function (ReflectionParameter $parameter) {
-                    return $parameter->isPromoted() && $parameter->isDefaultValueAvailable();
-                }
+                        return $parameter->isPromoted() && $parameter->isDefaultValueAvailable();
+                    }
                 )
                 ->mapWithKeys(fn (ReflectionParameter $parameter) => [
                     $parameter->name => $parameter->getDefaultValue(),
