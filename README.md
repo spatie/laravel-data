@@ -186,13 +186,14 @@ The JSON then will look like this:
 }
 ```
 
-You can also manually transform a data object to JSON as such:
+You can manually transform a data object to JSON:
 
 ```php
 SongData::create(Song::first())->toJson();
 ```
 
-Or to an array:
+You can also manually transform a data object to an array:
+
 
 ```php
 SongData::create(Song::first())->toArray();
@@ -255,7 +256,7 @@ It is possible to change the default values within this array by providing them 
  class SongData extends Data
 {
     public function __construct(
-        public string $title = 'Name of the song here',
+        public string $title = 'Title of the song here',
         public string $artist = "An artist",
     ) {
     }
@@ -268,7 +269,7 @@ Now when we call `empty`, our JSON looks like this:
 
 ```json
 {
-    "name": "Name of the song here",
+    "name": "Title of the song here",
     "artist": "An artist"
 }
 ``` 
@@ -277,14 +278,14 @@ You can also pass defaults within the `empty` call:
 
 ```php
 SongData::empty([
-    'name' => 'Name of the song here',
+    'name' => 'Title of the song here',
     'artist' => 'An artist'
 ]);
 ```
 
 ### Collections
 
-You can easily create a collection of data objects as such:
+Here's how to create a collection of data objects:
 
 ```php
 SongData::collection(Song::all());
@@ -329,7 +330,7 @@ The data object is smart enough to create a paginated response from this with li
         {
             "name" : "Giving Up on Love",
             "artist" : "Rick Astley"
-        },
+        }
     ],
     "meta" : {
         "current_page": 1,
@@ -350,24 +351,26 @@ The data object is smart enough to create a paginated response from this with li
 It is possible to change data objects in a collection:
 
 ```php
-SongData::collection(Song::all())->transform(function(SongData $song){
+$allSongs = Song::all());
+
+SongData::collection($allSongs)->transform(function(SongData $song){
     $song->artist = 'Abba';
     
     return $song;
 });
 ```
 
-You can also filter non-paginated collections:
+You can  filter non-paginated collections:
 
 ```php
-SongData::collection(Song::all())->filter(
+SongData::collection($allSongs)->filter(
     fn(SongData $song) => $song->artist === 'Rick Astley'
 );
 ```
 
 ### Nesting
 
-It is possible to nest data objects as such:
+It is possible to nest data objects.
 
 ```php
 class UserData extends Data
@@ -481,7 +484,7 @@ We get the following JSON:
 }
 ```
 
-As you can see the `songs` property is missing in the JSON output, it can explicitly be included as such:
+As you can see the `songs` property is missing in the JSON output. Here's how you can include it.
 
 ```php
 AlbumData::create(Album::first())->include('songs');
@@ -790,7 +793,7 @@ Would be transformed to the following TypeScript type:
 }
 ```
 
-To enable this, add the `DataTypeScriptTransformer` transformer to the transformers in the `typescript-transformer.php` config file. And annotate the data objects you want to be transformed or add the `DataTypeScriptCollector` to the collectors in `typescript-transformer.php` so they will all be transformed.
+To enable this, add the `Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer` transformer to the transformers in the `typescript-transformer.php` config file.  Annotate the data objects you want to be transformed or add the `DataTypeScriptCollector` to the collectors in `typescript-transformer.php` so they will all be transformed.
 
 ## Testing
 
