@@ -24,7 +24,7 @@ class DataCollectionTest extends TestCase
             15
         );
 
-        $this->assertMatchesSnapshot(SimpleData::collection($paginator)->toArray());
+        $this->assertMatchesJsonSnapshot(SimpleData::collection($paginator)->toArray());
     }
 
     /** @test */
