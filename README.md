@@ -450,6 +450,10 @@ class AlbumData extends Data
 This will always output a collection of songs, which can become quite large. With lazy properties, we can include properties when we want to:
 
 ```php
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Lazy;
+
 class AlbumData extends Data
 {
     public function __construct(
@@ -498,6 +502,8 @@ Properties will only be included when the `include` method is called on the data
 It is also possible to nest these includes. For example, let's update the `SongData` class and make all of its properties lazy:
 
 ```php
+use Spatie\LaravelData\Lazy;
+
 class SongData extends Data
 {
     public function __construct(
