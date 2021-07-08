@@ -23,7 +23,13 @@ class RemoveLazyTypeProcessor implements TypeProcessor
 
         /** @var \Illuminate\Support\Collection $otherTypes */
         [, $otherTypes] = collect(iterator_to_array($type->getIterator()))
-            ->partition(fn (Type $type) => $type instanceof Object_ && is_a((string) $type->getFqsen(), Lazy::class, true));
+            ->partition(function (Type $type) {
+                if (! $type instanceof Object_) {
+                    return false;
+                }
+
+                return is_a((string)$type->getFqsen(), Lazy::class, true);
+            });
 
         if ($otherTypes->isEmpty()) {
             throw new Exception("Type {$reflection->getDeclaringClass()->name}:{$reflection->getName()} cannot be only Lazy");

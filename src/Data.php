@@ -39,7 +39,9 @@ abstract class Data implements Arrayable, Responsable, Jsonable
 
     public function all(): array
     {
-        return DataTransformer::create()->withoutValueTransforming()->transform($this);
+        return DataTransformer::create()
+            ->withoutValueTransforming()
+            ->transform($this);
     }
 
     public function toArray(): array
