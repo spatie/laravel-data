@@ -40,7 +40,7 @@ class DataTransformer
         );
     }
 
-    private function resolvePayload(Data $data): array
+    protected function resolvePayload(Data $data): array
     {
         $reflection = new ReflectionClass($data);
 
@@ -66,7 +66,7 @@ class DataTransformer
         );
     }
 
-    private function shouldIncludeProperty(
+    protected function shouldIncludeProperty(
         string $name,
         mixed $value,
         array $includes,
@@ -95,7 +95,7 @@ class DataTransformer
         return array_key_exists($name, $includes);
     }
 
-    private function resolvePropertyValue(
+    protected function resolvePropertyValue(
         mixed $value,
         array $nestedInclusionTree,
         array $nestedExclusionTree,

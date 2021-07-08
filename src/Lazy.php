@@ -11,7 +11,7 @@ class Lazy
 
     private ?bool $defaultIncluded = null;
 
-    private function __construct(
+    protected function __construct(
         private Closure $value
     ) {
     }

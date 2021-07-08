@@ -122,7 +122,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         throw new Exception('Unsetting in paginated collection is prohibited');
     }
 
-    private function getTransformer(): DataCollectionTransformer
+    protected function getTransformer(): DataCollectionTransformer
     {
         return new DataCollectionTransformer(
             $this->dataClass,

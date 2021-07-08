@@ -39,7 +39,7 @@ class EmptyDataResolver
         }, []);
     }
 
-    private function resolveDefaults(array $extra): array
+    protected function resolveDefaults(array $extra): array
     {
         $defaultConstructorProperties = [];
 
@@ -63,7 +63,7 @@ class EmptyDataResolver
         );
     }
 
-    private function getValueForProperty(ReflectionProperty $property): mixed
+    protected function getValueForProperty(ReflectionProperty $property): mixed
     {
         $type = $property->getType();
 
@@ -82,7 +82,7 @@ class EmptyDataResolver
         throw new Exception("Unknown reflection type");
     }
 
-    private function getValueForNamedType(
+    protected function getValueForNamedType(
         ReflectionNamedType $type,
     ): mixed {
         $name = $type->getName();
@@ -107,7 +107,7 @@ class EmptyDataResolver
         return null;
     }
 
-    private function getValueForUnionType(
+    protected function getValueForUnionType(
         ReflectionProperty $property,
         ReflectionUnionType $type
     ): mixed {
@@ -124,7 +124,7 @@ class EmptyDataResolver
         return null;
     }
 
-    private function ensureUnionTypeIsValid(
+    protected function ensureUnionTypeIsValid(
         ReflectionProperty $property,
         array $types,
         bool $allowsNull,
@@ -145,7 +145,7 @@ class EmptyDataResolver
         }
     }
 
-    private function isCollectionProperty(string $name): bool
+    protected function isCollectionProperty(string $name): bool
     {
         return is_a($name, Collection::class, true)
             || is_a($name, DataCollection::class, true);

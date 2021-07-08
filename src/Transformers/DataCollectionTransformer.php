@@ -44,7 +44,7 @@ class DataCollectionTransformer
             : $this->items->all();
     }
 
-    private function transformCollection(array $items): array
+    protected function transformCollection(array $items): array
     {
         $items = array_map($this->transformItemClosure(), $items);
 
@@ -57,7 +57,7 @@ class DataCollectionTransformer
             : $items;
     }
 
-    private function transformItemClosure(): Closure
+    protected function transformItemClosure(): Closure
     {
         return function (mixed $item) {
             $item = $item instanceof Data
@@ -72,7 +72,7 @@ class DataCollectionTransformer
         };
     }
 
-    private function wrapPaginatedArray(array $paginated): array
+    protected function wrapPaginatedArray(array $paginated): array
     {
         return [
             'data' => $paginated['data'],

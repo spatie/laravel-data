@@ -63,7 +63,7 @@ class DataTypeScriptTransformer extends DtoTransformer
         );
     }
 
-    private function isPropertyLazy(ReflectionProperty $property): bool
+    protected function isPropertyLazy(ReflectionProperty $property): bool
     {
         $type = $property->getType();
 
