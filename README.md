@@ -495,7 +495,7 @@ AlbumData::create(Album::first())->include('songs');
 
 Properties will only be included when the `include` method is called on the data object with the property's name.
 
-It is also possible to nest these includes. For example, let's update the `SongData` class as such:
+It is also possible to nest these includes. For example, let's update the `SongData` class and make all of its properties lazy:
 
 ```php
 class SongData extends Data
