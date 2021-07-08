@@ -24,9 +24,9 @@ class RemoveLazyTypeProcessor implements TypeProcessor
             return $type;
         }
 
-        /** @var \Illuminate\Support\Collection $otherTypes */
-        [, $otherTypes] = collect(iterator_to_array($type->getIterator()))
-            ->partition(function (Type $type) {
+        /** @var \Illuminate\Support\Collection $types */
+        $types = collect(iterator_to_array($type->getIterator()))
+            ->reject(function (Type $type) {
                 if (! $type instanceof Object_) {
                     return false;
                 }
@@ -34,14 +34,14 @@ class RemoveLazyTypeProcessor implements TypeProcessor
                 return is_a((string)$type->getFqsen(), Lazy::class, true);
             });
 
-        if ($otherTypes->isEmpty()) {
+        if ($types->isEmpty()) {
             throw new Exception("Type {$reflection->getDeclaringClass()->name}:{$reflection->getName()} cannot be only Lazy");
         }
 
-        if ($otherTypes->count() === 1) {
-            return $otherTypes->first();
+        if ($types->count() === 1) {
+            return $types->first();
         }
 
-        return new Compound($otherTypes->all());
+        return new Compound($types->all());
     }
 }
