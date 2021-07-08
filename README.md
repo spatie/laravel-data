@@ -1,6 +1,4 @@
-**Work in progress, do not use this unless you know what you're doing!**
-
-# This is my package LaravelDataResource
+# Laravel Data
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-data.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-data-resource)
 [![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/spatie/laravel-data/run-tests?label=tests)](https://github.com/spatie/laravel-data-resource/actions?query=workflow%3Arun-tests+branch%3Amain)
@@ -56,9 +54,9 @@ Or you could transform the data object to a resource as such:
 return UserData::create(Auth::user());
 ```
 
-This will be transformed to a JSON version of the data object just like a Laravel resource:
+The controller will transform this to a JSON version of the data object just like a Laravel resource:
 
-```json
+```JSON
 {
     "name": "Ruben Van Assche",
     "email": "ruben@spatie.be",
@@ -66,9 +64,10 @@ This will be transformed to a JSON version of the data object just like a Larave
 }
 ```
 
-This package allows you to make collections, nest, lazy load data objects. And it allows the automatic tranformation of data objects to TypeScript definitions.
+This package allows you to make collections, nest, lazyload data objects. And it allows the automatic transformation of data objects to TypeScript definitions.
 
-Though this package is perfect to create simple data transfer objects when communicating between backend and frontend. For more complicated case I recommend our [spatie/data-transfer-object](https://github.com/spatie/data-transfer-object) package.
+Though this package is perfect to create simple data transfer objects when communicating between backend and frontend. For more complicated cases we recommend our [spatie/data-transfer-object](https://github.com/spatie/data-transfer-object) package.
+
 ## Support us
 
 [<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-data-resource.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-data-resource)
@@ -128,14 +127,14 @@ class SongData extends Data
 }
 ```
 
-In the constructor we define the properties associated with this data object, only public properties will be included when transforming the data object to a resource.
+In the constructor, we define the properties associated with this data object. Only public properties will be included when transforming the data object into a resource.
 
-Each data object also should have a static `create` method that will create the object based upon a model. This method will be called when the data object is created from a collection of models.
+Each data object also should have a static `create` method that will create the object from a model. This method will be called when the data object is created from a collection of models.
 
 Now you can create the data object in multiple ways, one where you don't have a model yet:
 
 ```php
-new SongData('Rick Astley', 'Never gonna give you up');
+new SongData('Rick Astley', 'Never gonna give you up);
 ```
 
 And one where you can use a model to create the data object:
@@ -144,7 +143,7 @@ And one where you can use a model to create the data object:
 SongData::create(Song::first());
 ```
 
-If you have a collection of models then you can create a collection of data objects as such:
+If you have a collection of models, then you can create a collection of data objects as such:
 
 ```php
 SongData::collection(Song::all());
@@ -152,7 +151,7 @@ SongData::collection(Song::all());
 
 ### Transforming a data object
 
-You can return a data object within a controller, it will automatically be converted to a JSON response:
+You can return a data object within a controller. It will automatically be converted to a JSON response:
 
 ```php
 class SongsController
@@ -166,7 +165,7 @@ class SongsController
 
 This will return:
 
-```json
+```JSON
 {
     "name": "Never gonna give you up",
     "artist": "Rick Astley"
@@ -187,9 +186,9 @@ SongData::create(Song::first())->toJson();
 
 ### Converting empty objects to an array
 
-When you're creating a new model, you probably want to provide a blueprint to the frontend with the required data to create a model. For example:
+When creating a new model, you probably want to provide a blueprint to the frontend with the required data to create a model. For example:
 
-```json
+```JSON
 {
     "name": null,
     "artist": null
@@ -211,9 +210,9 @@ class SongData extends Data
 }
 ```
 
-This would work but we know as soon as our model is created, the properties won't be `null` and this would not follow our data model. So it is considerd a bad practice.
+This approach would work, but as soon as the model is created, the properties won't be `null`, which doesn't follow our data model. So it is considered a bad practice.
 
-That's why in shuch cases you can return an empty representation of the data object:
+That's why in such cases, you can return an empty representation of the data object:
 
 ```php
 class SongsController
@@ -225,9 +224,9 @@ class SongsController
 }
 ```
 
-This will output the following JSON:
+Which will output the following JSON:
 
-```json
+```JSON
 {
     "name": null,
     "artist": null
@@ -251,7 +250,7 @@ It is possible to change the default values within this array by providing them 
 }
  ```
 
-Now when we call `empty` our JSON looks like this:
+Now when we call `empty`, our JSON looks like this:
 
 ```json
 {
@@ -278,7 +277,7 @@ SongData::collection(Song::all());
 
 A collection can be returned in a controller and will automatically be transformed to JSON:
 
-```json
+```JSON
 [
     {
         "name": "Never Gonna Give You Up",
@@ -307,7 +306,7 @@ SongData::collection(Song::paginate());
 
 The data object is smart enough to create a paginated response from this with links to the next, previous, last, ... pages:
 
-```json
+```JSON
 {
     "data" : [
         {
@@ -420,7 +419,7 @@ class AlbumData extends Data
 }
 ```
 
-This will always output a collection of songs, which can become quite large. With lazy properties we can include properties when we want to:
+This will always output a collection of songs, which can become quite large. With lazy properties, we can include properties when we want to:
 
 
 ```php
@@ -453,7 +452,7 @@ AlbumData::create(Album::first())->toArray();
 
 We get the following JSON:
 
-```json
+```JSON
 {
     "name": "Together Forever"
 }
@@ -473,7 +472,7 @@ Lazy properties can be included in different ways:
 Lazy::create(fn() => SongData::collection($album->songs));
 ```
 
-Will only be included when the `include` method is called on the data object with the name of the property.
+Properties will only be included when the `include` method is called on the data object with the property's name.
 
 It is also possible to nest these includes. For example, let's update the `SongData` class as such:
 
@@ -514,7 +513,7 @@ If you want to include all the properties of a data object you can do the follow
 AlbumData::create(Album::first())->include('songs.*');
 ```
 
-Explicitly including properties of resources also works on a single resource, for example our `UserData` looks like this:
+Explicitly including properties of resources also works on a single resource. For example, our `UserData` looks like this:
 
 ```php
 class UserData extends Data
@@ -559,7 +558,7 @@ You can also only include a lazy property when a certain relation is loaded on t
 Lazy::whenLoaded('songs', fn() => SongData::collection($album->songs));
 ```
 
-Now the property will only be included when the songs relation is loaded on the model.
+Now the property will only be included when the song's relation is loaded on the model.
 
 #### Default included lazy properties
 
@@ -569,7 +568,7 @@ It is possible to mark a lazy property as default included:
 Lazy::create(fn() => SongData::collection($album->songs))->defaultIncluded();
 ```
 
-The property will now always be included when the data object is transformed. You can explititly exlude properties that were default incuded as such:
+The property will now always be included when the data object is transformed. You can explicitly exclude properties that were default included as such:
 
 ```php
 AlbumData::create(Album::first())->exclude('songs');
@@ -577,9 +576,9 @@ AlbumData::create(Album::first())->exclude('songs');
 
 #### Include by query string
 
-It is possible to include or exclude lazy properties by the url query string:
+It is possible to include or exclude lazy properties by the URL query string:
 
-For example when we create a route `my-account`:
+For example, when we create a route `my-account:
 
 ```php
 // in web.php
@@ -589,19 +588,19 @@ Route::get('my-account', fn() => UserData::create(User::first()));
 
 Our JSON would look like this when we request `https://spatie.be/my-account`:
 
-```json
+```JSON
 {
     "name": "Ruben Van Assche"
 }
 ```
 
-We can include `favorite_song` by adding it to the query in the url as such:
+We can include `favorite_song` by adding it to the query in the URL as such:
 
 ```
 https://spatie.be/my-account?include=favorite_song
 ```
 
-It is also possible to define excludes with the `exclude` key in the url query.
+It is also possible to define excludes with the `exclude` key in the URL query.
 
 Including and excluding lazy properties works for data objects and data collections.
 
@@ -617,7 +616,7 @@ SongData::create(Song::first())->additional([
 
 This will output the following JSON:
 
-```json
+```JSON
 {
     "name": "Never gonna give you up",
     "artist": "Rick Astley",
@@ -635,7 +634,7 @@ SongData::create(Song::first())->additional([
 
 Which produces the following:
 
-```json
+```JSON
 {
     "name": "Never gonna give you up",
     "artist": "Rick Astley",
@@ -676,13 +675,13 @@ class SongData extends Data
 }
 ```
 
-Now each converted data object contains an `endpoints` key with all the endpoints for that data object.
+Each converted data object contains an `endpoints` key with all the endpoints for that data object.
 
 ### Transformers
 
-Each property of a data object should be converted into a type that is usefull to communicate via json. For example a `Carbon` object, should it be converted to `16-05-1994` or `16-05-1994T00:00:00+00`?
+Each property of a data object should be transformed into a useful type to communicate via JSON. For example, a `Carbon` object can be transformed to `16-05-1994` or `16-05-1994T00:00:00+00`.
 
-With this package you're free to decide how this transformation is done by using  transformers. A transformer is a simple class that implements the `Transformer` interface:
+With this package, you're free to decide how this transformation is done by using transformers. A transformer is a simple class that implements the `Transformer` interface:
 
 ```php
 class MyTransformer implements Transformer
@@ -699,9 +698,9 @@ class MyTransformer implements Transformer
 }
 ```
 
-You can add these transformers within the `data.php` config file. By default the package ships with two transformers:
+You can add these transformers within the `data.php` config file. By default, the package ships with two transformers:
 
-- `DateTransformer` transforms date objects to an ISO8601 format
+- `DateTransformer` transforms data objects to an ISO8601 format
 - `ArrayableTransformer` calls `toArray` on each `Arrayable`
 
 ### Transforming without loss of types
@@ -712,7 +711,7 @@ You can get an array representation of the data object without running transform
 UserData::create(User::first())->all();
 ```
 
-In this case the `favorite_song` within the `UserData` will still be a `SongData` object instead of an array with the transformed song data object.
+In this case, the `favorite_song` within the `UserData` will still be a `SongData` object instead of an array with the transformed song data object.
 
 It is possible to do the same on data collections:
 
@@ -724,7 +723,7 @@ SongData::collection(Song::all())->all(); // Array of SongData
 
 ### Getting a TypeScript version of your data object
 
-Thanks to the [typescript-transformer](https://github.com/spatie/typescript-transformer) package it is possible to automatically transform data objects into TypeScript definitions.
+Thanks to the [typescript-transformer](https://github.com/spatie/typescript-transformer) package, it is possible to transform data objects into TypeScript definitions automatically.
 
 For example, the following data object:
 
