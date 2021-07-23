@@ -4,12 +4,10 @@ namespace Spatie\LaravelData\Tests\Actions;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
-use ReflectionClass;
 use Spatie\LaravelData\Actions\ResolveEmptyDataObjectAction;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Support\EmptyDataResolver;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 

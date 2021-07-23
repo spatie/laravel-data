@@ -24,12 +24,12 @@ class DataConfig
     public function __construct(array $config)
     {
         $this->transformers = array_map(
-            fn(string $transformerClass) => app($transformerClass),
+            fn (string $transformerClass) => app($transformerClass),
             $config['transformers'] ?? []
         );
 
         $this->autoRules = array_map(
-            fn(string $autoRuleClass) => app($autoRuleClass),
+            fn (string $autoRuleClass) => app($autoRuleClass),
             $config['auto_rules'] ?? []
         );
 
@@ -49,7 +49,7 @@ class DataConfig
         $properties = (new ReflectionClass($class))->getProperties(ReflectionProperty::IS_PUBLIC);
 
         return $this->properties[$class] = array_map(
-            fn(ReflectionProperty $property) => DataProperty::create($property),
+            fn (ReflectionProperty $property) => DataProperty::create($property),
             $properties
         );
     }

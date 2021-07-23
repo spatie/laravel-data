@@ -2,14 +2,13 @@
 
 namespace Spatie\LaravelData\AutoRules;
 
-use Closure;
 use Spatie\LaravelData\Support\DataProperty;
 
 class NullableAutoRule implements AutoRule
 {
     public function handle(DataProperty $property, array $rules): array
     {
-        if($property->isNullable()){
+        if ($property->isNullable()) {
             $rules[] = 'nullable';
         }
 

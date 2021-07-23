@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests;
 
 use Illuminate\Support\Facades\Route;
-use Spatie\LaravelData\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 class RequestDataTest extends TestCase
@@ -23,13 +22,13 @@ class RequestDataTest extends TestCase
         });
 
         $this->postJson('/example-route', [
-            'string' => 'Hello'
+            'string' => 'Hello',
         ])
             ->assertOk()
             ->assertJson(['given' => 'Hello']);
 
         $this->postJson('/example-route', [
-            'string' => 'Hello world'
+            'string' => 'Hello world',
         ])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['string']);

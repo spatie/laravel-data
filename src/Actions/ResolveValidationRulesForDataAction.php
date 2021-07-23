@@ -25,7 +25,7 @@ class ResolveValidationRulesForDataAction
 
         $rules = collect($this->dataConfig->getDataProperties($class))
             ->mapWithKeys(
-                fn(DataProperty $property) => $resolver->execute($property)
+                fn (DataProperty $property) => $resolver->execute($property)
             );
 
         return self::$cachedDataObjectRules[$class] = $rules;

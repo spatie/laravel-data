@@ -8,7 +8,6 @@ class NestedData extends Data
 {
     public function __construct(
         public SimpleData $simple
-    )
-    {
+    ) {
     }
 }

@@ -5,7 +5,6 @@ namespace Spatie\LaravelData;
 use Spatie\LaravelData\Casts\DateTimeCast;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataResolver;
-use Spatie\LaravelData\Support\DataTransformers;
 use Spatie\LaravelData\Transformers\DateTransformer;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -31,17 +30,17 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
         $this->app->singleton(
             DataConfig::class,
-            fn() => new DataConfig(config('data'))
+            fn () => new DataConfig(config('data'))
         );
 
         $this->app->beforeResolving(RequestData::class, function ($class) {
-            if($this->app->has($class)){
+            if ($this->app->has($class)) {
                 return;
             }
 
             $this->app->bind(
                 $class,
-                fn() => $this->app->make(DataResolver::class)->get($class),
+                fn () => $this->app->make(DataResolver::class)->get($class),
             );
         });
     }

@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Tests\Casts;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use Carbon\Traits\Creator;
 use DateTime;
 use DateTimeImmutable;
 use Exception;

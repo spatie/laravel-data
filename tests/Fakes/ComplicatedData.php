@@ -3,10 +3,8 @@
 namespace Spatie\LaravelData\Tests\Fakes;
 
 use DateTime;
-use DateTimeInterface;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Casts\DateTimeCast;
-use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 
@@ -27,7 +25,6 @@ class ComplicatedData extends Data
         public SimpleData $nestedData,
         /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */
         public DataCollection $nestedCollection,
-    )
-    {
+    ) {
     }
 }

@@ -6,13 +6,12 @@ use Exception;
 use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
-use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\DataValidationAttribute;
+use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Str;
 
 class DataProperty
@@ -93,7 +92,7 @@ class DataProperty
 
     public function validationAttributes(): array
     {
-        if(! isset($this->validationAttributes)){
+        if (! isset($this->validationAttributes)) {
             $this->loadAttributes();
         }
 
@@ -102,7 +101,7 @@ class DataProperty
 
     public function castAttribute(): ?WithCast
     {
-        if(! isset($this->castAttribute)){
+        if (! isset($this->castAttribute)) {
             $this->loadAttributes();
         }
 
@@ -122,10 +121,10 @@ class DataProperty
             return $this->dataClass = current($this->types);
         }
 
-        if ($this->isDataCollection){
+        if ($this->isDataCollection) {
             $comment = $this->property->getDocComment();
 
-            if($comment === false){
+            if ($comment === false) {
                 throw new Exception('Could not resolve data class for property');
             }
 
@@ -186,7 +185,7 @@ class DataProperty
                 continue;
             }
 
-            if($this->isTypeBuiltIn($name)){
+            if ($this->isTypeBuiltIn($name)) {
                 $this->isBuiltIn = true;
                 $this->types[] = $name;
 
@@ -219,7 +218,7 @@ class DataProperty
 
     private function isTypeBuiltIn(string $name): bool
     {
-       return in_array($name, ['int', 'string', 'bool', 'array', 'float']);
+        return in_array($name, ['int', 'string', 'bool', 'array', 'float']);
     }
 
     private function ensurePropertyIsValid()
@@ -246,7 +245,7 @@ class DataProperty
                 continue;
             }
 
-            if($initiatedAttribute instanceof WithCast){
+            if ($initiatedAttribute instanceof WithCast) {
                 $this->castAttribute = $initiatedAttribute;
 
                 continue;
@@ -255,7 +254,7 @@ class DataProperty
 
         $this->validationAttributes = $validationAttributes;
 
-        if(! isset($this->castAttribute)){
+        if (! isset($this->castAttribute)) {
             $this->castAttribute = null;
         }
     }

@@ -13,7 +13,7 @@ class DateTimeInterfaceCast implements Cast
     ) {
     }
 
-    public function cast(DataProperty $property, mixed $value): DateTimeInterface|Uncastable
+    public function cast(DataProperty $property, mixed $value): DateTimeInterface | Uncastable
     {
         $type = $this->findType($property);
 

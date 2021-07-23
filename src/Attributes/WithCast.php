@@ -15,7 +15,7 @@ class WithCast
         public string $castClass,
         mixed ...$arguments
     ) {
-        if(! is_a($this->castClass, Cast::class, true)){
+        if (! is_a($this->castClass, Cast::class, true)) {
             throw new Exception("Cast given is not a cast");
         }
 

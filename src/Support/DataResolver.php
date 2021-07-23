@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support;
 
 use Illuminate\Http\Request;
-use Spatie\LaravelData\Actions\ResolveDataFromRequestAction;
 use Spatie\LaravelData\Actions\ResolveValidationRulesForDataAction;
 use Spatie\LaravelData\Data;
 use Validator;
@@ -29,6 +28,6 @@ class DataResolver
 
         $validator->validate();
 
-       return $class::createFromRequest($this->request);
+        return $class::createFromRequest($this->request);
     }
 }

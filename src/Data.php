@@ -6,17 +6,14 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Collection;
-use ReflectionClass;
 use Spatie\LaravelData\Actions\ResolveEmptyDataObjectAction;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\RequestableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
-use Spatie\LaravelData\Support\EmptyDataResolver;
 use Spatie\LaravelData\Transformers\DataTransformer;
 
 /**
@@ -36,7 +33,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, RequestData
 
     public static function empty(array $extra = []): array
     {
-        return app(ResolveEmptyDataObjectAction::class)->execute(static::class,$extra);
+        return app(ResolveEmptyDataObjectAction::class)->execute(static::class, $extra);
     }
 
     public function all(): array

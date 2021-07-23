@@ -3,10 +3,9 @@
 namespace Spatie\LaravelData\Tests\Support;
 
 use ReflectionProperty;
-use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\Max;
+use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Casts\DataCast;
-use Spatie\LaravelData\Casts\DateTimeCast;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
@@ -43,13 +42,13 @@ class DataPropertyTest extends TestCase
         $this->assertFalse($helper->isLazy());
 
         $helper = $this->resolveHelper(new class {
-            public int|Lazy $property;
+            public int | Lazy $property;
         });
 
         $this->assertTrue($helper->isLazy());
 
         $helper = $this->resolveHelper(new class {
-            public int|Lazy|null $property;
+            public int | Lazy | null $property;
         });
 
         $this->assertTrue($helper->isLazy());
@@ -71,7 +70,7 @@ class DataPropertyTest extends TestCase
         $this->assertTrue($helper->isNullable());
 
         $helper = $this->resolveHelper(new class {
-            public null|int $property;
+            public null | int $property;
         });
 
         $this->assertTrue($helper->isNullable());
@@ -93,7 +92,7 @@ class DataPropertyTest extends TestCase
         $this->assertTrue($helper->isData());
 
         $helper = $this->resolveHelper(new class {
-            public SimpleData|Lazy $property;
+            public SimpleData | Lazy $property;
         });
 
         $this->assertTrue($helper->isData());
@@ -115,7 +114,7 @@ class DataPropertyTest extends TestCase
         $this->assertTrue($helper->isDataCollection());
 
         $helper = $this->resolveHelper(new class {
-            public DataCollection|Lazy $property;
+            public DataCollection | Lazy $property;
         });
 
         $this->assertTrue($helper->isDataCollection());
@@ -131,19 +130,19 @@ class DataPropertyTest extends TestCase
         $this->assertTrue($helper->isBuiltIn());
 
         $helper = $this->resolveHelper(new class {
-            public int|float $property;
+            public int | float $property;
         });
 
         $this->assertTrue($helper->isBuiltIn());
 
         $helper = $this->resolveHelper(new class {
-            public int|Lazy $property;
+            public int | Lazy $property;
         });
 
         $this->assertTrue($helper->isBuiltIn());
 
         $helper = $this->resolveHelper(new class {
-            public int|Lazy|null $property;
+            public int | Lazy | null $property;
         });
 
         $this->assertTrue($helper->isBuiltIn());
@@ -155,7 +154,7 @@ class DataPropertyTest extends TestCase
         $this->assertFalse($helper->isBuiltIn());
 
         $helper = $this->resolveHelper(new class {
-            public DataCollection|null $property;
+            public DataCollection | null $property;
         });
 
         $this->assertFalse($helper->isBuiltIn());
@@ -211,19 +210,19 @@ class DataPropertyTest extends TestCase
         $this->assertEquals(['int'], $helper->types());
 
         $helper = $this->resolveHelper(new class {
-            public int|float $property;
+            public int | float $property;
         });
 
         $this->assertEquals(['int', 'float'], $helper->types());
 
         $helper = $this->resolveHelper(new class {
-            public int|Lazy $property;
+            public int | Lazy $property;
         });
 
         $this->assertEquals(['int'], $helper->types());
 
         $helper = $this->resolveHelper(new class {
-            public int|Lazy|null $property;
+            public int | Lazy | null $property;
         });
 
         $this->assertEquals(['int'], $helper->types());
@@ -235,7 +234,7 @@ class DataPropertyTest extends TestCase
         $this->expectException(InvalidDataPropertyType::class);
 
         $this->resolveHelper(new class {
-            public SimpleData|int $property;
+            public SimpleData | int $property;
         });
     }
 
@@ -245,7 +244,7 @@ class DataPropertyTest extends TestCase
         $this->expectException(InvalidDataPropertyType::class);
 
         $this->resolveHelper(new class {
-            public DataCollection|int $property;
+            public DataCollection | int $property;
         });
     }
 
@@ -285,9 +284,9 @@ class DataPropertyTest extends TestCase
     public function it_can_get_the_data_class_for_a_data_collection()
     {
         $helper = $this->resolveHelper(new class {
-            /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[]|\Spatie\LaravelData\DataCollection  */
+            /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[]|\Spatie\LaravelData\DataCollection */
             /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[]|DataCollection */
-            /** @var \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\Tests\Fakes\SimpleData[]  */
+            /** @var \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\Tests\Fakes\SimpleData[] */
             /** @var DataCollection|\Spatie\LaravelData\Tests\Fakes\SimpleData[] */
             /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */
             public DataCollection $property;

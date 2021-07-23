@@ -37,7 +37,7 @@ class ResolveDataObjectFromArrayActionTest extends TestCase
                 'defaultCast' => '1994-05-16T12:00:00+01:00',
                 'explicitCast' => '16-06-1994',
                 'nestedData' => [
-                    'string' => 'hello'
+                    'string' => 'hello',
                 ],
                 'nestedCollection' => [
                     ['string' => 'never'],
@@ -45,7 +45,7 @@ class ResolveDataObjectFromArrayActionTest extends TestCase
                     ['string' => 'give'],
                     ['string' => 'you'],
                     ['string' => 'up'],
-                ]
+                ],
             ]
         );
 

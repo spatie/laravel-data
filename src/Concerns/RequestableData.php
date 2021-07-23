@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Actions\ResolveDataObjectFromArrayAction;
-use Spatie\LaravelData\Casts\DataCast;
 
 trait RequestableData
 {

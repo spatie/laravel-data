@@ -38,12 +38,13 @@ class ResolveValidationRulesForPropertyAction
             $property->isData() => ['required', 'array'],
             $property->isDataCollection() && $property->isNullable() => ['nullable', 'array'],
             $property->isDataCollection() => ['present', 'array'],
+            // no break
             default => throw new Exception('Unknown data property')
         };
 
         return $this->resolveValidationRulesForDataAction
             ->execute($property->getDataClass())
-            ->mapWithKeys(fn(array $rules, string $name) => [
+            ->mapWithKeys(fn (array $rules, string $name) => [
                 "{$prefix}{$name}" => $rules,
             ])
             ->prepend($topLevelRules, $property->name());
@@ -53,7 +54,7 @@ class ResolveValidationRulesForPropertyAction
     {
         return array_reduce(
             $this->dataConfig->getAutoRules(),
-            fn(array $rules, AutoRule $autoRule) => $autoRule->handle($property, $rules),
+            fn (array $rules, AutoRule $autoRule) => $autoRule->handle($property, $rules),
             []
         );
     }

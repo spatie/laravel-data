@@ -10,7 +10,7 @@ class AttributesAutoRule implements AutoRule
     public function handle(DataProperty $property, array $rules): array
     {
         $attributeRules = array_map(
-            fn(DataValidationAttribute $attribute) => $attribute->getRules(),
+            fn (DataValidationAttribute $attribute) => $attribute->getRules(),
             $property->validationAttributes()
         );
 
