@@ -38,7 +38,9 @@ abstract class Data implements Arrayable, Responsable, Jsonable, RequestData
 
     public function all(): array
     {
-        return DataTransformer::create()->withoutValueTransforming()->transform($this);
+        return DataTransformer::create()
+            ->withoutValueTransforming()
+            ->transform($this);
     }
 
     public function toArray(): array
@@ -46,7 +48,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, RequestData
         return DataTransformer::create()->transform($this);
     }
 
-    public function toJson($options = 0)
+    public function toJson($options = 0): string
     {
         return json_encode($this->toArray(), $options);
     }

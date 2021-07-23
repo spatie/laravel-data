@@ -1,4 +1,4 @@
-# Laravel Data
+# Typed resources for Laravel
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-data.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-data-resource)
 [![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/spatie/laravel-data/run-tests?label=tests)](https://github.com/spatie/laravel-data-resource/actions?query=workflow%3Arun-tests+branch%3Amain)
@@ -8,10 +8,12 @@
 This package allows you to create data objects in Laravel that can also be used as API resources:
 
 ```php
+use Spatie\LaravelData\Data;
+
 class UserData extends Data
 {
     public function __construct(
-        public string $name,
+        public string $title,
         public string $email,
         public Carbon $birth_date,
     ) {
@@ -20,7 +22,7 @@ class UserData extends Data
     public static function create(User $user): static
     {
         return new self(
-            $user->name,
+            $user->title,
             $user->email,
             $user->birth_date
         );
@@ -42,7 +44,7 @@ And use this object through your application code:
 
 ```php
 User::create([
-    'name' => $userData->name,
+    'name' => $userData->title,
     'email' => $userData->email,
     'birth_date' => $userData->birth_date
 ]);
@@ -63,13 +65,14 @@ The controller will transform this to a JSON version of the data object just lik
     "birth_date": "1994-05-15T00:00:00+00:00"
 }
 ```
-With this package, you can easily construct data objects, nest them, add them to collections, send specific lazyloaded versions as an API resource, and transform the data object's structure as a TypeScript definition and even more.
+
+With this package, you can easily construct data objects, nest them, add them to collections, send specific lazy loaded versions as an API resource, and transform the data object's structure as a TypeScript definition and even more.
 
 Though this package is perfect to create simple data transfer objects when communicating between backend and frontend. For more complicated cases we recommend our [spatie/data-transfer-object](https://github.com/spatie/data-transfer-object) package.
 
 ## Support us
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-data-resource.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-data-resource)
+[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-data.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-data)
 
 We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
 
@@ -108,10 +111,12 @@ return [
 A data object extends from `Data` and looks like this:
 
 ```php
+use Spatie\LaravelData\Data;
+
 class SongData extends Data
 {
     public function __construct(
-        public string $name,
+        public string $title,
         public string $artist,
     ) {
     }
@@ -120,30 +125,13 @@ class SongData extends Data
 
 In the constructor, we define the properties associated with this data object. Only public properties will be included when transforming the data object into a resource.
 
-If you're not a fan of the PHP 8 syntax to declare class properties, then you can still use the old one:
-
-```php
-class SongData extends Data
-{
-    public string $name;
-    
-    public string $artist;
-
-    public function __construct(string $name, string $artist) 
-    {
-        $this->name = $name;
-        $this->artist = $artist;
-    }
-}
-```
-
 Each data object also should have a static `create` method that will create the object from a model. This method will be called when the data object is created from a collection of models:
 
 ```php
 class SongData extends Data
 {
     public function __construct(
-        public string $name,
+        public string $title,
         public string $artist,
     ) {
     }
@@ -151,7 +139,7 @@ class SongData extends Data
     public static function create(Song $song): self
     {
         return new self(
-            $song->name,
+            $song->title,
             $song->artist
         );
     }
@@ -199,13 +187,14 @@ The JSON then will look like this:
 }
 ```
 
-You can also manually transform a data object to JSON as such:
+You can manually transform a data object to JSON:
 
 ```php
 SongData::create(Song::first())->toJson();
 ```
 
-Or to an array:
+You can also manually transform a data object to an array:
+
 
 ```php
 SongData::create(Song::first())->toArray();
@@ -228,7 +217,7 @@ You could make each property of the data object nullable like this:
 class SongData extends Data
 {
     public function __construct(
-        public ?string $name,
+        public ?string $title,
         public ?string $artist,
     ) {
     }
@@ -268,7 +257,7 @@ It is possible to change the default values within this array by providing them 
  class SongData extends Data
 {
     public function __construct(
-        public string $name = 'Name of the song here',
+        public string $title = 'Title of the song here',
         public string $artist = "An artist",
     ) {
     }
@@ -281,7 +270,7 @@ Now when we call `empty`, our JSON looks like this:
 
 ```json
 {
-    "name": "Name of the song here",
+    "name": "Title of the song here",
     "artist": "An artist"
 }
 ``` 
@@ -290,14 +279,14 @@ You can also pass defaults within the `empty` call:
 
 ```php
 SongData::empty([
-    'name' => 'Name of the song here',
+    'name' => 'Title of the song here',
     'artist' => 'An artist'
 ]);
 ```
 
 ### Collections
 
-You can easily create a collection of data objects as such:
+Here's how to create a collection of data objects:
 
 ```php
 SongData::collection(Song::all());
@@ -342,7 +331,7 @@ The data object is smart enough to create a paginated response from this with li
         {
             "name" : "Giving Up on Love",
             "artist" : "Rick Astley"
-        },
+        }
     ],
     "meta" : {
         "current_page": 1,
@@ -363,30 +352,32 @@ The data object is smart enough to create a paginated response from this with li
 It is possible to change data objects in a collection:
 
 ```php
-SongData::collection(Song::all())->transform(function(SongData $song){
+$allSongs = Song::all());
+
+SongData::collection($allSongs)->transform(function(SongData $song){
     $song->artist = 'Abba';
     
     return $song;
 });
 ```
 
-You can also filter non-paginated collections:
+You can  filter non-paginated collections:
 
 ```php
-SongData::collection(Song::all())->filter(
+SongData::collection($allSongs)->filter(
     fn(SongData $song) => $song->artist === 'Rick Astley'
 );
 ```
 
 ### Nesting
 
-It is possible to nest data objects as such:
+It is possible to nest data objects.
 
 ```php
 class UserData extends Data
 {
     public function __construct(
-        public string $name,
+        public string $title,
         public string $email,
         public SongData $favorite_song,
     ) {
@@ -395,7 +386,7 @@ class UserData extends Data
     public static function create(User $user): self
     {
         return new self(
-            $user->name,
+            $user->title,
             $user->email,
             SongData::create($user->favorite_song)
         );
@@ -422,7 +413,7 @@ You can also nest a collection of resources:
 class AlbumData extends Data
 {
     public function __construct(
-        public string $name,
+        public string $title,
         /** @var SongData[] */
         public DataCollection $songs,
     ) {
@@ -431,7 +422,7 @@ class AlbumData extends Data
     public static function create(Album $album): self
     {
         return new self(
-            $album->name,
+            $album->title,
             SongData::collection($album->songs)
         );
     }
@@ -448,7 +439,7 @@ Sometimes you don't want all the properties included when transforming a data ob
 class AlbumData extends Data
 {
     public function __construct(
-        public string $name,
+        public string $title,
         /** @var SongData[] */
         public DataCollection $songs,
     ) {
@@ -459,10 +450,14 @@ class AlbumData extends Data
 This will always output a collection of songs, which can become quite large. With lazy properties, we can include properties when we want to:
 
 ```php
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Lazy;
+
 class AlbumData extends Data
 {
     public function __construct(
-        public string $name,
+        public string $title,
         /** @var SongData[] */
         public Lazy|DataCollection $songs,
     ) {
@@ -471,7 +466,7 @@ class AlbumData extends Data
     public static function create(Album $album): self
     {
         return new self(
-            $album->name,
+            $album->title,
             Lazy::create(fn() => SongData::collection($album->songs))
         );
     }
@@ -494,7 +489,7 @@ We get the following JSON:
 }
 ```
 
-As you can see the `songs` property is missing in the JSON output, it can explicitly be included as such:
+As you can see the `songs` property is missing in the JSON output. Here's how you can include it.
 
 ```php
 AlbumData::create(Album::first())->include('songs');
@@ -504,13 +499,15 @@ AlbumData::create(Album::first())->include('songs');
 
 Properties will only be included when the `include` method is called on the data object with the property's name.
 
-It is also possible to nest these includes. For example, let's update the `SongData` class as such:
+It is also possible to nest these includes. For example, let's update the `SongData` class and make all of its properties lazy:
 
 ```php
+use Spatie\LaravelData\Lazy;
+
 class SongData extends Data
 {
     public function __construct(
-        public Lazy|string $name,
+        public Lazy|string $title,
         public Lazy|string $artist,
     ) {
     }
@@ -518,7 +515,7 @@ class SongData extends Data
     public static function create(Song $song): self
     {
         return new self(
-            Lazy::create(fn() => $song->name),
+            Lazy::create(fn() => $song->title),
             Lazy::create(fn() => $song->artist)
         );
     }
@@ -549,7 +546,7 @@ Explicitly including properties of resources also works on a single resource. Fo
 class UserData extends Data
 {
     public function __construct(
-        public string $name,
+        public string $title,
         public Lazy|SongData $favorite_song,
     ) {
     }
@@ -557,7 +554,7 @@ class UserData extends Data
     public static function create(User $user): self
     {
         return new self(
-            $user->name,
+            $user->title,
             Lazy::create(fn() => SongData::create($user->favorite_song))
         );
     }
@@ -666,7 +663,7 @@ When using a closure, you have access to the underlying data object:
 
 ```php
 SongData::create(Song::first())->additional([
-    'slug' => fn(SongData $songData) => Str::slug($songData->name),
+    'slug' => fn(SongData $songData) => Str::slug($songData->title),
 ]);
 ```
 
@@ -687,7 +684,7 @@ class SongData extends Data
 {
     public function __construct(
         public int $id,
-        public string $name,
+        public string $title,
         public string $artist
     ) {
     }
@@ -696,7 +693,7 @@ class SongData extends Data
     {
         return new self(
             $song->id,
-            $song->name,
+            $song->title,
             $song->artist
         );
     }
@@ -717,11 +714,13 @@ Now each transformed data object contains an `endpoints` key with all the endpoi
 
 ### Transformers
 
-Each property of a data object should be transformed into a useable type to communicate via JSON. For example, a `Carbon` object can be transformed to `16-05-1994`, `16-05-1994T00:00:00+00` or something completely different.
+Each property of a data object should be transformed into a usable type to communicate via JSON. For example, a `Carbon` object can be transformed to `16-05-1994`, `16-05-1994T00:00:00+00` or something completely different.
 
 With this package, you're free to decide how this transformation is done by using transformers. A transformer is a class that implements the `Transformer` interface:
 
 ```php
+use Spatie\LaravelData\Transformers\Transformer;
+
 class MyTransformer implements Transformer
 {
     public function canTransform(mixed $value): bool
@@ -743,20 +742,19 @@ You can add these transformers within the `data.php` config file. By default, th
 
 ### Transforming without loss of types
 
-You can get an array representation of the data object without running transformers and keeping nested data objects and collections as they are as such:
+If you call `toArray` on a `Data` object each nested object will be converted to an array as well.
 
 ```php
-UserData::create(User::first())->all();
+$allSongs = Song::all();
+
+SongData::collection($allSongs)->toArray(); // Array of ['name' => '...', 'artist' => '...']
 ```
 
-In this case, the `favorite_song` within the `UserData` will still be a `SongData` object instead of an array with the transformed song data object.
+If you want to keep all the types, use `all`.
 
-It is possible to do the same on data collections:
 
 ```php
-SongData::collection(Song::all())->toArray(); // Array of ['name' => '...', 'artist' => '...']
-
-SongData::collection(Song::all())->all(); // Array of SongData
+SongData::collection($allSongs)->all(); // Array with SongData objects
 ```
 
 ### Getting a TypeScript version of your data object
@@ -801,7 +799,7 @@ Would be transformed to the following TypeScript type:
 }
 ```
 
-To enable this, add the `DataTypeScriptTransformer` transformer to the transformers in the `typescript-transformer.php` config file. And annotate the data objects you want to be transformed or add the `DataTypeScriptCollector` to the collectors in `typescript-transformer.php` so they will all be transformed.
+To enable this, add the `Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer` transformer to the transformers in the `typescript-transformer.php` config file.  Annotate the data objects you want to be transformed or add the `DataTypeScriptCollector` to the collectors in `typescript-transformer.php` so they will all be transformed.
 
 ## Testing
 

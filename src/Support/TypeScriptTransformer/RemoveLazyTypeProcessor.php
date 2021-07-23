@@ -15,24 +15,33 @@ use Spatie\TypeScriptTransformer\TypeProcessors\TypeProcessor;
 
 class RemoveLazyTypeProcessor implements TypeProcessor
 {
-    public function process(Type $type, ReflectionParameter | ReflectionMethod | ReflectionProperty $reflection, MissingSymbolsCollection $missingSymbolsCollection): ?Type
-    {
+    public function process(
+        Type $type,
+        ReflectionParameter | ReflectionMethod | ReflectionProperty $reflection,
+        MissingSymbolsCollection $missingSymbolsCollection
+    ): ?Type {
         if (! $type instanceof Compound) {
             return $type;
         }
 
-        /** @var \Illuminate\Support\Collection $otherTypes */
-        [, $otherTypes] = collect(iterator_to_array($type->getIterator()))
-            ->partition(fn (Type $type) => $type instanceof Object_ && is_a((string) $type->getFqsen(), Lazy::class, true));
+        /** @var \Illuminate\Support\Collection $types */
+        $types = collect(iterator_to_array($type->getIterator()))
+            ->reject(function (Type $type) {
+                if (! $type instanceof Object_) {
+                    return false;
+                }
 
-        if ($otherTypes->isEmpty()) {
+                return is_a((string)$type->getFqsen(), Lazy::class, true);
+            });
+
+        if ($types->isEmpty()) {
             throw new Exception("Type {$reflection->getDeclaringClass()->name}:{$reflection->getName()} cannot be only Lazy");
         }
 
-        if ($otherTypes->count() === 1) {
-            return $otherTypes->first();
+        if ($types->count() === 1) {
+            return $types->first();
         }
 
-        return new Compound($otherTypes->all());
+        return new Compound($types->all());
     }
 }

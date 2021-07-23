@@ -66,7 +66,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         return $this->getTransformer()->transform();
     }
 
-    public function toJson($options = 0)
+    public function toJson($options = 0): string
     {
         return json_encode($this->toArray(), $options);
     }
@@ -122,7 +122,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         throw new Exception('Unsetting in paginated collection is prohibited');
     }
 
-    private function getTransformer(): DataCollectionTransformer
+    protected function getTransformer(): DataCollectionTransformer
     {
         return new DataCollectionTransformer(
             $this->dataClass,

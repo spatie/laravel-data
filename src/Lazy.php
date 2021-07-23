@@ -11,7 +11,7 @@ class Lazy
 
     private ?bool $defaultIncluded = null;
 
-    private function __construct(
+    protected function __construct(
         private Closure $value
     ) {
     }
@@ -30,7 +30,7 @@ class Lazy
     {
         return self::when(
             fn () => $model->relationLoaded($relation),
-            $value
+            $value,
         );
     }
 
