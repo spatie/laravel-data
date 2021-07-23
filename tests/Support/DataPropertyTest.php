@@ -6,6 +6,7 @@ use ReflectionProperty;
 use Spatie\LaravelData\Attributes\Max;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Casts\DataCast;
+use Spatie\LaravelData\Casts\DateTimeCast;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
@@ -260,14 +261,25 @@ class DataPropertyTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_cast_attributes()
+    public function it_can_get_the_cast_attribute()
     {
         $helper = $this->resolveHelper(new class {
-            #[WithCast(DataCast::class)]
+            #[WithCast(DateTimeCast::class)]
             public SimpleData $property;
         });
 
-        $this->assertEquals(new WithCast(DataCast::class), $helper->castAttribute());
+        $this->assertEquals(new WithCast(DateTimeCast::class), $helper->castAttribute());
+    }
+
+    /** @test */
+    public function it_can_get_the_cast_attribute_with_arguments()
+    {
+        $helper = $this->resolveHelper(new class {
+            #[WithCast(DateTimeCast::class, 'd-m-y')]
+            public SimpleData $property;
+        });
+
+        $this->assertEquals(new WithCast(DateTimeCast::class, 'd-m-y'), $helper->castAttribute());
     }
 
     /** @test */

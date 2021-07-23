@@ -40,9 +40,8 @@ class DataProperty
         return new self($property);
     }
 
-    public function __construct(
-        protected ReflectionProperty $property
-    ) {
+    public function __construct(protected ReflectionProperty $property)
+    {
         $type = $this->property->getType();
 
         match (true) {
@@ -90,6 +89,11 @@ class DataProperty
         return $this->property->getName();
     }
 
+    public function className(): string
+    {
+        return $this->property->getDeclaringClass()->getName();
+    }
+
     public function validationAttributes(): array
     {
         if (! isset($this->validationAttributes)) {
@@ -135,11 +139,6 @@ class DataProperty
         throw new Exception('Property type is not a data object or data collection object');
     }
 
-    public function reflection(): ReflectionProperty
-    {
-        return $this->property;
-    }
-
     private function processNoType(): void
     {
         $this->isLazy = false;
@@ -172,6 +171,7 @@ class DataProperty
 
         $this->isLazy = false;
         $this->isNullable = false;
+        $this->isBuiltIn = false;
         $this->isData = false;
         $this->isDataCollection = false;
         $this->types = [];
