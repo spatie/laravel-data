@@ -11,6 +11,7 @@ use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Collection;
 use ReflectionClass;
+use Spatie\LaravelData\Actions\ResolveEmptyDataObjectAction;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\RequestableData;
@@ -35,9 +36,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, RequestData
 
     public static function empty(array $extra = []): array
     {
-        $reflection = new ReflectionClass(static::class);
-
-        return EmptyDataResolver::create($reflection)->get($extra);
+        return app(ResolveEmptyDataObjectAction::class)->execute(static::class,$extra);
     }
 
     public function all(): array

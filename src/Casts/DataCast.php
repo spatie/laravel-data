@@ -10,10 +10,11 @@ use ReflectionProperty;
 use ReflectionUnionType;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Support\DataProperty;
 
 class DataCast implements Cast
 {
-    public function cast(ReflectionNamedType $reflectionType, mixed $value): Data|Uncastable
+    public function cast(DataProperty $property, mixed $value): Data|Uncastable
     {
         $name = $reflectionType->getName();
 
@@ -36,7 +37,6 @@ class DataCast implements Cast
 
         return $data;
     }
-
 
     private function castValue(ReflectionProperty $reflectionProperty, mixed $value): mixed
     {

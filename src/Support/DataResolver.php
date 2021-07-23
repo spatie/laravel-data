@@ -3,36 +3,32 @@
 namespace Spatie\LaravelData\Support;
 
 use Illuminate\Http\Request;
-use ReflectionClass;
+use Spatie\LaravelData\Actions\ResolveDataFromRequestAction;
+use Spatie\LaravelData\Actions\ResolveValidationRulesForDataAction;
 use Spatie\LaravelData\Data;
 use Validator;
 
 class DataResolver
 {
-    public function __construct(private Request $request)
-    {
+    public function __construct(
+        protected Request $request,
+        protected ResolveValidationRulesForDataAction $resolveValidationRulesForDataAction
+    ) {
     }
 
     public function get(string $class): Data
     {
         /** @var \Spatie\LaravelData\RequestData|string $class */
-        $resolver = RequestDataResolver::create(new ReflectionClass($class));
 
-        $rules = array_merge(
-            $resolver->getRules(),
-            $class::getRules()
-        );
+        $rules = $this->resolveValidationRulesForDataAction
+            ->execute($class)
+            ->merge($class::rules())
+            ->toArray();
 
         $validator = Validator::make($this->request->all(), $rules);
 
         $validator->validate();
 
-        $data = $class::createFromRequest($this->request);
-
-        if ($data === null) {
-            $data = $resolver->get($this->request);
-        }
-
-        return $data;
+       return $class::createFromRequest($this->request);
     }
 }

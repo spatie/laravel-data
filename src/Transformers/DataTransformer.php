@@ -7,13 +7,13 @@ use ReflectionProperty;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Support\DataTransformers;
+use Spatie\LaravelData\Support\DataConfig;
 
 class DataTransformer
 {
     private bool $withValueTransforming = true;
 
-    private DataTransformers $transformers;
+    private DataConfig $config;
 
     public static function create(): self
     {
@@ -22,7 +22,7 @@ class DataTransformer
 
     public function __construct()
     {
-        $this->transformers = app(DataTransformers::class);
+        $this->config = app(DataConfig::class);
     }
 
     public function withoutValueTransforming(): static
@@ -113,7 +113,7 @@ class DataTransformer
         }
 
         return $this->withValueTransforming
-            ? $this->transformers->transform($value)
+            ? $this->config->transform($value)
             : $value;
     }
 }

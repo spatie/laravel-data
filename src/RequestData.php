@@ -8,5 +8,7 @@ interface RequestData
 {
     public static function createFromRequest(Request $request);
 
-    public static function getRules();
+    public static function rules(): array;
+
+    public static function casts() : array;
 }

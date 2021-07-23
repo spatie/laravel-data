@@ -2,8 +2,11 @@
 
 namespace Spatie\LaravelData;
 
+use Spatie\LaravelData\Casts\DateTimeCast;
+use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataResolver;
 use Spatie\LaravelData\Support\DataTransformers;
+use Spatie\LaravelData\Transformers\DateTransformer;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -18,9 +21,17 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
     public function packageRegistered()
     {
+        $this->app->when(DateTimeCast::class)->needs('$format')->give(
+            config('data.date_format')
+        );
+
+        $this->app->when(DateTransformer::class)->needs('$format')->give(
+            config('data.date_format')
+        );
+
         $this->app->singleton(
-            DataTransformers::class,
-            fn() => new DataTransformers(config('data.transformers'))
+            DataConfig::class,
+            fn() => new DataConfig(config('data'))
         );
 
         $this->app->beforeResolving(RequestData::class, function ($class) {

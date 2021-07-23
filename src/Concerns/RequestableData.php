@@ -3,15 +3,22 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Http\Request;
+use Spatie\LaravelData\Actions\ResolveDataObjectFromArrayAction;
+use Spatie\LaravelData\Casts\DataCast;
 
 trait RequestableData
 {
-    public static function createFromRequest(Request $request): ?static
+    public static function createFromRequest(Request $request): static
     {
-        return null;
+        return app(ResolveDataObjectFromArrayAction::class)->execute(static::class, $request->all());
     }
 
-    public static function getRules(): array
+    public static function rules(): array
+    {
+        return [];
+    }
+
+    public static function casts(): array
     {
         return [];
     }

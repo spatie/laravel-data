@@ -4,15 +4,15 @@ namespace Spatie\LaravelData\Attributes;
 
 use Attribute;
 
-#[Attribute]
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class Max implements DataValidationAttribute
 {
-    public function __construct(public int $maxLength)
+    public function __construct(public int $length)
     {
     }
 
     public function getRules(): array
     {
-        return ["max:{$this->maxLength}"];
+        return ["max:{$this->length}"];
     }
 }

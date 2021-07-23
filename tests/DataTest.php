@@ -311,7 +311,7 @@ class DataTest extends TestCase
             }
         };
 
-        $this->assertEquals(['date' => '1994-05-16 00:00:00'], $data->toArray());
+        $this->assertEquals(['date' => '1994-05-16T00:00:00+00:00'], $data->toArray());
     }
 
     /** @test */
