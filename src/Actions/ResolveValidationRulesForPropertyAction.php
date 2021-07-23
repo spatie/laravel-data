@@ -38,6 +38,7 @@ class ResolveValidationRulesForPropertyAction
             $property->isData() => ['required', 'array'],
             $property->isDataCollection() && $property->isNullable() => ['nullable', 'array'],
             $property->isDataCollection() => ['present', 'array'],
+            // no break
             default => throw new Exception('Could not resolve rules for data property')
         };
 

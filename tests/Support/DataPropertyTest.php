@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Tests\Support;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\Max;
 use Spatie\LaravelData\Attributes\WithCast;
-use Spatie\LaravelData\Casts\DataCast;
 use Spatie\LaravelData\Casts\DateTimeCast;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;

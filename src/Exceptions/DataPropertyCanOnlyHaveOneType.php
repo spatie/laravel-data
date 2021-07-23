@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Exceptions;
 
 use Exception;
-use ReflectionProperty;
 use Spatie\LaravelData\Support\DataProperty;
 
 class DataPropertyCanOnlyHaveOneType extends Exception
