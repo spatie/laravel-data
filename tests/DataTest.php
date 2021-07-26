@@ -87,7 +87,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_include_a_nested_lazy_property()
     {
-        $data = new class(Lazy::create(fn () => LazyData::create('Hello')), Lazy::create(fn () => LazyData::collection([ 'is', 'it', 'me', 'your', 'looking', 'for', ])), ) extends Data {
+        $data = new class(Lazy::create(fn () => LazyData::create('Hello')), Lazy::create(fn () => LazyData::collection([ 'is', 'it', 'me', 'your', 'looking', 'for', ])),) extends Data {
             public function __construct(
                 public Lazy | LazyData $data,
                 /** @var \Spatie\LaravelData\Tests\Fakes\LazyData[] */
@@ -338,8 +338,7 @@ class DataTest extends TestCase
             public function __construct(
                 #[WithTransformer(DateTransformer::class, 'd-m-Y')]
                 public $date
-            )
-            {
+            ) {
             }
         };
 
@@ -363,7 +362,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([ new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
+        $data = new class($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([ new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'),) extends Data {
             public function __construct(
                 public SimpleData $data,
                 public DataCollection $dataCollection,

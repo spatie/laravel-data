@@ -99,7 +99,7 @@ class DataTransformer
         array $nestedInclusionTree,
         array $nestedExclusionTree,
     ): mixed {
-        if($value === null){
+        if ($value === null) {
             return null;
         }
 
