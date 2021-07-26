@@ -2,7 +2,10 @@
 
 namespace Spatie\LaravelData;
 
+use Spatie\LaravelData\Casts\CarbonCast;
+use Spatie\LaravelData\Casts\CarbonImmutableCast;
 use Spatie\LaravelData\Casts\DateTimeCast;
+use Spatie\LaravelData\Casts\DateTimeImmutableCast;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataResolver;
 use Spatie\LaravelData\Transformers\DateTransformer;
@@ -21,6 +24,18 @@ class LaravelDataServiceProvider extends PackageServiceProvider
     public function packageRegistered()
     {
         $this->app->when(DateTimeCast::class)->needs('$format')->give(
+            config('data.date_format')
+        );
+
+        $this->app->when(DateTimeImmutableCast::class)->needs('$format')->give(
+            config('data.date_format')
+        );
+
+        $this->app->when(CarbonCast::class)->needs('$format')->give(
+            config('data.date_format')
+        );
+
+        $this->app->when(CarbonImmutableCast::class)->needs('$format')->give(
             config('data.date_format')
         );
 
