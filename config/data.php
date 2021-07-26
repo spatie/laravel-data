@@ -14,6 +14,9 @@ return [
 
     'casts' => [
         DateTime::class => Spatie\LaravelData\Casts\DateTimeCast::class,
+        DateTimeImmutable::class => Spatie\LaravelData\Casts\DateTimeImmutableCast::class,
+        Carbon\Carbon::class => Spatie\LaravelData\Casts\CarbonCast::class,
+        Carbon\CarbonImmutable::class => Spatie\LaravelData\Casts\CarbonImmutableCast::class,
     ],
 
     'auto_rules' => [
