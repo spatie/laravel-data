@@ -23,26 +23,6 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
     public function packageRegistered()
     {
-        $this->app->when(DateTimeCast::class)->needs('$format')->give(
-            config('data.date_format')
-        );
-
-        $this->app->when(DateTimeImmutableCast::class)->needs('$format')->give(
-            config('data.date_format')
-        );
-
-        $this->app->when(CarbonCast::class)->needs('$format')->give(
-            config('data.date_format')
-        );
-
-        $this->app->when(CarbonImmutableCast::class)->needs('$format')->give(
-            config('data.date_format')
-        );
-
-        $this->app->when(DateTransformer::class)->needs('$format')->give(
-            config('data.date_format')
-        );
-
         $this->app->singleton(
             DataConfig::class,
             fn () => new DataConfig(config('data'))

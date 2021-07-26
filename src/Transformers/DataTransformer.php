@@ -2,12 +2,11 @@
 
 namespace Spatie\LaravelData\Transformers;
 
-use ReflectionClass;
-use ReflectionProperty;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataProperty;
 
 class DataTransformer
 {
@@ -42,18 +41,17 @@ class DataTransformer
 
     protected function resolvePayload(Data $data): array
     {
-        $reflection = new ReflectionClass($data);
-
         $inclusionTree = $data->getInclusionTree();
         $exclusionTree = $data->getExclusionTree();
 
         return array_reduce(
-            $reflection->getProperties(ReflectionProperty::IS_PUBLIC),
-            function (array $payload, ReflectionProperty $property) use ($data, $exclusionTree, $inclusionTree) {
-                $name = $property->getName();
+            $this->config->getDataProperties($data::class),
+            function (array $payload, DataProperty $property) use ($data, $exclusionTree, $inclusionTree) {
+                $name = $property->name();
 
                 if ($this->shouldIncludeProperty($name, $data->{$name}, $inclusionTree, $exclusionTree)) {
                     $payload[$name] = $this->resolvePropertyValue(
+                        $property,
                         $data->{$name},
                         $inclusionTree[$name] ?? [],
                         $exclusionTree[$name] ?? []
@@ -96,6 +94,7 @@ class DataTransformer
     }
 
     protected function resolvePropertyValue(
+        DataProperty $property,
         mixed $value,
         array $nestedInclusionTree,
         array $nestedExclusionTree,
@@ -112,8 +111,12 @@ class DataTransformer
                 : $value;
         }
 
-        return $this->withValueTransforming
-            ? $this->config->transform($value)
-            : $value;
+        if (! $this->withValueTransforming) {
+            return $value;
+        }
+
+        $transformer = $property->transformerAttribute()?->get() ?? $this->config->findTransformerForValue($value);
+
+        return $transformer?->transform($value) ?? $value;
     }
 }

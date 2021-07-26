@@ -6,7 +6,7 @@ use DateTimeInterface;
 
 class DateTransformer implements Transformer
 {
-    public function __construct(protected string $format)
+    public function __construct(protected ?string $format = null)
     {
     }
 
@@ -17,7 +17,9 @@ class DateTransformer implements Transformer
 
     public function transform(mixed $value): string
     {
+        $format = $this->format ?? config('data.date_format');
+
         /** @var \DateTimeInterface $value */
-        return $value->format($this->format);
+        return $value->format($format);
     }
 }

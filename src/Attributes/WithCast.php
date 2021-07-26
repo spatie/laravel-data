@@ -22,4 +22,9 @@ class WithCast
 
         $this->arguments = $arguments;
     }
+
+    public function get(): Cast
+    {
+        return new ($this->castClass)(...$this->arguments);
+    }
 }

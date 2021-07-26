@@ -9,6 +9,7 @@ use ReflectionProperty;
 use ReflectionUnionType;
 use Spatie\LaravelData\Attributes\DataValidationAttribute;
 use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
@@ -34,6 +35,8 @@ class DataProperty
     private array $validationAttributes;
 
     private ?WithCast $castAttribute;
+
+    private ?WithTransformer $transformerAttribute;
 
     public static function create(ReflectionProperty $property): static
     {
@@ -111,6 +114,15 @@ class DataProperty
         }
 
         return $this->castAttribute;
+    }
+
+    public function transformerAttribute(): ?WithTransformer
+    {
+        if (! isset($this->transformerAttribute)) {
+            $this->loadAttributes();
+        }
+
+        return $this->transformerAttribute;
     }
 
     /**
@@ -252,12 +264,22 @@ class DataProperty
 
                 continue;
             }
+
+            if ($initiatedAttribute instanceof WithTransformer) {
+                $this->transformerAttribute = $initiatedAttribute;
+
+                continue;
+            }
         }
 
         $this->validationAttributes = $validationAttributes;
 
         if (! isset($this->castAttribute)) {
             $this->castAttribute = null;
+        }
+
+        if (! isset($this->transformerAttribute)) {
+            $this->transformerAttribute = null;
         }
     }
 }

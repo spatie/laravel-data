@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Tests;
 
 use DateTime;
+use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
@@ -13,6 +14,7 @@ use Spatie\LaravelData\Tests\Fakes\EmptyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Transformers\DateTransformer;
 
 class DataTest extends TestCase
 {
@@ -311,6 +313,23 @@ class DataTest extends TestCase
         };
 
         $this->assertEquals(['date' => '1994-05-16T00:00:00+00:00'], $data->toArray());
+    }
+
+    /** @test */
+    public function it_can_manually_specify_a_transformer()
+    {
+        $date = new DateTime('16 may 1994');
+
+        $data = new class($date) extends Data {
+            public function __construct(
+                #[WithTransformer(DateTransformer::class, 'd-m-Y')]
+                public $date
+            )
+            {
+            }
+        };
+
+        $this->assertEquals(['date' => '16-05-1994'], $data->toArray());
     }
 
     /** @test */

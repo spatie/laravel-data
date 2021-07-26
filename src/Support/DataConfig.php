@@ -64,14 +64,7 @@ class DataConfig
         return $this->autoRules;
     }
 
-    public function transform(mixed $value): mixed
-    {
-        $transformer = $this->findTransformerForValue($value);
-
-        return $transformer?->transform($value) ?? $value;
-    }
-
-    protected function findTransformerForValue(mixed $value): ?Transformer
+    public function findTransformerForValue(mixed $value): ?Transformer
     {
         foreach ($this->transformers as $transformer) {
             if ($transformer->canTransform($value)) {

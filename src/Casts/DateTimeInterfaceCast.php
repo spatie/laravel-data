@@ -9,12 +9,14 @@ use Spatie\LaravelData\Support\DataProperty;
 class DateTimeInterfaceCast implements Cast
 {
     public function __construct(
-        protected string $format
+        protected ?string $format = null
     ) {
     }
 
     public function cast(DataProperty $property, mixed $value): DateTimeInterface | Uncastable
     {
+        $format = $this->format ?? config('data.date_format');
+
         $type = $this->findType($property);
 
         if ($type instanceof Uncastable) {
@@ -22,10 +24,10 @@ class DateTimeInterfaceCast implements Cast
         }
 
         /** @var \DateTime|\DateTimeImmutable $name */
-        $datetime = $type::createFromFormat($this->format, $value);
+        $datetime = $type::createFromFormat($format, $value);
 
         if ($datetime === false) {
-            throw new Exception("Could not cast date: `{$value}` using format {$this->format}");
+            throw new Exception("Could not cast date: `{$value}` using format {$format}");
         }
 
         return $datetime;
