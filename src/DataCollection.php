@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData;
 
+use Illuminate\Contracts\Database\Eloquent\Castable as EloquentCastable;
 use ArrayAccess;
 use ArrayIterator;
 use Closure;
@@ -17,9 +18,11 @@ use Illuminate\Support\Collection;
 use IteratorAggregate;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
+use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
+use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
 use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 
-class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggregate, Countable, ArrayAccess
+class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggregate, Countable, ArrayAccess, EloquentCastable
 {
     use ResponsableData;
     use IncludeableData;
@@ -120,6 +123,15 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         }
 
         throw new Exception('Unsetting in paginated collection is prohibited');
+    }
+
+    public static function castUsing(array $arguments)
+    {
+        if(count($arguments) !== 1){
+            throw new Exception('Data collection eloquent cast should have its data class as an argument');
+        }
+
+        return new DataCollectionEloquentCast(current($arguments));
     }
 
     protected function getTransformer(): DataCollectionTransformer

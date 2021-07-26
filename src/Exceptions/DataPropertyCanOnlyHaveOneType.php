@@ -3,22 +3,14 @@
 namespace Spatie\LaravelData\Exceptions;
 
 use Exception;
-use ReflectionProperty;
+use Spatie\LaravelData\Support\DataProperty;
 
 class DataPropertyCanOnlyHaveOneType extends Exception
 {
-    public static function multi(ReflectionProperty $property, int $count): self
+    public static function create(DataProperty $property)
     {
-        return new self("A data property can only have one type, {$property->class}::{$property->name} has {$count} types");
-    }
+        $typesCount = count($property->types());
 
-    public static function lazy(ReflectionProperty $property, int $count): self
-    {
-        return new self("A lazy data property type can only have one type besides its Lazy type, {$property->class}::{$property->name} has {$count} types");
-    }
-
-    public static function nullableLazy(ReflectionProperty $property, int $count): self
-    {
-        return new self("A nullable lazy data property type can only have one type besides its `Lazy|null` type, {$property->class}::{$property->name} has {$count} types");
+        return new self("When resolving an empty data property, it can only have one type, {$property->className()}::{$property->name()} has {$typesCount} types");
     }
 }
