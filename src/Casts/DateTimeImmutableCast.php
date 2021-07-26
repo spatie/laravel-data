@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Casts;
 
-use DateTime;
 use DateTimeImmutable;
 use Spatie\LaravelData\Support\DataProperty;
 
