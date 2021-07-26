@@ -12,20 +12,19 @@ class DataCollectionEloquentCast implements CastsAttributes
     public function __construct(
         /** @var class-string<\Spatie\LaravelData\Data> */
         protected string $dataClass
-    )
-    {
+    ) {
     }
 
     public function get($model, string $key, $value, array $attributes): ?DataCollection
     {
-        if($value === null){
+        if ($value === null) {
             return null;
         }
 
         $data = json_decode($value, true, flags: JSON_THROW_ON_ERROR);
 
         $data = array_map(
-            fn(array $item) => ($this->dataClass)::createFromArray($item),
+            fn (array $item) => ($this->dataClass)::createFromArray($item),
             $data
         );
 
@@ -34,20 +33,20 @@ class DataCollectionEloquentCast implements CastsAttributes
 
     public function set($model, string $key, $value, array $attributes): ?string
     {
-        if($value === null){
+        if ($value === null) {
             return null;
         }
 
-        if($value instanceof DataCollection){
+        if ($value instanceof DataCollection) {
             $value = $value->all();
         }
 
-        if(!is_array($value)){
+        if (! is_array($value)) {
             throw new Exception("Value given to a data collection eloquent cast should be a DataCollection or array");
         }
 
         $data = array_map(
-            fn(array|Data $item) => is_array($item)
+            fn (array | Data $item) => is_array($item)
                 ? ($this->dataClass)::createFromArray($item)
                 : $item,
             $value

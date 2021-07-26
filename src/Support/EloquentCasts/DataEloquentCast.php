@@ -11,13 +11,12 @@ class DataEloquentCast implements CastsAttributes
     public function __construct(
         /** @var class-string<\Spatie\LaravelData\Data> */
         protected string $dataClass
-    )
-    {
+    ) {
     }
 
     public function get($model, string $key, $value, array $attributes): ?Data
     {
-        if($value === null){
+        if ($value === null) {
             return null;
         }
 
@@ -31,15 +30,15 @@ class DataEloquentCast implements CastsAttributes
 
     public function set($model, string $key, $value, array $attributes): ?string
     {
-        if($value === null){
+        if ($value === null) {
             return null;
         }
 
-        if(is_array($value)){
+        if (is_array($value)) {
             $value = ($this->dataClass)::createFromArray($value);
         }
 
-        if(!$value instanceof Data){
+        if (! $value instanceof Data) {
             $className = $model::class;
 
             throw new Exception("Attribute `{$key}` of model `{$className}` should be a Data object");

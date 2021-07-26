@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Http\Request;
-use Spatie\LaravelData\Actions\ResolveDataObjectFromArrayAction;
 
 trait RequestableData
 {

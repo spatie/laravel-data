@@ -17,7 +17,6 @@ use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\RequestableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
-use Spatie\LaravelData\Support\EmptyDataResolver;
 use Spatie\LaravelData\Transformers\DataTransformer;
 
 /**
