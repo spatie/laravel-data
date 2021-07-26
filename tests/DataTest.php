@@ -332,6 +332,21 @@ class DataTest extends TestCase
     }
 
     /** @test */
+    public function a_transformer_will_never_handle_a_null_value()
+    {
+        $data = new class(null) extends Data {
+            public function __construct(
+                #[WithTransformer(DateTransformer::class, 'd-m-Y')]
+                public $date
+            )
+            {
+            }
+        };
+
+        $this->assertEquals(['date' => null], $data->toArray());
+    }
+
+    /** @test */
     public function it_can_dynamically_include_data_based_upon_the_request()
     {
         $response = LazyData::create('Ruben')->toResponse(request());
