@@ -19,10 +19,10 @@ class ResolveDataObjectFromArrayAction
     {
         /** @var \Spatie\LaravelData\Data $data */
         $data = collect($this->dataConfig->getDataProperties($class))
-            ->mapWithKeys(fn(DataProperty $property) => [
+            ->mapWithKeys(fn (DataProperty $property) => [
                 $property->name() => $this->resolveValue($property, $values[$property->name()] ?? null),
             ])
-            ->pipe(fn(Collection $properties) => new $class(...$properties));
+            ->pipe(fn (Collection $properties) => new $class(...$properties));
 
         return $data;
     }
@@ -51,7 +51,7 @@ class ResolveDataObjectFromArrayAction
 
         if ($property->isDataCollection()) {
             $items = array_map(
-                fn(array $item) => $this->execute($property->getDataClass(), $item),
+                fn (array $item) => $this->execute($property->getDataClass(), $item),
                 $value
             );
 
