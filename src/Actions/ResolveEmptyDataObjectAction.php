@@ -69,7 +69,7 @@ class ResolveEmptyDataObjectAction
         }
 
         if ($property->isData()) {
-            /** @var \Spatie\LaravelData\Data $name */
+            /** @var \Spatie\LaravelData\Data $type */
             return $type::empty();
         }
 

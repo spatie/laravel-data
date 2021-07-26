@@ -74,7 +74,7 @@ class ResolveDataObjectFromArrayAction
     ): mixed {
         $attribute = $property->castAttribute();
 
-        /** @var \Spatie\LaravelData\Casts\Cast $cast */
+        /** @psalm-suppress all */
         $cast = new ($attribute->castClass)(...$attribute->arguments);
 
         return $cast->cast($property, $value);

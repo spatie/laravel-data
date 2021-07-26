@@ -9,15 +9,10 @@ trait RequestableData
 {
     public static function createFromRequest(Request $request): static
     {
-        return app(ResolveDataObjectFromArrayAction::class)->execute(static::class, $request->all());
+        return static::createFromArray($request->all());
     }
 
     public static function rules(): array
-    {
-        return [];
-    }
-
-    public static function casts(): array
     {
         return [];
     }

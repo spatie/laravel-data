@@ -25,10 +25,8 @@
         "brianium/paratest": "^6.2",
         "nunomaduro/collision": "^5.3",
         "orchestra/testbench": "^6.19",
-        "pestphp/pest": "^1.10",
         "phpunit/phpunit": "^9.3",
         "spatie/laravel-typescript-transformer": "^2.0",
-        "spatie/pest-plugin-snapshots": "^1.1",
         "spatie/phpunit-snapshot-assertions": "^4.2",
         "vimeo/psalm": "^4.4"
     },

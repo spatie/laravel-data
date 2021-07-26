@@ -33,6 +33,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
             fn () => new DataConfig(config('data'))
         );
 
+        /** @psalm-suppress UndefinedInterfaceMethod */
         $this->app->beforeResolving(RequestData::class, function ($class) {
             if ($this->app->has($class)) {
                 return;

@@ -1,2 +1,2 @@
 providers:
-  - Spatie\LaravelDataResource\LaravelDataResourceServiceProvider
+  - Spatie\LaravelData\LaravelDataServiceProvider

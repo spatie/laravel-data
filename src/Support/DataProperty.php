@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support;
 
 use Exception;
+use Illuminate\Support\Str;
 use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
@@ -12,7 +13,6 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
-use Str;
 
 class DataProperty
 {
@@ -96,6 +96,7 @@ class DataProperty
 
     public function validationAttributes(): array
     {
+        /** @psalm-suppress RedundantPropertyInitializationCheck */
         if (! isset($this->validationAttributes)) {
             $this->loadAttributes();
         }
@@ -117,6 +118,7 @@ class DataProperty
      */
     public function getDataClass(): string
     {
+        /** @psalm-suppress RedundantPropertyInitializationCheck */
         if (isset($this->dataClass)) {
             return $this->dataClass;
         }
@@ -133,7 +135,7 @@ class DataProperty
             }
 
             // TODO: make this more robust, because it isnt
-            return $this->dataClass = Str::of($comment)->after('@var \\')->before('[]');
+            return $this->dataClass = (string) Str::of($comment)->after('@var \\')->before('[]');
         }
 
         throw new Exception('Property type is not a data object or data collection object');

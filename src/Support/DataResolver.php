@@ -3,9 +3,9 @@
 namespace Spatie\LaravelData\Support;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Spatie\LaravelData\Actions\ResolveValidationRulesForDataAction;
 use Spatie\LaravelData\Data;
-use Validator;
 
 class DataResolver
 {
@@ -18,7 +18,6 @@ class DataResolver
     public function get(string $class): Data
     {
         /** @var \Spatie\LaravelData\RequestData|string $class */
-
         $rules = $this->resolveValidationRulesForDataAction
             ->execute($class)
             ->merge($class::rules())
