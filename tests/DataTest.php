@@ -189,7 +189,7 @@ class DataTest extends TestCase
             ) {
             }
 
-            public static function create(string $name)
+            public static function create(mixed $name): Data
             {
                 return new self(
                     Lazy::when(fn () => $name === 'Ruben', fn () => $name)
@@ -215,7 +215,7 @@ class DataTest extends TestCase
             ) {
             }
 
-            public static function create(string $name)
+            public static function create(mixed $name): Data
             {
                 return new self(
                     Lazy::when(fn () => $name === 'Ruben', fn () => $name)

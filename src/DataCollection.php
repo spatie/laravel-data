@@ -8,6 +8,7 @@ use Closure;
 use Countable;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Castable as EloquentCastable;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
@@ -30,11 +31,11 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     private ?Closure $filter = null;
 
-    private array | AbstractPaginator | CursorPaginator $items;
+    private array|AbstractPaginator|AbstractCursorPaginator|Paginator $items;
 
     public function __construct(
         private string $dataClass,
-        Collection | array | AbstractPaginator | CursorPaginator $items
+        Collection|array|AbstractPaginator|AbstractCursorPaginator|Paginator $items
     ) {
         $this->items = $items instanceof Collection ? $items->all() : $items;
     }
@@ -53,7 +54,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         return $this;
     }
 
-    public function items(): Collection | array | AbstractPaginator | CursorPaginator
+    public function items(): Collection|array|AbstractPaginator|CursorPaginator
     {
         return $this->items;
     }

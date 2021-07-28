@@ -12,7 +12,7 @@ class LazyData extends Data
     ) {
     }
 
-    public static function create(string $name)
+    public static function create(mixed $name): Data
     {
         return new self(
             Lazy::create(fn () => $name)
