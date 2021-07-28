@@ -34,6 +34,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, RequestData, El
         return [];
     }
 
+    //TODO: check iterator
     public static function collection(Collection | array | AbstractPaginator | CursorPaginator | LengthAwarePaginator $items): DataCollection
     {
         return new DataCollection(static::class, $items);

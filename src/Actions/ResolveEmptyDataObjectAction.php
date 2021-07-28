@@ -55,6 +55,7 @@ class ResolveEmptyDataObjectAction
         }
 
         if (count($property->types()) > 1) {
+            // TODO:add solution to message with extra array
             throw DataPropertyCanOnlyHaveOneType::create($property);
         }
 
@@ -77,6 +78,7 @@ class ResolveEmptyDataObjectAction
             return [];
         }
 
+        // TODO: Is iteratable
         if (is_a($type, Collection::class, true)) {
             return [];
         }

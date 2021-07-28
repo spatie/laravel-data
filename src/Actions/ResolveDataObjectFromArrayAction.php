@@ -37,6 +37,10 @@ class ResolveDataObjectFromArrayAction
             return $this->resolveValueByAttributeCast($property, $value);
         }
 
+        if ($cast = $this->resolveGlobalCast($property)) {
+            return $cast->cast($property, $value);
+        }
+
         if (empty($property->types())) {
             return $value;
         }
@@ -59,10 +63,6 @@ class ResolveDataObjectFromArrayAction
                 $property->getDataClass(),
                 $items
             );
-        }
-
-        if ($cast = $this->resolveGlobalCast($property)) {
-            return $cast->cast($property, $value);
         }
 
         return $value;

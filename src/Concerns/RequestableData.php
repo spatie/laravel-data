@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 trait RequestableData
 {
+    // TODO: authorization, messages,
     public static function createFromRequest(Request $request): static
     {
         return static::createFromArray($request->all());
