@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support;
 
 use ReflectionClass;
-use ReflectionProperty;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Transformers\Transformer;
 
@@ -24,12 +23,12 @@ class DataConfig
     public function __construct(array $config)
     {
         $this->transformers = array_map(
-            fn(string $transformerClass) => app($transformerClass),
+            fn (string $transformerClass) => app($transformerClass),
             $config['transformers'] ?? []
         );
 
         $this->autoRules = array_map(
-            fn(string $autoRuleClass) => app($autoRuleClass),
+            fn (string $autoRuleClass) => app($autoRuleClass),
             $config['auto_rules'] ?? []
         );
 
@@ -48,11 +47,11 @@ class DataConfig
     public function getCastForType(string $type): ?Cast
     {
         foreach ($this->casts as $castable => $cast) {
-            if(ltrim($type, ' \\') === ltrim($castable, ' \\')){
+            if (ltrim($type, ' \\') === ltrim($castable, ' \\')) {
                 return app($cast);
             }
 
-            if(is_a($type, $castable, true)){
+            if (is_a($type, $castable, true)) {
                 return app($cast);
             }
         }

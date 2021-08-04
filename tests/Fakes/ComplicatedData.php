@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Tests\Fakes;
 use Carbon\CarbonImmutable;
 use DateTime;
 use Spatie\LaravelData\Attributes\WithCast;
-use Spatie\LaravelData\Casts\DateTimeCast;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;

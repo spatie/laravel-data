@@ -48,7 +48,7 @@ class DataFromSomethingResolver
 
         $type = gettype($payload);
 
-        if($type === 'object'){
+        if ($type === 'object') {
             return $customFromMethods[ltrim($payload::class, ' \\')] ?? null;
         }
 

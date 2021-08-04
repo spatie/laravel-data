@@ -37,7 +37,7 @@ class RequestData extends Data
 
     public static function withValidator(Validator $validator): void
     {
-        if(self::$validatorClosure){
+        if (self::$validatorClosure) {
             (self::$validatorClosure)($validator);
         }
     }

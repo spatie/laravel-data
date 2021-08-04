@@ -3,9 +3,9 @@
 namespace Spatie\LaravelData\Tests\Resolvers;
 
 use ReflectionProperty;
-use Spatie\LaravelData\Resolvers\DataPropertyValidationRulesResolver;
 use Spatie\LaravelData\Attributes\Max;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Resolvers\DataPropertyValidationRulesResolver;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;

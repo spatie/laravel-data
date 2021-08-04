@@ -34,8 +34,8 @@ class EmptyDataResolver
 
         if ($reflection->hasMethod('__construct')) {
             $defaultConstructorProperties = collect($reflection->getMethod('__construct')->getParameters())
-                ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-                ->mapWithKeys(fn(ReflectionParameter $parameter) => [
+                ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+                ->mapWithKeys(fn (ReflectionParameter $parameter) => [
                     $parameter->name => $parameter->getDefaultValue(),
                 ])
                 ->toArray();

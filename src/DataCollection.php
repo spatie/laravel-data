@@ -31,11 +31,11 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     private ?Closure $filter = null;
 
-    private array|AbstractPaginator|AbstractCursorPaginator|Paginator $items;
+    private array | AbstractPaginator | AbstractCursorPaginator | Paginator $items;
 
     public function __construct(
         private string $dataClass,
-        Collection|array|AbstractPaginator|AbstractCursorPaginator|Paginator $items
+        Collection | array | AbstractPaginator | AbstractCursorPaginator | Paginator $items
     ) {
         $this->items = $items instanceof Collection ? $items->all() : $items;
     }
@@ -54,7 +54,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         return $this;
     }
 
-    public function items(): Collection|array|AbstractPaginator|CursorPaginator
+    public function items(): Collection | array | AbstractPaginator | CursorPaginator
     {
         return $this->items;
     }

@@ -8,7 +8,6 @@ use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
@@ -156,25 +155,25 @@ class DataCollectionTest extends TestCase
     public function arrayAccessCollections(): Generator
     {
         yield "array" => [
-            fn() => SimpleData::collection([
+            fn () => SimpleData::collection([
                 'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ]),
         ];
 
         yield "collection" => [
-            fn() => SimpleData::collection([
+            fn () => SimpleData::collection([
                 'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ]),
         ];
 
         yield "paginator" => [
-            fn() => SimpleData::collection(new LengthAwarePaginator([
+            fn () => SimpleData::collection(new LengthAwarePaginator([
                 'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ], 4, 15)),
         ];
 
         yield "cursor paginator" => [
-            fn() => SimpleData::collection(new CursorPaginator([
+            fn () => SimpleData::collection(new CursorPaginator([
                 'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ], 4)),
         ];

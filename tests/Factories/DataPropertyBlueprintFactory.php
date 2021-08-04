@@ -82,12 +82,10 @@ class DataPropertyBlueprintFactory
 
     public function withTransformer(
         string $transformerClass,
-    )
-    {
-
+    ) {
     }
 
-    public function create(): Property|PromotedParameter
+    public function create(): Property | PromotedParameter
     {
         $property = $this->constructorPromoted
             ? new PromotedParameter($this->name)
@@ -97,7 +95,7 @@ class DataPropertyBlueprintFactory
             ->setType($this->resolveTypes())
             ->setNullable($this->nullable);
 
-        if($this->annotationType){
+        if ($this->annotationType) {
             $property->setComment("@var {$this->annotationType} \${$this->name}");
         }
 
@@ -106,20 +104,20 @@ class DataPropertyBlueprintFactory
 
     private function resolveTypes(): ?string
     {
-        if(empty($this->types)){
+        if (empty($this->types)) {
             return null;
         }
 
         $types = $this->types;
 
-        if($this->lazy){
+        if ($this->lazy) {
             $types[] = Lazy::class;
         }
 
-        if(count($types) === 1){
+        if (count($types) === 1) {
             return current($types);
         }
 
-        return implode('|',$types);
+        return implode('|', $types);
     }
 }

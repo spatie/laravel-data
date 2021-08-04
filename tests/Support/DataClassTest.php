@@ -28,19 +28,17 @@ class DataClassTest extends TestCase
                 return new self($property);
             }
 
-            public static function fromNumber(int|float $property): static
+            public static function fromNumber(int | float $property): static
             {
                 return new self($property);
             }
 
             public function fromDoNotInclude(string $other)
             {
-
             }
 
             private static function fromAnotherDoNotInclude(string $other)
             {
-
             }
 
             public static function fromYetAnotherDoNotInclude($other): static

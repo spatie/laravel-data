@@ -49,8 +49,8 @@ class DataBlueprintFactory
         /** @var \Illuminate\Support\Collection $properties */
         /** @var \Illuminate\Support\Collection $promotedProperties */
         [$promotedProperties, $properties] = collect($this->properties)
-            ->map(fn(DataPropertyBlueprintFactory $factory) => $factory->create())
-            ->partition(fn(PromotedParameter|Property $property) => $property instanceof PromotedParameter);
+            ->map(fn (DataPropertyBlueprintFactory $factory) => $factory->create())
+            ->partition(fn (PromotedParameter | Property $property) => $property instanceof PromotedParameter);
 
         $class->setProperties($properties->all());
 

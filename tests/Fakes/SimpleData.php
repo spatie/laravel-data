@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Tests\Fakes;
 
-use Spatie\LaravelData\Attributes\Max;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\RequestData;
 

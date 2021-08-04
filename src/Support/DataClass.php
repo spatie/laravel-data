@@ -41,7 +41,7 @@ class DataClass
 
         $methods = array_filter(
             $this->class->getMethods(ReflectionMethod::IS_STATIC),
-            fn(ReflectionMethod $method) => $this->isValidCustomFromMethod($method)
+            fn (ReflectionMethod $method) => $this->isValidCustomFromMethod($method)
         );
 
         foreach ($methods as $method) {
@@ -58,7 +58,7 @@ class DataClass
                 continue;
             }
 
-            foreach ($type->getTypes() as $subType){
+            foreach ($type->getTypes() as $subType) {
                 $this->customFromMethods[$subType->getName()] = $method->getName();
             }
         }
