@@ -14,7 +14,7 @@ class MultiLazyData extends Data
     ) {
     }
 
-    public static function create(mixed $model): Data
+    public static function create($model): static
     {
         return new self(
             Lazy::create(fn () => $model->artist),

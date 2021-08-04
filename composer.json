@@ -28,6 +28,7 @@
         "phpunit/phpunit": "^9.3",
         "spatie/laravel-typescript-transformer": "^2.0",
         "spatie/phpunit-snapshot-assertions": "^4.2",
+        "nette/php-generator": "^3.5",
         "vimeo/psalm": "^4.4"
     },
     "autoload": {

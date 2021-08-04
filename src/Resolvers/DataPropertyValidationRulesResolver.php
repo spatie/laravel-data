@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelData\Actions;
+namespace Spatie\LaravelData\Resolvers;
 
 use Exception;
 use Illuminate\Support\Collection;
@@ -8,10 +8,10 @@ use Spatie\LaravelData\AutoRules\AutoRule;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 
-class ResolveValidationRulesForPropertyAction
+class DataPropertyValidationRulesResolver
 {
     public function __construct(
-        protected ResolveValidationRulesForDataAction $resolveValidationRulesForDataAction,
+        protected DataValidationRulesResolver $dataValidationRulesResolver,
         protected DataConfig $dataConfig
     ) {
     }
@@ -37,12 +37,11 @@ class ResolveValidationRulesForPropertyAction
             $property->isData() && $property->isNullable() => ['nullable', 'array'],
             $property->isData() => ['required', 'array'],
             $property->isDataCollection() && $property->isNullable() => ['nullable', 'array'],
-            $property->isDataCollection() => ['present', 'array'],
-            // no break
+            $property->isDataCollection() => ['required', 'array'],
             default => throw new Exception('Could not resolve rules for data property')
         };
 
-        return $this->resolveValidationRulesForDataAction
+        return $this->dataValidationRulesResolver
             ->execute($property->getDataClass())
             ->mapWithKeys(fn (array $rules, string $name) => [
                 "{$prefix}{$name}" => $rules,

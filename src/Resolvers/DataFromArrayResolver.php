@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelData\Actions;
+namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Casts\Cast;
@@ -9,7 +9,7 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 
-class ResolveDataObjectFromArrayAction
+class DataFromArrayResolver
 {
     public function __construct(protected DataConfig $dataConfig)
     {

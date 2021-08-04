@@ -9,13 +9,16 @@ use Spatie\LaravelData\RequestData;
 class SimpleData extends Data implements RequestData
 {
     public function __construct(
-        #[Max(10)]
         public string $string
     ) {
     }
 
     public static function create($resource): static
     {
-        return new self($resource);
+        if(is_string($resource)) {
+            return new self($resource);
+        }
+
+        return parent::create($resource);
     }
 }

@@ -1,12 +1,12 @@
 <?php
 
-namespace Spatie\LaravelData\Actions;
+namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 
-class ResolveValidationRulesForDataAction
+class DataValidationRulesResolver
 {
     /** @var array<string, \Illuminate\Support\Collection> */
     protected static $cachedDataObjectRules = [];
@@ -21,7 +21,7 @@ class ResolveValidationRulesForDataAction
             return self::$cachedDataObjectRules[$class];
         }
 
-        $resolver = app(ResolveValidationRulesForPropertyAction::class);
+        $resolver = app(DataPropertyValidationRulesResolver::class);
 
         $rules = collect($this->dataConfig->getDataProperties($class))
             ->mapWithKeys(

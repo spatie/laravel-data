@@ -1,9 +1,9 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Actions;
+namespace Spatie\LaravelData\Tests\Resolvers;
 
 use ReflectionProperty;
-use Spatie\LaravelData\Actions\ResolveValidationRulesForPropertyAction;
+use Spatie\LaravelData\Resolvers\DataPropertyValidationRulesResolver;
 use Spatie\LaravelData\Attributes\Max;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Support\DataProperty;
@@ -11,7 +11,7 @@ use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 
-class ResolveValidationRulesForPropertyActionTest extends TestCase
+class DataPropertyValidationRulesResolverTest extends TestCase
 {
     /** @test */
     public function it_will_add_a_required_or_nullable_rule_based_upon_the_property_nullability()
@@ -99,7 +99,7 @@ class ResolveValidationRulesForPropertyActionTest extends TestCase
 
         $this->assertEquals([
             'property' => ['required', 'array'],
-            'property.string' => ['required', 'string', 'max:10'],
+            'property.string' => ['required', 'string'],
         ], $rules);
 
         $rules = $this->resolveRules(new class {
@@ -108,7 +108,7 @@ class ResolveValidationRulesForPropertyActionTest extends TestCase
 
         $this->assertEquals([
             'property' => ['nullable', 'array'],
-            'property.string' => ['required', 'string', 'max:10'],
+            'property.string' => ['required', 'string'],
         ], $rules);
     }
 
@@ -122,8 +122,8 @@ class ResolveValidationRulesForPropertyActionTest extends TestCase
         });
 
         $this->assertEquals([
-            'property' => ['present', 'array'],
-            'property.*.string' => ['required', 'string', 'max:10'],
+            'property' => ['required', 'array'],
+            'property.*.string' => ['required', 'string'],
         ], $rules);
 
         $rules = $this->resolveRules(new class {
@@ -133,7 +133,7 @@ class ResolveValidationRulesForPropertyActionTest extends TestCase
 
         $this->assertEquals([
             'property' => ['nullable', 'array'],
-            'property.*.string' => ['required', 'string', 'max:10'],
+            'property.*.string' => ['required', 'string'],
         ], $rules);
     }
 
@@ -147,7 +147,7 @@ class ResolveValidationRulesForPropertyActionTest extends TestCase
         $this->assertEquals([
             'property' => ['required', 'array'],
             'property.simple' => ['required', 'array'],
-            'property.simple.string' => ['required', 'string', 'max:10'],
+            'property.simple.string' => ['required', 'string'],
         ], $rules);
 
         $rules = $this->resolveRules(new class {
@@ -156,7 +156,7 @@ class ResolveValidationRulesForPropertyActionTest extends TestCase
 
         $this->assertEquals([
             'property' => ['nullable', 'array'],
-            'property.string' => ['required', 'string', 'max:10'],
+            'property.string' => ['required', 'string'],
         ], $rules);
     }
 
@@ -166,6 +166,6 @@ class ResolveValidationRulesForPropertyActionTest extends TestCase
 
         $property = DataProperty::create($reflectionProperty);
 
-        return app(ResolveValidationRulesForPropertyAction::class)->execute($property)->toArray();
+        return app(DataPropertyValidationRulesResolver::class)->execute($property)->toArray();
     }
 }

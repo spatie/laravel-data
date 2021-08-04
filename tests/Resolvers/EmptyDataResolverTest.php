@@ -1,17 +1,17 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Actions;
+namespace Spatie\LaravelData\Tests\Resolvers;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Actions\ResolveEmptyDataObjectAction;
+use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 
-class ResolveEmptyDataObjectActionTest extends TestCase
+class EmptyDataResolverTest extends TestCase
 {
     /** @test */
     public function it_will_return_null_if_the_property_has_no_type()
@@ -164,7 +164,7 @@ class ResolveEmptyDataObjectActionTest extends TestCase
 
     private function assertEmptyPropertyValue(mixed $expected, object $class, array $extra = [])
     {
-        $resolver = app(ResolveEmptyDataObjectAction::class);
+        $resolver = app(EmptyDataResolver::class);
 
         $this->assertEquals($expected, $resolver->execute($class::class, $extra)['property']);
     }

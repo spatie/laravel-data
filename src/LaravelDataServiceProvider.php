@@ -2,8 +2,8 @@
 
 namespace Spatie\LaravelData;
 
+use Spatie\LaravelData\Resolvers\DataFromRequestResolver;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\DataResolver;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -31,7 +31,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
             $this->app->bind(
                 $class,
-                fn () => $this->app->make(DataResolver::class)->get($class),
+                fn () => $this->app->make(DataFromRequestResolver::class)->get($class),
             );
         });
     }

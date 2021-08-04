@@ -1,15 +1,17 @@
 <?php
 
-namespace Spatie\LaravelData\Actions;
+namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Collection;
+use Iterator;
 use ReflectionClass;
 use ReflectionParameter;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
+use Traversable;
 
-class ResolveEmptyDataObjectAction
+class EmptyDataResolver
 {
     public function __construct(protected DataConfig $dataConfig)
     {
@@ -55,7 +57,6 @@ class ResolveEmptyDataObjectAction
         }
 
         if (count($property->types()) > 1) {
-            // TODO:add solution to message with extra array
             throw DataPropertyCanOnlyHaveOneType::create($property);
         }
 
@@ -78,8 +79,7 @@ class ResolveEmptyDataObjectAction
             return [];
         }
 
-        // TODO: Is iteratable
-        if (is_a($type, Collection::class, true)) {
+        if (is_a($type, Traversable::class, true)) {
             return [];
         }
 

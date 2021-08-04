@@ -1,22 +1,22 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Actions;
+namespace Spatie\LaravelData\Tests\Resolvers;
 
 use DateTime;
-use Spatie\LaravelData\Actions\ResolveDataObjectFromArrayAction;
+use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 
-class ResolveDataObjectFromArrayActionTest extends TestCase
+class DataFromArrayResolverTest extends TestCase
 {
-    private mixed $action;
+    private DataFromArrayResolver $action;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->action = app(ResolveDataObjectFromArrayAction::class);
+        $this->action = app(DataFromArrayResolver::class);
     }
 
     /** @test */

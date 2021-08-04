@@ -11,6 +11,6 @@ class DataPropertyCanOnlyHaveOneType extends Exception
     {
         $typesCount = count($property->types());
 
-        return new self("When resolving an empty data property, it can only have one type, {$property->className()}::{$property->name()} has {$typesCount} types");
+        return new self("When resolving an empty data property, it can only have one type, {$property->className()}::{$property->name()} has {$typesCount} types. You can overwrite this by providing an empty value for the property in the `empty` call.");
     }
 }
