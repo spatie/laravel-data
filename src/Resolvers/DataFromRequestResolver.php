@@ -33,6 +33,6 @@ class DataFromRequestResolver
 
         $validator->validate();
 
-        return $class::create($this->request);
+        return $class::from($this->request);
     }
 }

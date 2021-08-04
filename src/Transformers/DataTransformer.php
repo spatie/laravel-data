@@ -44,9 +44,10 @@ class DataTransformer
         $inclusionTree = $data->getInclusionTree();
         $exclusionTree = $data->getExclusionTree();
 
-        return array_reduce(
-            $this->config->getDataProperties($data::class),
-            function (array $payload, DataProperty $property) use ($data, $exclusionTree, $inclusionTree) {
+        return $this->config
+            ->getDataClass($data::class)
+            ->properties()
+            ->reduce(function (array $payload, DataProperty $property) use ($data, $exclusionTree, $inclusionTree) {
                 $name = $property->name();
 
                 if ($this->shouldIncludeProperty($name, $data->{$name}, $inclusionTree, $exclusionTree)) {
@@ -59,9 +60,7 @@ class DataTransformer
                 }
 
                 return $payload;
-            },
-            []
-        );
+            }, []);
     }
 
     protected function shouldIncludeProperty(
@@ -99,7 +98,7 @@ class DataTransformer
         array $nestedInclusionTree,
         array $nestedExclusionTree,
     ): mixed {
-        if($value === null){
+        if ($value === null) {
             return null;
         }
 

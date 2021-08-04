@@ -13,7 +13,7 @@ interface RequestData
 
     public static function attributes(): array;
 
-    public static function createFromRequest(Request $request): static;
+    public static function fromRequest(Request $request): static;
 
     public static function withValidator(Validator $validator): void;
 }

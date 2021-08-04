@@ -2,8 +2,6 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
-use Illuminate\Support\Collection;
-use Iterator;
 use ReflectionClass;
 use ReflectionParameter;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
@@ -19,11 +17,11 @@ class EmptyDataResolver
 
     public function execute(string $class, array $extra = []): array
     {
-        $properties = $this->dataConfig->getDataProperties($class);
+        $dataClass = $this->dataConfig->getDataClass($class);
 
-        $defaults = $this->resolveDefaults(new ReflectionClass($class), $extra);
+        $defaults = $this->resolveDefaults($dataClass->reflection(), $extra);
 
-        return array_reduce($properties, function (array $payload, DataProperty $property) use ($defaults) {
+        return $dataClass->properties()->reduce(function (array $payload, DataProperty $property) use ($defaults) {
             $payload[$property->name()] = $defaults[$property->name()] ?? $this->getValueForProperty($property);
 
             return $payload;
@@ -36,8 +34,8 @@ class EmptyDataResolver
 
         if ($reflection->hasMethod('__construct')) {
             $defaultConstructorProperties = collect($reflection->getMethod('__construct')->getParameters())
-                ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-                ->mapWithKeys(fn (ReflectionParameter $parameter) => [
+                ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+                ->mapWithKeys(fn(ReflectionParameter $parameter) => [
                     $parameter->name => $parameter->getDefaultValue(),
                 ])
                 ->toArray();

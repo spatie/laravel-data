@@ -103,7 +103,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
         return $item instanceof Data
             ? $item
-            : $this->dataClass::create($item);
+            : $this->dataClass::from($item);
     }
 
     public function offsetSet($offset, $value): void

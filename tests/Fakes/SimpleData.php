@@ -13,12 +13,8 @@ class SimpleData extends Data implements RequestData
     ) {
     }
 
-    public static function create($resource): static
+    public static function fromString(string $string)
     {
-        if(is_string($resource)) {
-            return new self($resource);
-        }
-
-        return parent::create($resource);
+        return new self($string);
     }
 }

@@ -34,8 +34,8 @@ class DataFromArrayResolverTest extends TestCase
                 'array' => [1, 1, 2, 3, 5, 8],
                 'nullable' => null,
                 'mixed' => 42,
-                'defaultCast' => '1994-05-16T12:00:00+01:00',
                 'explicitCast' => '16-06-1994',
+                'defaultCast' => '1994-05-16T12:00:00+01:00',
                 'nestedData' => [
                     'string' => 'hello',
                 ],
@@ -60,13 +60,13 @@ class DataFromArrayResolverTest extends TestCase
         $this->assertEquals(42, $data->mixed);
         $this->assertEquals(DateTime::createFromFormat(DATE_ATOM, '1994-05-16T12:00:00+01:00'), $data->defaultCast);
         $this->assertEquals(DateTime::createFromFormat('d-m-Y', '16-06-1994'), $data->explicitCast);
-        $this->assertEquals(SimpleData::create('hello'), $data->nestedData);
+        $this->assertEquals(SimpleData::from('hello'), $data->nestedData);
         $this->assertEquals(SimpleData::collection([
-            SimpleData::create('never'),
-            SimpleData::create('gonna'),
-            SimpleData::create('give'),
-            SimpleData::create('you'),
-            SimpleData::create('up'),
+            SimpleData::from('never'),
+            SimpleData::from('gonna'),
+            SimpleData::from('give'),
+            SimpleData::from('you'),
+            SimpleData::from('up'),
         ]), $data->nestedCollection);
     }
 }

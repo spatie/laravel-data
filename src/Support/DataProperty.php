@@ -27,7 +27,7 @@ class DataProperty
 
     private bool $isDataCollection;
 
-    private string $dataClass;
+    private string $dataClassName;
 
     private array $types;
 
@@ -128,15 +128,15 @@ class DataProperty
     /**
      * @return class-string<\Spatie\LaravelData\Data>
      */
-    public function getDataClass(): string
+    public function getDataClassName(): string
     {
         /** @psalm-suppress RedundantPropertyInitializationCheck */
-        if (isset($this->dataClass)) {
-            return $this->dataClass;
+        if (isset($this->dataClassName)) {
+            return $this->dataClassName;
         }
 
         if ($this->isData) {
-            return $this->dataClass = current($this->types);
+            return $this->dataClassName = current($this->types);
         }
 
         if ($this->isDataCollection) {
@@ -147,7 +147,7 @@ class DataProperty
             }
 
             // TODO: make this more robust, because it isnt
-            return $this->dataClass = (string) Str::of($comment)->after('@var \\')->before('[]');
+            return $this->dataClassName = (string) Str::of($comment)->after('@var \\')->before('[]');
         }
 
         throw new Exception('Property type is not a data object or data collection object');
@@ -232,7 +232,7 @@ class DataProperty
 
     private function isTypeBuiltIn(string $name): bool
     {
-        return in_array($name, ['int', 'string', 'bool', 'array', 'float']);
+        return in_array($name, ['int', 'string', 'bool', 'array', 'float', 'mixed']);
     }
 
     private function ensurePropertyIsValid()

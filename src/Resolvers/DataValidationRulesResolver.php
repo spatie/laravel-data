@@ -23,7 +23,8 @@ class DataValidationRulesResolver
 
         $resolver = app(DataPropertyValidationRulesResolver::class);
 
-        $rules = collect($this->dataConfig->getDataProperties($class))
+        $rules = $this->dataConfig->getDataClass($class)
+            ->properties()
             ->mapWithKeys(
                 fn (DataProperty $property) => $resolver->execute($property)
             );

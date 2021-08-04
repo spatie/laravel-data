@@ -42,7 +42,7 @@ class DataPropertyValidationRulesResolver
         };
 
         return $this->dataValidationRulesResolver
-            ->execute($property->getDataClass())
+            ->execute($property->getDataClassName())
             ->mapWithKeys(fn (array $rules, string $name) => [
                 "{$prefix}{$name}" => $rules,
             ])

@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Tests;
 
+use Closure;
 use Generator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
@@ -31,8 +32,8 @@ class DataCollectionTest extends TestCase
     public function a_collection_can_be_constructed_with_data_objects()
     {
         $collectionA = SimpleData::collection([
-            SimpleData::create('A'),
-            SimpleData::create('B'),
+            SimpleData::from('A'),
+            SimpleData::from('B'),
         ]);
 
         $collectionB = SimpleData::collection([
@@ -118,8 +119,10 @@ class DataCollectionTest extends TestCase
      * @test
      * @dataProvider arrayAccessCollections
      */
-    public function it_has_array_access(DataCollection $collection)
+    public function it_has_array_access(Closure $collection)
     {
+        $collection = $collection();
+
         // Count
         $this->assertEquals(4, count($collection));
 
@@ -129,9 +132,9 @@ class DataCollectionTest extends TestCase
         $this->assertTrue(empty($collection[5]));
 
         // Offset get
-        $this->assertEquals(SimpleData::create('A'), $collection[0]);
+        $this->assertEquals(SimpleData::from('A'), $collection[0]);
 
-        $this->assertEquals(SimpleData::create('D'), $collection[3]);
+        $this->assertEquals(SimpleData::from('D'), $collection[3]);
 
         if ($collection->items() instanceof AbstractPaginator || $collection->items() instanceof CursorPaginator) {
             return;
@@ -141,8 +144,8 @@ class DataCollectionTest extends TestCase
         $collection[2] = 'And now something completely different';
         $collection[4] = 'E';
 
-        $this->assertEquals(SimpleData::create('And now something completely different'), $collection[2]);
-        $this->assertEquals(SimpleData::create('E'), $collection[4]);
+        $this->assertEquals(SimpleData::from('And now something completely different'), $collection[2]);
+        $this->assertEquals(SimpleData::from('E'), $collection[4]);
 
         // Offset unset
         unset($collection[4]);
@@ -153,26 +156,26 @@ class DataCollectionTest extends TestCase
     public function arrayAccessCollections(): Generator
     {
         yield "array" => [
-            SimpleData::collection([
-                'A', 'B', SimpleData::create('C'), SimpleData::create('D'),
+            fn() => SimpleData::collection([
+                'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ]),
         ];
 
         yield "collection" => [
-            SimpleData::collection([
-                'A', 'B', SimpleData::create('C'), SimpleData::create('D'),
+            fn() => SimpleData::collection([
+                'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ]),
         ];
 
         yield "paginator" => [
-            SimpleData::collection(new LengthAwarePaginator([
-                'A', 'B', SimpleData::create('C'), SimpleData::create('D'),
+            fn() => SimpleData::collection(new LengthAwarePaginator([
+                'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ], 4, 15)),
         ];
 
         yield "cursor paginator" => [
-            SimpleData::collection(new CursorPaginator([
-                'A', 'B', SimpleData::create('C'), SimpleData::create('D'),
+            fn() => SimpleData::collection(new CursorPaginator([
+                'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ], 4)),
         ];
     }

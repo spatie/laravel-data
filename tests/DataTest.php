@@ -93,7 +93,7 @@ class DataTest extends TestCase
         )->create();
 
         $data = new $dataClass(
-            Lazy::create(fn() => LazyData::create('Hello')),
+            Lazy::create(fn() => LazyData::from('Hello')),
             Lazy::create(fn() => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
         );
 
@@ -189,7 +189,7 @@ class DataTest extends TestCase
             ) {
             }
 
-            public static function create(mixed $name): static
+            public static function create(string $name): static
             {
                 return new self(
                     Lazy::when(fn() => $name === 'Ruben', fn() => $name)
@@ -215,7 +215,7 @@ class DataTest extends TestCase
             ) {
             }
 
-            public static function create(mixed $name): static
+            public static function create(string $name): static
             {
                 return new self(
                     Lazy::when(fn() => $name === 'Ruben', fn() => $name)
@@ -348,9 +348,9 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_dynamically_include_data_based_upon_the_request()
     {
-        $response = LazyData::create('Ruben')->toResponse(request());
+        $response = LazyData::from('Ruben')->toResponse(request());
 
-        $includedResponse = LazyData::create('Ruben')->toResponse(request()->merge([
+        $includedResponse = LazyData::from('Ruben')->toResponse(request()->merge([
             'include' => 'name',
         ]));
 

@@ -9,18 +9,19 @@ use Spatie\LaravelData\Support\DataProperty;
 class DateTimeInterfaceCast implements Cast
 {
     public function __construct(
-        protected ?string $format = null
+        protected ?string $format = null,
+        protected ?string $type = null
     ) {
     }
 
-    public function cast(DataProperty $property, mixed $value): DateTimeInterface | Uncastable
+    public function cast(DataProperty $property, mixed $value): DateTimeInterface|Uncastable
     {
         $format = $this->format ?? config('data.date_format');
 
-        $type = $this->findType($property);
+        $type = $this->type ?? $this->findType($property);
 
-        if ($type instanceof Uncastable) {
-            return $type;
+        if ($type === null) {
+            return Uncastable::create();
         }
 
         /** @var \DateTime|\DateTimeImmutable $name */
@@ -33,7 +34,7 @@ class DateTimeInterfaceCast implements Cast
         return $datetime;
     }
 
-    protected function findType(DataProperty $property)
+    protected function findType(DataProperty $property): ?string
     {
         foreach ($property->types() as $type) {
             if (is_a($type, DateTimeInterface::class, true)) {
@@ -41,6 +42,6 @@ class DateTimeInterfaceCast implements Cast
             }
         }
 
-        return Uncastable::create();
+        return null;
     }
 }

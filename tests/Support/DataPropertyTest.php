@@ -7,6 +7,7 @@ use Spatie\LaravelData\Attributes\Max;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeCast;
+use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
@@ -165,7 +166,7 @@ class DataPropertyTest extends TestCase
             public mixed $property;
         });
 
-        $this->assertFalse($helper->isBuiltIn());
+        $this->assertTrue($helper->isBuiltIn());
     }
 
     /** @test */
@@ -265,22 +266,22 @@ class DataPropertyTest extends TestCase
     public function it_can_get_the_cast_attribute()
     {
         $helper = $this->resolveHelper(new class {
-            #[WithCast(DateTimeCast::class)]
+            #[WithCast(DateTimeInterfaceCast::class)]
             public SimpleData $property;
         });
 
-        $this->assertEquals(new WithCast(DateTimeCast::class), $helper->castAttribute());
+        $this->assertEquals(new WithCast(DateTimeInterfaceCast::class), $helper->castAttribute());
     }
 
     /** @test */
     public function it_can_get_the_cast_attribute_with_arguments()
     {
         $helper = $this->resolveHelper(new class {
-            #[WithCast(DateTimeCast::class, 'd-m-y')]
+            #[WithCast(DateTimeInterfaceCast::class, 'd-m-y')]
             public SimpleData $property;
         });
 
-        $this->assertEquals(new WithCast(DateTimeCast::class, 'd-m-y'), $helper->castAttribute());
+        $this->assertEquals(new WithCast(DateTimeInterfaceCast::class, 'd-m-y'), $helper->castAttribute());
     }
 
     /** @test */
@@ -312,7 +313,7 @@ class DataPropertyTest extends TestCase
             public SimpleData $property;
         });
 
-        $this->assertEquals(SimpleData::class, $helper->getDataClass());
+        $this->assertEquals(SimpleData::class, $helper->getDataClassName());
     }
 
     /** @test */
@@ -327,7 +328,7 @@ class DataPropertyTest extends TestCase
             public DataCollection $property;
         });
 
-        $this->assertEquals(SimpleData::class, $helper->getDataClass());
+        $this->assertEquals(SimpleData::class, $helper->getDataClassName());
     }
 
     private function resolveHelper(object $class): DataProperty

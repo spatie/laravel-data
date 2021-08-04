@@ -18,7 +18,8 @@ class DataFromArrayResolver
     public function execute(string $class, array $values): Data
     {
         /** @var \Spatie\LaravelData\Data $data */
-        $data = collect($this->dataConfig->getDataProperties($class))
+        $data = $this->dataConfig->getDataClass($class)
+            ->properties()
             ->mapWithKeys(fn (DataProperty $property) => [
                 $property->name() => $this->resolveValue($property, $values[$property->name()] ?? null),
             ])
@@ -37,32 +38,32 @@ class DataFromArrayResolver
             return $this->resolveValueByAttributeCast($property, $value);
         }
 
-        if ($cast = $this->resolveGlobalCast($property)) {
-            return $cast->cast($property, $value);
+        if ($property->isBuiltIn()) {
+            return $value;
         }
 
         if (empty($property->types())) {
             return $value;
         }
 
-        if ($property->isBuiltIn()) {
-            return $value;
-        }
-
         if ($property->isData()) {
-            return $this->execute($property->getDataClass(), $value);
+            return $this->execute($property->getDataClassName(), $value);
         }
 
         if ($property->isDataCollection()) {
             $items = array_map(
-                fn (array $item) => $this->execute($property->getDataClass(), $item),
+                fn (array $item) => $this->execute($property->getDataClassName(), $item),
                 $value
             );
 
             return new DataCollection(
-                $property->getDataClass(),
+                $property->getDataClassName(),
                 $items
             );
+        }
+
+        if ($cast = $this->resolveGlobalCast($property)) {
+            return $cast->cast($property, $value);
         }
 
         return $value;

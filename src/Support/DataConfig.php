@@ -9,13 +9,13 @@ use Spatie\LaravelData\Transformers\Transformer;
 
 class DataConfig
 {
-    /** @var array<string, array<\Spatie\LaravelData\Support\DataProperty>> */
-    private array $properties = [];
+    /** @var array<string, \Spatie\LaravelData\Support\DataClass> */
+    private array $dataClasses = [];
 
     /** @var \Spatie\LaravelData\Transformers\Transformer[] */
     protected array $transformers = [];
 
-    /** @var array<string, \Spatie\LaravelData\Casts\Cast> */
+    /** @var array<string, string> */
     protected array $casts = [];
 
     /** @var \Spatie\LaravelData\AutoRules\AutoRule[] */
@@ -33,37 +33,31 @@ class DataConfig
             $config['auto_rules'] ?? []
         );
 
-        foreach ($config['casts'] ?? [] as $type => $castClass) {
-            $type = ltrim($type, ' \\');
-
-            $this->casts[$type] = app($castClass);
-        }
+        $this->casts = $config['casts'];
     }
 
-    public function getDataProperties(string $class): array
+    public function getDataClass(string $class): DataClass
     {
-        if (array_key_exists($class, $this->properties)) {
-            return $this->properties[$class];
+        if (array_key_exists($class, $this->dataClasses)) {
+            return $this->dataClasses[$class];
         }
 
-        $properties = (new ReflectionClass($class))->getProperties(ReflectionProperty::IS_PUBLIC);
-
-        $dataProperties = [];
-
-        foreach ($properties as $property) {
-            if ($property->isStatic()) {
-                continue;
-            }
-
-            $dataProperties[] = DataProperty::create($property);
-        }
-
-        return $this->properties[$class] = $dataProperties;
+        return $this->dataClasses[$class] = DataClass::create(new ReflectionClass($class));
     }
 
     public function getCastForType(string $type): ?Cast
     {
-        return $this->casts[ltrim($type, ' \\')] ?? null;
+        foreach ($this->casts as $castable => $cast) {
+            if(ltrim($type, ' \\') === ltrim($castable, ' \\')){
+                return app($cast);
+            }
+
+            if(is_a($type, $castable, true)){
+                return app($cast);
+            }
+        }
+
+        return null;
     }
 
     public function getAutoRules(): array

@@ -24,7 +24,7 @@ class DataCollectionEloquentCast implements CastsAttributes
         $data = json_decode($value, true, flags: JSON_THROW_ON_ERROR);
 
         $data = array_map(
-            fn (array $item) => ($this->dataClass)::create($item),
+            fn (array $item) => ($this->dataClass)::from($item),
             $data
         );
 
@@ -47,7 +47,7 @@ class DataCollectionEloquentCast implements CastsAttributes
 
         $data = array_map(
             fn (array | Data $item) => is_array($item)
-                ? ($this->dataClass)::create($item)
+                ? ($this->dataClass)::from($item)
                 : $item,
             $value
         );

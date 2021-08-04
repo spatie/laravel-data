@@ -23,7 +23,7 @@ class DataEloquentCast implements CastsAttributes
         $payload = json_decode($value, true, flags: JSON_THROW_ON_ERROR);
 
         /** @var \Spatie\LaravelData\Data $data */
-        $data = ($this->dataClass)::create($payload);
+        $data = ($this->dataClass)::from($payload);
 
         return $data;
     }
@@ -35,7 +35,7 @@ class DataEloquentCast implements CastsAttributes
         }
 
         if (is_array($value)) {
-            $value = ($this->dataClass)::create($value);
+            $value = ($this->dataClass)::from($value);
         }
 
         if (! $value instanceof Data) {
