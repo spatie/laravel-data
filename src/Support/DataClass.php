@@ -10,7 +10,7 @@ use ReflectionProperty;
 
 class DataClass
 {
-    /** @var Collection<\Spatie\LaravelData\Support\DataProperty> */
+    /** @var \Illuminate\Support\Collection */
     private Collection $properties;
 
     /** @var array<string, string> */

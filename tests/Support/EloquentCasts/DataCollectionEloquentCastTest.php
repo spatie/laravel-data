@@ -44,7 +44,7 @@ class DataCollectionEloquentCastTest extends TestCase
             ],
         ]);
 
-        $this->assertDatabaseHas(DummyModel::class, [
+        $this->assertDatabaseHas('dummy_models', [
             'data_collection' => json_encode([
                 ['string' => 'Hello'],
                 ['string' => 'World'],
@@ -81,7 +81,7 @@ class DataCollectionEloquentCastTest extends TestCase
             'data_collection' => null,
         ]);
 
-        $this->assertDatabaseHas(DummyModel::class, [
+        $this->assertDatabaseHas('dummy_models', [
             'data_collection' => null,
         ]);
     }

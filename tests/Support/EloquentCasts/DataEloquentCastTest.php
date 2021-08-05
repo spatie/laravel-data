@@ -23,7 +23,7 @@ class DataEloquentCastTest extends TestCase
             'data' => new SimpleData('Test'),
         ]);
 
-        $this->assertDatabaseHas(DummyModel::class, [
+        $this->assertDatabaseHas('dummy_models', [
             'data' => json_encode(['string' => 'Test']),
         ]);
     }
@@ -35,7 +35,7 @@ class DataEloquentCastTest extends TestCase
             'data' => ['string' => 'Test'],
         ]);
 
-        $this->assertDatabaseHas(DummyModel::class, [
+        $this->assertDatabaseHas('dummy_models', [
             'data' => json_encode(['string' => 'Test']),
         ]);
     }
@@ -63,7 +63,7 @@ class DataEloquentCastTest extends TestCase
             'data' => null,
         ]);
 
-        $this->assertDatabaseHas(DummyModel::class, [
+        $this->assertDatabaseHas('dummy_models', [
             'data' => null,
         ]);
     }
