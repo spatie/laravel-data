@@ -29,7 +29,6 @@ abstract class Data implements Arrayable, Responsable, Jsonable, RequestData, El
     use RequestableData;
 
     /**
-     * - rename create in data to from and try to find a correct function via reflection
      * - Maybe add support for the dto package casts?
      * - add support for authorization in requestabledata
      * - add a lot of better exceptions

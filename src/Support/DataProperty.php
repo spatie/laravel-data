@@ -12,8 +12,10 @@ use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Exceptions\CannotFindDataTypeForProperty;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
+use TypeError;
 
 class DataProperty
 {
@@ -51,7 +53,7 @@ class DataProperty
             $type === null => $this->processNoType(),
             $type instanceof ReflectionNamedType => $this->processNamedType($type),
             $type instanceof ReflectionUnionType => $this->processUnionType($type),
-            default => throw new Exception("Unknown reflection type")
+            default => throw new TypeError(),
         };
 
         $this->ensurePropertyIsValid();
@@ -143,14 +145,20 @@ class DataProperty
             $comment = $this->property->getDocComment();
 
             if ($comment === false) {
-                throw new Exception('Could not resolve data class for property');
+                throw CannotFindDataTypeForProperty::missingDataCollectionAnotation($this->className(), $this->name());
             }
 
             // TODO: make this more robust, because it isnt
-            return $this->dataClassName = (string) Str::of($comment)->after('@var \\')->before('[]');
+            $class = (string) Str::of($comment)->after('@var \\')->before('[]');
+
+            if(! is_subclass_of($class, Data::class)){
+                throw CannotFindDataTypeForProperty::wrongDataCollectionAnnotation($this->className(), $this->name());
+            }
+
+            return $this->dataClassName = $class;
         }
 
-        throw new Exception('Property type is not a data object or data collection object');
+        throw CannotFindDataTypeForProperty::noDataReferenceFound($this->className(), $this->name());
     }
 
     private function processNoType(): void

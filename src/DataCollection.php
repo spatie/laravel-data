@@ -18,6 +18,8 @@ use Illuminate\Support\Collection;
 use IteratorAggregate;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
+use Spatie\LaravelData\Exceptions\CannotCastData;
+use Spatie\LaravelData\Exceptions\InvalidPaginatedDataCollectionModification;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
 use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 
@@ -109,7 +111,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
     {
         match (true) {
             is_array($this->items) => $this->items[$offset] = $value,
-            default => throw new Exception('Cannot update a value in a paginated collection')
+            default => throw InvalidPaginatedDataCollectionModification::cannotSetItem()
         };
     }
 
@@ -121,13 +123,13 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
             return;
         }
 
-        throw new Exception('Unsetting in paginated collection is prohibited');
+        throw InvalidPaginatedDataCollectionModification::cannotUnSetItem();
     }
 
     public static function castUsing(array $arguments)
     {
         if (count($arguments) !== 1) {
-            throw new Exception('Data collection eloquent cast should have its data class as an argument');
+            throw CannotCastData::dataCollectionTypeRequired();
         }
 
         return new DataCollectionEloquentCast(current($arguments));

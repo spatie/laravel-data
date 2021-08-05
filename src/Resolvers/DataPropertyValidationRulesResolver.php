@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelData\AutoRules\AutoRule;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
+use TypeError;
 
 class DataPropertyValidationRulesResolver
 {
@@ -30,7 +31,7 @@ class DataPropertyValidationRulesResolver
         $prefix = match (true) {
             $property->isData() => "{$property->name()}.",
             $property->isDataCollection() => "{$property->name()}.*.",
-            default => throw new Exception('Unknown data property')
+            default => throw new TypeError()
         };
 
         $topLevelRules = match (true) {
@@ -38,8 +39,7 @@ class DataPropertyValidationRulesResolver
             $property->isData() => ['required', 'array'],
             $property->isDataCollection() && $property->isNullable() => ['nullable', 'array'],
             $property->isDataCollection() => ['required', 'array'],
-            // no break
-            default => throw new Exception('Could not resolve rules for data property')
+            default => throw new TypeError()
         };
 
         return $this->dataValidationRulesResolver

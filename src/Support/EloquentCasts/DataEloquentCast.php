@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Support\EloquentCasts;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Exceptions\CannotCastData;
 
 class DataEloquentCast implements CastsAttributes
 {
@@ -39,9 +40,7 @@ class DataEloquentCast implements CastsAttributes
         }
 
         if (! $value instanceof Data) {
-            $className = $model::class;
-
-            throw new Exception("Attribute `{$key}` of model `{$className}` should be a Data object");
+            throw CannotCastData::shouldBeData($model::class, $key);
         }
 
         return $value->toJson();

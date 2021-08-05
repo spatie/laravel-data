@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Exceptions\CannotCastData;
 
 class DataCollectionEloquentCast implements CastsAttributes
 {
@@ -42,7 +43,7 @@ class DataCollectionEloquentCast implements CastsAttributes
         }
 
         if (! is_array($value)) {
-            throw new Exception("Value given to a data collection eloquent cast should be a DataCollection or array");
+            throw CannotCastData::shouldBeArray($model::class, $key);
         }
 
         $data = array_map(

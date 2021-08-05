@@ -3,7 +3,7 @@
 namespace Spatie\LaravelData\Casts;
 
 use DateTimeInterface;
-use Exception;
+use Spatie\LaravelData\Exceptions\CannotCastDate;
 use Spatie\LaravelData\Support\DataProperty;
 
 class DateTimeInterfaceCast implements Cast
@@ -14,7 +14,7 @@ class DateTimeInterfaceCast implements Cast
     ) {
     }
 
-    public function cast(DataProperty $property, mixed $value): DateTimeInterface | Uncastable
+    public function cast(DataProperty $property, mixed $value): DateTimeInterface|Uncastable
     {
         $format = $this->format ?? config('data.date_format');
 
@@ -28,7 +28,7 @@ class DateTimeInterfaceCast implements Cast
         $datetime = $type::createFromFormat($format, $value);
 
         if ($datetime === false) {
-            throw new Exception("Could not cast date: `{$value}` using format {$format}");
+            throw CannotCastDate::create($format, $type, $value);
         }
 
         return $datetime;

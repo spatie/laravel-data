@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Attributes;
 
 use Attribute;
 use Exception;
+use Spatie\LaravelData\Exceptions\CannotCreateTransformerAttribute;
 use Spatie\LaravelData\Transformers\Transformer;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY)]
@@ -17,7 +18,7 @@ class WithTransformer
         mixed ...$arguments
     ) {
         if (! is_a($this->transformerClass, Transformer::class, true)) {
-            throw new Exception("Transformer given is not a transformer");
+            throw CannotCreateTransformerAttribute::notATransformer();
         }
 
         $this->arguments = $arguments;

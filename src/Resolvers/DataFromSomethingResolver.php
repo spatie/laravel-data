@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Exceptions\CannotCreateDataFromValue;
 use Spatie\LaravelData\Support\DataConfig;
 
 class DataFromSomethingResolver
@@ -15,31 +16,31 @@ class DataFromSomethingResolver
     {
     }
 
-    public function execute(string $class, mixed $payload): Data
+    public function execute(string $class, mixed $value): Data
     {
         /** @var class-string<\Spatie\LaravelData\Data>|\Spatie\LaravelData\Data $class */
 
-        if ($customFromMethod = $this->resolveCustomFromMethod($class, $payload)) {
-            return $class::$customFromMethod($payload);
+        if ($customFromMethod = $this->resolveCustomFromMethod($class, $value)) {
+            return $class::$customFromMethod($value);
         }
 
-        if ($payload instanceof Model) {
-            return $class::fromModel($payload);
+        if ($value instanceof Model) {
+            return $class::fromModel($value);
         }
 
-        if ($payload instanceof Request) {
-            return $class::fromRequest($payload);
+        if ($value instanceof Request) {
+            return $class::fromRequest($value);
         }
 
-        if ($payload instanceof Arrayable) {
-            return $class::fromArray($payload->toArray());
+        if ($value instanceof Arrayable) {
+            return $class::fromArray($value->toArray());
         }
 
-        if (is_array($payload)) {
-            return $class::fromArray($payload);
+        if (is_array($value)) {
+            return $class::fromArray($value);
         }
 
-        throw new Exception("Could not create a data object from value");
+        throw CannotCreateDataFromValue::create($class, $value);
     }
 
     private function resolveCustomFromMethod(string $class, mixed $payload): ?string
