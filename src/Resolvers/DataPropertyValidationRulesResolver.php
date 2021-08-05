@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
-use Exception;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\AutoRules\AutoRule;
 use Spatie\LaravelData\Support\DataConfig;
@@ -39,6 +38,7 @@ class DataPropertyValidationRulesResolver
             $property->isData() => ['required', 'array'],
             $property->isDataCollection() && $property->isNullable() => ['nullable', 'array'],
             $property->isDataCollection() => ['required', 'array'],
+            // no break
             default => throw new TypeError()
         };
 

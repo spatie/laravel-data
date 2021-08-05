@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Exceptions;
 
 use Exception;
-use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Transformers\Transformer;
 
 class CannotCreateTransformerAttribute extends Exception

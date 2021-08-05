@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Attributes;
 
 use Attribute;
-use Exception;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Exceptions\CannotCreateCastAttribute;
 

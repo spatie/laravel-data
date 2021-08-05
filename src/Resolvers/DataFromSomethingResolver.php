@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
-use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;

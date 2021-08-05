@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support\EloquentCasts;
 
-use Exception;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;

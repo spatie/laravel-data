@@ -6,7 +6,6 @@ use ArrayAccess;
 use ArrayIterator;
 use Closure;
 use Countable;
-use Exception;
 use Illuminate\Contracts\Database\Eloquent\Castable as EloquentCastable;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Support\Arrayable;

@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support;
 
-use Exception;
 use Illuminate\Support\Str;
 use ReflectionNamedType;
 use ReflectionProperty;
@@ -151,7 +150,7 @@ class DataProperty
             // TODO: make this more robust, because it isnt
             $class = (string) Str::of($comment)->after('@var \\')->before('[]');
 
-            if(! is_subclass_of($class, Data::class)){
+            if (! is_subclass_of($class, Data::class)) {
                 throw CannotFindDataTypeForProperty::wrongDataCollectionAnnotation($this->className(), $this->name());
             }
 
