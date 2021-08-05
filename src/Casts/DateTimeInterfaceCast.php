@@ -38,7 +38,7 @@ class DateTimeInterfaceCast implements Cast
     {
         foreach ($property->types() as $type) {
             if (is_a($type, DateTimeInterface::class, true)) {
-                return $type;
+                return (string) $type;
             }
         }
 

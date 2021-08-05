@@ -10,7 +10,7 @@ use ReflectionProperty;
 
 class DataClass
 {
-    /** @var \Illuminate\Support\Collection<\Spatie\LaravelData\Support\DataProperty> */
+    /** @var Collection<\Spatie\LaravelData\Support\DataProperty> */
     private Collection $properties;
 
     /** @var array<string, string> */
@@ -33,6 +33,7 @@ class DataClass
 
     public function customFromMethods(): array
     {
+        /** @psalm-suppress RedundantPropertyInitializationCheck */
         if (isset($this->customFromMethods)) {
             return $this->customFromMethods;
         }

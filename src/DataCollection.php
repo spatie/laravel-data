@@ -54,7 +54,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         return $this;
     }
 
-    public function items(): Collection | array | AbstractPaginator | CursorPaginator
+    public function items(): array | AbstractPaginator | AbstractCursorPaginator | Paginator
     {
         return $this->items;
     }
