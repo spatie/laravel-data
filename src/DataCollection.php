@@ -14,7 +14,6 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
-use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Collection;
 use IteratorAggregate;
 use Spatie\LaravelData\Concerns\IncludeableData;

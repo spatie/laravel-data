@@ -362,7 +362,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'),) extends Data {
+        $data = new class($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
             public function __construct(
                 public SimpleData $data,
                 public DataCollection $dataCollection,
