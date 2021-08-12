@@ -20,7 +20,7 @@ class RequestDataTest extends TestCase
 
         $this->handleExceptions([
             AuthenticationException::class,
-            ValidationException::class
+            ValidationException::class,
         ]);
 
         RequestData::clear();

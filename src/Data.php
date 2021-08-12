@@ -47,7 +47,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, RequestData, El
         return app(DataFromArrayResolver::class)->execute(static::class, $payload);
     }
 
-    public static function collection(Collection|array|AbstractPaginator|AbstractCursorPaginator|Paginator $items): DataCollection
+    public static function collection(Collection | array | AbstractPaginator | AbstractCursorPaginator | Paginator $items): DataCollection
     {
         return new DataCollection(static::class, $items);
     }

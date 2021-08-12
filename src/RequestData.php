@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData;
 
-use Illuminate\Http\Request;
 use Illuminate\Validation\Validator;
 
 interface RequestData

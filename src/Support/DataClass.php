@@ -52,7 +52,8 @@ class DataClass
             return $this->hasAuthorizationMethod;
         }
 
-        $this->resolveSpecialMethods();;
+        $this->resolveSpecialMethods();
+        ;
 
         return $this->hasAuthorizationMethod;
     }
@@ -85,7 +86,7 @@ class DataClass
 
         $this->hasAuthorizationMethod = array_reduce(
             $reflectionMethods,
-            fn($hasMethod, ReflectionMethod $method) => $hasMethod || ($method->getName() === 'authorized' && $method->isPublic()),
+            fn ($hasMethod, ReflectionMethod $method) => $hasMethod || ($method->getName() === 'authorized' && $method->isPublic()),
             false
         );
 

@@ -45,7 +45,7 @@ class RequestData extends Data
 
     public static function authorized()
     {
-        if(self::$enableAuthorizeFailure){
+        if (self::$enableAuthorizeFailure) {
             return false;
         }
     }

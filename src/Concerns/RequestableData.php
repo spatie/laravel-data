@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Concerns;
 
-use Illuminate\Http\Request;
 use Illuminate\Validation\Validator;
 
 trait RequestableData
