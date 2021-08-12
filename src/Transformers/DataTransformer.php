@@ -108,7 +108,7 @@ class DataTransformer
         array $includes,
         ?array $allowedIncludes,
     ): bool {
-        if($allowedIncludes !== null && ! in_array($name, $allowedIncludes)){
+        if ($allowedIncludes !== null && ! in_array($name, $allowedIncludes)) {
             return false;
         }
 

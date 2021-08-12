@@ -62,7 +62,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     public function transform(TransformationType $type): array
     {
-        $transformer =  new DataCollectionTransformer(
+        $transformer = new DataCollectionTransformer(
             $this->dataClass,
             $type,
             $this->getInclusionTree(),

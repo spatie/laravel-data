@@ -29,7 +29,7 @@ class TransformationType
 
     public function useTransformers(): bool
     {
-        return match ($this->type){
+        return match ($this->type) {
             self::FULL, self::REQUEST => true,
             self::WITHOUT_VALUE_TRANSFORMING => false,
         };
@@ -37,7 +37,7 @@ class TransformationType
 
     public function limitIncludesAndExcludes(): bool
     {
-        return match ($this->type){
+        return match ($this->type) {
             self::FULL, self::WITHOUT_VALUE_TRANSFORMING => false,
             self::REQUEST => true,
         };

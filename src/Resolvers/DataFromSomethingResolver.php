@@ -54,7 +54,7 @@ class DataFromSomethingResolver
 
     private function resolveCustomCreationMethod(string $class, string $type, mixed $payload): ?string
     {
-        $customCreationMethods = match ($type){
+        $customCreationMethods = match ($type) {
             self::TYPE_FROM => $this->dataConfig->getDataClass($class)->creationMethods(),
             self::TYPE_OPTIONAL => $this->dataConfig->getDataClass($class)->optionalCreationMethods(),
             default => throw new Exception('Unknown creation type')
@@ -72,6 +72,7 @@ class DataFromSomethingResolver
             'integer' => 'int',
             'double' => 'float',
             'array' => 'array',
+            // no break
             default => null,
         };
 

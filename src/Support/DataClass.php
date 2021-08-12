@@ -80,8 +80,8 @@ class DataClass
     private function resolveProperties(): Collection
     {
         return collect($this->class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(fn(ReflectionProperty $property) => $property->isStatic())
-            ->map(fn(ReflectionProperty $property) => DataProperty::create($property))
+            ->reject(fn (ReflectionProperty $property) => $property->isStatic())
+            ->map(fn (ReflectionProperty $property) => DataProperty::create($property))
             ->values();
     }
 
@@ -92,7 +92,7 @@ class DataClass
         $methods = collect($this->class->getMethods(ReflectionMethod::IS_STATIC));
 
         $this->hasAuthorizationMethod = $methods->contains(
-            fn(ReflectionMethod $method) => $method->getName() === 'authorized' && $method->isPublic()
+            fn (ReflectionMethod $method) => $method->getName() === 'authorized' && $method->isPublic()
         );
 
         [$creationMethods, $optionalCreationMethods] = $methods
@@ -103,7 +103,7 @@ class DataClass
                     && $method->name !== 'from'
                     && $method->name !== 'optional';
             })
-            ->partition(fn(ReflectionMethod $method) => str_starts_with($method->getName(), 'from'));
+            ->partition(fn (ReflectionMethod $method) => str_starts_with($method->getName(), 'from'));
 
         $this->creationMethods = $this->extractTypesFromCreationalMethods($creationMethods);
         $this->optionalCreationMethods = $this->extractTypesFromCreationalMethods($optionalCreationMethods);
@@ -111,7 +111,7 @@ class DataClass
 
     private function extractTypesFromCreationalMethods(Collection $methods): array
     {
-        return $methods->mapWithKeys(function(ReflectionMethod $method){
+        return $methods->mapWithKeys(function (ReflectionMethod $method) {
             /** @var \ReflectionNamedType|\ReflectionUnionType|null $type */
             $type = current($method->getParameters())->getType();
 
@@ -120,7 +120,7 @@ class DataClass
             }
 
             if ($type instanceof ReflectionNamedType) {
-                return [$type->getName() =>  $method->getName()];
+                return [$type->getName() => $method->getName()];
             }
 
             $entries = [];

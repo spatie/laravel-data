@@ -14,11 +14,10 @@ use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\RequestableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
-use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
-use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
+use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Transformers\DataTransformer;
 
 abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastable
