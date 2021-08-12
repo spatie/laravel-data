@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -11,16 +12,25 @@ use Spatie\LaravelData\Support\DataConfig;
 
 class DataFromSomethingResolver
 {
+    public const TYPE_OPTIONAL = 'optional';
+    public const TYPE_FROM = 'from';
+
     public function __construct(protected DataConfig $dataConfig)
     {
     }
 
-    public function execute(string $class, mixed $value): Data
-    {
-        /** @var class-string<\Spatie\LaravelData\Data>|\Spatie\LaravelData\Data $class */
+    public function execute(
+        string $class,
+        string $type,
+        mixed $value
+    ): ?Data {
+        if ($type === static::TYPE_OPTIONAL && $value === null) {
+            return null;
+        }
 
-        if ($customFromMethod = $this->resolveCustomFromMethod($class, $value)) {
-            return $class::$customFromMethod($value);
+        /** @var class-string<\Spatie\LaravelData\Data>|\Spatie\LaravelData\Data $class */
+        if ($customCreationMethod = $this->resolveCustomCreationMethod($class, $type, $value)) {
+            return $class::$customCreationMethod($value);
         }
 
         if ($value instanceof Model) {
@@ -42,14 +52,18 @@ class DataFromSomethingResolver
         throw CannotCreateDataFromValue::create($class, $value);
     }
 
-    private function resolveCustomFromMethod(string $class, mixed $payload): ?string
+    private function resolveCustomCreationMethod(string $class, string $type, mixed $payload): ?string
     {
-        $customFromMethods = $this->dataConfig->getDataClass($class)->customFromMethods();
+        $customCreationMethods = match ($type){
+            self::TYPE_FROM => $this->dataConfig->getDataClass($class)->creationMethods(),
+            self::TYPE_OPTIONAL => $this->dataConfig->getDataClass($class)->optionalCreationMethods(),
+            default => throw new Exception('Unknown creation type')
+        };
 
         $type = gettype($payload);
 
         if ($type === 'object') {
-            return $customFromMethods[ltrim($payload::class, ' \\')] ?? null;
+            return $customCreationMethods[ltrim($payload::class, ' \\')] ?? null;
         }
 
         $type = match ($type) {
@@ -61,6 +75,6 @@ class DataFromSomethingResolver
             default => null,
         };
 
-        return $customFromMethods[$type] ?? null;
+        return $customCreationMethods[$type] ?? null;
     }
 }

@@ -265,7 +265,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_exclude_default_lazy_data()
     {
-        $data = DefaultLazyData::create('Freek');
+        $data = DefaultLazyData::from('Freek');
 
         $this->assertEquals([], $data->exclude('name')->toArray());
     }
@@ -357,6 +357,76 @@ class DataTest extends TestCase
         $this->assertEquals([], $response->getData(true));
 
         $this->assertEquals(['name' => 'Ruben'], $includedResponse->getData(true));
+    }
+
+    /** @test */
+    public function it_can_disable_including_data_dynamically_from_the_request()
+    {
+        LazyData::$allowedIncludes = [];
+
+        $response = LazyData::from('Ruben')->toResponse(request()->merge([
+            'include' => 'name',
+        ]));
+
+        $this->assertEquals([], $response->getData(true));
+
+        LazyData::$allowedIncludes = ['name'];
+
+        $response = LazyData::from('Ruben')->toResponse(request()->merge([
+            'include' => 'name',
+        ]));
+
+        $this->assertEquals(['name' => 'Ruben'], $response->getData(true));
+
+        LazyData::$allowedIncludes = null;
+
+        $response = LazyData::from('Ruben')->toResponse(request()->merge([
+            'include' => 'name',
+        ]));
+
+        $this->assertEquals(['name' => 'Ruben'], $response->getData(true));
+    }
+
+    /** @test */
+    public function it_can_dynamically_exclude_data_based_upon_the_request()
+    {
+        $response = DefaultLazyData::from('Ruben')->toResponse(request());
+
+        $excludedResponse = DefaultLazyData::from('Ruben')->toResponse(request()->merge([
+            'exclude' => 'name',
+        ]));
+
+        $this->assertEquals(['name' => 'Ruben'], $response->getData(true));
+
+        $this->assertEquals([], $excludedResponse->getData(true));
+    }
+
+    /** @test */
+    public function it_can_disable_excluding_data_dynamically_from_the_request()
+    {
+        DefaultLazyData::$allowedExcludes = [];
+
+        $response = DefaultLazyData::from('Ruben')->toResponse(request()->merge([
+            'exclude' => 'name',
+        ]));
+
+        $this->assertEquals(['name' => 'Ruben'], $response->getData(true));
+
+        DefaultLazyData::$allowedExcludes = ['name'];
+
+        $response = DefaultLazyData::from('Ruben')->toResponse(request()->merge([
+            'exclude' => 'name',
+        ]));
+
+        $this->assertEquals([], $response->getData(true));
+
+        DefaultLazyData::$allowedExcludes = null;
+
+        $response = DefaultLazyData::from('Ruben')->toResponse(request()->merge([
+            'exclude' => 'name',
+        ]));
+
+        $this->assertEquals([], $response->getData(true));
     }
 
     /** @test */

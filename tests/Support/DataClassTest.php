@@ -60,7 +60,82 @@ class DataClassTest extends TestCase
             DummyDto::class => 'fromDummyDto',
             'int' => 'fromNumber',
             'float' => 'fromNumber',
-        ], DataClass::create(new ReflectionClass($subject))->customFromMethods());
+        ], DataClass::create(new ReflectionClass($subject))->creationMethods());
+    }
+
+    /** @test */
+    public function it_can_find_optional_methods_and_the_types_that_can_be_used_with_them()
+    {
+        $subject = new class(null) extends Data {
+            public function __construct(public $property)
+            {
+            }
+
+            public static function optionalString(string $property): static
+            {
+            }
+
+            public static function optionalDummyDto(DummyDto $property): static
+            {
+            }
+
+            public static function optionalNumber(int | float $property): static
+            {
+            }
+
+            public static function doNotInclude(string $property): static
+            {
+            }
+
+            public function optionalDoNotIncludeA(string $other)
+            {
+            }
+
+            private static function optionalDoNotIncludeB(string $other)
+            {
+            }
+
+            protected static function optionalDoNotIncludeC(string $other)
+            {
+            }
+
+            public static function optionalDoNotIncludeD($other): static
+            {
+            }
+
+            public static function optionalDoNotIncludeE(string $other, string $extra): static
+            {
+            }
+        };
+
+        $this->assertEquals([
+            'string' => 'optionalString',
+            DummyDto::class => 'optionalDummyDto',
+            'int' => 'optionalNumber',
+            'float' => 'optionalNumber',
+        ], DataClass::create(new ReflectionClass($subject))->optionalCreationMethods());
+    }
+
+    /** @test */
+    public function it_can_have_a_from_and_optional_method_for_the_same_type()
+    {
+        $subject = new class(null) extends Data {
+            public static function optionalString(string $property): ?static
+            {
+            }
+
+            public static function fromString(string $property): static
+            {
+            }
+        };
+
+        $this->assertEquals([
+            'string' => 'fromString',
+        ], DataClass::create(new ReflectionClass($subject))->creationMethods());
+
+        $this->assertEquals([
+            'string' => 'optionalString',
+        ], DataClass::create(new ReflectionClass($subject))->optionalCreationMethods());
     }
 
     /** @test */

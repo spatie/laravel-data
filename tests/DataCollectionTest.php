@@ -8,6 +8,7 @@ use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
@@ -202,5 +203,110 @@ class DataCollectionTest extends TestCase
         ],
             $includedResponse->getData(true)
         );
+    }
+
+    /** @test */
+    public function it_can_disable_manually_including_data_in_the_request()
+    {
+        LazyData::$allowedIncludes = [];
+
+        $response = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+            'include' => 'name',
+        ]));
+
+        $this->assertEquals([
+            [],
+            [],
+            [],
+        ], $response->getData(true));
+
+        LazyData::$allowedIncludes = ['name'];
+
+        $response = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+            'include' => 'name',
+        ]));
+
+        $this->assertEquals([
+            ['name' => 'Ruben'],
+            ['name' => 'Freek'],
+            ['name' => 'Brent'],
+        ], $response->getData(true));
+
+        LazyData::$allowedIncludes = null;
+
+        $response = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+            'include' => 'name',
+        ]));
+
+        $this->assertEquals([
+            ['name' => 'Ruben'],
+            ['name' => 'Freek'],
+            ['name' => 'Brent'],
+        ], $response->getData(true));
+    }
+
+    /** @test */
+    public function it_can_dynamically_exclude_data_based_upon_the_request()
+    {
+        $response = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request());
+
+        $excludedResponse = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+            'exclude' => 'name',
+        ]));
+
+        $this->assertEquals(
+            [
+                ['name' => 'Ruben'],
+                ['name' => 'Freek'],
+                ['name' => 'Brent'],
+            ],
+            $response->getData(true)
+        );
+
+        $this->assertEquals([
+            [],
+            [],
+            [],
+        ], $excludedResponse->getData(true));
+    }
+
+    /** @test */
+    public function it_can_disable_manually_excluding_data_in_the_request()
+    {
+        DefaultLazyData::$allowedExcludes = [];
+
+        $response = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+            'exclude' => 'name',
+        ]));
+
+        $this->assertEquals([
+            ['name' => 'Ruben'],
+            ['name' => 'Freek'],
+            ['name' => 'Brent'],
+        ], $response->getData(true));
+
+        DefaultLazyData::$allowedExcludes = ['name'];
+
+        $response = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+            'exclude' => 'name',
+        ]));
+
+        $this->assertEquals([
+            [],
+            [],
+            [],
+        ], $response->getData(true));
+
+        DefaultLazyData::$allowedExcludes = null;
+
+        $response = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+            'exclude' => 'name',
+        ]));
+
+        $this->assertEquals([
+            [],
+            [],
+            [],
+        ], $response->getData(true));
     }
 }

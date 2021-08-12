@@ -17,10 +17,11 @@ use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
+use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
 use Spatie\LaravelData\Transformers\DataTransformer;
 
-abstract class Data implements Arrayable, Responsable, Jsonable, RequestData, EloquentCastable
+abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastable
 {
     use ResponsableData;
     use IncludeableData;
@@ -29,22 +30,25 @@ abstract class Data implements Arrayable, Responsable, Jsonable, RequestData, El
 
     /**
      * - Maybe add support for the dto package casts?
-     * - remarks freek: https://spatie.slack.com/archives/DCK4VGZ3K/p1625758265030900
+     * - Add regex to dataproperty
      */
 
     public static function optional($payload): ?static
     {
-        return $payload !== null ? static::from($payload) : null;
+        return app(DataFromSomethingResolver::class)->execute(
+            static::class,
+            DataFromSomethingResolver::TYPE_OPTIONAL,
+            $payload
+        );
     }
 
     public static function from($payload): static
     {
-        return app(DataFromSomethingResolver::class)->execute(static::class, $payload);
-    }
-
-    public static function fromArray(array $payload)
-    {
-        return app(DataFromArrayResolver::class)->execute(static::class, $payload);
+        return app(DataFromSomethingResolver::class)->execute(
+            static::class,
+            DataFromSomethingResolver::TYPE_FROM,
+            $payload
+        );
     }
 
     public static function collection(Collection | array | AbstractPaginator | AbstractCursorPaginator | Paginator $items): DataCollection
@@ -57,16 +61,19 @@ abstract class Data implements Arrayable, Responsable, Jsonable, RequestData, El
         return app(EmptyDataResolver::class)->execute(static::class, $extra);
     }
 
+    public function transform(TransformationType $type): array
+    {
+        return DataTransformer::create($type)->transform($this);
+    }
+
     public function all(): array
     {
-        return DataTransformer::create()
-            ->withoutValueTransforming()
-            ->transform($this);
+        return $this->transform(TransformationType::withoutValueTransforming());
     }
 
     public function toArray(): array
     {
-        return DataTransformer::create()->transform($this);
+        return $this->transform(TransformationType::full());
     }
 
     public function toJson($options = 0): string

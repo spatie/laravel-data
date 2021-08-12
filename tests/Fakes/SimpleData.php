@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Tests\Fakes;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\RequestData;
 
-class SimpleData extends Data implements RequestData
+class SimpleData extends Data
 {
     public function __construct(
         public string $string

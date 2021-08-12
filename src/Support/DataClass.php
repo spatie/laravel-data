@@ -14,7 +14,10 @@ class DataClass
     private Collection $properties;
 
     /** @var array<string, string> */
-    private array $customFromMethods;
+    private array $creationMethods;
+
+    /** @var array<string, string> */
+    private array $optionalCreationMethods;
 
     private bool $hasAuthorizationMethod;
 
@@ -33,16 +36,28 @@ class DataClass
         return $this->properties;
     }
 
-    public function customFromMethods(): array
+    public function creationMethods(): array
     {
         /** @psalm-suppress RedundantPropertyInitializationCheck */
-        if (isset($this->customFromMethods)) {
-            return $this->customFromMethods;
+        if (isset($this->creationMethods)) {
+            return $this->creationMethods;
         }
 
-        $this->resolveSpecialMethods();
+        $this->resolveMagicalMethods();
 
-        return $this->customFromMethods;
+        return $this->creationMethods;
+    }
+
+    public function optionalCreationMethods(): array
+    {
+        /** @psalm-suppress RedundantPropertyInitializationCheck */
+        if (isset($this->optionalCreationMethods)) {
+            return $this->optionalCreationMethods;
+        }
+
+        $this->resolveMagicalMethods();
+
+        return $this->optionalCreationMethods;
     }
 
     public function hasAuthorizationMethod(): bool
@@ -52,8 +67,7 @@ class DataClass
             return $this->hasAuthorizationMethod;
         }
 
-        $this->resolveSpecialMethods();
-        ;
+        $this->resolveMagicalMethods();
 
         return $this->hasAuthorizationMethod;
     }
@@ -65,75 +79,57 @@ class DataClass
 
     private function resolveProperties(): Collection
     {
-        $properties = [];
-
-        foreach ($this->class->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            if ($property->isStatic()) {
-                continue;
-            }
-
-            $properties[] = DataProperty::create($property);
-        }
-
-        return collect($properties);
+        return collect($this->class->getProperties(ReflectionProperty::IS_PUBLIC))
+            ->reject(fn(ReflectionProperty $property) => $property->isStatic())
+            ->map(fn(ReflectionProperty $property) => DataProperty::create($property))
+            ->values();
     }
 
-    private function resolveSpecialMethods()
+    private function resolveMagicalMethods()
     {
-        $this->customFromMethods = [];
+        $this->creationMethods = [];
 
-        $reflectionMethods = $this->class->getMethods(ReflectionMethod::IS_STATIC);
+        $methods = collect($this->class->getMethods(ReflectionMethod::IS_STATIC));
 
-        $this->hasAuthorizationMethod = array_reduce(
-            $reflectionMethods,
-            fn ($hasMethod, ReflectionMethod $method) => $hasMethod || ($method->getName() === 'authorized' && $method->isPublic()),
-            false
+        $this->hasAuthorizationMethod = $methods->contains(
+            fn(ReflectionMethod $method) => $method->getName() === 'authorized' && $method->isPublic()
         );
 
-        $methods = array_filter(
-            $reflectionMethods,
-            fn (ReflectionMethod $method) => $this->isValidCustomFromMethod($method)
-        );
+        [$creationMethods, $optionalCreationMethods] = $methods
+            ->filter(function (ReflectionMethod $method) {
+                return $method->isPublic()
+                    && (str_starts_with($method->getName(), 'from') || str_starts_with($method->getName(), 'optional'))
+                    && $method->getNumberOfParameters() === 1
+                    && $method->name !== 'from'
+                    && $method->name !== 'optional';
+            })
+            ->partition(fn(ReflectionMethod $method) => str_starts_with($method->getName(), 'from'));
 
-        foreach ($methods as $method) {
+        $this->creationMethods = $this->extractTypesFromCreationalMethods($creationMethods);
+        $this->optionalCreationMethods = $this->extractTypesFromCreationalMethods($optionalCreationMethods);
+    }
+
+    private function extractTypesFromCreationalMethods(Collection $methods): array
+    {
+        return $methods->mapWithKeys(function(ReflectionMethod $method){
             /** @var \ReflectionNamedType|\ReflectionUnionType|null $type */
             $type = current($method->getParameters())->getType();
 
             if ($type === null) {
-                continue;
+                return [];
             }
 
             if ($type instanceof ReflectionNamedType) {
-                $this->customFromMethods[$type->getName()] = $method->getName();
-
-                continue;
+                return [$type->getName() =>  $method->getName()];
             }
+
+            $entries = [];
 
             foreach ($type->getTypes() as $subType) {
-                $this->customFromMethods[$subType->getName()] = $method->getName();
+                $entries[$subType->getName()] = $method->getName();
             }
-        }
-    }
 
-    private function isValidCustomFromMethod(ReflectionMethod $method): bool
-    {
-        if (! $method->isPublic()) {
-            return false;
-        }
-
-        if (! str_starts_with($method->getName(), 'from')) {
-            return false;
-        }
-
-        if ($method->getNumberOfParameters() !== 1) {
-            return false;
-        }
-
-        return ! in_array($method->getName(), [
-            'from',
-            'fromModel',
-            'fromArray',
-            'fromRequest',
-        ]);
+            return $entries;
+        })->toArray();
     }
 }

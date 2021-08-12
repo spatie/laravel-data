@@ -20,6 +20,7 @@ use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\InvalidPaginatedDataCollectionModification;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
+use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 
 class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggregate, Countable, ArrayAccess, EloquentCastable
@@ -59,14 +60,29 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         return $this->items;
     }
 
+    public function transform(TransformationType $type): array
+    {
+        $transformer =  new DataCollectionTransformer(
+            $this->dataClass,
+            $type,
+            $this->getInclusionTree(),
+            $this->getExclusionTree(),
+            $this->items,
+            $this->through,
+            $this->filter
+        );
+
+        return $transformer->transform();
+    }
+
     public function all(): array
     {
-        return $this->getTransformer()->withoutValueTransforming()->transform();
+        return $this->transform(TransformationType::withoutValueTransforming());
     }
 
     public function toArray(): array
     {
-        return $this->getTransformer()->transform();
+        return $this->transform(TransformationType::full());
     }
 
     public function toJson($options = 0): string
@@ -76,9 +92,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     public function getIterator(): ArrayIterator
     {
-        $items = $this->getTransformer()->withoutValueTransforming()->transform();
-
-        return new ArrayIterator($items);
+        return new ArrayIterator($this->transform(TransformationType::withoutValueTransforming()));
     }
 
     public function count()
@@ -132,17 +146,5 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         }
 
         return new DataCollectionEloquentCast(current($arguments));
-    }
-
-    protected function getTransformer(): DataCollectionTransformer
-    {
-        return new DataCollectionTransformer(
-            $this->dataClass,
-            $this->getInclusionTree(),
-            $this->getExclusionTree(),
-            $this->items,
-            $this->through,
-            $this->filter
-        );
     }
 }

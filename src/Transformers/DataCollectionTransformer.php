@@ -7,26 +7,19 @@ use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Support\TransformationType;
 
 class DataCollectionTransformer
 {
-    private bool $withValueTransforming = true;
-
     public function __construct(
         protected string $dataClass,
+        protected TransformationType $transformationType,
         protected array $inclusionTree,
         protected array $exclusionTree,
         protected array | AbstractPaginator | AbstractCursorPaginator $items,
         protected ?Closure $through,
         protected ?Closure $filter,
     ) {
-    }
-
-    public function withoutValueTransforming(): static
-    {
-        $this->withValueTransforming = false;
-
-        return $this;
     }
 
     public function transform(): array
@@ -39,7 +32,7 @@ class DataCollectionTransformer
             $this->transformItemClosure()
         );
 
-        return $this->withValueTransforming
+        return $this->transformationType->useTransformers()
             ? $this->wrapPaginatedArray($this->items->toArray())
             : $this->items->all();
     }
@@ -52,8 +45,8 @@ class DataCollectionTransformer
             ? array_values(array_filter($items, $this->filter))
             : $items;
 
-        return $this->withValueTransforming
-            ? array_map(fn (Data $data) => $data->toArray(), $items)
+        return $this->transformationType->useTransformers()
+            ? array_map(fn (Data $data) => $data->transform($this->transformationType), $items)
             : $items;
     }
 
