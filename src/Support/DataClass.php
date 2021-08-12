@@ -16,6 +16,8 @@ class DataClass
     /** @var array<string, string> */
     private array $customFromMethods;
 
+    private bool $hasAuthorizationMethod;
+
     public function __construct(protected ReflectionClass $class)
     {
         $this->properties = $this->resolveProperties();
@@ -38,10 +40,57 @@ class DataClass
             return $this->customFromMethods;
         }
 
+        $this->resolveSpecialMethods();
+
+        return $this->customFromMethods;
+    }
+
+    public function hasAuthorizationMethod(): bool
+    {
+        /** @psalm-suppress RedundantPropertyInitializationCheck */
+        if (isset($this->hasAuthorizationMethod)) {
+            return $this->hasAuthorizationMethod;
+        }
+
+        $this->resolveSpecialMethods();;
+
+        return $this->hasAuthorizationMethod;
+    }
+
+    public function reflection(): ReflectionClass
+    {
+        return $this->class;
+    }
+
+    private function resolveProperties(): Collection
+    {
+        $properties = [];
+
+        foreach ($this->class->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+            if ($property->isStatic()) {
+                continue;
+            }
+
+            $properties[] = DataProperty::create($property);
+        }
+
+        return collect($properties);
+    }
+
+    private function resolveSpecialMethods()
+    {
         $this->customFromMethods = [];
 
+        $reflectionMethods = $this->class->getMethods(ReflectionMethod::IS_STATIC);
+
+        $this->hasAuthorizationMethod = array_reduce(
+            $reflectionMethods,
+            fn($hasMethod, ReflectionMethod $method) => $hasMethod || ($method->getName() === 'authorized' && $method->isPublic()),
+            false
+        );
+
         $methods = array_filter(
-            $this->class->getMethods(ReflectionMethod::IS_STATIC),
+            $reflectionMethods,
             fn (ReflectionMethod $method) => $this->isValidCustomFromMethod($method)
         );
 
@@ -63,28 +112,6 @@ class DataClass
                 $this->customFromMethods[$subType->getName()] = $method->getName();
             }
         }
-
-        return $this->customFromMethods;
-    }
-
-    public function reflection(): ReflectionClass
-    {
-        return $this->class;
-    }
-
-    private function resolveProperties(): Collection
-    {
-        $properties = [];
-
-        foreach ($this->class->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            if ($property->isStatic()) {
-                continue;
-            }
-
-            $properties[] = DataProperty::create($property);
-        }
-
-        return collect($properties);
     }
 
     private function isValidCustomFromMethod(ReflectionMethod $method): bool

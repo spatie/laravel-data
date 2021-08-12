@@ -7,7 +7,6 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
@@ -30,20 +29,17 @@ abstract class Data implements Arrayable, Responsable, Jsonable, RequestData, El
 
     /**
      * - Maybe add support for the dto package casts?
-     * - add support for authorization in requestabledata
-     * - add a lot of better exceptions
-     * - optional https://spatie.slack.com/archives/G011TEW1NEQ/p1627478861007300
      * - remarks freek: https://spatie.slack.com/archives/DCK4VGZ3K/p1625758265030900
      */
+
+    public static function optional($payload): ?static
+    {
+        return $payload !== null ? static::from($payload) : null;
+    }
 
     public static function from($payload): static
     {
         return app(DataFromSomethingResolver::class)->execute(static::class, $payload);
-    }
-
-    public static function fromModel(Model $model): Data
-    {
-        return static::fromArray($model->toArray());
     }
 
     public static function fromArray(array $payload)
@@ -51,7 +47,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, RequestData, El
         return app(DataFromArrayResolver::class)->execute(static::class, $payload);
     }
 
-    public static function collection(Collection | array | AbstractPaginator | AbstractCursorPaginator | Paginator $items): DataCollection
+    public static function collection(Collection|array|AbstractPaginator|AbstractCursorPaginator|Paginator $items): DataCollection
     {
         return new DataCollection(static::class, $items);
     }

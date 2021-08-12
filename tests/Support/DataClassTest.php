@@ -62,4 +62,34 @@ class DataClassTest extends TestCase
             'float' => 'fromNumber',
         ], DataClass::create(new ReflectionClass($subject))->customFromMethods());
     }
+
+    /** @test */
+    public function it_can_check_if_a_data_class_has_an_authorisation_method()
+    {
+        $withMethod = new class(null) extends Data {
+            public static function authorized(): bool
+            {
+            }
+        };
+
+        $withNonStaticMethod = new class(null) extends Data {
+            public function authorized(): bool
+            {
+            }
+        };
+
+        $withNonPublicMethod = new class(null) extends Data {
+            protected static function authorized(): bool
+            {
+            }
+        };
+
+        $withoutMethod = new class(null) extends Data {
+        };
+
+        $this->assertTrue(DataClass::create(new ReflectionClass($withMethod))->hasAuthorizationMethod());
+        $this->assertFalse(DataClass::create(new ReflectionClass($withNonPublicMethod))->hasAuthorizationMethod());
+        $this->assertFalse(DataClass::create(new ReflectionClass($withNonStaticMethod))->hasAuthorizationMethod());
+        $this->assertFalse(DataClass::create(new ReflectionClass($withoutMethod))->hasAuthorizationMethod());
+    }
 }

@@ -24,19 +24,19 @@ class DataFromSomethingResolver
         }
 
         if ($value instanceof Model) {
-            return $class::fromModel($value);
+            return app(DataFromArrayResolver::class)->execute($class, $value->toArray());
         }
 
         if ($value instanceof Request) {
-            return $class::fromRequest($value);
+            return app(DataFromArrayResolver::class)->execute($class, $value->all());
         }
 
         if ($value instanceof Arrayable) {
-            return $class::fromArray($value->toArray());
+            return app(DataFromArrayResolver::class)->execute($class, $value->toArray());
         }
 
         if (is_array($value)) {
-            return $class::fromArray($value);
+            return app(DataFromArrayResolver::class)->execute($class, $value);
         }
 
         throw CannotCreateDataFromValue::create($class, $value);

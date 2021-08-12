@@ -7,11 +7,6 @@ use Illuminate\Validation\Validator;
 
 trait RequestableData
 {
-    public static function fromRequest(Request $request): static
-    {
-        return static::fromArray($request->all());
-    }
-
     public static function rules(): array
     {
         return [];

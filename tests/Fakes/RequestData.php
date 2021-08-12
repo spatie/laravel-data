@@ -13,6 +13,7 @@ class RequestData extends Data
     public static array $attributes = [];
     public static array $rules = [];
     public static ?Closure $validatorClosure = null;
+    public static bool $enableAuthorizeFailure = false;
 
     public function __construct(
         #[Max(10)]
@@ -42,11 +43,19 @@ class RequestData extends Data
         }
     }
 
+    public static function authorized()
+    {
+        if(self::$enableAuthorizeFailure){
+            return false;
+        }
+    }
+
     public static function clear()
     {
         self::$attributes = [];
         self::$rules = [];
         self::$messages = [];
         self::$validatorClosure = null;
+        self::$enableAuthorizeFailure = false;
     }
 }

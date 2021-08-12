@@ -2,8 +2,10 @@
 
 namespace Spatie\LaravelData\Tests;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
@@ -16,7 +18,10 @@ class RequestDataTest extends TestCase
     {
         parent::setUp();
 
-        $this->handleValidationExceptions();
+        $this->handleExceptions([
+            AuthenticationException::class,
+            ValidationException::class
+        ]);
 
         RequestData::clear();
 
@@ -159,6 +164,14 @@ class RequestDataTest extends TestCase
         ])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['simple_collection.1.string' => 'The simple_collection.1.string must be a string.']);
+    }
+
+    /** @test */
+    public function it_can_check_for_authorisation()
+    {
+        RequestData::$enableAuthorizeFailure = true;
+
+        $this->validRequest()->assertStatus(401);
     }
 
     private function validRequest(): TestResponse
