@@ -29,6 +29,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
 
     /**
      * - Maybe add support for the dto package casts?
+     * - When creating an object using optional, should an optional* method be called or a from* method with a fallback to null
      * - Add regex to dataproperty
      */
 

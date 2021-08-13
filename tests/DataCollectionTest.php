@@ -309,4 +309,23 @@ class DataCollectionTest extends TestCase
             [],
         ], $response->getData(true));
     }
+
+    /** @test */
+    public function aaaa()
+    {
+        $collection = LazyData::collection([
+            LazyData::from('A')
+        ]);
+
+// Changing an item in the collection
+        $collection[0]->name = 'Giving Up on Love';
+
+// Adding an item to the collection
+        $collection[] = LazyData::from('B');
+
+// Removing an item from the collection
+//        unset($collection[0]);
+
+        dd($collection->include('name')->toArray());
+    }
 }
