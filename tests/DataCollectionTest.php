@@ -314,16 +314,16 @@ class DataCollectionTest extends TestCase
     public function aaaa()
     {
         $collection = LazyData::collection([
-            LazyData::from('A')
+            LazyData::from('A'),
         ]);
 
-// Changing an item in the collection
+        // Changing an item in the collection
         $collection[0]->name = 'Giving Up on Love';
 
-// Adding an item to the collection
+        // Adding an item to the collection
         $collection[] = LazyData::from('B');
 
-// Removing an item from the collection
+        // Removing an item from the collection
 //        unset($collection[0]);
 
         dd($collection->include('name')->toArray());
