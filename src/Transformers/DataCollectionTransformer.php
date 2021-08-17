@@ -55,7 +55,9 @@ class DataCollectionTransformer
         return function (mixed $item) {
             $item = $item instanceof Data
                 ? $item
-                : $this->dataClass::from($item)->withPartialsTrees($this->inclusionTree, $this->exclusionTree);
+                : $this->dataClass::from($item);
+
+            $item->withPartialsTrees($this->inclusionTree, $this->exclusionTree);
 
             if ($this->through) {
                 $item = ($this->through)($item);

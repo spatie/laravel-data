@@ -311,21 +311,33 @@ class DataCollectionTest extends TestCase
     }
 
     /** @test */
-    public function aaaa()
+    public function it_can_update_data_properties_within_a_collection()
     {
         $collection = LazyData::collection([
-            LazyData::from('A'),
+            LazyData::from('Never gonna give you up!')
         ]);
 
-        // Changing an item in the collection
+        $this->assertEquals([
+            ['name' => 'Never gonna give you up!']
+        ], $collection->include('name')->toArray());
+
         $collection[0]->name = 'Giving Up on Love';
 
-        // Adding an item to the collection
-        $collection[] = LazyData::from('B');
+        $this->assertEquals([
+            ['name' => 'Giving Up on Love']
+        ], $collection->include('name')->toArray());
 
-        // Removing an item from the collection
-//        unset($collection[0]);
+        $collection[] = LazyData::from('Cry for help');
 
-        dd($collection->include('name')->toArray());
+        $this->assertEquals([
+            ['name' => 'Giving Up on Love'],
+            ['name' => 'Cry for help']
+        ], $collection->include('name')->toArray());
+
+        unset($collection[0]);
+
+        $this->assertEquals([
+            1 => ['name' => 'Cry for help']
+        ], $collection->include('name')->toArray());
     }
 }

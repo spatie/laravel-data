@@ -122,10 +122,17 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     public function offsetSet($offset, $value): void
     {
-        match (true) {
-            is_array($this->items) => $this->items[$offset] = $value,
-            default => throw InvalidPaginatedDataCollectionModification::cannotSetItem()
-        };
+        if(! is_array($this->items)){
+            throw InvalidPaginatedDataCollectionModification::cannotSetItem();
+        }
+
+        if(empty($offset)){
+            $this->items[] = $value;
+
+            return;
+        }
+
+        $this->items[$offset] = $value;
     }
 
     public function offsetUnset($offset): void
