@@ -12,24 +12,16 @@ use Spatie\LaravelData\Support\DataConfig;
 
 class DataFromSomethingResolver
 {
-    public const TYPE_OPTIONAL = 'optional';
-    public const TYPE_FROM = 'from';
-
     public function __construct(protected DataConfig $dataConfig)
     {
     }
 
     public function execute(
         string $class,
-        string $type,
         mixed $value
-    ): ?Data {
-        if ($type === static::TYPE_OPTIONAL && $value === null) {
-            return null;
-        }
-
+    ): Data {
         /** @var class-string<\Spatie\LaravelData\Data>|\Spatie\LaravelData\Data $class */
-        if ($customCreationMethod = $this->resolveCustomCreationMethod($class, $type, $value)) {
+        if ($customCreationMethod = $this->resolveCustomCreationMethod($class, $value)) {
             return $class::$customCreationMethod($value);
         }
 
@@ -52,13 +44,9 @@ class DataFromSomethingResolver
         throw CannotCreateDataFromValue::create($class, $value);
     }
 
-    private function resolveCustomCreationMethod(string $class, string $type, mixed $payload): ?string
+    private function resolveCustomCreationMethod(string $class, mixed $payload): ?string
     {
-        $customCreationMethods = match ($type) {
-            self::TYPE_FROM => $this->dataConfig->getDataClass($class)->creationMethods(),
-            self::TYPE_OPTIONAL => $this->dataConfig->getDataClass($class)->optionalCreationMethods(),
-            default => throw new Exception('Unknown creation type')
-        };
+        $customCreationMethods = $this->dataConfig->getDataClass($class)->creationMethods();
 
         $type = gettype($payload);
 

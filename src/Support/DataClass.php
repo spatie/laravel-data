@@ -16,9 +16,6 @@ class DataClass
     /** @var array<string, string> */
     private array $creationMethods;
 
-    /** @var array<string, string> */
-    private array $optionalCreationMethods;
-
     private bool $hasAuthorizationMethod;
 
     public function __construct(protected ReflectionClass $class)
@@ -46,18 +43,6 @@ class DataClass
         $this->resolveMagicalMethods();
 
         return $this->creationMethods;
-    }
-
-    public function optionalCreationMethods(): array
-    {
-        /** @psalm-suppress RedundantPropertyInitializationCheck */
-        if (isset($this->optionalCreationMethods)) {
-            return $this->optionalCreationMethods;
-        }
-
-        $this->resolveMagicalMethods();
-
-        return $this->optionalCreationMethods;
     }
 
     public function hasAuthorizationMethod(): bool
@@ -95,7 +80,7 @@ class DataClass
             fn (ReflectionMethod $method) => $method->getName() === 'authorized' && $method->isPublic()
         );
 
-        [$creationMethods, $optionalCreationMethods] = $methods
+        $this->creationMethods = $methods
             ->filter(function (ReflectionMethod $method) {
                 return $method->isPublic()
                     && (str_starts_with($method->getName(), 'from') || str_starts_with($method->getName(), 'optional'))
@@ -103,33 +88,25 @@ class DataClass
                     && $method->name !== 'from'
                     && $method->name !== 'optional';
             })
-            ->partition(fn (ReflectionMethod $method) => str_starts_with($method->getName(), 'from'));
+            ->mapWithKeys(function (ReflectionMethod $method) {
+                /** @var \ReflectionNamedType|\ReflectionUnionType|null $type */
+                $type = current($method->getParameters())->getType();
 
-        $this->creationMethods = $this->extractTypesFromCreationalMethods($creationMethods);
-        $this->optionalCreationMethods = $this->extractTypesFromCreationalMethods($optionalCreationMethods);
-    }
+                if ($type === null) {
+                    return [];
+                }
 
-    private function extractTypesFromCreationalMethods(Collection $methods): array
-    {
-        return $methods->mapWithKeys(function (ReflectionMethod $method) {
-            /** @var \ReflectionNamedType|\ReflectionUnionType|null $type */
-            $type = current($method->getParameters())->getType();
+                if ($type instanceof ReflectionNamedType) {
+                    return [$type->getName() => $method->getName()];
+                }
 
-            if ($type === null) {
-                return [];
-            }
+                $entries = [];
 
-            if ($type instanceof ReflectionNamedType) {
-                return [$type->getName() => $method->getName()];
-            }
+                foreach ($type->getTypes() as $subType) {
+                    $entries[$subType->getName()] = $method->getName();
+                }
 
-            $entries = [];
-
-            foreach ($type->getTypes() as $subType) {
-                $entries[$subType->getName()] = $method->getName();
-            }
-
-            return $entries;
-        })->toArray();
+                return $entries;
+            })->toArray();
     }
 }

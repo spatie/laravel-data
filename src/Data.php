@@ -35,18 +35,15 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
 
     public static function optional($payload): ?static
     {
-        return app(DataFromSomethingResolver::class)->execute(
-            static::class,
-            DataFromSomethingResolver::TYPE_OPTIONAL,
-            $payload
-        );
+        return $payload === null
+            ? null
+            : static::from($payload);
     }
 
     public static function from($payload): static
     {
         return app(DataFromSomethingResolver::class)->execute(
             static::class,
-            DataFromSomethingResolver::TYPE_FROM,
             $payload
         );
     }
