@@ -19,6 +19,7 @@ use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\InvalidPaginatedDataCollectionModification;
+use Spatie\LaravelData\Exceptions\ItemShouldBeData;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
 use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Transformers\DataCollectionTransformer;
@@ -32,13 +33,15 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     private ?Closure $filter = null;
 
-    private array | AbstractPaginator | AbstractCursorPaginator | Paginator $items;
+    private array|AbstractPaginator|AbstractCursorPaginator|Paginator $items;
 
     public function __construct(
         private string $dataClass,
-        Collection | array | AbstractPaginator | AbstractCursorPaginator | Paginator $items
+        Collection|array|AbstractPaginator|AbstractCursorPaginator|Paginator $items
     ) {
         $this->items = $items instanceof Collection ? $items->all() : $items;
+
+        $this->ensureAllItemsAreData();
     }
 
     public function through(Closure $through): static
@@ -55,7 +58,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         return $this;
     }
 
-    public function items(): array | AbstractPaginator | AbstractCursorPaginator | Paginator
+    public function items(): array|AbstractPaginator|AbstractCursorPaginator|Paginator
     {
         return $this->items;
     }
@@ -104,7 +107,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
     {
         return match (true) {
             is_array($this->items) => array_key_exists($offset, $this->items),
-            $this->items instanceof AbstractPaginator, $this->items instanceof AbstractCursorPaginator => array_key_exists($offset, $this->items->items())
+            $this->isPaginated() => array_key_exists($offset, $this->items->items())
         };
     }
 
@@ -112,21 +115,23 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
     {
         $item = match (true) {
             is_array($this->items) => $this->items[$offset],
-            $this->items instanceof AbstractPaginator, $this->items instanceof AbstractCursorPaginator => $this->items->items()[$offset]
+            $this->isPaginated() => $this->items->items()[$offset]
         };
 
-        return $item instanceof Data
-            ? $item
-            : $this->dataClass::from($item);
+        return $item;
     }
 
     public function offsetSet($offset, $value): void
     {
-        if(! is_array($this->items)){
+        if ($this->isPaginated()) {
             throw InvalidPaginatedDataCollectionModification::cannotSetItem();
         }
 
-        if(empty($offset)){
+        $value = $value instanceof Data
+            ? $value
+            : $this->dataClass::from($value);
+
+        if (empty($offset)) {
             $this->items[] = $value;
 
             return;
@@ -137,13 +142,16 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     public function offsetUnset($offset): void
     {
-        if (is_array($this->items)) {
-            unset($this->items[$offset]);
-
-            return;
+        if ($this->isPaginated()) {
+            throw InvalidPaginatedDataCollectionModification::cannotUnSetItem();
         }
 
-        throw InvalidPaginatedDataCollectionModification::cannotUnSetItem();
+        unset($this->items[$offset]);
+    }
+
+    public function isPaginated(): bool
+    {
+        return $this->items instanceof AbstractPaginator || $this->items instanceof AbstractCursorPaginator;
     }
 
     public static function castUsing(array $arguments)
@@ -153,5 +161,14 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         }
 
         return new DataCollectionEloquentCast(current($arguments));
+    }
+
+    protected function ensureAllItemsAreData()
+    {
+        $closure = fn($item) => $item instanceof Data ? $item : $this->dataClass::from($item);
+
+        $this->items = $this->isPaginated()
+            ? $this->items->through($closure)
+            : array_map($closure, $this->items);
     }
 }

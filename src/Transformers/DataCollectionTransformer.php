@@ -16,7 +16,7 @@ class DataCollectionTransformer
         protected TransformationType $transformationType,
         protected array $inclusionTree,
         protected array $exclusionTree,
-        protected array | AbstractPaginator | AbstractCursorPaginator $items,
+        protected array|AbstractPaginator|AbstractCursorPaginator $items,
         protected ?Closure $through,
         protected ?Closure $filter,
     ) {
@@ -46,17 +46,13 @@ class DataCollectionTransformer
             : $items;
 
         return $this->transformationType->useTransformers()
-            ? array_map(fn (Data $data) => $data->transform($this->transformationType), $items)
+            ? array_map(fn(Data $data) => $data->transform($this->transformationType), $items)
             : $items;
     }
 
     protected function transformItemClosure(): Closure
     {
-        return function (mixed $item) {
-            $item = $item instanceof Data
-                ? $item
-                : $this->dataClass::from($item);
-
+        return function (Data $item) {
             $item->withPartialsTrees($this->inclusionTree, $this->exclusionTree);
 
             if ($this->through) {
