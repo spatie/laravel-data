@@ -1,10 +1,10 @@
 <?php
 
-namespace Spatie\LaravelData\AutoRules;
+namespace Spatie\LaravelData\RuleInferrers;
 
 use Spatie\LaravelData\Support\DataProperty;
 
-class BuiltInTypesAutoRule implements AutoRule
+class BuiltInTypesRuleInferrer implements RuleInferrer
 {
     public function handle(DataProperty $property, array $rules): array
     {

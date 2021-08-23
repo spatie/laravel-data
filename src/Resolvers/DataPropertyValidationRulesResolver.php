@@ -3,7 +3,7 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\AutoRules\AutoRule;
+use Spatie\LaravelData\RuleInferrers\RuleInferrer;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use TypeError;
@@ -53,8 +53,8 @@ class DataPropertyValidationRulesResolver
     private function getRulesForProperty(DataProperty $property): array
     {
         return array_reduce(
-            $this->dataConfig->getAutoRules(),
-            fn (array $rules, AutoRule $autoRule) => $autoRule->handle($property, $rules),
+            $this->dataConfig->getRuleInferrers(),
+            fn (array $rules, RuleInferrer $ruleInferrer) => $ruleInferrer->handle($property, $rules),
             []
         );
     }

@@ -26,10 +26,10 @@ return [
      * Validation Rules that will automatically be added when a data object is resolved
      * from a request
      */
-    'auto_rules' => [
-        Spatie\LaravelData\AutoRules\NullableAutoRule::class,
-        Spatie\LaravelData\AutoRules\RequiredAutoRule::class,
-        Spatie\LaravelData\AutoRules\BuiltInTypesAutoRule::class,
-        Spatie\LaravelData\AutoRules\AttributesAutoRule::class,
+    'rule_inferrers' => [
+        Spatie\LaravelData\RuleInferrers\NullableRuleInferrer::class,
+        Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer::class,
+        Spatie\LaravelData\RuleInferrers\BuiltInTypesRuleInferrer::class,
+        Spatie\LaravelData\RuleInferrers\AttributesRuleInferrer::class,
     ],
 ];

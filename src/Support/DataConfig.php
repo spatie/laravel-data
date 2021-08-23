@@ -17,8 +17,8 @@ class DataConfig
     /** @var array<string, string> */
     protected array $casts = [];
 
-    /** @var \Spatie\LaravelData\AutoRules\AutoRule[] */
-    private array $autoRules = [];
+    /** @var \Spatie\LaravelData\RuleInferrers\RuleInferrer[] */
+    private array $ruleInferrers = [];
 
     public function __construct(array $config)
     {
@@ -27,9 +27,9 @@ class DataConfig
             $config['transformers'] ?? []
         );
 
-        $this->autoRules = array_map(
-            fn (string $autoRuleClass) => app($autoRuleClass),
-            $config['auto_rules'] ?? []
+        $this->ruleInferrers = array_map(
+            fn (string $ruleInferrerClass) => app($ruleInferrerClass),
+            $config['rule_inferrers'] ?? []
         );
 
         $this->casts = $config['casts'];
@@ -59,9 +59,9 @@ class DataConfig
         return null;
     }
 
-    public function getAutoRules(): array
+    public function getRuleInferrers(): array
     {
-        return $this->autoRules;
+        return $this->ruleInferrers;
     }
 
     public function findTransformerForValue(mixed $value): ?Transformer
