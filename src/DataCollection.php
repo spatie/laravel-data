@@ -19,7 +19,6 @@ use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\InvalidPaginatedDataCollectionModification;
-use Spatie\LaravelData\Exceptions\ItemShouldBeData;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
 use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Transformers\DataCollectionTransformer;
@@ -33,11 +32,11 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     private ?Closure $filter = null;
 
-    private array|AbstractPaginator|AbstractCursorPaginator|Paginator $items;
+    private array | AbstractPaginator | AbstractCursorPaginator | Paginator $items;
 
     public function __construct(
         private string $dataClass,
-        Collection|array|AbstractPaginator|AbstractCursorPaginator|Paginator $items
+        Collection | array | AbstractPaginator | AbstractCursorPaginator | Paginator $items
     ) {
         $this->items = $items instanceof Collection ? $items->all() : $items;
 
@@ -58,7 +57,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         return $this;
     }
 
-    public function items(): array|AbstractPaginator|AbstractCursorPaginator|Paginator
+    public function items(): array | AbstractPaginator | AbstractCursorPaginator | Paginator
     {
         return $this->items;
     }
@@ -165,7 +164,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     protected function ensureAllItemsAreData()
     {
-        $closure = fn($item) => $item instanceof Data ? $item : $this->dataClass::from($item);
+        $closure = fn ($item) => $item instanceof Data ? $item : $this->dataClass::from($item);
 
         $this->items = $this->isPaginated()
             ? $this->items->through($closure)

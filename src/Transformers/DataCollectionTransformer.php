@@ -16,7 +16,7 @@ class DataCollectionTransformer
         protected TransformationType $transformationType,
         protected array $inclusionTree,
         protected array $exclusionTree,
-        protected array|AbstractPaginator|AbstractCursorPaginator $items,
+        protected array | AbstractPaginator | AbstractCursorPaginator $items,
         protected ?Closure $through,
         protected ?Closure $filter,
     ) {
@@ -46,7 +46,7 @@ class DataCollectionTransformer
             : $items;
 
         return $this->transformationType->useTransformers()
-            ? array_map(fn(Data $data) => $data->transform($this->transformationType), $items)
+            ? array_map(fn (Data $data) => $data->transform($this->transformationType), $items)
             : $items;
     }
 
