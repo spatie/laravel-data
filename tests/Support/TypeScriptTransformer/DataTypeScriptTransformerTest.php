@@ -18,7 +18,7 @@ class DataTypeScriptTransformerTest extends TestCase
     {
         $config = TypeScriptTransformerConfig::create();
 
-        $data = new class(null, 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn () => 'Lazy'), SimpleData::from('Simple data'), SimpleData::collection([]), ) extends Data {
+        $data = new class(null, 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn () => 'Lazy'), SimpleData::from('Simple data'), SimpleData::collection([]),) extends Data {
             public function __construct(
                 public null | int $nullable,
                 public int $int,
