@@ -50,7 +50,7 @@ class DataFromSomethingResolver
         $type = gettype($payload);
 
         if ($type === 'object') {
-            return $customCreationMethods[ltrim($payload::class, ' \\')] ?? null;
+            return $this->resolveCustomCreationMethodForObject($customCreationMethods, $payload);
         }
 
         $type = match ($type) {
@@ -59,10 +59,26 @@ class DataFromSomethingResolver
             'integer' => 'int',
             'double' => 'float',
             'array' => 'array',
-            // no break
             default => null,
         };
 
         return $customCreationMethods[$type] ?? null;
+    }
+
+    private function resolveCustomCreationMethodForObject(array $customCreationMethods, mixed $payload): ?string
+    {
+        $className = ltrim($payload::class, ' \\');
+
+        if (array_key_exists($className, $customCreationMethods)) {
+            return $customCreationMethods[$className];
+        }
+
+        foreach ($customCreationMethods as $customCreationMethodType => $customCreationMethod) {
+            if (is_a($className, $customCreationMethodType, true)) {
+                return $customCreationMethod;
+            }
+        }
+
+        return null;
     }
 }
