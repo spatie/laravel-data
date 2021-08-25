@@ -4,10 +4,6 @@ namespace Spatie\LaravelData\Tests\Factories;
 
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\Parameter;
-use Nette\PhpGenerator\PromotedParameter;
-use Nette\PhpGenerator\Property;
-use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Lazy;
 
 class DataMagicMethodFactory
 {

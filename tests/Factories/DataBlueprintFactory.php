@@ -59,7 +59,7 @@ class DataBlueprintFactory
         $class->setExtends(Data::class);
 
         $methods = array_map(
-            fn(DataMagicMethodFactory $factory) => $factory->create(),
+            fn (DataMagicMethodFactory $factory) => $factory->create(),
             $this->methods
         );
 

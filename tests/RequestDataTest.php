@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataMagicMethodFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
@@ -87,7 +86,7 @@ class RequestDataTest extends TestCase
     /** @test */
     public function it_can_change_the_validator()
     {
-        RequestData::$validatorClosure = fn(Validator $validator) => $validator->setRules([]);
+        RequestData::$validatorClosure = fn (Validator $validator) => $validator->setRules([]);
 
         $this->invalidRequest()
             ->assertOk()
