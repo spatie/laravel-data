@@ -6,7 +6,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Util\Exception;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\TestCase;
@@ -98,7 +97,7 @@ class DataFromSomethingResolverTest extends TestCase
 
             public static function fromModel(Model $arrayable)
             {
-               throw new Exception("Cannot be called");
+                throw new Exception("Cannot be called");
             }
 
             public static function fromDummyModel(DummyModel $model)
