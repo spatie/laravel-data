@@ -3,11 +3,14 @@
 namespace Spatie\LaravelData\Tests;
 
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
+use Spatie\LaravelData\Tests\Factories\DataMagicMethodFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -84,7 +87,7 @@ class RequestDataTest extends TestCase
     /** @test */
     public function it_can_change_the_validator()
     {
-        RequestData::$validatorClosure = fn (Validator $validator) => $validator->setRules([]);
+        RequestData::$validatorClosure = fn(Validator $validator) => $validator->setRules([]);
 
         $this->invalidRequest()
             ->assertOk()
@@ -172,6 +175,31 @@ class RequestDataTest extends TestCase
         RequestData::$enableAuthorizeFailure = true;
 
         $this->validRequest()->assertStatus(401);
+    }
+
+    /** @test */
+    public function it_can_manually_override_how_the_data_object_will_be_constructed()
+    {
+        DataBlueprintFactory::new('OverrideableDataFromRequest')
+            ->withProperty(DataPropertyBlueprintFactory::new('name')->withType('string'))
+            ->withMethod(
+                DataMagicMethodFactory::new('fromRequest')
+                    ->withInputType(Request::class, 'request')
+                    ->withBody('return new self("{$request->input(\'first_name\')} {$request->input(\'last_name\')}");')
+            )
+            ->create();
+
+        Route::post('/other-route', function (\OverrideableDataFromRequest $data) {
+            return ['name' => $data->name];
+        });
+
+        $this->postJson('/other-route', [
+            'name' => 'ignore',  // TODO, how can we remove this rule?
+            'first_name' => 'Rick',
+            'last_name' => 'Astley',
+        ])
+            ->assertOk()
+            ->assertJson(['name' => 'Rick Astley']);
     }
 
     private function validRequest(): TestResponse

@@ -14,6 +14,9 @@ class DataBlueprintFactory
     /** @var \Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory[] */
     private array $properties = [];
 
+    /** @var \Spatie\LaravelData\Tests\Factories\DataMagicMethodFactory[] */
+    private array $methods = [];
+
     public function __construct(?string $name = null)
     {
         $this->name = $name ?? 'Data' . uniqid();
@@ -33,6 +36,15 @@ class DataBlueprintFactory
         return $clone;
     }
 
+    public function withMethod(DataMagicMethodFactory ...$methods): self
+    {
+        $clone = clone $this;
+
+        $clone->methods = $methods;
+
+        return $clone;
+    }
+
     public function create(): string
     {
         eval($this->toString());
@@ -45,6 +57,14 @@ class DataBlueprintFactory
         $class = new ClassType($this->name);
 
         $class->setExtends(Data::class);
+
+        $methods = array_map(
+            fn(DataMagicMethodFactory $factory) => $factory->create(),
+            $this->methods
+        );
+
+        $class->setMethods($methods);
+
 
         /** @var \Illuminate\Support\Collection $properties */
         /** @var \Illuminate\Support\Collection $promotedProperties */
