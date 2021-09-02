@@ -2,7 +2,7 @@
 
 namespace Spatie\LaravelData\RuleInferrers;
 
-use Spatie\LaravelData\Attributes\Validation\DataValidationAttribute;
+use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
 use Spatie\LaravelData\Support\DataProperty;
 
 class AttributesRuleInferrer implements RuleInferrer
@@ -10,7 +10,7 @@ class AttributesRuleInferrer implements RuleInferrer
     public function handle(DataProperty $property, array $rules): array
     {
         $attributeRules = array_map(
-            fn (DataValidationAttribute $attribute) => $attribute->getRules(),
+            fn (ValidationAttribute $attribute) => $attribute->getRules(),
             $property->validationAttributes()
         );
 

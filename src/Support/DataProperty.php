@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
-use Spatie\LaravelData\Attributes\Validation\DataValidationAttribute;
+use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
@@ -32,7 +32,7 @@ class DataProperty
 
     private array $types;
 
-    /** @var \Spatie\LaravelData\Attributes\Validation\DataValidationAttribute[] */
+    /** @var \Spatie\LaravelData\Attributes\Validation\ValidationAttribute[] */
     private array $validationAttributes;
 
     private ?WithCast $castAttribute;
@@ -260,7 +260,7 @@ class DataProperty
         foreach ($this->property->getAttributes() as $attribute) {
             $initiatedAttribute = $attribute->newInstance();
 
-            if ($initiatedAttribute instanceof DataValidationAttribute) {
+            if ($initiatedAttribute instanceof ValidationAttribute) {
                 $validationAttributes[] = $initiatedAttribute;
 
                 continue;

@@ -5,13 +5,13 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Max implements ValidationAttribute
+class DateFormat implements ValidationAttribute
 {
-    public function __construct(private int $value)
+    public function __construct(private string $format)
 {}
 
     public function getRules(): array
     {
-        return ['max:' . $this->value];
+        return ['date_format:' . $this->format];
     }
 }

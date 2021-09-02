@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Rule implements DataValidationAttribute
+class Rule implements ValidationAttribute
 {
     protected array $rules;
 

@@ -2,7 +2,7 @@
 
 namespace Spatie\LaravelData\Attributes\Validation;
 
-interface DataValidationAttribute
+interface ValidationAttribute
 {
     public function getRules(): array;
 }
