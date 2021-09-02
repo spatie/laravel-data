@@ -3,7 +3,7 @@
 namespace Spatie\LaravelData\Tests\Support;
 
 use ReflectionProperty;
-use Spatie\LaravelData\Attributes\Max;
+use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
@@ -13,7 +13,7 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
-use Spatie\LaravelData\Transformers\DateTransformer;
+use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 class DataPropertyTest extends TestCase
 {
@@ -287,22 +287,22 @@ class DataPropertyTest extends TestCase
     public function it_can_get_the_transformer_attribute()
     {
         $helper = $this->resolveHelper(new class {
-            #[WithTransformer(DateTransformer::class)]
+            #[WithTransformer(DateTimeInterfaceTransformer::class)]
             public SimpleData $property;
         });
 
-        $this->assertEquals(new WithTransformer(DateTransformer::class), $helper->transformerAttribute());
+        $this->assertEquals(new WithTransformer(DateTimeInterfaceTransformer::class), $helper->transformerAttribute());
     }
 
     /** @test */
     public function it_can_get_the_transformer_attribute_with_arguments()
     {
         $helper = $this->resolveHelper(new class {
-            #[WithTransformer(DateTransformer::class, 'd-m-y')]
+            #[WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-y')]
             public SimpleData $property;
         });
 
-        $this->assertEquals(new WithTransformer(DateTransformer::class, 'd-m-y'), $helper->transformerAttribute());
+        $this->assertEquals(new WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-y'), $helper->transformerAttribute());
     }
 
     /** @test */

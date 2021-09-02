@@ -11,28 +11,29 @@ class DataConfig
     /** @var array<string, \Spatie\LaravelData\Support\DataClass> */
     private array $dataClasses = [];
 
-    /** @var \Spatie\LaravelData\Transformers\Transformer[] */
+    /** @var array<string, \Spatie\LaravelData\Transformers\Transformer> */
     protected array $transformers = [];
 
-    /** @var array<string, string> */
+    /** @var array<string, \Spatie\LaravelData\Casts\Cast> */
     protected array $casts = [];
 
     /** @var \Spatie\LaravelData\RuleInferrers\RuleInferrer[] */
-    private array $ruleInferrers = [];
+    private array $ruleInferrers;
 
     public function __construct(array $config)
     {
-        $this->transformers = array_map(
-            fn (string $transformerClass) => app($transformerClass),
-            $config['transformers'] ?? []
-        );
-
         $this->ruleInferrers = array_map(
-            fn (string $ruleInferrerClass) => app($ruleInferrerClass),
+            fn(string $ruleInferrerClass) => app($ruleInferrerClass),
             $config['rule_inferrers'] ?? []
         );
 
-        $this->casts = $config['casts'];
+        foreach ($config['transformers'] ?? [] as $transformable => $transformer) {
+            $this->transformers[ltrim($transformable, ' \\')] = app($transformer);
+        }
+
+        foreach ($config['casts'] ?? [] as $castable => $cast) {
+            $this->casts[ltrim($castable, ' \\')] = app($cast);
+        }
     }
 
     public function getDataClass(string $class): DataClass
@@ -44,19 +45,28 @@ class DataConfig
         return $this->dataClasses[$class] = DataClass::create(new ReflectionClass($class));
     }
 
-    public function getCastForType(string $type): ?Cast
+    public function findGlobalCastForProperty(DataProperty $property): ?Cast
     {
-        foreach ($this->casts as $castable => $cast) {
-            if (ltrim($type, ' \\') === ltrim($castable, ' \\')) {
-                return app($cast);
-            }
+        if ($property->isBuiltIn()) {
+            return null;
+        }
 
-            if (is_a($type, $castable, true)) {
-                return app($cast);
+        foreach ($property->types() as $type) {
+            if ($cast = $this->findSuitableReplacerForClass($this->casts, $type)) {
+                return $cast;
             }
         }
 
         return null;
+    }
+
+    public function findGlobalTransformerForValue(mixed $value): ?Transformer
+    {
+        if (gettype($value) !== 'object') {
+            return null;
+        }
+
+        return $this->findSuitableReplacerForClass($this->transformers, get_class($value));
     }
 
     public function getRuleInferrers(): array
@@ -64,11 +74,17 @@ class DataConfig
         return $this->ruleInferrers;
     }
 
-    public function findTransformerForValue(mixed $value): ?Transformer
-    {
-        foreach ($this->transformers as $transformer) {
-            if ($transformer->canTransform($value)) {
-                return $transformer;
+    protected function findSuitableReplacerForClass(
+        array $replacers,
+        string $class
+    ) {
+        foreach ($replacers as $replaceable => $replacer) {
+            if ($class === $replaceable) {
+                return $replacer;
+            }
+
+            if (is_a($class, $replaceable, true)) {
+                return $replacer;
             }
         }
 

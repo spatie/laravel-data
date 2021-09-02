@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -46,7 +47,7 @@ class DataFromRequestResolver
     private function checkAuthorization(string $class)
     {
         if ($class::authorized() === false) {
-            throw new AuthenticationException();
+            throw new AuthorizationException();
         }
     }
 }

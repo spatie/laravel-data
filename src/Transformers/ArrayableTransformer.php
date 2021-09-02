@@ -2,16 +2,11 @@
 
 namespace Spatie\LaravelData\Transformers;
 
-use Illuminate\Contracts\Support\Arrayable;
+use Spatie\LaravelData\Support\DataProperty;
 
 class ArrayableTransformer implements Transformer
 {
-    public function canTransform(mixed $value): bool
-    {
-        return $value instanceof Arrayable;
-    }
-
-    public function transform(mixed $value): array
+    public function transform(DataProperty $property, mixed $value): array
     {
         /** @var \Illuminate\Contracts\Support\Arrayable $value */
         return $value->toArray();

@@ -2,7 +2,7 @@
 
 namespace Spatie\LaravelData\RuleInferrers;
 
-use Spatie\LaravelData\Attributes\DataValidationAttribute;
+use Spatie\LaravelData\Attributes\Validation\DataValidationAttribute;
 use Spatie\LaravelData\Support\DataProperty;
 
 class AttributesRuleInferrer implements RuleInferrer

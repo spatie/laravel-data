@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Tests\Fakes;
 
 use Closure;
 use Illuminate\Validation\Validator;
-use Spatie\LaravelData\Attributes\Max;
+use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Data;
 
 class RequestData extends Data

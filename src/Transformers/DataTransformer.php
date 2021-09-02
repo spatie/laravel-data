@@ -149,8 +149,8 @@ class DataTransformer
             return $value;
         }
 
-        $transformer = $property->transformerAttribute()?->get() ?? $this->config->findTransformerForValue($value);
+        $transformer = $property->transformerAttribute()?->get() ?? $this->config->findGlobalTransformerForValue($value);
 
-        return $transformer?->transform($value) ?? $value;
+        return $transformer?->transform($property, $value) ?? $value;
     }
 }

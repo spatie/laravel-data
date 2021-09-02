@@ -2,20 +2,15 @@
 
 namespace Spatie\LaravelData\Transformers;
 
-use DateTimeInterface;
+use Spatie\LaravelData\Support\DataProperty;
 
-class DateTransformer implements Transformer
+class DateTimeInterfaceTransformer implements Transformer
 {
     public function __construct(protected ?string $format = null)
     {
     }
 
-    public function canTransform(mixed $value): bool
-    {
-        return $value instanceof DateTimeInterface;
-    }
-
-    public function transform(mixed $value): string
+    public function transform(DataProperty $property, mixed $value): string
     {
         $format = $this->format ?? config('data.date_format');
 

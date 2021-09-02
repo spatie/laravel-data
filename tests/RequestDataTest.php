@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Tests;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,7 @@ class RequestDataTest extends TestCase
 
         $this->handleExceptions([
             AuthenticationException::class,
+            AuthorizationException::class,
             ValidationException::class,
         ]);
 
@@ -173,7 +175,7 @@ class RequestDataTest extends TestCase
     {
         RequestData::$enableAuthorizeFailure = true;
 
-        $this->validRequest()->assertStatus(401);
+        $this->validRequest()->assertStatus(403);
     }
 
     /** @test */

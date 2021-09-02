@@ -29,7 +29,7 @@ return [
      * them to types that can be JSON encoded.
      */
     'transformers' => [
-        \Spatie\LaravelData\Transformers\DateTransformer::class,
+        \Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer::class,
         \Spatie\LaravelData\Transformers\ArrayableTransformer::class,
     ],
 

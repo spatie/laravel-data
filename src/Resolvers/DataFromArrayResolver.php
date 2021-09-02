@@ -62,7 +62,7 @@ class DataFromArrayResolver
             );
         }
 
-        if ($cast = $this->resolveGlobalCast($property)) {
+        if ($cast = $this->dataConfig->findGlobalCastForProperty($property)) {
             return $cast->cast($property, $value);
         }
 
@@ -74,16 +74,5 @@ class DataFromArrayResolver
         mixed $value
     ): mixed {
         return $property->castAttribute()->get()->cast($property, $value);
-    }
-
-    private function resolveGlobalCast(DataProperty $property): ?Cast
-    {
-        if (count($property->types()) !== 1) {
-            return null;
-        }
-
-        $type = current($property->types());
-
-        return $this->dataConfig->getCastForType($type);
     }
 }

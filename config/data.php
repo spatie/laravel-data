@@ -2,29 +2,31 @@
 
 return [
     /*
-     * The date format to be used when converting a DateTimeInterface from and to json
+     * The package will use this date format when working with dates through the app
      */
     'date_format' => DATE_ATOM,
 
     /*
-     * Transformers will take properties within your data objects and transform
-     * them to types that can be JSON encoded.
+     * Global transformers will take complex types and transform them into simple
+     * types.
      */
     'transformers' => [
-        \Spatie\LaravelData\Transformers\DateTransformer::class,
-        \Spatie\LaravelData\Transformers\ArrayableTransformer::class,
+        DateTimeInterface::class => \Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer::class,
+        \Illuminate\Contracts\Support\Arrayable::class => \Spatie\LaravelData\Transformers\ArrayableTransformer::class,
     ],
 
     /*
-     * Global casts will automatically transform values in arrays to data object properties
+     * Global casts will cast values into complex types when creating a data
+     * object from simple types.
      */
     'casts' => [
         DateTimeInterface::class => Spatie\LaravelData\Casts\DateTimeInterfaceCast::class,
     ],
 
     /*
-     * Validation Rules that will automatically be added when a data object is resolved
-     * from a request
+     * Rule inferrers can be configured here, they will automatically add
+     * validation rules to properties of a data object based upon
+     * the type of the property.
      */
     'rule_inferrers' => [
         Spatie\LaravelData\RuleInferrers\NullableRuleInferrer::class,

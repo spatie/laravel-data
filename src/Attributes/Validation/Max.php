@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelData\Attributes;
+namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 

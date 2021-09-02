@@ -198,7 +198,7 @@ SongData::collection($allSongs)->transform(function(SongData $song){
 });
 ```
 
-You can  filter non-paginated collections:
+You can filter non-paginated collections:
 
 ```php
 SongData::collection($allSongs)->filter(

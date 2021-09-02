@@ -16,7 +16,7 @@ use Spatie\LaravelData\Tests\Fakes\EmptyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Transformers\DateTransformer;
+use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 class DataTest extends TestCase
 {
@@ -322,7 +322,7 @@ class DataTest extends TestCase
 
         $data = new class($date) extends Data {
             public function __construct(
-                #[WithTransformer(DateTransformer::class, 'd-m-Y')]
+                #[WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-Y')]
                 public $date
             ) {
             }
@@ -336,7 +336,7 @@ class DataTest extends TestCase
     {
         $data = new class(null) extends Data {
             public function __construct(
-                #[WithTransformer(DateTransformer::class, 'd-m-Y')]
+                #[WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-Y')]
                 public $date
             ) {
             }

@@ -3,7 +3,7 @@
 namespace Spatie\LaravelData\Tests\Resolvers;
 
 use ReflectionProperty;
-use Spatie\LaravelData\Attributes\Max;
+use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Resolvers\DataPropertyValidationRulesResolver;
 use Spatie\LaravelData\Support\DataProperty;

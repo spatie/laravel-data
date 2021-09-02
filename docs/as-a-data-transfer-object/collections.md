@@ -1,6 +1,6 @@
 ---
 title: Collections 
-weight: 2
+weight: 3
 ---
 
 Next to a `Data` class , the package also provides a `DataCollection` class that can be used to store a collection of
