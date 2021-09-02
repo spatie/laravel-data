@@ -8,7 +8,8 @@ use Attribute;
 class Size implements ValidationAttribute
 {
     public function __construct(private int $size)
-{}
+    {
+    }
 
     public function getRules(): array
     {

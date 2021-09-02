@@ -8,7 +8,8 @@ use Attribute;
 class Before implements ValidationAttribute
 {
     public function __construct(private string $date)
-{}
+    {
+    }
 
     public function getRules(): array
     {

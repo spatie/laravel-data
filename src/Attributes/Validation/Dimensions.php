@@ -28,11 +28,11 @@ class Dimensions implements ValidationAttribute
         // Validate the options we were given.
         $options = array_filter(
             [
-                'min_width'  => $this->minWidth,
+                'min_width' => $this->minWidth,
                 'min_height' => $this->minHeight,
-                'max_width'  => $this->maxWidth,
+                'max_width' => $this->maxWidth,
                 'max_height' => $this->maxHeight,
-                'ratio'      => $this->ratio,
+                'ratio' => $this->ratio,
             ],
             fn ($value) => ! is_null($value)
         );

@@ -8,7 +8,8 @@ use Attribute;
 class DateFormat implements ValidationAttribute
 {
     public function __construct(private string $format)
-{}
+    {
+    }
 
     public function getRules(): array
     {

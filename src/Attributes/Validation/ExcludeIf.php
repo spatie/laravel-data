@@ -8,7 +8,8 @@ use Attribute;
 class ExcludeIf implements ValidationAttribute
 {
     public function __construct(private string $field, private string $value)
-{}
+    {
+    }
 
     public function getRules(): array
     {

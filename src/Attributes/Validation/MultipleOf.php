@@ -8,7 +8,8 @@ use Attribute;
 class MultipleOf implements ValidationAttribute
 {
     public function __construct(private int $value)
-{}
+    {
+    }
 
     public function getRules(): array
     {

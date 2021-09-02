@@ -8,7 +8,8 @@ use Attribute;
 class GreaterThan implements ValidationAttribute
 {
     public function __construct(private string $field)
-{}
+    {
+    }
 
     public function getRules(): array
     {

@@ -8,7 +8,8 @@ use Attribute;
 class Same implements ValidationAttribute
 {
     public function __construct(private string $fieldName)
-{}
+    {
+    }
 
     public function getRules(): array
     {

@@ -7,11 +7,11 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Email implements ValidationAttribute
 {
-    const RfcValidation           = 1 << 0;
+    const RfcValidation = 1 << 0;
     const NoRfcWarningsValidation = 1 << 1;
-    const DnsCheckValidation      = 1 << 2;
-    const SpoofCheckValidation    = 1 << 3;
-    const FilterEmailValidation   = 1 << 4;
+    const DnsCheckValidation = 1 << 2;
+    const SpoofCheckValidation = 1 << 3;
+    const FilterEmailValidation = 1 << 4;
 
     private int $mode;
 

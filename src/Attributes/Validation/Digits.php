@@ -8,7 +8,8 @@ use Attribute;
 class Digits implements ValidationAttribute
 {
     public function __construct(private int $value)
-{}
+    {
+    }
 
     public function getRules(): array
     {

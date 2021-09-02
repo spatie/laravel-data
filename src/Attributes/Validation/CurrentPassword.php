@@ -8,7 +8,8 @@ use Attribute;
 class CurrentPassword implements ValidationAttribute
 {
     public function __construct(private ?string $guard = null)
-{}
+    {
+    }
 
     public function getRules(): array
     {

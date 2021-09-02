@@ -8,7 +8,8 @@ use Attribute;
 class Regex implements ValidationAttribute
 {
     public function __construct(private string $pattern)
-{}
+    {
+    }
 
     public function getRules(): array
     {

@@ -8,7 +8,8 @@ use Attribute;
 class DigitsBetween implements ValidationAttribute
 {
     public function __construct(private int $min, private int $max)
-{}
+    {
+    }
 
     public function getRules(): array
     {
