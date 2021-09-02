@@ -129,7 +129,7 @@ class DataProperty
     /**
      * @return class-string<\Spatie\LaravelData\Data>
      */
-    public function getDataClassName(): string
+    public function dataClassName(): string
     {
         /** @psalm-suppress RedundantPropertyInitializationCheck */
         if (isset($this->dataClassName)) {

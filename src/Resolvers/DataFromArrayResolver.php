@@ -46,17 +46,17 @@ class DataFromArrayResolver
         }
 
         if ($property->isData()) {
-            return $this->execute($property->getDataClassName(), $value);
+            return $this->execute($property->dataClassName(), $value);
         }
 
         if ($property->isDataCollection()) {
             $items = array_map(
-                fn (array $item) => $this->execute($property->getDataClassName(), $item),
+                fn (array $item) => $this->execute($property->dataClassName(), $item),
                 $value
             );
 
             return new DataCollection(
-                $property->getDataClassName(),
+                $property->dataClassName(),
                 $items
             );
         }

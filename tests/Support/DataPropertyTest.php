@@ -312,7 +312,7 @@ class DataPropertyTest extends TestCase
             public SimpleData $property;
         });
 
-        $this->assertEquals(SimpleData::class, $helper->getDataClassName());
+        $this->assertEquals(SimpleData::class, $helper->dataClassName());
     }
 
     /** @test */
@@ -327,7 +327,7 @@ class DataPropertyTest extends TestCase
             public DataCollection $property;
         });
 
-        $this->assertEquals(SimpleData::class, $helper->getDataClassName());
+        $this->assertEquals(SimpleData::class, $helper->dataClassName());
     }
 
     private function resolveHelper(object $class): DataProperty

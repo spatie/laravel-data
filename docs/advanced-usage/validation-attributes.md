@@ -2,11 +2,34 @@
 title: Validation attributes weight: 5
 ---
 
-It is possible to validate properties with this package by using validation attributes. The same validation rules that
-exist can also be used as attributes. For example in a Laravel request you would do the following:
+It is possible to validate the request before a data object is constructed, this can be done by adding validation attributes to the properties of a data object like this:
 
 ```php
-class 
+class SongData extends Data
+{
+    public function __construct(
+        #[Uuid()]
+        public string $uuid,
+        #[Max(15), IP, StartsWith('192.')]
+        public string $ip,
+    ) {
+    }
+}
+```
+
+## Creating your own validation attribute
+
+A validation attribute is a class that implements `ValidationAttribute` and returns an array of validation rules when the `getRules` method is called:
+
+```php
+#[Attribute(Attribute::TARGET_PROPERTY)]
+class CustomRule implements ValidationAttribute
+{
+    public function getRules(): array
+    {
+        return [new CustomRule()];
+    }
+}
 ```
 
 ## Available validation attributes
