@@ -13,7 +13,7 @@ class Dimensions implements ValidationAttribute
         private ?int $minHeight = null,
         private ?int $maxWidth = null,
         private ?int $maxHeight = null,
-        private null|float|string $ratio = null
+        private null | float | string $ratio = null
     ) {
     }
 
@@ -27,8 +27,8 @@ class Dimensions implements ValidationAttribute
             'ratio' => $this->ratio,
         ])
             ->filter()
-            ->whenEmpty(fn() => throw CannotBuildValidationRule::create('You must specify one of minWidth, minHeight, maxWidth, maxHeight, or ratio.'))
-            ->map(fn($value, string $key) => "{$key}={$value}")
+            ->whenEmpty(fn () => throw CannotBuildValidationRule::create('You must specify one of minWidth, minHeight, maxWidth, maxHeight, or ratio.'))
+            ->map(fn ($value, string $key) => "{$key}={$value}")
             ->implode(',');
 
         return ["dimensions:{$parameters}"];

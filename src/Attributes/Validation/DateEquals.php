@@ -11,7 +11,7 @@ class DateEquals implements ValidationAttribute
 {
     use BuildsValidationRules;
 
-    public function __construct(private string|DateTimeInterface $date)
+    public function __construct(private string | DateTimeInterface $date)
     {
     }
 

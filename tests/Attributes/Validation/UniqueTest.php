@@ -48,7 +48,7 @@ class UniqueTest extends TestCase
             new Unique('users', 'email', ignore: 5, ignoreColumn: 'uuid')
         );
 
-        $closure = fn(Builder $builder) => $builder;
+        $closure = fn (Builder $builder) => $builder;
 
         $this->assertValidationAttributeRules(
             [(new BaseUnique('users', 'email'))->where($closure)],

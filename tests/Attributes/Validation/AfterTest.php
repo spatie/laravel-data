@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests\Attributes\Validation;
 
 use Carbon\Carbon;
-use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\Validation\After;
 use Spatie\LaravelData\Tests\TestCase;
 use Spatie\TestTime\TestTime;

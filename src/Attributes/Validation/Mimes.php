@@ -12,7 +12,7 @@ class Mimes implements ValidationAttribute
 
     private array $mimes;
 
-    public function __construct(string|array $mimes)
+    public function __construct(string | array $mimes)
     {
         $this->mimes = is_string($mimes) ? [$mimes] : $mimes;
     }

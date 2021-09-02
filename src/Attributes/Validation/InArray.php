@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
-use Illuminate\Validation\Rules\In as BaseIn;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class InArray implements ValidationAttribute

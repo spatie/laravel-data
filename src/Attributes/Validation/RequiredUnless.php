@@ -12,7 +12,7 @@ class RequiredUnless implements ValidationAttribute
 
     public function __construct(
         private string $field,
-        private array|string $values
+        private array | string $values
     ) {
     }
 

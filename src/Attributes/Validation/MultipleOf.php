@@ -7,7 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class MultipleOf implements ValidationAttribute
 {
-    public function __construct(private int|float $value)
+    public function __construct(private int | float $value)
     {
     }
 

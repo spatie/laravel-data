@@ -10,7 +10,7 @@ class Prohibits implements ValidationAttribute
 {
     use BuildsValidationRules;
 
-    public function __construct(private array|string $fields,)
+    public function __construct(private array | string $fields, )
     {
     }
 

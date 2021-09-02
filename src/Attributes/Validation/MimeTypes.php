@@ -12,7 +12,7 @@ class MimeTypes implements ValidationAttribute
 
     private array $mimeTypes;
 
-    public function __construct(string|array $mimeTypes)
+    public function __construct(string | array $mimeTypes)
     {
         $this->mimeTypes = is_string($mimeTypes) ? [$mimeTypes] : $mimeTypes;
     }

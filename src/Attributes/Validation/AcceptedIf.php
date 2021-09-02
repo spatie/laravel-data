@@ -7,7 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class AcceptedIf implements ValidationAttribute
 {
-    public function __construct(private string $field, private string|bool|int|float $value)
+    public function __construct(private string $field, private string | bool | int | float $value)
     {
     }
 
@@ -15,7 +15,7 @@ class AcceptedIf implements ValidationAttribute
     {
         $value = $this->value;
 
-        if(is_bool($value)){
+        if (is_bool($value)) {
             $value = $value ? 'true' : 'false';
         }
 

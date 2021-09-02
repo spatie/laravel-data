@@ -20,7 +20,7 @@ trait BuildsValidationRules
             return implode(',', $mixed);
         }
 
-        if($mixed instanceof DateTimeInterface){
+        if ($mixed instanceof DateTimeInterface) {
             return $mixed->format(DATE_ATOM);
         }
 

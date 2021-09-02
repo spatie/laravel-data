@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Tests\Attributes\Validation;
 
-use Spatie\LaravelData\Attributes\Validation\Distinct;
 use Spatie\LaravelData\Attributes\Validation\Email;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 use Spatie\LaravelData\Tests\TestCase;

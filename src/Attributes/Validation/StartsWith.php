@@ -10,9 +10,9 @@ class StartsWith implements ValidationAttribute
 {
     use BuildsValidationRules;
 
-    private string|array $values;
+    private string | array $values;
 
-    public function __construct(string|array $values)
+    public function __construct(string | array $values)
     {
     }
 

@@ -10,7 +10,7 @@ class In implements ValidationAttribute
 {
     private array $values;
 
-    public function __construct(array|string $values)
+    public function __construct(array | string $values)
     {
         $this->values = is_string($values) ? [$values] : $values;
     }

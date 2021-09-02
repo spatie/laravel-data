@@ -11,7 +11,7 @@ class RequiredWithoutAll implements ValidationAttribute
     use BuildsValidationRules;
 
     public function __construct(
-        private array|string $fields,
+        private array | string $fields,
     ) {
     }
 
