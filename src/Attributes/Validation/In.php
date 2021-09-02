@@ -8,15 +8,15 @@ use Illuminate\Validation\Rules\In as BaseIn;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class In implements ValidationAttribute
 {
-    private array $rules;
+    private array $values;
 
-    public function __construct(array $values)
+    public function __construct(array|string $values)
     {
-        $this->rules = [ new BaseIn($values) ];
+        $this->values = is_string($values) ? [$values] : $values;
     }
 
     public function getRules(): array
     {
-        return $this->rules;
+        return [new BaseIn($this->values)];
     }
 }

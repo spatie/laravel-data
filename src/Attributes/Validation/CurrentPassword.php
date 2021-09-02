@@ -13,10 +13,8 @@ class CurrentPassword implements ValidationAttribute
 
     public function getRules(): array
     {
-        if (! is_null($this->guard)) {
-            return ['current_password:' . $this->guard];
-        }
-
-        return ['current_password'];
+        return $this->guard === null
+            ? ['current_password']
+            : ["current_password:{$this->guard}"];
     }
 }

@@ -17,7 +17,6 @@ class Password implements ValidationAttribute
         private bool $uncompromised = true,
         private int $uncompromisedThreshold = 0
     ) {
-        //
     }
 
     public function getRules(): array
@@ -44,6 +43,6 @@ class Password implements ValidationAttribute
             $rule->uncompromised($this->uncompromisedThreshold);
         }
 
-        return [ $rule ];
+        return [$rule];
     }
 }

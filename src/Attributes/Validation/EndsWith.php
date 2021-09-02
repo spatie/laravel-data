@@ -3,19 +3,21 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Attributes\Validation\Concerns\BuildsValidationRules;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class EndsWith implements ValidationAttribute
 {
-    private array $validEndingStrings;
+    use BuildsValidationRules;
 
-    public function __construct(string ...$string)
+    private string|array $values;
+
+    public function __construct(string|array $values)
     {
-        $this->validEndingStrings = $string;
     }
 
     public function getRules(): array
     {
-        return ['ends_with:' . implode(',', $this->validEndingStrings)];
+        return ["ends_with:{$this->normalizeValue($this->values)}"];
     }
 }

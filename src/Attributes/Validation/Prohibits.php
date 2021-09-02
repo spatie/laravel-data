@@ -3,20 +3,19 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
-use DateTimeInterface;
 use Spatie\LaravelData\Attributes\Validation\Concerns\BuildsValidationRules;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class After implements ValidationAttribute
+class Prohibits implements ValidationAttribute
 {
     use BuildsValidationRules;
 
-    public function __construct(private string|DateTimeInterface $date)
+    public function __construct(private array|string $fields,)
     {
     }
 
     public function getRules(): array
     {
-        return ["after:{$this->normalizeValue($this->date)}"];
+        return ["prohibits:{$this->normalizeValue($this->fields)}"];
     }
 }

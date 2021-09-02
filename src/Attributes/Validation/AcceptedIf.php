@@ -7,12 +7,18 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class AcceptedIf implements ValidationAttribute
 {
-    public function __construct(private string $field, private string $value)
+    public function __construct(private string $field, private string|bool|int|float $value)
     {
     }
 
     public function getRules(): array
     {
-        return ["accepted_if:{$this->field},{$this->value}"];
+        $value = $this->value;
+
+        if(is_bool($value)){
+            $value = $value ? 'true' : 'false';
+        }
+
+        return ["accepted_if:{$this->field},{$value}"];
     }
 }

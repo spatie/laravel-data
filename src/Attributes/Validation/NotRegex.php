@@ -8,10 +8,12 @@ use Attribute;
 class NotRegex implements ValidationAttribute
 {
     public function __construct(private string $pattern)
-{
+    {
+
+    }
 
     public function getRules(): array
     {
-        return ['not_regex:' . $this->pattern];
+        return ["not_regex:{$this->pattern}"];
     }
 }

@@ -13,6 +13,6 @@ class Regex implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ['regex:' . $this->pattern];
+        return ["regex:{$this->pattern}"];
     }
 }

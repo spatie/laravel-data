@@ -13,6 +13,6 @@ class DateFormat implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ['date_format:' . $this->format];
+        return ['date_format:{$this->format}'];
     }
 }

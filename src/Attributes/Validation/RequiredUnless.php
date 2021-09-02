@@ -3,21 +3,21 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Attributes\Validation\Concerns\BuildsValidationRules;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredUnless implements ValidationAttribute
 {
-    private array $values;
+    use BuildsValidationRules;
 
-    public function __construct(private string $field, string ...$values)
-    {
-        $this->values = $values;
+    public function __construct(
+        private string $field,
+        private array|string $values
+    ) {
     }
 
     public function getRules(): array
     {
-        return [
-            "required_unless:{$this->field}," . implode(',', $this->values),
-        ];
+        return ["prohibited_unless:{$this->field},{$this->normalizeValue($this->values)}"];
     }
 }

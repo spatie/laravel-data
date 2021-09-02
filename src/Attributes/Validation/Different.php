@@ -13,6 +13,6 @@ class Different implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ['different:' . $this->field];
+        return ['different:{$this->field}'];
     }
 }

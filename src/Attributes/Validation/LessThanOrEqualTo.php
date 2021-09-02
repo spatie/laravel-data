@@ -13,6 +13,6 @@ class LessThanOrEqualTo implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ['lte:' . $this->field];
+        return ["lte:{$this->field}"];
     }
 }

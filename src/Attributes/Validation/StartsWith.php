@@ -3,19 +3,21 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Attributes\Validation\Concerns\BuildsValidationRules;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class StartsWith implements ValidationAttribute
 {
-    private array $validStartingStrings;
+    use BuildsValidationRules;
 
-    public function __construct(string ...$string)
+    private string|array $values;
+
+    public function __construct(string|array $values)
     {
-        $this->validStartingStrings = $string;
     }
 
     public function getRules(): array
     {
-        return ['starts_with:' . implode(',', $this->validStartingStrings)];
+        return ["starts_with:{$this->normalizeValue($this->values)}"];
     }
 }

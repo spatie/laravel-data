@@ -13,6 +13,6 @@ class Digits implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ['digits:' . $this->value];
+        return ['digits:{$this->value}'];
     }
 }

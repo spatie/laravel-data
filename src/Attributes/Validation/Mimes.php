@@ -3,19 +3,22 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Attributes\Validation\Concerns\BuildsValidationRules;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Mimes implements ValidationAttribute
 {
+    use BuildsValidationRules;
+
     private array $mimes;
 
-    public function __construct(string ...$mimes)
+    public function __construct(string|array $mimes)
     {
-        $this->mimes = $mimes;
+        $this->mimes = is_string($mimes) ? [$mimes] : $mimes;
     }
 
     public function getRules(): array
     {
-        return ['mimes:' . implode(',', $this->mimes)];
+        return ["mimes:{$this->normalizeValue($this->mimes)}"];
     }
 }

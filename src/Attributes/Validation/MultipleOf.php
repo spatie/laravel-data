@@ -7,12 +7,12 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class MultipleOf implements ValidationAttribute
 {
-    public function __construct(private int $value)
+    public function __construct(private int|float $value)
     {
     }
 
     public function getRules(): array
     {
-        return ['multiple_of:' . $this->value];
+        return ["multiple_of:{$this->value}"];
     }
 }

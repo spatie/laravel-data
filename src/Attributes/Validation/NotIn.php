@@ -3,20 +3,21 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Illuminate\Validation\Rules\In as BaseIn;
 use Illuminate\Validation\Rules\NotIn as BaseNotIn;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class NotIn implements ValidationAttribute
 {
-    private array $rules;
+    private array $values;
 
-    public function __construct(array $values)
+    public function __construct(array|string $values)
     {
-        $this->rules = [ new BaseNotIn($values) ];
+        $this->values = is_string($values) ? [$values] : $values;
     }
 
     public function getRules(): array
     {
-        return $this->rules;
+        return [new BaseNotIn($this->values)];
     }
 }

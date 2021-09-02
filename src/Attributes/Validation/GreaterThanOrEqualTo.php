@@ -3,13 +3,16 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
-use Illuminate\Validation\Rules\Password as BasePassword;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class PasswordDefaults implements ValidationAttribute
+class GreaterThanOrEqualTo implements ValidationAttribute
 {
+    public function __construct(private string $field)
+    {
+    }
+
     public function getRules(): array
     {
-        return [ BasePassword::default() ];
+        return ["gte:{$this->field}"];
     }
 }

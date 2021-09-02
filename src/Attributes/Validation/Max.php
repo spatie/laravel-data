@@ -13,6 +13,6 @@ class Max implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ['max:' . $this->value];
+        return ["max:{$this->value}"];
     }
 }

@@ -13,6 +13,6 @@ class GreaterThan implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ['gt:' . $this->field];
+        return ["gt:{$this->field}"];
     }
 }

@@ -13,6 +13,6 @@ class Min implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ['min:' . $this->value];
+        return ["min:{$this->value}"];
     }
 }

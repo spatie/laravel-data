@@ -13,6 +13,6 @@ class Size implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ['size:' . $this->size];
+        return ["size:{$this->size}"];
     }
 }

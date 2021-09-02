@@ -3,9 +3,10 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Illuminate\Validation\Rules\In as BaseIn;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class GreatThanOrEqualTo implements ValidationAttribute
+class InArray implements ValidationAttribute
 {
     public function __construct(private string $field)
     {
@@ -13,6 +14,6 @@ class GreatThanOrEqualTo implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ['gte:' . $this->field];
+        return ["in_array:{$this->field}"];
     }
 }
