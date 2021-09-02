@@ -9,11 +9,11 @@ class Rule implements DataValidationAttribute
 {
     protected array $rules;
 
-    public function __construct(string|array ...$rules)
+    public function __construct(string | array ...$rules)
     {
         $this->rules = array_reduce(
             $rules,
-            fn(array $carry, array|string $new) => array_merge($carry, is_string($new) ? explode('|', $new) : $new),
+            fn (array $carry, array | string $new) => array_merge($carry, is_string($new) ? explode('|', $new) : $new),
             [],
         );
     }

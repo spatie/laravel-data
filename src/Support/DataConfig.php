@@ -23,7 +23,7 @@ class DataConfig
     public function __construct(array $config)
     {
         $this->ruleInferrers = array_map(
-            fn(string $ruleInferrerClass) => app($ruleInferrerClass),
+            fn (string $ruleInferrerClass) => app($ruleInferrerClass),
             $config['rule_inferrers'] ?? []
         );
 
