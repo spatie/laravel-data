@@ -59,7 +59,7 @@ We get the following JSON:
 }
 ```
 
-As you can see the `songs` property is missing in the JSON output. Here's how you can include it.
+As you can see, the `songs` property is missing in the JSON output. Here's how you can include it.
 
 ```php
 AlbumData::from(Album::first())->include('songs');
@@ -92,7 +92,7 @@ class SongData extends Data
 }
 ```
 
-Now `name` or `artist` should be explicitly included, this can be done as such on the `AlbumData`:
+Now `name` or `artist` should be explicitly included. This can be done as such on the `AlbumData`:
 
 ```php
 AlbumData::from(Album::first())->include('songs.name', 'songs.artist');
@@ -104,13 +104,13 @@ Or you could combine these includes:
 AlbumData::from(Album::first())->include('songs.{name, artist}');
 ```
 
-If you want to include all the properties of a data object you can do the following:
+If you want to include all the properties of a data object, you can do the following:
 
 ```php
 AlbumData::from(Album::first())->include('songs.*');
 ```
 
-Explicitly including properties of resources also works on a single resource. For example, our `UserData` looks like this:
+Explicitly including properties of data objects also works on a single data object. For example, our `UserData` looks like this:
 
 ```php
 class UserData extends Data
@@ -141,25 +141,25 @@ return UserData::from(Auth::user())->include('favorite_song.name');
 
 ### Conditional Lazy properties
 
-Lazy properties can be included in different ways:
+You can include lazy properties in different ways:
 
 ```php
 Lazy::create(fn() => SongData::collection($album->songs));
 ```
 
-With a fundamental `Lazy` property, you must explicitly include it when the data object is transformed.
+With a basic `Lazy` property, you must explicitly include it when the data object is transformed.
 
-Sometimes you only want to include a property when a certain condition is true. This can be done with conditional lazy properties:
+Sometimes you only want to include a property when a specific condition is true. This can be done with conditional lazy properties:
 
 ```php
 Lazy::when($this->is_admin, fn() => SongData::collection($album->songs));
 ```
 
-The property now only will be included when the `is_admin` property of the data object is true.
+The property will only be included when the `is_admin` property of the data object is true.
 
 ### Relational Lazy properties
 
-You can also only include a lazy property when a certain relation is loaded on the model as such:
+You can also only include a lazy property when a particular relation is loaded on the model as such:
 
 ```php
 Lazy::whenLoaded('songs', fn() => SongData::collection($album->songs));

@@ -1,9 +1,9 @@
 ---
-title: Eloquent casting 
+title: Eloquent casting
 weight: 1
 ---
 
-Since data objects can be created from array's and be easily transformed to array's again they are excellent to be used
+Since data objects can be created from array's and be easily transformed into array's back again, they are excellent to be used
 with [Eloquent casts](https://laravel.com/docs/8.x/eloquent-mutators#custom-casts):
 
 ```php
@@ -53,7 +53,7 @@ class Artist extends Model
 }
 ```
 
-A collections of data objects within the Eloquent model can be made as such:
+A collection of data objects within the Eloquent model can be made as such:
 
 ```php
 Artist::create([

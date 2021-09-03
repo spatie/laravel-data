@@ -1,11 +1,11 @@
 ---
-title: Collections 
+title: Collections
 weight: 3
 ---
 
-Next to a `Data` class , the package also provides a `DataCollection` class that can be used to store a collection of
-data objects. We advise you when storing a collection of data objects within a data object to store them in
-a `DataCollection` like this:
+The package provides next to the `Data` class also a `DataCollection` class. This collection can store a set of data objects, and we advise you to use it when storing a collection of data objects within a data object.
+
+For example:
 
 ```php
 class AlbumData extends Data
@@ -19,10 +19,9 @@ class AlbumData extends Data
 }
 ```
 
-The reason for this will become clear in the next chapters because the package requires this for internal state
-management.
+Using `DataCollection`s is required for internal state management within the data object, which will become clear in the following chapters.
 
-## Creating `DataCollections`
+## Creating `DataCollection`s
 
 There are a few different ways to create a `DataCollection`:
 
@@ -33,7 +32,7 @@ SongData::collection([
 ]);
 ```
 
-If you have a collection of models you can do the following:
+If you have a collection of models, you can do the following:
 
 ```php
 SongData::collection(Song::all());
@@ -54,7 +53,7 @@ SongData::collection([
 ]);
 ```
 
-A `DataCollection` can just work like a regular array:
+A `DataCollection` just works like a regular array:
 
 ```php
 $collection = SongData::collection([

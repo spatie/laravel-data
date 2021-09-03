@@ -1,4 +1,4 @@
 ---
-title: Tutorial
+title: Quickstart
 weight: 2
 ---

@@ -1,8 +1,9 @@
 ---
-title: Validation attributes weight: 5
+title: Validation attributes
+weight: 7
 ---
 
-It is possible to validate the request before a data object is constructed, this can be done by adding validation attributes to the properties of a data object like this:
+It is possible to validate the request before a data object is constructed. This can be done by adding validation attributes to the properties of a data object like this:
 
 ```php
 class SongData extends Data
@@ -17,7 +18,7 @@ class SongData extends Data
 }
 ```
 
-## Creating your own validation attribute
+## Creating your validation attribute
 
 A validation attribute is a class that implements `ValidationAttribute` and returns an array of validation rules when the `getRules` method is called:
 
@@ -727,6 +728,16 @@ public ?string $value;
 public ?string $value; 
 ```
 
+### Rule
+
+```php
+#[Rule('string|uuid')]
+public string $value; 
+
+#[Rule(['string','uuid'])]
+public string $value; 
+```
+
 ### Same
 
 [Docs](https://laravel.com/docs/8.x/validation#rule-same)
@@ -805,7 +816,7 @@ public string $value;
 public string $value; 
 ```
 
-### Url
+### Uuid
 
 [Docs](https://laravel.com/docs/8.x/validation#rule-uuid)
 

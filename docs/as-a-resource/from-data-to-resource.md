@@ -3,7 +3,7 @@ title: From data to resource
 weight: 1
 ---
 
-In the previous chapters we saw how to create a data object from a set of values, now we're going to transform the data object to an array that can be used on the front or in API's just like Laravel Api Resources.
+In the previous chapters, we saw how to create a data object from a set of values. Now we're going to transform the data object to an array that you can use on the frontend of your application or in APIs, just like Laravel API resources.
 
 A data object will automatically be transformed to a JSON response when returned in a controller:
 
@@ -144,7 +144,7 @@ A collection can be returned in a controller and will automatically be transform
 ]
 ```
 
-A collection of data objects can also be transformed to an array:
+You can also transform a collection of data objects into an array:
 
 ```php
 SongData::collection(Song::all())->toArray();
@@ -266,11 +266,11 @@ class AlbumData extends Data
 }
 ```
 
-We're using a `DataCollection` type here in the data object definition. You should always use a `DataCollection` type when nesting a collection of data objects. The package requires this for internal state management.
+We're using a `DataCollection` type here in the data object definition. It would be best always to use a `DataCollection` type when nesting a collection of data objects. The package requires this for internal state management.
 
 ## Appending properties
 
-It is possible to add some extra properties to your data objects when they are transformed to a resource:
+It is possible to add some extra properties to your data objects when they are transformed into a resource:
 
 ```php
 SongData::from(Song::first())->additional([

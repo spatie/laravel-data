@@ -1,5 +1,6 @@
 ---
-title: Nesting weight: 2
+title: Nesting 
+weight: 2
 ---
 
 It is possible to nest multiple data objects:

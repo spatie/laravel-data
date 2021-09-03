@@ -24,7 +24,7 @@ return [
     ],
 
     /*
-     * Rule inferrers can be configured here, they will automatically add
+     * Rule inferrers can be configured here. They will automatically add
      * validation rules to properties of a data object based upon
      * the type of the property.
      */

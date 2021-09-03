@@ -16,19 +16,19 @@ class SongData extends Data
 }
 ```
 
-Since this is just a simple PHP object it can be initialized as such:
+Since this is just a simple PHP object, it can be initialized as such:
 
 ```php
 new SongData('Never gonna give you up', 'Rick Astley');
 ```
 
-But with this package you can initialize the data object also with an array:
+But with this package, you can initialize the data object also with an array:
 
 ```php
 SongData::from(['title' => 'Never gonna give you up', 'artist' => 'Rick Astley']);
 ```
 
-Actually you can use the `from` method to create a data object from nearly anything, for example, let's say you have an Eloquent model like this:
+You can use the `from` method to create a data object from nearly anything. For example, let's say you have an Eloquent model like this:
 
 ```php
 class Song extends Model{
@@ -42,11 +42,13 @@ You can create a data object from such a model like this:
 SongData::from(Song::firstOrFail($id));
 ```
 
-The package will try to find the required properties within the model and uses them to construct the data object.
+The package will find the required properties within the model and use them to construct the data object.
 
 ## Magical creation
 
-It is possible to overwrite the behaviour of the `from` method for specific types. So a data object will be constructed in a specific manner for that type. You can do this by adding the following method to the data object:
+It is possible to overwrite or extend the behaviour of the `from` method for specific types. So you can construct a data object in a specific manner for that type. This can be done by adding a static method starting with 'from' to the data object.
+
+For example, we want to change how we create a data object from a model. We can add a `fromModel` static method that takes the model we want to use as a parameter:
 
 ```php
 class SongData extends Data
@@ -70,9 +72,9 @@ Now when creating a data object from a model like this:
 SongData::from(Song::firstOrFail($id));
 ```
 
-The `fromModel` method will be called instead of the default method to create a data object from model.
+Instead of the default method, the `fromModel` method will be called to create a data object from the found model.
 
-You're truly free to add as many from methods as you want, for example, you could add one to create a data object from string:
+You're truly free to add as many from methods as you want. For example, you could add one to create a data object from a string:
 
 ```php
 class SongData extends Data
@@ -92,7 +94,7 @@ class SongData extends Data
 }
 ```
 
-From now on you can create a data object like this:
+From now on, you can create a data object like this:
 
 ```php
 SongData::from('Never gonna give you up|Rick Astley');
@@ -105,21 +107,22 @@ There are a few requirements to enable magical data object creation:
 - The method can only take **one typed parameter** for which you want to create an object
 - The method cannot be called **from**
 
-When no such method can be found for a type given to the `from` the data object will try to create itself from the following types:
+When the package cannot find such a method for a type given to the data object's `from` method. Then the data object will try to create itself from the following types:
 
 - An *Eloquent model* by calling `toArray` on it
 - A *Laravel request* by calling `all` on it
 - An *Arrayable* by calling `toArray` on it
 - An *array*
 
-When a data object cannot be created using magical methods or the default methods, a `CannotCreateDataFromValue` will be thrown.
+When a data object cannot be created using magical methods or the default methods, a `CannotCreateDataFromValue` exception will be thrown.
 
 ## Optional creation
 
-It is not possible to return `null` from the `from` method of a data object, since we always expect a data object when calling `from`. To solve this you can call the `optional` method:
+It is impossible to return `null` from a data object's `from` method since we always expect a data object when calling `from`. To solve this, you can call the `optional` method:
 
 ```php
 SongData::optional(null); // returns null
 ```
 
-Underneath the optional method will call the `from` method when a value is given, so you can still magically create data objects.
+Underneath the optional method will call the `from` method when a value is given, so you can still magically create data objects. When a null value is given, it will return null.
+

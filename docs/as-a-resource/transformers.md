@@ -3,11 +3,11 @@ title: Transforming data
 weight: 3
 ---
 
-Each property of a data object should be transformed into a usable type to communicate via JSON. 
+Each property of a data object should be transformed into a usable type to communicate via JSON.
 
-For the default types (string, bool, int, float and array) there are no complex transformations required, but special types like `Carbon` or a Laravel Model will need to extra attention.
+No complex transformations are required for the default types (string, bool, int, float and array), but special types like `Carbon` or a Laravel Model will need extra attention.
 
-Transformers are simple classes that will convert a complex type to something simple like a `string` or `int`. For example, a `Carbon` object can be transformed to `16-05-1994`, `16-05-1994T00:00:00+00` or something completely different.
+Transformers are simple classes that will convert a complex type to something simple like a `string` or `int`. For example, we can transform a `Carbon` object to `16-05-1994`, `16-05-1994T00:00:00+00` or something completely different.
 
 There are two ways you can define transformers: locally and globally.
 
@@ -41,13 +41,13 @@ class ArtistData extends Data{
 }
 ```
 
-Next to a `DateTimeInterfaceTransformer` the package also ships with an `ArraybleTransformer` that transforms an `Arrayable` to an array.
+Next to a `DateTimeInterfaceTransformer` the package also ships with an `ArraybleTransformer` that transforms an `Arrayable` object to an array.
 
-It is possible to create transformers for your own specific types [here](TODO).
+It is possible to create transformers for your specific types [here](URL).
 
 ## Global transformers
 
-Global transformers are defined in the `data.php` config file and will be used when no local transformer for a property was added. By default, there are two transformers:
+Global transformers are defined in the `data.php` config file and are used when no local transformer for a property was added. By default, there are two transformers:
 
 ```php
 /*
@@ -66,4 +66,10 @@ The package will look through these global transformers and tries to find a suit
 - an **interface** (e.g. DateTimeInterface)
 - a **base class** (e.g. Enum)
 
+## Getting a data object without transforming
 
+It is possible to get an array representation of a data object without transforming the properties. This means `Carbon` objects won't be transformed into strings. And also, nested data objects and `DataCollection`s won't be transformed into arrays. You can do this by calling the `all` method on a data object like this:
+
+```php
+ArtistData::from($artist)->all();
+```
