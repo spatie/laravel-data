@@ -10,7 +10,7 @@ class Rule extends ValidationAttribute
 {
     protected array $rules = [];
 
-    public function __construct(string|array|ValidationAttribute|RuleContract ...$rules)
+    public function __construct(string | array | ValidationAttribute | RuleContract ...$rules)
     {
         foreach ($rules as $rule) {
             $newRules = match (true) {

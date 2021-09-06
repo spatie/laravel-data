@@ -611,7 +611,7 @@ class RulesTest extends TestCase
             'expected' => [new BaseExists('tenant.users', 'email')],
         ];
 
-        $closure = fn(Builder $builder) => $builder;
+        $closure = fn (Builder $builder) => $builder;
 
         yield [
             'attribute' => new Exists('users', 'email', where: $closure),
@@ -811,12 +811,10 @@ class RulesTest extends TestCase
         $laravelRule = new class implements RuleContract {
             public function passes($attribute, $value)
             {
-
             }
 
             public function message()
             {
-
             }
         };
 
@@ -836,8 +834,8 @@ class RulesTest extends TestCase
                 'x',
                 'y',
                 $laravelRule,
-                'required'
-            ]
+                'required',
+            ],
         ];
     }
 
@@ -891,7 +889,7 @@ class RulesTest extends TestCase
             'expected' => [(new BaseUnique('users', 'email'))->ignore(5, 'uuid')],
         ];
 
-        $closure = fn(Builder $builder) => $builder;
+        $closure = fn (Builder $builder) => $builder;
 
         yield [
             'attribute' => new Unique('users', 'email', where: $closure),

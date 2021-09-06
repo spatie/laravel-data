@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests;
 
 use DateTime;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
@@ -19,7 +18,6 @@ use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
-use Stringable;
 
 class DataTest extends TestCase
 {
@@ -435,7 +433,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
+        $data = new class($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'),) extends Data {
             public function __construct(
                 public SimpleData $data,
                 public DataCollection $dataCollection,
@@ -527,9 +525,9 @@ class DataTest extends TestCase
 
         try {
             $dataClass::validate(['string' => 10]);
-        }catch (ValidationException $exception){
+        } catch (ValidationException $exception) {
             $this->assertEquals([
-                'string' => ['The string must be a string.']
+                'string' => ['The string must be a string.'],
             ], $exception->errors());
 
             return;

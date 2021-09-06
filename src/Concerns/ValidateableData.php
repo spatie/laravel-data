@@ -9,7 +9,7 @@ use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
 
 trait ValidateableData
 {
-    public static function validate(Arrayable|array $payload): static
+    public static function validate(Arrayable | array $payload): static
     {
         $rules = app(DataValidationRulesResolver::class)
             ->execute(static::class)
