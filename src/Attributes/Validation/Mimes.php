@@ -6,9 +6,9 @@ use Attribute;
 use Spatie\LaravelData\Attributes\Validation\Concerns\BuildsValidationRules;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Mimes implements ValidationAttribute
+class Mimes extends ValidationAttribute
 {
-    use BuildsValidationRules;
+
 
     private array $mimes;
 

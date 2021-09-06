@@ -6,15 +6,15 @@ use Attribute;
 use Illuminate\Validation\Rules\Password as BasePassword;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Password implements ValidationAttribute
+class Password extends ValidationAttribute
 {
     public function __construct(
         private int $min = 12,
-        private bool $letters = true,
-        private bool $mixedCase = true,
-        private bool $numbers = true,
-        private bool $symbols = true,
-        private bool $uncompromised = true,
+        private bool $letters = false,
+        private bool $mixedCase = false,
+        private bool $numbers = false,
+        private bool $symbols = false,
+        private bool $uncompromised = false,
         private int $uncompromisedThreshold = 0
     ) {
     }

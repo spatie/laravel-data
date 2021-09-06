@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class DateFormat implements ValidationAttribute
+class DateFormat extends ValidationAttribute
 {
     public function __construct(private string $format)
     {
@@ -13,6 +13,6 @@ class DateFormat implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ['date_format:{$this->format}'];
+        return ["date_format:{$this->format}"];
     }
 }

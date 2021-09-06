@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class InArray implements ValidationAttribute
+class InArray extends ValidationAttribute
 {
     public function __construct(private string $field)
     {

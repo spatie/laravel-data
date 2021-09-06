@@ -12,7 +12,7 @@ use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
-use Spatie\LaravelData\Concerns\RequestableData;
+use Spatie\LaravelData\Concerns\ValidateableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
@@ -25,11 +25,10 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
     use ResponsableData;
     use IncludeableData;
     use AppendableData;
-    use RequestableData;
+    use ValidateableData;
 
     /**
      * - Maybe add support for the dto package casts?
-     * - When creating an object using optional, should an optional* method be called or a from* method with a fallback to null
      * - Add regex to dataproperty
      */
 

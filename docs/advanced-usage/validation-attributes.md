@@ -179,12 +179,12 @@ public Carbon $value;
 public int $value; 
 ```
 
-### Boolean
+### BooleanType
 
 [Docs](https://laravel.com/docs/8.x/validation#rule-boolean)
 
 ```php
-#[Boolean]
+#[BooleanType]
 public bool $value; 
 ```
 
@@ -352,14 +352,17 @@ public string $value;
 [Docs](https://laravel.com/docs/8.x/validation#rule-exists)
 
 ```php
-#[Exists('posts')]
-public int $value;
+#[Exists('users')]
+public string $value; 
 
-#[Exists(Post::class)]
-public int $value;
+#[Exists(User::class)]
+public string $value; 
 
-#[Exists(Post::class, 'id')]
-public int $value;
+#[Exists('users', 'email')]
+public string $value;
+
+#[Exists('users', 'email', connection: 'tenant')]
+public string $value;
 ```
 
 ### File
@@ -792,6 +795,9 @@ public string $value;
 
 ```php
 #[Unique('users')]
+public string $value; 
+
+#[Unique(User::class)]
 public string $value; 
 
 #[Unique('users', 'email')]

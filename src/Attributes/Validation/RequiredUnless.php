@@ -6,9 +6,9 @@ use Attribute;
 use Spatie\LaravelData\Attributes\Validation\Concerns\BuildsValidationRules;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class RequiredUnless implements ValidationAttribute
+class RequiredUnless extends ValidationAttribute
 {
-    use BuildsValidationRules;
+
 
     public function __construct(
         private string $field,
@@ -18,6 +18,6 @@ class RequiredUnless implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ["prohibited_unless:{$this->field},{$this->normalizeValue($this->values)}"];
+        return ["required_unless:{$this->field},{$this->normalizeValue($this->values)}"];
     }
 }

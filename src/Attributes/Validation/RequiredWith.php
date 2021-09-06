@@ -6,9 +6,9 @@ use Attribute;
 use Spatie\LaravelData\Attributes\Validation\Concerns\BuildsValidationRules;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class RequiredWith implements ValidationAttribute
+class RequiredWith extends ValidationAttribute
 {
-    use BuildsValidationRules;
+
 
     public function __construct(
         private array | string $fields,
@@ -17,6 +17,6 @@ class RequiredWith implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ["prohibited_if:{$this->normalizeValue($this->fields)}"];
+        return ["required_with:{$this->normalizeValue($this->fields)}"];
     }
 }

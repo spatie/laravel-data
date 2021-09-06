@@ -125,4 +125,3 @@ SongData::optional(null); // returns null
 ```
 
 Underneath the optional method will call the `from` method when a value is given, so you can still magically create data objects. When a null value is given, it will return null.
-

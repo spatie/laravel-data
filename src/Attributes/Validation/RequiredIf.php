@@ -6,9 +6,9 @@ use Attribute;
 use Spatie\LaravelData\Attributes\Validation\Concerns\BuildsValidationRules;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class RequiredIf implements ValidationAttribute
+class RequiredIf extends ValidationAttribute
 {
-    use BuildsValidationRules;
+
 
     public function __construct(
         private string $field,

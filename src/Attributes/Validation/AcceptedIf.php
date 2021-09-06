@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class AcceptedIf implements ValidationAttribute
+class AcceptedIf extends ValidationAttribute
 {
     public function __construct(private string $field, private string | bool | int | float $value)
     {

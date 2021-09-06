@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Different implements ValidationAttribute
+class Different extends ValidationAttribute
 {
     public function __construct(private string $field)
     {
@@ -13,6 +13,6 @@ class Different implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ['different:{$this->field}'];
+        return ["different:{$this->field}"];
     }
 }

@@ -7,11 +7,9 @@ use DateTimeInterface;
 use Spatie\LaravelData\Attributes\Validation\Concerns\BuildsValidationRules;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Before implements ValidationAttribute
+class Before extends ValidationAttribute
 {
-    use BuildsValidationRules;
-
-    public function __construct(private string | DateTimeInterface $date)
+    public function __construct(private string|DateTimeInterface $date)
     {
     }
 

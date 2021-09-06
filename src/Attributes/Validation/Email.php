@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Email implements ValidationAttribute
+class Email extends ValidationAttribute
 {
     public const RfcValidation = 'rfc';
     public const NoRfcWarningsValidation = 'strict';

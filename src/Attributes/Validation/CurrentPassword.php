@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class CurrentPassword implements ValidationAttribute
+class CurrentPassword extends ValidationAttribute
 {
     public function __construct(private ?string $guard = null)
     {

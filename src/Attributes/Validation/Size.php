@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Size implements ValidationAttribute
+class Size extends ValidationAttribute
 {
     public function __construct(private int $size)
     {

@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class NotRegex implements ValidationAttribute
+class NotRegex extends ValidationAttribute
 {
     public function __construct(private string $pattern)
     {

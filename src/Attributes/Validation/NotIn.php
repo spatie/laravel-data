@@ -6,7 +6,7 @@ use Attribute;
 use Illuminate\Validation\Rules\NotIn as BaseNotIn;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class NotIn implements ValidationAttribute
+class NotIn extends ValidationAttribute
 {
     private array $values;
 

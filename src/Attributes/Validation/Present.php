@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Present implements ValidationAttribute
+class Present extends ValidationAttribute
 {
     public function getRules(): array
     {

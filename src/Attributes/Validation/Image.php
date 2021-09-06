@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Image implements ValidationAttribute
+class Image extends ValidationAttribute
 {
     public function getRules(): array
     {

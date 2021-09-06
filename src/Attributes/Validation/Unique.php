@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Validation\Rules\Unique as BaseUnique;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Unique implements ValidationAttribute
+class Unique extends ValidationAttribute
 {
     public function __construct(
         private string $table,

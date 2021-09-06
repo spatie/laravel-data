@@ -3,6 +3,8 @@
 namespace Spatie\LaravelData\Tests;
 
 use DateTime;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -17,6 +19,7 @@ use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
+use Stringable;
 
 class DataTest extends TestCase
 {
@@ -513,5 +516,37 @@ class DataTest extends TestCase
             new $dataClass('Hello world'),
             $dataClass::optional(['string' => 'Hello world'])
         );
+    }
+
+    /** @test */
+    public function it_can_validate_if_an_array_fits_a_data_object_and_will_throw_an_exception()
+    {
+        $dataClass = DataBlueprintFactory::new()
+            ->withProperty(DataPropertyBlueprintFactory::new('string')->withType('string'))
+            ->create();
+
+        try {
+            $dataClass::validate(['string' => 10]);
+        }catch (ValidationException $exception){
+            $this->assertEquals([
+                'string' => ['The string must be a string.']
+            ], $exception->errors());
+
+            return;
+        }
+
+        $this->assertFalse(true, 'We should not end up here');
+    }
+
+    /** @test */
+    public function it_can_validate_if_an_array_fits_a_data_object_and_returns_the_data_object()
+    {
+        $dataClass = DataBlueprintFactory::new()
+            ->withProperty(DataPropertyBlueprintFactory::new('string')->withType('string'))
+            ->create();
+
+        $data = $dataClass::validate(['string' => 'Hello World']);
+
+        $this->assertEquals('Hello World', $data->string);
     }
 }

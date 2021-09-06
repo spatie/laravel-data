@@ -3,19 +3,25 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Illuminate\Contracts\Validation\Rule as RuleContract;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Rule implements ValidationAttribute
+class Rule extends ValidationAttribute
 {
-    protected array $rules;
+    protected array $rules = [];
 
-    public function __construct(string | array ...$rules)
+    public function __construct(string|array|ValidationAttribute|RuleContract ...$rules)
     {
-        $this->rules = array_reduce(
-            $rules,
-            fn (array $carry, array | string $new) => array_merge($carry, is_string($new) ? explode('|', $new) : $new),
-            [],
-        );
+        foreach ($rules as $rule) {
+            $newRules = match (true) {
+                is_string($rule) => explode('|', $rule),
+                $rule instanceof RuleContract => [$rule],
+                is_array($rule) => $rule,
+                $rule instanceof ValidationAttribute => $rule->getRules(),
+            };
+
+            $this->rules = array_merge($this->rules, $newRules);
+        }
     }
 
     public function getRules(): array

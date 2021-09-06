@@ -6,7 +6,7 @@ use Attribute;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Distinct implements ValidationAttribute
+class Distinct extends ValidationAttribute
 {
     public const Strict = 'strict';
     public const IgnoreCase = 'ignore_case';

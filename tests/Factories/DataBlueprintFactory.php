@@ -45,6 +45,7 @@ class DataBlueprintFactory
         return $clone;
     }
 
+    /** @return string|\Spatie\LaravelData\Data */
     public function create(): string
     {
         eval($this->toString());

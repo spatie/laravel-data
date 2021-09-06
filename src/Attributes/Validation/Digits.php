@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Digits implements ValidationAttribute
+class Digits extends ValidationAttribute
 {
     public function __construct(private int $value)
     {
@@ -13,6 +13,6 @@ class Digits implements ValidationAttribute
 
     public function getRules(): array
     {
-        return ['digits:{$this->value}'];
+        return ["digits:{$this->value}"];
     }
 }

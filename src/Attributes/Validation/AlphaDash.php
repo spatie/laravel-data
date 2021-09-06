@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class AlphaDash implements ValidationAttribute
+class AlphaDash extends ValidationAttribute
 {
     public function getRules(): array
     {

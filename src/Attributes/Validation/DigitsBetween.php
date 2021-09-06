@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class DigitsBetween implements ValidationAttribute
+class DigitsBetween extends ValidationAttribute
 {
     public function __construct(private int $min, private int $max)
     {

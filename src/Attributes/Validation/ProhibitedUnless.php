@@ -6,9 +6,9 @@ use Attribute;
 use Spatie\LaravelData\Attributes\Validation\Concerns\BuildsValidationRules;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class ProhibitedUnless implements ValidationAttribute
+class ProhibitedUnless extends ValidationAttribute
 {
-    use BuildsValidationRules;
+
 
     public function __construct(
         private string $field,

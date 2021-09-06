@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Regex implements ValidationAttribute
+class Regex extends ValidationAttribute
 {
     public function __construct(private string $pattern)
     {

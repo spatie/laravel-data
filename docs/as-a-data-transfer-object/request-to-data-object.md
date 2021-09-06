@@ -138,6 +138,27 @@ class SongData extends Data
 }
 ```
 
+It is even possible to use the validationAttribute objects within the `rules` method:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        public string $artist,
+    ) {
+    }
+    
+    public static function rules(): array
+    {
+        return [
+            'title' => [new Required(), new StringType()],
+            'artist' => [new Required(), new StringType()],
+        ];
+    }
+}
+```
+
 ### Automatically inferring rules for properties
 
 Since we have such strongly typed data objects, we can infer some validation rules from them. Rule inferrers will take information about the type of the property and will create validation rules from that information.
@@ -261,4 +282,12 @@ class SongData extends Data
 
 If the method returns `false`, then an `AuthorizationException` is thrown.
 
+## Validating a data object without request
 
+It is also possible to validate values for a data object without using a request:
+
+```php
+SongData::validate(['title' => 'Never gonna give you up', 'artist' => 'Rick Astley']); // returns a SongData object
+```
+
+When the validation passes, a new data object is returned with the values. When the validation fails, a Laravel `ValidationException` is thrown.

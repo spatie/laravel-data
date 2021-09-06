@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Max implements ValidationAttribute
+class Max extends ValidationAttribute
 {
     public function __construct(private int $value)
     {

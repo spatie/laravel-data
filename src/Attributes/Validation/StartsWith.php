@@ -6,13 +6,9 @@ use Attribute;
 use Spatie\LaravelData\Attributes\Validation\Concerns\BuildsValidationRules;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class StartsWith implements ValidationAttribute
+class StartsWith extends ValidationAttribute
 {
-    use BuildsValidationRules;
-
-    private string | array $values;
-
-    public function __construct(string | array $values)
+    public function __construct(private string|array $values)
     {
     }
 

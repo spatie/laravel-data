@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class ArrayType implements ValidationAttribute
+class ArrayType extends ValidationAttribute
 {
     public function __construct(private array $keys = [])
     {
