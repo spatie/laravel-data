@@ -808,7 +808,7 @@ class RulesTest extends TestCase
 
     public function ruleAttributesDataProvider(): Generator
     {
-        $laravelRule = new class implements RuleContract {
+        $laravelRule = new class() implements RuleContract {
             public function passes($attribute, $value)
             {
             }

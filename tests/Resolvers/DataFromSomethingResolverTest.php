@@ -56,7 +56,7 @@ class DataFromSomethingResolverTest extends TestCase
             }
         };
 
-        $interfaceable = new class implements Arrayable {
+        $interfaceable = new class() implements Arrayable {
             public function toArray()
             {
                 return [

@@ -16,7 +16,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
     /** @test */
     public function it_will_add_a_required_or_nullable_rule_based_upon_the_property_nullability()
     {
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             public int $property;
         });
 
@@ -24,7 +24,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             'property' => ['required', 'numeric'],
         ], $rules);
 
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             public ?int $property;
         });
 
@@ -36,7 +36,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
     /** @test */
     public function it_will_add_basic_rules_for_certain_types()
     {
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             public string $property;
         });
 
@@ -44,7 +44,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             'property' => ['required', 'string'],
         ], $rules);
 
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             public int $property;
         });
 
@@ -52,7 +52,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             'property' => ['required', 'numeric'],
         ], $rules);
 
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             public bool $property;
         });
 
@@ -60,7 +60,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             'property' => ['required', 'boolean'],
         ], $rules);
 
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             public float $property;
         });
 
@@ -68,7 +68,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             'property' => ['required', 'numeric'],
         ], $rules);
 
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             public array $property;
         });
 
@@ -80,7 +80,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
     /** @test */
     public function it_will_take_validation_attributes_into_account()
     {
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             #[Max(10)]
             public string $property;
         });
@@ -93,7 +93,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
     /** @test */
     public function it_will_take_rules_from_nested_data_objects()
     {
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             public SimpleData $property;
         });
 
@@ -102,7 +102,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             'property.string' => ['required', 'string'],
         ], $rules);
 
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             public ?SimpleData $property;
         });
 
@@ -116,7 +116,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
     /** @test */
     public function it_will_take_rules_from_nested_data_collections()
     {
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */
             public DataCollection $property;
         });
@@ -126,7 +126,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             'property.*.string' => ['required', 'string'],
         ], $rules);
 
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[]|null */
             public ?DataCollection $property;
         });
@@ -140,7 +140,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
     /** @test */
     public function it_can_nest_validation_rules_event_further()
     {
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             public NestedData $property;
         });
 
@@ -150,7 +150,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             'property.simple.string' => ['required', 'string'],
         ], $rules);
 
-        $rules = $this->resolveRules(new class {
+        $rules = $this->resolveRules(new class() {
             public ?SimpleData $property;
         });
 

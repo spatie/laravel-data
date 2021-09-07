@@ -9,7 +9,7 @@ use Spatie\LaravelData\Tests\TestCase;
 
 class DataEloquentCastTest extends TestCase
 {
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 

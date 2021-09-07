@@ -25,7 +25,7 @@ class ValidationAttributeTest extends TestCase
      */
     public function it_can_normalize_values(mixed $input, mixed $output)
     {
-        $normalizer = new class extends ValidationAttribute {
+        $normalizer = new class() extends ValidationAttribute {
             public function execute(mixed $value): mixed
             {
                 return $this->normalizeValue($value);
