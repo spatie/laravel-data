@@ -36,7 +36,7 @@ class DateTimeInterfaceCast implements Cast
 
     protected function findType(DataProperty $property): ?string
     {
-        foreach ($property->types() as $type) {
+        foreach ($property->types()->all() as $type) {
             if (is_a($type, DateTimeInterface::class, true)) {
                 return (string) $type;
             }

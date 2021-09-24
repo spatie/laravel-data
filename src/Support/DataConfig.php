@@ -51,7 +51,7 @@ class DataConfig
             return null;
         }
 
-        foreach ($property->types() as $type) {
+        foreach ($property->types()->all() as $type) {
             if ($cast = $this->findSuitableReplacerForClass($this->casts, $type)) {
                 return $cast;
             }

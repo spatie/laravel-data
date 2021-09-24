@@ -19,10 +19,10 @@ class DataFromArrayResolver
         /** @var \Spatie\LaravelData\Data $data */
         $data = $this->dataConfig->getDataClass($class)
             ->properties()
-            ->mapWithKeys(fn (DataProperty $property) => [
+            ->mapWithKeys(fn(DataProperty $property) => [
                 $property->name() => $this->resolveValue($property, $values[$property->name()] ?? null),
             ])
-            ->pipe(fn (Collection $properties) => new $class(...$properties));
+            ->pipe(fn(Collection $properties) => new $class(...$properties));
 
         return $data;
     }
@@ -33,15 +33,19 @@ class DataFromArrayResolver
             return $value;
         }
 
-        if ($property->castAttribute()) {
-            return $this->resolveValueByAttributeCast($property, $value);
+        if (! $this->shouldBeCasted($property, $value)) {
+            return $value;
+        }
+
+        if ($castAttribute = $property->castAttribute()) {
+            return $castAttribute->get()->cast($property, $value);
         }
 
         if ($property->isBuiltIn()) {
             return $value;
         }
 
-        if (empty($property->types())) {
+        if ($property->types()->isEmpty()) {
             return $value;
         }
 
@@ -51,7 +55,7 @@ class DataFromArrayResolver
 
         if ($property->isDataCollection()) {
             $items = array_map(
-                fn (array $item) => $this->execute($property->dataClassName(), $item),
+                fn(array $item) => $this->execute($property->dataClassName(), $item),
                 $value
             );
 
@@ -68,10 +72,25 @@ class DataFromArrayResolver
         return $value;
     }
 
-    private function resolveValueByAttributeCast(
-        DataProperty $property,
-        mixed $value
-    ): mixed {
-        return $property->castAttribute()->get()->cast($property, $value);
+    private function shouldBeCasted(DataProperty $property, mixed $value): bool
+    {
+        $type = gettype($value);
+
+        if ($this->isSimpleType($property, $type)) {
+            return false;
+        }
+
+        if ($type !== 'object') {
+            return true;
+        }
+
+        return $property->types()->canBe($type);
+    }
+
+    private function isSimpleType(DataProperty $property, string $type): bool
+    {
+        return ! $property->types()->isEmpty()
+            && $property->isBuiltIn()
+            && in_array($type, ['bool', 'string', 'int', 'float', 'array']);
     }
 }

@@ -30,7 +30,7 @@ class DataProperty
 
     private string $dataClassName;
 
-    private array $types;
+    private DataPropertyTypes $types;
 
     /** @var \Spatie\LaravelData\Attributes\Validation\ValidationAttribute[] */
     private array $validationAttributes;
@@ -83,7 +83,7 @@ class DataProperty
         return $this->isDataCollection;
     }
 
-    public function types(): array
+    public function types(): DataPropertyTypes
     {
         return $this->types;
     }
@@ -137,7 +137,7 @@ class DataProperty
         }
 
         if ($this->isData) {
-            return $this->dataClassName = current($this->types);
+            return $this->dataClassName = $this->types->first();
         }
 
         if ($this->isDataCollection) {
@@ -167,7 +167,7 @@ class DataProperty
         $this->isBuiltIn = true;
         $this->isData = false;
         $this->isDataCollection = false;
-        $this->types = [];
+        $this->types = new DataPropertyTypes();
     }
 
     private function processNamedType(ReflectionNamedType $type)
@@ -183,21 +183,19 @@ class DataProperty
         $this->isData = is_a($name, Data::class, true);
         $this->isDataCollection = is_a($name, DataCollection::class, true);
         $this->isNullable = $type->allowsNull();
-        $this->types = [$name];
+        $this->types = new DataPropertyTypes([$name]);
     }
 
     private function processUnionType(ReflectionUnionType $type)
     {
-        $types = $type->getTypes();
-
         $this->isLazy = false;
         $this->isNullable = false;
         $this->isBuiltIn = false;
         $this->isData = false;
         $this->isDataCollection = false;
-        $this->types = [];
+        $this->types = new DataPropertyTypes();
 
-        foreach ($types as $childType) {
+        foreach ($type->getTypes() as $childType) {
             $name = $childType->getName();
 
             if ($name === 'null') {
@@ -208,7 +206,7 @@ class DataProperty
 
             if ($this->isTypeBuiltIn($name)) {
                 $this->isBuiltIn = true;
-                $this->types[] = $name;
+                $this->types->add($name);
 
                 continue;
             }
@@ -221,19 +219,19 @@ class DataProperty
 
             if (is_a($name, Data::class, true)) {
                 $this->isData = true;
-                $this->types[] = $name;
+                $this->types->add($name);
 
                 continue;
             }
 
             if (is_a($name, DataCollection::class, true)) {
                 $this->isDataCollection = true;
-                $this->types[] = $name;
+                $this->types->add($name);
 
                 continue;
             }
 
-            $this->types[] = $name;
+            $this->types->add($name);
         }
     }
 
@@ -244,11 +242,11 @@ class DataProperty
 
     private function ensurePropertyIsValid()
     {
-        if ($this->isData && count($this->types) > 1) {
+        if ($this->isData && $this->types->count() > 1) {
             throw InvalidDataPropertyType::unionWithData($this->property);
         }
 
-        if ($this->isDataCollection && count($this->types) > 1) {
+        if ($this->isDataCollection && $this->types->count() > 1) {
             throw InvalidDataPropertyType::unionWithDataCollection($this->property);
         }
     }

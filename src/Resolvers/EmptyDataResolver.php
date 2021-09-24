@@ -50,15 +50,15 @@ class EmptyDataResolver
 
     private function getValueForProperty(DataProperty $property): mixed
     {
-        if (empty($property->types())) {
+        if ($property->types()->isEmpty()) {
             return null;
         }
 
-        if (count($property->types()) > 1) {
+        if ($property->types()->count() > 1) {
             throw DataPropertyCanOnlyHaveOneType::create($property);
         }
 
-        $type = current($property->types());
+        $type = $property->types()->first();
 
         if ($type === 'array') {
             return [];

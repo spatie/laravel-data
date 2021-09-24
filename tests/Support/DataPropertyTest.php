@@ -29,7 +29,7 @@ class DataPropertyTest extends TestCase
         $this->assertTrue($helper->isBuiltIn());
         $this->assertFalse($helper->isData());
         $this->assertFalse($helper->isDataCollection());
-        $this->assertEmpty($helper->types());
+        $this->assertTrue($helper->types()->isEmpty());
         $this->assertEquals('property', $helper->name());
         $this->assertEquals([], $helper->validationAttributes());
     }
@@ -209,25 +209,25 @@ class DataPropertyTest extends TestCase
             public int $property;
         });
 
-        $this->assertEquals(['int'], $helper->types());
+        $this->assertEquals(['int'], $helper->types()->all());
 
         $helper = $this->resolveHelper(new class() {
             public int | float $property;
         });
 
-        $this->assertEquals(['int', 'float'], $helper->types());
+        $this->assertEquals(['int', 'float'], $helper->types()->all());
 
         $helper = $this->resolveHelper(new class() {
             public int | Lazy $property;
         });
 
-        $this->assertEquals(['int'], $helper->types());
+        $this->assertEquals(['int'], $helper->types()->all());
 
         $helper = $this->resolveHelper(new class() {
             public int | Lazy | null $property;
         });
 
-        $this->assertEquals(['int'], $helper->types());
+        $this->assertEquals(['int'], $helper->types()->all());
     }
 
     /** @test */

@@ -12,23 +12,23 @@ class BuiltInTypesRuleInferrer implements RuleInferrer
             return $rules;
         }
 
-        if (in_array('int', $property->types())) {
+        if ($property->types()->canBe('int')) {
             $rules[] = 'numeric';
         }
 
-        if (in_array('string', $property->types())) {
+        if ($property->types()->canBe('string')) {
             $rules[] = 'string';
         }
 
-        if (in_array('bool', $property->types())) {
+        if ($property->types()->canBe('bool')) {
             $rules[] = 'boolean';
         }
 
-        if (in_array('float', $property->types())) {
+        if ($property->types()->canBe('float')) {
             $rules[] = 'numeric';
         }
 
-        if (in_array('array', $property->types())) {
+        if ($property->types()->canBe('array')) {
             $rules[] = 'array';
         }
 
