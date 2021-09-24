@@ -19,10 +19,10 @@ class DataFromArrayResolver
         /** @var \Spatie\LaravelData\Data $data */
         $data = $this->dataConfig->getDataClass($class)
             ->properties()
-            ->mapWithKeys(fn(DataProperty $property) => [
+            ->mapWithKeys(fn (DataProperty $property) => [
                 $property->name() => $this->resolveValue($property, $values[$property->name()] ?? null),
             ])
-            ->pipe(fn(Collection $properties) => new $class(...$properties));
+            ->pipe(fn (Collection $properties) => new $class(...$properties));
 
         return $data;
     }
@@ -55,7 +55,7 @@ class DataFromArrayResolver
 
         if ($property->isDataCollection()) {
             $items = array_map(
-                fn(array $item) => $this->execute($property->dataClassName(), $item),
+                fn (array $item) => $this->execute($property->dataClassName(), $item),
                 $value
             );
 

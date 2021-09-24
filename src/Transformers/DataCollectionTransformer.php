@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Transformers;
 
 use Closure;
 use Illuminate\Pagination\AbstractCursorPaginator;
-use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\TransformationType;

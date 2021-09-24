@@ -2,8 +2,6 @@
 
 namespace Spatie\LaravelData\Tests\Resolvers;
 
-use Carbon\CarbonImmutable;
-use Carbon\CarbonTimeZone;
 use DateTime;
 use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
@@ -91,7 +89,7 @@ class DataFromArrayResolverTest extends TestCase
                 'defaultCast' => DateTime::createFromFormat(DATE_ATOM, '1994-05-16T12:00:00+02:00'),
                 'nestedData' => SimpleData::from('hello'),
                 'nestedCollection' => SimpleData::collection([
-                    'never', 'gonna', 'give', 'you', 'up'
+                    'never', 'gonna', 'give', 'you', 'up',
                 ]),
             ]
         );
