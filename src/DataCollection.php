@@ -13,6 +13,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Collection;
 use IteratorAggregate;
 use Spatie\LaravelData\Concerns\IncludeableData;
@@ -32,11 +33,11 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     private ?Closure $filter = null;
 
-    private array | AbstractPaginator | AbstractCursorPaginator | Paginator $items;
+    private array | CursorPaginator | Paginator $items;
 
     public function __construct(
         private string $dataClass,
-        Collection | array | AbstractPaginator | AbstractCursorPaginator | Paginator $items
+        Collection | array | CursorPaginator | Paginator $items
     ) {
         $this->items = $items instanceof Collection ? $items->all() : $items;
 
@@ -57,7 +58,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         return $this;
     }
 
-    public function items(): array | AbstractPaginator | AbstractCursorPaginator | Paginator
+    public function items(): array | CursorPaginator | Paginator
     {
         return $this->items;
     }
@@ -155,7 +156,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     public function isPaginated(): bool
     {
-        return $this->items instanceof AbstractPaginator || $this->items instanceof AbstractCursorPaginator;
+        return $this->items instanceof CursorPaginator || $this->items instanceof Paginator;
     }
 
     public static function castUsing(array $arguments)

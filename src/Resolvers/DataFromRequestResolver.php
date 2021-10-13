@@ -30,8 +30,7 @@ class DataFromRequestResolver
 
     private function checkAuthorization(string $class)
     {
-        /** @var \Spatie\LaravelData\Data|string $class */
-
+        /** @psalm-suppress UndefinedMethod */
         if ($class::authorized() === false) {
             throw new AuthorizationException();
         }

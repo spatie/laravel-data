@@ -3,7 +3,9 @@
 namespace Spatie\LaravelData\Transformers;
 
 use Closure;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Pagination\AbstractCursorPaginator;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\TransformationType;
@@ -15,7 +17,7 @@ class DataCollectionTransformer
         protected TransformationType $transformationType,
         protected array $inclusionTree,
         protected array $exclusionTree,
-        protected array | AbstractPaginator | AbstractCursorPaginator $items,
+        protected array | CursorPaginator | Paginator  $items,
         protected ?Closure $through,
         protected ?Closure $filter,
     ) {
