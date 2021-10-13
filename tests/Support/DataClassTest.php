@@ -13,7 +13,7 @@ class DataClassTest extends TestCase
     /** @test */
     public function it_can_find_from_methods_and_the_types_that_can_be_used_with_them()
     {
-        $subject = new class(null) extends Data {
+        $subject = new class (null) extends Data {
             public function __construct(public $property)
             {
             }
@@ -66,25 +66,25 @@ class DataClassTest extends TestCase
     /** @test */
     public function it_can_check_if_a_data_class_has_an_authorisation_method()
     {
-        $withMethod = new class(null) extends Data {
+        $withMethod = new class (null) extends Data {
             public static function authorized(): bool
             {
             }
         };
 
-        $withNonStaticMethod = new class(null) extends Data {
+        $withNonStaticMethod = new class (null) extends Data {
             public function authorized(): bool
             {
             }
         };
 
-        $withNonPublicMethod = new class(null) extends Data {
+        $withNonPublicMethod = new class (null) extends Data {
             protected static function authorized(): bool
             {
             }
         };
 
-        $withoutMethod = new class(null) extends Data {
+        $withoutMethod = new class (null) extends Data {
         };
 
         $this->assertTrue(DataClass::create(new ReflectionClass($withMethod))->hasAuthorizationMethod());

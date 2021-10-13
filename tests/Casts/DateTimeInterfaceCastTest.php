@@ -20,7 +20,7 @@ class DateTimeInterfaceCastTest extends TestCase
     {
         $caster = new DateTimeInterfaceCast('d-m-Y H:i:s');
 
-        $class = new class() {
+        $class = new class () {
             public Carbon $carbon;
 
             public CarbonImmutable $carbonImmutable;
@@ -56,7 +56,7 @@ class DateTimeInterfaceCastTest extends TestCase
     {
         $caster = new DateTimeInterfaceCast('d-m-Y H:i:s');
 
-        $class = new class() {
+        $class = new class () {
             public DateTime $carbon;
         };
 
@@ -73,7 +73,7 @@ class DateTimeInterfaceCastTest extends TestCase
     {
         $caster = new DateTimeInterfaceCast('d-m-Y');
 
-        $class = new class() {
+        $class = new class () {
             public int $int;
         };
 

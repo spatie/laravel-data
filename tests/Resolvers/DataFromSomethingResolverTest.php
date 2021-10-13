@@ -15,7 +15,7 @@ class DataFromSomethingResolverTest extends TestCase
     /** @test */
     public function it_can_create_data_from_a_custom_method()
     {
-        $data = new class('') extends Data {
+        $data = new class ('') extends Data {
             public function __construct(public string $string)
             {
             }
@@ -45,7 +45,7 @@ class DataFromSomethingResolverTest extends TestCase
     /** @test */
     public function it_can_create_data_from_a_custom_method_with_an_interface_parameter()
     {
-        $data = new class('') extends Data {
+        $data = new class ('') extends Data {
             public function __construct(public string $string)
             {
             }
@@ -56,7 +56,7 @@ class DataFromSomethingResolverTest extends TestCase
             }
         };
 
-        $interfaceable = new class() implements Arrayable {
+        $interfaceable = new class () implements Arrayable {
             public function toArray()
             {
                 return [
@@ -71,7 +71,7 @@ class DataFromSomethingResolverTest extends TestCase
     /** @test */
     public function it_can_create_data_from_a_custom_method_with_an_inherited_parameter()
     {
-        $data = new class('') extends Data {
+        $data = new class ('') extends Data {
             public function __construct(public string $string)
             {
             }
@@ -90,7 +90,7 @@ class DataFromSomethingResolverTest extends TestCase
     /** @test */
     public function it_can_create_data_from_a_custom_method_and_always_takes_the_nearest_type()
     {
-        $data = new class('') extends Data {
+        $data = new class ('') extends Data {
             public function __construct(public string $string)
             {
             }
@@ -114,7 +114,7 @@ class DataFromSomethingResolverTest extends TestCase
     /** @test */
     public function it_can_create_data_from_a_custom_optional_method()
     {
-        $data = new class('') extends Data {
+        $data = new class ('') extends Data {
             public function __construct(public string $string)
             {
             }

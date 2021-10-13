@@ -184,7 +184,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_have_conditional_lazy_data()
     {
-        $blueprint = new class() extends Data {
+        $blueprint = new class () extends Data {
             public function __construct(
                 public string | Lazy | null $name = null
             ) {
@@ -210,7 +210,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_have_conditional_lazy_data_manually_loaded()
     {
-        $blueprint = new class() extends Data {
+        $blueprint = new class () extends Data {
             public function __construct(
                 public string | Lazy | null $name = null
             ) {
@@ -235,7 +235,7 @@ class DataTest extends TestCase
         /** @var \Illuminate\Database\Eloquent\Model $model */
         $model = DummyModel::make();
 
-        $data = new class(Lazy::whenLoaded('relation', $model, fn () => 'loaded')) extends Data {
+        $data = new class (Lazy::whenLoaded('relation', $model, fn () => 'loaded')) extends Data {
             public function __construct(
                 public string | Lazy $relation,
             ) {
@@ -254,7 +254,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_have_default_included_lazy_data()
     {
-        $data = new class('Freek') extends Data {
+        $data = new class ('Freek') extends Data {
             public function __construct(public string | Lazy $name)
             {
             }
@@ -307,7 +307,7 @@ class DataTest extends TestCase
     {
         $date = new DateTime('16 may 1994');
 
-        $data = new class($date) extends Data {
+        $data = new class ($date) extends Data {
             public function __construct(public DateTime $date)
             {
             }
@@ -321,7 +321,7 @@ class DataTest extends TestCase
     {
         $date = new DateTime('16 may 1994');
 
-        $data = new class($date) extends Data {
+        $data = new class ($date) extends Data {
             public function __construct(
                 #[WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-Y')]
                 public $date
@@ -335,7 +335,7 @@ class DataTest extends TestCase
     /** @test */
     public function a_transformer_will_never_handle_a_null_value()
     {
-        $data = new class(null) extends Data {
+        $data = new class (null) extends Data {
             public function __construct(
                 #[WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-Y')]
                 public $date
@@ -433,7 +433,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
+        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
             public function __construct(
                 public SimpleData $data,
                 public DataCollection $dataCollection,
@@ -463,7 +463,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_append_data_via_method_overwrite()
     {
-        $data = new class('Freek') extends Data {
+        $data = new class ('Freek') extends Data {
             public function __construct(public string $name)
             {
             }
@@ -483,7 +483,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_append_data_via_method_call()
     {
-        $data = new class('Freek') extends Data {
+        $data = new class ('Freek') extends Data {
             public function __construct(public string $name)
             {
             }
