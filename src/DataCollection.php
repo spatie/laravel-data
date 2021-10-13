@@ -92,6 +92,11 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         return json_encode($this->toArray(), $options);
     }
 
+    public function toCollection(): Collection
+    {
+        return new Collection($this->items);
+    }
+
     public function getIterator(): ArrayIterator
     {
         return new ArrayIterator($this->transform(TransformationType::withoutValueTransforming()));
