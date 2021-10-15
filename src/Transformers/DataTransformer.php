@@ -129,12 +129,12 @@ class DataTransformer
         array $nestedInclusionTree,
         array $nestedExclusionTree,
     ): mixed {
-        if ($value === null) {
-            return null;
-        }
-
         if ($value instanceof Lazy) {
             $value = $value->resolve();
+        }
+
+        if ($value === null) {
+            return null;
         }
 
         if ($value instanceof Data || $value instanceof DataCollection) {
