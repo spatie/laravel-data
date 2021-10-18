@@ -1,5 +1,6 @@
 ---
-title: Quickstart weight: 2
+title: Quickstart
+weight: 2
 ---
 
 In this quickstart, we'll guide you through the most important functionalities of the package and how to use them. We start by installing the package:
