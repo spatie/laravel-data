@@ -1,5 +1,5 @@
 ---
-title: Request to data object
+title: From a request
 weight: 5
 ---
 
@@ -99,7 +99,7 @@ class SongData extends Data
 
 Now when you provide an artist with a length of more than 20 characters, the validation will fail just like it would when you created a custom request class for the endpoint.
 
-We've created a comprehensive set of rule attributes. You can find a complete list (here)[URL].
+We've created a comprehensive set of rule attributes. You can find a complete list [here](/docs/laravel-data/v1/advanced-usage/validation-attributes).
 
 One special attribute is the Rule attribute. With it, you can write rules just like you would when creating a custom Laravel request:
 
@@ -190,7 +190,7 @@ By default, four rule inferrers are enabled:
     - A `array` type will add the `array` rule
 - **AttributesRuleInferrer** will make sure that rule attributes we described above will also add their rules
 
-It is possible to write your rule inferrers. You can find more information [here](URL).
+It is possible to write your rule inferrers. You can find more information [here](/docs/laravel-data/v1/advanced-usage/creating-a-rule-inferrer).
 
 ### Overwriting the validator
 

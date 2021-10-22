@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-weight: 2
+weight: 1
 ---
 
 In this quickstart, we'll guide you through the most important functionalities of the package and how to use them. We start by installing the package:
@@ -24,7 +24,9 @@ class PostData extends Data
 }
 ```
 
-The only requirement for using the package is extending your data objects from the base `Data` object. We add the requirements for a post as public properties. In this example, we use PHP 8.0 newest feature: constructor promoted properties, but you're free to use class properties like before PHP 8.0. A constructor that initiates the properties is also required. Luckily, with promoted properties, this one comes for free!
+The only requirement for using the package is extending your data objects from the base `Data` object. We add the requirements for a post as public properties. 
+
+In this example, we use PHP 8.0 newest feature: constructor promoted properties, but you're free to use class properties like before PHP 8.0. A constructor that initiates the properties is also required. Luckily, with promoted properties, this one comes for free!
 
 The `PostStatus` is an enum using the [spatie/enum](https://github.com/spatie/enum) package:
 
@@ -90,7 +92,9 @@ public function __invoke(Request $request)
 
 But this throws the following exception:
 
-> TypeError: App\Data\PostData::__construct(): Argument #3 ($status) must be of type App\Enums\PostStatus, string given
+```
+TypeError: App\Data\PostData::__construct(): Argument #3 ($status) must be of type App\Enums\PostStatus, string given
+```
 
 That's because the status property expects a `PostStatus` enum object, but it gets a string. We can fix this by implementing a cast for enums:
 
@@ -147,7 +151,7 @@ By default, the global casts list looks like this:
 
 This means that if a class property is of type `DateTime`, `Carbon`, `CarbonImmutable`, ... it will be automatically converted.
 
-You can read more about casting (here)[TODOURL].
+You can read more about casting [here](/docs/laravel-data/v1/as-a-data-transfer-object/casts).
 
 Since we're working with requests, wouldn't it be cool to validate the data coming in from the request using the data object? Typically you would create a request with a validator like this:
 
@@ -219,7 +223,7 @@ class PostData extends Data
 }
 ```
 
-There's still much more you can do with validating data objects. Read more about it (here)[TODOURL].
+There's still much more you can do with validating data objects. Read more about it [here](/docs/laravel-data/v1/as-a-data-transfer-object/request-to-data-object#validating-a-request).
 
 Let's continue. In our application, we will have a `Post` Eloquent model:
 
@@ -287,7 +291,7 @@ class PostData extends Data
 ```
 
 Magic creation methods allow you to create data objects from any type by passing them to the `from` method of a data
-object, you can read more about it [here](TODOURL).
+object, you can read more about it [here](/laravel-data/v1/as-a-data-transfer-object/creating-a-data-object#magical-creation).
 
 It can be convenient to transform more complex models than our `Post` into data objects because you can decide how a model
 would be mapped onto a data object.
@@ -342,7 +346,7 @@ AuthorData::from([
 
 The data object is smart enough to convert an array of posts into a data collection of post data. Mapping data coming from the frontend was never that easy!
 
-You can do a lot more with data collections. Read more about it (here)[URLTODO].
+You can do a lot more with data collections. Read more about it [here](/docs/laravel-data/v1/as-a-data-transfer-object/collections).
 
 We've been creating many data objects from all sorts of values, time to change course and go the other way around and start transforming data objects into arrays.
 
@@ -449,7 +453,7 @@ class PostData extends Data
 }
 ```
 
-You can read a lot more about transformers (here)[TODOURL].
+You can read a lot more about transformers [here](/docs/laravel-data/v1/as-a-resource/transformers).
 
 We now can send our posts as JSON to the front, but what if we want to create a new post? When using Inertia, for example, we might need an empty blueprint object like this that the user could fill in:
 
@@ -688,11 +692,11 @@ You can do quite a lot with lazy properties like including them:
 - when they are requested in the URL query
 - by default with an option to exclude them
 
-And a lot more. You can read all about it (here)[TODOUR].
+And a lot more. You can read all about it [here](/docs/laravel-data/v1/as-a-resource/lazy-properties).
 
 So that's it, a quick overview of this package. There's still a lot more you can do with data objects like:
 
-- (casting)[TODOURL] them into Eloquent models
-- (transforming)[TODOURL] the structure to typescript
-- (working)[TODOURL] with `DataCollections`
+- [casting](/docs/laravel-data/v1/advanced-usage/eloquent-casting) them into Eloquent models
+- [transforming](/docs/laravel-data/v1/advanced-usage/typescript) the structure to typescript
+- [working](https://spatie.be/docs/laravel-data/v1/as-a-data-transfer-object/collections) with `DataCollections`
 - you find it all in these docs

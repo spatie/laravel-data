@@ -1,5 +1,5 @@
 ---
-title: TypeScript
+title: Transforming to TypeScript
 weight: 2
 ---
 

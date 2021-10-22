@@ -1,4 +1,4 @@
 ---
-title: As a data-transfer-object
+title: As a DTO
 weight: 2
 ---

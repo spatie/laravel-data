@@ -14,6 +14,6 @@ interface Cast
 }
 ```
 
-The value that should be cast is given, and a `DataProperty` object which represents the property for which the value is cast. You can read more about the internal structures of the package [here](URL).
+The value that should be cast is given, and a `DataProperty` object which represents the property for which the value is cast. You can read more about the internal structures of the package [here](/docs/laravel-data/v1/advanced-usage/internal-structures).
 
 In the end, the cast should return a casted value. Please note that the given value of a cast can never be `null`.
