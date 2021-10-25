@@ -3,8 +3,6 @@ title: From data to resource
 weight: 1
 ---
 
-In the previous chapters, we saw how to create a data object from a set of values. Now we're going to transform the data object to an array that you can use on the frontend of your application or in APIs, just like Laravel API resources.
-
 A data object will automatically be transformed to a JSON response when returned in a controller:
 
 ```php
@@ -121,7 +119,7 @@ SongData::empty([
 ]);
 ```
 
-## Collections
+## Using collections
 
 Here's how to create a collection of data objects:
 
