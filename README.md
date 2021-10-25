@@ -74,6 +74,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 ## Credits
 
 - [Ruben Van Assche](https://github.com/rubenvanassche)
+- [Aidan Casey](https://github.com/aidan-casey) (Validation Attributes)
 - [All Contributors](../../contributors)
 
 ## License
