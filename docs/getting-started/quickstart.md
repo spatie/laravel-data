@@ -3,11 +3,9 @@ title: Quickstart
 weight: 1
 ---
 
-In this quickstart, we'll guide you through the most important functionalities of the package and how to use them. We start by installing the package:
+In this quickstart, we'll guide you through the most important functionalities of the package and how to use them. 
 
-```bash
-composer require spatie/laravel-data
-```
+First, you should [install the package](https://spatie.be/docs/laravel-data/v1/installation-setup).
 
 We're going to create a blog with different posts so let's get started with the `PostData` object. A post has a title, some content, a status and a date when it was published:
 
@@ -25,8 +23,6 @@ class PostData extends Data
 ```
 
 The only requirement for using the package is extending your data objects from the base `Data` object. We add the requirements for a post as public properties. 
-
-In this example, we use PHP 8.0 newest feature: constructor promoted properties, but you're free to use class properties like before PHP 8.0. A constructor that initiates the properties is also required. Luckily, with promoted properties, this one comes for free!
 
 The `PostStatus` is an enum using the [spatie/enum](https://github.com/spatie/enum) package:
 
@@ -65,6 +61,8 @@ $post = PostData::from([
     'published_at' => CarbonImmutable::now(),
 ]);
 ```
+
+## Using requests and casts
 
 Now let's say we have a Laravel request coming from the front with these properties. Our controller would then look like
 this:
@@ -124,9 +122,9 @@ class PostData extends Data
 }
 ```
 
-It is possible to write more powerful casts that would work for any enum type, but we're not going to cover this for now in the quickstart.
+## Using global casts
 
-Now when we send the following payload to the controller:
+Let's send the following payload to the controller:
 
 ```json
 {
@@ -153,7 +151,9 @@ This means that if a class property is of type `DateTime`, `Carbon`, `CarbonImmu
 
 You can read more about casting [here](/docs/laravel-data/v1/as-a-data-transfer-object/casts).
 
-Since we're working with requests, wouldn't it be cool to validate the data coming in from the request using the data object? Typically you would create a request with a validator like this:
+## Validation using form requests
+
+Since we're working with requests, wouldn't it be cool to validate the data coming in from the request using the data object? Typically, you would create a request with a validator like this:
 
 ```php
 class PostDataRequest extends FormRequest
@@ -225,7 +225,9 @@ class PostData extends Data
 
 There's still much more you can do with validating data objects. Read more about it [here](/docs/laravel-data/v1/as-a-data-transfer-object/request-to-data-object#validating-a-request).
 
-Let's continue. In our application, we will have a `Post` Eloquent model:
+## Working with Eloquent models
+
+In our application, we have a `Post` Eloquent model:
 
 ```php
 class Post extends Model
@@ -242,11 +244,13 @@ class Post extends Model
 }
 ```
 
-Thanks to the casts we added earlier, this can be quickly transformed into a `PostData` object as such:
+Thanks to the casts we added earlier, this can be quickly transformed into a `PostData` object:
 
 ```php
 PostData::from(Post::findOrFail($id));
 ```
+
+## Customizing the creation of a data object
 
 It is even possible to manually define how such a model is mapped onto a data object. To demonstrate that, we will take a completely different example that shows the strength of the `from` method.
 
@@ -295,6 +299,8 @@ object, you can read more about it [here](/laravel-data/v1/as-a-data-transfer-ob
 
 It can be convenient to transform more complex models than our `Post` into data objects because you can decide how a model
 would be mapped onto a data object.
+
+## Nesting data objects and collections
 
 Now that we have a fully functional post data object. We're going to create a new data object, `AuthorData` that will store the name of an author and a collection of posts the author wrote:
 
@@ -347,6 +353,8 @@ AuthorData::from([
 The data object is smart enough to convert an array of posts into a data collection of post data. Mapping data coming from the frontend was never that easy!
 
 You can do a lot more with data collections. Read more about it [here](/docs/laravel-data/v1/as-a-data-transfer-object/collections).
+
+## Usage in controllers
 
 We've been creating many data objects from all sorts of values, time to change course and go the other way around and start transforming data objects into arrays.
 
@@ -411,6 +419,8 @@ This will give the following array:
 
 As you can see, if we transform a data object to JSON, the `CarbonImmutable` published at date is transformed into a string.
 
+## Using transformers
+
 A few sections ago, we used casts to convert simple types into complex types. Transformers work the other way around. They transform complex types into simple ones and transform a data object into a simpler structure like an array or JSON.
 
 Just like the `DateTimeInterfaceCast` we also have a `DateTimeInterfaceTransformer` that will convert `DateTime`, `Carbon`, ... objects into strings.
@@ -455,6 +465,8 @@ class PostData extends Data
 
 You can read a lot more about transformers [here](/docs/laravel-data/v1/as-a-resource/transformers).
 
+## Generating a blueprint
+
 We now can send our posts as JSON to the front, but what if we want to create a new post? When using Inertia, for example, we might need an empty blueprint object like this that the user could fill in:
 
 ```json
@@ -490,6 +502,8 @@ PostData::empty([
     'status' => 'draft';
 ]);
 ```
+
+## Lazy properties
 
 For the last section of this quickstart, we're going to take a look at the `AuthorData` object again:
 
