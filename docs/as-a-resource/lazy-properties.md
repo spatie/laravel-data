@@ -185,7 +185,7 @@ AlbumData::create(Album::first())->exclude('songs');
 
 It is possible to include or exclude lazy properties by the URL query string:
 
-For example, when we create a route `my-account:
+For example, when we create a route `my-account`:
 
 ```php
 // in web.php
