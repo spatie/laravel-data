@@ -3,18 +3,22 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Illuminate\Support\Arr;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ArrayType extends ValidationAttribute
 {
-    public function __construct(private array $keys = [])
+    private array $keys;
+
+    public function __construct(array|string ...$keys)
     {
+        $this->keys = $keys;
     }
 
     public function getRules(): array
     {
         return empty($this->keys)
             ? ['array']
-            : ['array:' . implode(',', $this->keys)];
+            : ['array:' . implode(',', Arr::flatten($this->keys))];
     }
 }

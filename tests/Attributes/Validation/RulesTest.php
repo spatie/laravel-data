@@ -427,6 +427,16 @@ class RulesTest extends TestCase
             'attribute' => new ArrayType(['a', 'b', 'c']),
             'expected' => ['array:a,b,c'],
         ];
+
+        yield [
+            'attribute' => new ArrayType('a', 'b', 'c'),
+            'expected' => ['array:a,b,c'],
+        ];
+
+        yield [
+            'attribute' => new ArrayType('a', ['b', 'c']),
+            'expected' => ['array:a,b,c'],
+        ];
     }
 
     public function beforeAttributesDataProvider(): Generator
@@ -575,6 +585,11 @@ class RulesTest extends TestCase
         ];
 
         yield [
+            'attribute' => new Email(Email::RfcValidation, Email::NoRfcWarningsValidation),
+            'expected' => ['email:rfc,strict'],
+        ];
+
+        yield [
             'attribute' => new Email(['fake']),
             'expected' => [],
             'exception' => CannotBuildValidationRule::class,
@@ -590,6 +605,11 @@ class RulesTest extends TestCase
 
         yield [
             'attribute' => new EndsWith(['x', 'y']),
+            'expected' => ['ends_with:x,y'],
+        ];
+
+        yield [
+            'attribute' => new EndsWith('x', 'y'),
             'expected' => ['ends_with:x,y'],
         ];
     }
@@ -630,6 +650,11 @@ class RulesTest extends TestCase
             'attribute' => new In(['key', 'other']),
             'expected' => [new BaseIn(['key', 'other'])],
         ];
+
+        yield [
+            'attribute' => new In('key', 'other'),
+            'expected' => [new BaseIn(['key', 'other'])],
+        ];
     }
 
     public function mimesAttributesDataProvider(): Generator
@@ -641,6 +666,11 @@ class RulesTest extends TestCase
 
         yield [
             'attribute' => new MimeTypes(['video/quicktime', 'video/avi']),
+            'expected' => ['mimestypes:video/quicktime,video/avi'],
+        ];
+
+        yield [
+            'attribute' => new MimeTypes('video/quicktime', 'video/avi'),
             'expected' => ['mimestypes:video/quicktime,video/avi'],
         ];
     }
@@ -656,6 +686,11 @@ class RulesTest extends TestCase
             'attribute' => new Mimes(['jpg', 'png']),
             'expected' => ['mimes:jpg,png'],
         ];
+
+        yield [
+            'attribute' => new Mimes('jpg', 'png'),
+            'expected' => ['mimes:jpg,png'],
+        ];
     }
 
     public function notInAttributesDataProvider(): Generator
@@ -667,6 +702,11 @@ class RulesTest extends TestCase
 
         yield [
             'attribute' => new NotIn(['key', 'other']),
+            'expected' => [new BaseNotIn(['key', 'other'])],
+        ];
+
+        yield [
+            'attribute' => new NotIn('key', 'other'),
             'expected' => [new BaseNotIn(['key', 'other'])],
         ];
     }
@@ -700,6 +740,11 @@ class RulesTest extends TestCase
             'attribute' => new ProhibitedIf('field', ['key', 'other']),
             'expected' => ['prohibited_if:field,key,other'],
         ];
+
+        yield [
+            'attribute' => new ProhibitedIf('field', 'key', 'other'),
+            'expected' => ['prohibited_if:field,key,other'],
+        ];
     }
 
     public function prohibitedUnlessAttributesDataProvider(): Generator
@@ -711,6 +756,11 @@ class RulesTest extends TestCase
 
         yield [
             'attribute' => new ProhibitedUnless('field', ['key', 'other']),
+            'expected' => ['prohibited_unless:field,key,other'],
+        ];
+
+        yield [
+            'attribute' => new ProhibitedUnless('field', 'key', 'other'),
             'expected' => ['prohibited_unless:field,key,other'],
         ];
     }
@@ -726,6 +776,11 @@ class RulesTest extends TestCase
             'attribute' => new Prohibits(['key', 'other']),
             'expected' => ['prohibits:key,other'],
         ];
+
+        yield [
+            'attribute' => new Prohibits('key', 'other'),
+            'expected' => ['prohibits:key,other'],
+        ];
     }
 
     public function requiredIfAttributesDataProvider(): Generator
@@ -737,6 +792,11 @@ class RulesTest extends TestCase
 
         yield [
             'attribute' => new RequiredIf('field', ['key', 'other']),
+            'expected' => ['required_if:field,key,other'],
+        ];
+
+        yield [
+            'attribute' => new RequiredIf('field', 'key', 'other'),
             'expected' => ['required_if:field,key,other'],
         ];
     }
@@ -752,6 +812,11 @@ class RulesTest extends TestCase
             'attribute' => new RequiredUnless('field', ['key', 'other']),
             'expected' => ['required_unless:field,key,other'],
         ];
+
+        yield [
+            'attribute' => new RequiredUnless('field', 'key', 'other'),
+            'expected' => ['required_unless:field,key,other'],
+        ];
     }
 
     public function requiredWithAttributesDataProvider(): Generator
@@ -763,6 +828,11 @@ class RulesTest extends TestCase
 
         yield [
             'attribute' => new RequiredWith(['key', 'other']),
+            'expected' => ['required_with:key,other'],
+        ];
+
+        yield [
+            'attribute' => new RequiredWith('key', 'other'),
             'expected' => ['required_with:key,other'],
         ];
     }
@@ -778,6 +848,11 @@ class RulesTest extends TestCase
             'attribute' => new RequiredWithAll(['key', 'other']),
             'expected' => ['required_with_all:key,other'],
         ];
+
+        yield [
+            'attribute' => new RequiredWithAll('key', 'other'),
+            'expected' => ['required_with_all:key,other'],
+        ];
     }
 
     public function requiredWithoutAttributesDataProvider(): Generator
@@ -791,6 +866,11 @@ class RulesTest extends TestCase
             'attribute' => new RequiredWithout(['key', 'other']),
             'expected' => ['required_without:key,other'],
         ];
+
+        yield [
+            'attribute' => new RequiredWithout('key', 'other'),
+            'expected' => ['required_without:key,other'],
+        ];
     }
 
     public function requiredWithoutAllAttributesDataProvider(): Generator
@@ -802,6 +882,11 @@ class RulesTest extends TestCase
 
         yield [
             'attribute' => new RequiredWithoutAll(['key', 'other']),
+            'expected' => ['required_without_all:key,other'],
+        ];
+
+        yield [
+            'attribute' => new RequiredWithoutAll('key', 'other'),
             'expected' => ['required_without_all:key,other'],
         ];
     }
@@ -848,6 +933,11 @@ class RulesTest extends TestCase
 
         yield [
             'attribute' => new StartsWith(['x', 'y']),
+            'expected' => ['starts_with:x,y'],
+        ];
+
+        yield [
+            'attribute' => new StartsWith('x', 'y'),
             'expected' => ['starts_with:x,y'],
         ];
     }

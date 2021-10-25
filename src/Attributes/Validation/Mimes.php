@@ -3,15 +3,16 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Illuminate\Support\Arr;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Mimes extends ValidationAttribute
 {
     private array $mimes;
 
-    public function __construct(string | array $mimes)
+    public function __construct(string | array ...$mimes)
     {
-        $this->mimes = is_string($mimes) ? [$mimes] : $mimes;
+        $this->mimes = Arr::flatten($mimes);
     }
 
     public function getRules(): array

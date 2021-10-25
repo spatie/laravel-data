@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 
@@ -17,9 +18,9 @@ class Email extends ValidationAttribute
 
     private array $modes;
 
-    public function __construct(array | string $modes = [])
+    public function __construct(array | string ...$modes)
     {
-        $this->modes = is_string($modes) ? [$modes] : $modes;
+        $this->modes = Arr::flatten($modes);
     }
 
     public function getRules(): array

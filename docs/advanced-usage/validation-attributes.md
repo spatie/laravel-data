@@ -129,6 +129,9 @@ public array $value;
 
 #[ArrayType(['valid_key', 'other_valid_key'])]
 public array $value; 
+
+#[ArrayType('valid_key', 'other_valid_key')]
+public array $value; 
 ```
 
 ### Bail
@@ -315,6 +318,9 @@ public string $value;
 
 #[Email([Distinct::RfcValidation, Distinct::DnsCheckValidation])]
 public string $value;  
+
+#[Email(Distinct::RfcValidation, Distinct::DnsCheckValidation)]
+public string $value;  
 ```
 
 ### EndsWith
@@ -326,6 +332,9 @@ public string $value;
 public string $value;
 
 #[EndsWith(['a', 'b'])]
+public string $value;
+
+#[EndsWith('a', 'b')]
 public string $value;
 ```
 
@@ -416,6 +425,9 @@ public UploadedFile $value;
 
 ```php
 #[In([1, 2, 3, 'a', 'b'])]
+public mixed $value; 
+
+#[In(1, 2, 3, 'a', 'b')]
 public mixed $value; 
 ```
 
@@ -510,6 +522,9 @@ public UploadedFile $value;
 
 #[MimeTypes(['video/quicktime', 'video/avi'])]
 public UploadedFile $value; 
+
+#[MimeTypes('video/quicktime', 'video/avi')]
+public UploadedFile $value; 
 ```
 
 ### Mimes
@@ -521,6 +536,9 @@ public UploadedFile $value;
 public UploadedFile $value; 
 
 #[Mimes(['jpg', 'png'])]
+public UploadedFile $value; 
+
+#[Mimes('jpg', 'png')]
 public UploadedFile $value; 
 ```
 
@@ -548,6 +566,9 @@ public int $value;
 
 ```php
 #[NotIn([1, 2, 3, 'a', 'b'])]
+public mixed $value; 
+
+#[NotIn(1, 2, 3, 'a', 'b')]
 public mixed $value; 
 ```
 
@@ -639,6 +660,9 @@ public ?string $value;
 
 #[Prohibits(['other_field', 'another_field'])]
 public ?string $value; 
+
+#[Prohibits('other_field', 'another_field')]
+public ?string $value; 
 ```
 
 ### Regex
@@ -693,6 +717,9 @@ public ?string $value;
 
 #[RequiredWith(['other_field', 'another_field'])]
 public ?string $value; 
+
+#[RequiredWith('other_field', 'another_field')]
+public ?string $value; 
 ```
 
 ### RequiredWithAll
@@ -704,6 +731,9 @@ public ?string $value;
 public ?string $value; 
 
 #[RequiredWithAll(['other_field', 'another_field'])]
+public ?string $value; 
+
+#[RequiredWithAll('other_field', 'another_field')]
 public ?string $value; 
 ```
 
@@ -717,6 +747,9 @@ public ?string $value;
 
 #[RequiredWithout(['other_field', 'another_field'])]
 public ?string $value; 
+
+#[RequiredWithout('other_field', 'another_field')]
+public ?string $value; 
 ```
 
 ### RequiredWithoutAll
@@ -728,6 +761,9 @@ public ?string $value;
 public ?string $value; 
 
 #[RequiredWithoutAll(['other_field', 'another_field'])]
+public ?string $value; 
+
+#[RequiredWithoutAll('other_field', 'another_field')]
 public ?string $value; 
 ```
 
@@ -768,6 +804,9 @@ public string $value;
 public string $value;
 
 #[StartsWith(['a', 'b'])]
+public string $value;
+
+#[StartsWith('a', 'b')]
 public string $value;
 ```
 
