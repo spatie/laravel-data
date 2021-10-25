@@ -3,7 +3,7 @@ title: From a request
 weight: 5
 ---
 
-Next to manually creating, creating data objects, it is also possible to create a data object by the values given in the request.
+You can create a data object by the values given in the request.
 
 For example, let's say you send a POST request to an endpoint with the following data:
 
@@ -27,13 +27,8 @@ class SongData extends Data
 }
 ```
 
-You can now get the data object anywhere within your application as such:
 
-```php
-app(SongData::class);
-```
-
-Or inject it into your controller:
+You can now inject the `SongData` class in your controller. It will allready be filled with the values found in the request. 
 
 ```php
 class SongController{
@@ -50,36 +45,7 @@ class SongController{
 }
 ```
 
-This works because the package will register a callback into the Laravel container that will be called when the container wants to resolve a data object. It will then look at the request values and try to make a data object out of it.
-
-There's a lot more you can do with this package. It is possible to add validation rules for the requests that will become data objects. You can automatically generate validation rules for data properties, authorize the creation of a data object and much more! Let's dive into it.
-
-## Mapping a request onto a data object
-
-By default, the package will do a one to one mapping from request to the data object, which means that for each property within the data object, a value with the same key will be searched within the request values.
-
-If you want to customize this mapping, then you can always add a magical creation method like this:
-
-```php
-class SongData extends Data
-{
-    public function __construct(
-        public string $title,
-        public string $artist,
-    ) {
-    }
-    
-    public static function fromRequest(Request $request): static
-    {
-        return new self(
-            {$request->input('title_of_song')}, 
-            {$request->input('artist_name')}
-        );
-    }
-}
-```
-
-## Validating a request
+## Using validation
 
 When creating a data object from a request, the package can also validate the values from the request that will be used to construct the data object.
 
@@ -97,11 +63,11 @@ class SongData extends Data
 }
 ```
 
-Now when you provide an artist with a length of more than 20 characters, the validation will fail just like it would when you created a custom request class for the endpoint.
+When you provide an artist with a length of more than 20 characters, the validation will fail just like it would when you created a custom request class for the endpoint.
 
-We've created a comprehensive set of rule attributes. You can find a complete list [here](/docs/laravel-data/v1/advanced-usage/validation-attributes).
+You can find a complete list of available rules [here](/docs/laravel-data/v1/advanced-usage/validation-attributes).
 
-One special attribute is the Rule attribute. With it, you can write rules just like you would when creating a custom Laravel request:
+One special attribute is the `Rule` attribute. With it, you can write rules just like you would when creating a custom Laravel request:
 
 ```php
 // using an array
@@ -158,6 +124,42 @@ class SongData extends Data
     }
 }
 ```
+
+## Mapping a request onto a data object
+
+By default, the package will do a one to one mapping from request to the data object, which means that for each property within the data object, a value with the same key will be searched within the request values.
+
+If you want to customize this mapping, then you can always add a magical creation method like this:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        public string $artist,
+    ) {
+    }
+    
+    public static function fromRequest(Request $request): static
+    {
+        return new self(
+            {$request->input('title_of_song')}, 
+            {$request->input('artist_name')}
+        );
+    }
+}
+```
+
+### Getting the data object filled with request data from anywhere
+
+You can resolve a data object from the container.
+
+```php
+app(SongData::class);
+```
+
+We resolving a data object from the container, it's properties will allready be filled by the values of the request with matching key names. 
+If the request contains data that is not compatible with the data object, a validation exception will be thrown.
 
 ### Automatically inferring rules for properties
 
