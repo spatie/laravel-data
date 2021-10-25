@@ -47,7 +47,7 @@ These types cannot be automatically created. A cast is needed to construct them 
 
 There are two types of casts, local and global casts.
 
-## local casts
+## Local casts
 
 Local casts are defined within the data object itself and can be added using attributes:
 
@@ -143,7 +143,7 @@ class SongData extends Data
 }
 ```
 
-## Creating your casts
+## Creating your own casts
 
 It is possible to create your casts. You can read more about this in the [advanced chapter](/docs/laravel-data/v1/advanced-usage/creating-a-cast).
 
