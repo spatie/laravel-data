@@ -3,7 +3,11 @@ title: Introduction
 weight: 1
 ---
 
-This package tries to be a layer between your backend and the frontend code. By creating a structured data model that both sides must strictly implement we can ensure data will be communicated correctly.
+This package enables the creation of rich data objects which can be used in various ways. Using this package you only need to describe your data once:
+
+- instead of form requests, you can use a data object
+- instead of API transformers, you can use a data object
+- instead of manually writing typescript definitions, you can use... 🥁 a data object
 
 A `laravel-data` specific object is just a regular PHP object that extends from `Data`:
 
