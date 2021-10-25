@@ -10,7 +10,7 @@ use ReflectionProperty;
 
 class DataClass
 {
-    /** @var \Illuminate\Support\Collection */
+    /** @var \Illuminate\Support\Collection<string, string> */
     private Collection $properties;
 
     /** @var array<string, string> */
