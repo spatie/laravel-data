@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use DateTimeInterface;
-use Illuminate\Support\Arr;
 use Stringable;
 
 abstract class ValidationAttribute implements Stringable

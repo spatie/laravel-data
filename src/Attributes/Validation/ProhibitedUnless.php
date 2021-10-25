@@ -14,7 +14,8 @@ class ProhibitedUnless extends ValidationAttribute
         private string $field,
         array | string ...$values
     ) {
-        $this->values = Arr::flatten($values);;
+        $this->values = Arr::flatten($values);
+        ;
     }
 
     public function getRules(): array
