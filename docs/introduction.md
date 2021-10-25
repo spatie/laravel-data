@@ -5,9 +5,9 @@ weight: 1
 
 This package enables the creation of rich data objects which can be used in various ways. Using this package you only need to describe your data once:
 
-- instead of form requests, you can use a data object
-- instead of API transformers, you can use a data object
-- instead of manually writing typescript definitions, you can use... 🥁 a data object
+- instead of a form request, you can use a data object
+- instead of an API transformer, you can use a data object
+- instead of manually writing a typescript definition, you can use... 🥁 a data object
 
 A `laravel-data` specific object is just a regular PHP object that extends from `Data`:
 
