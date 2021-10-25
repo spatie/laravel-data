@@ -50,13 +50,17 @@ It is possible to create transformers for your specific types. You can find more
 Global transformers are defined in the `data.php` config file and are used when no local transformer for a property was added. By default, there are two transformers:
 
 ```php
+use Illuminate\Contracts\Support\Arrayable;
+use Spatie\LaravelData\Transformers\ArrayableTransformer;
+use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
+
 /*
  * Global transformers will take complex types and transform them into simple
  * types.
  */
 'transformers' => [
-    DateTimeInterface::class => \Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer::class,
-    \Illuminate\Contracts\Support\Arrayable::class => \Spatie\LaravelData\Transformers\ArrayableTransformer::class,
+    DateTimeInterface::class => DateTimeInterfaceTransformer::class,
+    Arrayable::class => ArrayableTransformer::class,
 ],
 ```
 
