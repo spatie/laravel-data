@@ -16,15 +16,14 @@ class DataFromArrayResolver
 
     public function execute(string $class, array $values): Data
     {
-        /** @var \Spatie\LaravelData\Data $data */
-        $data = $this->dataConfig->getDataClass($class)
+        $properties = $this->dataConfig
+            ->getDataClass($class)
             ->properties()
-            ->mapWithKeys(fn (DataProperty $property) => [
+            ->mapWithKeys(fn(DataProperty $property) => [
                 $property->name() => $this->resolveValue($property, $values[$property->name()] ?? null),
-            ])
-            ->pipe(fn (Collection $properties) => new $class(...$properties));
+            ]);
 
-        return $data;
+        return $this->createDataObjectWithProperties($class, $properties);
     }
 
     private function resolveValue(DataProperty $property, mixed $value): mixed
@@ -55,7 +54,7 @@ class DataFromArrayResolver
 
         if ($property->isDataCollection()) {
             $items = array_map(
-                fn (array $item) => $this->execute($property->dataClassName(), $item),
+                fn(array $item) => $this->execute($property->dataClassName(), $item),
                 $value
             );
 
@@ -92,5 +91,20 @@ class DataFromArrayResolver
         return ! $property->types()->isEmpty()
             && $property->isBuiltIn()
             && in_array($type, ['bool', 'string', 'int', 'float', 'array']);
+    }
+
+    private function createDataObjectWithProperties(string $class, Collection $properties): Data
+    {
+        if (method_exists($class, '__construct')) {
+            return new $class(...$properties);
+        }
+
+        $data = new $class;
+
+        foreach ($properties as $key => $value) {
+            $data->{$key} = $value;
+        }
+
+        return $data;
     }
 }

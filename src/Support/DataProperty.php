@@ -18,26 +18,26 @@ use TypeError;
 
 class DataProperty
 {
-    private bool $isLazy;
+    protected bool $isLazy;
 
-    private bool $isNullable;
+    protected bool $isNullable;
 
-    private bool $isBuiltIn;
+    protected bool $isBuiltIn;
 
-    private bool $isData;
+    protected bool $isData;
 
-    private bool $isDataCollection;
+    protected bool $isDataCollection;
 
-    private string $dataClassName;
+    protected string $dataClassName;
 
-    private DataPropertyTypes $types;
+    protected DataPropertyTypes $types;
 
     /** @var \Spatie\LaravelData\Attributes\Validation\ValidationAttribute[] */
-    private array $validationAttributes;
+    protected array $validationAttributes;
 
-    private ?WithCast $castAttribute;
+    protected ?WithCast $castAttribute;
 
-    private ?WithTransformer $transformerAttribute;
+    protected ?WithTransformer $transformerAttribute;
 
     public static function create(ReflectionProperty $property): static
     {

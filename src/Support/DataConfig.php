@@ -9,7 +9,7 @@ use Spatie\LaravelData\Transformers\Transformer;
 class DataConfig
 {
     /** @var array<string, \Spatie\LaravelData\Support\DataClass> */
-    private array $dataClasses = [];
+    protected array $dataClasses = [];
 
     /** @var array<string, \Spatie\LaravelData\Transformers\Transformer> */
     protected array $transformers = [];
@@ -18,7 +18,7 @@ class DataConfig
     protected array $casts = [];
 
     /** @var \Spatie\LaravelData\RuleInferrers\RuleInferrer[] */
-    private array $ruleInferrers;
+    protected array $ruleInferrers;
 
     public function __construct(array $config)
     {

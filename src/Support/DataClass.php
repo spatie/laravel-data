@@ -10,13 +10,12 @@ use ReflectionProperty;
 
 class DataClass
 {
-    /** @var \Illuminate\Support\Collection<string, string> */
-    private Collection $properties;
+    protected Collection $properties;
 
     /** @var array<string, string> */
-    private array $creationMethods;
+    protected array $creationMethods;
 
-    private bool $hasAuthorizationMethod;
+    protected bool $hasAuthorizationMethod;
 
     public function __construct(protected ReflectionClass $class)
     {
