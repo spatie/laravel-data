@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use PhpParser\Node\Expr\AssignOp\Mod;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Exceptions\CannotCreateDataFromValue;
 use Spatie\LaravelData\Support\DataConfig;

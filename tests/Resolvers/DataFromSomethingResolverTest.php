@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Util\Exception;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
-use Spatie\LaravelData\Tests\Fakes\DummyEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\TestCase;

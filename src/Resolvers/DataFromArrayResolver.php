@@ -19,7 +19,7 @@ class DataFromArrayResolver
         $properties = $this->dataConfig
             ->getDataClass($class)
             ->properties()
-            ->mapWithKeys(fn(DataProperty $property) => [
+            ->mapWithKeys(fn (DataProperty $property) => [
                 $property->name() => $this->resolveValue($property, $values[$property->name()] ?? null),
             ]);
 
@@ -54,7 +54,7 @@ class DataFromArrayResolver
 
         if ($property->isDataCollection()) {
             $items = array_map(
-                fn(array $item) => $this->execute($property->dataClassName(), $item),
+                fn (array $item) => $this->execute($property->dataClassName(), $item),
                 $value
             );
 
@@ -99,7 +99,7 @@ class DataFromArrayResolver
             return new $class(...$properties);
         }
 
-        $data = new $class;
+        $data = new $class();
 
         foreach ($properties as $key => $value) {
             $data->{$key} = $value;

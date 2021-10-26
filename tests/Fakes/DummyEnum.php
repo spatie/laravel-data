@@ -11,5 +11,4 @@ use Spatie\Enum\Laravel\Enum;
  */
 class DummyEnum extends Enum
 {
-
 }
