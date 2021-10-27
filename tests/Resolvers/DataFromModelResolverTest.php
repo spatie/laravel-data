@@ -26,7 +26,7 @@ class DataFromModelResolverTest extends TestCase
     /** @test */
     public function it_can_get_a_data_object_from_model()
     {
-        $fakeModelClass = new class() extends Model {
+        $fakeModelClass = new class () extends Model {
         };
 
         $model = $fakeModelClass::make([
@@ -44,7 +44,7 @@ class DataFromModelResolverTest extends TestCase
     /** @test */
     public function it_can_get_a_data_object_from_model_with_casts()
     {
-        $fakeModelClass = new class() extends Model {
+        $fakeModelClass = new class () extends Model {
             protected $casts = [
                 'enum' => DummyEnum::class,
             ];
@@ -72,7 +72,7 @@ class DataFromModelResolverTest extends TestCase
     /** @test */
     public function it_can_get_a_data_object_from_model_with_dates()
     {
-        $fakeModelClass = new class() extends Model {
+        $fakeModelClass = new class () extends Model {
             protected $casts = [
                 'date' => 'date',
                 'datetime' => 'datetime',

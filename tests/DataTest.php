@@ -590,7 +590,7 @@ class DataTest extends TestCase
             'enum' => DummyEnum::published(),
         ]);
 
-        $dataClass = new class() extends Data {
+        $dataClass = new class () extends Data {
             public string $string;
 
             public bool $boolean;
