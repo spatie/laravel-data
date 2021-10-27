@@ -162,7 +162,7 @@ The property will only be included when the `is_admin` property of the data obje
 You can also only include a lazy property when a particular relation is loaded on the model as such:
 
 ```php
-Lazy::whenLoaded('songs', fn() => SongData::collection($album->songs));
+Lazy::whenLoaded('songs', $album, fn() => SongData::collection($album->songs));
 ```
 
 Now the property will only be included when the song's relation is loaded on the model.
