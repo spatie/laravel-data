@@ -125,3 +125,36 @@ SongData::optional(null); // returns null
 ```
 
 Underneath the optional method will call the `from` method when a value is given, so you can still magically create data objects. When a null value is given, it will return null.
+
+## Quickly getting data from Models, Requests, ...
+
+By adding the `WithData` trait to a Model, Request or any class that can be magically be converted to a data object, you'll enable support for the `getData` method. This method will automatically generate a data object for the object it is called upon.
+
+For example, let's retake a look at the `Song` model we saw earlier. We can add the `WithData` trait as follows:
+
+```php
+class Song extends Model{
+    use WithData;
+    
+    protected $dataClass = SongData::class;
+}
+```
+
+Now we can quickly get the data object for the model as such:
+
+```php
+Song::firstOrFail($id)->getData(); // A SongData object
+```
+
+You can also use a method to define the data class:
+
+```php
+class Song extends Model{
+    use WithData;
+    
+    protected function dataClass(): string
+    {
+        return SongData::class;
+    }
+}
+```
