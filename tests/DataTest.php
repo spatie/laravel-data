@@ -618,14 +618,14 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_add_the_with_data_trait_to_a_request()
     {
-        $formRequest = new class extends FormRequest{
+        $formRequest = new class() extends FormRequest {
             use WithData;
 
             public string $dataClass = SimpleData::class;
         };
 
         $formRequest->replace([
-            'string' => 'Hello World'
+            'string' => 'Hello World',
         ]);
 
         $data = $formRequest->getData();
@@ -636,14 +636,14 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_add_the_with_data_trait_to_a_model()
     {
-        $model = new class extends Model {
+        $model = new class() extends Model {
             use WithData;
 
             protected string $dataClass = SimpleData::class;
         };
 
         $model->fill([
-            'string' => 'Hello World'
+            'string' => 'Hello World',
         ]);
 
         $data = $model->getData();
@@ -654,13 +654,13 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_define_the_with_data_trait_data_class_by_method()
     {
-        $arrayable = new class implements Arrayable {
+        $arrayable = new class() implements Arrayable {
             use WithData;
 
             public function toArray()
             {
                 return [
-                    'string' => 'Hello World'
+                    'string' => 'Hello World',
                 ];
             }
 
