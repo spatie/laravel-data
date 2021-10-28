@@ -8,14 +8,13 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\TestCase;
 
 class RequiredRuleInferrerTest extends TestCase
 {
     private RequiredRuleInferrer $inferrer;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -25,7 +24,7 @@ class RequiredRuleInferrerTest extends TestCase
     /** @test */
     public function it_wont_add_a_required_rule_when_a_property_is_non_nullable()
     {
-        $dataProperty = $this->getProperty(new class extends Data{
+        $dataProperty = $this->getProperty(new class() extends Data {
             public string $string;
         });
 
@@ -37,7 +36,7 @@ class RequiredRuleInferrerTest extends TestCase
     /** @test */
     public function it_wont_add_a_required_rule_when_a_property_is_nullable()
     {
-        $dataProperty = $this->getProperty(new class extends Data{
+        $dataProperty = $this->getProperty(new class() extends Data {
             public ?string $string;
         });
 
@@ -49,7 +48,7 @@ class RequiredRuleInferrerTest extends TestCase
     /** @test */
     public function it_wont_add_a_required_rule_when_a_property_already_contains_a_required_rule()
     {
-        $dataProperty = $this->getProperty(new class extends Data{
+        $dataProperty = $this->getProperty(new class() extends Data {
             public string $string;
         });
 
@@ -61,7 +60,7 @@ class RequiredRuleInferrerTest extends TestCase
     /** @test */
     public function it_wont_add_a_required_rule_when_a_property_already_contains_a_required_object_rule()
     {
-        $dataProperty = $this->getProperty(new class extends Data{
+        $dataProperty = $this->getProperty(new class() extends Data {
             public string $string;
         });
 
@@ -73,7 +72,7 @@ class RequiredRuleInferrerTest extends TestCase
     /** @test */
     public function it_wont_add_a_required_rule_when_a_property_already_contains_a_boolean_rule()
     {
-        $dataProperty = $this->getProperty(new class extends Data{
+        $dataProperty = $this->getProperty(new class() extends Data {
             public string $string;
         });
 

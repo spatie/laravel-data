@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests\Resolvers;
 
 use ReflectionProperty;
-use Spatie\LaravelData\Attributes\Validation\BooleanType;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
 use Spatie\LaravelData\Attributes\Validation\Rule;
