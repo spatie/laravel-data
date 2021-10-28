@@ -3,7 +3,10 @@
 namespace Spatie\LaravelData\Tests\Resolvers;
 
 use ReflectionProperty;
+use Spatie\LaravelData\Attributes\Validation\BooleanType;
 use Spatie\LaravelData\Attributes\Validation\Max;
+use Spatie\LaravelData\Attributes\Validation\RequiredWith;
+use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Resolvers\DataPropertyValidationRulesResolver;
 use Spatie\LaravelData\Support\DataProperty;
@@ -20,7 +23,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             public int $property;
         });
 
-        $this->assertEquals([
+        $this->assertEqualsCanonicalizing([
             'property' => ['required', 'numeric'],
         ], $rules);
 
@@ -28,7 +31,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             public ?int $property;
         });
 
-        $this->assertEquals([
+        $this->assertEqualsCanonicalizing([
             'property' => ['nullable', 'numeric'],
         ], $rules);
     }
@@ -40,7 +43,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             public string $property;
         });
 
-        $this->assertEquals([
+        $this->assertEqualsCanonicalizing([
             'property' => ['required', 'string'],
         ], $rules);
 
@@ -48,7 +51,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             public int $property;
         });
 
-        $this->assertEquals([
+        $this->assertEqualsCanonicalizing([
             'property' => ['required', 'numeric'],
         ], $rules);
 
@@ -56,15 +59,15 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             public bool $property;
         });
 
-        $this->assertEquals([
-            'property' => ['required', 'boolean'],
+        $this->assertEqualsCanonicalizing([
+            'property' => ['boolean'],
         ], $rules);
 
         $rules = $this->resolveRules(new class () {
             public float $property;
         });
 
-        $this->assertEquals([
+        $this->assertEqualsCanonicalizing([
             'property' => ['required', 'numeric'],
         ], $rules);
 
@@ -72,7 +75,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             public array $property;
         });
 
-        $this->assertEquals([
+        $this->assertEqualsCanonicalizing([
             'property' => ['required', 'array'],
         ], $rules);
     }
@@ -85,7 +88,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             public string $property;
         });
 
-        $this->assertEquals([
+        $this->assertEqualsCanonicalizing([
             'property' => ['required', 'string', 'max:10'],
         ], $rules);
     }
@@ -97,7 +100,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             public SimpleData $property;
         });
 
-        $this->assertEquals([
+        $this->assertEqualsCanonicalizing([
             'property' => ['required', 'array'],
             'property.string' => ['required', 'string'],
         ], $rules);
@@ -106,12 +109,11 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             public ?SimpleData $property;
         });
 
-        $this->assertEquals([
+        $this->assertEqualsCanonicalizing([
             'property' => ['nullable', 'array'],
             'property.string' => ['required', 'string'],
         ], $rules);
     }
-
 
     /** @test */
     public function it_will_take_rules_from_nested_data_collections()
@@ -121,7 +123,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             public DataCollection $property;
         });
 
-        $this->assertEquals([
+        $this->assertEqualsCanonicalizing([
             'property' => ['required', 'array'],
             'property.*.string' => ['required', 'string'],
         ], $rules);
@@ -131,7 +133,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             public ?DataCollection $property;
         });
 
-        $this->assertEquals([
+        $this->assertEqualsCanonicalizing([
             'property' => ['nullable', 'array'],
             'property.*.string' => ['required', 'string'],
         ], $rules);
@@ -144,7 +146,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             public NestedData $property;
         });
 
-        $this->assertEquals([
+        $this->assertEqualsCanonicalizing([
             'property' => ['required', 'array'],
             'property.simple' => ['required', 'array'],
             'property.simple.string' => ['required', 'string'],
@@ -154,9 +156,47 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             public ?SimpleData $property;
         });
 
-        $this->assertEquals([
+        $this->assertEqualsCanonicalizing([
             'property' => ['nullable', 'array'],
             'property.string' => ['required', 'string'],
+        ], $rules);
+    }
+
+    /** @test */
+    public function it_will_never_add_extra_require_rules_when_not_needed()
+    {
+        $rules = $this->resolveRules(new class () {
+            public ?string $property;
+        });
+
+        $this->assertEqualsCanonicalizing([
+            'property' => ['string', 'nullable'],
+        ], $rules);
+
+        $rules = $this->resolveRules(new class () {
+            public bool $property;
+        });
+
+        $this->assertEqualsCanonicalizing([
+            'property' => ['boolean'],
+        ], $rules);
+
+        $rules = $this->resolveRules(new class () {
+            #[RequiredWith('other')]
+            public string $property;
+        });
+
+        $this->assertEqualsCanonicalizing([
+            'property' => ['string', 'required_with:other'],
+        ], $rules);
+
+        $rules = $this->resolveRules(new class () {
+            #[Rule('required_with:other')]
+            public string $property;
+        });
+
+        $this->assertEqualsCanonicalizing([
+            'property' => ['string', 'required_with:other'],
         ], $rules);
     }
 
