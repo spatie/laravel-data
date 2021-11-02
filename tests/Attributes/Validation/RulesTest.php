@@ -980,7 +980,7 @@ class RulesTest extends TestCase
         ];
 
         yield [
-            'attribute' => new Unique('users', 'email', ignore: fn() => 5),
+            'attribute' => new Unique('users', 'email', ignore: fn () => 5),
             'expected' => [(new BaseUnique('users', 'email'))->ignore(5)],
         ];
 
