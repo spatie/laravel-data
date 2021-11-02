@@ -979,6 +979,11 @@ class RulesTest extends TestCase
             'expected' => [(new BaseUnique('users', 'email'))->ignore(5, 'uuid')],
         ];
 
+        yield [
+            'attribute' => new Unique('users', 'email', ignore: fn() => 5),
+            'expected' => [(new BaseUnique('users', 'email'))->ignore(5)],
+        ];
+
         $closure = fn (Builder $builder) => $builder;
 
         yield [

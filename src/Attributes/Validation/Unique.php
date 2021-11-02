@@ -13,7 +13,7 @@ class Unique extends ValidationAttribute
         private string $table,
         private ?string $column = 'NULL',
         private ?string $connection = null,
-        private ?string $ignore = null,
+        private string|Closure|null $ignore = null,
         private ?string $ignoreColumn = null,
         private bool $withoutTrashed = false,
         private string $deletedAtColumn = 'deleted_at',
@@ -33,7 +33,10 @@ class Unique extends ValidationAttribute
         }
 
         if ($this->ignore) {
-            $rule->ignore($this->ignore, $this->ignoreColumn);
+            $rule->ignore(
+                is_callable($this->ignore) ? ($this->ignore)() : $this->ignore,
+                $this->ignoreColumn
+            );
         }
 
         if ($this->where) {
