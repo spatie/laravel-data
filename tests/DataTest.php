@@ -5,6 +5,9 @@ namespace Spatie\LaravelData\Tests;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use DateTime;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
@@ -23,6 +26,7 @@ use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
+use Spatie\LaravelData\WithData;
 
 class DataTest extends TestCase
 {
@@ -609,5 +613,65 @@ class DataTest extends TestCase
         $this->assertTrue(CarbonImmutable::create(2020, 05, 16, 12, 00, 00)->eq($data->date));
         $this->assertNull($data->nullable_date);
         $this->assertTrue($data->enum->equals(DummyEnum::published()));
+    }
+
+    /** @test */
+    public function it_can_add_the_with_data_trait_to_a_request()
+    {
+        $formRequest = new class () extends FormRequest {
+            use WithData;
+
+            public string $dataClass = SimpleData::class;
+        };
+
+        $formRequest->replace([
+            'string' => 'Hello World',
+        ]);
+
+        $data = $formRequest->getData();
+
+        $this->assertEquals(SimpleData::from('Hello World'), $data);
+    }
+
+    /** @test */
+    public function it_can_add_the_with_data_trait_to_a_model()
+    {
+        $model = new class () extends Model {
+            use WithData;
+
+            protected string $dataClass = SimpleData::class;
+        };
+
+        $model->fill([
+            'string' => 'Hello World',
+        ]);
+
+        $data = $model->getData();
+
+        $this->assertEquals(SimpleData::from('Hello World'), $data);
+    }
+
+    /** @test */
+    public function it_can_define_the_with_data_trait_data_class_by_method()
+    {
+        $arrayable = new class () implements Arrayable {
+            use WithData;
+
+            public function toArray()
+            {
+                return [
+                    'string' => 'Hello World',
+                ];
+            }
+
+            protected function dataClass(): string
+            {
+                return SimpleData::class;
+            }
+        };
+
+        $data = $arrayable->getData();
+
+        $this->assertEquals(SimpleData::from('Hello World'), $data);
     }
 }

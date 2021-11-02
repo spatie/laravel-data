@@ -24,7 +24,7 @@ class RequiredRuleInferrerTest extends TestCase
     /** @test */
     public function it_wont_add_a_required_rule_when_a_property_is_non_nullable()
     {
-        $dataProperty = $this->getProperty(new class() extends Data {
+        $dataProperty = $this->getProperty(new class () extends Data {
             public string $string;
         });
 
@@ -36,7 +36,7 @@ class RequiredRuleInferrerTest extends TestCase
     /** @test */
     public function it_wont_add_a_required_rule_when_a_property_is_nullable()
     {
-        $dataProperty = $this->getProperty(new class() extends Data {
+        $dataProperty = $this->getProperty(new class () extends Data {
             public ?string $string;
         });
 
@@ -48,7 +48,7 @@ class RequiredRuleInferrerTest extends TestCase
     /** @test */
     public function it_wont_add_a_required_rule_when_a_property_already_contains_a_required_rule()
     {
-        $dataProperty = $this->getProperty(new class() extends Data {
+        $dataProperty = $this->getProperty(new class () extends Data {
             public string $string;
         });
 
@@ -60,7 +60,7 @@ class RequiredRuleInferrerTest extends TestCase
     /** @test */
     public function it_wont_add_a_required_rule_when_a_property_already_contains_a_required_object_rule()
     {
-        $dataProperty = $this->getProperty(new class() extends Data {
+        $dataProperty = $this->getProperty(new class () extends Data {
             public string $string;
         });
 
@@ -72,7 +72,7 @@ class RequiredRuleInferrerTest extends TestCase
     /** @test */
     public function it_wont_add_a_required_rule_when_a_property_already_contains_a_boolean_rule()
     {
-        $dataProperty = $this->getProperty(new class() extends Data {
+        $dataProperty = $this->getProperty(new class () extends Data {
             public string $string;
         });
 
