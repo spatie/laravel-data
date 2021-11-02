@@ -850,6 +850,9 @@ public string $value;
 
 #[Unique('users', ignore: 5)]
 public string $value;
+
+#[Unique('users', ignore: fn() => request()->get('email'))]
+public string $value;
 ```
 
 ### Url
