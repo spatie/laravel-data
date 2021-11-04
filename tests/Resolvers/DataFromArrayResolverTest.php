@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Tests\Resolvers;
 
+use Carbon\CarbonImmutable;
 use DateTime;
 use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
@@ -59,7 +60,7 @@ class DataFromArrayResolverTest extends TestCase
         $this->assertNull($data->nullable);
         $this->assertEquals(42, $data->mixed);
         $this->assertEquals(DateTime::createFromFormat(DATE_ATOM, '1994-05-16T12:00:00+01:00'), $data->defaultCast);
-        $this->assertEquals(DateTime::createFromFormat('d-m-Y', '16-06-1994'), $data->explicitCast);
+        $this->assertEquals(CarbonImmutable::createFromFormat('d-m-Y', '16-06-1994'), $data->explicitCast);
         $this->assertEquals(SimpleData::from('hello'), $data->nestedData);
         $this->assertEquals(SimpleData::collection([
             SimpleData::from('never'),
