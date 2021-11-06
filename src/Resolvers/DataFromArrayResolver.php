@@ -32,6 +32,10 @@ class DataFromArrayResolver
             return $value;
         }
 
+        if ($property->isData()) {
+            return $property->dataClassName()::from($value);
+        }
+
         if (! $this->shouldBeCasted($property, $value)) {
             return $value;
         }
@@ -48,13 +52,9 @@ class DataFromArrayResolver
             return $value;
         }
 
-        if ($property->isData()) {
-            return $this->execute($property->dataClassName(), $value);
-        }
-
         if ($property->isDataCollection()) {
             $items = array_map(
-                fn (array $item) => $this->execute($property->dataClassName(), $item),
+                fn ($item) => $property->dataClassName()::from($item),
                 $value
             );
 
