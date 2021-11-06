@@ -249,7 +249,7 @@ class AlbumData extends Data
 {
     public function __construct(
         public string $title,
-        /** @var SongData[] */
+        #[CollectionOf(SongData::class)]
         public DataCollection $songs,
     ) {
     }

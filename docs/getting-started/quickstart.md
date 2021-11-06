@@ -309,7 +309,7 @@ class AuthorData extends Data
 {
     public function __construct(
         public string $name,
-        /** @var \App\Data\PostData[] */
+        #[CollectionOf(PostData::class)]
         public DataCollection $posts
     ) {
     }
@@ -512,7 +512,7 @@ class AuthorData extends Data
 {
     public function __construct(
         public string $name,
-        /** @var \App\Data\PostData[] */
+        #[CollectionOf(PostData::class)]
         public DataCollection $posts
     ) {
     }
@@ -578,7 +578,7 @@ class AuthorData extends Data
 {
     public function __construct(
         public string $name,
-        /** @var \App\Data\PostData[] */
+        #[CollectionOf(PostData::class)]
         public DataCollection|Lazy $posts
     ) {
     }

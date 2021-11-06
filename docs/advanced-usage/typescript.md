@@ -19,7 +19,7 @@ class DataObject extends Data{
         public array $array,
         public Lazy|string $lazy,
         public SimpleData $simpleData,
-        /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */
+        #[CollectionOf(SimpleData::class)]
         public DataCollection $dataCollection,
     )
     {

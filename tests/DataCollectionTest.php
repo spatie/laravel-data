@@ -11,6 +11,8 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataCollectionWithAttribute;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataCollectionWithComment;
 
 class DataCollectionTest extends TestCase
 {
@@ -352,5 +354,41 @@ class DataCollectionTest extends TestCase
             ]),
             SimpleData::collection(['A', 'B', 'C'])->toCollection()
         );
+    }
+
+    /** @test */
+    public function it_can_resolve_a_data_collection_with_a_comment()
+    {
+        $data =  SimpleDataCollectionWithComment::from(
+            [
+                'items' => [
+                    ['string' => 'Never gonna give you up!'],
+                    ['string' => 'Never gonna let you down!'],
+                ]
+            ]
+        );
+
+        $this->assertInstanceOf(SimpleData::class, $data->items[0]);
+        $this->assertEquals('Never gonna give you up!', $data->items[0]->string);
+        $this->assertInstanceOf(SimpleData::class, $data->items[1]);
+        $this->assertEquals('Never gonna let you down!', $data->items[1]->string);
+    }
+
+    /** @test */
+    public function it_can_resolve_a_data_collection_with_an_attribute()
+    {
+        $data =  SimpleDataCollectionWithAttribute::from(
+            [
+               'items' => [
+                   ['string' => 'Never gonna give you up!'],
+                   ['string' => 'Never gonna let you down!'],
+               ]
+            ]
+        );
+
+        $this->assertInstanceOf(SimpleData::class, $data->items[0]);
+        $this->assertEquals('Never gonna give you up!', $data->items[0]->string);
+        $this->assertInstanceOf(SimpleData::class, $data->items[1]);
+        $this->assertEquals('Never gonna let you down!', $data->items[1]->string);
     }
 }

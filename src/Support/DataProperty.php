@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
+use Spatie\LaravelData\Attributes\CollectionOf;
 use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
@@ -141,6 +142,14 @@ class DataProperty
         }
 
         if ($this->isDataCollection) {
+
+            $attributes = $this->property->getAttributes(CollectionOf::class)[0] ?? null;
+            $class = $attributes?->getArguments()[0] ?? null;
+
+            if (is_subclass_of($class, Data::class)) {
+                return $this->dataClassName = $class;
+            }
+
             $comment = $this->property->getDocComment();
 
             if ($comment === false) {
