@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data-resource` will be documented in this file.
 
+## 1.0.5 - 2021-11-10
+
+- change data property types collection checking procedure
+
 ## 1.0.4 - 2021-11-04
 
 - revert allow ignoring with a closure within a unique rule

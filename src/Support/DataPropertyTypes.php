@@ -40,7 +40,7 @@ class DataPropertyTypes
                 return true;
             }
 
-            if (is_a($type, $propertyType, true)) {
+            if (is_a($propertyType, $type, true)) {
                 return true;
             }
         }
