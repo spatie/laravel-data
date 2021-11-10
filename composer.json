@@ -18,7 +18,8 @@
     "require": {
         "php": "^8.0",
         "illuminate/contracts": "^8.64",
-        "spatie/laravel-package-tools": "^1.9.0",
+        "phpdocumentor/type-resolver": "^1.5",
+        "spatie/laravel-package-tools": "^1.9.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.14",

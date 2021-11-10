@@ -320,10 +320,48 @@ class DataPropertyTest extends TestCase
     {
         $helper = $this->resolveHelper(new class () {
             /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[]|\Spatie\LaravelData\DataCollection */
+            public DataCollection $property;
+        });
+
+        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+
+        $helper = $this->resolveHelper(new class () {
             /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[]|DataCollection */
+            public DataCollection $property;
+        });
+
+        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+
+        $helper = $this->resolveHelper(new class () {
             /** @var \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\Tests\Fakes\SimpleData[] */
+            public DataCollection $property;
+        });
+
+        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+
+        $helper = $this->resolveHelper(new class () {
             /** @var DataCollection|\Spatie\LaravelData\Tests\Fakes\SimpleData[] */
+            public DataCollection $property;
+        });
+
+        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+
+        $helper = $this->resolveHelper(new class () {
             /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */
+            public DataCollection $property;
+        });
+
+        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+
+        $helper = $this->resolveHelper(new class () {
+            /** @var \Spatie\LaravelData\DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData> */
+            public DataCollection $property;
+        });
+
+        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+
+        $helper = $this->resolveHelper(new class () {
+            /** @var SimpleData[] */
             public DataCollection $property;
         });
 

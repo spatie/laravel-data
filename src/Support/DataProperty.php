@@ -2,10 +2,10 @@
 
 namespace Spatie\LaravelData\Support;
 
-use Illuminate\Support\Str;
 use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
@@ -38,6 +38,8 @@ class DataProperty
     protected ?WithCast $castAttribute;
 
     protected ?WithTransformer $transformerAttribute;
+
+    protected ?DataCollectionOf $dataCollectionOfAttribute;
 
     public static function create(ReflectionProperty $property): static
     {
@@ -126,6 +128,15 @@ class DataProperty
         return $this->transformerAttribute;
     }
 
+    public function dataCollectionOfAttribute(): ?DataCollectionOf
+    {
+        if (! isset($this->dataCollectionOfAttribute)) {
+            $this->loadAttributes();
+        }
+
+        return $this->dataCollectionOfAttribute;
+    }
+
     /**
      * @return class-string<\Spatie\LaravelData\Data>
      */
@@ -141,20 +152,7 @@ class DataProperty
         }
 
         if ($this->isDataCollection) {
-            $comment = $this->property->getDocComment();
-
-            if ($comment === false) {
-                throw CannotFindDataTypeForProperty::missingDataCollectionAnotation($this->className(), $this->name());
-            }
-
-            // TODO: make this more robust, because it isnt
-            $class = (string) Str::of($comment)->after('@var \\')->before('[]');
-
-            if (! is_subclass_of($class, Data::class)) {
-                throw CannotFindDataTypeForProperty::wrongDataCollectionAnnotation($this->className(), $this->name());
-            }
-
-            return $this->dataClassName = $class;
+            return $this->dataClassName = $this->resolveDataCollectionClass();
         }
 
         throw CannotFindDataTypeForProperty::noDataReferenceFound($this->className(), $this->name());
@@ -251,6 +249,21 @@ class DataProperty
         }
     }
 
+    private function resolveDataCollectionClass(): string
+    {
+        if ($attribute = $this->dataCollectionOfAttribute()) {
+            return $attribute->class;
+        }
+
+        $class = (new DataCollectionAnnotationReader())->getClass($this->property);
+
+        if ($class === null) {
+            throw CannotFindDataTypeForProperty::wrongDataCollectionAnnotation($this->className(), $this->name());
+        }
+
+        return $class;
+    }
+
     private function loadAttributes(): void
     {
         $validationAttributes = [];
@@ -275,6 +288,12 @@ class DataProperty
 
                 continue;
             }
+
+            if ($initiatedAttribute instanceof DataCollectionOf) {
+                $this->dataCollectionOfAttribute = $initiatedAttribute;
+
+                continue;
+            }
         }
 
         $this->validationAttributes = $validationAttributes;
@@ -285,6 +304,10 @@ class DataProperty
 
         if (! isset($this->transformerAttribute)) {
             $this->transformerAttribute = null;
+        }
+
+        if (! isset($this->dataCollectionOfAttribute)) {
+            $this->dataCollectionOfAttribute = null;
         }
     }
 }
