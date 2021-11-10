@@ -19,7 +19,6 @@
         "php": "^8.0",
         "illuminate/contracts": "^8.64",
         "spatie/laravel-package-tools": "^1.9.0",
-        "spatie/test-time": "^1.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.14",
@@ -32,7 +31,8 @@
         "spatie/laravel-typescript-transformer": "^2.0",
         "spatie/phpunit-snapshot-assertions": "^4.2",
         "nette/php-generator": "^3.5",
-        "vimeo/psalm": "^4.4"
+        "vimeo/psalm": "^4.4",
+        "spatie/test-time": "^1.2"
     },
     "autoload": {
         "psr-4": {
