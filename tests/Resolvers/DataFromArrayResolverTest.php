@@ -4,8 +4,13 @@ namespace Spatie\LaravelData\Tests\Resolvers;
 
 use Carbon\CarbonImmutable;
 use DateTime;
+use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
+use Spatie\LaravelData\Tests\Fakes\DummyModel;
+use Spatie\LaravelData\Tests\Fakes\ModelData;
+use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
+use Spatie\LaravelData\Tests\Fakes\NestedModelData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 
@@ -114,5 +119,68 @@ class DataFromArrayResolverTest extends TestCase
             SimpleData::from('you'),
             SimpleData::from('up'),
         ]), $data->nestedCollection);
+    }
+
+    /** @test */
+    public function it_will_allow_a_nested_data_object_to_handle_their_own_types()
+    {
+        $model = new DummyModel(['id' => 10]);
+
+        /** @var \Spatie\LaravelData\Tests\Fakes\NestedModelData $data */
+        $withoutModelData = $this->action->execute(
+            NestedModelData::class,
+            [
+                'model' => [
+                    'id' => 10,
+                ],
+            ]
+        );
+
+        $this->assertInstanceOf(NestedModelData::class, $withoutModelData);
+        $this->assertEquals(10, $withoutModelData->model->id);
+
+        /** @var \Spatie\LaravelData\Tests\Fakes\NestedModelData $data */
+        $withModelData = $this->action->execute(
+            NestedModelData::class,
+            [
+                'model' => $model,
+            ]
+        );
+
+        $this->assertInstanceOf(NestedModelData::class, $withModelData);
+        $this->assertEquals(10, $withModelData->model->id);
+    }
+
+    /** @test */
+    public function it_will_allow_a_nested_collection_object_to_handle_its_own_types()
+    {
+        $items = [
+            ['id' => 10],
+            ['id' => 20],
+        ];
+
+        $scenariosData = [
+            $items,
+            array_map(fn($item) => new DummyModel($item), $items),
+            new DataCollection(ModelData::class, $items),
+        ];
+
+        foreach ($scenariosData as $scenarioData) {
+
+            /** @var \Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData $data */
+            $data = $this->action->execute(
+                NestedModelCollectionData::class,
+                [
+                    'models' => $scenarioData,
+                ]
+            );
+
+            $this->assertInstanceOf(NestedModelCollectionData::class, $data);
+            $this->assertInstanceOf(DataCollection::class, $data->models);
+            $this->assertInstanceOf(ModelData::class, $data->models[0]);
+            $this->assertEquals(10, $data->models[0]->id);
+            $this->assertInstanceOf(ModelData::class, $data->models[1]);
+            $this->assertEquals(20, $data->models[1]->id);
+        }
     }
 }
