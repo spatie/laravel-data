@@ -9,7 +9,7 @@ For example, let's say you send a POST request to an endpoint with the following
 
 ```json
 {
-    "song" : "Never gonna give you up",
+    "title" : "Never gonna give you up",
     "artist" : "Rick Astley"
 }
 ```
