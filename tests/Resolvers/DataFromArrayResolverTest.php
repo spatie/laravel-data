@@ -161,7 +161,7 @@ class DataFromArrayResolverTest extends TestCase
 
         $scenariosData = [
             $items,
-            array_map(fn($item) => new DummyModel($item), $items),
+            array_map(fn ($item) => new DummyModel($item), $items),
             new DataCollection(ModelData::class, $items),
         ];
 

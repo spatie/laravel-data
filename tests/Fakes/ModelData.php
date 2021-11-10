@@ -8,7 +8,7 @@ class ModelData extends Data
 {
     public function __construct(
         public int $id
-    ){
+    ) {
     }
 
     public static function fromDummyModel(DummyModel $model)
