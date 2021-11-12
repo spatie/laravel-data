@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support;
 
-use phpDocumentor\Reflection\Fqsen;
 use phpDocumentor\Reflection\FqsenResolver;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use ReflectionProperty;
@@ -11,7 +10,8 @@ use Spatie\LaravelData\Data;
 class DataCollectionAnnotationReader
 {
     public function getClass(
-        ReflectionProperty $reflectionProperty): ?string
+        ReflectionProperty $reflectionProperty
+    ): ?string
     {
         $comment = $reflectionProperty->getDocComment();
 
