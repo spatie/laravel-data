@@ -11,8 +11,7 @@ class DataCollectionAnnotationReader
 {
     public function getClass(
         ReflectionProperty $reflectionProperty
-    ): ?string
-    {
+    ): ?string {
         $comment = $reflectionProperty->getDocComment();
 
         if ($comment === false) {
