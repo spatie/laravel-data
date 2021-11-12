@@ -2,15 +2,18 @@
 
 namespace Spatie\LaravelData\Tests\Support;
 
+use Generator;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Exceptions\CannotFindDataTypeForProperty;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
@@ -44,13 +47,13 @@ class DataPropertyTest extends TestCase
         $this->assertFalse($helper->isLazy());
 
         $helper = $this->resolveHelper(new class () {
-            public int | Lazy $property;
+            public int|Lazy $property;
         });
 
         $this->assertTrue($helper->isLazy());
 
         $helper = $this->resolveHelper(new class () {
-            public int | Lazy | null $property;
+            public int|Lazy|null $property;
         });
 
         $this->assertTrue($helper->isLazy());
@@ -72,7 +75,7 @@ class DataPropertyTest extends TestCase
         $this->assertTrue($helper->isNullable());
 
         $helper = $this->resolveHelper(new class () {
-            public null | int $property;
+            public null|int $property;
         });
 
         $this->assertTrue($helper->isNullable());
@@ -94,7 +97,7 @@ class DataPropertyTest extends TestCase
         $this->assertTrue($helper->isData());
 
         $helper = $this->resolveHelper(new class () {
-            public SimpleData | Lazy $property;
+            public SimpleData|Lazy $property;
         });
 
         $this->assertTrue($helper->isData());
@@ -116,7 +119,7 @@ class DataPropertyTest extends TestCase
         $this->assertTrue($helper->isDataCollection());
 
         $helper = $this->resolveHelper(new class () {
-            public DataCollection | Lazy $property;
+            public DataCollection|Lazy $property;
         });
 
         $this->assertTrue($helper->isDataCollection());
@@ -132,19 +135,19 @@ class DataPropertyTest extends TestCase
         $this->assertTrue($helper->isBuiltIn());
 
         $helper = $this->resolveHelper(new class () {
-            public int | float $property;
+            public int|float $property;
         });
 
         $this->assertTrue($helper->isBuiltIn());
 
         $helper = $this->resolveHelper(new class () {
-            public int | Lazy $property;
+            public int|Lazy $property;
         });
 
         $this->assertTrue($helper->isBuiltIn());
 
         $helper = $this->resolveHelper(new class () {
-            public int | Lazy | null $property;
+            public int|Lazy|null $property;
         });
 
         $this->assertTrue($helper->isBuiltIn());
@@ -156,7 +159,7 @@ class DataPropertyTest extends TestCase
         $this->assertFalse($helper->isBuiltIn());
 
         $helper = $this->resolveHelper(new class () {
-            public DataCollection | null $property;
+            public DataCollection|null $property;
         });
 
         $this->assertFalse($helper->isBuiltIn());
@@ -212,19 +215,19 @@ class DataPropertyTest extends TestCase
         $this->assertEquals(['int'], $helper->types()->all());
 
         $helper = $this->resolveHelper(new class () {
-            public int | float $property;
+            public int|float $property;
         });
 
         $this->assertEquals(['int', 'float'], $helper->types()->all());
 
         $helper = $this->resolveHelper(new class () {
-            public int | Lazy $property;
+            public int|Lazy $property;
         });
 
         $this->assertEquals(['int'], $helper->types()->all());
 
         $helper = $this->resolveHelper(new class () {
-            public int | Lazy | null $property;
+            public int|Lazy|null $property;
         });
 
         $this->assertEquals(['int'], $helper->types()->all());
@@ -236,7 +239,7 @@ class DataPropertyTest extends TestCase
         $this->expectException(InvalidDataPropertyType::class);
 
         $this->resolveHelper(new class () {
-            public SimpleData | int $property;
+            public SimpleData|int $property;
         });
     }
 
@@ -246,7 +249,7 @@ class DataPropertyTest extends TestCase
         $this->expectException(InvalidDataPropertyType::class);
 
         $this->resolveHelper(new class () {
-            public DataCollection | int $property;
+            public DataCollection|int $property;
         });
     }
 
@@ -315,57 +318,109 @@ class DataPropertyTest extends TestCase
         $this->assertEquals(SimpleData::class, $helper->dataClassName());
     }
 
-    /** @test */
-    public function it_can_get_the_data_class_for_a_data_collection()
+    /**
+     * @test
+     * @dataProvider correctAnnotationsDataProvider
+     */
+    public function it_can_get_the_data_class_for_a_data_collection_by_annotation(
+        string $property,
+        ?string $expected
+    ) {
+        $dataProperty = DataProperty::create(new ReflectionProperty(CollectionAnnotationsData::class, $property));
+
+        $this->assertEquals($expected, $dataProperty->dataClassName());
+    }
+
+    public function correctAnnotationsDataProvider(): Generator
     {
-        $helper = $this->resolveHelper(new class () {
-            /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[]|\Spatie\LaravelData\DataCollection */
-            public DataCollection $property;
-        });
+        yield [
+            'property' => 'propertyA',
+            'expected' => SimpleData::class,
+        ];
 
-        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+        yield [
+            'property' => 'propertyB',
+            'expected' => SimpleData::class,
+        ];
 
-        $helper = $this->resolveHelper(new class () {
-            /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[]|DataCollection */
-            public DataCollection $property;
-        });
+        yield [
+            'property' => 'propertyC',
+            'expected' => SimpleData::class,
+        ];
 
-        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+        yield [
+            'property' => 'propertyD',
+            'expected' => SimpleData::class,
+        ];
 
-        $helper = $this->resolveHelper(new class () {
-            /** @var \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\Tests\Fakes\SimpleData[] */
-            public DataCollection $property;
-        });
+        yield [
+            'property' => 'propertyE',
+            'expected' => SimpleData::class,
+        ];
 
-        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+        yield [
+            'property' => 'propertyF',
+            'expected' => SimpleData::class,
+        ];
 
-        $helper = $this->resolveHelper(new class () {
-            /** @var DataCollection|\Spatie\LaravelData\Tests\Fakes\SimpleData[] */
-            public DataCollection $property;
-        });
+        yield [
+            'property' => 'propertyG',
+            'expected' => SimpleData::class,
+        ];
 
-        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+        yield [
+            'property' => 'propertyH',
+            'expected' => SimpleData::class,
+        ];
 
-        $helper = $this->resolveHelper(new class () {
-            /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */
-            public DataCollection $property;
-        });
+        yield [
+            'property' => 'propertyI',
+            'expected' => SimpleData::class,
+        ];
 
-        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+        yield [
+            'property' => 'propertyJ',
+            'expected' => SimpleData::class,
+        ];
 
-        $helper = $this->resolveHelper(new class () {
-            /** @var \Spatie\LaravelData\DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData> */
-            public DataCollection $property;
-        });
+        yield [
+            'property' => 'propertyK',
+            'expected' => SimpleData::class,
+        ];
 
-        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+        yield [
+            'property' => 'propertyL',
+            'expected' => SimpleData::class,
+        ];
+    }
 
-        $helper = $this->resolveHelper(new class () {
-            /** @var SimpleData[] */
-            public DataCollection $property;
-        });
+    /**
+     * @test
+     * @dataProvider invalidAnnotationsDataProvider
+     */
+    public function it_cannot_get_the_data_class_for_invalid_annotations(
+        string $property,
+    ) {
+        $dataProperty = DataProperty::create(new ReflectionProperty(CollectionAnnotationsData::class, $property));
 
-        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+        $this->expectException(CannotFindDataTypeForProperty::class);
+
+        $dataProperty->dataClassName();
+    }
+
+    public function invalidAnnotationsDataProvider(): Generator
+    {
+        yield [
+            'property' => 'propertyM',
+        ];
+
+        yield [
+            'property' => 'propertyN',
+        ];
+
+        yield [
+            'property' => 'propertyO',
+        ];
     }
 
     private function resolveHelper(object $class): DataProperty

@@ -2,11 +2,12 @@
 
 All notable changes to `laravel-data-resource` will be documented in this file.
 
-## 1.0.5 - 2021-11-10
+## 1.1.0 - 2021-11-12
 
 - change data property types collection checking procedure
 - move `spatie/test-time` dependency to require-dev
 - expand support for nested data object creation (#19)
+- expand support for annotating data collections
 
 ## 1.0.4 - 2021-11-04
 

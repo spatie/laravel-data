@@ -18,6 +18,6 @@ class CannotFindDataTypeForProperty extends Exception
 
     public static function wrongDataCollectionAnnotation(string $class, string $propertyName): self
     {
-        return new self("Data collection property `{$propertyName}` in `{$class}` has an annotation that isn't a data object");
+        return new self("Data collection property `{$propertyName}` in `{$class}` has an annotation that isn't a data object or is missing an annotation");
     }
 }

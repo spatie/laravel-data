@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Tests\Fakes;
 
+use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\DataCollection;
 
 class CollectionAnnotationsData
@@ -39,11 +40,14 @@ class CollectionAnnotationsData
     /** @var SimpleData[] */
     public DataCollection $propertyK;
 
-    /** @var SimpleData */
+    #[DataCollectionOf(SimpleData::class)]
     public DataCollection $propertyL;
 
-    /** @var \Spatie\LaravelData\Lazy[] */
+    /** @var SimpleData */
     public DataCollection $propertyM;
 
+    /** @var \Spatie\LaravelData\Lazy[] */
     public DataCollection $propertyN;
+
+    public DataCollection $propertyO;
 }

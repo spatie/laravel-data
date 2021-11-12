@@ -81,3 +81,51 @@ foreach ($songs as $song){
 }
 ```
 
+## Typing data within your collections
+
+When nesting a data collection into your data object, always type the kind of data objects that will be stored within the collection:
+
+```php
+class AlbumData extends Data
+{
+    public function __construct(
+        public string $title,
+        /** @var SongData[] */
+        public DataCollection $songs,
+    ) {
+    }
+}
+```
+
+Because we typed `$songs` as `SongData[]`, the package automatically knows it should create `SongData` objects when creating an `AlbumData` object from an array.
+
+There are quite a few ways to type data collections:
+
+```php
+// Without namespace
+
+/** @var SongData[] */
+public DataCollection $songs;
+
+// With namespace
+
+/** @var \App\Data\SongData[] */
+public DataCollection $songs;
+
+// As an array
+
+/** @var array<SongData> */
+public DataCollection $songs;
+
+// As a data collection
+
+/** @var \Spatie\LaravelData\DataCollection<SongData> */
+public DataCollection $songs;
+
+// With an attribute
+
+#[DataCollectionOf(SongData::class)]
+public DataCollection $songs;
+```
+
+You're free to use one of these annotations/attributes as long as you're using one of them when adding a data collection to a data object.
