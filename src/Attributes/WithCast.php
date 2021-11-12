@@ -12,7 +12,7 @@ class WithCast
     public array $arguments;
 
     public function __construct(
-        /** @var class-string<\Spatie\LaravelData\Casts\Cast> */
+        /** @var class-string<\Spatie\LaravelData\Casts\Cast> $castClass */
         public string $castClass,
         mixed ...$arguments
     ) {

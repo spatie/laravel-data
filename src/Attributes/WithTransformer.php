@@ -12,7 +12,7 @@ class WithTransformer
     public array $arguments;
 
     public function __construct(
-        /** @var class-string<\Spatie\LaravelData\Transformers\Transformer> */
+        /** @var class-string<\Spatie\LaravelData\Transformers\Transformer> $transformerClass */
         public string $transformerClass,
         mixed ...$arguments
     ) {
