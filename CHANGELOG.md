@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-data-resource` will be documented in this file.
 
+## 1.2.0 - 2021-11-16
+
+- when creating data objects, we now will always run validation when a `Request` object is given not only when a data object is injected
+- removal of `DataFromRequestResolver`
+- added `DataValidatorResolver`
+
 ## 1.1.0 - 2021-11-12
 
 - change data property types collection checking procedure
