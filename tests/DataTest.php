@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Tests;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use DateTime;
-use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
@@ -681,11 +680,11 @@ class DataTest extends TestCase
     /** @test */
     public function it_always_validates_requests_when_passed_to_the_from_method()
     {
-        try{
+        try {
             RequestData::from(new Request());
-        }catch (ValidationException $exception){
+        } catch (ValidationException $exception) {
             $this->assertEquals([
-                'string' => ['The string field is required.']
+                'string' => ['The string field is required.'],
             ], $exception->errors());
 
             return;

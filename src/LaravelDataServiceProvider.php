@@ -20,7 +20,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
     {
         $this->app->singleton(
             DataConfig::class,
-            fn() => new DataConfig(config('data'))
+            fn () => new DataConfig(config('data'))
         );
 
         /** @psalm-suppress UndefinedInterfaceMethod */
@@ -31,7 +31,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
             $this->app->bind(
                 $class,
-                fn() => $class::from($this->app->make(Request::class)),
+                fn () => $class::from($this->app->make(Request::class)),
             );
         });
     }
