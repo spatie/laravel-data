@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -11,36 +12,60 @@ use Spatie\LaravelData\Support\DataConfig;
 
 class DataFromSomethingResolver
 {
-    public function __construct(protected DataConfig $dataConfig)
-    {
+    public function __construct(
+        protected DataConfig $dataConfig,
+        protected DataValidatorResolver $dataValidatorResolver,
+        protected DataFromModelResolver $dataFromModelResolver,
+        protected DataFromArrayResolver $dataFromArrayResolver,
+    ) {
     }
 
-    public function execute(
-        string $class,
-        mixed $value
-    ): Data {
+    public function execute(string $class, mixed $value): Data
+    {
+        if ($value instanceof Request) {
+            $this->ensureRequestIsValid($class, $value);
+        }
+
         /** @var class-string<\Spatie\LaravelData\Data>|\Spatie\LaravelData\Data $class */
         if ($customCreationMethod = $this->resolveCustomCreationMethod($class, $value)) {
             return $class::$customCreationMethod($value);
         }
 
         if ($value instanceof Model) {
-            return app(DataFromModelResolver::class)->execute($class, $value);
+            return $this->dataFromModelResolver->execute($class, $value);
         }
 
         if ($value instanceof Request) {
-            return app(DataFromArrayResolver::class)->execute($class, $value->all());
+            return $this->dataFromArrayResolver->execute($class, $value->all());
         }
 
         if ($value instanceof Arrayable) {
-            return app(DataFromArrayResolver::class)->execute($class, $value->toArray());
+            return $this->dataFromArrayResolver->execute($class, $value->toArray());
         }
 
         if (is_array($value)) {
-            return app(DataFromArrayResolver::class)->execute($class, $value);
+            return $this->dataFromArrayResolver->execute($class, $value);
         }
 
         throw CannotCreateDataFromValue::create($class, $value);
+    }
+
+    private function ensureRequestIsValid(string $class, Request $value): void
+    {
+        /** @var \Spatie\LaravelData\Data|string $class */
+        if ($this->dataConfig->getDataClass($class)->hasAuthorizationMethod()) {
+            $this->ensureRequestIsAuthorized($class);
+        }
+
+        $this->dataValidatorResolver->execute($class, $value)->validate();
+    }
+
+    private function ensureRequestIsAuthorized(string $class): void
+    {
+        /** @psalm-suppress UndefinedMethod */
+        if ($class::authorized() === false) {
+            throw new AuthorizationException();
+        }
     }
 
     private function resolveCustomCreationMethod(string $class, mixed $payload): ?string

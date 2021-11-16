@@ -5,9 +5,11 @@ namespace Spatie\LaravelData\Tests;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use DateTime;
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
@@ -23,6 +25,7 @@ use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\EmptyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
+use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
@@ -673,5 +676,21 @@ class DataTest extends TestCase
         $data = $arrayable->getData();
 
         $this->assertEquals(SimpleData::from('Hello World'), $data);
+    }
+
+    /** @test */
+    public function it_always_validates_requests_when_passed_to_the_from_method()
+    {
+        try{
+            RequestData::from(new Request());
+        }catch (ValidationException $exception){
+            $this->assertEquals([
+                'string' => ['The string field is required.']
+            ], $exception->errors());
+
+            return;
+        }
+
+        $this->fail('We should not end up here');
     }
 }

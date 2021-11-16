@@ -3,27 +3,14 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Validator;
-use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
+use Spatie\LaravelData\Resolvers\DataValidatorResolver;
 
 trait ValidateableData
 {
-    public static function validate(Arrayable | array $payload): static
+    public static function validate(Arrayable|array $payload): static
     {
-        $rules = app(DataValidationRulesResolver::class)
-            ->execute(static::class)
-            ->merge(static::rules())
-            ->toArray();
-
-        $validator = ValidatorFacade::make(
-            $payload instanceof Arrayable ? $payload->toArray() : $payload,
-            $rules,
-            static::messages(),
-            static::attributes()
-        );
-
-        static::withValidator($validator);
+        $validator = app(DataValidatorResolver::class)->execute(static::class, $payload);
 
         $validator->validate();
 

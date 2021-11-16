@@ -2,7 +2,7 @@
 
 namespace Spatie\LaravelData;
 
-use Spatie\LaravelData\Resolvers\DataFromRequestResolver;
+use Illuminate\Http\Request;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -20,7 +20,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
     {
         $this->app->singleton(
             DataConfig::class,
-            fn () => new DataConfig(config('data'))
+            fn() => new DataConfig(config('data'))
         );
 
         /** @psalm-suppress UndefinedInterfaceMethod */
@@ -31,7 +31,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
             $this->app->bind(
                 $class,
-                fn () => $this->app->make(DataFromRequestResolver::class)->get($class),
+                fn() => $class::from($this->app->make(Request::class)),
             );
         });
     }
