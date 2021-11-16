@@ -604,7 +604,7 @@ public ?string $value;
 [Docs](https://laravel.com/docs/8.x/validation#rule-password)
 
 ```php
-#[Password(length: 12, letters: true, mixedCase: true, numbers: false, symbols: false, uncompromised: true, uncompromisedThreshold: 0)]
+#[Password(min: 12, letters: true, mixedCase: true, numbers: false, symbols: false, uncompromised: true, uncompromisedThreshold: 0)]
 public string $value; 
 ```
 
