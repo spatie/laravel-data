@@ -680,6 +680,8 @@ class DataTest extends TestCase
     /** @test */
     public function it_always_validates_requests_when_passed_to_the_from_method()
     {
+        RequestData::clear();
+
         try {
             RequestData::from(new Request());
         } catch (ValidationException $exception) {
