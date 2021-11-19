@@ -47,7 +47,7 @@ class RequestDataTest extends TestCase
     {
         $this->invalidRequest()
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['string' => 'The string must not be greater than 10 characters.']);
+            ->assertJsonValidationErrors(['string' => __('validation.max.string', ['attribute' => 'string', 'max' => 10])]);
     }
 
     /** @test */
@@ -82,7 +82,7 @@ class RequestDataTest extends TestCase
 
         $this->invalidRequest()
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['string' => 'The data property must not be greater than 10 characters.']);
+            ->assertJsonValidationErrors(['string' => __('validation.max.string', ['attribute' => 'data property', 'max' => 10])]);
     }
 
     /** @test */
