@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Exceptions\CannotCreateDataFromValue;
+use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataConfig;
 
 class DataFromSomethingResolver

@@ -4,11 +4,12 @@ namespace Spatie\LaravelData\Tests\Resolvers;
 
 use Carbon\CarbonImmutable;
 use DateTime;
-use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\ModelData;
+use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -130,9 +131,7 @@ class DataFromArrayResolverTest extends TestCase
         $withoutModelData = $this->action->execute(
             NestedModelData::class,
             [
-                'model' => [
-                    'id' => 10,
-                ],
+                'model' => ['id' => 10],
             ]
         );
 
@@ -154,33 +153,59 @@ class DataFromArrayResolverTest extends TestCase
     /** @test */
     public function it_will_allow_a_nested_collection_object_to_handle_its_own_types()
     {
-        $items = [
-            ['id' => 10],
-            ['id' => 20],
-        ];
+        /** @var \Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData $data */
+        $data = $this->action->execute(
+            NestedModelCollectionData::class,
+            [
+                'models' => [['id' => 10], ['id' => 20],],
+            ]
+        );
 
-        $scenariosData = [
-            $items,
-            array_map(fn ($item) => new DummyModel($item), $items),
-            new DataCollection(ModelData::class, $items),
-        ];
+        $this->assertInstanceOf(NestedModelCollectionData::class, $data);
+        $this->assertEquals(
+            ModelData::collection([['id' => 10], ['id' => 20]]),
+            $data->models
+        );
 
-        foreach ($scenariosData as $scenarioData) {
+        /** @var \Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData $data */
+        $data = $this->action->execute(
+            NestedModelCollectionData::class,
+            [
+                'models' => [new DummyModel(['id' => 10]), new DummyModel(['id' => 20]),],
+            ]
+        );
 
-            /** @var \Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData $data */
-            $data = $this->action->execute(
-                NestedModelCollectionData::class,
-                [
-                    'models' => $scenarioData,
-                ]
-            );
+        $this->assertInstanceOf(NestedModelCollectionData::class, $data);
+        $this->assertEquals(
+            ModelData::collection([['id' => 10], ['id' => 20]]),
+            $data->models
+        );
 
-            $this->assertInstanceOf(NestedModelCollectionData::class, $data);
-            $this->assertInstanceOf(DataCollection::class, $data->models);
-            $this->assertInstanceOf(ModelData::class, $data->models[0]);
-            $this->assertEquals(10, $data->models[0]->id);
-            $this->assertInstanceOf(ModelData::class, $data->models[1]);
-            $this->assertEquals(20, $data->models[1]->id);
-        }
+        /** @var \Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData $data */
+        $data = $this->action->execute(
+            NestedModelCollectionData::class,
+            [
+                'models' => ModelData::collection([['id' => 10], ['id' => 20]]),
+            ]
+        );
+
+        $this->assertInstanceOf(NestedModelCollectionData::class, $data);
+        $this->assertEquals(
+            ModelData::collection([['id' => 10], ['id' => 20]]),
+            $data->models
+        );
+    }
+
+    /** @test */
+    public function it_works_nicely_with_lazy_data()
+    {
+        /** @var \Spatie\LaravelData\Tests\Fakes\NestedLazyData $data */
+        $data = $this->action->execute(
+            NestedLazyData::class,
+            ['simple' => Lazy::create(fn() => SimpleData::from('Hello'))]
+        );
+
+        $this->assertInstanceOf(Lazy::class, $data->simple);
+        $this->assertEquals(Lazy::create(fn() => SimpleData::from('Hello')), $data->simple);
     }
 }
