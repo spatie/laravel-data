@@ -202,10 +202,10 @@ class DataFromArrayResolverTest extends TestCase
         /** @var \Spatie\LaravelData\Tests\Fakes\NestedLazyData $data */
         $data = $this->action->execute(
             NestedLazyData::class,
-            ['simple' => Lazy::create(fn() => SimpleData::from('Hello'))]
+            ['simple' => Lazy::create(fn () => SimpleData::from('Hello'))]
         );
 
         $this->assertInstanceOf(Lazy::class, $data->simple);
-        $this->assertEquals(Lazy::create(fn() => SimpleData::from('Hello')), $data->simple);
+        $this->assertEquals(Lazy::create(fn () => SimpleData::from('Hello')), $data->simple);
     }
 }

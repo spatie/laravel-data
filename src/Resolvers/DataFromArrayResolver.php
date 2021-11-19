@@ -33,7 +33,7 @@ class DataFromArrayResolver
             return $value;
         }
 
-        if($value instanceof Lazy){
+        if ($value instanceof Lazy) {
             return $value;
         }
 
