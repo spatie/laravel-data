@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-data-resource` will be documented in this file.
 
+## 1.2.1 - 2021-11-19
+
+- fixes an issue where data object could not be created when it had lazy nested data object
+- fixes windows test suite
+
 ## 1.2.0 - 2021-11-16
 
 - when creating data objects, we now will always run validation when a `Request` object is given not only when a data object is injected
