@@ -1,5 +1,6 @@
 ---
-title: Creating a data object weight: 1
+title: Creating a data object 
+weight: 1
 ---
 
 Let's get started with the following simple data object:
