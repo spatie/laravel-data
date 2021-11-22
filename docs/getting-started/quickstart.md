@@ -660,7 +660,7 @@ class PostData extends Data
     public static function fromModel(Post $post): PostData
     {
         return new self(
-            Lazy::create(fn() => $post->title),,
+            Lazy::create(fn() => $post->title),
             Lazy::create(fn() => $post->content),
             Lazy::create(fn() => $post->status),
             Lazy::create(fn() => $post->published_at)
