@@ -101,7 +101,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         return new ArrayIterator($this->transform(TransformationType::withoutValueTransforming()));
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->items);
     }
