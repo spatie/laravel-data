@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data-resource` will be documented in this file.
 
+## 1.2.3 - 2021-12-03
+
+- fix return type notice message
+
 ## 1.2.1 - 2021-11-19
 
 - fixes an issue where data object could not be created when it had lazy nested data object
