@@ -33,6 +33,7 @@ class DateTimeInterfaceCast implements Cast
         }
 
         if ($datetime === false) {
+            /** @psalm-suppress InvalidCast,InvalidArgument */
             throw CannotCastDate::create($format, $type, $value);
         }
 
