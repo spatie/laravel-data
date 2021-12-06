@@ -284,6 +284,35 @@ class SongData extends Data
 
 If the method returns `false`, then an `AuthorizationException` is thrown.
 
+## Validating a collection of data objects:
+
+Let's say we want to create a data object like this from a request:
+
+```php
+class AlbumData extends Data
+{
+    public function __construct(
+        public string $title,
+        /** @var SongData[] */
+        public DataCollection $songs,
+    ) {
+    }
+}
+```
+
+Since the `SongData` has its own validation rules, the package will automatically apply them when resolving validation rules for this object. 
+
+In this case the validation rules for `AlbumData` would look like this:
+
+```php
+[
+    'title' => ['required', 'string'],
+    'songs' => ['required', 'array'],
+    'songs.*.title' => ['required', 'string'],
+    'songs.*.artist' => ['required', 'string'],
+]
+```
+
 ## Validating a data object without request
 
 It is also possible to validate values for a data object without using a request:
