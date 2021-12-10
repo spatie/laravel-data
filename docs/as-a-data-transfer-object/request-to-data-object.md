@@ -275,7 +275,7 @@ class SongData extends Data
     ) {
     }
 
-    public static function authorize(): bool
+    public static function authorized(): bool
     {
         return Auth::user()->name === 'Ruben';
     }

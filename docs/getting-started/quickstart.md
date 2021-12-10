@@ -158,7 +158,7 @@ Since we're working with requests, wouldn't it be cool to validate the data comi
 ```php
 class PostDataRequest extends FormRequest
 {
-    public function authorize()
+    public function authorized()
     {
         return false;
     }
