@@ -155,7 +155,7 @@ Sometimes you only want to include a property when a specific condition is true.
 Lazy::when($this->is_admin, fn() => SongData::collection($album->songs));
 ```
 
-The property will only be included when the `is_admin` property of the data object is true.
+The property will only be included when the `is_admin` property of the data object is true. It is not possible to include the property later on with the `include` method when a condition is not accepted.
 
 ### Relational Lazy properties
 

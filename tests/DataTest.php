@@ -219,7 +219,7 @@ class DataTest extends TestCase
     }
 
     /** @test */
-    public function it_can_have_conditional_lazy_data_manually_loaded()
+    public function it_cannot_have_conditional_lazy_data_manually_loaded()
     {
         $blueprint = new class () extends Data {
             public function __construct(
@@ -237,7 +237,7 @@ class DataTest extends TestCase
 
         $data = $blueprint::create('Freek');
 
-        $this->assertEquals(['name' => 'Freek'], $data->include('name')->toArray());
+        $this->assertEmpty($data->include('name')->toArray());
     }
 
     /** @test */

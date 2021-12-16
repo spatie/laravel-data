@@ -27,11 +27,6 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
     use AppendableData;
     use ValidateableData;
 
-    /**
-     * - Maybe add support for the dto package casts?
-     * - Add regex to dataproperty
-     */
-
     public static function optional($payload): ?static
     {
         return $payload === null

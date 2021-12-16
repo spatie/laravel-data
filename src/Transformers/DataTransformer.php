@@ -75,6 +75,10 @@ class DataTransformer
             return true;
         }
 
+        if ($value->isConditional()) {
+            return ($value->getCondition())();
+        }
+
         if ($this->isPropertyExcluded($name, $excludes, $allowedExcludes)) {
             return false;
         }
@@ -116,7 +120,7 @@ class DataTransformer
             return true;
         }
 
-        if ($value->shouldInclude()) {
+        if ($value->isDefaultIncluded()) {
             return true;
         }
 

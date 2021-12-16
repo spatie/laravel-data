@@ -48,17 +48,19 @@ class Lazy
         return $this;
     }
 
-    public function shouldInclude(): bool
+    public function isConditional(): bool
     {
-        if ($this->defaultIncluded) {
-            return true;
-        }
+        return $this->condition !== null;
+    }
 
-        if ($this->condition === null) {
-            return false;
-        }
+    public function getCondition(): Closure
+    {
+        return $this->condition;
+    }
 
-        return ($this->condition)();
+    public function isDefaultIncluded(): bool
+    {
+        return $this->defaultIncluded ?? false;
     }
 
     public function resolve(): mixed
