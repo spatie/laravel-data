@@ -180,7 +180,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
 
     protected function ensureAllItemsAreData()
     {
-        $closure = fn($item) => $item instanceof Data ? $item : $this->dataClass::from($item);
+        $closure = fn ($item) => $item instanceof Data ? $item : $this->dataClass::from($item);
 
         $this->items = $this->isPaginated()
             ? $this->items->through($closure)
