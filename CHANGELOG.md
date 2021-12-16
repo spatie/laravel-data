@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-data-resource` will be documented in this file.
 
+## 1.2.4 - 2021-12-16
+
+- rename the `authorized` method to `authorize`
+- disable the behavior were excluded conditional properties still could be included
+
 ## 1.2.3 - 2021-12-03
 
 - fix return type notice message
