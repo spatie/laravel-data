@@ -42,12 +42,4 @@ class TransformationType
             self::REQUEST => true,
         };
     }
-
-    public function wrapCollectionInKey(): bool
-    {
-        return match ($this->type) {
-            self::FULL, self::WITHOUT_VALUE_TRANSFORMING => false,
-            self::REQUEST => true,
-        };
-    }
 }
