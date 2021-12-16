@@ -20,6 +20,7 @@ class DataCollectionTransformer
         protected Enumerable|CursorPaginator|Paginator $items,
         protected ?Closure $through,
         protected ?Closure $filter,
+        protected ?string $wrapKey,
     ) {
     }
 
@@ -40,7 +41,7 @@ class DataCollectionTransformer
 
     protected function transformCollection(Enumerable $items): array
     {
-        return $items->map($this->transformItemClosure())
+        $items = $items->map($this->transformItemClosure())
             ->when(
                 $this->filter !== null,
                 fn (Enumerable $collection) => $collection->filter($this->filter)->values()
@@ -50,6 +51,10 @@ class DataCollectionTransformer
                 fn (Enumerable $collection) => $collection->map(fn (Data $data) => $data->transform($this->transformationType))
             )
             ->all();
+
+        return $this->wrapKey === null
+            ? $items
+            : [$this->wrapKey => $items];
     }
 
     protected function transformItemClosure(): Closure
@@ -68,7 +73,7 @@ class DataCollectionTransformer
     protected function wrapPaginatedArray(array $paginated): array
     {
         return [
-            'data' => $paginated['data'],
+            $this->wrapKey ?? 'data' => $paginated['data'],
             'meta' => Arr::except($paginated, [
                 'data',
                 'links',

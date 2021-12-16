@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Http\JsonResponse;
+use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Support\TransformationType;
 
 trait ResponsableData
@@ -22,7 +23,11 @@ trait ResponsableData
             $this->exclude(...explode(',', $request->get('exclude')));
         }
 
-        return new JsonResponse($this->transform(TransformationType::request()));
+        $data = $this instanceof DataCollection
+            ? $this->transform(TransformationType::request(), 'data')
+            : $this->transform(TransformationType::request());
+
+        return new JsonResponse($data);
     }
 
     public function allowedRequestIncludes(): ?array

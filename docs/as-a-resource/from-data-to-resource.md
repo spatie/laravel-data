@@ -130,16 +130,41 @@ SongData::collection(Song::all());
 A collection can be returned in a controller and will automatically be transformed to JSON:
 
 ```json
-[
-    {
-        "name": "Never Gonna Give You Up",
-        "artist": "Rick Astley"
-    },
-    {
-        "name": "Giving Up on Love",
-        "artist": "Rick Astley"
-    }
-]
+{
+    "data" : [
+        {
+            "name" : "Never Gonna Give You Up",
+            "artist" : "Rick Astley"
+        },
+        {
+            "name" : "Giving Up on Love",
+            "artist" : "Rick Astley"
+        }
+    ]
+}
+```
+
+It is possible to change the data key as such:
+
+```php
+SongData::collection(Song::all())->wrapKey('items');
+```
+
+The transformed JSON now looks like this:
+
+```json
+{
+    "items" : [
+        {
+            "name" : "Never Gonna Give You Up",
+            "artist" : "Rick Astley"
+        },
+        {
+            "name" : "Giving Up on Love",
+            "artist" : "Rick Astley"
+        }
+    ]
+}
 ```
 
 You can also transform a collection of data objects into an array:

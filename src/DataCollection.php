@@ -38,7 +38,8 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
 
     public function __construct(
         private string $dataClass,
-        Enumerable|array|CursorPaginator|Paginator $items
+        Enumerable|array|CursorPaginator|Paginator $items,
+        private ?string $wrapKey = null
     ) {
         $this->items = is_array($items) ? new Collection($items) : $items;
 
@@ -66,7 +67,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
             : $this->items->all();
     }
 
-    public function transform(TransformationType $type): array
+    public function transform(TransformationType $type, ?string $wrapKey = null): array
     {
         $transformer = new DataCollectionTransformer(
             $this->dataClass,
@@ -75,7 +76,8 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
             $this->getExclusionTree(),
             $this->items,
             $this->through,
-            $this->filter
+            $this->filter,
+            $this->wrapKey ?? $wrapKey,
         );
 
         return $transformer->transform();
@@ -111,6 +113,13 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
         $items = $this->items;
 
         return $items;
+    }
+
+    public function wrapKey(string $key): static
+    {
+        $this->wrapKey = $key;
+
+        return $this;
     }
 
     public function getIterator(): ArrayIterator
@@ -171,7 +180,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
 
     protected function ensureAllItemsAreData()
     {
-        $closure = fn ($item) => $item instanceof Data ? $item : $this->dataClass::from($item);
+        $closure = fn($item) => $item instanceof Data ? $item : $this->dataClass::from($item);
 
         $this->items = $this->isPaginated()
             ? $this->items->through($closure)
