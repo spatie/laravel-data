@@ -76,7 +76,7 @@ class DataClass
         $methods = collect($this->class->getMethods(ReflectionMethod::IS_STATIC));
 
         $this->hasAuthorizationMethod = $methods->contains(
-            fn (ReflectionMethod $method) => $method->getName() === 'authorized' && $method->isPublic()
+            fn (ReflectionMethod $method) => in_array($method->getName(), ['authorize', 'authorized']) && $method->isPublic()
         );
 
         $this->creationMethods = $methods

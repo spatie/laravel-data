@@ -179,6 +179,14 @@ class RequestDataTest extends TestCase
     }
 
     /** @test */
+    public function it_can_check_for_authorisation_with_wrong_method_name()
+    {
+        RequestData::$enableAuthorizedFailure = true;
+
+        $this->validRequest()->assertStatus(403);
+    }
+
+    /** @test */
     public function it_can_manually_override_how_the_data_object_will_be_constructed()
     {
         DataBlueprintFactory::new('OverrideableDataFromRequest')

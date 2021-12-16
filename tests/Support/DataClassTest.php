@@ -67,19 +67,19 @@ class DataClassTest extends TestCase
     public function it_can_check_if_a_data_class_has_an_authorisation_method()
     {
         $withMethod = new class (null) extends Data {
-            public static function authorized(): bool
+            public static function authorize(): bool
             {
             }
         };
 
         $withNonStaticMethod = new class (null) extends Data {
-            public function authorized(): bool
+            public function authorize(): bool
             {
             }
         };
 
         $withNonPublicMethod = new class (null) extends Data {
-            protected static function authorized(): bool
+            protected static function authorize(): bool
             {
             }
         };

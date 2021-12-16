@@ -63,7 +63,13 @@ class DataFromSomethingResolver
     private function ensureRequestIsAuthorized(string $class): void
     {
         /** @psalm-suppress UndefinedMethod */
-        if ($class::authorized() === false) {
+        // TODO: remove this with the next major release
+        if (method_exists($class, 'authorized') && $class::authorized() === false) {
+            throw new AuthorizationException();
+        }
+
+        /** @psalm-suppress UndefinedMethod */
+        if (method_exists($class, 'authorize') && $class::authorize() === false) {
             throw new AuthorizationException();
         }
     }
