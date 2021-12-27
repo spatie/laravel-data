@@ -143,8 +143,8 @@ class SongData extends Data
     public static function fromRequest(Request $request): static
     {
         return new self(
-            {$request->input('title_of_song')}, 
-            {$request->input('artist_name')}
+            $request->input('title_of_song'), 
+            $request->input('artist_name')
         );
     }
 }
