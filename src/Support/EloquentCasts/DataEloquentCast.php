@@ -22,10 +22,7 @@ class DataEloquentCast implements CastsAttributes
 
         $payload = json_decode($value, true, flags: JSON_THROW_ON_ERROR);
 
-        /** @var \Spatie\LaravelData\Data $data */
-        $data = ($this->dataClass)::from($payload);
-
-        return $data;
+        return ($this->dataClass)::from($payload);
     }
 
     public function set($model, string $key, $value, array $attributes): ?string
