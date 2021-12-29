@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\RuleInferrers;
 
+use Illuminate\Contracts\Validation\Rule as CustomRuleInterface;
 use Illuminate\Validation\Rules\RequiredIf;
 use Spatie\LaravelData\Support\DataProperty;
 
@@ -22,12 +23,13 @@ class RequiredRuleInferrer implements RuleInferrer
             return false;
         }
 
+
         foreach ($rules as $rule) {
             if ($rule === 'boolean') {
                 return false;
             }
 
-            if (str_starts_with($rule, 'required')) {
+            if (is_string($rule) && str_starts_with($rule, 'required')) {
                 return false;
             }
 

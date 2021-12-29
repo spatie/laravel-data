@@ -53,7 +53,7 @@ class Lazy
         return $this->condition !== null;
     }
 
-    public function getCondition(): Closure
+    public function getCondition(): ?Closure
     {
         return $this->condition;
     }

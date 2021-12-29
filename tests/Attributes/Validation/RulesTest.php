@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Generator;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Validation\Rules\Enum as EnumRule;
 use Illuminate\Validation\Rules\Exists as BaseExists;
 use Illuminate\Validation\Rules\In as BaseIn;
 use Illuminate\Validation\Rules\NotIn as BaseNotIn;
@@ -37,6 +38,7 @@ use Spatie\LaravelData\Attributes\Validation\Dimensions;
 use Spatie\LaravelData\Attributes\Validation\Distinct;
 use Spatie\LaravelData\Attributes\Validation\Email;
 use Spatie\LaravelData\Attributes\Validation\EndsWith;
+use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\ExcludeIf;
 use Spatie\LaravelData\Attributes\Validation\ExcludeUnless;
 use Spatie\LaravelData\Attributes\Validation\Exists;
@@ -209,6 +211,12 @@ class RulesTest extends TestCase
             'attribute' => new DigitsBetween(5, 10),
             'expected' => ['digits_between:5,10'],
         ];
+
+        yield [
+            'attribute' => new Enum('enum_class'),
+            'expected' => [new EnumRule('enum_class')],
+        ];
+
 
         yield [
             'attribute' => new ExcludeIf('field', true),

@@ -338,6 +338,15 @@ public string $value;
 public string $value;
 ```
 
+### Enum
+
+[Docs](https://laravel.com/docs/8.x/validation#rule-enum)
+
+```php
+#[Enum(ChannelType::class)]
+public string $value;
+```
+
 ### ExcludeIf
 
 [Docs](https://laravel.com/docs/8.x/validation#rule-exclude-if)

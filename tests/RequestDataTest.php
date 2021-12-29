@@ -7,6 +7,8 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
@@ -37,7 +39,7 @@ class RequestDataTest extends TestCase
     /** @test */
     public function it_can_pass_validation()
     {
-        $this->validRequest()
+        $this->performRequest('Hello')
             ->assertOk()
             ->assertJson(['given' => 'Hello']);
     }
@@ -45,7 +47,7 @@ class RequestDataTest extends TestCase
     /** @test */
     public function it_can_fail_validation()
     {
-        $this->invalidRequest()
+        $this->performRequest('Hello World')
             ->assertStatus(422)
             ->assertJsonValidationErrors(['string' => __('validation.max.string', ['attribute' => 'string', 'max' => 10])]);
     }
@@ -55,9 +57,45 @@ class RequestDataTest extends TestCase
     {
         RequestData::$rules = ['string' => 'max:200'];
 
-        $this->invalidRequest()
+        $this->performRequest('Accepted string longer then 10 characters from attribute on data object')
             ->assertOk()
-            ->assertJson(['given' => 'Hello world']);
+            ->assertJson(['given' => 'Accepted string longer then 10 characters from attribute on data object']);
+    }
+
+    /** @test */
+    public function it_can_overwrite_rules_like_a_regular_laravel_request()
+    {
+        RequestData::$rules = ['string' => 'min:10|numeric'];
+
+        $this->performRequest('Too short')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'string' => [
+                    __('validation.min.string', ['attribute' => 'string', 'min' => 10]),
+                    __('validation.numeric', ['attribute' => 'string']),
+                ],
+            ]);
+
+        RequestData::$rules = ['string' => ['min:10', 'numeric']];
+
+        $this->performRequest('Too short')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'string' => [
+                    __('validation.min.string', ['attribute' => 'string', 'min' => 10]),
+                    __('validation.numeric', ['attribute' => 'string']),
+                ],
+            ]);
+
+        RequestData::$rules = ['string' => Rule::in(['alpha', 'beta'])];
+
+        $this->performRequest('Not in list')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'string' => [
+                    __('validation.in', ['attribute' => 'string']),
+                ],
+            ]);
     }
 
     /** @test */
@@ -67,7 +105,7 @@ class RequestDataTest extends TestCase
             'max' => 'too long',
         ];
 
-        $this->invalidRequest()
+        $this->performRequest('Hello World')
             ->assertStatus(422)
             ->assertJsonValidationErrors(['string' => 'too long']);
     }
@@ -80,7 +118,7 @@ class RequestDataTest extends TestCase
             'string' => 'data property',
         ];
 
-        $this->invalidRequest()
+        $this->performRequest('Hello world')
             ->assertStatus(422)
             ->assertJsonValidationErrors(['string' => __('validation.max.string', ['attribute' => 'data property', 'max' => 10])]);
     }
@@ -88,9 +126,9 @@ class RequestDataTest extends TestCase
     /** @test */
     public function it_can_change_the_validator()
     {
-        RequestData::$validatorClosure = fn (Validator $validator) => $validator->setRules([]);
+        RequestData::$validatorClosure = fn(Validator $validator) => $validator->setRules([]);
 
-        $this->invalidRequest()
+        $this->performRequest('Hello world')
             ->assertOk()
             ->assertJson(['given' => 'Hello world']);
     }
@@ -175,7 +213,7 @@ class RequestDataTest extends TestCase
     {
         RequestData::$enableAuthorizeFailure = true;
 
-        $this->validRequest()->assertStatus(403);
+        $this->performRequest('Hello')->assertStatus(403);
     }
 
     /** @test */
@@ -183,7 +221,7 @@ class RequestDataTest extends TestCase
     {
         RequestData::$enableAuthorizedFailure = true;
 
-        $this->validRequest()->assertStatus(403);
+        $this->performRequest('Hello')->assertStatus(403);
     }
 
     /** @test */
@@ -211,17 +249,10 @@ class RequestDataTest extends TestCase
             ->assertJson(['name' => 'Rick Astley']);
     }
 
-    private function validRequest(): TestResponse
+    private function performRequest(string $string): TestResponse
     {
         return $this->postJson('/example-route', [
-            'string' => 'Hello',
-        ]);
-    }
-
-    private function invalidRequest(): TestResponse
-    {
-        return $this->postJson('/example-route', [
-            'string' => 'Hello world',
+            'string' => $string,
         ]);
     }
 }

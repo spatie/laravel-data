@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Tests\RuleInferrers;
 
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 use ReflectionClass;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer;
@@ -79,6 +80,18 @@ class RequiredRuleInferrerTest extends TestCase
         $rules = $this->inferrer->handle($dataProperty, ['boolean']);
 
         $this->assertEqualsCanonicalizing(['boolean'], $rules);
+    }
+
+    /** @test */
+    public function it_has_support_for_rules_that_cannot_be_converted_to_string()
+    {
+        $dataProperty = $this->getProperty(new class () extends Data {
+            public string $string;
+        });
+
+        $rules = $this->inferrer->handle($dataProperty, [new Enum('SomeClass')]);
+
+        $this->assertEqualsCanonicalizing(['required', new Enum('SomeClass')], $rules);
     }
 
     private function getProperty(object $class): DataProperty
