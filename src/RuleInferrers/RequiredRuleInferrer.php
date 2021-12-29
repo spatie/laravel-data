@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\RuleInferrers;
 
-use Illuminate\Contracts\Validation\Rule as CustomRuleInterface;
 use Illuminate\Validation\Rules\RequiredIf;
 use Spatie\LaravelData\Support\DataProperty;
 
