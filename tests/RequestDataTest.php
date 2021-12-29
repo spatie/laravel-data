@@ -91,9 +91,7 @@ class RequestDataTest extends TestCase
         $this->performRequest('Not in list')
             ->assertStatus(422)
             ->assertJsonValidationErrors([
-                'string' => [
-                    __('validation.in', ['attribute' => 'string']),
-                ],
+                'string' => __('validation.in', ['attribute' => 'string']),
             ]);
     }
 
