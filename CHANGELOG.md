@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-data-resource` will be documented in this file.
 
+## 1.2.5 - 2021-12-29
+
+- fixes the RequiredRuleResolver to support custom rules like `Enum`
+- add an Enum validation rule attribute
+
 ## 1.2.4 - 2021-12-16
 
 - rename the `authorized` method to `authorize`
