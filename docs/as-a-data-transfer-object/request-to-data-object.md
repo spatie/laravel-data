@@ -28,7 +28,7 @@ class SongData extends Data
 ```
 
 
-You can now inject the `SongData` class in your controller. It will allready be filled with the values found in the request. 
+You can now inject the `SongData` class in your controller. It will already be filled with the values found in the request. 
 
 ```php
 class SongController{
