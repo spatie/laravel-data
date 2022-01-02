@@ -189,7 +189,7 @@ It is possible to change data objects in a collection:
 ```php
 $allSongs = Song::all());
 
-SongData::collection($allSongs)->transform(function(SongData $song){
+SongData::collection($allSongs)->through(function(SongData $song){
     $song->artist = 'Abba';
     
     return $song;
