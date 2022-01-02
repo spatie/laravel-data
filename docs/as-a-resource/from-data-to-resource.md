@@ -187,7 +187,7 @@ The data object is smart enough to create a paginated response from this with li
 It is possible to change data objects in a collection:
 
 ```php
-$allSongs = Song::all());
+$allSongs = Song::all();
 
 SongData::collection($allSongs)->transform(function(SongData $song){
     $song->artist = 'Abba';
