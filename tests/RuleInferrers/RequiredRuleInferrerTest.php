@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Tests\RuleInferrers;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use ReflectionClass;
-use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer;
 use Spatie\LaravelData\Support\DataClass;

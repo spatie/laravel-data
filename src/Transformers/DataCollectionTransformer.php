@@ -43,10 +43,11 @@ class DataCollectionTransformer
         return $items->map($this->transformItemClosure())
             ->when(
                 $this->filter !== null,
-                fn(Enumerable $collection) => $collection->filter($this->filter)->values())
+                fn (Enumerable $collection) => $collection->filter($this->filter)->values()
+            )
             ->when(
                 $this->transformationType->useTransformers(),
-                fn(Enumerable $collection) => $collection->map(fn(Data $data) => $data->transform($this->transformationType))
+                fn (Enumerable $collection) => $collection->map(fn (Data $data) => $data->transform($this->transformationType))
             )
             ->all();
     }
