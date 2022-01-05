@@ -110,7 +110,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
 
         $this->assertEqualsCanonicalizing([
             'property' => ['nullable', 'array'],
-            'property.string' => ['required', 'string'],
+            'property.string' => ['nullable', 'string'],
         ], $rules);
     }
 
@@ -157,7 +157,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
 
         $this->assertEqualsCanonicalizing([
             'property' => ['nullable', 'array'],
-            'property.string' => ['required', 'string'],
+            'property.string' => ['nullable', 'string'],
         ], $rules);
     }
 

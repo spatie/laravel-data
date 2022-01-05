@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\RuleInferrers;
 
 use Illuminate\Validation\Rules\RequiredIf;
+use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Support\DataProperty;
 
 class RequiredRuleInferrer implements RuleInferrer
@@ -22,9 +23,8 @@ class RequiredRuleInferrer implements RuleInferrer
             return false;
         }
 
-
         foreach ($rules as $rule) {
-            if ($rule === 'boolean') {
+            if (in_array($rule, ['boolean', 'nullable'])) {
                 return false;
             }
 
@@ -32,7 +32,7 @@ class RequiredRuleInferrer implements RuleInferrer
                 return false;
             }
 
-            if ($rule instanceof RequiredIf) {
+            if ($rule instanceof RequiredIf || $rule instanceof Nullable) {
                 return false;
             }
         }

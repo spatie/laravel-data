@@ -8,27 +8,18 @@ use Spatie\LaravelData\Support\DataProperty;
 
 class DataValidationRulesResolver
 {
-    /** @var array<string, \Illuminate\Support\Collection> */
-    protected static $cachedDataObjectRules = [];
-
     public function __construct(protected DataConfig $dataConfig)
     {
     }
 
-    public function execute(string $class): Collection
+    public function execute(string $class, bool $nullable = false): Collection
     {
-        if (array_key_exists($class, self::$cachedDataObjectRules)) {
-            return self::$cachedDataObjectRules[$class];
-        }
-
         $resolver = app(DataPropertyValidationRulesResolver::class);
 
-        $rules = $this->dataConfig->getDataClass($class)
+        return $this->dataConfig->getDataClass($class)
             ->properties()
             ->mapWithKeys(
-                fn (DataProperty $property) => $resolver->execute($property)
+                fn(DataProperty $property) => $resolver->execute($property, $nullable)
             );
-
-        return self::$cachedDataObjectRules[$class] = $rules;
     }
 }
