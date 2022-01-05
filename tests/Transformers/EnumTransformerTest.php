@@ -13,11 +13,11 @@ class EnumTransformerTest extends TestCase
     /** @test */
     public function it_can_transform_enums()
     {
-        if(version_compare(phpversion(), '8.1', '<')){
+        if (version_compare(phpversion(), '8.1', '<')) {
             $this->markTestIncomplete('No enum support in PHP 8.1');
         }
 
-        $transformer = new EnumTransformer;
+        $transformer = new EnumTransformer();
 
         $class = new class () {
             public DummyBackedEnum $enum = DummyBackedEnum::FOO;
