@@ -97,9 +97,14 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     public function toCollection(): Enumerable
     {
-        return $this->isPaginated()
-            ? new Collection($this->items)
-            : $this->items;
+        if ($this->isPaginated()) {
+            throw InvalidDataCollectionModification::cannotCastToCollection();
+        }
+
+        /** @var \Illuminate\Support\Enumerable $items */
+        $items = $this->items;
+
+        return $items;
     }
 
     public function getIterator(): ArrayIterator
