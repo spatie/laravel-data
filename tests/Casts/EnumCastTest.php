@@ -11,7 +11,6 @@ use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyUnitEnum;
 use Spatie\LaravelData\Tests\TestCase;
 
-/** @requires PHP >= 8.1 */
 class EnumCastTest extends TestCase
 {
     protected EnumCast $caster;
@@ -20,7 +19,11 @@ class EnumCastTest extends TestCase
     {
         parent::setUp();
 
-        $this->caster = new EnumCast();
+        if(version_compare(phpversion(), '8.1', '<')){
+            $this->markTestIncomplete('No enum support in PHP 8.1');
+        }
+
+        $this->caster = new EnumCast;
     }
 
     /** @test */
