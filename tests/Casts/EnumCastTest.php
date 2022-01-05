@@ -20,14 +20,13 @@ class EnumCastTest extends TestCase
     {
         parent::setUp();
 
-        $this->caster = new EnumCast;
+        $this->caster = new EnumCast();
     }
 
     /** @test */
     public function it_can_cast_enum()
     {
-        $class = new class()
-        {
+        $class = new class () {
             public DummyBackedEnum $enum;
         };
 
@@ -40,8 +39,7 @@ class EnumCastTest extends TestCase
     /** @test */
     public function it_fails_when_it_cannot_cast_an_enum_from_value()
     {
-        $class = new class()
-        {
+        $class = new class () {
             public DummyBackedEnum $enum;
         };
 
@@ -56,8 +54,7 @@ class EnumCastTest extends TestCase
     /** @test */
     public function it_fails_when_casting_a_unit_enum()
     {
-        $class = new class()
-        {
+        $class = new class () {
             public DummyUnitEnum $enum;
         };
 
@@ -70,8 +67,7 @@ class EnumCastTest extends TestCase
     /** @test */
     public function it_fails_with_other_types()
     {
-        $class = new class()
-        {
+        $class = new class () {
             public int $int;
         };
 

@@ -14,10 +14,9 @@ class EnumTransformerTest extends TestCase
     /** @test */
     public function it_can_transform_enum()
     {
-        $transformer = new EnumTransformer;
+        $transformer = new EnumTransformer();
 
-        $class = new class()
-        {
+        $class = new class () {
             public DummyBackedEnum $enum = DummyBackedEnum::FOO;
         };
 
