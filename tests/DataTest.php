@@ -698,11 +698,5 @@ class DataTest extends TestCase
 
         $this->fail('We should not end up here');
     }
-
-    /** @test */
-    public function dd()
-    {
-        ComplicatedData::from($somethin)->wi
-    }
 }
 

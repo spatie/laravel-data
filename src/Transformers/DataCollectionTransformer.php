@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\TransformationType;
 
@@ -16,7 +17,7 @@ class DataCollectionTransformer
         protected TransformationType $transformationType,
         protected array $inclusionTree,
         protected array $exclusionTree,
-        protected array | CursorPaginator | Paginator  $items,
+        protected Enumerable|CursorPaginator|Paginator $items,
         protected ?Closure $through,
         protected ?Closure $filter,
     ) {
@@ -24,7 +25,7 @@ class DataCollectionTransformer
 
     public function transform(): array
     {
-        if (is_array($this->items)) {
+        if ($this->items instanceof Enumerable) {
             return $this->transformCollection($this->items);
         }
 
@@ -37,17 +38,17 @@ class DataCollectionTransformer
             : $this->items->all();
     }
 
-    protected function transformCollection(array $items): array
+    protected function transformCollection(Enumerable $items): array
     {
-        $items = array_map($this->transformItemClosure(), $items);
-
-        $items = $this->filter
-            ? array_values(array_filter($items, $this->filter))
-            : $items;
-
-        return $this->transformationType->useTransformers()
-            ? array_map(fn (Data $data) => $data->transform($this->transformationType), $items)
-            : $items;
+        return $items->map($this->transformItemClosure())
+            ->when(
+                $this->filter !== null,
+                fn(Enumerable $collection) => $collection->filter($this->filter)->values())
+            ->when(
+                $this->transformationType->useTransformers(),
+                fn(Enumerable $collection) => $collection->map(fn(Data $data) => $data->transform($this->transformationType))
+            )
+            ->all();
     }
 
     protected function transformItemClosure(): Closure

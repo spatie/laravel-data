@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Exceptions;
 
 use Exception;
 
-class InvalidPaginatedDataCollectionModification extends Exception
+class InvalidDataCollectionModification extends Exception
 {
     public static function cannotSetItem(): self
     {

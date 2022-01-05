@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
@@ -42,7 +43,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
         );
     }
 
-    public static function collection(Collection | array | AbstractPaginator | AbstractCursorPaginator | Paginator $items): DataCollection
+    public static function collection(Enumerable | array | AbstractPaginator | AbstractCursorPaginator | Paginator $items): DataCollection
     {
         return new DataCollection(static::class, $items);
     }

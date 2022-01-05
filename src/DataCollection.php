@@ -13,11 +13,13 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
+use Illuminate\Support\LazyCollection;
 use IteratorAggregate;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
-use Spatie\LaravelData\Exceptions\InvalidPaginatedDataCollectionModification;
+use Spatie\LaravelData\Exceptions\InvalidDataCollectionModification;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
 use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Transformers\DataCollectionTransformer;
@@ -31,13 +33,13 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     private ?Closure $filter = null;
 
-    private array | CursorPaginator | Paginator $items;
+    private Enumerable|CursorPaginator|Paginator $items;
 
     public function __construct(
         private string $dataClass,
-        Collection | array | CursorPaginator | Paginator $items
+        Enumerable|array|CursorPaginator|Paginator $items
     ) {
-        $this->items = $items instanceof Collection ? $items->all() : $items;
+        $this->items = is_array($items) ? new Collection($items) : $items;
 
         $this->ensureAllItemsAreData();
     }
@@ -56,9 +58,11 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         return $this;
     }
 
-    public function items(): array | CursorPaginator | Paginator
+    public function items(): array|CursorPaginator|Paginator
     {
-        return $this->items;
+        return $this->isPaginated()
+            ? $this->items
+            : $this->items->all();
     }
 
     public function transform(TransformationType $type): array
@@ -91,9 +95,11 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
         return json_encode($this->toArray(), $options);
     }
 
-    public function toCollection(): Collection
+    public function toCollection(): Enumerable
     {
-        return new Collection($this->items);
+        return $this->isPaginated()
+            ? new Collection($this->items)
+            : $this->items;
     }
 
     public function getIterator(): ArrayIterator
@@ -108,48 +114,34 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     public function offsetExists($offset): bool
     {
-        return match (true) {
-            is_array($this->items) => array_key_exists($offset, $this->items),
-            $this->isPaginated() => array_key_exists($offset, $this->items->items())
-        };
+        return $this->items->offsetExists($offset);
     }
 
     public function offsetGet($offset): Data
     {
-        $item = match (true) {
-            is_array($this->items) => $this->items[$offset],
-            $this->isPaginated() => $this->items->items()[$offset]
-        };
-
-        return $item;
+        return $this->items->offsetGet($offset);
     }
 
     public function offsetSet($offset, $value): void
     {
-        if ($this->isPaginated()) {
-            throw InvalidPaginatedDataCollectionModification::cannotSetItem();
+        if ($this->isPaginated() || $this->items instanceof LazyCollection) {
+            throw InvalidDataCollectionModification::cannotSetItem();
         }
 
         $value = $value instanceof Data
             ? $value
             : $this->dataClass::from($value);
 
-        if (empty($offset)) {
-            $this->items[] = $value;
-
-            return;
-        }
-
-        $this->items[$offset] = $value;
+        $this->items->offsetSet($offset, $value);
     }
 
     public function offsetUnset($offset): void
     {
-        if ($this->isPaginated()) {
-            throw InvalidPaginatedDataCollectionModification::cannotUnSetItem();
+        if ($this->isPaginated() || $this->items instanceof LazyCollection) {
+            throw InvalidDataCollectionModification::cannotUnSetItem();
         }
 
-        unset($this->items[$offset]);
+        $this->offsetUnset($offset);
     }
 
     public function isPaginated(): bool
@@ -168,10 +160,10 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
 
     protected function ensureAllItemsAreData()
     {
-        $closure = fn ($item) => $item instanceof Data ? $item : $this->dataClass::from($item);
+        $closure = fn($item) => $item instanceof Data ? $item : $this->dataClass::from($item);
 
         $this->items = $this->isPaginated()
             ? $this->items->through($closure)
-            : array_map($closure, $this->items);
+            : $this->items->map($closure);
     }
 }
