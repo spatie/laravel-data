@@ -13,6 +13,7 @@ return [
     'transformers' => [
         DateTimeInterface::class => \Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer::class,
         \Illuminate\Contracts\Support\Arrayable::class => \Spatie\LaravelData\Transformers\ArrayableTransformer::class,
+        // BackedEnum::class => Spatie\LaravelData\Transformers\EnumTransformer::class,
     ],
 
     /*
@@ -21,6 +22,7 @@ return [
      */
     'casts' => [
         DateTimeInterface::class => Spatie\LaravelData\Casts\DateTimeInterfaceCast::class,
+        // BackedEnum::class => Spatie\LaravelData\Casts\EnumCast::class,
     ],
 
     /*
