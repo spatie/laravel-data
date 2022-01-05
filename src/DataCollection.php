@@ -141,7 +141,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, IteratorAggreg
             throw InvalidDataCollectionModification::cannotUnSetItem();
         }
 
-        $this->offsetUnset($offset);
+        $this->items->offsetUnset($offset);
     }
 
     public function isPaginated(): bool

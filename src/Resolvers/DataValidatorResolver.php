@@ -17,7 +17,6 @@ class DataValidatorResolver
     {
         $rules = app(DataValidationRulesResolver::class)
             ->execute($dataClass)
-            ->merge($dataClass::rules())
             ->toArray();
 
         $validator = ValidatorFacade::make(

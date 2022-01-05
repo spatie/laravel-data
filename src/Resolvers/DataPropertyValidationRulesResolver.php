@@ -53,10 +53,10 @@ class DataPropertyValidationRulesResolver
 
     private function getRulesForProperty(DataProperty $property, bool $nullable): array
     {
-        return array_reduce(
+        return array_unique(array_reduce(
             $this->dataConfig->getRuleInferrers(),
             fn(array $rules, RuleInferrer $ruleInferrer) => $ruleInferrer->handle($property, $rules),
             $nullable ? ['nullable'] : []
-        );
+        ));
     }
 }

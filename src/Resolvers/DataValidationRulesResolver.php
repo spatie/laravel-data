@@ -16,10 +16,13 @@ class DataValidationRulesResolver
     {
         $resolver = app(DataPropertyValidationRulesResolver::class);
 
+        /** @var class-string<\Spatie\LaravelData\Data> $class */
+        $overWrittenRules = $class::rules();
+
         return $this->dataConfig->getDataClass($class)
             ->properties()
-            ->mapWithKeys(
-                fn(DataProperty $property) => $resolver->execute($property, $nullable)
-            );
+            ->reject(fn(DataProperty $property) => array_key_exists($property->name(), $overWrittenRules))
+            ->mapWithKeys(fn(DataProperty $property) => $resolver->execute($property, $nullable))
+            ->merge($overWrittenRules);
     }
 }

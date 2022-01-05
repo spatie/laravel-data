@@ -124,6 +124,7 @@ class SongData extends Data
     }
 }
 ```
+Rules defined within the `rules` method will always overwrite automatically generated rules.
 
 ## Mapping a request onto a data object
 
