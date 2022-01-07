@@ -340,7 +340,7 @@ class DataPropertyTest extends TestCase
     {
         $this->onlyPHP81();
 
-        $dataProperty = DataProperty::create(new ReflectionProperty(IntersectionTypeData::class, 'property'));
+        $dataProperty = DataProperty::create(new ReflectionProperty(IntersectionTypeData::class, 'intersection'));
 
         $this->assertEquals(new DataPropertyTypes([Arrayable::class, Countable::class]), $dataProperty->types());
     }
