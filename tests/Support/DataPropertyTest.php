@@ -18,6 +18,7 @@ use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\DataPropertyTypes;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\FakeEnum;
+use Spatie\LaravelData\Tests\Fakes\IntersectionTypeData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
@@ -337,11 +338,11 @@ class DataPropertyTest extends TestCase
     /** @test */
     public function it_has_support_for_intersection_types()
     {
-        $helper = $this->resolveHelper(new class () {
-            public Arrayable & Countable $property;
-        });
+        $this->onlyPHP81();
 
-        $this->assertEquals(new DataPropertyTypes([Arrayable::class, Countable::class]), $helper->types());
+        $dataProperty = DataProperty::create(new ReflectionProperty(IntersectionTypeData::class, 'property'));
+
+        $this->assertEquals(new DataPropertyTypes([Arrayable::class, Countable::class]), $dataProperty->types());
     }
 
     /**

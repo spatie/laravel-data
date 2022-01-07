@@ -22,8 +22,10 @@ use Spatie\LaravelData\Tests\Fakes\DummyEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\EmptyData;
+use Spatie\LaravelData\Tests\Fakes\IntersectionTypeData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
+use Spatie\LaravelData\Tests\Fakes\ReadonlyData;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
@@ -698,16 +700,11 @@ class DataTest extends TestCase
     /** @test */
     public function it_has_support_for_readonly_properties()
     {
-        $dataClass = new class ('test') extends Data {
-            public function __construct(
-                public readonly string $string,
-            ) {
-            }
-        };
+        $this->onlyPHP81();
 
-        $data = $dataClass::from(['string' => 'Hello world']);
+        $data = ReadonlyData::from(['string' => 'Hello world']);
 
-        $this->assertInstanceOf(Data::class, $data);
+        $this->assertInstanceOf(ReadonlyData::class, $data);
         $this->assertEquals('Hello world', $data->string);
     }
 
@@ -718,16 +715,9 @@ class DataTest extends TestCase
 
         $collection = collect(['a', 'b', 'c']);
 
-        $dataClass = new class ($collection) extends Data {
-            public function __construct(
-                public Arrayable & \Countable $intersection,
-            ) {
-            }
-        };
+        $data = IntersectionTypeData::from(['intersection' => $collection]);
 
-        $data = $dataClass::from(['intersection' => $collection]);
-
-        $this->assertInstanceOf(Data::class, $data);
+        $this->assertInstanceOf(IntersectionTypeData::class, $data);
         $this->assertEquals($collection, $data->intersection);
     }
 }
