@@ -209,6 +209,8 @@ class DataPropertyTest extends TestCase
     /** @test */
     public function it_can_recognize_an_enum_as_built_in_type()
     {
+        $this->onlyPHP81();
+
         $helper = $this->resolveHelper(new class () {
             public FakeEnum $property;
         });

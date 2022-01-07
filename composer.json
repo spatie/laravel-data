@@ -46,7 +46,7 @@
         }
     },
     "scripts": {
-        "psalm": "vendor/bin/psalm --no-cache",
+        "psalm": "vendor/bin/psalm --no-cache --php-version=8.1",
         "test": "./vendor/bin/testbench package:test --parallel --no-coverage",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },
