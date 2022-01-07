@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-data-resource` will be documented in this file.
 
+## 1.3.1 - 2022-01-07
+
+- add basic support for intersection types
+- allow casting of built in PHP types
+- add support for inferring enum rules
+- fix an issue where an Enum validation attribute would not work
+
 ## 1.2.5 - 2021-12-29
 
 - fixes the RequiredRuleResolver to support custom rules like `Enum`
