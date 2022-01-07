@@ -338,7 +338,7 @@ class DataPropertyTest extends TestCase
     public function it_has_support_for_intersection_types()
     {
         $helper = $this->resolveHelper(new class () {
-            public Arrayable&Countable $property;
+            public Arrayable & Countable $property;
         });
 
         $this->assertEquals(new DataPropertyTypes([Arrayable::class, Countable::class]), $helper->types());

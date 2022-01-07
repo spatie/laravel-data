@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Iterator;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -70,7 +69,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::new('name')->lazy()->withType('string')
         )->create();
 
-        $data = new $dataClass(Lazy::create(fn() => 'test'));
+        $data = new $dataClass(Lazy::create(fn () => 'test'));
 
         $this->assertEquals([], $data->toArray());
 
@@ -106,8 +105,8 @@ class DataTest extends TestCase
         )->create();
 
         $data = new $dataClass(
-            Lazy::create(fn() => LazyData::from('Hello')),
-            Lazy::create(fn() => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
+            Lazy::create(fn () => LazyData::from('Hello')),
+            Lazy::create(fn () => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
         );
 
         $this->assertEquals([], (clone $data)->toArray());
@@ -150,7 +149,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::dataCollection('songs', MultiLazyData::class)->lazy()
         )->create();
 
-        $collection = Lazy::create(fn() => MultiLazyData::collection([
+        $collection = Lazy::create(fn () => MultiLazyData::collection([
             DummyDto::rick(),
             DummyDto::bon(),
         ]));
@@ -205,7 +204,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
+                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
                 );
             }
         };
@@ -231,7 +230,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
+                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
                 );
             }
         };
@@ -247,7 +246,7 @@ class DataTest extends TestCase
         /** @var \Illuminate\Database\Eloquent\Model $model */
         $model = DummyModelWithCasts::make();
 
-        $data = new class (Lazy::whenLoaded('relation', $model, fn() => 'loaded')) extends Data {
+        $data = new class (Lazy::whenLoaded('relation', $model, fn () => 'loaded')) extends Data {
             public function __construct(
                 public string|Lazy $relation,
             ) {
@@ -445,7 +444,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn() => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'),) extends Data {
+        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
             public function __construct(
                 public SimpleData $data,
                 public DataCollection $dataCollection,
@@ -503,7 +502,7 @@ class DataTest extends TestCase
 
         $transformed = $data->additional([
             'company' => 'Spatie',
-            'alt_name' => fn(Data $data) => "{$data->name} from Spatie",
+            'alt_name' => fn (Data $data) => "{$data->name} from Spatie",
         ])->toArray();
 
         $this->assertEquals([
@@ -699,7 +698,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_has_support_for_readonly_properties()
     {
-        $dataClass = new class('test') extends Data {
+        $dataClass = new class ('test') extends Data {
             public function __construct(
                 public readonly string $string,
             ) {
@@ -717,9 +716,9 @@ class DataTest extends TestCase
     {
         $collection = collect(['a', 'b', 'c']);
 
-        $dataClass = new class($collection) extends Data {
+        $dataClass = new class ($collection) extends Data {
             public function __construct(
-                public Arrayable&\Countable $intersection,
+                public Arrayable & \Countable $intersection,
             ) {
             }
         };
