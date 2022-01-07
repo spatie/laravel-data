@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use DateTime;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
+use Spatie\LaravelData\Tests\Fakes\BuiltInTypeWithCastData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\ModelData;
@@ -207,5 +208,18 @@ class DataFromArrayResolverTest extends TestCase
 
         $this->assertInstanceOf(Lazy::class, $data->simple);
         $this->assertEquals(Lazy::create(fn () => SimpleData::from('Hello')), $data->simple);
+    }
+
+    /** @test */
+    public function it_allows_casting_of_built_in_types()
+    {
+        /** @var \Spatie\LaravelData\Tests\Fakes\BuiltInTypeWithCastData $data */
+        $data = $this->action->execute(
+            BuiltInTypeWithCastData::class,
+            ['money' => 3.14]
+        );
+
+        $this->assertIsInt($data->money);
+        $this->assertEquals(314, $data->money);
     }
 }

@@ -49,10 +49,6 @@ class DataFromArrayResolver
             return $castAttribute->get()->cast($property, $value);
         }
 
-        if ($property->isBuiltIn()) {
-            return $value;
-        }
-
         if ($property->types()->isEmpty()) {
             return $value;
         }
