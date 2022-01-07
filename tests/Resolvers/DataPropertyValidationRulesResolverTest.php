@@ -11,9 +11,9 @@ use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Resolvers\DataPropertyValidationRulesResolver;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 use Spatie\LaravelData\Tests\TestCase;
 
 class DataPropertyValidationRulesResolverTest extends TestCase
@@ -225,7 +225,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
         });
 
         $this->assertEqualsCanonicalizing([
-            'property' => ['string', 'required', new EnumRule(FakeEnum::class)]
+            'property' => ['string', 'required', new EnumRule(FakeEnum::class)],
         ], $rules);
     }
 
