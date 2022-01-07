@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Concerns;
 use Illuminate\Http\JsonResponse;
 use Spatie\LaravelData\Support\TransformationType;
 
-/** @mixin \Spatie\LaravelData\Data|\Spatie\LaravelData\DataCollection */
 trait ResponsableData
 {
     /**

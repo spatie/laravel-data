@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Support;
 
+use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
@@ -53,7 +54,7 @@ class DataProperty
         match (true) {
             $type === null => $this->processNoType(),
             $type instanceof ReflectionNamedType => $this->processNamedType($type),
-            $type instanceof ReflectionUnionType => $this->processUnionType($type),
+            $type instanceof ReflectionUnionType, $type instanceof ReflectionIntersectionType => $this->processListType($type),
             default => throw new TypeError(),
         };
 
@@ -184,7 +185,7 @@ class DataProperty
         $this->types = new DataPropertyTypes([$name]);
     }
 
-    private function processUnionType(ReflectionUnionType $type)
+    private function processListType(ReflectionUnionType|ReflectionIntersectionType $type)
     {
         $this->isLazy = false;
         $this->isNullable = false;

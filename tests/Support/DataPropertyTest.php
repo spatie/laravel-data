@@ -2,7 +2,9 @@
 
 namespace Spatie\LaravelData\Tests\Support;
 
+use Countable;
 use Generator;
+use Illuminate\Contracts\Support\Arrayable;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\WithCast;
@@ -13,6 +15,7 @@ use Spatie\LaravelData\Exceptions\CannotFindDataTypeForProperty;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\DataPropertyTypes;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -329,6 +332,16 @@ class DataPropertyTest extends TestCase
         });
 
         $this->assertEquals(SimpleData::class, $helper->dataClassName());
+    }
+
+    /** @test */
+    public function it_has_support_for_intersection_types()
+    {
+        $helper = $this->resolveHelper(new class () {
+            public Arrayable&Countable $property;
+        });
+
+        $this->assertEquals(new DataPropertyTypes([Arrayable::class, Countable::class]), $helper->types());
     }
 
     /**
