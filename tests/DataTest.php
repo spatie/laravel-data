@@ -714,6 +714,8 @@ class DataTest extends TestCase
     /** @test */
     public function it_has_support_for_intersection_types()
     {
+        $this->onlyPHP81();
+
         $collection = collect(['a', 'b', 'c']);
 
         $dataClass = new class ($collection) extends Data {
