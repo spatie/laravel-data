@@ -2,7 +2,9 @@
 
 namespace Spatie\LaravelData\Tests\Resolvers;
 
+use Illuminate\Validation\Rules\Enum as EnumRule;
 use ReflectionProperty;
+use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
 use Spatie\LaravelData\Attributes\Validation\Rule;
@@ -11,6 +13,7 @@ use Spatie\LaravelData\Resolvers\DataPropertyValidationRulesResolver;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 use Spatie\LaravelData\Tests\TestCase;
 
 class DataPropertyValidationRulesResolverTest extends TestCase
@@ -76,6 +79,20 @@ class DataPropertyValidationRulesResolverTest extends TestCase
 
         $this->assertEqualsCanonicalizing([
             'property' => ['required', 'array'],
+        ], $rules);
+    }
+
+    /** @test */
+    public function it_will_add_rules_for_enums()
+    {
+        $this->onlyPHP81();
+
+        $rules = $this->resolveRules(new class () {
+            public FakeEnum $property;
+        });
+
+        $this->assertEqualsCanonicalizing([
+            'property' => ['required', new EnumRule(FakeEnum::class)],
         ], $rules);
     }
 
@@ -196,6 +213,19 @@ class DataPropertyValidationRulesResolverTest extends TestCase
 
         $this->assertEqualsCanonicalizing([
             'property' => ['string', 'required_with:other'],
+        ], $rules);
+    }
+
+    /** @test */
+    public function it_will_work_with_non_string_rules()
+    {
+        $rules = $this->resolveRules(new class () {
+            #[Enum(FakeEnum::class)]
+            public string $property;
+        });
+
+        $this->assertEqualsCanonicalizing([
+            'property' => ['string', 'required', new EnumRule(FakeEnum::class)]
         ], $rules);
     }
 

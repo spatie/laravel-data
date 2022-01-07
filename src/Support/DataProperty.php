@@ -235,6 +235,10 @@ class DataProperty
 
     private function isTypeBuiltIn(string $name): bool
     {
+        if (version_compare(phpversion(), '8.1', '>=') && enum_exists($name)) {
+            return true;
+        }
+
         return in_array($name, ['int', 'string', 'bool', 'array', 'float', 'mixed']);
     }
 

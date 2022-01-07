@@ -2,6 +2,8 @@
 
 namespace Spatie\LaravelData\RuleInferrers;
 
+use BackedEnum;
+use Illuminate\Validation\Rules\Enum;
 use Spatie\LaravelData\Support\DataProperty;
 
 class BuiltInTypesRuleInferrer implements RuleInferrer
@@ -30,6 +32,10 @@ class BuiltInTypesRuleInferrer implements RuleInferrer
 
         if ($property->types()->canBe('array')) {
             $rules[] = 'array';
+        }
+
+        if ($enumClass = $property->types()->getImplementedType(BackedEnum::class)) {
+            $rules[] = new Enum($enumClass);
         }
 
         return $rules;

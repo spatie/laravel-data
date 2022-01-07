@@ -44,4 +44,11 @@ class TestCase extends Orchestra
     ) {
         $this->assertEquals($expected, $attribute->getRules());
     }
+
+    public function onlyPHP81()
+    {
+        if (version_compare(phpversion(), '8.1', '<')) {
+            $this->markTestIncomplete('No enum support in PHP 8.1');
+        }
+    }
 }

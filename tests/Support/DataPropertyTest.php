@@ -14,6 +14,7 @@ use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
+use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
@@ -200,6 +201,16 @@ class DataPropertyTest extends TestCase
 
         $helper = $this->resolveHelper(new class () {
             public array $property;
+        });
+
+        $this->assertTrue($helper->isBuiltIn());
+    }
+
+    /** @test */
+    public function it_can_recognize_an_enum_as_built_in_type()
+    {
+        $helper = $this->resolveHelper(new class () {
+            public FakeEnum $property;
         });
 
         $this->assertTrue($helper->isBuiltIn());

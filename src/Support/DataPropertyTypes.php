@@ -33,18 +33,23 @@ class DataPropertyTypes
         return current($this->types);
     }
 
-    public function canBe(string $type): bool
+    public function getImplementedType(string $type): ?string
     {
         foreach ($this->types as $propertyType) {
             if ($type === $propertyType) {
-                return true;
+                return $propertyType;
             }
 
             if (is_a($propertyType, $type, true)) {
-                return true;
+                return $propertyType;
             }
         }
 
-        return false;
+        return null;
+    }
+
+    public function canBe(string $type): bool
+    {
+        return $this->getImplementedType($type) !== null;
     }
 }

@@ -19,9 +19,7 @@ class EnumCastTest extends TestCase
     {
         parent::setUp();
 
-        if (version_compare(phpversion(), '8.1', '<')) {
-            $this->markTestIncomplete('No enum support in PHP 8.1');
-        }
+        $this->onlyPHP81();
 
         $this->caster = new EnumCast();
     }
