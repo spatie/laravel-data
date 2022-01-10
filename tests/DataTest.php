@@ -727,7 +727,7 @@ class DataTest extends TestCase
     {
         $this->onlyPHP81();
 
-        config(['casts.'.\BackedEnum::class => \Spatie\LaravelData\Casts\EnumCast::class]);
+        config(['data.casts.'.\BackedEnum::class => \Spatie\LaravelData\Casts\EnumCast::class]);
 
         $dataClass = DataBlueprintFactory::new()->withProperty(
             DataPropertyBlueprintFactory::new('fake')->withType(FakeEnum::class)
