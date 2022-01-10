@@ -22,6 +22,7 @@ use Spatie\LaravelData\Tests\Fakes\DummyEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\EmptyData;
+use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 use Spatie\LaravelData\Tests\Fakes\IntersectionTypeData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
@@ -719,5 +720,21 @@ class DataTest extends TestCase
 
         $this->assertInstanceOf(IntersectionTypeData::class, $data);
         $this->assertEquals($collection, $data->intersection);
+    }
+
+    /** @test */
+    public function it_can_include_enum_data()
+    {
+        $this->onlyPHP81();
+
+        config(['casts.'.\BackedEnum::class => \Spatie\LaravelData\Casts\EnumCast::class]);
+
+        $dataClass = DataBlueprintFactory::new()->withProperty(
+            DataPropertyBlueprintFactory::new('fake')->withType(FakeEnum::class)
+        )->create();
+
+        $data = $dataClass::from(['fake' => 'a']);
+
+        $this->assertEquals(FakeEnum::Alpha, $data->fake);
     }
 }
