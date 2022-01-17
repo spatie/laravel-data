@@ -9,6 +9,8 @@ use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
 use Spatie\LaravelData\Tests\Fakes\BuiltInTypeWithCastData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
+use Spatie\LaravelData\Tests\Fakes\EnumData;
+use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 use Spatie\LaravelData\Tests\Fakes\ModelData;
 use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
@@ -221,5 +223,21 @@ class DataFromArrayResolverTest extends TestCase
 
         $this->assertIsInt($data->money);
         $this->assertEquals(314, $data->money);
+    }
+
+    /** @test */
+    public function it_allows_casting_of_enum_types()
+    {
+        $this->onlyPHP81();
+
+        config(['data.casts.'.\BackedEnum::class => \Spatie\LaravelData\Casts\EnumCast::class]);
+
+        /** @var \Spatie\LaravelData\Tests\Fakes\BuiltInTypeWithCastData $data */
+        $data = $this->action->execute(
+            EnumData::class,
+            ['enum' => 'a']
+        );
+
+        $this->assertEquals(FakeEnum::Alpha, $data->fake);
     }
 }

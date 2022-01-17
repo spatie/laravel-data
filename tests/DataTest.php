@@ -721,20 +721,4 @@ class DataTest extends TestCase
         $this->assertInstanceOf(IntersectionTypeData::class, $data);
         $this->assertEquals($collection, $data->intersection);
     }
-
-    /** @test */
-    public function it_can_include_enum_data()
-    {
-        $this->onlyPHP81();
-
-        config(['data.casts.'.\BackedEnum::class => \Spatie\LaravelData\Casts\EnumCast::class]);
-
-        $dataClass = DataBlueprintFactory::new()->withProperty(
-            DataPropertyBlueprintFactory::new('fake')->withType(FakeEnum::class)
-        )->create();
-
-        $data = $dataClass::from(['fake' => 'a']);
-
-        $this->assertEquals(FakeEnum::Alpha, $data->fake);
-    }
 }
