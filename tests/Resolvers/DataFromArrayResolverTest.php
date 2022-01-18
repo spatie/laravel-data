@@ -4,11 +4,15 @@ namespace Spatie\LaravelData\Tests\Resolvers;
 
 use Carbon\CarbonImmutable;
 use DateTime;
+use DateTimeImmutable;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
 use Spatie\LaravelData\Tests\Fakes\BuiltInTypeWithCastData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
+use Spatie\LaravelData\Tests\Fakes\DateCastData;
+use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
+use Spatie\LaravelData\Tests\Fakes\EnumCastData;
 use Spatie\LaravelData\Tests\Fakes\ModelData;
 use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
@@ -221,5 +225,31 @@ class DataFromArrayResolverTest extends TestCase
 
         $this->assertIsInt($data->money);
         $this->assertEquals(314, $data->money);
+    }
+
+    /** @test */
+    public function it_allows_casting()
+    {
+        $data = $this->action->execute(
+            DateCastData::class,
+            ['date' => '2022-01-18']
+        );
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $data->date);
+        $this->assertEquals(DateTimeImmutable::createFromFormat('Y-m-d', '2022-01-18'), $data->date);
+    }
+
+    /** @test */
+    public function it_allows_casting_of_enums()
+    {
+        $this->onlyPHP81();
+
+        $data = $this->action->execute(
+            EnumCastData::class,
+            ['enum' => 'foo']
+        );
+
+        $this->assertInstanceOf(DummyBackedEnum::class, $data->enum);
+        $this->assertEquals(DummyBackedEnum::FOO, $data->enum);
     }
 }
