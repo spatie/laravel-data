@@ -52,7 +52,7 @@
         }
     },
     "scripts": {
-        "psalm": "vendor/bin/psalm --no-cache --php-version=8.0",
+        "psalm": "vendor/bin/psalm --no-cache",
         "test": "./vendor/bin/paratest --no-coverage",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
         "format": "vendor/bin/php-cs-fixer fix --allow-risky=yes"
