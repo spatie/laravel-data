@@ -28,7 +28,6 @@
         "nunomaduro/collision": "^5.3",
         "orchestra/testbench": "^6.23",
         "phpunit/phpunit": "^9.3",
-        "spatie/laravel-enum": "^2.5",
         "spatie/laravel-typescript-transformer": "^2.0",
         "spatie/phpunit-snapshot-assertions": "^4.2",
         "spatie/test-time": "^1.2",
