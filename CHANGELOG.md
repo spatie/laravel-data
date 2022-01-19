@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-data-resource` will be documented in this file.
 
+## 1.3.2 - 2022-01-19
+
+- add support for json_encode to Data objects
+- add support for json_encode to DataCollection objects
+
 ## 1.3.1 - 2022-01-07
 
 - add basic support for intersection types
