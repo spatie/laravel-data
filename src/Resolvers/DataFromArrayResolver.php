@@ -37,16 +37,16 @@ class DataFromArrayResolver
             return $value;
         }
 
+        if ($castAttribute = $property->castAttribute()) {
+            return $castAttribute->get()->cast($property, $value);
+        }
+
         if ($property->isData()) {
             return $property->dataClassName()::from($value);
         }
 
         if (! $this->shouldBeCasted($property, $value)) {
             return $value;
-        }
-
-        if ($castAttribute = $property->castAttribute()) {
-            return $castAttribute->get()->cast($property, $value);
         }
 
         if ($property->types()->isEmpty()) {
