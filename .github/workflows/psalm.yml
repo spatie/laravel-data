@@ -1,10 +1,6 @@
 name: Psalm
 
-on:
-  push:
-    paths:
-      - '**.php'
-      - 'psalm.xml.dist'
+on: ['push']
 
 jobs:
   psalm:
