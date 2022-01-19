@@ -720,4 +720,11 @@ class DataTest extends TestCase
         $this->assertInstanceOf(IntersectionTypeData::class, $data);
         $this->assertEquals($collection, $data->intersection);
     }
+
+    /** @test */
+    public function it_can_transform_to_json()
+    {
+        $this->assertEquals('{"string":"Hello"}', SimpleData::from('Hello')->toJson());
+        $this->assertEquals('{"string":"Hello"}', json_encode(SimpleData::from('Hello')));
+    }
 }
