@@ -42,13 +42,19 @@ class DataProperty
 
     protected ?DataCollectionOf $dataCollectionOfAttribute;
 
-    public static function create(ReflectionProperty $property): static
-    {
-        return new self($property);
+    public static function create(
+        ReflectionProperty $property,
+        bool $hasDefaultValue = false,
+        mixed $defaultValue = null
+    ): static {
+        return new self($property, $hasDefaultValue, $defaultValue);
     }
 
-    public function __construct(protected ReflectionProperty $property)
-    {
+    public function __construct(
+        protected ReflectionProperty $property,
+        protected bool $hasDefaultValue = false,
+        protected mixed $defaultValue = null
+    ) {
         $type = $this->property->getType();
 
         match (true) {
@@ -74,6 +80,21 @@ class DataProperty
     public function isBuiltIn(): bool
     {
         return $this->isBuiltIn;
+    }
+
+    public function isPromoted(): bool
+    {
+        return $this->property->isPromoted();
+    }
+
+    public function hasDefaultValue(): bool
+    {
+        return $this->hasDefaultValue;
+    }
+
+    public function defaultValue(): mixed
+    {
+        return $this->defaultValue;
     }
 
     public function isData(): bool

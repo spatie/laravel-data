@@ -17,18 +17,32 @@ class DataFromArrayResolver
 
     public function execute(string $class, array $values): Data
     {
-        $properties = $this->dataConfig
+        [$promotedProperties, $classProperties] = $this->dataConfig
             ->getDataClass($class)
             ->properties()
-            ->mapWithKeys(fn (DataProperty $property) => [
-                $property->name() => $this->resolveValue($property, $values[$property->name()] ?? null),
-            ]);
+            ->reject(fn(DataProperty $property) => $this->shouldIgnoreProperty($property, $values))
+            ->partition(fn(DataProperty $property) => $property->isPromoted());
 
-        return $this->createDataObjectWithProperties($class, $properties);
+        return $this->createDataObjectWithProperties(
+            $class,
+            $promotedProperties->mapWithKeys(fn(DataProperty $property) => [
+                $property->name() => $this->resolveValue($property, $values),
+            ]),
+            $classProperties->mapWithKeys(fn(DataProperty $property) => [
+                $property->name() => $this->resolveValue($property, $values),
+            ])
+        );
     }
 
-    private function resolveValue(DataProperty $property, mixed $value): mixed
+    private function shouldIgnoreProperty(DataProperty $property, array $values): bool
     {
+        return ! array_key_exists($property->name(), $values) && $property->hasDefaultValue();
+    }
+
+    private function resolveValue(DataProperty $property, array $values): mixed
+    {
+        $value = $values[$property->name()] ?? null;
+
         if ($value === null) {
             return $value;
         }
@@ -55,7 +69,7 @@ class DataFromArrayResolver
 
         if ($property->isDataCollection()) {
             $items = array_map(
-                fn ($item) => $property->dataClassName()::from($item),
+                fn($item) => $property->dataClassName()::from($item),
                 $value
             );
 
@@ -83,17 +97,16 @@ class DataFromArrayResolver
         return $property->types()->canBe($type);
     }
 
-    private function createDataObjectWithProperties(string $class, Collection $properties): Data
-    {
-        if (method_exists($class, '__construct')) {
-            return new $class(...$properties);
-        }
+    private function createDataObjectWithProperties(
+        string $class,
+        Collection $promotedProperties,
+        Collection $classProperties
+    ): Data {
+        $data = new $class(...$promotedProperties);
 
-        $data = new $class();
-
-        foreach ($properties as $key => $value) {
-            $data->{$key} = $value;
-        }
+        $classProperties->each(
+            fn(mixed $value, string $name) => $data->{$name} = $value
+        );
 
         return $data;
     }
