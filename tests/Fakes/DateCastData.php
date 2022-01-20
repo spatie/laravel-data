@@ -12,5 +12,6 @@ class DateCastData extends Data
     public function __construct(
         #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         public DateTimeImmutable $date
-    ) {}
+    ) {
+    }
 }

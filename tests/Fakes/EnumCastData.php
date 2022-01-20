@@ -11,5 +11,6 @@ class EnumCastData extends Data
     public function __construct(
         #[WithCast(EnumCast::class)]
         public DummyBackedEnum $enum
-    ) {}
+    ) {
+    }
 }
