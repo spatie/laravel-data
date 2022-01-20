@@ -2,6 +2,24 @@
 
 All notable changes to `laravel-data-resource` will be documented in this file.
 
+## 1.3.3 - 2022-01-20
+
+## What's Changed
+
+- Laravel 9.x by @aidan-casey in https://github.com/spatie/laravel-data/pull/77
+- Removes Spatie's Laravel Enums from dev requirements by @aidan-casey in https://github.com/spatie/laravel-data/pull/76
+
+## New Contributors
+
+- @aidan-casey made their first contribution in https://github.com/spatie/laravel-data/pull/77
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/1.3.2...1.3.3
+
+## 1.3.2 - 2022-01-19
+
+- add support for json_encode to Data objects
+- add support for json_encode to DataCollection objects
+
 ## 1.3.1 - 2022-01-07
 
 - add basic support for intersection types

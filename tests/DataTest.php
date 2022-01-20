@@ -18,7 +18,6 @@ use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
-use Spatie\LaravelData\Tests\Fakes\DummyEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\EmptyData;
@@ -595,7 +594,6 @@ class DataTest extends TestCase
             'boolean' => true,
             'date' => CarbonImmutable::create(2020, 05, 16, 12, 00, 00),
             'nullable_date' => null,
-            'enum' => DummyEnum::published(),
         ]);
 
         $dataClass = new class () extends Data {
@@ -606,8 +604,6 @@ class DataTest extends TestCase
             public Carbon $date;
 
             public ?Carbon $nullable_date;
-
-            public DummyEnum $enum;
         };
 
         $data = $dataClass::from(DummyModel::findOrFail($model->id));
@@ -616,7 +612,6 @@ class DataTest extends TestCase
         $this->assertTrue($data->boolean);
         $this->assertTrue(CarbonImmutable::create(2020, 05, 16, 12, 00, 00)->eq($data->date));
         $this->assertNull($data->nullable_date);
-        $this->assertTrue($data->enum->equals(DummyEnum::published()));
     }
 
     /** @test */
@@ -719,5 +714,12 @@ class DataTest extends TestCase
 
         $this->assertInstanceOf(IntersectionTypeData::class, $data);
         $this->assertEquals($collection, $data->intersection);
+    }
+
+    /** @test */
+    public function it_can_transform_to_json()
+    {
+        $this->assertEquals('{"string":"Hello"}', SimpleData::from('Hello')->toJson());
+        $this->assertEquals('{"string":"Hello"}', json_encode(SimpleData::from('Hello')));
     }
 }

@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Enumerable;
+use JsonSerializable;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
@@ -20,7 +21,7 @@ use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
 use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Transformers\DataTransformer;
 
-abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastable
+abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastable, JsonSerializable
 {
     use ResponsableData;
     use IncludeableData;
@@ -42,7 +43,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
         );
     }
 
-    public static function collection(Enumerable | array | AbstractPaginator | AbstractCursorPaginator | Paginator $items): DataCollection
+    public static function collection(Enumerable|array|AbstractPaginator|AbstractCursorPaginator|Paginator $items): DataCollection
     {
         return new DataCollection(static::class, $items);
     }
@@ -70,6 +71,11 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
     public function toJson($options = 0): string
     {
         return json_encode($this->toArray(), $options);
+    }
+
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 
     public static function castUsing(array $arguments)

@@ -386,4 +386,13 @@ class DataCollectionTest extends TestCase
             SimpleData::collection(['A', 'B', 'C'])->toCollection()
         );
     }
+
+    /** @test */
+    public function a_collection_can_be_transformed_to_json()
+    {
+        $collection = SimpleData::collection(['A', 'B', 'C']);
+
+        $this->assertEquals('[{"string":"A"},{"string":"B"},{"string":"C"}]', $collection->toJson());
+        $this->assertEquals('[{"string":"A"},{"string":"B"},{"string":"C"}]', json_encode($collection));
+    }
 }
