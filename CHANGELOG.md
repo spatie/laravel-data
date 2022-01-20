@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-data-resource` will be documented in this file.
 
+## 1.4.0 - 2022-01-20
+
+- removes checks for built in types and `isBuiltIn` from `DataProperty`
+- add better support for defaults
+
 ## 1.3.3 - 2022-01-20
 
 ## What's Changed
