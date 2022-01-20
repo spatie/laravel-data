@@ -113,6 +113,5 @@ class DataClassTest extends TestCase
         $this->assertEquals('default_promoted_property', $properties[3]->name());
         $this->assertTrue($properties[3]->hasDefaultValue());
         $this->assertEquals('Hello Again', $properties[3]->defaultValue());
-
     }
 }

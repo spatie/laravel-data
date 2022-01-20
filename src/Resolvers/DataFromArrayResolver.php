@@ -20,15 +20,15 @@ class DataFromArrayResolver
         [$promotedProperties, $classProperties] = $this->dataConfig
             ->getDataClass($class)
             ->properties()
-            ->reject(fn(DataProperty $property) => $this->shouldIgnoreProperty($property, $values))
-            ->partition(fn(DataProperty $property) => $property->isPromoted());
+            ->reject(fn (DataProperty $property) => $this->shouldIgnoreProperty($property, $values))
+            ->partition(fn (DataProperty $property) => $property->isPromoted());
 
         return $this->createDataObjectWithProperties(
             $class,
-            $promotedProperties->mapWithKeys(fn(DataProperty $property) => [
+            $promotedProperties->mapWithKeys(fn (DataProperty $property) => [
                 $property->name() => $this->resolveValue($property, $values),
             ]),
-            $classProperties->mapWithKeys(fn(DataProperty $property) => [
+            $classProperties->mapWithKeys(fn (DataProperty $property) => [
                 $property->name() => $this->resolveValue($property, $values),
             ])
         );
@@ -69,7 +69,7 @@ class DataFromArrayResolver
 
         if ($property->isDataCollection()) {
             $items = array_map(
-                fn($item) => $property->dataClassName()::from($item),
+                fn ($item) => $property->dataClassName()::from($item),
                 $value
             );
 
@@ -105,7 +105,7 @@ class DataFromArrayResolver
         $data = new $class(...$promotedProperties);
 
         $classProperties->each(
-            fn(mixed $value, string $name) => $data->{$name} = $value
+            fn (mixed $value, string $name) => $data->{$name} = $value
         );
 
         return $data;

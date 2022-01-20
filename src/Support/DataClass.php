@@ -67,8 +67,8 @@ class DataClass
         $defaultValues = $this->resolveDefaultValues();
 
         return collect($this->class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(fn(ReflectionProperty $property) => $property->isStatic())
-            ->map(fn(ReflectionProperty $property) => DataProperty::create(
+            ->reject(fn (ReflectionProperty $property) => $property->isStatic())
+            ->map(fn (ReflectionProperty $property) => DataProperty::create(
                 $property,
                 array_key_exists($property->getName(), $defaultValues),
                 $defaultValues[$property->getName()] ?? null,
@@ -83,8 +83,8 @@ class DataClass
         }
 
         return collect($this->class->getMethod('__construct')->getParameters())
-            ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-            ->mapWithKeys(fn(ReflectionParameter $parameter) => [
+            ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+            ->mapWithKeys(fn (ReflectionParameter $parameter) => [
                 $parameter->name => $parameter->getDefaultValue(),
             ])
             ->merge($this->class->getDefaultProperties())
@@ -98,7 +98,7 @@ class DataClass
         $methods = collect($this->class->getMethods(ReflectionMethod::IS_STATIC));
 
         $this->hasAuthorizationMethod = $methods->contains(
-            fn(ReflectionMethod $method) => in_array($method->getName(), ['authorize', 'authorized']) && $method->isPublic()
+            fn (ReflectionMethod $method) => in_array($method->getName(), ['authorize', 'authorized']) && $method->isPublic()
         );
 
         $this->creationMethods = $methods
