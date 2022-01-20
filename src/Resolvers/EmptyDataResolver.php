@@ -44,10 +44,6 @@ class EmptyDataResolver
             return [];
         }
 
-        if ($property->isBuiltIn()) {
-            return null;
-        }
-
         if ($property->isData()) {
             /** @var \Spatie\LaravelData\Data $type */
             return $type::empty();

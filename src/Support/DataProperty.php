@@ -23,8 +23,6 @@ class DataProperty
 
     protected bool $isNullable;
 
-    protected bool $isBuiltIn;
-
     protected bool $isData;
 
     protected bool $isDataCollection;
@@ -75,11 +73,6 @@ class DataProperty
     public function isNullable(): bool
     {
         return $this->isNullable;
-    }
-
-    public function isBuiltIn(): bool
-    {
-        return $this->isBuiltIn;
     }
 
     public function isPromoted(): bool
@@ -184,7 +177,6 @@ class DataProperty
     {
         $this->isLazy = false;
         $this->isNullable = true;
-        $this->isBuiltIn = true;
         $this->isData = false;
         $this->isDataCollection = false;
         $this->types = new DataPropertyTypes();
@@ -199,7 +191,6 @@ class DataProperty
         }
 
         $this->isLazy = false;
-        $this->isBuiltIn = $this->isTypeBuiltIn($name);
         $this->isData = is_a($name, Data::class, true);
         $this->isDataCollection = is_a($name, DataCollection::class, true);
         $this->isNullable = $type->allowsNull();
@@ -210,7 +201,6 @@ class DataProperty
     {
         $this->isLazy = false;
         $this->isNullable = false;
-        $this->isBuiltIn = false;
         $this->isData = false;
         $this->isDataCollection = false;
         $this->types = new DataPropertyTypes();
@@ -220,13 +210,6 @@ class DataProperty
 
             if ($name === 'null') {
                 $this->isNullable = true;
-
-                continue;
-            }
-
-            if ($this->isTypeBuiltIn($name)) {
-                $this->isBuiltIn = true;
-                $this->types->add($name);
 
                 continue;
             }
@@ -253,15 +236,6 @@ class DataProperty
 
             $this->types->add($name);
         }
-    }
-
-    private function isTypeBuiltIn(string $name): bool
-    {
-        if (version_compare(phpversion(), '8.1', '>=') && enum_exists($name)) {
-            return true;
-        }
-
-        return in_array($name, ['int', 'string', 'bool', 'array', 'float', 'mixed']);
     }
 
     private function ensurePropertyIsValid()
