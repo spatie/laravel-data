@@ -76,22 +76,11 @@ class DataFromArrayResolver
     {
         $type = gettype($value);
 
-        if ($this->isSimpleType($property, $type)) {
-            return false;
-        }
-
         if ($type !== 'object') {
             return true;
         }
 
         return $property->types()->canBe($type);
-    }
-
-    private function isSimpleType(DataProperty $property, string $type): bool
-    {
-        return ! $property->types()->isEmpty()
-            && $property->isBuiltIn()
-            && in_array($type, ['bool', 'string', 'int', 'float', 'array']);
     }
 
     private function createDataObjectWithProperties(string $class, Collection $properties): Data
