@@ -51,20 +51,22 @@ class DataFromArrayResolver
             return $value;
         }
 
+        $shouldCast = $this->shouldBeCasted($property, $value);
+
+        if ($shouldCast && $castAttribute = $property->castAttribute()) {
+            return $castAttribute->get()->cast($property, $value);
+        }
+
+        if ($shouldCast && $cast = $this->dataConfig->findGlobalCastForProperty($property)) {
+            return $cast->cast($property, $value);
+        }
+
         if ($property->isData()) {
             return $property->dataClassName()::from($value);
         }
 
-        if (! $this->shouldBeCasted($property, $value)) {
-            return $value;
-        }
-
-        if ($castAttribute = $property->castAttribute()) {
-            return $castAttribute->get()->cast($property, $value);
-        }
-
-        if ($property->types()->isEmpty()) {
-            return $value;
+        if($property->isDataCollection() && $value instanceof DataCollection){
+            return  $value;
         }
 
         if ($property->isDataCollection()) {
@@ -77,10 +79,6 @@ class DataFromArrayResolver
                 $property->dataClassName(),
                 $items
             );
-        }
-
-        if ($cast = $this->dataConfig->findGlobalCastForProperty($property)) {
-            return $cast->cast($property, $value);
         }
 
         return $value;
