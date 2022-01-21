@@ -65,7 +65,7 @@ class DataFromArrayResolver
             return $property->dataClassName()::from($value);
         }
 
-        if($property->isDataCollection() && $value instanceof DataCollection){
+        if ($property->isDataCollection() && $value instanceof DataCollection) {
             return  $value;
         }
 
