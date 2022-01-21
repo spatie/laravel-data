@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `laravel-data-resource` will be documented in this file.
+All notable changes to `laravel-data` will be documented in this file.
 
 ## 1.4.1 - 2022-01-21
 
