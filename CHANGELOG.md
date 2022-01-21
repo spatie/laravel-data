@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data-resource` will be documented in this file.
 
+## 1.4.1 - 2022-01-21
+
+- Allow transformers to target Data and DataCollections
+
 ## 1.4.0 - 2022-01-20
 
 - removes checks for built in types and `isBuiltIn` from `DataProperty`
