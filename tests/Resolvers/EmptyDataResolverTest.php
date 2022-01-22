@@ -168,6 +168,26 @@ class EmptyDataResolverTest extends TestCase
     }
 
     /** @test */
+    public function it_cannot_have_multiple_types_with_a_undefined()
+    {
+        $this->expectException(DataPropertyCanOnlyHaveOneType::class);
+
+        $this->assertEmptyPropertyValue(null, new class () {
+            public int | string | Undefined $property;
+        });
+    }
+
+    /** @test */
+    public function it_cannot_have_multiple_types_with_a_nullable_undefined()
+    {
+        $this->expectException(DataPropertyCanOnlyHaveOneType::class);
+
+        $this->assertEmptyPropertyValue(null, new class () {
+            public int | string | Undefined | null $property;
+        });
+    }
+
+    /** @test */
     public function it_can_overwrite_empty_properties()
     {
         $this->assertEmptyPropertyValue('Hello', new class () {

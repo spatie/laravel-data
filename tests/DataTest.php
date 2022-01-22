@@ -22,6 +22,7 @@ use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
+use Spatie\LaravelData\Tests\Fakes\DefaultUndefinedData;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\EmptyData;
@@ -1046,7 +1047,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_will_not_include_lazy_undefined_values_when_transforming()
     {
-        $data = new class ('Hello World', Lazy::create(fn () => Undefined::make())) extends Data {
+        $data = new class ('Hello World', Lazy::create(fn() => Undefined::make())) extends Data {
             public function __construct(
                 public string $string,
                 public string|Undefined|Lazy $lazy_undefined_string,
@@ -1057,5 +1058,25 @@ class DataTest extends TestCase
         $this->assertEquals($data->toArray(), [
             'string' => 'Hello World',
         ]);
+    }
+
+    /** @test */
+    public function it_excludes_undefined_values_data()
+    {
+        $data = DefaultUndefinedData::from([]);
+
+        $this->assertEquals([], $data->toArray());
+    }
+
+    /** @test */
+    public function it_includes_value_if_not_undefined_data()
+    {
+        $data = DefaultUndefinedData::from([
+            'name' => 'Freek'
+        ]);
+
+        $this->assertEquals([
+            'name' => 'Freek'
+        ], $data->toArray());
     }
 }
