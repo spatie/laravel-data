@@ -17,6 +17,7 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
+use Spatie\LaravelData\Tests\Fakes\DefaultUndefinedData;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
@@ -772,5 +773,26 @@ class DataTest extends TestCase
         $this->assertEquals('Test Again', $data->promoted_property);
         $this->assertEquals('Test', $data->default_property);
         $this->assertEquals('Test Again', $data->default_promoted_property);
+    }
+
+
+    /** @test */
+    public function it_excludes_undefined_values_data()
+    {
+        $data = DefaultUndefinedData::from([]);
+
+        $this->assertEquals([], $data->toArray());
+    }
+
+    /** @test */
+    public function it_includes_value_if_not_undefined_data()
+    {
+        $data = DefaultUndefinedData::from([
+            'name' => 'Freek'
+        ]);
+
+        $this->assertEquals([
+            'name' => 'Freek'
+        ], $data->toArray());
     }
 }

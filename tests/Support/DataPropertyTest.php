@@ -21,6 +21,7 @@ use Spatie\LaravelData\Tests\Fakes\IntersectionTypeData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
+use Spatie\LaravelData\Undefined;
 
 class DataPropertyTest extends TestCase
 {
@@ -33,6 +34,7 @@ class DataPropertyTest extends TestCase
 
         $this->assertFalse($helper->isLazy());
         $this->assertTrue($helper->isNullable());
+        $this->assertFalse($helper->isUndefinable());
         $this->assertFalse($helper->isData());
         $this->assertFalse($helper->isDataCollection());
         $this->assertTrue($helper->types()->isEmpty());
@@ -83,6 +85,29 @@ class DataPropertyTest extends TestCase
 
         $this->assertTrue($helper->isNullable());
     }
+
+    /** @test */
+    public function it_can_check_if_a_property_is_undefinable()
+    {
+        $helper = $this->resolveHelper(new class () {
+            public int $property;
+        });
+
+        $this->assertFalse($helper->isUndefinable());
+
+        $helper = $this->resolveHelper(new class () {
+            public Undefined $property;
+        });
+
+        $this->assertTrue($helper->isUndefinable());
+
+        $helper = $this->resolveHelper(new class () {
+            public Undefined|int $property;
+        });
+
+        $this->assertTrue($helper->isUndefinable());
+    }
+
 
     /** @test */
     public function it_can_check_if_a_property_is_a_data_object()
