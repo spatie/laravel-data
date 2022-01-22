@@ -18,7 +18,6 @@ use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
-use Spatie\LaravelData\Tests\Fakes\DummyEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\EmptyData;
@@ -595,7 +594,6 @@ class DataTest extends TestCase
             'boolean' => true,
             'date' => CarbonImmutable::create(2020, 05, 16, 12, 00, 00),
             'nullable_date' => null,
-            'enum' => DummyEnum::published(),
         ]);
 
         $dataClass = new class () extends Data {
@@ -606,8 +604,6 @@ class DataTest extends TestCase
             public Carbon $date;
 
             public ?Carbon $nullable_date;
-
-            public DummyEnum $enum;
         };
 
         $data = $dataClass::from(DummyModel::findOrFail($model->id));
@@ -616,7 +612,6 @@ class DataTest extends TestCase
         $this->assertTrue($data->boolean);
         $this->assertTrue(CarbonImmutable::create(2020, 05, 16, 12, 00, 00)->eq($data->date));
         $this->assertNull($data->nullable_date);
-        $this->assertTrue($data->enum->equals(DummyEnum::published()));
     }
 
     /** @test */
@@ -719,5 +714,63 @@ class DataTest extends TestCase
 
         $this->assertInstanceOf(IntersectionTypeData::class, $data);
         $this->assertEquals($collection, $data->intersection);
+    }
+
+    /** @test */
+    public function it_can_transform_to_json()
+    {
+        $this->assertEquals('{"string":"Hello"}', SimpleData::from('Hello')->toJson());
+        $this->assertEquals('{"string":"Hello"}', json_encode(SimpleData::from('Hello')));
+    }
+
+    /** @test */
+    public function it_can_construct_a_data_object_with_both_constructor_promoted_and_default_properties()
+    {
+        $dataClass = new class ('') extends Data {
+            public string $property;
+
+            public function __construct(
+                public string $promoted_property,
+            ) {
+            }
+        };
+
+        $data = $dataClass::from([
+            'property' => 'A',
+            'promoted_property' => 'B',
+        ]);
+
+        $this->assertEquals('A', $data->property);
+        $this->assertEquals('B', $data->promoted_property);
+    }
+
+    /** @test */
+    public function it_can_construct_a_data_object_with_default_values()
+    {
+        $data = DataWithDefaults::from([
+            'property' => 'Test',
+            'promoted_property' => 'Test Again',
+        ]);
+
+        $this->assertEquals('Test', $data->property);
+        $this->assertEquals('Test Again', $data->promoted_property);
+        $this->assertEquals('Hello', $data->default_property);
+        $this->assertEquals('Hello Again', $data->default_promoted_property);
+    }
+
+    /** @test */
+    public function it_can_construct_a_data_object_with_default_values_and_overwrite_them()
+    {
+        $data = DataWithDefaults::from([
+            'property' => 'Test',
+            'default_property' => 'Test',
+            'promoted_property' => 'Test Again',
+            'default_promoted_property' => 'Test Again',
+        ]);
+
+        $this->assertEquals('Test', $data->property);
+        $this->assertEquals('Test Again', $data->promoted_property);
+        $this->assertEquals('Test', $data->default_property);
+        $this->assertEquals('Test Again', $data->default_promoted_property);
     }
 }

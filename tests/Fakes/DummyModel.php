@@ -12,7 +12,6 @@ class DummyModel extends Model
         'date' => 'datetime',
         'nullable_date' => 'datetime',
         'boolean' => 'boolean',
-        'enum' => DummyEnum::class,
     ];
 
     public static function migrate()
@@ -24,7 +23,6 @@ class DummyModel extends Model
             $blueprint->dateTime('date');
             $blueprint->dateTime('nullable_date')->nullable();
             $blueprint->boolean('boolean');
-            $blueprint->string('enum');
 
             $blueprint->timestamps();
         });

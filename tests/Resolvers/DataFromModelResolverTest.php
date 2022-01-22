@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelData\Resolvers\DataFromModelResolver;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
-use Spatie\LaravelData\Tests\Fakes\DummyEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 
@@ -39,34 +38,6 @@ class DataFromModelResolverTest extends TestCase
         );
 
         $this->assertEquals(new SimpleData('Hello'), $data);
-    }
-
-    /** @test */
-    public function it_can_get_a_data_object_from_model_with_casts()
-    {
-        $fakeModelClass = new class () extends Model {
-            protected $casts = [
-                'enum' => DummyEnum::class,
-            ];
-        };
-
-        $model = $fakeModelClass::make([
-            'enum' => DummyEnum::published(),
-        ]);
-
-        $dataClass = DataBlueprintFactory::new('DataFromModelWithCast')
-            ->withProperty(
-                DataPropertyBlueprintFactory::new('enum')
-                    ->withType(DummyEnum::class)
-            )
-            ->create();
-
-        $data = $this->resolver->execute(
-            $dataClass,
-            $model
-        );
-
-        $this->assertTrue($data->enum->equals(DummyEnum::published()));
     }
 
     /** @test */

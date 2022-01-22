@@ -23,8 +23,6 @@ class DataProperty
 
     protected bool $isNullable;
 
-    protected bool $isBuiltIn;
-
     protected bool $isData;
 
     protected bool $isDataCollection;
@@ -42,13 +40,19 @@ class DataProperty
 
     protected ?DataCollectionOf $dataCollectionOfAttribute;
 
-    public static function create(ReflectionProperty $property): static
-    {
-        return new self($property);
+    public static function create(
+        ReflectionProperty $property,
+        bool $hasDefaultValue = false,
+        mixed $defaultValue = null
+    ): static {
+        return new self($property, $hasDefaultValue, $defaultValue);
     }
 
-    public function __construct(protected ReflectionProperty $property)
-    {
+    public function __construct(
+        protected ReflectionProperty $property,
+        protected bool $hasDefaultValue = false,
+        protected mixed $defaultValue = null
+    ) {
         $type = $this->property->getType();
 
         match (true) {
@@ -71,9 +75,19 @@ class DataProperty
         return $this->isNullable;
     }
 
-    public function isBuiltIn(): bool
+    public function isPromoted(): bool
     {
-        return $this->isBuiltIn;
+        return $this->property->isPromoted();
+    }
+
+    public function hasDefaultValue(): bool
+    {
+        return $this->hasDefaultValue;
+    }
+
+    public function defaultValue(): mixed
+    {
+        return $this->defaultValue;
     }
 
     public function isData(): bool
@@ -163,7 +177,6 @@ class DataProperty
     {
         $this->isLazy = false;
         $this->isNullable = true;
-        $this->isBuiltIn = true;
         $this->isData = false;
         $this->isDataCollection = false;
         $this->types = new DataPropertyTypes();
@@ -178,7 +191,6 @@ class DataProperty
         }
 
         $this->isLazy = false;
-        $this->isBuiltIn = $this->isTypeBuiltIn($name);
         $this->isData = is_a($name, Data::class, true);
         $this->isDataCollection = is_a($name, DataCollection::class, true);
         $this->isNullable = $type->allowsNull();
@@ -189,7 +201,6 @@ class DataProperty
     {
         $this->isLazy = false;
         $this->isNullable = false;
-        $this->isBuiltIn = false;
         $this->isData = false;
         $this->isDataCollection = false;
         $this->types = new DataPropertyTypes();
@@ -199,13 +210,6 @@ class DataProperty
 
             if ($name === 'null') {
                 $this->isNullable = true;
-
-                continue;
-            }
-
-            if ($this->isTypeBuiltIn($name)) {
-                $this->isBuiltIn = true;
-                $this->types->add($name);
 
                 continue;
             }
@@ -232,15 +236,6 @@ class DataProperty
 
             $this->types->add($name);
         }
-    }
-
-    private function isTypeBuiltIn(string $name): bool
-    {
-        if (version_compare(phpversion(), '8.1', '>=') && enum_exists($name)) {
-            return true;
-        }
-
-        return in_array($name, ['int', 'string', 'bool', 'array', 'float', 'mixed']);
     }
 
     private function ensurePropertyIsValid()

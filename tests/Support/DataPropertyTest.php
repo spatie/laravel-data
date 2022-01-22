@@ -17,7 +17,6 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\DataPropertyTypes;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
-use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 use Spatie\LaravelData\Tests\Fakes\IntersectionTypeData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
@@ -34,7 +33,6 @@ class DataPropertyTest extends TestCase
 
         $this->assertFalse($helper->isLazy());
         $this->assertTrue($helper->isNullable());
-        $this->assertTrue($helper->isBuiltIn());
         $this->assertFalse($helper->isData());
         $this->assertFalse($helper->isDataCollection());
         $this->assertTrue($helper->types()->isEmpty());
@@ -128,98 +126,6 @@ class DataPropertyTest extends TestCase
         });
 
         $this->assertTrue($helper->isDataCollection());
-    }
-
-    /** @test */
-    public function it_can_check_if_a_property_is_built_in()
-    {
-        $helper = $this->resolveHelper(new class () {
-            public int $property;
-        });
-
-        $this->assertTrue($helper->isBuiltIn());
-
-        $helper = $this->resolveHelper(new class () {
-            public int|float $property;
-        });
-
-        $this->assertTrue($helper->isBuiltIn());
-
-        $helper = $this->resolveHelper(new class () {
-            public int|Lazy $property;
-        });
-
-        $this->assertTrue($helper->isBuiltIn());
-
-        $helper = $this->resolveHelper(new class () {
-            public int|Lazy|null $property;
-        });
-
-        $this->assertTrue($helper->isBuiltIn());
-
-        $helper = $this->resolveHelper(new class () {
-            public DataCollection $property;
-        });
-
-        $this->assertFalse($helper->isBuiltIn());
-
-        $helper = $this->resolveHelper(new class () {
-            public DataCollection|null $property;
-        });
-
-        $this->assertFalse($helper->isBuiltIn());
-
-        $helper = $this->resolveHelper(new class () {
-            public mixed $property;
-        });
-
-        $this->assertTrue($helper->isBuiltIn());
-    }
-
-    /** @test */
-    public function it_can_recognize_the_different_built_in_types()
-    {
-        $helper = $this->resolveHelper(new class () {
-            public int $property;
-        });
-
-        $this->assertTrue($helper->isBuiltIn());
-
-        $helper = $this->resolveHelper(new class () {
-            public float $property;
-        });
-
-        $this->assertTrue($helper->isBuiltIn());
-
-        $helper = $this->resolveHelper(new class () {
-            public bool $property;
-        });
-
-        $this->assertTrue($helper->isBuiltIn());
-
-        $helper = $this->resolveHelper(new class () {
-            public string $property;
-        });
-
-        $this->assertTrue($helper->isBuiltIn());
-
-        $helper = $this->resolveHelper(new class () {
-            public array $property;
-        });
-
-        $this->assertTrue($helper->isBuiltIn());
-    }
-
-    /** @test */
-    public function it_can_recognize_an_enum_as_built_in_type()
-    {
-        $this->onlyPHP81();
-
-        $helper = $this->resolveHelper(new class () {
-            public FakeEnum $property;
-        });
-
-        $this->assertTrue($helper->isBuiltIn());
     }
 
     /** @test */
