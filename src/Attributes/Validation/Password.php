@@ -17,7 +17,6 @@ class Password extends ValidationAttribute
         private ?bool $uncompromised = null,
         private ?int $uncompromisedThreshold = null
     ) {
-
     }
 
     public function getRules(): array
