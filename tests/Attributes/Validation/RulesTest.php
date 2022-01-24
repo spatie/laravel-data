@@ -722,7 +722,7 @@ class RulesTest extends TestCase
     public function passwordAttributesDataProvider(): Generator
     {
         BasePassword::defaults(
-            fn() => BasePassword::min(23)
+            fn () => BasePassword::min(23)
                 ->symbols()
                 ->mixedCase()
                 ->numbers()
@@ -736,13 +736,13 @@ class RulesTest extends TestCase
                     ->symbols()
                     ->mixedCase()
                     ->numbers()
-                    ->uncompromised(0)
-            ]
+                    ->uncompromised(0),
+            ],
         ];
 
         yield [
             'attribute' => new Password(),
-            'expected' => [ BasePassword::default() ]
+            'expected' => [ BasePassword::default() ],
         ];
 
         yield [
