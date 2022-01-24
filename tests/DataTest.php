@@ -773,4 +773,30 @@ class DataTest extends TestCase
         $this->assertEquals('Test', $data->default_property);
         $this->assertEquals('Test Again', $data->default_promoted_property);
     }
+
+    /** @test */
+    public function it_continues_value_assignment_after_a_false_boolean()
+    {
+        $dataClass = new class () extends Data {
+            public bool $false;
+
+            public bool $true;
+
+            public string $string;
+
+            public Carbon $date;
+        };
+
+        $data = $dataClass::from([
+            'false' => false,
+            'true' => true,
+            'string' => 'string',
+            'date' => Carbon::create(2020, 05, 16, 12, 00, 00),
+        ]);
+
+        $this->assertFalse($data->false);
+        $this->assertTrue($data->true);
+        $this->assertEquals('string', $data->string);
+        $this->assertTrue(Carbon::create(2020, 05, 16, 12, 00, 00)->equalTo($data->date));
+    }
 }

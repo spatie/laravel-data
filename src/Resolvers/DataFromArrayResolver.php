@@ -103,7 +103,9 @@ class DataFromArrayResolver
         $data = new $class(...$promotedProperties);
 
         $classProperties->each(
-            fn (mixed $value, string $name) => $data->{$name} = $value
+            function (mixed $value, string $name) use ($data) {
+                $data->{$name} = $value;
+            }
         );
 
         return $data;
