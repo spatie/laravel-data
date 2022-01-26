@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 1.4.2 - 2022-01-26
+
+- fix for aborting value assignment after a false boolean (#80)
+- add a `WithoutValidation` attribute
+- allow transformers to target native types, data collections and data objects
+
 ## 1.4.1 - 2022-01-21
 
 - Allow transformers to target Data and DataCollections
