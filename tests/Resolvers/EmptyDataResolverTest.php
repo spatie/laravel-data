@@ -10,7 +10,6 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
-use Spatie\LaravelData\Undefined;
 
 class EmptyDataResolverTest extends TestCase
 {
@@ -106,37 +105,6 @@ class EmptyDataResolverTest extends TestCase
         });
     }
 
-    public function it_will_return_the_base_type_for_lazy_types_that_can_be_undefined()
-    {
-        $this->assertEmptyPropertyValue(null, new class () {
-            public Lazy | string | Undefined $property;
-        });
-
-        $this->assertEmptyPropertyValue([], new class () {
-            public Lazy | array | Undefined $property;
-        });
-
-        $this->assertEmptyPropertyValue(['string' => null], new class () {
-            public Lazy | SimpleData | Undefined $property;
-        });
-    }
-
-    /** @test */
-    public function it_will_return_the_base_type_for_undefinable_types()
-    {
-        $this->assertEmptyPropertyValue(null, new class() {
-            public Undefined | string $property;
-        });
-
-        $this->assertEmptyPropertyValue([], new class () {
-            public Undefined | array $property;
-        });
-
-        $this->assertEmptyPropertyValue(['string' => null], new class () {
-            public Undefined | SimpleData $property;
-        });
-    }
-
     /** @test */
     public function it_cannot_have_multiple_types()
     {
@@ -164,26 +132,6 @@ class EmptyDataResolverTest extends TestCase
 
         $this->assertEmptyPropertyValue(null, new class () {
             public int | string | Lazy | null $property;
-        });
-    }
-
-    /** @test */
-    public function it_cannot_have_multiple_types_with_a_undefined()
-    {
-        $this->expectException(DataPropertyCanOnlyHaveOneType::class);
-
-        $this->assertEmptyPropertyValue(null, new class () {
-            public int | string | Undefined $property;
-        });
-    }
-
-    /** @test */
-    public function it_cannot_have_multiple_types_with_a_nullable_undefined()
-    {
-        $this->expectException(DataPropertyCanOnlyHaveOneType::class);
-
-        $this->assertEmptyPropertyValue(null, new class () {
-            public int | string | Undefined | null $property;
         });
     }
 

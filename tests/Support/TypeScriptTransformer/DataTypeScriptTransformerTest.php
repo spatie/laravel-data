@@ -9,7 +9,6 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
-use Spatie\LaravelData\Undefined;
 use Spatie\TypeScriptTransformer\TypeScriptTransformerConfig;
 
 class DataTypeScriptTransformerTest extends TestCase
@@ -19,12 +18,9 @@ class DataTypeScriptTransformerTest extends TestCase
     {
         $config = TypeScriptTransformerConfig::create();
 
-        $data = new class (null, Undefined::make(), 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'],
-            Lazy::create(fn
-        () => 'Lazy'), SimpleData::from('Simple data'), SimpleData::collection([]), ) extends Data {
+        $data = new class (null, 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn () => 'Lazy'), SimpleData::from('Simple data'), SimpleData::collection([]), ) extends Data {
             public function __construct(
                 public null | int $nullable,
-                public Undefined | int $undefineable,
                 public int $int,
                 public bool $bool,
                 public string $string,

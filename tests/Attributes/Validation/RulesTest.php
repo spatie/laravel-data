@@ -82,7 +82,6 @@ use Spatie\LaravelData\Attributes\Validation\RequiredWithoutAll;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\Same;
 use Spatie\LaravelData\Attributes\Validation\Size;
-use Spatie\LaravelData\Attributes\Validation\Sometimes;
 use Spatie\LaravelData\Attributes\Validation\StartsWith;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Timezone;
@@ -373,11 +372,6 @@ class RulesTest extends TestCase
         yield [
             'attribute' => new Uuid(),
             'expected' => ['uuid'],
-        ];
-
-        yield [
-            'attribute' => new Sometimes(),
-            'expected' => ['sometimes'],
         ];
     }
 

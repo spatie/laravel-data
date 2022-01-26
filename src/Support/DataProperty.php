@@ -16,7 +16,6 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotFindDataTypeForProperty;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Undefined;
 use TypeError;
 
 class DataProperty
@@ -24,8 +23,6 @@ class DataProperty
     protected bool $isLazy;
 
     protected bool $isNullable;
-
-    protected bool $isUndefinable;
 
     protected bool $isData;
 
@@ -79,11 +76,6 @@ class DataProperty
     public function isNullable(): bool
     {
         return $this->isNullable;
-    }
-
-    public function isUndefinable(): bool
-    {
-        return $this->isUndefinable;
     }
 
     public function isPromoted(): bool
@@ -198,7 +190,6 @@ class DataProperty
     {
         $this->isLazy = false;
         $this->isNullable = true;
-        $this->isUndefinable = false;
         $this->isData = false;
         $this->isDataCollection = false;
         $this->types = new DataPropertyTypes();
@@ -216,7 +207,6 @@ class DataProperty
         $this->isData = is_a($name, Data::class, true);
         $this->isDataCollection = is_a($name, DataCollection::class, true);
         $this->isNullable = $type->allowsNull();
-        $this->isUndefinable = is_a($name, Undefined::class, true);
         $this->types = new DataPropertyTypes([$name]);
     }
 
@@ -224,7 +214,6 @@ class DataProperty
     {
         $this->isLazy = false;
         $this->isNullable = false;
-        $this->isUndefinable = false;
         $this->isData = false;
         $this->isDataCollection = false;
         $this->types = new DataPropertyTypes();
@@ -234,12 +223,6 @@ class DataProperty
 
             if ($name === 'null') {
                 $this->isNullable = true;
-
-                continue;
-            }
-
-            if ($name === Undefined::class) {
-                $this->isUndefinable = true;
 
                 continue;
             }

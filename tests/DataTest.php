@@ -22,7 +22,6 @@ use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
-use Spatie\LaravelData\Tests\Fakes\DefaultUndefinedData;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
@@ -936,25 +935,5 @@ class DataTest extends TestCase
         $this->assertTrue($data->true);
         $this->assertEquals('string', $data->string);
         $this->assertTrue(Carbon::create(2020, 05, 16, 12, 00, 00)->equalTo($data->date));
-    }
-
-    /** @test */
-    public function it_excludes_undefined_values_data()
-    {
-        $data = DefaultUndefinedData::from([]);
-
-        $this->assertEquals([], $data->toArray());
-    }
-
-    /** @test */
-    public function it_includes_value_if_not_undefined_data()
-    {
-        $data = DefaultUndefinedData::from([
-            'name' => 'Freek'
-        ]);
-
-        $this->assertEquals([
-            'name' => 'Freek'
-        ], $data->toArray());
     }
 }

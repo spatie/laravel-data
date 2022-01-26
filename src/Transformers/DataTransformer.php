@@ -8,7 +8,6 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\TransformationType;
-use Spatie\LaravelData\Undefined;
 
 class DataTransformer
 {
@@ -72,10 +71,6 @@ class DataTransformer
         ?array $allowedIncludes,
         ?array $allowedExcludes,
     ): bool {
-        if ($value instanceof Undefined) {
-            return false;
-        }
-
         if (! $value instanceof Lazy) {
             return true;
         }
