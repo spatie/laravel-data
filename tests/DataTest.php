@@ -980,7 +980,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_create_an_partial_data_object()
     {
-        $dataClass = new class('', Undefined::create(), Undefined::create()) extends Data {
+        $dataClass = new class ('', Undefined::create(), Undefined::create()) extends Data {
             public function __construct(
                 public string $string,
                 public string|Undefined $undefinable_string,
@@ -1012,7 +1012,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_transform_a_partial_object()
     {
-        $dataClass = new class('', Undefined::create(), Undefined::create()) extends Data {
+        $dataClass = new class ('', Undefined::create(), Undefined::create()) extends Data {
             public function __construct(
                 public string $string,
                 public string|Undefined $undefinable_string,
