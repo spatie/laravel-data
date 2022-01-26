@@ -183,9 +183,11 @@ class MakeDataCommand extends Command
 
     protected function getUseStatements(): string
     {
-        $useStatements = array_keys($this->useStatements[$this->dataClass]);
-
-        return implode(PHP_EOL, array_map(fn ($useStatement) => "use {$useStatement};", $useStatements));
+        return collect($this->useStatements[$this->dataClass])
+            ->keys()
+            ->sort()
+            ->map(fn ($useStatement) => "use {$useStatement};")
+            ->implode(PHP_EOL);
     }
 
     protected function getNextRelatedModel(): ?string
