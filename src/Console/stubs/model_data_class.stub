@@ -1,0 +1,20 @@
+<?php
+
+namespace {{ namespace }};
+
+{{ useStatements }}
+
+/**
+ * The data class of the {{ model }} model.
+ *
+ */
+class {{ class }} extends Data
+{
+    /**
+     * Instantiate the data class.
+     *
+     */
+    public function __construct(
+{{ properties }}{{ relationships }}
+    ) {}
+}

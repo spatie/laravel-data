@@ -36,4 +36,9 @@ return [
         Spatie\LaravelData\RuleInferrers\NullableRuleInferrer::class,
         Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer::class,
     ],
+
+    /*
+     * The qualifier to fully qualify the name of a generated data class
+     */
+    'qualifier' => Spatie\LaravelData\Console\DefaultDataQualifier::class,
 ];
