@@ -8,6 +8,7 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Undefined;
 
 class DataFromArrayResolver
 {
@@ -41,9 +42,13 @@ class DataFromArrayResolver
 
     private function resolveValue(DataProperty $property, array $values): mixed
     {
-        $value = $values[$property->name()] ?? null;
+        $value =  array_key_exists($property->name(), $values) ? $values[$property->name()] ?? null : Undefined::make();
 
         if ($value === null) {
+            return $value;
+        }
+
+        if ($value instanceof Undefined) {
             return $value;
         }
 
