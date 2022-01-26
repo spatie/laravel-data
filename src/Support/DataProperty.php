@@ -308,7 +308,7 @@ class DataProperty
                 continue;
             }
 
-            if($initiatedAttribute instanceof WithoutValidation){
+            if ($initiatedAttribute instanceof WithoutValidation) {
                 $this->withValidation = false;
 
                 continue;

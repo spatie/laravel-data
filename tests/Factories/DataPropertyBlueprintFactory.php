@@ -107,7 +107,7 @@ class DataPropertyBlueprintFactory
             $property->setComment("@var {$this->annotationType} \${$this->name}");
         }
 
-        if(count($this->attributes)){
+        if (count($this->attributes)) {
             $property->setAttributes($this->attributes);
         }
 

@@ -10,8 +10,6 @@ use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
-use Spatie\LaravelData\Attributes\Validation\Required;
-use Spatie\LaravelData\Attributes\Validation\RequiredIf;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
@@ -229,10 +227,12 @@ class RequestDataTest extends TestCase
     public function it_can_skip_validation_on_certain_properties()
     {
         DataBlueprintFactory::new('ValidationSkippeableDataFromRequest')
-            ->withProperty(DataPropertyBlueprintFactory::new('first_name')
+            ->withProperty(
+                DataPropertyBlueprintFactory::new('first_name')
                 ->withType('string')
             )
-            ->withProperty(DataPropertyBlueprintFactory::new('last_name')
+            ->withProperty(
+                DataPropertyBlueprintFactory::new('last_name')
                 ->withAttribute(WithoutValidation::class)
                 ->withAttribute(RequiredWith::class, ['first_name'])
                 ->nullable()
@@ -255,7 +255,8 @@ class RequestDataTest extends TestCase
     public function it_can_manually_override_how_the_data_object_will_be_constructed()
     {
         DataBlueprintFactory::new('OverrideableDataFromRequest')
-            ->withProperty(DataPropertyBlueprintFactory::new('name')
+            ->withProperty(
+                DataPropertyBlueprintFactory::new('name')
                 ->withAttribute(WithoutValidation::class)
                 ->withType('string')
             )
