@@ -804,6 +804,15 @@ public string $value;
 public string $value; 
 ```
 
+### Sometimes
+
+[Docs](https://laravel.com/docs/8.x/validation#validating-when-present)
+
+```php
+#[Sometimes]
+public string $value; 
+```
+
 ### StartsWith
 
 [Docs](https://laravel.com/docs/8.x/validation#rule-starts-with)

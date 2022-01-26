@@ -31,6 +31,7 @@ return [
      * the type of the property.
      */
     'rule_inferrers' => [
+        Spatie\LaravelData\RuleInferrers\SometimesRuleInferrer::class,
         Spatie\LaravelData\RuleInferrers\BuiltInTypesRuleInferrer::class,
         Spatie\LaravelData\RuleInferrers\AttributesRuleInferrer::class,
         Spatie\LaravelData\RuleInferrers\NullableRuleInferrer::class,

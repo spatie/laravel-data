@@ -186,3 +186,51 @@ class SongController
     }
 }
 ```
+
+## Partial creation
+
+Sometimes you have a data object with properties which shouldn't always be set, this can happen in a partial API update where you only want to update certain fields. In this case you can make a property `Undefined` as such:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        public string|Undefined $artist,
+    ) {
+    }
+}
+```
+
+You can now create the data object as such:
+
+```php
+SongData::from([
+    'title' => 'Never gonna give you up'
+]);
+```
+
+The value of `artist` will automatically be set to `Undefined`. When you transform this data object to an array, it will look like this:
+
+```php
+[
+    'title' => 'Never gonna give you up'
+]
+```
+
+You can manually use `Undefined` values within magical creation methods as such:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        public string|Undefined $artist,
+    ) {
+    }
+    
+    public static function fromTitle(string $title): static{
+        return new self($title, Undefined::create());
+    }
+}
+```
