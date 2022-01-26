@@ -2,9 +2,11 @@
 
 namespace Spatie\LaravelData\Tests\Resolvers;
 
+use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
+use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\TestCase;
 
@@ -83,6 +85,27 @@ class DataValidationRulesResolverTest extends TestCase
             'nested.string' => ['string', 'required', 'min:10', 'max:100'],
             'collection' => ['array', 'required'],
             'collection.*.string' => ['string', 'required', 'min:10', 'max:100'],
+        ], $this->resolver->execute($data::class)->all());
+    }
+
+    /** @test */
+    public function it_can_skip_certain_properties_from_being_validated()
+    {
+        $data = new class () extends Data {
+            #[WithoutValidation]
+            public string $skip_string;
+
+            #[WithoutValidation]
+            public SimpleData $skip_data;
+
+            #[WithoutValidation]
+            public DataCollection $skip_data_collection;
+
+            public ?int $age;
+        };
+
+        $this->assertEquals([
+            'age' => ['numeric', 'nullable'],
         ], $this->resolver->execute($data::class)->all());
     }
 }

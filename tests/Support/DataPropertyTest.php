@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\DataCollection;
@@ -249,6 +250,19 @@ class DataPropertyTest extends TestCase
         $dataProperty = DataProperty::create(new ReflectionProperty(IntersectionTypeData::class, 'intersection'));
 
         $this->assertEquals(new DataPropertyTypes([Arrayable::class, Countable::class]), $dataProperty->types());
+    }
+
+    /** @test */
+    public function it_can_check_if_a_property_should_be_validated()
+    {
+        $this->assertTrue($this->resolveHelper(new class () {
+            public string $property;
+        })->shouldValidateProperty());
+
+        $this->assertFalse($this->resolveHelper(new class () {
+            #[WithoutValidation]
+            public string $property;
+        })->shouldValidateProperty());
     }
 
     /**

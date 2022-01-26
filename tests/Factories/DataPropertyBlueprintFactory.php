@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Tests\Factories;
 
+use Nette\PhpGenerator\Attribute;
 use Nette\PhpGenerator\PromotedParameter;
 use Nette\PhpGenerator\Property;
 use Spatie\LaravelData\DataCollection;
@@ -18,6 +19,9 @@ class DataPropertyBlueprintFactory
     private bool $constructorPromoted = true;
 
     private ?string $annotationType = null;
+
+    /** @var array<object> */
+    private array $attributes = [];
 
     public function __construct(private string $name)
     {
@@ -80,9 +84,13 @@ class DataPropertyBlueprintFactory
         return $clone;
     }
 
-    public function withTransformer(
-        string $transformerClass,
-    ) {
+    public function withAttribute(string $class, array $arguments = []): self
+    {
+        $clone = clone $this;
+
+        $clone->attributes[] = new Attribute($class, $arguments);
+
+        return $clone;
     }
 
     public function create(): Property | PromotedParameter
@@ -97,6 +105,10 @@ class DataPropertyBlueprintFactory
 
         if ($this->annotationType) {
             $property->setComment("@var {$this->annotationType} \${$this->name}");
+        }
+
+        if(count($this->attributes)){
+            $property->setAttributes($this->attributes);
         }
 
         return $property;

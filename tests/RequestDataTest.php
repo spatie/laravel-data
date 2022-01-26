@@ -10,6 +10,10 @@ use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\RequiredIf;
+use Spatie\LaravelData\Attributes\Validation\RequiredWith;
+use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataMagicMethodFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
@@ -222,10 +226,39 @@ class RequestDataTest extends TestCase
     }
 
     /** @test */
+    public function it_can_skip_validation_on_certain_properties()
+    {
+        DataBlueprintFactory::new('ValidationSkippeableDataFromRequest')
+            ->withProperty(DataPropertyBlueprintFactory::new('first_name')
+                ->withType('string')
+            )
+            ->withProperty(DataPropertyBlueprintFactory::new('last_name')
+                ->withAttribute(WithoutValidation::class)
+                ->withAttribute(RequiredWith::class, ['first_name'])
+                ->nullable()
+                ->withType('string')
+            )
+            ->create();
+
+        Route::post('/other-route', function (\ValidationSkippeableDataFromRequest $data) {
+            return ['first_name' => $data->first_name, 'last_name' => $data->last_name];
+        });
+
+        $this->postJson('/other-route', [
+            'first_name' => 'Rick',
+        ])
+            ->assertOk()
+            ->assertJson(['first_name' => 'Rick', 'last_name' => null]);
+    }
+
+    /** @test */
     public function it_can_manually_override_how_the_data_object_will_be_constructed()
     {
         DataBlueprintFactory::new('OverrideableDataFromRequest')
-            ->withProperty(DataPropertyBlueprintFactory::new('name')->withType('string'))
+            ->withProperty(DataPropertyBlueprintFactory::new('name')
+                ->withAttribute(WithoutValidation::class)
+                ->withType('string')
+            )
             ->withMethod(
                 DataMagicMethodFactory::new('fromRequest')
                     ->withInputType(Request::class, 'request')
@@ -238,7 +271,6 @@ class RequestDataTest extends TestCase
         });
 
         $this->postJson('/other-route', [
-            'name' => 'ignore',  // TODO, how can we remove this rule?
             'first_name' => 'Rick',
             'last_name' => 'Astley',
         ])

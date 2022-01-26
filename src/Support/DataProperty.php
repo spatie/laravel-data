@@ -9,6 +9,7 @@ use ReflectionUnionType;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
 use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -33,6 +34,8 @@ class DataProperty
 
     /** @var \Spatie\LaravelData\Attributes\Validation\ValidationAttribute[] */
     protected array $validationAttributes;
+
+    protected bool $withValidation;
 
     protected ?WithCast $castAttribute;
 
@@ -123,6 +126,16 @@ class DataProperty
         }
 
         return $this->validationAttributes;
+    }
+
+    public function shouldValidateProperty(): bool
+    {
+        /** @psalm-suppress RedundantPropertyInitializationCheck */
+        if (! isset($this->withValidation)) {
+            $this->loadAttributes();
+        }
+
+        return $this->withValidation;
     }
 
     public function castAttribute(): ?WithCast
@@ -294,6 +307,12 @@ class DataProperty
 
                 continue;
             }
+
+            if($initiatedAttribute instanceof WithoutValidation){
+                $this->withValidation = false;
+
+                continue;
+            }
         }
 
         $this->validationAttributes = $validationAttributes;
@@ -308,6 +327,10 @@ class DataProperty
 
         if (! isset($this->dataCollectionOfAttribute)) {
             $this->dataCollectionOfAttribute = null;
+        }
+
+        if (! isset($this->withValidation)) {
+            $this->withValidation = true;
         }
     }
 }
