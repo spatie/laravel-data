@@ -9,19 +9,23 @@ use Illuminate\Validation\Rules\Password as BasePassword;
 class Password extends ValidationAttribute
 {
     public function __construct(
-        private int $min = 12,
-        private bool $letters = false,
-        private bool $mixedCase = false,
-        private bool $numbers = false,
-        private bool $symbols = false,
-        private bool $uncompromised = false,
-        private int $uncompromisedThreshold = 0
+        private ?int $min = null,
+        private ?bool $letters = null,
+        private ?bool $mixedCase = null,
+        private ?bool $numbers = null,
+        private ?bool $symbols = null,
+        private ?bool $uncompromised = null,
+        private ?int $uncompromisedThreshold = null
     ) {
     }
 
     public function getRules(): array
     {
-        $rule = BasePassword::min($this->min);
+        if ($this->wantsDefaults()) {
+            return [ BasePassword::default() ];
+        }
+
+        $rule = BasePassword::min($this->min ?? 12);
 
         if ($this->letters) {
             $rule->letters();
@@ -40,9 +44,22 @@ class Password extends ValidationAttribute
         }
 
         if ($this->uncompromised) {
-            $rule->uncompromised($this->uncompromisedThreshold);
+            $rule->uncompromised($this->uncompromisedThreshold ?? 0);
         }
 
         return [$rule];
+    }
+
+    private function wantsDefaults(): bool
+    {
+        return (
+            is_null($this->min) &&
+            is_null($this->letters) &&
+            is_null($this->mixedCase) &&
+            is_null($this->numbers) &&
+            is_null($this->symbols) &&
+            is_null($this->uncompromised) &&
+            is_null($this->uncompromisedThreshold)
+        );
     }
 }

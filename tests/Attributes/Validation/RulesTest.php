@@ -727,8 +727,32 @@ class RulesTest extends TestCase
 
     public function passwordAttributesDataProvider(): Generator
     {
+        BasePassword::defaults(
+            fn () => BasePassword::min(23)
+                ->symbols()
+                ->mixedCase()
+                ->numbers()
+                ->uncompromised(0)
+        );
+
         yield [
             'attribute' => new Password(),
+            'expected' => [
+                BasePassword::min(23)
+                    ->symbols()
+                    ->mixedCase()
+                    ->numbers()
+                    ->uncompromised(0),
+            ],
+        ];
+
+        yield [
+            'attribute' => new Password(),
+            'expected' => [ BasePassword::default() ],
+        ];
+
+        yield [
+            'attribute' => new Password(min: 12),
             'expected' => [new BasePassword(12)],
         ];
 
