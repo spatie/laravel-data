@@ -11,9 +11,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Spatie\LaravelData\Attributes\Validation\Max;
-use Spatie\LaravelData\Attributes\Validation\RequiredWith;
 use Spatie\LaravelData\Attributes\WithoutValidation;
-use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataMagicMethodFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
@@ -247,7 +245,7 @@ class RequestDataTest extends TestCase
         });
 
         $this->postJson('/other-route', [
-            'first_name' => 'Rick', 'last_name' => 'Astley'
+            'first_name' => 'Rick', 'last_name' => 'Astley',
         ])
             ->assertOk()
             ->assertJson(['first_name' => 'Rick', 'last_name' => 'Astley']);
