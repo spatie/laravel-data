@@ -975,4 +975,24 @@ class DataTest extends TestCase
         $this->assertEquals('string', $data->string);
         $this->assertTrue(Carbon::create(2020, 05, 16, 12, 00, 00)->equalTo($data->date));
     }
+
+    /** @test */
+    public function it_excludes_undefined_values_data()
+    {
+        $data = DefaultUndefinedData::from([]);
+
+        $this->assertEquals([], $data->toArray());
+    }
+
+    /** @test */
+    public function it_includes_value_if_not_undefined_data()
+    {
+        $data = DefaultUndefinedData::from([
+            'name' => 'Freek',
+        ]);
+
+        $this->assertEquals([
+            'name' => 'Freek',
+        ], $data->toArray());
+    }
 }
