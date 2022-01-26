@@ -39,6 +39,7 @@ use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataCollectionTransf
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
+use Spatie\LaravelData\Undefined;
 use Spatie\LaravelData\WithData;
 
 class DataTest extends TestCase
@@ -80,7 +81,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::new('name')->lazy()->withType('string')
         )->create();
 
-        $data = new $dataClass(Lazy::create(fn () => 'test'));
+        $data = new $dataClass(Lazy::create(fn() => 'test'));
 
         $this->assertEquals([], $data->toArray());
 
@@ -116,8 +117,8 @@ class DataTest extends TestCase
         )->create();
 
         $data = new $dataClass(
-            Lazy::create(fn () => LazyData::from('Hello')),
-            Lazy::create(fn () => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
+            Lazy::create(fn() => LazyData::from('Hello')),
+            Lazy::create(fn() => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
         );
 
         $this->assertEquals([], (clone $data)->toArray());
@@ -160,7 +161,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::dataCollection('songs', MultiLazyData::class)->lazy()
         )->create();
 
-        $collection = Lazy::create(fn () => MultiLazyData::collection([
+        $collection = Lazy::create(fn() => MultiLazyData::collection([
             DummyDto::rick(),
             DummyDto::bon(),
         ]));
@@ -215,7 +216,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
                 );
             }
         };
@@ -241,7 +242,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
                 );
             }
         };
@@ -463,7 +464,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
+        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn() => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'),) extends Data {
             public function __construct(
                 public SimpleData $data,
                 public DataCollection $dataCollection,
@@ -521,7 +522,7 @@ class DataTest extends TestCase
 
         $transformed = $data->additional([
             'company' => 'Spatie',
-            'alt_name' => fn (Data $data) => "{$data->name} from Spatie",
+            'alt_name' => fn(Data $data) => "{$data->name} from Spatie",
         ])->toArray();
 
         $this->assertEquals([
@@ -977,22 +978,87 @@ class DataTest extends TestCase
     }
 
     /** @test */
-    public function it_excludes_undefined_values_data()
+    public function it_can_create_an_partial_data_object()
     {
-        $data = DefaultUndefinedData::from([]);
+        $dataClass = new class('', Undefined::make(), Undefined::make()) extends Data {
+            public function __construct(
+                public string $string,
+                public string|Undefined $undefinable_string,
+                #[WithCast(StringToUpperCast::class)]
+                public string|Undefined $undefinable_string_with_cast,
+            ) {
+            }
+        };
 
-        $this->assertEquals([], $data->toArray());
+        $partialData = $dataClass::from([
+            'string' => 'Hello World',
+        ]);
+
+        $this->assertEquals('Hello World', $partialData->string);
+        $this->assertEquals(Undefined::make(), $partialData->undefinable_string);
+        $this->assertEquals(Undefined::make(), $partialData->undefinable_string_with_cast);
+
+        $fullData = $dataClass::from([
+            'string' => 'Hello World',
+            'undefinable_string' => 'Hello World',
+            'undefinable_string_with_cast' => 'Hello World',
+        ]);
+
+        $this->assertEquals('Hello World', $fullData->string);
+        $this->assertEquals('Hello World', $fullData->undefinable_string);
+        $this->assertEquals('HELLO WORLD', $fullData->undefinable_string_with_cast);
     }
 
     /** @test */
-    public function it_includes_value_if_not_undefined_data()
+    public function it_can_transform_a_partial_object()
     {
-        $data = DefaultUndefinedData::from([
-            'name' => 'Freek',
+        $dataClass = new class('', Undefined::make(), Undefined::make()) extends Data {
+            public function __construct(
+                public string $string,
+                public string|Undefined $undefinable_string,
+                #[WithTransformer(StringToUpperTransformer::class)]
+                public string|Undefined $undefinable_string_with_transformer,
+            ) {
+            }
+        };
+
+        $partialData = $dataClass::from([
+            'string' => 'Hello World',
+        ]);
+
+        $fullData = $dataClass::from([
+            'string' => 'Hello World',
+            'undefinable_string' => 'Hello World',
+            'undefinable_string_with_transformer' => 'Hello World',
         ]);
 
         $this->assertEquals([
-            'name' => 'Freek',
-        ], $data->toArray());
+            'string' => 'Hello World'
+        ], $partialData->toArray());
+
+        $this->assertEquals([
+            'string' => 'Hello World',
+            'undefinable_string' => 'Hello World',
+            'undefinable_string_with_transformer' => 'HELLO WORLD',
+        ], $fullData->toArray());
+    }
+
+    /** @test */
+    public function it_will_not_include_lazy_undefined_values_when_transforming()
+    {
+        $data = new class(
+            'Hello World',
+            Lazy::create(fn() => Undefined::make())
+        ) extends Data {
+            public function __construct(
+                public string $string,
+                public string|Undefined|Lazy $lazy_undefined_string,
+            ) {
+            }
+        };
+
+        $this->assertEquals($data->toArray(), [
+            'string' => 'Hello World'
+        ]);
     }
 }

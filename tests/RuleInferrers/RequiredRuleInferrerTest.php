@@ -13,6 +13,7 @@ use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
+use Spatie\LaravelData\Undefined;
 
 class RequiredRuleInferrerTest extends TestCase
 {
@@ -120,6 +121,17 @@ class RequiredRuleInferrerTest extends TestCase
         $rules = $this->inferrer->handle($dataProperty, ['present', 'array']);
 
         $this->assertEqualsCanonicalizing(['present', 'array'], $rules);
+    }
+
+    public function it_wont_add_required_rules_to_undefinable_properties()
+    {
+        $dataProperty = $this->getProperty(new class () extends Data {
+            public string|Undefined $string;
+        });
+
+        $rules = $this->inferrer->handle($dataProperty, []);
+
+        $this->assertEqualsCanonicalizing([], $rules);
     }
 
     private function getProperty(object $class): DataProperty
