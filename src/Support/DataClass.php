@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use ReflectionParameter;
 use ReflectionProperty;
 
 class DataClass
@@ -63,10 +64,31 @@ class DataClass
 
     private function resolveProperties(): Collection
     {
+        $defaultValues = $this->resolveDefaultValues();
+
         return collect($this->class->getProperties(ReflectionProperty::IS_PUBLIC))
             ->reject(fn (ReflectionProperty $property) => $property->isStatic())
-            ->map(fn (ReflectionProperty $property) => DataProperty::create($property))
+            ->map(fn (ReflectionProperty $property) => DataProperty::create(
+                $property,
+                array_key_exists($property->getName(), $defaultValues),
+                $defaultValues[$property->getName()] ?? null,
+            ))
             ->values();
+    }
+
+    private function resolveDefaultValues(): array
+    {
+        if (! $this->class->hasMethod('__construct')) {
+            return $this->class->getDefaultProperties();
+        }
+
+        return collect($this->class->getMethod('__construct')->getParameters())
+            ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+            ->mapWithKeys(fn (ReflectionParameter $parameter) => [
+                $parameter->name => $parameter->getDefaultValue(),
+            ])
+            ->merge($this->class->getDefaultProperties())
+            ->toArray();
     }
 
     private function resolveMagicalMethods()

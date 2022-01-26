@@ -2,8 +2,6 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
-use ReflectionClass;
-use ReflectionParameter;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
@@ -19,33 +17,15 @@ class EmptyDataResolver
     {
         $dataClass = $this->dataConfig->getDataClass($class);
 
-        $defaults = $this->resolveDefaults($dataClass->reflection(), $extra);
-
-        return $dataClass->properties()->reduce(function (array $payload, DataProperty $property) use ($defaults) {
-            $payload[$property->name()] = $defaults[$property->name()] ?? $this->getValueForProperty($property);
+        return $dataClass->properties()->reduce(function (array $payload, DataProperty $property) use ($extra) {
+            if ($property->hasDefaultValue()) {
+                $payload[$property->name()] = $property->defaultValue();
+            } else {
+                $payload[$property->name()] = $extra[$property->name()] ?? $this->getValueForProperty($property);
+            }
 
             return $payload;
         }, []);
-    }
-
-    private function resolveDefaults(ReflectionClass $reflection, array $extra): array
-    {
-        $defaultConstructorProperties = [];
-
-        if ($reflection->hasMethod('__construct')) {
-            $defaultConstructorProperties = collect($reflection->getMethod('__construct')->getParameters())
-                ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-                ->mapWithKeys(fn (ReflectionParameter $parameter) => [
-                    $parameter->name => $parameter->getDefaultValue(),
-                ])
-                ->toArray();
-        }
-
-        return array_merge(
-            $reflection->getDefaultProperties(),
-            $defaultConstructorProperties,
-            $extra
-        );
     }
 
     private function getValueForProperty(DataProperty $property): mixed
@@ -62,10 +42,6 @@ class EmptyDataResolver
 
         if ($type === 'array') {
             return [];
-        }
-
-        if ($property->isBuiltIn()) {
-            return null;
         }
 
         if ($property->isData()) {

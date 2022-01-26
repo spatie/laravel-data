@@ -19,7 +19,6 @@ A data property represents a single property within a data object. You can call 
 
 - `isLazy` check if the property can be lazy evaluated
 - `isNullable` check if the property can be null
-- `isBuiltIn` check if the property has a built-in PHP type
 - `isData` check if the property has a data object type
 - `isDataCollection` check if the property has a data collection type
 - `types` get all the types the property can have

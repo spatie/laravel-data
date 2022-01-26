@@ -10,10 +10,6 @@ class BuiltInTypesRuleInferrer implements RuleInferrer
 {
     public function handle(DataProperty $property, array $rules): array
     {
-        if (! $property->isBuiltIn()) {
-            return $rules;
-        }
-
         if ($property->types()->canBe('int')) {
             $rules[] = 'numeric';
         }
