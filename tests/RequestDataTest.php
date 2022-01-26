@@ -17,6 +17,7 @@ use Spatie\LaravelData\Tests\Factories\DataMagicMethodFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Undefined;
 
 class RequestDataTest extends TestCase
 {
@@ -236,7 +237,7 @@ class RequestDataTest extends TestCase
                 ->withAttribute(WithoutValidation::class)
                 ->withAttribute(RequiredWith::class, ['first_name'])
                 ->nullable()
-                ->withType('string')
+                ->withType('string', Undefined::class)
             )
             ->create();
 
