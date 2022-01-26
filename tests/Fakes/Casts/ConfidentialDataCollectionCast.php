@@ -11,6 +11,6 @@ class ConfidentialDataCollectionCast implements Cast
 {
     public function cast(DataProperty $property, mixed $value): DataCollection
     {
-        return SimpleData::collection(array_map(fn() => SimpleData::from('CONFIDENTIAL'), $value));
+        return SimpleData::collection(array_map(fn () => SimpleData::from('CONFIDENTIAL'), $value));
     }
 }

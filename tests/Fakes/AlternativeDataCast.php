@@ -9,6 +9,5 @@ class AlternativeDataCast implements Cast
 {
     public function cast(DataProperty $property, mixed $value): mixed
     {
-
     }
 }
