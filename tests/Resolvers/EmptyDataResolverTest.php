@@ -124,7 +124,7 @@ class EmptyDataResolverTest extends TestCase
     /** @test */
     public function it_will_return_the_base_type_for_undefinable_types()
     {
-        $this->assertEmptyPropertyValue(null, new class() {
+        $this->assertEmptyPropertyValue(null, new class () {
             public Undefined | string $property;
         });
 

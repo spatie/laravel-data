@@ -950,11 +950,11 @@ class DataTest extends TestCase
     public function it_includes_value_if_not_undefined_data()
     {
         $data = DefaultUndefinedData::from([
-            'name' => 'Freek'
+            'name' => 'Freek',
         ]);
 
         $this->assertEquals([
-            'name' => 'Freek'
+            'name' => 'Freek',
         ], $data->toArray());
     }
 }
