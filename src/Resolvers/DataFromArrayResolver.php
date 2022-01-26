@@ -42,7 +42,7 @@ class DataFromArrayResolver
 
     private function resolveValue(DataProperty $property, array $values): mixed
     {
-        $value = array_key_exists($property->name(), $values) ? $values[$property->name()] ?? null : Undefined::make();
+        $value = array_key_exists($property->name(), $values) ? $values[$property->name()] ?? null : Undefined::create();
 
         if ($value === null) {
             return $value;

@@ -941,7 +941,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_create_an_partial_data_object()
     {
-        $dataClass = new class ('', Undefined::make(), Undefined::make()) extends Data {
+        $dataClass = new class('', Undefined::create(), Undefined::create()) extends Data {
             public function __construct(
                 public string $string,
                 public string|Undefined $undefinable_string,
@@ -956,8 +956,8 @@ class DataTest extends TestCase
         ]);
 
         $this->assertEquals('Hello World', $partialData->string);
-        $this->assertEquals(Undefined::make(), $partialData->undefinable_string);
-        $this->assertEquals(Undefined::make(), $partialData->undefinable_string_with_cast);
+        $this->assertEquals(Undefined::create(), $partialData->undefinable_string);
+        $this->assertEquals(Undefined::create(), $partialData->undefinable_string_with_cast);
 
         $fullData = $dataClass::from([
             'string' => 'Hello World',
@@ -973,7 +973,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_transform_a_partial_object()
     {
-        $dataClass = new class ('', Undefined::make(), Undefined::make()) extends Data {
+        $dataClass = new class('', Undefined::create(), Undefined::create()) extends Data {
             public function __construct(
                 public string $string,
                 public string|Undefined $undefinable_string,
