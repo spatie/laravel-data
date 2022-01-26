@@ -51,14 +51,22 @@ class DataTransformer
             ->reduce(function (array $payload, DataProperty $property) use ($allowedExcludes, $allowedIncludes, $data, $exclusionTree, $inclusionTree) {
                 $name = $property->name();
 
-                if ($this->shouldIncludeProperty($name, $data->{$name}, $inclusionTree, $exclusionTree, $allowedIncludes, $allowedExcludes)) {
-                    $payload[$name] = $this->resolvePropertyValue(
-                        $property,
-                        $data->{$name},
-                        $inclusionTree[$name] ?? [],
-                        $exclusionTree[$name] ?? []
-                    );
+                if (! $this->shouldIncludeProperty($name, $data->{$name}, $inclusionTree, $exclusionTree, $allowedIncludes, $allowedExcludes)) {
+                    return $payload;
                 }
+
+                $value = $this->resolvePropertyValue(
+                    $property,
+                    $data->{$name},
+                    $inclusionTree[$name] ?? [],
+                    $exclusionTree[$name] ?? []
+                );
+
+                if ($value instanceof Undefined) {
+                    return $payload;
+                }
+
+                $payload[$name] = $value;
 
                 return $payload;
             }, []);
