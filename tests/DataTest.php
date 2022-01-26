@@ -10,12 +10,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
+use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
+use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
+use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
@@ -28,6 +33,9 @@ use Spatie\LaravelData\Tests\Fakes\ReadonlyData;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
+use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataCollectionTransformer;
+use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataTransformer;
+use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\WithData;
 
@@ -70,7 +78,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::new('name')->lazy()->withType('string')
         )->create();
 
-        $data = new $dataClass(Lazy::create(fn () => 'test'));
+        $data = new $dataClass(Lazy::create(fn() => 'test'));
 
         $this->assertEquals([], $data->toArray());
 
@@ -106,8 +114,8 @@ class DataTest extends TestCase
         )->create();
 
         $data = new $dataClass(
-            Lazy::create(fn () => LazyData::from('Hello')),
-            Lazy::create(fn () => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
+            Lazy::create(fn() => LazyData::from('Hello')),
+            Lazy::create(fn() => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
         );
 
         $this->assertEquals([], (clone $data)->toArray());
@@ -150,7 +158,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::dataCollection('songs', MultiLazyData::class)->lazy()
         )->create();
 
-        $collection = Lazy::create(fn () => MultiLazyData::collection([
+        $collection = Lazy::create(fn() => MultiLazyData::collection([
             DummyDto::rick(),
             DummyDto::bon(),
         ]));
@@ -205,7 +213,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
                 );
             }
         };
@@ -231,7 +239,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
                 );
             }
         };
@@ -247,7 +255,7 @@ class DataTest extends TestCase
         /** @var \Illuminate\Database\Eloquent\Model $model */
         $model = DummyModelWithCasts::make();
 
-        $data = new class (Lazy::whenLoaded('relation', $model, fn () => 'loaded')) extends Data {
+        $data = new class (Lazy::whenLoaded('relation', $model, fn() => 'loaded')) extends Data {
             public function __construct(
                 public string|Lazy $relation,
             ) {
@@ -445,7 +453,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
+        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn() => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'),) extends Data {
             public function __construct(
                 public SimpleData $data,
                 public DataCollection $dataCollection,
@@ -503,7 +511,7 @@ class DataTest extends TestCase
 
         $transformed = $data->additional([
             'company' => 'Spatie',
-            'alt_name' => fn (Data $data) => "{$data->name} from Spatie",
+            'alt_name' => fn(Data $data) => "{$data->name} from Spatie",
         ])->toArray();
 
         $this->assertEquals([
@@ -772,5 +780,134 @@ class DataTest extends TestCase
         $this->assertEquals('Test Again', $data->promoted_property);
         $this->assertEquals('Test', $data->default_property);
         $this->assertEquals('Test Again', $data->default_promoted_property);
+    }
+
+    /** @test */
+    public function it_can_use_a_custom_transformer_to_transform_data_objects_and_collections()
+    {
+        $nestedData = new class(42, 'Hello World') extends Data {
+            public function __construct(
+                public int $integer,
+                public string $string,
+            ) {
+            }
+        };
+
+        $nestedDataCollection = $nestedData::collection([
+            ['integer' => 314, 'string' => 'pi'],
+            ['integer' => '69', 'string' => 'Laravel after hours'],
+        ]);
+
+        $dataWithDefaultTransformers = new class($nestedData, $nestedDataCollection) extends Data {
+            public function __construct(
+                public Data $nestedData,
+                public DataCollection $nestedDataCollection,
+            ) {
+            }
+        };
+
+        $dataWithSpecificTransformers = new class($nestedData, $nestedDataCollection) extends Data {
+            public function __construct(
+                #[WithTransformer(ConfidentialDataTransformer::class)]
+                public Data $nestedData,
+                #[WithTransformer(ConfidentialDataCollectionTransformer::class)]
+                public DataCollection $nestedDataCollection,
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'nestedData' => ['integer' => 42, 'string' => 'Hello World'],
+            'nestedDataCollection' => [
+                ['integer' => 314, 'string' => 'pi'],
+                ['integer' => '69', 'string' => 'Laravel after hours'],
+            ],
+        ], $dataWithDefaultTransformers->toArray());
+
+        $this->assertEquals([
+            'nestedData' => ['integer' => 'CONFIDENTIAL', 'string' => 'CONFIDENTIAL'],
+            'nestedDataCollection' => [
+                ['integer' => 'CONFIDENTIAL', 'string' => 'CONFIDENTIAL'],
+                ['integer' => 'CONFIDENTIAL', 'string' => 'CONFIDENTIAL'],
+            ],
+        ], $dataWithSpecificTransformers->toArray());
+    }
+
+    /** @test */
+    public function it_can_transform_built_in_types_with_custom_transformers()
+    {
+        $data = new class('Hello World', 'Hello World') extends Data {
+            public function __construct(
+                public string $without_transformer,
+                #[WithTransformer(StringToUpperTransformer::class)]
+                public string $with_transformer
+            ) {
+            }
+        };
+        $this->assertEquals([
+            'without_transformer' => 'Hello World',
+            'with_transformer' => 'HELLO WORLD',
+        ], $data->toArray());
+    }
+
+    /** @test */
+    public function it_can_cast_data_objects_and_collections_using_a_custom_cast()
+    {
+        $dataWithDefaultCastsClass = new class(new SimpleData(''), SimpleData::collection([])) extends Data {
+            public function __construct(
+                public SimpleData $nestedData,
+                #[DataCollectionOf(SimpleData::class)]
+                public DataCollection $nestedDataCollection,
+            ) {
+            }
+        };
+
+        $dataWithCustomCastsClass = new class(new SimpleData(''), SimpleData::collection([])) extends Data {
+            public function __construct(
+                #[WithCast(ConfidentialDataCast::class)]
+                public SimpleData $nestedData,
+                #[WithCast(ConfidentialDataCollectionCast::class)]
+                #[DataCollectionOf(SimpleData::class)]
+                public DataCollection $nestedDataCollection,
+            ) {
+            }
+        };
+
+        $dataWithDefaultCasts = $dataWithDefaultCastsClass::from([
+            'nestedData' => 'a secret',
+            'nestedDataCollection' => ['another secret', 'yet another secret']
+        ]);
+
+        $dataWithCustomCasts = $dataWithCustomCastsClass::from([
+            'nestedData' => 'a secret',
+            'nestedDataCollection' => ['another secret', 'yet another secret']
+        ]);
+
+        $this->assertEquals(SimpleData::from('a secret'), $dataWithDefaultCasts->nestedData);
+        $this->assertEquals(SimpleData::collection(['another secret', 'yet another secret']), $dataWithDefaultCasts->nestedDataCollection);
+
+        $this->assertEquals(SimpleData::from('CONFIDENTIAL'), $dataWithCustomCasts->nestedData);
+        $this->assertEquals(SimpleData::collection(['CONFIDENTIAL', 'CONFIDENTIAL']), $dataWithCustomCasts->nestedDataCollection);
+    }
+
+    /** @test */
+    public function it_can_cast_built_in_types_with_custom_casts()
+    {
+        $dataClass = new class('', '') extends Data {
+            public function __construct(
+                public string $without_cast,
+                #[WithCast(StringToUpperCast::class)]
+                public string $with_cast
+            ) {
+            }
+        };
+
+        $data = $dataClass::from([
+            'without_cast' => 'Hello World',
+            'with_cast' => 'Hello World',
+        ]);
+
+        $this->assertEquals('Hello World', $data->without_cast);
+        $this->assertEquals('HELLO WORLD', $data->with_cast);
     }
 }

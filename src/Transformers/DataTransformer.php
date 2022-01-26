@@ -141,6 +141,10 @@ class DataTransformer
             return null;
         }
 
+        if ($transformer = $this->resolveTransformerForValue($property, $value)) {
+            return $transformer->transform($property, $value);
+        }
+
         if ($value instanceof Data || $value instanceof DataCollection) {
             $value->withPartialsTrees($nestedInclusionTree, $nestedExclusionTree);
 
@@ -149,12 +153,26 @@ class DataTransformer
                 : $value;
         }
 
+        return $value;
+    }
+
+    private function resolveTransformerForValue(
+        DataProperty $property,
+        mixed $value,
+    ): ?Transformer {
         if (! $this->transformationType->useTransformers()) {
-            return $value;
+            return null;
         }
 
         $transformer = $property->transformerAttribute()?->get() ?? $this->config->findGlobalTransformerForValue($value);
 
-        return $transformer?->transform($property, $value) ?? $value;
+        $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
+            && ($property->isData() || $property->isDataCollection());
+
+        if ($shouldUseDefaultDataTransformer) {
+            return null;
+        }
+
+        return $transformer;
     }
 }
