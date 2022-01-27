@@ -72,7 +72,7 @@ class CastPropertiesPipe extends DataPipe
 
         if ($property->isDataCollection()) {
             $items = array_map(
-                fn($item) => $property->dataClassName()::from($item),
+                fn ($item) => $property->dataClassName()::from($item),
                 $value
             );
 

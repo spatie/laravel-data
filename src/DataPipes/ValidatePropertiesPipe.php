@@ -14,7 +14,7 @@ class ValidatePropertiesPipe extends DataPipe
     ) {
     }
 
-    public function execute(mixed $value, Collection $payload, DataClass $class,): Collection
+    public function execute(mixed $value, Collection $payload, DataClass $class, ): Collection
     {
         if (! $value instanceof Request) {
             return $payload;

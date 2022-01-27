@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\DataPipes;
 
-use Illuminate\Routing\Pipeline;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataClass;
 

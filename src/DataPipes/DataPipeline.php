@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\DataPipes;
 
-use Exception;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataSerializers\DataSerializer;
@@ -36,7 +35,7 @@ class DataPipeline
 
         $payload = $this->serializePayload($initialPayload, $dataClass);
 
-        if($payload instanceof Data){
+        if ($payload instanceof Data) {
             // TODO: this will cause no pipeline execution, so no validation or authorisation on magic methods
             return $payload;
         }
@@ -48,15 +47,15 @@ class DataPipeline
         }
 
         [$promotedProperties, $classProperties] = $dataClass->properties()->partition(
-            fn(DataProperty $property) => $property->isPromoted()
+            fn (DataProperty $property) => $property->isPromoted()
         );
 
         return $this->createDataObjectWithProperties(
             $this->dataClass,
-            $promotedProperties->mapWithKeys(fn(DataProperty $property) => [
+            $promotedProperties->mapWithKeys(fn (DataProperty $property) => [
                 $property->name() => $payload->get($property->name()),
             ]),
-            $classProperties->mapWithKeys(fn(DataProperty $property) => [
+            $classProperties->mapWithKeys(fn (DataProperty $property) => [
                 $property->name() => $payload->get($property->name()),
             ])
         );

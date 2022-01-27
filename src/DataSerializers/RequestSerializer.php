@@ -9,7 +9,7 @@ class RequestSerializer implements DataSerializer
 {
     public function serialize(mixed $payload): array|Data|null
     {
-        if(! $payload instanceof Request){
+        if (! $payload instanceof Request) {
             return null;
         }
 
