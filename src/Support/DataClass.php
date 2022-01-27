@@ -33,6 +33,11 @@ class DataClass
         return $this->properties;
     }
 
+    public function name(): string
+    {
+        return $this->reflection()->name;
+    }
+
     public function creationMethods(): array
     {
         /** @psalm-suppress RedundantPropertyInitializationCheck */

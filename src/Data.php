@@ -11,10 +11,21 @@ use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Enumerable;
 use JsonSerializable;
+use phpDocumentor\Reflection\Types\Static_;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\ValidateableData;
+use Spatie\LaravelData\DataPipes\AuthorizedPipe;
+use Spatie\LaravelData\DataPipes\CastPropertiesPipe;
+use Spatie\LaravelData\DataPipes\DataPipeline;
+use Spatie\LaravelData\DataPipes\RenamePropertiesPipe;
+use Spatie\LaravelData\DataPipes\ValidatePropertiesPipe;
+use Spatie\LaravelData\DataSerializers\ArrayableSerializer;
+use Spatie\LaravelData\DataSerializers\ArraySerializer;
+use Spatie\LaravelData\DataSerializers\MagicMethodSerializer;
+use Spatie\LaravelData\DataSerializers\ModelSerializer;
+use Spatie\LaravelData\DataSerializers\RequestSerializer;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
@@ -28,6 +39,22 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
     use AppendableData;
     use ValidateableData;
 
+    public static function pipeline(): DataPipeline
+    {
+        // TODO: Should this be a factory?
+        return DataPipeline::create()
+            ->serializer(MagicMethodSerializer::class)
+            ->serializer(new ModelSerializer())
+            ->serializer(new RequestSerializer())
+            ->serializer(new ArrayableSerializer())
+            ->serializer(new ArraySerializer())
+            ->pipe(AuthorizedPipe::class)
+            ->pipe(ValidatePropertiesPipe::class)
+            ->pipe(RenamePropertiesPipe::class)
+            ->pipe(CastPropertiesPipe::class)
+            ->into(static::class);
+    }
+
     public static function optional($payload): ?static
     {
         return $payload === null
@@ -37,10 +64,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
 
     public static function from($payload): static
     {
-        return app(DataFromSomethingResolver::class)->execute(
-            static::class,
-            $payload
-        );
+        return static::pipeline()->from($payload);
     }
 
     public static function collection(Enumerable|array|AbstractPaginator|AbstractCursorPaginator|Paginator $items): DataCollection
