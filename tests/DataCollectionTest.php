@@ -9,6 +9,7 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -394,5 +395,31 @@ class DataCollectionTest extends TestCase
 
         $this->assertEquals('[{"string":"A"},{"string":"B"},{"string":"C"}]', $collection->toJson());
         $this->assertEquals('[{"string":"A"},{"string":"B"},{"string":"C"}]', json_encode($collection));
+    }
+
+    /** @test */
+    public function it_will_cast_data_object_into_the_data_collection_objects()
+    {
+        $dataClass = new class('') extends Data{
+            public function __construct(public string $otherString)
+            {
+            }
+
+            public static function fromSimpleData(SimpleData $simpleData): static
+            {
+                return new self($simpleData->string);
+            }
+        };
+
+        $collection = $dataClass::collection([
+            SimpleData::from('A'),
+            SimpleData::from('B'),
+        ]);
+
+        $this->assertInstanceOf($dataClass::class, $collection[0]);
+        $this->assertEquals('A', $collection[0]->otherString);
+
+        $this->assertInstanceOf($dataClass::class, $collection[1]);
+        $this->assertEquals('B', $collection[1]->otherString);
     }
 }
