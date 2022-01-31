@@ -400,7 +400,7 @@ class DataCollectionTest extends TestCase
     /** @test */
     public function it_will_cast_data_object_into_the_data_collection_objects()
     {
-        $dataClass = new class('') extends Data{
+        $dataClass = new class ('') extends Data {
             public function __construct(public string $otherString)
             {
             }
