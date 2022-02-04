@@ -25,7 +25,7 @@ class DateTimeInterfaceCast implements Cast
             return Uncastable::create();
         }
 
-        /** @var \DateTime|\DateTimeImmutable $type */
+        /** @var class-string<\DateTime|\DateTimeImmutable> $type */
         try {
             $datetime = $type::createFromFormat($format, $value);
         } catch (Throwable $e) {
@@ -33,7 +33,6 @@ class DateTimeInterfaceCast implements Cast
         }
 
         if ($datetime === false) {
-            /** @psalm-suppress InvalidCast,InvalidArgument */
             throw CannotCastDate::create($format, $type, $value);
         }
 

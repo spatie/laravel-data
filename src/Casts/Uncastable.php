@@ -6,6 +6,6 @@ class Uncastable
 {
     public static function create(): static
     {
-        return new self();
+        return new static();
     }
 }
