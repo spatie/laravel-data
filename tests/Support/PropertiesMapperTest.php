@@ -27,7 +27,7 @@ class PropertiesMapperTest extends TestCase
     /** @test */
     public function it_can_map_property_names_using_strings()
     {
-        $dataClass = new class {
+        $dataClass = new class () {
             #[MapFrom('something')]
             public string $mapped;
 
@@ -58,7 +58,7 @@ class PropertiesMapperTest extends TestCase
     /** @test */
     public function it_can_map_property_names_using_ints()
     {
-        $dataClass = new class {
+        $dataClass = new class () {
             #[MapFrom(0)]
             public string $line1;
 
@@ -88,7 +88,7 @@ class PropertiesMapperTest extends TestCase
     /** @test */
     public function it_can_map_property_names_using_a_mapper()
     {
-        $dataClass = new class {
+        $dataClass = new class () {
             // TODO: this is a bit confusing so we're going from snake -> camel but the class name says something different
             #[MapFrom(CamelCaseToSnakeCaseMapper::class)]
             public string $mappedCasedProperty;
@@ -106,7 +106,7 @@ class PropertiesMapperTest extends TestCase
     /** @test */
     public function it_can_map_when_the_property_is_a_data_object()
     {
-        $dataClass = new class {
+        $dataClass = new class () {
             #[MapFrom('something')]
             public SimpleData $mapped;
 
@@ -136,7 +136,7 @@ class PropertiesMapperTest extends TestCase
     /** @test */
     public function it_can_map_when_the_property_is_a_data_object_with_its_own_mappings()
     {
-        $dataClass = new class {
+        $dataClass = new class () {
             #[MapFrom('something')]
             public SimpleDataWithMappedProperty $mapped;
 
@@ -166,7 +166,7 @@ class PropertiesMapperTest extends TestCase
     /** @test */
     public function it_can_map_when_the_property_is_a_data_collection()
     {
-        $dataClass = new class {
+        $dataClass = new class () {
             #[MapFrom('something'), DataCollectionOf(SimpleData::class)]
             public DataCollection $mapped;
 
@@ -203,7 +203,7 @@ class PropertiesMapperTest extends TestCase
     /** @test */
     public function it_can_map_when_the_property_is_a_data_collection_which_also_maps_properties()
     {
-        $dataClass = new class {
+        $dataClass = new class () {
             #[MapFrom('something'), DataCollectionOf(SimpleDataWithMappedProperty::class)]
             public DataCollection $mapped;
 

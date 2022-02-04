@@ -8,7 +8,7 @@ class CamelCaseToSnakeCaseMapper implements Mapper
 {
     public function map(int|string $name, array $properties): string|int
     {
-        if(! is_string($name)){
+        if (! is_string($name)) {
             return $name;
         }
 

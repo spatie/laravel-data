@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Serializers;
 
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Support\DataClass;
 
 interface DataSerializer
 {

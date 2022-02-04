@@ -7,7 +7,7 @@ use Spatie\LaravelData\Support\DataConfig;
 
 class MagicMethodSerializer implements DataSerializer
 {
-    public function __construct(protected  DataConfig $dataConfig,)
+    public function __construct(protected  DataConfig $dataConfig, )
     {
     }
 

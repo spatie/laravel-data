@@ -20,7 +20,7 @@ class PropertiesMapper
 
         $mapper = $this->resolveClassMapper($class);
 
-        return $class->properties()->mapWithKeys(fn(DataProperty $property) => [
+        return $class->properties()->mapWithKeys(fn (DataProperty $property) => [
             $property->name() => $this->resolveValueForProperty(
                 $property,
                 $properties,
@@ -55,19 +55,19 @@ class PropertiesMapper
             ? $property->name()
             : $mapper->map($property->name(), $properties);
 
-        if(! Arr::has($properties, $from)){
+        if (! Arr::has($properties, $from)) {
             return new Undefined();
         }
 
         $value = Arr::get($properties, $from);
 
-        if($property->isData()){
+        if ($property->isData()) {
             return $this->execute($value, $property->dataClassName());
         }
 
-        if($property->isDataCollection()){
+        if ($property->isDataCollection()) {
             return array_map(
-                fn(array $nestedProperties) => $this->execute($nestedProperties, $property->dataClassName()),
+                fn (array $nestedProperties) => $this->execute($nestedProperties, $property->dataClassName()),
                 $value
             );
         }
@@ -108,5 +108,4 @@ class PropertiesMapper
 
         return $mapper;
     }
-
 }

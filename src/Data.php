@@ -93,7 +93,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
             RequestSerializer::class,
             MagicMethodSerializer::class,
             ModelSerializer::class,
-            ArraySerializer::class
+            ArraySerializer::class,
         ];
     }
 }
