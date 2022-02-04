@@ -18,14 +18,14 @@ class DataClass
 
     protected bool $hasAuthorizationMethod;
 
-    public function __construct(protected ReflectionClass $class)
+    final public function __construct(protected ReflectionClass $class)
     {
         $this->properties = $this->resolveProperties();
     }
 
     public static function create(ReflectionClass $class): static
     {
-        return new self($class);
+        return new static($class);
     }
 
     public function properties(): Collection

@@ -51,10 +51,10 @@ class DataProperty
         bool $hasDefaultValue = false,
         mixed $defaultValue = null
     ): static {
-        return new self($property, $hasDefaultValue, $defaultValue);
+        return new static($property, $hasDefaultValue, $defaultValue);
     }
 
-    public function __construct(
+    final public function __construct(
         protected ReflectionProperty $property,
         protected bool $hasDefaultValue = false,
         protected mixed $defaultValue = null

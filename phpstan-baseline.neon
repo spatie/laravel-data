@@ -1,0 +1,17 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Casts/Uncastable.php
+
+		-
+			message: "#^Method Spatie\\\\LaravelData\\\\Data\\:\\:from\\(\\) should return static\\(Spatie\\\\LaravelData\\\\Data\\) but returns Spatie\\\\LaravelData\\\\Data\\.$#"
+			count: 1
+			path: src/Data.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:mapWithKeys\\(\\) expects callable\\(mixed, \\(int\\|string\\)\\)\\: array, Closure\\(Spatie\\\\LaravelData\\\\Support\\\\DataProperty\\)\\: Illuminate\\\\Support\\\\Collection given\\.$#"
+			count: 1
+			path: src/Resolvers/DataValidationRulesResolver.php
+

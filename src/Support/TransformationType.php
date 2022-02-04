@@ -12,34 +12,28 @@ class TransformationType
     {
     }
 
-    public static function full(): static
+    public static function full(): TransformationType
     {
         return new self(self::FULL);
     }
 
-    public static function request(): static
+    public static function request(): TransformationType
     {
         return new self(self::REQUEST);
     }
 
-    public static function withoutValueTransforming(): static
+    public static function withoutValueTransforming(): TransformationType
     {
         return new self(self::WITHOUT_VALUE_TRANSFORMING);
     }
 
     public function useTransformers(): bool
     {
-        return match ($this->type) {
-            self::FULL, self::REQUEST => true,
-            self::WITHOUT_VALUE_TRANSFORMING => false,
-        };
+        return $this->type !== self::WITHOUT_VALUE_TRANSFORMING;
     }
 
     public function limitIncludesAndExcludes(): bool
     {
-        return match ($this->type) {
-            self::FULL, self::WITHOUT_VALUE_TRANSFORMING => false,
-            self::REQUEST => true,
-        };
+        return $this->type === self::REQUEST;
     }
 }
