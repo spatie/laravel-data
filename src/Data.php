@@ -17,6 +17,10 @@ use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\ValidateableData;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
+use Spatie\LaravelData\Serializers\ArraySerializer;
+use Spatie\LaravelData\Serializers\MagicMethodSerializer;
+use Spatie\LaravelData\Serializers\ModelSerializer;
+use Spatie\LaravelData\Serializers\RequestSerializer;
 use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
 use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Transformers\DataTransformer;
@@ -81,5 +85,15 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
     public static function castUsing(array $arguments)
     {
         return new DataEloquentCast(static::class);
+    }
+
+    public static function serializers(): array
+    {
+        return [
+            RequestSerializer::class,
+            MagicMethodSerializer::class,
+            ModelSerializer::class,
+            ArraySerializer::class
+        ];
     }
 }

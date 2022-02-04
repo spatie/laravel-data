@@ -1,27 +1,33 @@
 <?php
 
-namespace Spatie\LaravelData\Resolvers;
+namespace Spatie\LaravelData\Serializers;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
 
-class DataFromModelResolver
+class ModelSerializer implements DataSerializer
 {
     public function __construct(
         private DataFromArrayResolver $dataFromArrayResolver
     ) {
     }
 
-    public function execute(string $class, Model $model)
+    public function serialize(string $class, mixed $payload): ?Data
     {
-        $values = $model->toArray();
-
-        foreach ($model->getDates() as $key) {
-            $values[$key] = $model->getAttribute($key);
+        if (! $payload instanceof Model) {
+            return null;
         }
 
-        foreach ($model->getCasts() as $key => $cast) {
+        $values = $payload->toArray();
+
+        foreach ($payload->getDates() as $key) {
+            $values[$key] = $payload->getAttribute($key);
+        }
+
+        foreach ($payload->getCasts() as $key => $cast) {
             if ($this->isDateCast($cast)) {
-                $values[$key] = $model->getAttribute($key);
+                $values[$key] = $payload->getAttribute($key);
             }
         }
 

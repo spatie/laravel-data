@@ -8,6 +8,7 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
+use Spatie\LaravelData\Attributes\MapFrom;
 
 class DataClass
 {
@@ -17,6 +18,8 @@ class DataClass
     protected array $creationMethods;
 
     protected bool $hasAuthorizationMethod;
+
+    protected ?MapFrom $mapperAttribute;
 
     final public function __construct(protected ReflectionClass $class)
     {
@@ -31,6 +34,11 @@ class DataClass
     public function properties(): Collection
     {
         return $this->properties;
+    }
+
+    public function className(): string
+    {
+        return $this->class->name;
     }
 
     public function creationMethods(): array
@@ -57,9 +65,13 @@ class DataClass
         return $this->hasAuthorizationMethod;
     }
 
-    public function reflection(): ReflectionClass
+    public function mapperAttribute(): ?MapFrom
     {
-        return $this->class;
+        if (! isset($this->mapperAttribute)) {
+            $this->loadAttributes();
+        }
+
+        return $this->mapperAttribute;
     }
 
     private function resolveProperties(): Collection
@@ -67,8 +79,8 @@ class DataClass
         $defaultValues = $this->resolveDefaultValues();
 
         return collect($this->class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(fn (ReflectionProperty $property) => $property->isStatic())
-            ->map(fn (ReflectionProperty $property) => DataProperty::create(
+            ->reject(fn(ReflectionProperty $property) => $property->isStatic())
+            ->map(fn(ReflectionProperty $property) => DataProperty::create(
                 $property,
                 array_key_exists($property->getName(), $defaultValues),
                 $defaultValues[$property->getName()] ?? null,
@@ -83,8 +95,8 @@ class DataClass
         }
 
         return collect($this->class->getMethod('__construct')->getParameters())
-            ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-            ->mapWithKeys(fn (ReflectionParameter $parameter) => [
+            ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+            ->mapWithKeys(fn(ReflectionParameter $parameter) => [
                 $parameter->name => $parameter->getDefaultValue(),
             ])
             ->merge($this->class->getDefaultProperties())
@@ -98,7 +110,7 @@ class DataClass
         $methods = collect($this->class->getMethods(ReflectionMethod::IS_STATIC));
 
         $this->hasAuthorizationMethod = $methods->contains(
-            fn (ReflectionMethod $method) => in_array($method->getName(), ['authorize', 'authorized']) && $method->isPublic()
+            fn(ReflectionMethod $method) => in_array($method->getName(), ['authorize', 'authorized']) && $method->isPublic()
         );
 
         $this->creationMethods = $methods
@@ -130,4 +142,22 @@ class DataClass
                 return $entries;
             })->toArray();
     }
+
+    private function loadAttributes(): void
+    {
+        foreach ($this->class->getAttributes() as $attribute) {
+            $initiatedAttribute = $attribute->newInstance();
+
+            if ($initiatedAttribute instanceof MapFrom) {
+                $this->mapperAttribute = $initiatedAttribute;
+
+                continue;
+            }
+        }
+
+        if (! isset($this->mapperAttribute)) {
+            $this->mapperAttribute = null;
+        }
+    }
+
 }
