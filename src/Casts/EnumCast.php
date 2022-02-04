@@ -22,11 +22,10 @@ class EnumCast implements Cast
             return Uncastable::create();
         }
 
-        /** @var \BackedEnum $type */
+        /** @var class-string<\BackedEnum> $type */
         try {
             return $type::from($value);
         } catch (Throwable $e) {
-            /** @psalm-suppress InvalidCast,InvalidArgument */
             throw CannotCastEnum::create($type, $value);
         }
     }
