@@ -11,6 +11,7 @@ use ReflectionProperty;
 
 class DataClass
 {
+    /** @return Collection<string, \Spatie\LaravelData\Support\DataProperty> */
     protected Collection $properties;
 
     /** @var array<string, string> */
@@ -28,6 +29,7 @@ class DataClass
         return new static($class);
     }
 
+    /** @return Collection<string, \Spatie\LaravelData\Support\DataProperty> */
     public function properties(): Collection
     {
         return $this->properties;
