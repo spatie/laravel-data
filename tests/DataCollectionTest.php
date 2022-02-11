@@ -10,7 +10,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -20,7 +19,7 @@ class DataCollectionTest extends TestCase
     /** @test */
     public function it_can_get_a_paginated_data_collection()
     {
-        $items = Collection::times(100, fn(int $index) => "Item {$index}");
+        $items = Collection::times(100, fn (int $index) => "Item {$index}");
 
         $paginator = new LengthAwarePaginator(
             $items->forPage(1, 15),
@@ -52,7 +51,7 @@ class DataCollectionTest extends TestCase
     {
         $collection = SimpleData::collection(['A', 'B']);
 
-        $filtered = $collection->filter(fn(SimpleData $data) => $data->string === 'A')->toArray();
+        $filtered = $collection->filter(fn (SimpleData $data) => $data->string === 'A')->toArray();
 
         $this->assertEquals([
             ['string' => 'A'],
@@ -66,7 +65,7 @@ class DataCollectionTest extends TestCase
             new LengthAwarePaginator(['A', 'B'], 2, 15)
         );
 
-        $filtered = $collection->filter(fn(SimpleData $data) => $data->string === 'A')->toArray();
+        $filtered = $collection->filter(fn (SimpleData $data) => $data->string === 'A')->toArray();
 
         $this->assertEquals([
             ['string' => 'A'],
@@ -79,7 +78,7 @@ class DataCollectionTest extends TestCase
     {
         $collection = SimpleData::collection(['A', 'B']);
 
-        $filtered = $collection->through(fn(SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
+        $filtered = $collection->through(fn (SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
 
         $this->assertEquals([
             ['string' => 'Ax'],
@@ -94,7 +93,7 @@ class DataCollectionTest extends TestCase
             new LengthAwarePaginator(['A', 'B'], 2, 15)
         );
 
-        $filtered = $collection->through(fn(SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
+        $filtered = $collection->through(fn (SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
 
         $this->assertEquals([
             ['string' => 'Ax'],
@@ -159,25 +158,25 @@ class DataCollectionTest extends TestCase
     public function arrayAccessCollections(): Generator
     {
         yield "array" => [
-            fn() => SimpleData::collection([
+            fn () => SimpleData::collection([
                 'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ]),
         ];
 
         yield "collection" => [
-            fn() => SimpleData::collection([
+            fn () => SimpleData::collection([
                 'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ]),
         ];
 
         yield "paginator" => [
-            fn() => SimpleData::collection(new LengthAwarePaginator([
+            fn () => SimpleData::collection(new LengthAwarePaginator([
                 'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ], 4, 15)),
         ];
 
         yield "cursor paginator" => [
-            fn() => SimpleData::collection(new CursorPaginator([
+            fn () => SimpleData::collection(new CursorPaginator([
                 'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ], 4)),
         ];
@@ -369,7 +368,7 @@ class DataCollectionTest extends TestCase
             $data->string = strtoupper($data->string);
 
             return $data;
-        })->filter(fn(SimpleData $data) => $data->string === strtoupper('Never gonna give you up!'))->toArray();
+        })->filter(fn (SimpleData $data) => $data->string === strtoupper('Never gonna give you up!'))->toArray();
 
         $this->assertEquals([
             ['string' => strtoupper('Never gonna give you up!')],
