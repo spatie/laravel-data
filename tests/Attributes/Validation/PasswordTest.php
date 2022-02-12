@@ -46,7 +46,7 @@ class PasswordTest extends TestCase
         ];
 
         yield 'uncompromised' => [
-            'setDefaults' => fn() => ValidationPassword::defaults(fn () => ValidationPassword::min(69)->uncompromised(7)),
+            'setDefaults' => fn () => ValidationPassword::defaults(fn () => ValidationPassword::min(69)->uncompromised(7)),
             'expectedConfig' => [
                 'min' => 69,
                 'uncompromised' => true,
