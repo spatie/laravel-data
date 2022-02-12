@@ -23,6 +23,7 @@ class PasswordTest extends TestCase
 
         foreach ($expectedConfig as $key => $expected) {
             $prop = $clazz->getProperty($key);
+            $prop->setAccessible(true);
             $actual = $prop->getValue($rule);
 
             $this->assertSame($expected, $actual);
