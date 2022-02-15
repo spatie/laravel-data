@@ -24,14 +24,14 @@ class LaravelDataServiceProvider extends PackageServiceProvider
         );
 
         /** @psalm-suppress UndefinedInterfaceMethod */
-        $this->app->beforeResolving(Data::class, function ($class) {
-            if ($this->app->has($class)) {
+        $this->app->beforeResolving(Data::class, function ($class, $parameters, $app) {
+            if ($app->has($class)) {
                 return;
             }
 
-            $this->app->bind(
+            $app->bind(
                 $class,
-                fn () => $class::from($this->app->make(Request::class)),
+                fn($container) => $class::from($container['request'])
             );
         });
     }
