@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData;
 
-use Illuminate\Http\Request;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -31,7 +30,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
             $app->bind(
                 $class,
-                fn($container) => $class::from($container['request'])
+                fn ($container) => $class::from($container['request'])
             );
         });
     }
