@@ -5,15 +5,27 @@ namespace Spatie\LaravelData\Tests\Resolvers;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\LaravelData\Resolvers\DataFromModelResolver;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
+use Spatie\LaravelData\Tests\Factories\FakeNestedModelFactory;
+use Spatie\LaravelData\Tests\Fakes\FakeModelData;
+use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
+use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 
 class DataFromModelResolverTest extends TestCase
 {
+    use RefreshDatabase;
+
     private DataFromModelResolver $resolver;
+
+    protected function defineDatabaseMigrations()
+    {
+        $this->loadMigrationsFrom(__DIR__ . '/../Migrations');
+    }
 
     public function setUp(): void
     {
@@ -25,19 +37,38 @@ class DataFromModelResolverTest extends TestCase
     /** @test */
     public function it_can_get_a_data_object_from_model()
     {
-        $fakeModelClass = new class () extends Model {
-        };
+        $model = FakeModel::factory()->create();
 
-        $model = $fakeModelClass::make([
-            'string' => 'Hello',
-        ]);
+        $data = FakeModelData::from($model);
 
-        $data = $this->resolver->execute(
-            SimpleData::class,
-            $model
-        );
+        $this->assertEquals($model->string, $data->string);
+        $this->assertEquals($model->nullable, $data->nullable);
+        $this->assertEquals($model->date, $data->date);
+    }
 
-        $this->assertEquals(new SimpleData('Hello'), $data);
+    /** @test */
+    public function it_can_get_a_data_object_with_nesting_from_model_and_relations()
+    {
+        $model = FakeModel::factory()->create();
+
+        $nestedModelA = FakeNestedModel::factory()->for($model)->create();
+        $nestedModelB = FakeNestedModel::factory()->for($model)->create();
+
+        $data = FakeModelData::from($model->load('fakeNestedModels'));
+
+        $this->assertEquals($model->string, $data->string);
+        $this->assertEquals($model->nullable, $data->nullable);
+        $this->assertEquals($model->date, $data->date);
+
+        $this->assertCount(2, $data->fake_nested_models);
+
+        $this->assertEquals($nestedModelA->string, $data->fake_nested_models[0]->string);
+        $this->assertEquals($nestedModelA->nullable, $data->fake_nested_models[0]->nullable);
+        $this->assertEquals($nestedModelA->date, $data->fake_nested_models[0]->date);
+
+        $this->assertEquals($nestedModelB->string, $data->fake_nested_models[1]->string);
+        $this->assertEquals($nestedModelB->nullable, $data->fake_nested_models[1]->nullable);
+        $this->assertEquals($nestedModelB->date, $data->fake_nested_models[1]->date);
     }
 
     /** @test */

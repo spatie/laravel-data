@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class DataFromModelResolver
 {
@@ -12,6 +13,14 @@ class DataFromModelResolver
     }
 
     public function execute(string $class, Model $model)
+    {
+        return $this->dataFromArrayResolver->execute(
+            $class,
+            $this->serializeModel($model)
+        );
+    }
+
+    private function serializeModel(Model $model): array
     {
         $values = $model->toArray();
 
@@ -25,10 +34,15 @@ class DataFromModelResolver
             }
         }
 
-        return $this->dataFromArrayResolver->execute(
-            $class,
-            $values
-        );
+        foreach ($model->getRelations() as $key => $relation) {
+            $key = $model::$snakeAttributes ? Str::snake($key) : $key;
+
+            $values[$key] = $relation
+                ->map(fn(Model $model) => $this->serializeModel($model))
+                ->all();
+        }
+
+        return $values;
     }
 
     private function isDateCast(string $cast): bool
