@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests\Fakes;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
@@ -24,7 +23,7 @@ class FakeNestedModelData extends Data
             $model->string,
             $model->nullable,
             $model->date,
-            Lazy::whenLoaded('fakeModel', $model, fn() => FakeModelData::from($model->fakeModel)),
+            Lazy::whenLoaded('fakeModel', $model, fn () => FakeModelData::from($model->fakeModel)),
         );
     }
 }
