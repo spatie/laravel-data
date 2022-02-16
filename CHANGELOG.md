@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 1.4.3 - 2022-02-16
+
+- allow using default password config in password validation attribute (#94)
+- solve binding issues on Laravel Octane (#101)
+- fixes a bug where models nested by relation could not be created due to date casts
+- add a `links` array to the paginated response
+- stop execution of `lazy::whenLoaded` closure when the relation is `null`
+
 ## 1.4.2 - 2022-01-26
 
 - fix for aborting value assignment after a false boolean (#80)
