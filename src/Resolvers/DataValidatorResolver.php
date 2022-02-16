@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Validator;
+use Spatie\LaravelData\Undefined;
 
 class DataValidatorResolver
 {
@@ -19,8 +20,13 @@ class DataValidatorResolver
             ->execute($dataClass)
             ->toArray();
 
-        $validator = ValidatorFacade::make(
+        $properties = array_filter(
             $payload instanceof Arrayable ? $payload->toArray() : $payload,
+            fn(mixed $item) => ! $item instanceof Undefined
+        );
+
+        $validator = ValidatorFacade::make(
+            $properties,
             $rules,
             $dataClass::messages(),
             $dataClass::attributes()

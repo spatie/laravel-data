@@ -217,14 +217,6 @@ class RequestDataTest extends TestCase
     }
 
     /** @test */
-    public function it_can_check_for_authorisation_with_wrong_method_name()
-    {
-        RequestData::$enableAuthorizedFailure = true;
-
-        $this->performRequest('Hello')->assertStatus(403);
-    }
-
-    /** @test */
     public function it_can_skip_validation_on_certain_properties()
     {
         DataBlueprintFactory::new('ValidationSkippeableDataFromRequest')

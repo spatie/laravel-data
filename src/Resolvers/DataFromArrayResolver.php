@@ -21,7 +21,6 @@ class DataFromArrayResolver
         [$promotedProperties, $classProperties] = $this->dataConfig
             ->getDataClass($class)
             ->properties()
-            ->reject(fn (DataProperty $property) => $this->shouldIgnoreProperty($property, $values))
             ->partition(fn (DataProperty $property) => $property->isPromoted());
 
         return $this->createDataObjectWithProperties(
@@ -35,17 +34,16 @@ class DataFromArrayResolver
         );
     }
 
-    private function shouldIgnoreProperty(DataProperty $property, array $values): bool
-    {
-        return ! array_key_exists($property->name(), $values) && $property->hasDefaultValue();
-    }
-
     private function resolveValue(DataProperty $property, array $values): mixed
     {
         $value = array_key_exists($property->name(), $values) ? $values[$property->name()] ?? null : Undefined::create();
 
         if ($value === null) {
             return $value;
+        }
+
+        if ($value instanceof Undefined && $property->hasDefaultValue()) {
+            return $property->defaultValue();
         }
 
         if ($value instanceof Undefined) {

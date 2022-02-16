@@ -20,7 +20,6 @@ class MagicMethodSerializer implements DataSerializer
         return null;
     }
 
-
     private function resolveCustomCreationMethod(string $class, mixed $payload): ?string
     {
         $customCreationMethods = $this->dataConfig->getDataClass($class)->creationMethods();
