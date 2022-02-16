@@ -14,7 +14,7 @@ class FakeModelFactory extends Factory
         return [
             'string' => $this->faker->name,
             'nullable' => null,
-            'date' => $this->faker->dateTime()
+            'date' => $this->faker->dateTime(),
         ];
     }
 }

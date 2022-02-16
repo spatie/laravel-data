@@ -38,7 +38,7 @@ class DataFromModelResolver
             $key = $model::$snakeAttributes ? Str::snake($key) : $key;
 
             $values[$key] = $relation
-                ->map(fn(Model $model) => $this->serializeModel($model))
+                ->map(fn (Model $model) => $this->serializeModel($model))
                 ->all();
         }
 
