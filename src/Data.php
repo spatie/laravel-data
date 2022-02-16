@@ -43,7 +43,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
         );
     }
 
-    public static function collection(Enumerable|array|AbstractPaginator|AbstractCursorPaginator|Paginator $items): DataCollection
+    public static function collection(Enumerable|array|AbstractPaginator|AbstractCursorPaginator|Paginator|DataCollection $items): DataCollection
     {
         return new DataCollection(static::class, $items);
     }

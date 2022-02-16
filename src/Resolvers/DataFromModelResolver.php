@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -37,9 +38,7 @@ class DataFromModelResolver
         foreach ($model->getRelations() as $key => $relation) {
             $key = $model::$snakeAttributes ? Str::snake($key) : $key;
 
-            $values[$key] = $relation
-                ->map(fn (Model $model) => $this->serializeModel($model))
-                ->all();
+            $values[$key] = $relation;
         }
 
         return $values;

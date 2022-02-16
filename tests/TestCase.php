@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Tests;
 use Faker\Factory as FakerFactory;
 use Faker\Generator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
 use Spatie\LaravelData\LaravelDataServiceProvider;
@@ -13,6 +14,7 @@ use Spatie\Snapshots\MatchesSnapshots;
 class TestCase extends Orchestra
 {
     use MatchesSnapshots;
+    use RefreshDatabase;
 
     public function setUp(): void
     {
@@ -31,6 +33,11 @@ class TestCase extends Orchestra
     public function getEnvironmentSetUp($app)
     {
         config()->set('database.default', 'testing');
+    }
+
+    protected function defineDatabaseMigrations()
+    {
+        $this->loadMigrationsFrom(__DIR__ . '/Migrations');
     }
 
     public function faker(): Generator

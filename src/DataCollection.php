@@ -38,9 +38,13 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
 
     public function __construct(
         private string $dataClass,
-        Enumerable|array|CursorPaginator|Paginator $items
+        Enumerable|array|CursorPaginator|Paginator|DataCollection $items
     ) {
-        $this->items = is_array($items) ? new Collection($items) : $items;
+        $this->items = match (true) {
+            is_array($items) => new Collection($items),
+            $items instanceof DataCollection => $items->toCollection(),
+            default => $items
+        };
 
         $this->ensureAllItemsAreData();
     }
@@ -171,7 +175,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
 
     protected function ensureAllItemsAreData()
     {
-        $closure = fn ($item) => $item instanceof Data ? $item : $this->dataClass::from($item);
+        $closure = fn($item) => $item instanceof Data ? $item : $this->dataClass::from($item);
 
         $this->items = $this->isPaginated()
             ? $this->items->through($closure)

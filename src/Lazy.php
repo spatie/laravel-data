@@ -26,11 +26,11 @@ class Lazy
         return self::create($value)->condition($condition);
     }
 
-    public static function whenLoaded(string $relation, Model $model, Closure $value)
+    public static function whenLoaded(string $relation, Model $model, Closure $value): static
     {
         return self::when(
-            fn () => $model->relationLoaded($relation),
-            $value,
+            fn() => $model->relationLoaded($relation),
+            fn() => $model->{$relation} !== null ? $value() : null,
         );
     }
 

@@ -65,20 +65,8 @@ class DataFromArrayResolver
             return $property->dataClassName()::from($value);
         }
 
-        if ($property->isDataCollection() && $value instanceof DataCollection) {
-            return  $value;
-        }
-
         if ($property->isDataCollection()) {
-            $items = array_map(
-                fn ($item) => $property->dataClassName()::from($item),
-                $value
-            );
-
-            return new DataCollection(
-                $property->dataClassName(),
-                $items
-            );
+            return $property->dataClassName()::collection($value);
         }
 
         return $value;

@@ -7,6 +7,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\LaravelData\Resolvers\DataFromModelResolver;
+use Spatie\LaravelData\Tests\Concerns\WithFakeModels;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\FakeModelData;
@@ -16,14 +17,7 @@ use Spatie\LaravelData\Tests\TestCase;
 
 class DataFromModelResolverTest extends TestCase
 {
-    use RefreshDatabase;
-
     private DataFromModelResolver $resolver;
-
-    protected function defineDatabaseMigrations()
-    {
-        $this->loadMigrationsFrom(__DIR__ . '/../Migrations');
-    }
 
     public function setUp(): void
     {

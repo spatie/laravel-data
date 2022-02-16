@@ -26,8 +26,11 @@ use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\EmptyData;
+use Spatie\LaravelData\Tests\Fakes\FakeModelData;
+use Spatie\LaravelData\Tests\Fakes\FakeNestedModelData;
 use Spatie\LaravelData\Tests\Fakes\IntersectionTypeData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
+use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\ReadonlyData;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
@@ -252,23 +255,31 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_include_data_based_upon_relations_loaded()
     {
-        /** @var \Illuminate\Database\Eloquent\Model $model */
-        $model = DummyModelWithCasts::make();
+        $model = FakeNestedModel::factory()->create();
 
-        $data = new class (Lazy::whenLoaded('relation', $model, fn () => 'loaded')) extends Data {
-            public function __construct(
-                public string|Lazy $relation,
-            ) {
-            }
-        };
+        $transformed = FakeNestedModelData::createWithLazyWhenLoaded($model)->all();
 
-        $this->assertEquals([], $data->toArray());
+        $this->assertArrayNotHasKey('fake_model', $transformed);
 
-        $model->setRelation('relation', []);
+        $transformed = FakeNestedModelData::createWithLazyWhenLoaded($model->load('fakeModel'))->all();
 
-        $this->assertEquals([
-            'relation' => 'loaded',
-        ], $data->toArray());
+        $this->assertArrayHasKey('fake_model', $transformed);
+        $this->assertInstanceOf(FakeModelData::class, $transformed['fake_model']);
+    }
+
+    /** @test */
+    public function it_can_include_data_based_upon_relations_loaded_when_they_are_null()
+    {
+        $model = FakeNestedModel::factory(['fake_model_id' => null])->create();
+
+        $transformed = FakeNestedModelData::createWithLazyWhenLoaded($model)->all();
+
+        $this->assertArrayNotHasKey('fake_model', $transformed);
+
+        $transformed = FakeNestedModelData::createWithLazyWhenLoaded($model->load('fakeModel'))->all();
+
+        $this->assertArrayHasKey('fake_model', $transformed);
+        $this->assertNull($transformed['fake_model']);
     }
 
     /** @test */
