@@ -15,12 +15,17 @@ class Password extends ValidationAttribute
         private bool $numbers = false,
         private bool $symbols = false,
         private bool $uncompromised = false,
-        private int $uncompromisedThreshold = 0
+        private int $uncompromisedThreshold = 0,
+        private bool $default = false,
     ) {
     }
 
     public function getRules(): array
     {
+        if ($this->default) {
+            return [BasePassword::default()];
+        }
+
         $rule = BasePassword::min($this->min);
 
         if ($this->letters) {
