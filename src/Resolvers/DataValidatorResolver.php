@@ -22,7 +22,7 @@ class DataValidatorResolver
 
         $properties = array_filter(
             $payload instanceof Arrayable ? $payload->toArray() : $payload,
-            fn(mixed $item) => ! $item instanceof Undefined
+            fn (mixed $item) => ! $item instanceof Undefined
         );
 
         $validator = ValidatorFacade::make(

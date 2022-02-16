@@ -20,7 +20,7 @@ class PropertiesMapper
 
         $mapper = $this->resolveClassMapper($class);
 
-        return $class->properties()->mapWithKeys(fn(DataProperty $property) => [
+        return $class->properties()->mapWithKeys(fn (DataProperty $property) => [
             $property->name() => $this->resolveValueForProperty(
                 $property,
                 $properties,
