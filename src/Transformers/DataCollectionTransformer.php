@@ -69,7 +69,7 @@ class DataCollectionTransformer
     {
         return [
             'data' => $paginated['data'],
-            'links' => $paginated['links'],
+            'links' => $paginated['links'] ?? [],
             'meta' => Arr::except($paginated, [
                 'data',
                 'links',
