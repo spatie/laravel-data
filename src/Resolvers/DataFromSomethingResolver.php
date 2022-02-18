@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Exceptions\CannotCreateDataFromValue;
 use Spatie\LaravelData\Support\DataConfig;
+use stdClass;
 
 class DataFromSomethingResolver
 {
@@ -41,6 +42,10 @@ class DataFromSomethingResolver
 
         if ($value instanceof Arrayable) {
             return $this->dataFromArrayResolver->execute($class, $value->toArray());
+        }
+
+        if ($value instanceof stdClass) {
+            $value = (array) $value;
         }
 
         if (is_array($value)) {
