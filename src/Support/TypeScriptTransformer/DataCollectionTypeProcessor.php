@@ -32,7 +32,7 @@ class DataCollectionTypeProcessor implements TypeProcessor
 
         $class = $attributes[0]->getArguments()[0];
 
-        if(! class_exists($class)){
+        if (! class_exists($class)) {
             return $type;
         }
 
