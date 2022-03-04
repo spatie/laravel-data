@@ -49,7 +49,7 @@ class DataTransformer
             ->getDataClass($data::class)
             ->properties()
             ->reduce(function (array $payload, DataProperty $property) use ($allowedExcludes, $allowedIncludes, $data, $exclusionTree, $inclusionTree) {
-                $name = $property->name();
+                $name = $property->name;
 
                 if (! $this->shouldIncludeProperty($name, $data->{$name}, $inclusionTree, $exclusionTree, $allowedIncludes, $allowedExcludes)) {
                     return $payload;
@@ -177,10 +177,10 @@ class DataTransformer
             return null;
         }
 
-        $transformer = $property->transformerAttribute()?->get() ?? $this->config->findGlobalTransformerForValue($value);
+        $transformer = $property->transformer ?? $this->config->findGlobalTransformerForValue($value);
 
         $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
-            && ($property->isData() || $property->isDataCollection());
+            && ($property->isDataObject || $property->isDataCollection);
 
         if ($shouldUseDefaultDataTransformer) {
             return null;

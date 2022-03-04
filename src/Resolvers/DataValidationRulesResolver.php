@@ -24,7 +24,7 @@ class DataValidationRulesResolver
 
         return $this->dataConfig->getDataClass($class)
             ->properties()
-            ->reject(fn (DataProperty $property) => array_key_exists($property->name(), $overWrittenRules) || ! $property->shouldValidateProperty())
+            ->reject(fn (DataProperty $property) => array_key_exists($property->name, $overWrittenRules) || ! $property->validate)
             ->mapWithKeys(fn (DataProperty $property) => $resolver->execute($property, $nullable))
             ->merge($overWrittenRules);
     }

@@ -18,39 +18,39 @@ class DataPropertyValidationRulesResolver
 
     public function execute(DataProperty $property, bool $nullable = false): Collection
     {
-        if ($property->isData() || $property->isDataCollection()) {
+        if ($property->isDataObject || $property->isDataCollection) {
             return $this->getNestedRules($property, $nullable);
         }
 
-        return collect([$property->name() => $this->getRulesForProperty($property, $nullable)]);
+        return collect([$property->name => $this->getRulesForProperty($property, $nullable)]);
     }
 
     private function getNestedRules(DataProperty $property, bool $nullable): Collection
     {
         $prefix = match (true) {
-            $property->isData() => "{$property->name()}.",
-            $property->isDataCollection() => "{$property->name()}.*.",
+            $property->isDataObject => "{$property->name}.",
+            $property->isDataCollection => "{$property->name}.*.",
             default => throw new TypeError()
         };
 
-        $isNullable = $nullable || $property->isNullable();
+        $isNullable = $nullable || $property->nullable;
 
         $toplevelRule = match (true) {
             $isNullable => 'nullable',
-            $property->isData() => "required",
-            $property->isDataCollection() => "present",
+            $property->isDataObject => "required",
+            $property->isDataCollection => "present",
             default => throw new TypeError()
         };
 
         return $this->dataValidationRulesResolver
             ->execute(
-                $property->dataClassName(),
-                $nullable || ($property->isData() && $property->isNullable())
+                $property->dataClass,
+                $nullable || ($property->isDataObject && $property->nullable)
             )
             ->mapWithKeys(fn (array $rules, string $name) => [
                 "{$prefix}{$name}" => $rules,
             ])
-            ->prepend([$toplevelRule, 'array'], $property->name());
+            ->prepend([$toplevelRule, 'array'], $property->name);
     }
 
     private function getRulesForProperty(DataProperty $property, bool $nullable): array

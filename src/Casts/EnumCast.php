@@ -32,7 +32,7 @@ class EnumCast implements Cast
 
     protected function findType(DataProperty $property): ?string
     {
-        foreach ($property->types()->all() as $type) {
+        foreach ($property->types->all() as $type) {
             if (is_a($type, BackedEnum::class, true)) {
                 return (string) $type;
             }

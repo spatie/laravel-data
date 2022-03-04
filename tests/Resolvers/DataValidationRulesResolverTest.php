@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Tests\Resolvers;
 
 use Illuminate\Http\Request;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -99,7 +100,7 @@ class DataValidationRulesResolverTest extends TestCase
             #[WithoutValidation]
             public SimpleData $skip_data;
 
-            #[WithoutValidation]
+            #[WithoutValidation, DataCollectionOf(SimpleData::class)]
             public DataCollection $skip_data_collection;
 
             public ?int $age;

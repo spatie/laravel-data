@@ -47,7 +47,7 @@ class DataConfig
 
     public function findGlobalCastForProperty(DataProperty $property): ?Cast
     {
-        foreach ($property->types()->all() as $type) {
+        foreach ($property->types->all() as $type) {
             if ($cast = $this->findSuitableReplacerForClass($this->casts, $type)) {
                 return $cast;
             }

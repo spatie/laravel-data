@@ -19,7 +19,7 @@ class RequiredRuleInferrer implements RuleInferrer
 
     protected function shouldAddRule(DataProperty $property, array $rules): bool
     {
-        if ($property->isNullable() || $property->isUndefinable()) {
+        if ($property->nullable || $property->undefinable) {
             return false;
         }
 

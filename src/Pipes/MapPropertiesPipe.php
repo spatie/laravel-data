@@ -52,11 +52,11 @@ class MapPropertiesPipe extends Pipe
     private function resolvePropertyMapper(
         DataProperty $property,
     ): ?Mapper {
-        if ($property->mapperAttribute() === null) {
+        if ($property->mapFrom === null) {
             return null;
         }
 
-        $from = $property->mapperAttribute()->from;
+        $from = $property->mapFrom->from;
 
         if (is_int($from)) {
             return new NameProvidedMapper($from);
