@@ -2,18 +2,15 @@
 
 namespace Spatie\LaravelData\Tests\Integration;
 
-use ReflectionClass;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapFrom;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Mappers\SnakeToCamelCaseMapper;
-use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 use Spatie\LaravelData\Tests\TestCase;
-use TypeError;
 
 class PropertyMapping extends TestCase
 {
@@ -50,14 +47,14 @@ class PropertyMapping extends TestCase
     /** @test */
     public function it_replaces_properties_when_a_mapped_alternative_exists()
     {
-        $dataClass = new class () extends Data{
+        $dataClass = new class () extends Data {
             #[MapFrom('something')]
             public string $mapped;
         };
 
         $data = $dataClass::from([
             'mapped' => 'We are the knights who say, ni!',
-            'something' => 'Bring us a, shrubbery!'
+            'something' => 'Bring us a, shrubbery!',
         ]);
 
         $this->assertEquals('Bring us a, shrubbery!', $data->mapped);
@@ -66,7 +63,7 @@ class PropertyMapping extends TestCase
     /** @test */
     public function it_skips_properties_it_cannot_find()
     {
-        $dataClass = new class () extends Data{
+        $dataClass = new class () extends Data {
             #[MapFrom('something')]
             public string $mapped;
         };
@@ -81,7 +78,7 @@ class PropertyMapping extends TestCase
     /** @test */
     public function it_can_use_integers_to_map_properties()
     {
-        $dataClass = new class () extends Data{
+        $dataClass = new class () extends Data {
             #[MapFrom(1)]
             public string $mapped;
         };
@@ -97,7 +94,7 @@ class PropertyMapping extends TestCase
     /** @test */
     public function it_can_use_integers_to_map_properties_in_nested_data()
     {
-        $dataClass = new class () extends Data{
+        $dataClass = new class () extends Data {
             #[MapFrom('1.0')]
             public string $mapped;
         };
@@ -113,7 +110,7 @@ class PropertyMapping extends TestCase
     /** @test */
     public function it_can_combine_integers_and_strings_to_map_properties()
     {
-        $dataClass = new class () extends Data{
+        $dataClass = new class () extends Data {
             #[MapFrom('lines.1')]
             public string $mapped;
         };
@@ -131,7 +128,7 @@ class PropertyMapping extends TestCase
     /** @test */
     public function it_can_use_a_dedicated_mapper()
     {
-        $dataClass = new class () extends Data{
+        $dataClass = new class () extends Data {
             #[MapFrom(SnakeToCamelCaseMapper::class)]
             public string $mappedLine;
         };

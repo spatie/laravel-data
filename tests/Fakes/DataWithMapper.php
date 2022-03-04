@@ -6,7 +6,6 @@ use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapFrom;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Mappers\CamelToSnakeCaseMapper;
 use Spatie\LaravelData\Mappers\SnakeToCamelCaseMapper;
 
 #[MapFrom(SnakeToCamelCaseMapper::class)]
