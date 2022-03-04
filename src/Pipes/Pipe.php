@@ -2,30 +2,15 @@
 
 namespace Spatie\LaravelData\Pipes;
 
-use Closure;
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataClass;
 
 abstract class Pipe
 {
-    abstract public function pipe(
+    public abstract function handle(
         mixed $initialValue,
         DataClass $class,
         Collection $properties,
-    ): Closure|array;
+    ): Collection|Data;
 }
-
-/**
- * Serializers:
- * - Magic method (first run validation, authorization)
- * - Model
- * - Request
- * - Arrayable
- * - Array
- *
- * Pipes:
- * - AuthorizedPipe
- * - ValidatePropertiesPipe
- * - RenamePropertiesPipe
- * - CastPropertiesPipe
- */

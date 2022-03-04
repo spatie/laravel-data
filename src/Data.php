@@ -15,6 +15,15 @@ use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\ValidateableData;
+use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
+use Spatie\LaravelData\Normalizers\ArrayNormalizer;
+use Spatie\LaravelData\Normalizers\ModelNormalizer;
+use Spatie\LaravelData\Normalizers\ObjectNormalizer;
+use Spatie\LaravelData\Pipes\AuthorizedPipe;
+use Spatie\LaravelData\Pipes\CastPropertiesPipe;
+use Spatie\LaravelData\Pipes\DefaultValuesPipe;
+use Spatie\LaravelData\Pipes\RenamePropertiesPipe;
+use Spatie\LaravelData\Pipes\ValidatePropertiesPipe;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
@@ -41,6 +50,21 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
             static::class,
             $payload
         );
+    }
+
+    public static function pipeline(): DataPipeline
+    {
+        return DataPipeline::create()
+            ->into(static::class)
+            ->normalizer(ModelNormalizer::class)
+            ->normalizer(ArraybleNormalizer::class)
+            ->normalizer(ObjectNormalizer::class)
+            ->normalizer(ArrayNormalizer::class)
+            ->through(AuthorizedPipe::class)
+            ->through(ValidatePropertiesPipe::class)
+            ->through(RenamePropertiesPipe::class)
+            ->through(DefaultValuesPipe::class)
+            ->through(CastPropertiesPipe::class);
     }
 
     public static function collection(Enumerable|array|AbstractPaginator|AbstractCursorPaginator|Paginator|DataCollection $items): DataCollection
