@@ -61,7 +61,7 @@ class DataClassTest extends TestCase
             DummyDto::class => 'fromDummyDto',
             'int' => 'fromNumber',
             'float' => 'fromNumber',
-        ], DataClass::create(new ReflectionClass($subject))->creationMethods());
+        ], DataClass::create(new ReflectionClass($subject))->creationMethods);
     }
 
     /** @test */
@@ -88,17 +88,17 @@ class DataClassTest extends TestCase
         $withoutMethod = new class (null) extends Data {
         };
 
-        $this->assertTrue(DataClass::create(new ReflectionClass($withMethod))->hasAuthorizationMethod());
-        $this->assertFalse(DataClass::create(new ReflectionClass($withNonPublicMethod))->hasAuthorizationMethod());
-        $this->assertFalse(DataClass::create(new ReflectionClass($withNonStaticMethod))->hasAuthorizationMethod());
-        $this->assertFalse(DataClass::create(new ReflectionClass($withoutMethod))->hasAuthorizationMethod());
+        $this->assertTrue(DataClass::create(new ReflectionClass($withMethod))->hasAuthorizationMethod);
+        $this->assertFalse(DataClass::create(new ReflectionClass($withNonPublicMethod))->hasAuthorizationMethod);
+        $this->assertFalse(DataClass::create(new ReflectionClass($withNonStaticMethod))->hasAuthorizationMethod);
+        $this->assertFalse(DataClass::create(new ReflectionClass($withoutMethod))->hasAuthorizationMethod);
     }
 
     /** @test */
     public function it_will_populate_defaults_to_properties_when_they_exist()
     {
         /** @var \Spatie\LaravelData\Support\DataProperty[] $properties */
-        $properties = DataClass::create(new ReflectionClass(DataWithDefaults::class))->properties();
+        $properties = DataClass::create(new ReflectionClass(DataWithDefaults::class))->properties;
 
         $this->assertEquals('property', $properties[0]->name);
         $this->assertFalse($properties[0]->hasDefaultValue);

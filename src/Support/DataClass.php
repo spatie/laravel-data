@@ -12,77 +12,40 @@ use Spatie\LaravelData\Attributes\MapFrom;
 
 class DataClass
 {
-    /** @return Collection<string, \Spatie\LaravelData\Support\DataProperty> */
-    protected Collection $properties;
-
-    /** @var array<string, string> */
-    protected array $creationMethods;
-
-    protected bool $hasAuthorizationMethod;
-
-    protected ?MapFrom $mapperAttribute;
-
-    final public function __construct(protected ReflectionClass $class)
-    {
-        $this->properties = $this->resolveProperties();
+    public function __construct(
+        public readonly string $name,
+        /** @var Collection<string, \Spatie\LaravelData\Support\DataProperty> */
+        public readonly Collection $properties,
+        /** @var array<string, string> */
+        public readonly array $creationMethods,
+        public readonly bool $hasAuthorizationMethod,
+        public readonly ?string $fromMapperClass,
+    ) {
     }
 
-    public static function create(ReflectionClass $class): static
+    public static function create(ReflectionClass $class)
     {
-        return new static($class);
+        $methods = collect($class->getMethods());
+
+        $attributes = collect($class->getAttributes());
+
+        return new self(
+            name: $class->name,
+            properties: static::resolveProperties($class),
+            creationMethods: static::resolveMagicalMethods($methods),
+            hasAuthorizationMethod: static::hasAuthorizationMethod($methods),
+            fromMapperClass: $attributes->first(fn(object $attribute) => $attribute instanceof MapFrom)?->from,
+        );
     }
 
-    /** @return Collection<string, \Spatie\LaravelData\Support\DataProperty> */
-    public function properties(): Collection
-    {
-        return $this->properties;
-    }
+    private static function resolveProperties(
+        ReflectionClass $class
+    ): Collection {
+        $defaultValues = static::resolveDefaultValues($class);
 
-    public function name(): string
-    {
-        return $this->class->name;
-    }
-
-    public function creationMethods(): array
-    {
-        /** @psalm-suppress RedundantPropertyInitializationCheck */
-        if (isset($this->creationMethods)) {
-            return $this->creationMethods;
-        }
-
-        $this->resolveMagicalMethods();
-
-        return $this->creationMethods;
-    }
-
-    public function hasAuthorizationMethod(): bool
-    {
-        /** @psalm-suppress RedundantPropertyInitializationCheck */
-        if (isset($this->hasAuthorizationMethod)) {
-            return $this->hasAuthorizationMethod;
-        }
-
-        $this->resolveMagicalMethods();
-
-        return $this->hasAuthorizationMethod;
-    }
-
-    public function mapperAttribute(): ?MapFrom
-    {
-        if (! isset($this->mapperAttribute)) {
-            $this->loadAttributes();
-        }
-
-        return $this->mapperAttribute;
-    }
-
-    private function resolveProperties(): Collection
-    {
-        $defaultValues = $this->resolveDefaultValues();
-
-        return collect($this->class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(fn (ReflectionProperty $property) => $property->isStatic())
-            ->map(fn (ReflectionProperty $property) => DataProperty::create(
+        return collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
+            ->reject(fn(ReflectionProperty $property) => $property->isStatic())
+            ->map(fn(ReflectionProperty $property) => DataProperty::create(
                 $property,
                 array_key_exists($property->getName(), $defaultValues),
                 $defaultValues[$property->getName()] ?? null,
@@ -90,34 +53,29 @@ class DataClass
             ->values();
     }
 
-    private function resolveDefaultValues(): array
-    {
-        if (! $this->class->hasMethod('__construct')) {
-            return $this->class->getDefaultProperties();
+    private static function resolveDefaultValues(
+        ReflectionClass $class
+    ): array {
+        if (! $class->hasMethod('__construct')) {
+            return $class->getDefaultProperties();
         }
 
-        return collect($this->class->getMethod('__construct')->getParameters())
-            ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-            ->mapWithKeys(fn (ReflectionParameter $parameter) => [
+        return collect($class->getMethod('__construct')->getParameters())
+            ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+            ->mapWithKeys(fn(ReflectionParameter $parameter) => [
                 $parameter->name => $parameter->getDefaultValue(),
             ])
-            ->merge($this->class->getDefaultProperties())
+            ->merge($class->getDefaultProperties())
             ->toArray();
     }
 
-    private function resolveMagicalMethods()
-    {
-        $this->creationMethods = [];
-
-        $methods = collect($this->class->getMethods(ReflectionMethod::IS_STATIC));
-
-        $this->hasAuthorizationMethod = $methods->contains(
-            fn (ReflectionMethod $method) => $method->getName() === 'authorize' && $method->isPublic()
-        );
-
-        $this->creationMethods = $methods
+    private static function resolveMagicalMethods(
+        Collection $methods,
+    ): array {
+        return $methods
             ->filter(function (ReflectionMethod $method) {
-                return $method->isPublic()
+                return $method->isStatic()
+                    && $method->isPublic()
                     && (str_starts_with($method->getName(), 'from') || str_starts_with($method->getName(), 'optional'))
                     && $method->getNumberOfParameters() === 1
                     && $method->name !== 'from'
@@ -145,20 +103,11 @@ class DataClass
             })->toArray();
     }
 
-    private function loadAttributes(): void
-    {
-        foreach ($this->class->getAttributes() as $attribute) {
-            $initiatedAttribute = $attribute->newInstance();
-
-            if ($initiatedAttribute instanceof MapFrom) {
-                $this->mapperAttribute = $initiatedAttribute;
-
-                continue;
-            }
-        }
-
-        if (! isset($this->mapperAttribute)) {
-            $this->mapperAttribute = null;
-        }
+    private static function hasAuthorizationMethod(
+        Collection $methods
+    ): bool {
+        return $methods->contains(fn(ReflectionMethod $method) => $method->isStatic()
+            && $method->getName() === 'authorize'
+            && $method->isPublic());
     }
 }

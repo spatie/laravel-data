@@ -17,7 +17,7 @@ class EmptyDataResolver
     {
         $dataClass = $this->dataConfig->getDataClass($class);
 
-        return $dataClass->properties()->reduce(function (array $payload, DataProperty $property) use ($extra) {
+        return $dataClass->properties->reduce(function (array $payload, DataProperty $property) use ($extra) {
             if ($property->hasDefaultValue) {
                 $payload[$property->name] = $property->defaultValue;
             } else {
