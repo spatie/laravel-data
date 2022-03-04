@@ -16,8 +16,7 @@ class DataFromSomethingResolver
     public function __construct(
         protected DataConfig $dataConfig,
         protected DataFromArrayResolver $dataFromArrayResolver,
-    )
-    {
+    ) {
     }
 
     public function execute(string $class, mixed $value)
@@ -31,7 +30,7 @@ class DataFromSomethingResolver
 
         $piped = $pipeline->using($value)->execute();
 
-        if($piped instanceof Data){
+        if ($piped instanceof Data) {
             return $piped;
         }
 

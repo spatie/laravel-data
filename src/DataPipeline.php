@@ -2,12 +2,10 @@
 
 namespace Spatie\LaravelData;
 
-use Exception;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Exceptions\CannotCreateDataFromValue;
 use Spatie\LaravelData\Normalizers\Normalizer;
 use Spatie\LaravelData\Pipes\Pipe;
-use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
 use Spatie\LaravelData\Support\DataConfig;
 
 class DataPipeline
@@ -61,22 +59,22 @@ class DataPipeline
     {
         /** @var \Spatie\LaravelData\Normalizers\Normalizer[] $normalizers */
         $normalizers = array_map(
-            fn(string|Normalizer $normalizer) => is_string($normalizer) ? app($normalizer) : $normalizer,
+            fn (string|Normalizer $normalizer) => is_string($normalizer) ? app($normalizer) : $normalizer,
             $this->normalizers
         );
 
         /** @var \Spatie\LaravelData\Pipes\Pipe $pipes */
         $pipes = array_map(
-            fn(string|Pipe $pipe) => is_string($pipe) ? app($pipe) : $pipe,
+            fn (string|Pipe $pipe) => is_string($pipe) ? app($pipe) : $pipe,
             $this->pipes
         );
 
         $properties = null;
 
-        foreach ($normalizers as $normalizer){
+        foreach ($normalizers as $normalizer) {
             $properties = $normalizer->normalize($this->value);
 
-            if($properties !== null){
+            if ($properties !== null) {
                 break;
             }
         }
@@ -89,10 +87,10 @@ class DataPipeline
 
         $class = $this->dataConfig->getDataClass($this->classString);
 
-        foreach ($pipes as $pipe){
+        foreach ($pipes as $pipe) {
             $piped = $pipe->handle($this->value, $class, $properties);
 
-            if($piped instanceof Data){
+            if ($piped instanceof Data) {
                 return $piped;
             }
 
