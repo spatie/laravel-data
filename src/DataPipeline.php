@@ -2,110 +2,103 @@
 
 namespace Spatie\LaravelData;
 
+use Exception;
+use Illuminate\Support\Collection;
+use Spatie\LaravelData\Exceptions\CannotCreateDataFromValue;
+use Spatie\LaravelData\Normalizers\Normalizer;
+use Spatie\LaravelData\Pipes\Pipe;
+use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
+use Spatie\LaravelData\Support\DataConfig;
+
 class DataPipeline
 {
-    /** @var \Spatie\LaravelData\DataPipes\DataPipe[] */
+    private array $normalizers = [];
+
     private array $pipes = [];
 
-    /** @var array<DataSerializer|class-string<DataSerializer>> */
-    private array $serializers = [];
+    private mixed $value;
 
-    private string $dataClass;
+    private string $classString;
+
+    public function __construct(private DataConfig $dataConfig)
+    {
+    }
 
     public static function create(): static
     {
-        return new static();
+        return app(static::class);
     }
 
-    public function __construct()
+    public function using(mixed $value): static
     {
+        $this->value = $value;
+
+        return $this;
     }
 
-    public function from(mixed $initialPayload): Data
+    public function into(string $classString): static
     {
-        $dataClass = app(DataConfig::class)->getDataClass($this->dataClass);
+        $this->classString = $classString;
 
-        $payload = $this->serializePayload($initialPayload, $dataClass);
+        return $this;
+    }
 
-        if ($payload instanceof Data) {
-            // TODO: this will cause no pipeline execution, so no validation or authorisation on magic methods
-            return $payload;
-        }
+    public function normalizer(string|Normalizer $normalizer): static
+    {
+        $this->normalizers[] = $normalizer;
 
-        $payload = collect($payload);
+        return $this;
+    }
 
-        foreach ($this->pipes as $pipe) {
-            $payload = $pipe->execute($initialPayload, $payload, $dataClass);
-        }
+    public function through(string|Pipe $pipe): static
+    {
+        $this->pipes[] = $pipe;
 
-        [$promotedProperties, $classProperties] = $dataClass->properties()->partition(
-            fn (DataProperty $property) => $property->isPromoted()
+        return $this;
+    }
+
+    public function execute(): Collection|Data
+    {
+        /** @var \Spatie\LaravelData\Normalizers\Normalizer[] $normalizers */
+        $normalizers = array_map(
+            fn(string|Normalizer $normalizer) => is_string($normalizer) ? app($normalizer) : $normalizer,
+            $this->normalizers
         );
 
-        return $this->createDataObjectWithProperties(
-            $this->dataClass,
-            $promotedProperties->mapWithKeys(fn (DataProperty $property) => [
-                $property->name() => $payload->get($property->name()),
-            ]),
-            $classProperties->mapWithKeys(fn (DataProperty $property) => [
-                $property->name() => $payload->get($property->name()),
-            ])
+        /** @var \Spatie\LaravelData\Pipes\Pipe $pipes */
+        $pipes = array_map(
+            fn(string|Pipe $pipe) => is_string($pipe) ? app($pipe) : $pipe,
+            $this->pipes
         );
-    }
 
-    public function pipe(DataPipe|string $pipe): static
-    {
-        $this->pipes[] = is_string($pipe) ? resolve($pipe) : $pipe;
+        $properties = null;
 
-        return $this;
-    }
+        foreach ($normalizers as $normalizer){
+            $properties = $normalizer->normalize($this->value);
 
-    public function serializer(DataSerializer|string $serializer): static
-    {
-        $this->serializers[] = $serializer;
-
-        return $this;
-    }
-
-    public function into(string $dataClass): static
-    {
-        $this->dataClass = $dataClass;
-
-        return $this;
-    }
-
-    private function serializePayload(
-        mixed $initialPayload,
-        DataClass $dataClass,
-    ): array|Data {
-        foreach ($this->serializers as $serializer) {
-            $serializer = $serializer instanceof DataSerializer
-                ? $serializer
-                : resolve($serializer, ['dataClass' => $dataClass]);
-
-            $serialized = $serializer->serialize($initialPayload);
-
-            if ($serialized !== null) {
-                return $serialized;
+            if($properties !== null){
+                break;
             }
         }
 
-        throw CannotCreateDataFromValue::create($dataClass->name(), $initialPayload);
-    }
+        $properties = collect($properties);
 
-    private function createDataObjectWithProperties(
-        string $class,
-        Collection $promotedProperties,
-        Collection $classProperties
-    ): Data {
-        $data = new $class(...$promotedProperties);
+        if ($properties === null) {
+            throw CannotCreateDataFromValue::create($this->classString, $this->value);
+        }
 
-        $classProperties->each(
-            function (mixed $value, string $name) use ($data) {
-                $data->{$name} = $value;
+        $class = $this->dataConfig->getDataClass($this->classString);
+
+        foreach ($pipes as $pipe){
+            $piped = $pipe->handle($this->value, $class, $properties);
+
+            if($piped instanceof Data){
+                return $piped;
             }
-        );
 
-        return $data;
+            $properties = $piped;
+        }
+
+        return $properties;
     }
 }

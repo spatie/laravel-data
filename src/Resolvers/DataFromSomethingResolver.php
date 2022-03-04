@@ -2,12 +2,12 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Exceptions\CannotCreateDataFromValue;
+use Spatie\LaravelData\DataPipeline;
+use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
+use Spatie\LaravelData\Pipes\AuthorizedPipe;
+use Spatie\LaravelData\Pipes\ValidatePropertiesPipe;
 use Spatie\LaravelData\Support\DataConfig;
 use stdClass;
 
@@ -15,62 +15,27 @@ class DataFromSomethingResolver
 {
     public function __construct(
         protected DataConfig $dataConfig,
-        protected DataValidatorResolver $dataValidatorResolver,
-        protected DataFromModelResolver $dataFromModelResolver,
         protected DataFromArrayResolver $dataFromArrayResolver,
-    ) {
+    )
+    {
     }
 
-    public function execute(string $class, mixed $value): Data
+    public function execute(string $class, mixed $value)
     {
-        if ($value instanceof Request) {
-            $this->ensureRequestIsValid($class, $value);
-        }
-
-        /** @var class-string<\Spatie\LaravelData\Data>|\Spatie\LaravelData\Data $class */
         if ($customCreationMethod = $this->resolveCustomCreationMethod($class, $value)) {
-            return $class::$customCreationMethod($value);
+            return $this->createDataFromCustomCreationMethod($class, $customCreationMethod, $value);
         }
 
-        if ($value instanceof Model) {
-            return $this->dataFromModelResolver->execute($class, $value);
+        /** @var \Spatie\LaravelData\DataPipeline $pipeline */
+        $pipeline = $class::pipeline();
+
+        $piped = $pipeline->using($value)->execute();
+
+        if($piped instanceof Data){
+            return $piped;
         }
 
-        if ($value instanceof Request) {
-            return $this->dataFromArrayResolver->execute($class, $value->all());
-        }
-
-        if ($value instanceof Arrayable) {
-            return $this->dataFromArrayResolver->execute($class, $value->toArray());
-        }
-
-        if ($value instanceof stdClass) {
-            $value = (array) $value;
-        }
-
-        if (is_array($value)) {
-            return $this->dataFromArrayResolver->execute($class, $value);
-        }
-
-        throw CannotCreateDataFromValue::create($class, $value);
-    }
-
-    private function ensureRequestIsValid(string $class, Request $value): void
-    {
-        /** @var \Spatie\LaravelData\Data|string $class */
-        if ($this->dataConfig->getDataClass($class)->hasAuthorizationMethod()) {
-            $this->ensureRequestIsAuthorized($class);
-        }
-
-        $this->dataValidatorResolver->execute($class, $value)->validate();
-    }
-
-    private function ensureRequestIsAuthorized(string $class): void
-    {
-        /** @psalm-suppress UndefinedMethod */
-        if (method_exists($class, 'authorize') && $class::authorize() === false) {
-            throw new AuthorizationException();
-        }
+        return $this->dataFromArrayResolver->execute($class, $piped->all());
     }
 
     private function resolveCustomCreationMethod(string $class, mixed $payload): ?string
@@ -110,5 +75,23 @@ class DataFromSomethingResolver
         }
 
         return null;
+    }
+
+    private function createDataFromCustomCreationMethod(
+        string $class,
+        string $method,
+        mixed $value,
+    ): Data {
+        if ($value instanceof Request) {
+            DataPipeline::create()
+                ->normalizer(ArraybleNormalizer::class)
+                ->into($class)
+                ->through(AuthorizedPipe::class)
+                ->through(ValidatePropertiesPipe::class)
+                ->using($value)
+                ->execute();
+        }
+
+        return $class::$method($value);
     }
 }
