@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Tests\Normalizers;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\LaravelData\Normalizers\ModelNormalizer;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\FakeModelData;

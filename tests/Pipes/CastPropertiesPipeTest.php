@@ -179,11 +179,11 @@ class CastPropertiesPipeTest extends TestCase
     public function it_works_nicely_with_lazy_data()
     {
         $data = NestedLazyData::from([
-            'simple' => Lazy::create(fn() => SimpleData::from('Hello')),
+            'simple' => Lazy::create(fn () => SimpleData::from('Hello')),
         ]);
 
         $this->assertInstanceOf(Lazy::class, $data->simple);
-        $this->assertEquals(Lazy::create(fn() => SimpleData::from('Hello')), $data->simple);
+        $this->assertEquals(Lazy::create(fn () => SimpleData::from('Hello')), $data->simple);
     }
 
     /** @test */

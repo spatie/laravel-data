@@ -19,16 +19,16 @@ class DataFromArrayResolver
         [$promotedProperties, $classProperties] = $this->dataConfig
             ->getDataClass($class)
             ->properties()
-            ->partition(fn(DataProperty $property) => $property->isPromoted());
+            ->partition(fn (DataProperty $property) => $property->isPromoted());
 
         return $this->createDataObjectWithProperties(
             $class,
-            $promotedProperties->mapWithKeys(fn(DataProperty $property) => [
+            $promotedProperties->mapWithKeys(fn (DataProperty $property) => [
                 $property->name() => $properties->has($property->name())
                     ? $properties->get($property->name())
                     : Undefined::create(),
             ]),
-            $classProperties->mapWithKeys(fn(DataProperty $property) => [
+            $classProperties->mapWithKeys(fn (DataProperty $property) => [
                 $property->name() => $properties->has($property->name())
                     ? $properties->get($property->name())
                     : Undefined::create(),
