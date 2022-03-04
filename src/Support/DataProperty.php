@@ -18,6 +18,7 @@ use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Undefined;
 use TypeError;
+use Spatie\LaravelData\Attributes\MapFrom;
 
 class DataProperty
 {
@@ -45,6 +46,8 @@ class DataProperty
     protected ?WithTransformer $transformerAttribute;
 
     protected ?DataCollectionOf $dataCollectionOfAttribute;
+
+    protected ?MapFrom $mapperAttribute;
 
     public static function create(
         ReflectionProperty $property,
@@ -171,6 +174,15 @@ class DataProperty
         }
 
         return $this->dataCollectionOfAttribute;
+    }
+
+    public function mapperAttribute(): ?MapFrom
+    {
+        if (! isset($this->mapperAttribute)) {
+            $this->loadAttributes();
+        }
+
+        return $this->mapperAttribute;
     }
 
     /**
@@ -330,6 +342,12 @@ class DataProperty
 
                 continue;
             }
+
+            if ($initiatedAttribute instanceof MapFrom) {
+                $this->mapperAttribute = $initiatedAttribute;
+
+                continue;
+            }
         }
 
         $this->validationAttributes = $validationAttributes;
@@ -348,6 +366,10 @@ class DataProperty
 
         if (! isset($this->withValidation)) {
             $this->withValidation = true;
+        }
+
+        if (! isset($this->mapperAttribute)) {
+            $this->mapperAttribute = null;
         }
     }
 }

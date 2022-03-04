@@ -22,7 +22,7 @@ use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\Pipes\AuthorizedPipe;
 use Spatie\LaravelData\Pipes\CastPropertiesPipe;
 use Spatie\LaravelData\Pipes\DefaultValuesPipe;
-use Spatie\LaravelData\Pipes\RenamePropertiesPipe;
+use Spatie\LaravelData\Pipes\MapPropertiesPipe;
 use Spatie\LaravelData\Pipes\ValidatePropertiesPipe;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
@@ -62,7 +62,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
             ->normalizer(ArrayNormalizer::class)
             ->through(AuthorizedPipe::class)
             ->through(ValidatePropertiesPipe::class)
-            ->through(RenamePropertiesPipe::class)
+            ->through(MapPropertiesPipe::class)
             ->through(DefaultValuesPipe::class)
             ->through(CastPropertiesPipe::class);
     }

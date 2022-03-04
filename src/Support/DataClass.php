@@ -8,6 +8,7 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
+use Spatie\LaravelData\Attributes\MapFrom;
 
 class DataClass
 {
@@ -18,6 +19,8 @@ class DataClass
     protected array $creationMethods;
 
     protected bool $hasAuthorizationMethod;
+
+    protected ?MapFrom $mapperAttribute;
 
     final public function __construct(protected ReflectionClass $class)
     {
@@ -37,7 +40,7 @@ class DataClass
 
     public function name(): string
     {
-        return $this->reflection()->name;
+        return $this->class->name;
     }
 
     public function creationMethods(): array
@@ -64,9 +67,13 @@ class DataClass
         return $this->hasAuthorizationMethod;
     }
 
-    public function reflection(): ReflectionClass
+    public function mapperAttribute(): ?MapFrom
     {
-        return $this->class;
+        if (! isset($this->mapperAttribute)) {
+            $this->loadAttributes();
+        }
+
+        return $this->mapperAttribute;
     }
 
     private function resolveProperties(): Collection
@@ -136,5 +143,22 @@ class DataClass
 
                 return $entries;
             })->toArray();
+    }
+
+    private function loadAttributes(): void
+    {
+        foreach ($this->class->getAttributes() as $attribute) {
+            $initiatedAttribute = $attribute->newInstance();
+
+            if ($initiatedAttribute instanceof MapFrom) {
+                $this->mapperAttribute = $initiatedAttribute;
+
+                continue;
+            }
+        }
+
+        if (! isset($this->mapperAttribute)) {
+            $this->mapperAttribute = null;
+        }
     }
 }
