@@ -14,14 +14,13 @@ class CastPropertiesPipe extends Pipe
 {
     public function __construct(
         protected DataConfig $dataConfig,
-    )
-    {
+    ) {
     }
 
     public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection|Data
     {
         foreach ($properties as $name => $value) {
-            $dataProperty = $class->properties()->first(fn(DataProperty $dataProperty) => $dataProperty->name() === $name);
+            $dataProperty = $class->properties()->first(fn (DataProperty $dataProperty) => $dataProperty->name() === $name);
 
             if ($dataProperty === null) {
                 continue;

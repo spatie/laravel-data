@@ -8,7 +8,7 @@ use Spatie\LaravelData\Support\DataClass;
 
 class RenamePropertiesPipe extends Pipe
 {
-    public function handle(mixed $initialValue, DataClass $class, Collection $properties,): Collection|Data
+    public function handle(mixed $initialValue, DataClass $class, Collection $properties, ): Collection|Data
     {
         return $properties;
     }

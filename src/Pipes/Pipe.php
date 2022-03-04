@@ -8,7 +8,7 @@ use Spatie\LaravelData\Support\DataClass;
 
 abstract class Pipe
 {
-    public abstract function handle(
+    abstract public function handle(
         mixed $initialValue,
         DataClass $class,
         Collection $properties,

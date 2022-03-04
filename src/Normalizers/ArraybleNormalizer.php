@@ -8,7 +8,7 @@ class ArraybleNormalizer extends Normalizer
 {
     public function normalize(mixed $value): ?array
     {
-        if(! $value instanceof Arrayable){
+        if (! $value instanceof Arrayable) {
             return null;
         }
 
