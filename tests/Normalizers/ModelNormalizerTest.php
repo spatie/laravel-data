@@ -1,11 +1,11 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Resolvers;
+namespace Spatie\LaravelData\Tests\Normalizers;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\LaravelData\Resolvers\DataFromModelResolver;
+use Spatie\LaravelData\Normalizers\ModelNormalizer;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\FakeModelData;
@@ -13,17 +13,8 @@ use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
 use Spatie\LaravelData\Tests\TestCase;
 
-class DataFromModelResolverTest extends TestCase
+class ModelNormalizerTest extends TestCase
 {
-    private DataFromModelResolver $resolver;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->resolver = app(DataFromModelResolver::class);
-    }
-
     /** @test */
     public function it_can_get_a_data_object_from_model()
     {
@@ -93,7 +84,7 @@ class DataFromModelResolverTest extends TestCase
             )
             ->create();
 
-        $data = $this->resolver->execute($dataClass, $model);
+        $data = $dataClass::from($model);
 
         $this->assertTrue($data->date->eq(Carbon::create(2020, 05, 16, 00, 00, 00)));
         $this->assertTrue($data->datetime->eq(Carbon::create(2020, 05, 16, 12, 00, 00)));

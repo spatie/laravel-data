@@ -14,8 +14,8 @@ class DefaultValuesPipe extends Pipe
     {
         $class
             ->properties()
-            ->filter(fn (DataProperty $property) => ! $properties->has($property->name()))
-            ->each(function (DataProperty $property) {
+            ->filter(fn(DataProperty $property) => ! $properties->has($property->name()))
+            ->each(function (DataProperty $property) use (&$properties) {
                 if ($property->hasDefaultValue()) {
                     $properties[$property->name()] = $property->defaultValue();
                 }

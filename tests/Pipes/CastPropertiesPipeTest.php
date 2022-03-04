@@ -1,12 +1,13 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Resolvers;
+namespace Spatie\LaravelData\Tests\Pipes;
 
 use Carbon\CarbonImmutable;
 use DateTime;
 use DateTimeImmutable;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
+use Spatie\LaravelData\Pipes\CastPropertiesPipe;
 use Spatie\LaravelData\Tests\Fakes\BuiltInTypeWithCastData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DateCastData;
@@ -21,46 +22,40 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 use Spatie\LaravelData\Undefined;
 
-class DataFromArrayResolverTest extends TestCase
+class CastPropertiesPipeTest extends TestCase
 {
-    private DataFromArrayResolver $action;
-
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->action = app(DataFromArrayResolver::class);
+        $this->pipe = resolve(CastPropertiesPipe::class);
     }
 
     /** @test */
     public function it_maps_default_types()
     {
-        /** @var \Spatie\LaravelData\Tests\Fakes\ComplicatedData $data */
-        $data = $this->action->execute(
-            ComplicatedData::class,
-            [
-                'withoutType' => 42,
-                'int' => 42,
-                'bool' => true,
-                'float' => 3.14,
-                'string' => 'Hello world',
-                'array' => [1, 1, 2, 3, 5, 8],
-                'nullable' => null,
-                'mixed' => 42,
-                'explicitCast' => '16-06-1994',
-                'defaultCast' => '1994-05-16T12:00:00+01:00',
-                'nestedData' => [
-                    'string' => 'hello',
-                ],
-                'nestedCollection' => [
-                    ['string' => 'never'],
-                    ['string' => 'gonna'],
-                    ['string' => 'give'],
-                    ['string' => 'you'],
-                    ['string' => 'up'],
-                ],
-            ]
-        );
+        $data = ComplicatedData::from([
+            'withoutType' => 42,
+            'int' => 42,
+            'bool' => true,
+            'float' => 3.14,
+            'string' => 'Hello world',
+            'array' => [1, 1, 2, 3, 5, 8],
+            'nullable' => null,
+            'mixed' => 42,
+            'explicitCast' => '16-06-1994',
+            'defaultCast' => '1994-05-16T12:00:00+01:00',
+            'nestedData' => [
+                'string' => 'hello',
+            ],
+            'nestedCollection' => [
+                ['string' => 'never'],
+                ['string' => 'gonna'],
+                ['string' => 'give'],
+                ['string' => 'you'],
+                ['string' => 'up'],
+            ],
+        ]);
 
         $this->assertInstanceOf(ComplicatedData::class, $data);
         $this->assertEquals(42, $data->withoutType);
@@ -87,26 +82,22 @@ class DataFromArrayResolverTest extends TestCase
     /** @test */
     public function it_wont_cast_a_property_that_is_already_in_the_correct_type()
     {
-        /** @var \Spatie\LaravelData\Tests\Fakes\ComplicatedData $data */
-        $data = $this->action->execute(
-            ComplicatedData::class,
-            [
-                'withoutType' => 42,
-                'int' => 42,
-                'bool' => true,
-                'float' => 3.14,
-                'string' => 'Hello world',
-                'array' => [1, 1, 2, 3, 5, 8],
-                'nullable' => null,
-                'mixed' => 42,
-                'explicitCast' => DateTime::createFromFormat('d-m-Y', '16-06-1994'),
-                'defaultCast' => DateTime::createFromFormat(DATE_ATOM, '1994-05-16T12:00:00+02:00'),
-                'nestedData' => SimpleData::from('hello'),
-                'nestedCollection' => SimpleData::collection([
-                    'never', 'gonna', 'give', 'you', 'up',
-                ]),
-            ]
-        );
+        $data = ComplicatedData::from([
+            'withoutType' => 42,
+            'int' => 42,
+            'bool' => true,
+            'float' => 3.14,
+            'string' => 'Hello world',
+            'array' => [1, 1, 2, 3, 5, 8],
+            'nullable' => null,
+            'mixed' => 42,
+            'explicitCast' => DateTime::createFromFormat('d-m-Y', '16-06-1994'),
+            'defaultCast' => DateTime::createFromFormat(DATE_ATOM, '1994-05-16T12:00:00+02:00'),
+            'nestedData' => SimpleData::from('hello'),
+            'nestedCollection' => SimpleData::collection([
+                'never', 'gonna', 'give', 'you', 'up',
+            ]),
+        ]);
 
         $this->assertInstanceOf(ComplicatedData::class, $data);
         $this->assertEquals(42, $data->withoutType);
@@ -134,24 +125,17 @@ class DataFromArrayResolverTest extends TestCase
     {
         $model = new DummyModel(['id' => 10]);
 
-        /** @var \Spatie\LaravelData\Tests\Fakes\NestedModelData $data */
-        $withoutModelData = $this->action->execute(
-            NestedModelData::class,
-            [
-                'model' => ['id' => 10],
-            ]
-        );
+        $withoutModelData = NestedModelData::from([
+            'model' => ['id' => 10],
+        ]);
 
         $this->assertInstanceOf(NestedModelData::class, $withoutModelData);
         $this->assertEquals(10, $withoutModelData->model->id);
 
         /** @var \Spatie\LaravelData\Tests\Fakes\NestedModelData $data */
-        $withModelData = $this->action->execute(
-            NestedModelData::class,
-            [
-                'model' => $model,
-            ]
-        );
+        $withModelData = NestedModelData::from([
+            'model' => $model,
+        ]);
 
         $this->assertInstanceOf(NestedModelData::class, $withModelData);
         $this->assertEquals(10, $withModelData->model->id);
@@ -160,13 +144,9 @@ class DataFromArrayResolverTest extends TestCase
     /** @test */
     public function it_will_allow_a_nested_collection_object_to_handle_its_own_types()
     {
-        /** @var \Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData $data */
-        $data = $this->action->execute(
-            NestedModelCollectionData::class,
-            [
-                'models' => [['id' => 10], ['id' => 20],],
-            ]
-        );
+        $data = NestedModelCollectionData::from([
+            'models' => [['id' => 10], ['id' => 20],],
+        ]);
 
         $this->assertInstanceOf(NestedModelCollectionData::class, $data);
         $this->assertEquals(
@@ -174,13 +154,9 @@ class DataFromArrayResolverTest extends TestCase
             $data->models
         );
 
-        /** @var \Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData $data */
-        $data = $this->action->execute(
-            NestedModelCollectionData::class,
-            [
-                'models' => [new DummyModel(['id' => 10]), new DummyModel(['id' => 20]),],
-            ]
-        );
+        $data = NestedModelCollectionData::from([
+            'models' => [new DummyModel(['id' => 10]), new DummyModel(['id' => 20]),],
+        ]);
 
         $this->assertInstanceOf(NestedModelCollectionData::class, $data);
         $this->assertEquals(
@@ -188,13 +164,9 @@ class DataFromArrayResolverTest extends TestCase
             $data->models
         );
 
-        /** @var \Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData $data */
-        $data = $this->action->execute(
-            NestedModelCollectionData::class,
-            [
-                'models' => ModelData::collection([['id' => 10], ['id' => 20]]),
-            ]
-        );
+        $data = NestedModelCollectionData::from([
+            'models' => ModelData::collection([['id' => 10], ['id' => 20]]),
+        ]);
 
         $this->assertInstanceOf(NestedModelCollectionData::class, $data);
         $this->assertEquals(
@@ -206,24 +178,20 @@ class DataFromArrayResolverTest extends TestCase
     /** @test */
     public function it_works_nicely_with_lazy_data()
     {
-        /** @var \Spatie\LaravelData\Tests\Fakes\NestedLazyData $data */
-        $data = $this->action->execute(
-            NestedLazyData::class,
-            ['simple' => Lazy::create(fn () => SimpleData::from('Hello'))]
-        );
+        $data = NestedLazyData::from([
+            'simple' => Lazy::create(fn() => SimpleData::from('Hello')),
+        ]);
 
         $this->assertInstanceOf(Lazy::class, $data->simple);
-        $this->assertEquals(Lazy::create(fn () => SimpleData::from('Hello')), $data->simple);
+        $this->assertEquals(Lazy::create(fn() => SimpleData::from('Hello')), $data->simple);
     }
 
     /** @test */
     public function it_allows_casting_of_built_in_types()
     {
-        /** @var \Spatie\LaravelData\Tests\Fakes\BuiltInTypeWithCastData $data */
-        $data = $this->action->execute(
-            BuiltInTypeWithCastData::class,
-            ['money' => 3.14]
-        );
+        $data = BuiltInTypeWithCastData::from([
+            'money' => 3.14,
+        ]);
 
         $this->assertIsInt($data->money);
         $this->assertEquals(314, $data->money);
@@ -232,10 +200,9 @@ class DataFromArrayResolverTest extends TestCase
     /** @test */
     public function it_allows_casting()
     {
-        $data = $this->action->execute(
-            DateCastData::class,
-            ['date' => '2022-01-18']
-        );
+        $data = DateCastData::from([
+            'date' => '2022-01-18',
+        ]);
 
         $this->assertInstanceOf(DateTimeImmutable::class, $data->date);
         $this->assertEquals(DateTimeImmutable::createFromFormat('Y-m-d', '2022-01-18'), $data->date);
@@ -246,10 +213,9 @@ class DataFromArrayResolverTest extends TestCase
     {
         $this->onlyPHP81();
 
-        $data = $this->action->execute(
-            EnumCastData::class,
-            ['enum' => 'foo']
-        );
+        $data = EnumCastData::from([
+            'enum' => 'foo',
+        ]);
 
         $this->assertInstanceOf(DummyBackedEnum::class, $data->enum);
         $this->assertEquals(DummyBackedEnum::FOO, $data->enum);
@@ -258,7 +224,7 @@ class DataFromArrayResolverTest extends TestCase
     /** @test */
     public function it_can_manually_set_values_in_the_constructor()
     {
-        $dataClass = new class ('', '') {
+        $dataClass = new class ('', '') extends Data {
             public string $member;
 
             public string $other_member;
@@ -278,16 +244,13 @@ class DataFromArrayResolverTest extends TestCase
             }
         };
 
-        $data = $this->action->execute(
-            $dataClass::class,
-            [
-                'promoted' => 'A',
-                'non_promoted' => 'B',
-                'non_promoted_with_default' => 'C',
-                'promoted_with_with_default' => 'D',
-                'member_to_set' => 'E',
-            ]
-        );
+        $data = $dataClass::from([
+            'promoted' => 'A',
+            'non_promoted' => 'B',
+            'non_promoted_with_default' => 'C',
+            'promoted_with_with_default' => 'D',
+            'member_to_set' => 'E',
+        ]);
 
         $this->assertEquals([
             'member' => 'changed_in_constructor: B',
