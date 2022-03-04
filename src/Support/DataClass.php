@@ -34,7 +34,7 @@ class DataClass
             properties: static::resolveProperties($class),
             creationMethods: static::resolveMagicalMethods($methods),
             hasAuthorizationMethod: static::hasAuthorizationMethod($methods),
-            fromMapperClass: $attributes->first(fn(object $attribute) => $attribute instanceof MapFrom)?->from,
+            fromMapperClass: $attributes->first(fn (object $attribute) => $attribute instanceof MapFrom)?->from,
         );
     }
 
@@ -44,8 +44,8 @@ class DataClass
         $defaultValues = static::resolveDefaultValues($class);
 
         return collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(fn(ReflectionProperty $property) => $property->isStatic())
-            ->map(fn(ReflectionProperty $property) => DataProperty::create(
+            ->reject(fn (ReflectionProperty $property) => $property->isStatic())
+            ->map(fn (ReflectionProperty $property) => DataProperty::create(
                 $property,
                 array_key_exists($property->getName(), $defaultValues),
                 $defaultValues[$property->getName()] ?? null,
@@ -61,8 +61,8 @@ class DataClass
         }
 
         return collect($class->getMethod('__construct')->getParameters())
-            ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-            ->mapWithKeys(fn(ReflectionParameter $parameter) => [
+            ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+            ->mapWithKeys(fn (ReflectionParameter $parameter) => [
                 $parameter->name => $parameter->getDefaultValue(),
             ])
             ->merge($class->getDefaultProperties())
@@ -106,7 +106,7 @@ class DataClass
     private static function hasAuthorizationMethod(
         Collection $methods
     ): bool {
-        return $methods->contains(fn(ReflectionMethod $method) => $method->isStatic()
+        return $methods->contains(fn (ReflectionMethod $method) => $method->isStatic()
             && $method->getName() === 'authorize'
             && $method->isPublic());
     }

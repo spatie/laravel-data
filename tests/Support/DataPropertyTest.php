@@ -12,7 +12,6 @@ use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotFindDataTypeForProperty;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
@@ -251,7 +250,7 @@ class DataPropertyTest extends TestCase
             public SimpleData $property;
         });
 
-        $this->assertEquals(new DateTimeInterfaceTransformer, $helper->transformer);
+        $this->assertEquals(new DateTimeInterfaceTransformer(), $helper->transformer);
     }
 
     /** @test */

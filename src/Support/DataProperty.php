@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support;
 
-use Attribute;
 use Illuminate\Support\Collection;
 use ReflectionAttribute;
 use ReflectionIntersectionType;
@@ -59,20 +58,20 @@ class DataProperty
         $type = $property->getType();
 
         $attributes = collect($property->getAttributes())->map(
-            fn(ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
+            fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
         );
 
         $parameters = [
             'name' => $property->name,
             'className' => $property->class,
-            'validate' => ! $attributes->contains(fn(object $attribute) => $attribute instanceof WithoutValidation),
+            'validate' => ! $attributes->contains(fn (object $attribute) => $attribute instanceof WithoutValidation),
             'promoted' => $property->isPromoted(),
             'hasDefaultValue' => $hasDefaultValue,
             'defaultValue' => $defaultValue,
-            'validationAttributes' => $attributes->filter(fn(object $attribute) => $attribute instanceof ValidationAttribute)->all(),
-            'cast' => $attributes->first(fn(object $attribute) => $attribute instanceof WithCast)?->get(),
-            'transformer' => $attributes->first(fn(object $attribute) => $attribute instanceof WithTransformer)?->get(),
-            'mapFrom' => $attributes->first(fn(object $attribute) => $attribute instanceof MapFrom),
+            'validationAttributes' => $attributes->filter(fn (object $attribute) => $attribute instanceof ValidationAttribute)->all(),
+            'cast' => $attributes->first(fn (object $attribute) => $attribute instanceof WithCast)?->get(),
+            'transformer' => $attributes->first(fn (object $attribute) => $attribute instanceof WithTransformer)?->get(),
+            'mapFrom' => $attributes->first(fn (object $attribute) => $attribute instanceof MapFrom),
             'attributes' => $attributes->all(),
         ];
 
@@ -194,7 +193,7 @@ class DataProperty
         ReflectionProperty $property,
         Collection $attributes,
     ): string {
-        if ($dataCollectionOf = $attributes->first(fn(object $attribute) => $attribute instanceof DataCollectionOf)) {
+        if ($dataCollectionOf = $attributes->first(fn (object $attribute) => $attribute instanceof DataCollectionOf)) {
             return $dataCollectionOf->class;
         }
 
