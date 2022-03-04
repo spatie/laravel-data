@@ -100,18 +100,18 @@ class DataClassTest extends TestCase
         /** @var \Spatie\LaravelData\Support\DataProperty[] $properties */
         $properties = DataClass::create(new ReflectionClass(DataWithDefaults::class))->properties();
 
-        $this->assertEquals('property', $properties[0]->name());
-        $this->assertFalse($properties[0]->hasDefaultValue());
+        $this->assertEquals('property', $properties[0]->name);
+        $this->assertFalse($properties[0]->hasDefaultValue);
 
-        $this->assertEquals('default_property', $properties[1]->name());
-        $this->assertTrue($properties[1]->hasDefaultValue());
-        $this->assertEquals('Hello', $properties[1]->defaultValue());
+        $this->assertEquals('default_property', $properties[1]->name);
+        $this->assertTrue($properties[1]->hasDefaultValue);
+        $this->assertEquals('Hello', $properties[1]->defaultValue);
 
-        $this->assertEquals('promoted_property', $properties[2]->name());
-        $this->assertFalse($properties[2]->hasDefaultValue());
+        $this->assertEquals('promoted_property', $properties[2]->name);
+        $this->assertFalse($properties[2]->hasDefaultValue);
 
-        $this->assertEquals('default_promoted_property', $properties[3]->name());
-        $this->assertTrue($properties[3]->hasDefaultValue());
-        $this->assertEquals('Hello Again', $properties[3]->defaultValue());
+        $this->assertEquals('default_promoted_property', $properties[3]->name);
+        $this->assertTrue($properties[3]->hasDefaultValue);
+        $this->assertEquals('Hello Again', $properties[3]->defaultValue);
     }
 }

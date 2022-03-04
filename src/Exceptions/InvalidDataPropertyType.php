@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Exceptions;
 
 use Exception;
 use ReflectionProperty;
+use Spatie\LaravelData\Support\DataProperty;
 
 class InvalidDataPropertyType extends Exception
 {
@@ -12,13 +13,18 @@ class InvalidDataPropertyType extends Exception
         return new self("A data property cannot have Lazy as it's only type ({$property->class}::{$property->name})");
     }
 
-    public static function unionWithData(ReflectionProperty $property)
+    public static function onlyUndefined(ReflectionProperty $property)
     {
-        return new self("A data property cannot have multiple types besides the data object type ({$property->class}::{$property->name})");
+        return new self("A data property cannot have Undefined as it's only type ({$property->class}::{$property->name})");
     }
 
-    public static function unionWithDataCollection(ReflectionProperty $property)
+    public static function unionWithData(DataProperty $property)
     {
-        return new self("A data property cannot have multiple types besides the data object collection type ({$property->class}::{$property->name})");
+        return new self("A data property cannot have multiple types besides the data object type ({$property->className}::{$property->name})");
+    }
+
+    public static function unionWithDataCollection(DataProperty $property)
+    {
+        return new self("A data property cannot have multiple types besides the data object collection type ({$property->className}::{$property->name})");
     }
 }

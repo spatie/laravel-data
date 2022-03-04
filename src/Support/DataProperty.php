@@ -2,6 +2,9 @@
 
 namespace Spatie\LaravelData\Support;
 
+use Attribute;
+use Illuminate\Support\Collection;
+use ReflectionAttribute;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionProperty;
@@ -12,364 +15,209 @@ use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
+use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotFindDataTypeForProperty;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Transformers\Transformer;
 use Spatie\LaravelData\Undefined;
 use TypeError;
 
 class DataProperty
 {
-    protected bool $isLazy;
-
-    protected bool $isNullable;
-
-    protected bool $isUndefinable;
-
-    protected bool $isData;
-
-    protected bool $isDataCollection;
-
-    protected string $dataClassName;
-
-    protected DataPropertyTypes $types;
-
-    /** @var \Spatie\LaravelData\Attributes\Validation\ValidationAttribute[] */
-    protected array $validationAttributes;
-
-    protected bool $withValidation;
-
-    protected ?WithCast $castAttribute;
-
-    protected ?WithTransformer $transformerAttribute;
-
-    protected ?DataCollectionOf $dataCollectionOfAttribute;
-
-    protected ?MapFrom $mapperAttribute;
+    public function __construct(
+        public readonly string $name,
+        public readonly string $className,
+        public readonly DataPropertyTypes $types,
+        public readonly bool $validate,
+        public readonly bool $lazy,
+        public readonly bool $nullable,
+        public readonly bool $undefinable,
+        public readonly bool $promoted,
+        public readonly bool $isDataObject,
+        public readonly bool $isDataCollection,
+        public readonly bool $hasDefaultValue,
+        public readonly mixed $defaultValue,
+        public readonly array $validationAttributes,
+        public readonly ?Cast $cast,
+        public readonly ?Transformer $transformer,
+        public readonly ?MapFrom $mapFrom,
+        /** @var class-string<\Spatie\LaravelData\Data> */
+        public readonly ?string $dataClass,
+        public readonly array $attributes,
+    ) {
+        $this->ensurePropertyIsValid();
+    }
 
     public static function create(
         ReflectionProperty $property,
         bool $hasDefaultValue = false,
         mixed $defaultValue = null
-    ): static {
-        return new static($property, $hasDefaultValue, $defaultValue);
-    }
-
-    final public function __construct(
-        protected ReflectionProperty $property,
-        protected bool $hasDefaultValue = false,
-        protected mixed $defaultValue = null
     ) {
-        $type = $this->property->getType();
+        $type = $property->getType();
 
-        match (true) {
-            $type === null => $this->processNoType(),
-            $type instanceof ReflectionNamedType => $this->processNamedType($type),
-            $type instanceof ReflectionUnionType, $type instanceof ReflectionIntersectionType => $this->processListType($type),
+        $attributes = collect($property->getAttributes())->map(
+            fn(ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
+        );
+
+        $parameters = [
+            'name' => $property->name,
+            'className' => $property->class,
+            'validate' => ! $attributes->contains(fn(object $attribute) => $attribute instanceof WithoutValidation),
+            'promoted' => $property->isPromoted(),
+            'hasDefaultValue' => $hasDefaultValue,
+            'defaultValue' => $defaultValue,
+            'validationAttributes' => $attributes->filter(fn(object $attribute) => $attribute instanceof ValidationAttribute)->all(),
+            'cast' => $attributes->first(fn(object $attribute) => $attribute instanceof WithCast)?->get(),
+            'transformer' => $attributes->first(fn(object $attribute) => $attribute instanceof WithTransformer)?->get(),
+            'mapFrom' => $attributes->first(fn(object $attribute) => $attribute instanceof MapFrom),
+            'attributes' => $attributes->all(),
+        ];
+
+        $specificParameters = match (true) {
+            $type === null => static::processNoType(),
+            $type instanceof ReflectionNamedType => static::processNamedType($property, $type, $attributes),
+            $type instanceof ReflectionUnionType, $type instanceof ReflectionIntersectionType => self::processListType($property, $type, $attributes),
             default => throw new TypeError(),
         };
 
-        $this->ensurePropertyIsValid();
+        return new self(...array_merge($parameters, $specificParameters));
     }
 
-    public function isLazy(): bool
+    private static function processNoType(): array
     {
-        return $this->isLazy;
+        return [
+            'types' => new DataPropertyTypes(),
+            'lazy' => false,
+            'nullable' => true,
+            'undefinable' => false,
+            'isDataObject' => false,
+            'isDataCollection' => false,
+            'dataClass' => null,
+        ];
     }
 
-    public function isNullable(): bool
-    {
-        return $this->isNullable;
-    }
-
-    public function isUndefinable(): bool
-    {
-        return $this->isUndefinable;
-    }
-
-    public function isPromoted(): bool
-    {
-        return $this->property->isPromoted();
-    }
-
-    public function hasDefaultValue(): bool
-    {
-        return $this->hasDefaultValue;
-    }
-
-    public function defaultValue(): mixed
-    {
-        return $this->defaultValue;
-    }
-
-    public function isData(): bool
-    {
-        return $this->isData;
-    }
-
-    public function isDataCollection(): bool
-    {
-        return $this->isDataCollection;
-    }
-
-    public function types(): DataPropertyTypes
-    {
-        return $this->types;
-    }
-
-    public function name(): string
-    {
-        return $this->property->getName();
-    }
-
-    public function className(): string
-    {
-        return $this->property->getDeclaringClass()->getName();
-    }
-
-    public function validationAttributes(): array
-    {
-        /** @psalm-suppress RedundantPropertyInitializationCheck */
-        if (! isset($this->validationAttributes)) {
-            $this->loadAttributes();
-        }
-
-        return $this->validationAttributes;
-    }
-
-    public function shouldValidateProperty(): bool
-    {
-        /** @psalm-suppress RedundantPropertyInitializationCheck */
-        if (! isset($this->withValidation)) {
-            $this->loadAttributes();
-        }
-
-        return $this->withValidation;
-    }
-
-    public function castAttribute(): ?WithCast
-    {
-        if (! isset($this->castAttribute)) {
-            $this->loadAttributes();
-        }
-
-        return $this->castAttribute;
-    }
-
-    public function transformerAttribute(): ?WithTransformer
-    {
-        if (! isset($this->transformerAttribute)) {
-            $this->loadAttributes();
-        }
-
-        return $this->transformerAttribute;
-    }
-
-    public function dataCollectionOfAttribute(): ?DataCollectionOf
-    {
-        if (! isset($this->dataCollectionOfAttribute)) {
-            $this->loadAttributes();
-        }
-
-        return $this->dataCollectionOfAttribute;
-    }
-
-    public function mapperAttribute(): ?MapFrom
-    {
-        if (! isset($this->mapperAttribute)) {
-            $this->loadAttributes();
-        }
-
-        return $this->mapperAttribute;
-    }
-
-    /**
-     * @return class-string<\Spatie\LaravelData\Data>
-     */
-    public function dataClassName(): string
-    {
-        /** @psalm-suppress RedundantPropertyInitializationCheck */
-        if (isset($this->dataClassName)) {
-            return $this->dataClassName;
-        }
-
-        if ($this->isData) {
-            return $this->dataClassName = $this->types->first();
-        }
-
-        if ($this->isDataCollection) {
-            return $this->dataClassName = $this->resolveDataCollectionClass();
-        }
-
-        throw CannotFindDataTypeForProperty::noDataReferenceFound($this->className(), $this->name());
-    }
-
-    private function processNoType(): void
-    {
-        $this->isLazy = false;
-        $this->isNullable = true;
-        $this->isUndefinable = false;
-        $this->isData = false;
-        $this->isDataCollection = false;
-        $this->types = new DataPropertyTypes();
-    }
-
-    private function processNamedType(ReflectionNamedType $type)
-    {
+    private static function processNamedType(
+        ReflectionProperty $property,
+        ReflectionNamedType $type,
+        Collection $attributes,
+    ): array {
         $name = $type->getName();
 
         if (is_a($name, Lazy::class, true)) {
-            throw InvalidDataPropertyType::onlyLazy($this->property);
+            throw InvalidDataPropertyType::onlyLazy($property);
         }
 
-        $this->isLazy = false;
-        $this->isData = is_a($name, Data::class, true);
-        $this->isDataCollection = is_a($name, DataCollection::class, true);
-        $this->isNullable = $type->allowsNull();
-        $this->isUndefinable = is_a($name, Undefined::class, true);
-        $this->types = new DataPropertyTypes([$name]);
+        if (is_a($name, Undefined::class, true)) {
+            throw InvalidDataPropertyType::onlyUndefined($property);
+        }
+
+        $isDataObject = is_a($name, Data::class, true);
+        $isDataCollection = is_a($name, DataCollection::class, true);
+
+        return [
+            'types' => new DataPropertyTypes([$name]),
+            'lazy' => false,
+            'nullable' => $type->allowsNull(),
+            'undefinable' => false,
+            'isDataObject' => $isDataObject,
+            'isDataCollection' => $isDataCollection,
+            'dataClass' => match (true) {
+                $isDataObject => $name,
+                $isDataCollection => static::resolveDataCollectionClass($property, $attributes),
+                default => null
+            },
+        ];
     }
 
-    private function processListType(ReflectionUnionType|ReflectionIntersectionType $type)
-    {
-        $this->isLazy = false;
-        $this->isNullable = false;
-        $this->isUndefinable = false;
-        $this->isData = false;
-        $this->isDataCollection = false;
-        $this->types = new DataPropertyTypes();
+    private static function processListType(
+        ReflectionProperty $property,
+        ReflectionUnionType|ReflectionIntersectionType $types,
+        Collection $attributes,
+    ): array {
+        $parameters = [
+            'types' => new DataPropertyTypes(),
+            'lazy' => false,
+            'nullable' => false,
+            'undefinable' => false,
+            'isDataObject' => false,
+            'isDataCollection' => false,
+            'dataClass' => null,
+        ];
 
-        foreach ($type->getTypes() as $childType) {
+        foreach ($types->getTypes() as $childType) {
             $name = $childType->getName();
 
             if ($name === 'null') {
-                $this->isNullable = true;
+                $parameters['nullable'] = true;
 
                 continue;
             }
 
             if ($name === Undefined::class) {
-                $this->isUndefinable = true;
+                $parameters['undefinable'] = true;
 
                 continue;
             }
 
             if ($name === Lazy::class) {
-                $this->isLazy = true;
+                $parameters['lazy'] = true;
 
                 continue;
             }
 
             if (is_a($name, Data::class, true)) {
-                $this->isData = true;
-                $this->types->add($name);
+                $parameters['isDataObject'] = true;
+                $parameters['types']->add($name);
+                $parameters['dataClass'] = $name;
 
                 continue;
             }
 
             if (is_a($name, DataCollection::class, true)) {
-                $this->isDataCollection = true;
-                $this->types->add($name);
+                $parameters['isDataCollection'] = true;
+                $parameters['types']->add($name);
+                $parameters['dataClass'] = static::resolveDataCollectionClass($property, $attributes);
 
                 continue;
             }
 
-            $this->types->add($name);
+            $parameters['types']->add($name);
         }
+
+        return $parameters;
     }
 
-    private function ensurePropertyIsValid()
-    {
-        if ($this->isData && $this->types->count() > 1) {
-            throw InvalidDataPropertyType::unionWithData($this->property);
+    private static function resolveDataCollectionClass(
+        ReflectionProperty $property,
+        Collection $attributes,
+    ): string {
+        if ($dataCollectionOf = $attributes->first(fn(object $attribute) => $attribute instanceof DataCollectionOf)) {
+            return $dataCollectionOf->class;
         }
 
-        if ($this->isDataCollection && $this->types->count() > 1) {
-            throw InvalidDataPropertyType::unionWithDataCollection($this->property);
-        }
-    }
-
-    private function resolveDataCollectionClass(): string
-    {
-        if ($attribute = $this->dataCollectionOfAttribute()) {
-            return $attribute->class;
-        }
-
-        $class = (new DataCollectionAnnotationReader())->getClass($this->property);
+        $class = (new DataCollectionAnnotationReader())->getClass($property);
 
         if ($class === null) {
-            throw CannotFindDataTypeForProperty::wrongDataCollectionAnnotation($this->className(), $this->name());
+            throw CannotFindDataTypeForProperty::wrongDataCollectionAnnotation(
+                $property->class,
+                $property->name
+            );
         }
 
         return $class;
     }
 
-    private function loadAttributes(): void
+    private function ensurePropertyIsValid()
     {
-        $validationAttributes = [];
-
-        foreach ($this->property->getAttributes() as $attribute) {
-            $initiatedAttribute = $attribute->newInstance();
-
-            if ($initiatedAttribute instanceof ValidationAttribute) {
-                $validationAttributes[] = $initiatedAttribute;
-
-                continue;
-            }
-
-            if ($initiatedAttribute instanceof WithCast) {
-                $this->castAttribute = $initiatedAttribute;
-
-                continue;
-            }
-
-            if ($initiatedAttribute instanceof WithTransformer) {
-                $this->transformerAttribute = $initiatedAttribute;
-
-                continue;
-            }
-
-            if ($initiatedAttribute instanceof DataCollectionOf) {
-                $this->dataCollectionOfAttribute = $initiatedAttribute;
-
-                continue;
-            }
-
-            if ($initiatedAttribute instanceof WithoutValidation) {
-                $this->withValidation = false;
-
-                continue;
-            }
-
-            if ($initiatedAttribute instanceof MapFrom) {
-                $this->mapperAttribute = $initiatedAttribute;
-
-                continue;
-            }
+        if ($this->isDataObject && $this->types->count() > 1) {
+            throw InvalidDataPropertyType::unionWithData($this);
         }
 
-        $this->validationAttributes = $validationAttributes;
-
-        if (! isset($this->castAttribute)) {
-            $this->castAttribute = null;
-        }
-
-        if (! isset($this->transformerAttribute)) {
-            $this->transformerAttribute = null;
-        }
-
-        if (! isset($this->dataCollectionOfAttribute)) {
-            $this->dataCollectionOfAttribute = null;
-        }
-
-        if (! isset($this->withValidation)) {
-            $this->withValidation = true;
-        }
-
-        if (! isset($this->mapperAttribute)) {
-            $this->mapperAttribute = null;
+        if ($this->isDataCollection && $this->types->count() > 1) {
+            throw InvalidDataPropertyType::unionWithDataCollection($this);
         }
     }
 }

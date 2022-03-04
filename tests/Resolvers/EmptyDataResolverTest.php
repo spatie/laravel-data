@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Tests\Resolvers;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
 use Spatie\LaravelData\Lazy;
@@ -62,6 +63,7 @@ class EmptyDataResolverTest extends TestCase
         });
 
         $this->assertEmptyPropertyValue([], new class () {
+            #[DataCollectionOf(SimpleData::class)]
             public DataCollection $property;
         });
     }

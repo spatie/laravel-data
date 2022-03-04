@@ -6,11 +6,13 @@ use Countable;
 use Generator;
 use Illuminate\Contracts\Support\Arrayable;
 use ReflectionProperty;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotFindDataTypeForProperty;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
@@ -33,14 +35,14 @@ class DataPropertyTest extends TestCase
             public $property;
         });
 
-        $this->assertFalse($helper->isLazy());
-        $this->assertTrue($helper->isNullable());
-        $this->assertFalse($helper->isUndefinable());
-        $this->assertFalse($helper->isData());
-        $this->assertFalse($helper->isDataCollection());
-        $this->assertTrue($helper->types()->isEmpty());
-        $this->assertEquals('property', $helper->name());
-        $this->assertEquals([], $helper->validationAttributes());
+        $this->assertFalse($helper->lazy);
+        $this->assertTrue($helper->nullable);
+        $this->assertFalse($helper->undefinable);
+        $this->assertFalse($helper->isDataObject);
+        $this->assertFalse($helper->isDataCollection);
+        $this->assertTrue($helper->types->isEmpty());
+        $this->assertEquals('property', $helper->name);
+        $this->assertEquals([], $helper->validationAttributes);
     }
 
     /** @test */
@@ -50,19 +52,19 @@ class DataPropertyTest extends TestCase
             public int $property;
         });
 
-        $this->assertFalse($helper->isLazy());
+        $this->assertFalse($helper->lazy);
 
         $helper = $this->resolveHelper(new class () {
             public int|Lazy $property;
         });
 
-        $this->assertTrue($helper->isLazy());
+        $this->assertTrue($helper->lazy);
 
         $helper = $this->resolveHelper(new class () {
             public int|Lazy|null $property;
         });
 
-        $this->assertTrue($helper->isLazy());
+        $this->assertTrue($helper->lazy);
     }
 
     /** @test */
@@ -72,19 +74,19 @@ class DataPropertyTest extends TestCase
             public int $property;
         });
 
-        $this->assertFalse($helper->isNullable());
+        $this->assertFalse($helper->nullable);
 
         $helper = $this->resolveHelper(new class () {
             public ?int $property;
         });
 
-        $this->assertTrue($helper->isNullable());
+        $this->assertTrue($helper->nullable);
 
         $helper = $this->resolveHelper(new class () {
             public null|int $property;
         });
 
-        $this->assertTrue($helper->isNullable());
+        $this->assertTrue($helper->nullable);
     }
 
     /** @test */
@@ -94,21 +96,24 @@ class DataPropertyTest extends TestCase
             public int $property;
         });
 
-        $this->assertFalse($helper->isUndefinable());
-
-        $helper = $this->resolveHelper(new class () {
-            public Undefined $property;
-        });
-
-        $this->assertTrue($helper->isUndefinable());
+        $this->assertFalse($helper->undefinable);
 
         $helper = $this->resolveHelper(new class () {
             public Undefined|int $property;
         });
 
-        $this->assertTrue($helper->isUndefinable());
+        $this->assertTrue($helper->undefinable);
     }
 
+    /** @test */
+    public function a_property_cannot_be_undefinable_alone()
+    {
+        $this->expectException(InvalidDataPropertyType::class);
+
+        $this->resolveHelper(new class () {
+            public Undefined $property;
+        });
+    }
 
     /** @test */
     public function it_can_check_if_a_property_is_a_data_object()
@@ -117,19 +122,19 @@ class DataPropertyTest extends TestCase
             public int $property;
         });
 
-        $this->assertFalse($helper->isData());
+        $this->assertFalse($helper->isDataObject);
 
         $helper = $this->resolveHelper(new class () {
             public SimpleData $property;
         });
 
-        $this->assertTrue($helper->isData());
+        $this->assertTrue($helper->isDataObject);
 
         $helper = $this->resolveHelper(new class () {
             public SimpleData|Lazy $property;
         });
 
-        $this->assertTrue($helper->isData());
+        $this->assertTrue($helper->isDataObject);
     }
 
     /** @test */
@@ -139,19 +144,21 @@ class DataPropertyTest extends TestCase
             public int $property;
         });
 
-        $this->assertFalse($helper->isDataCollection());
+        $this->assertFalse($helper->isDataCollection);
 
         $helper = $this->resolveHelper(new class () {
+            #[DataCollectionOf(SimpleData::class)]
             public DataCollection $property;
         });
 
-        $this->assertTrue($helper->isDataCollection());
+        $this->assertTrue($helper->isDataCollection);
 
         $helper = $this->resolveHelper(new class () {
+            #[DataCollectionOf(SimpleData::class)]
             public DataCollection|Lazy $property;
         });
 
-        $this->assertTrue($helper->isDataCollection());
+        $this->assertTrue($helper->isDataCollection);
     }
 
     /** @test */
@@ -161,25 +168,25 @@ class DataPropertyTest extends TestCase
             public int $property;
         });
 
-        $this->assertEquals(['int'], $helper->types()->all());
+        $this->assertEquals(['int'], $helper->types->all());
 
         $helper = $this->resolveHelper(new class () {
             public int|float $property;
         });
 
-        $this->assertEquals(['int', 'float'], $helper->types()->all());
+        $this->assertEquals(['int', 'float'], $helper->types->all());
 
         $helper = $this->resolveHelper(new class () {
             public int|Lazy $property;
         });
 
-        $this->assertEquals(['int'], $helper->types()->all());
+        $this->assertEquals(['int'], $helper->types->all());
 
         $helper = $this->resolveHelper(new class () {
             public int|Lazy|null $property;
         });
 
-        $this->assertEquals(['int'], $helper->types()->all());
+        $this->assertEquals(['int'], $helper->types->all());
     }
 
     /** @test */
@@ -198,6 +205,7 @@ class DataPropertyTest extends TestCase
         $this->expectException(InvalidDataPropertyType::class);
 
         $this->resolveHelper(new class () {
+            #[DataCollectionOf(SimpleData::class)]
             public DataCollection|int $property;
         });
     }
@@ -210,7 +218,7 @@ class DataPropertyTest extends TestCase
             public SimpleData $property;
         });
 
-        $this->assertEquals([new Max(10)], $helper->validationAttributes());
+        $this->assertEquals([new Max(10)], $helper->validationAttributes);
     }
 
     /** @test */
@@ -221,7 +229,7 @@ class DataPropertyTest extends TestCase
             public SimpleData $property;
         });
 
-        $this->assertEquals(new WithCast(DateTimeInterfaceCast::class), $helper->castAttribute());
+        $this->assertEquals(new DateTimeInterfaceCast(), $helper->cast);
     }
 
     /** @test */
@@ -232,7 +240,7 @@ class DataPropertyTest extends TestCase
             public SimpleData $property;
         });
 
-        $this->assertEquals(new WithCast(DateTimeInterfaceCast::class, 'd-m-y'), $helper->castAttribute());
+        $this->assertEquals(new DateTimeInterfaceCast('d-m-y'), $helper->cast);
     }
 
     /** @test */
@@ -243,7 +251,7 @@ class DataPropertyTest extends TestCase
             public SimpleData $property;
         });
 
-        $this->assertEquals(new WithTransformer(DateTimeInterfaceTransformer::class), $helper->transformerAttribute());
+        $this->assertEquals(new DateTimeInterfaceTransformer, $helper->transformer);
     }
 
     /** @test */
@@ -254,7 +262,7 @@ class DataPropertyTest extends TestCase
             public SimpleData $property;
         });
 
-        $this->assertEquals(new WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-y'), $helper->transformerAttribute());
+        $this->assertEquals(new DateTimeInterfaceTransformer('d-m-y'), $helper->transformer);
     }
 
     /** @test */
@@ -264,7 +272,7 @@ class DataPropertyTest extends TestCase
             public SimpleData $property;
         });
 
-        $this->assertEquals(SimpleData::class, $helper->dataClassName());
+        $this->assertEquals(SimpleData::class, $helper->dataClass);
     }
 
     /** @test */
@@ -274,7 +282,7 @@ class DataPropertyTest extends TestCase
 
         $dataProperty = DataProperty::create(new ReflectionProperty(IntersectionTypeData::class, 'intersection'));
 
-        $this->assertEquals(new DataPropertyTypes([Arrayable::class, Countable::class]), $dataProperty->types());
+        $this->assertEquals(new DataPropertyTypes([Arrayable::class, Countable::class]), $dataProperty->types);
     }
 
     /** @test */
@@ -282,12 +290,12 @@ class DataPropertyTest extends TestCase
     {
         $this->assertTrue($this->resolveHelper(new class () {
             public string $property;
-        })->shouldValidateProperty());
+        })->validate);
 
         $this->assertFalse($this->resolveHelper(new class () {
             #[WithoutValidation]
             public string $property;
-        })->shouldValidateProperty());
+        })->validate);
     }
 
     /**
@@ -300,7 +308,7 @@ class DataPropertyTest extends TestCase
     ) {
         $dataProperty = DataProperty::create(new ReflectionProperty(CollectionAnnotationsData::class, $property));
 
-        $this->assertEquals($expected, $dataProperty->dataClassName());
+        $this->assertEquals($expected, $dataProperty->dataClass);
     }
 
     public function correctAnnotationsDataProvider(): Generator
@@ -373,11 +381,9 @@ class DataPropertyTest extends TestCase
     public function it_cannot_get_the_data_class_for_invalid_annotations(
         string $property,
     ) {
-        $dataProperty = DataProperty::create(new ReflectionProperty(CollectionAnnotationsData::class, $property));
-
         $this->expectException(CannotFindDataTypeForProperty::class);
 
-        $dataProperty->dataClassName();
+        $dataProperty = DataProperty::create(new ReflectionProperty(CollectionAnnotationsData::class, $property));
     }
 
     public function invalidAnnotationsDataProvider(): Generator

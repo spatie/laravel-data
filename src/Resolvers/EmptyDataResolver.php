@@ -18,10 +18,10 @@ class EmptyDataResolver
         $dataClass = $this->dataConfig->getDataClass($class);
 
         return $dataClass->properties()->reduce(function (array $payload, DataProperty $property) use ($extra) {
-            if ($property->hasDefaultValue()) {
-                $payload[$property->name()] = $property->defaultValue();
+            if ($property->hasDefaultValue) {
+                $payload[$property->name] = $property->defaultValue;
             } else {
-                $payload[$property->name()] = $extra[$property->name()] ?? $this->getValueForProperty($property);
+                $payload[$property->name] = $extra[$property->name] ?? $this->getValueForProperty($property);
             }
 
             return $payload;
@@ -30,26 +30,26 @@ class EmptyDataResolver
 
     private function getValueForProperty(DataProperty $property): mixed
     {
-        if ($property->types()->isEmpty()) {
+        if ($property->types->isEmpty()) {
             return null;
         }
 
-        if ($property->types()->count() > 1) {
+        if ($property->types->count() > 1) {
             throw DataPropertyCanOnlyHaveOneType::create($property);
         }
 
-        $type = $property->types()->first();
+        $type = $property->types->first();
 
         if ($type === 'array') {
             return [];
         }
 
-        if ($property->isData()) {
+        if ($property->isDataObject) {
             /** @var \Spatie\LaravelData\Data $type */
             return $type::empty();
         }
 
-        if ($property->isDataCollection()) {
+        if ($property->isDataCollection) {
             return [];
         }
 

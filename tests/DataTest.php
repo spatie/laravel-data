@@ -468,6 +468,7 @@ class DataTest extends TestCase
         $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
             public function __construct(
                 public SimpleData $data,
+                #[DataCollectionOf(SimpleData::class)]
                 public DataCollection $dataCollection,
                 public Lazy|Data $lazy,
                 public string $string,
@@ -842,6 +843,7 @@ class DataTest extends TestCase
         $dataWithDefaultTransformers = new class ($nestedData, $nestedDataCollection) extends Data {
             public function __construct(
                 public Data $nestedData,
+                #[DataCollectionOf(SimpleData::class)]
                 public DataCollection $nestedDataCollection,
             ) {
             }
@@ -851,7 +853,7 @@ class DataTest extends TestCase
             public function __construct(
                 #[WithTransformer(ConfidentialDataTransformer::class)]
                 public Data $nestedData,
-                #[WithTransformer(ConfidentialDataCollectionTransformer::class)]
+                #[WithTransformer(ConfidentialDataCollectionTransformer::class), DataCollectionOf(SimpleData::class)]
                 public DataCollection $nestedDataCollection,
             ) {
             }

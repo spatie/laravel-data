@@ -20,7 +20,7 @@ class CastPropertiesPipe extends Pipe
     public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection|Data
     {
         foreach ($properties as $name => $value) {
-            $dataProperty = $class->properties()->first(fn (DataProperty $dataProperty) => $dataProperty->name() === $name);
+            $dataProperty = $class->properties()->first(fn (DataProperty $dataProperty) => $dataProperty->name === $name);
 
             if ($dataProperty === null) {
                 continue;
@@ -40,20 +40,20 @@ class CastPropertiesPipe extends Pipe
     {
         $shouldCast = $this->shouldBeCasted($property, $value);
 
-        if ($shouldCast && $castAttribute = $property->castAttribute()) {
-            return $castAttribute->get()->cast($property, $value);
+        if ($shouldCast && $cast = $property->cast) {
+            return $cast->cast($property, $value);
         }
 
         if ($shouldCast && $cast = $this->dataConfig->findGlobalCastForProperty($property)) {
             return $cast->cast($property, $value);
         }
 
-        if ($property->isData()) {
-            return $property->dataClassName()::from($value);
+        if ($property->isDataObject) {
+            return $property->dataClass::from($value);
         }
 
-        if ($property->isDataCollection()) {
-            return $property->dataClassName()::collection($value);
+        if ($property->isDataCollection) {
+            return $property->dataClass::collection($value);
         }
 
         return $value;
@@ -67,6 +67,6 @@ class CastPropertiesPipe extends Pipe
             return true;
         }
 
-        return $property->types()->canBe($type);
+        return $property->types->canBe($type);
     }
 }

@@ -11,7 +11,7 @@ class AttributesRuleInferrer implements RuleInferrer
     {
         $attributeRules = array_map(
             fn (ValidationAttribute $attribute) => $attribute->getRules(),
-            $property->validationAttributes()
+            $property->validationAttributes
         );
 
         return array_merge($rules, ...$attributeRules);

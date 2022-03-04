@@ -14,14 +14,14 @@ class DefaultValuesPipe extends Pipe
     {
         $class
             ->properties()
-            ->filter(fn (DataProperty $property) => ! $properties->has($property->name()))
+            ->filter(fn (DataProperty $property) => ! $properties->has($property->name))
             ->each(function (DataProperty $property) use (&$properties) {
-                if ($property->hasDefaultValue()) {
-                    $properties[$property->name()] = $property->defaultValue();
+                if ($property->hasDefaultValue) {
+                    $properties[$property->name] = $property->defaultValue;
                 }
 
-                if ($property->isUndefinable()) {
-                    $properties[$property->name()] = Undefined::create();
+                if ($property->undefinable) {
+                    $properties[$property->name] = Undefined::create();
                 }
             });
 
