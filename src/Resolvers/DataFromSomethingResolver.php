@@ -34,7 +34,7 @@ class DataFromSomethingResolver
             return $piped;
         }
 
-        return $this->dataFromArrayResolver->execute($class, $piped->all());
+        return $this->dataFromArrayResolver->execute($class, $piped);
     }
 
     private function resolveCustomCreationMethod(string $class, mixed $payload): ?string
