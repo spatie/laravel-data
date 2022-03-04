@@ -10,7 +10,6 @@ use ReflectionMethod;
 use ReflectionParameter;
 use ReflectionProperty;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Undefined;
 use Spatie\TypeScriptTransformer\Structures\MissingSymbolsCollection;
 use Spatie\TypeScriptTransformer\TypeProcessors\TypeProcessor;
 
