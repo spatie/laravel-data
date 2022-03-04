@@ -1047,7 +1047,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_will_not_include_lazy_undefined_values_when_transforming()
     {
-        $data = new class ('Hello World', Lazy::create(fn() => Undefined::make())) extends Data {
+        $data = new class ('Hello World', Lazy::create(fn () => Undefined::make())) extends Data {
             public function __construct(
                 public string $string,
                 public string|Undefined|Lazy $lazy_undefined_string,
@@ -1072,11 +1072,11 @@ class DataTest extends TestCase
     public function it_includes_value_if_not_undefined_data()
     {
         $data = DefaultUndefinedData::from([
-            'name' => 'Freek'
+            'name' => 'Freek',
         ]);
 
         $this->assertEquals([
-            'name' => 'Freek'
+            'name' => 'Freek',
         ], $data->toArray());
     }
 }
