@@ -256,7 +256,7 @@ class DataFromArrayResolverTest extends TestCase
     /** @test */
     public function it_can_manually_set_values_in_the_constructor()
     {
-        $dataClass = new class('', '') {
+        $dataClass = new class ('', '') {
             public string $member;
 
             public string $other_member;
@@ -283,7 +283,7 @@ class DataFromArrayResolverTest extends TestCase
                 'non_promoted' => 'B',
                 'non_promoted_with_default' => 'C',
                 'promoted_with_with_default' => 'D',
-                'member_to_set' => 'E'
+                'member_to_set' => 'E',
             ]
         );
 
@@ -293,7 +293,7 @@ class DataFromArrayResolverTest extends TestCase
             'member_with_default' => 'default',
             'promoted' => 'A',
             'promoted_with_with_default' => 'B',
-            'member_to_set' => 'E'
+            'member_to_set' => 'E',
         ], $data->toArray());
     }
 }
