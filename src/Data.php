@@ -30,6 +30,20 @@ use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
 use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Transformers\DataTransformer;
 
+/**
+ * TODO: review DataProperty and DataClass and make them cachable
+ * TODO: should we use closures in pipes? Should we add other pipes?
+ * TODO: add MapTo support and a more general Map attribute combining both
+ * TODO: remove Data traits?
+ * TODO: restructure tests
+ * TODO: split lazy classes
+ * TODO: what about the pipeline and multiple arguments? -> use serializers for all arguments and merge them?
+ * TODO: split DataCollection in DataCollection and PaginatedDataCollection
+ * TODO: add more context to casts
+ * TODO: test the pipeline
+ * TODO: fix DataFromArrayResolver with constructor parameters
+ */
+
 abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastable, JsonSerializable
 {
     use ResponsableData;
