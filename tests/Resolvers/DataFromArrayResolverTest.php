@@ -252,4 +252,48 @@ class DataFromArrayResolverTest extends TestCase
         $this->assertInstanceOf(DummyBackedEnum::class, $data->enum);
         $this->assertEquals(DummyBackedEnum::FOO, $data->enum);
     }
+
+    /** @test */
+    public function it_can_manually_set_values_in_the_constructor()
+    {
+        $dataClass = new class('', '') {
+            public string $member;
+
+            public string $other_member;
+
+            public string $member_with_default = 'default';
+
+            public string $member_to_set;
+
+            public function __construct(
+                public string $promoted,
+                string $non_promoted,
+                string $non_promoted_with_default = 'default',
+                public string $promoted_with_with_default = 'default',
+            ) {
+                $this->member = "changed_in_constructor: {$non_promoted}";
+                $this->other_member = "changed_in_constructor: {$non_promoted_with_default}";
+            }
+        };
+
+        $data = $this->action->execute(
+            $dataClass::class,
+            [
+                'promoted' => 'A',
+                'non_promoted' => 'B',
+                'non_promoted_with_default' => 'C',
+                'promoted_with_with_default' => 'D',
+                'member_to_set' => 'E'
+            ]
+        );
+
+        $this->assertEquals([
+            'member' => 'changed_in_constructor: B',
+            'other_member' => 'changed_in_constructor: C',
+            'member_with_default' => 'default',
+            'promoted' => 'A',
+            'promoted_with_with_default' => 'B',
+            'member_to_set' => 'E'
+        ], $data->toArray());
+    }
 }
