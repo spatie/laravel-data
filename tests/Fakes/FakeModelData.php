@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Undefined;
 
 class FakeModelData extends Data
 {
@@ -14,7 +15,7 @@ class FakeModelData extends Data
         public ?string $nullable,
         public CarbonImmutable $date,
         #[DataCollectionOf(FakeNestedModelData::class)]
-        public ?DataCollection $fake_nested_models,
+        public Undefined|null|DataCollection $fake_nested_models,
     ) {
     }
 }
