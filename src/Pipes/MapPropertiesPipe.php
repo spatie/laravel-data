@@ -17,7 +17,7 @@ class MapPropertiesPipe extends Pipe
     {
         $classMapper = $this->resolveClassMapper($class);
 
-        foreach ($class->properties() as $dataProperty) {
+        foreach ($class->properties as $dataProperty) {
             $mapper = $this->resolvePropertyMapper($dataProperty) ?? $classMapper;
 
             if ($mapper === null) {
@@ -36,11 +36,11 @@ class MapPropertiesPipe extends Pipe
 
     private function resolveClassMapper(DataClass $class): ?Mapper
     {
-        if ($class->mapperAttribute() === null) {
+        if ($class->fromMapperClass === null) {
             return null;
         }
 
-        $mapFrom = $class->mapperAttribute()->from;
+        $mapFrom = $class->fromMapperClass;
 
         if (! class_exists($mapFrom)) {
             InvalidDataClassMapper::create($class);

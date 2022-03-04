@@ -15,7 +15,7 @@ class InvalidDataClassMapper extends Exception
 
         $target = $target instanceof DataProperty
             ? "{$target->className}:{$target->name}"
-            : $target->className;
+            : $target->name;
 
         return new self("`MapFrom` attribute on `{$target}` should be a class implementing `{$mapperClass}`");
     }

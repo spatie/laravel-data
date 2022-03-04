@@ -18,7 +18,7 @@ class DataFromArrayResolver
     {
         [$promotedProperties, $classProperties] = $this->dataConfig
             ->getDataClass($class)
-            ->properties()
+            ->properties
             ->partition(fn (DataProperty $property) => $property->promoted);
 
         return $this->createDataObjectWithProperties(

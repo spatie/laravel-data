@@ -16,8 +16,8 @@ class AuthorizedPipe extends Pipe
             return $properties;
         }
 
-        if ($class->hasAuthorizationMethod()) {
-            $this->ensureRequestIsAuthorized($class->name());
+        if ($class->hasAuthorizationMethod) {
+            $this->ensureRequestIsAuthorized($class->name);
         }
 
         return $properties;

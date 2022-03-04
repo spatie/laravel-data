@@ -47,7 +47,7 @@ class DataTransformer
 
         return $this->config
             ->getDataClass($data::class)
-            ->properties()
+            ->properties
             ->reduce(function (array $payload, DataProperty $property) use ($allowedExcludes, $allowedIncludes, $data, $exclusionTree, $inclusionTree) {
                 $name = $property->name;
 

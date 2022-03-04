@@ -39,7 +39,7 @@ class DataFromSomethingResolver
 
     private function resolveCustomCreationMethod(string $class, mixed $payload): ?string
     {
-        $customCreationMethods = $this->dataConfig->getDataClass($class)->creationMethods();
+        $customCreationMethods = $this->dataConfig->getDataClass($class)->creationMethods;
 
         $type = gettype($payload);
 

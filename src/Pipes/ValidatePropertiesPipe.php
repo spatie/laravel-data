@@ -33,7 +33,7 @@ class ValidatePropertiesPipe extends Pipe
             return $properties;
         }
 
-        $this->dataValidatorResolver->execute($class->name(), $properties)->validate();
+        $this->dataValidatorResolver->execute($class->name, $properties)->validate();
 
         return $properties;
     }
