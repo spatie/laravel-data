@@ -853,7 +853,8 @@ class DataTest extends TestCase
             public function __construct(
                 #[WithTransformer(ConfidentialDataTransformer::class)]
                 public Data $nestedData,
-                #[WithTransformer(ConfidentialDataCollectionTransformer::class), DataCollectionOf(SimpleData::class)]
+                #[WithTransformer(ConfidentialDataCollectionTransformer::class),
+                DataCollectionOf(SimpleData::class)]
                 public DataCollection $nestedDataCollection,
             ) {
             }

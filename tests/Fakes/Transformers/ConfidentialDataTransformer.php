@@ -2,8 +2,8 @@
 
 namespace Spatie\LaravelData\Tests\Fakes\Transformers;
 
-use Spatie\LaravelData\Support\DataProperty;
 use function collect;
+use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Transformers\Transformer;
 
 class ConfidentialDataTransformer implements Transformer
