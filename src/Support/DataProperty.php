@@ -31,10 +31,10 @@ class DataProperty
         public readonly string $className,
         public readonly DataPropertyTypes $types,
         public readonly bool $validate,
-        public readonly bool $lazy,
-        public readonly bool $nullable,
-        public readonly bool $undefinable,
-        public readonly bool $promoted,
+        public readonly bool $isLazy,
+        public readonly bool $isNullable,
+        public readonly bool $isUndefinable,
+        public readonly bool $isPromoted,
         public readonly bool $isDataObject,
         public readonly bool $isDataCollection,
         public readonly bool $hasDefaultValue,
@@ -65,7 +65,7 @@ class DataProperty
             'name' => $property->name,
             'className' => $property->class,
             'validate' => ! $attributes->contains(fn (object $attribute) => $attribute instanceof WithoutValidation),
-            'promoted' => $property->isPromoted(),
+            'isPromoted' => $property->isPromoted(),
             'hasDefaultValue' => $hasDefaultValue,
             'defaultValue' => $defaultValue,
             'validationAttributes' => $attributes->filter(fn (object $attribute) => $attribute instanceof ValidationAttribute)->all(),
@@ -89,9 +89,9 @@ class DataProperty
     {
         return [
             'types' => new DataPropertyTypes(),
-            'lazy' => false,
-            'nullable' => true,
-            'undefinable' => false,
+            'isLazy' => false,
+            'isNullable' => true,
+            'isUndefinable' => false,
             'isDataObject' => false,
             'isDataCollection' => false,
             'dataClass' => null,
@@ -118,9 +118,9 @@ class DataProperty
 
         return [
             'types' => new DataPropertyTypes([$name]),
-            'lazy' => false,
-            'nullable' => $type->allowsNull(),
-            'undefinable' => false,
+            'isLazy' => false,
+            'isNullable' => $type->allowsNull(),
+            'isUndefinable' => false,
             'isDataObject' => $isDataObject,
             'isDataCollection' => $isDataCollection,
             'dataClass' => match (true) {
@@ -138,9 +138,9 @@ class DataProperty
     ): array {
         $parameters = [
             'types' => new DataPropertyTypes(),
-            'lazy' => false,
-            'nullable' => false,
-            'undefinable' => false,
+            'isLazy' => false,
+            'isNullable' => false,
+            'isUndefinable' => false,
             'isDataObject' => false,
             'isDataCollection' => false,
             'dataClass' => null,
@@ -150,19 +150,19 @@ class DataProperty
             $name = $childType->getName();
 
             if ($name === 'null') {
-                $parameters['nullable'] = true;
+                $parameters['isNullable'] = true;
 
                 continue;
             }
 
             if ($name === Undefined::class) {
-                $parameters['undefinable'] = true;
+                $parameters['isUndefinable'] = true;
 
                 continue;
             }
 
             if ($name === Lazy::class) {
-                $parameters['lazy'] = true;
+                $parameters['isLazy'] = true;
 
                 continue;
             }

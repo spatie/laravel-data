@@ -20,7 +20,7 @@ class DefaultValuesPipe extends Pipe
                     $properties[$property->name] = $property->defaultValue;
                 }
 
-                if ($property->undefinable) {
+                if ($property->isUndefinable) {
                     $properties[$property->name] = Undefined::create();
                 }
             });
