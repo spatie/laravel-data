@@ -36,7 +36,7 @@ class DataClass
             constructorParameters: self::resolveConstructorParameters($class),
             creationMethods: static::resolveMagicalMethods($methods),
             hasAuthorizationMethod: static::hasAuthorizationMethod($methods),
-            mapFrom: $attributes->first(fn(object $attribute) => $attribute instanceof MapFrom),
+            mapFrom: $attributes->first(fn (object $attribute) => $attribute instanceof MapFrom),
         );
     }
 
@@ -46,8 +46,8 @@ class DataClass
         $defaultValues = static::resolveDefaultValues($class);
 
         return collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(fn(ReflectionProperty $property) => $property->isStatic())
-            ->map(fn(ReflectionProperty $property) => DataProperty::create(
+            ->reject(fn (ReflectionProperty $property) => $property->isStatic())
+            ->map(fn (ReflectionProperty $property) => DataProperty::create(
                 $property,
                 array_key_exists($property->getName(), $defaultValues),
                 $defaultValues[$property->getName()] ?? null,
@@ -63,7 +63,7 @@ class DataClass
         }
 
         return collect($class->getMethod('__construct')->getParameters())
-            ->map(fn(ReflectionParameter $parameter) => DataConstructorParameter::create($parameter));
+            ->map(fn (ReflectionParameter $parameter) => DataConstructorParameter::create($parameter));
     }
 
     private static function resolveDefaultValues(
@@ -74,8 +74,8 @@ class DataClass
         }
 
         $values = collect($class->getMethod('__construct')->getParameters())
-            ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-            ->mapWithKeys(fn(ReflectionParameter $parameter) => [
+            ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+            ->mapWithKeys(fn (ReflectionParameter $parameter) => [
                 $parameter->name => $parameter->getDefaultValue(),
             ])
             ->toArray();
@@ -123,7 +123,7 @@ class DataClass
     private static function hasAuthorizationMethod(
         Collection $methods
     ): bool {
-        return $methods->contains(fn(ReflectionMethod $method) => $method->isStatic()
+        return $methods->contains(fn (ReflectionMethod $method) => $method->isStatic()
             && $method->getName() === 'authorize'
             && $method->isPublic());
     }
