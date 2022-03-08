@@ -33,7 +33,7 @@ class DataPropertyValidationRulesResolver
             default => throw new TypeError()
         };
 
-        $isNullable = $nullable || $property->nullable;
+        $isNullable = $nullable || $property->isNullable;
 
         $toplevelRule = match (true) {
             $isNullable => 'nullable',
@@ -45,7 +45,7 @@ class DataPropertyValidationRulesResolver
         return $this->dataValidationRulesResolver
             ->execute(
                 $property->dataClass,
-                $nullable || ($property->isDataObject && $property->nullable)
+                $nullable || ($property->isDataObject && $property->isNullable)
             )
             ->mapWithKeys(fn (array $rules, string $name) => [
                 "{$prefix}{$name}" => $rules,

@@ -34,9 +34,9 @@ class DataPropertyTest extends TestCase
             public $property;
         });
 
-        $this->assertFalse($helper->lazy);
-        $this->assertTrue($helper->nullable);
-        $this->assertFalse($helper->undefinable);
+        $this->assertFalse($helper->isLazy);
+        $this->assertTrue($helper->isNullable);
+        $this->assertFalse($helper->isUndefinable);
         $this->assertFalse($helper->isDataObject);
         $this->assertFalse($helper->isDataCollection);
         $this->assertTrue($helper->types->isEmpty());
@@ -51,19 +51,19 @@ class DataPropertyTest extends TestCase
             public int $property;
         });
 
-        $this->assertFalse($helper->lazy);
+        $this->assertFalse($helper->isLazy);
 
         $helper = $this->resolveHelper(new class () {
             public int|Lazy $property;
         });
 
-        $this->assertTrue($helper->lazy);
+        $this->assertTrue($helper->isLazy);
 
         $helper = $this->resolveHelper(new class () {
             public int|Lazy|null $property;
         });
 
-        $this->assertTrue($helper->lazy);
+        $this->assertTrue($helper->isLazy);
     }
 
     /** @test */
@@ -73,19 +73,19 @@ class DataPropertyTest extends TestCase
             public int $property;
         });
 
-        $this->assertFalse($helper->nullable);
+        $this->assertFalse($helper->isNullable);
 
         $helper = $this->resolveHelper(new class () {
             public ?int $property;
         });
 
-        $this->assertTrue($helper->nullable);
+        $this->assertTrue($helper->isNullable);
 
         $helper = $this->resolveHelper(new class () {
             public null|int $property;
         });
 
-        $this->assertTrue($helper->nullable);
+        $this->assertTrue($helper->isNullable);
     }
 
     /** @test */
@@ -95,13 +95,13 @@ class DataPropertyTest extends TestCase
             public int $property;
         });
 
-        $this->assertFalse($helper->undefinable);
+        $this->assertFalse($helper->isUndefinable);
 
         $helper = $this->resolveHelper(new class () {
             public Undefined|int $property;
         });
 
-        $this->assertTrue($helper->undefinable);
+        $this->assertTrue($helper->isUndefinable);
     }
 
     /** @test */
