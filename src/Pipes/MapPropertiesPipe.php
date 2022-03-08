@@ -13,7 +13,7 @@ use Spatie\LaravelData\Support\DataProperty;
 
 class MapPropertiesPipe extends Pipe
 {
-    public function handle(mixed $initialValue, DataClass $class, Collection $properties, ): Collection|Data
+    public function handle(mixed $initialValue, DataClass $class, Collection $properties,): Collection|Data
     {
         $classMapper = $this->resolveClassMapper($class);
 
@@ -36,11 +36,11 @@ class MapPropertiesPipe extends Pipe
 
     private function resolveClassMapper(DataClass $class): ?Mapper
     {
-        if ($class->fromMapperClass === null) {
+        if ($class->mapFrom === null) {
             return null;
         }
 
-        $mapFrom = $class->fromMapperClass;
+        $mapFrom = $class->mapFrom->from;
 
         if (! class_exists($mapFrom)) {
             InvalidDataClassMapper::create($class);

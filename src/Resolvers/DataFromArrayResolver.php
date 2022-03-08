@@ -5,8 +5,8 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataConstructorParameter;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Undefined;
 
 class DataFromArrayResolver
 {
@@ -16,38 +16,31 @@ class DataFromArrayResolver
 
     public function execute(string $class, Collection $properties): Data
     {
-        [$promotedProperties, $classProperties] = $this->dataConfig
-            ->getDataClass($class)
+        $dataClass = $this->dataConfig->getDataClass($class);
+
+        $data = $dataClass
+            ->constructorParameters
+            ->mapWithKeys(function (DataConstructorParameter $parameter) use ($properties) {
+                if ($properties->has($parameter->name)) {
+                    return [$parameter->name => $properties->get($parameter->name)];
+                }
+
+                if (! $parameter->isPromoted && $parameter->hasDefaultValue) {
+                    return [$parameter->name => $parameter->defaultValue];
+                }
+
+                return [];
+            })
+            ->pipe(fn(Collection $parameters) => new $dataClass->name(...$parameters));
+
+        $dataClass
             ->properties
-            ->partition(fn (DataProperty $property) => $property->isPromoted);
-
-        return $this->createDataObjectWithProperties(
-            $class,
-            $promotedProperties->mapWithKeys(fn (DataProperty $property) => [
-                $property->name => $properties->has($property->name)
-                    ? $properties->get($property->name)
-                    : Undefined::create(),
-            ]),
-            $classProperties->mapWithKeys(fn (DataProperty $property) => [
-                $property->name => $properties->has($property->name)
-                    ? $properties->get($property->name)
-                    : Undefined::create(),
-            ])
-        );
-    }
-
-    private function createDataObjectWithProperties(
-        string $class,
-        Collection $promotedProperties,
-        Collection $classProperties
-    ): Data {
-        $data = new $class(...$promotedProperties);
-
-        $classProperties->each(
-            function (mixed $value, string $name) use ($data) {
-                $data->{$name} = $value;
-            }
-        );
+            ->filter(
+                fn(DataProperty $property) => ! $property->isPromoted && $properties->has($property->name)
+            )
+            ->each(function (DataProperty $property) use ($properties, $data) {
+                $data->{$property->name} = $properties->get($property->name);
+            });
 
         return $data;
     }
