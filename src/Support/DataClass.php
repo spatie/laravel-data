@@ -14,27 +14,29 @@ class DataClass
 {
     public function __construct(
         public readonly string $name,
-        /** @var Collection<string, \Spatie\LaravelData\Support\DataProperty> */
+        /** @var Collection<\Spatie\LaravelData\Support\DataProperty> */
         public readonly Collection $properties,
+        /** @var Collection<\Spatie\LaravelData\Support\DataConstructorParameter> */
+        public readonly Collection $constructorParameters,
         /** @var array<string, string> */
         public readonly array $creationMethods,
         public readonly bool $hasAuthorizationMethod,
-        public readonly ?string $fromMapperClass,
+        public readonly ?MapFrom $mapFrom,
     ) {
     }
 
     public static function create(ReflectionClass $class)
     {
         $methods = collect($class->getMethods());
-
         $attributes = collect($class->getAttributes());
 
         return new self(
             name: $class->name,
             properties: static::resolveProperties($class),
+            constructorParameters: self::resolveConstructorParameters($class),
             creationMethods: static::resolveMagicalMethods($methods),
             hasAuthorizationMethod: static::hasAuthorizationMethod($methods),
-            fromMapperClass: $attributes->first(fn (object $attribute) => $attribute instanceof MapFrom)?->from,
+            mapFrom: $attributes->first(fn(object $attribute) => $attribute instanceof MapFrom),
         );
     }
 
@@ -44,13 +46,24 @@ class DataClass
         $defaultValues = static::resolveDefaultValues($class);
 
         return collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(fn (ReflectionProperty $property) => $property->isStatic())
-            ->map(fn (ReflectionProperty $property) => DataProperty::create(
+            ->reject(fn(ReflectionProperty $property) => $property->isStatic())
+            ->map(fn(ReflectionProperty $property) => DataProperty::create(
                 $property,
                 array_key_exists($property->getName(), $defaultValues),
                 $defaultValues[$property->getName()] ?? null,
             ))
             ->values();
+    }
+
+    private static function resolveConstructorParameters(
+        ReflectionClass $class
+    ): Collection {
+        if (! $class->hasMethod('__construct')) {
+            return collect();
+        }
+
+        return collect($class->getMethod('__construct')->getParameters())
+            ->map(fn(ReflectionParameter $parameter) => DataConstructorParameter::create($parameter));
     }
 
     private static function resolveDefaultValues(
@@ -60,13 +73,17 @@ class DataClass
             return $class->getDefaultProperties();
         }
 
-        return collect($class->getMethod('__construct')->getParameters())
-            ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-            ->mapWithKeys(fn (ReflectionParameter $parameter) => [
+        $values = collect($class->getMethod('__construct')->getParameters())
+            ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+            ->mapWithKeys(fn(ReflectionParameter $parameter) => [
                 $parameter->name => $parameter->getDefaultValue(),
             ])
-            ->merge($class->getDefaultProperties())
             ->toArray();
+
+        return array_merge(
+            $class->getDefaultProperties(),
+            $values
+        );
     }
 
     private static function resolveMagicalMethods(
@@ -106,7 +123,7 @@ class DataClass
     private static function hasAuthorizationMethod(
         Collection $methods
     ): bool {
-        return $methods->contains(fn (ReflectionMethod $method) => $method->isStatic()
+        return $methods->contains(fn(ReflectionMethod $method) => $method->isStatic()
             && $method->getName() === 'authorize'
             && $method->isPublic());
     }

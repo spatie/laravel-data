@@ -250,14 +250,30 @@ class CastPropertiesPipeTest extends TestCase
             'non_promoted_with_default' => 'C',
             'promoted_with_with_default' => 'D',
             'member_to_set' => 'E',
+            'member_with_default' => 'F',
         ]);
 
         $this->assertEquals([
             'member' => 'changed_in_constructor: B',
             'other_member' => 'changed_in_constructor: C',
+            'member_with_default' => 'F',
+            'promoted' => 'A',
+            'promoted_with_with_default' => 'D',
+            'member_to_set' => 'E',
+        ], $data->toArray());
+
+        $data = $dataClass::from([
+            'promoted' => 'A',
+            'non_promoted' => 'B',
+            'member_to_set' => 'E',
+        ]);
+
+        $this->assertEquals([
+            'member' => 'changed_in_constructor: B',
+            'other_member' => 'changed_in_constructor: default',
             'member_with_default' => 'default',
             'promoted' => 'A',
-            'promoted_with_with_default' => 'B',
+            'promoted_with_with_default' => 'default',
             'member_to_set' => 'E',
         ], $data->toArray());
     }
