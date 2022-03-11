@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Pipes;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Exceptions\InvalidDataClassMapper;
 use Spatie\LaravelData\Mappers\Mapper;
 use Spatie\LaravelData\Mappers\NameProvidedMapper;

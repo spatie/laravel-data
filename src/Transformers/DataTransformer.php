@@ -90,7 +90,7 @@ class DataTransformer
             return true;
         }
 
-        if($value instanceof RelationalLazy || $value instanceof ConditionalLazy){
+        if ($value instanceof RelationalLazy || $value instanceof ConditionalLazy) {
             return $value->shouldBeIncluded();
         }
 

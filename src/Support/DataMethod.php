@@ -28,7 +28,7 @@ class DataMethod
         return new self(
             $method->name,
             collect($method->getParameters())->map(
-                fn(ReflectionParameter $parameter) => DataParameter::create($parameter),
+                fn (ReflectionParameter $parameter) => DataParameter::create($parameter),
             ),
             $method->isStatic(),
             $method->isPublic(),
@@ -39,8 +39,8 @@ class DataMethod
     public function accepts(mixed ...$input): bool
     {
         $types = array_is_list($input)
-            ? $this->parameters->map(fn(DataParameter $parameter) => $parameter->types)
-            : $this->parameters->mapWithKeys(fn(DataParameter $parameter) => [$parameter->name => $parameter->types]);
+            ? $this->parameters->map(fn (DataParameter $parameter) => $parameter->types)
+            : $this->parameters->mapWithKeys(fn (DataParameter $parameter) => [$parameter->name => $parameter->types]);
 
         if (count($input) !== $this->parameters->count()) {
             return false;

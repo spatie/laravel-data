@@ -29,7 +29,7 @@ class DataClass
             name: $class->name,
             properties: static::resolveProperties($class, $methods->get('__construct')),
             methods: $methods,
-            mapFrom: $attributes->first(fn(object $attribute) => $attribute instanceof MapFrom),
+            mapFrom: $attributes->first(fn (object $attribute) => $attribute instanceof MapFrom),
         );
     }
 
@@ -37,7 +37,7 @@ class DataClass
         ReflectionClass $reflectionClass,
     ): Collection {
         return collect($reflectionClass->getMethods())->mapWithKeys(
-            fn(ReflectionMethod $method) => [$method->name => DataMethod::create($method)],
+            fn (ReflectionMethod $method) => [$method->name => DataMethod::create($method)],
         );
     }
 
@@ -68,8 +68,8 @@ class DataClass
 
         $values = $constructorMethod
             ->parameters
-            ->filter(fn(DataParameter $parameter) => $parameter->isPromoted && $parameter->hasDefaultValue)
-            ->mapWithKeys(fn(DataParameter $parameter) => [
+            ->filter(fn (DataParameter $parameter) => $parameter->isPromoted && $parameter->hasDefaultValue)
+            ->mapWithKeys(fn (DataParameter $parameter) => [
                 $parameter->name => $parameter->defaultValue,
             ])
             ->toArray();

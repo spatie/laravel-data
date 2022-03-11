@@ -46,7 +46,7 @@ class DataFromSomethingResolver
         $customCreationMethods = $this->dataConfig
             ->getDataClass($class)
             ->methods
-            ->filter(fn(DataMethod $method) => $method->isCustomCreationMethod);
+            ->filter(fn (DataMethod $method) => $method->isCustomCreationMethod);
 
         $methodName = null;
 
