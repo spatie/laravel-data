@@ -32,7 +32,6 @@ use Spatie\LaravelData\Transformers\DataTransformer;
 
 /**
  * TODO: review DataProperty and DataClass and make them cachable
- * TODO: should we use closures in pipes? Should we add other pipes?
  * TODO: add MapTo support and a more general Map attribute combining both
  * TODO: remove Data traits?
  * TODO: restructure tests
@@ -41,7 +40,6 @@ use Spatie\LaravelData\Transformers\DataTransformer;
  * TODO: add more context to casts
  * TODO: test the pipeline
  */
-
 abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastable, JsonSerializable
 {
     use ResponsableData;
@@ -49,18 +47,26 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
     use AppendableData;
     use ValidateableData;
 
-    public static function optional($payload): ?static
+    public static function optional(mixed ...$payloads): ?static
     {
-        return $payload === null
-            ? null
-            : static::from($payload);
+        if (count($payloads) === 0) {
+            return null;
+        }
+
+        foreach ($payloads as $payload) {
+            if ($payload !== null) {
+                return static::from(...$payloads);
+            }
+        }
+
+        return null;
     }
 
-    public static function from($payload): static
+    public static function from(mixed ...$payloads): static
     {
         return app(DataFromSomethingResolver::class)->execute(
             static::class,
-            $payload
+            ...$payloads
         );
     }
 

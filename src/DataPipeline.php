@@ -55,7 +55,7 @@ class DataPipeline
         return $this;
     }
 
-    public function execute(): Collection|Data
+    public function execute(): Collection
     {
         /** @var \Spatie\LaravelData\Normalizers\Normalizer[] $normalizers */
         $normalizers = array_map(
@@ -89,10 +89,6 @@ class DataPipeline
 
         foreach ($pipes as $pipe) {
             $piped = $pipe->handle($this->value, $class, $properties);
-
-            if ($piped instanceof Data) {
-                return $piped;
-            }
 
             $properties = $piped;
         }

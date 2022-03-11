@@ -17,7 +17,7 @@ class CastPropertiesPipe extends Pipe
     ) {
     }
 
-    public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection|Data
+    public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
     {
         foreach ($properties as $name => $value) {
             $dataProperty = $class->properties->first(fn (DataProperty $dataProperty) => $dataProperty->name === $name);

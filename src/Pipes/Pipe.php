@@ -12,5 +12,5 @@ abstract class Pipe
         mixed $initialValue,
         DataClass $class,
         Collection $properties,
-    ): Collection|Data;
+    ): Collection;
 }

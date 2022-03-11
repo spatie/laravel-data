@@ -10,7 +10,7 @@ use Spatie\LaravelData\Undefined;
 
 class DefaultValuesPipe extends Pipe
 {
-    public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection|Data
+    public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
     {
         $class
             ->properties

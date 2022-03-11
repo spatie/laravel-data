@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\DataConstructorParameter;
+use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;
 
 class DataFromArrayResolver
@@ -18,9 +18,10 @@ class DataFromArrayResolver
     {
         $dataClass = $this->dataConfig->getDataClass($class);
 
-        $data = $dataClass
-            ->constructorParameters
-            ->mapWithKeys(function (DataConstructorParameter $parameter) use ($properties) {
+        $constructorParameters = $dataClass->methods->get('__construct')?->parameters ?? collect();
+
+        $data = $constructorParameters
+            ->mapWithKeys(function (DataParameter $parameter) use ($properties) {
                 if ($properties->has($parameter->name)) {
                     return [$parameter->name => $properties->get($parameter->name)];
                 }
