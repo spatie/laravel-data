@@ -3,95 +3,37 @@
 namespace Spatie\LaravelData\Tests\Support;
 
 use ReflectionClass;
+use Spatie\LaravelData\Attributes\MapFrom;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Mappers\SnakeToCamelCaseMapper;
 use Spatie\LaravelData\Support\DataClass;
+use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Tests\DataWithDefaults;
-use Spatie\LaravelData\Tests\Fakes\DummyDto;
+use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
+use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 
 class DataClassTest extends TestCase
 {
     /** @test */
-    public function it_can_find_from_methods_and_the_types_that_can_be_used_with_them()
+    public function it_keeps_track_of_a_global_map_from_attribute()
     {
-        $subject = new class (null) extends Data {
-            public function __construct(public $property)
-            {
-            }
-
-            public static function fromString(string $property): static
-            {
-            }
-
-            public static function fromDummyDto(DummyDto $property): static
-            {
-            }
-
-            public static function fromNumber(int|float $property): static
-            {
-            }
-
-            public static function doNotInclude(string $property): static
-            {
-            }
-
-            public function fromDoNotIncludeA(string $other)
-            {
-            }
-
-            private static function fromDoNotIncludeB(string $other)
-            {
-            }
-
-            protected static function fromDoNotIncludeC(string $other)
-            {
-            }
-
-            public static function fromDoNotIncludeD($other): static
-            {
-            }
-
-            public static function fromDoNotIncludeE(string $other, string $extra): static
-            {
-            }
-        };
-
-        $this->assertEquals([
-            'string' => 'fromString',
-            DummyDto::class => 'fromDummyDto',
-            'int' => 'fromNumber',
-            'float' => 'fromNumber',
-        ], DataClass::create(new ReflectionClass($subject))->creationMethods);
+        $this->assertEquals(
+            new MapFrom(SnakeToCamelCaseMapper::class),
+            DataClass::create(new ReflectionClass(DataWithMapper::class))->mapFrom,
+        );
     }
 
     /** @test */
-    public function it_can_check_if_a_data_class_has_an_authorisation_method()
+    public function it_will_provide_information_about_special_methods()
     {
-        $withMethod = new class (null) extends Data {
-            public static function authorize(): bool
-            {
-            }
-        };
+        $class = DataClass::create(new ReflectionClass(SimpleData::class));
 
-        $withNonStaticMethod = new class (null) extends Data {
-            public function authorize(): bool
-            {
-            }
-        };
+        $this->assertArrayHasKey('__construct', $class->methods);
+        $this->assertInstanceOf(DataMethod::class, $class->methods->get('__construct'));
 
-        $withNonPublicMethod = new class (null) extends Data {
-            protected static function authorize(): bool
-            {
-            }
-        };
-
-        $withoutMethod = new class (null) extends Data {
-        };
-
-        $this->assertTrue(DataClass::create(new ReflectionClass($withMethod))->hasAuthorizationMethod);
-        $this->assertFalse(DataClass::create(new ReflectionClass($withNonPublicMethod))->hasAuthorizationMethod);
-        $this->assertFalse(DataClass::create(new ReflectionClass($withNonStaticMethod))->hasAuthorizationMethod);
-        $this->assertFalse(DataClass::create(new ReflectionClass($withoutMethod))->hasAuthorizationMethod);
+        $this->assertArrayHasKey('fromString', $class->methods);
+        $this->assertInstanceOf(DataMethod::class, $class->methods->get('fromString'));
     }
 
     /** @test */

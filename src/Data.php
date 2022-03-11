@@ -31,13 +31,13 @@ use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Transformers\DataTransformer;
 
 /**
- * TODO: review DataProperty and DataClass and make them cachable
+ * TODO: Make all supporting data structures cachable
  * TODO: add MapTo support and a more general Map attribute combining both
- * TODO: remove Data traits?
- * TODO: restructure tests
- * TODO: what about the pipeline and multiple arguments? -> use serializers for all arguments and merge them?
+ * TODO: A TransformerPipeline?
  * TODO: split DataCollection in DataCollection and PaginatedDataCollection
  * TODO: add more context to casts
+ * TODO: test multiple from arguments more
+ * TODO: replace DataPropertyTypes and Types with one custom solution
  * TODO: test the pipeline
  */
 abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastable, JsonSerializable

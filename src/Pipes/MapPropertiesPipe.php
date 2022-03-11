@@ -23,10 +23,10 @@ class MapPropertiesPipe extends Pipe
                 continue;
             }
 
-            $mapped = $mapper->map($dataProperty->name(), $properties);
+            $mapped = $mapper->map($dataProperty->name, $properties);
 
             if (Arr::has($properties, $mapped)) {
-                $properties->put($dataProperty->name(), Arr::get($properties, $mapped));
+                $properties->put($dataProperty->name, Arr::get($properties, $mapped));
             }
         }
 
