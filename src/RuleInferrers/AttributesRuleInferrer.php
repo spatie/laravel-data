@@ -11,7 +11,7 @@ class AttributesRuleInferrer implements RuleInferrer
     {
         $attributeRules = $property->attributes
             ->filter(fn (object $attribute) => $attribute instanceof ValidationAttribute)
-            ->map(fn(ValidationAttribute $attribute) => $attribute->getRules())
+            ->map(fn (ValidationAttribute $attribute) => $attribute->getRules())
             ->all();
 
 

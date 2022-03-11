@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Tests\Support;
 
 use ReflectionClass;
 use Spatie\LaravelData\Attributes\MapFrom;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeToCamelCaseMapper;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataMethod;

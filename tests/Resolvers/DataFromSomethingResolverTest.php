@@ -195,7 +195,7 @@ class DataFromSomethingResolverTest extends TestCase
             }
         };
 
-        Route::post('/', fn(Request $request) => $data::from($request));
+        Route::post('/', fn (Request $request) => $data::from($request));
 
         $this->postJson('/', [])->assertJsonValidationErrorFor('string');
 

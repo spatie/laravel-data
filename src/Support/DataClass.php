@@ -33,7 +33,7 @@ class DataClass
             name: $class->name,
             properties: static::resolveProperties($class, $methods->get('__construct')),
             methods: $methods,
-            mapFrom: $attributes->first(fn(object $attribute) => $attribute instanceof MapFrom),
+            mapFrom: $attributes->first(fn (object $attribute) => $attribute instanceof MapFrom),
         );
     }
 
@@ -42,10 +42,10 @@ class DataClass
     ): Collection {
         return collect($reflectionClass->getMethods())
             ->filter(
-                fn(ReflectionMethod $method) => $method->name === '__construct' || str_starts_with($method->name, 'from')
+                fn (ReflectionMethod $method) => $method->name === '__construct' || str_starts_with($method->name, 'from')
             )
             ->mapWithKeys(
-                fn(ReflectionMethod $method) => [$method->name => DataMethod::create($method)],
+                fn (ReflectionMethod $method) => [$method->name => DataMethod::create($method)],
             );
     }
 
@@ -56,8 +56,8 @@ class DataClass
         $defaultValues = static::resolveDefaultValues($class, $constructorMethod);
 
         return collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(fn(ReflectionProperty $property) => $property->isStatic())
-            ->map(fn(ReflectionProperty $property) => DataProperty::create(
+            ->reject(fn (ReflectionProperty $property) => $property->isStatic())
+            ->map(fn (ReflectionProperty $property) => DataProperty::create(
                 $property,
                 array_key_exists($property->getName(), $defaultValues),
                 $defaultValues[$property->getName()] ?? null,
@@ -76,8 +76,8 @@ class DataClass
 
         $values = $constructorMethod
             ->parameters
-            ->filter(fn(DataParameter $parameter) => $parameter->isPromoted && $parameter->hasDefaultValue)
-            ->mapWithKeys(fn(DataParameter $parameter) => [
+            ->filter(fn (DataParameter $parameter) => $parameter->isPromoted && $parameter->hasDefaultValue)
+            ->mapWithKeys(fn (DataParameter $parameter) => [
                 $parameter->name => $parameter->defaultValue,
             ])
             ->toArray();

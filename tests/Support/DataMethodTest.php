@@ -13,11 +13,10 @@ class DataMethodTest extends TestCase
     /** @test */
     public function it_can_create_a_data_method_from_a_constructor()
     {
-        $class = new class extends Data {
+        $class = new class () extends Data {
             public function __construct(
                 public string $property = 'hello',
-            )
-            {
+            ) {
             }
         };
 
@@ -34,11 +33,10 @@ class DataMethodTest extends TestCase
     /** @test */
     public function it_can_create_a_data_method_from_a_magic_method()
     {
-        $class = new class extends Data {
+        $class = new class () extends Data {
             public static function fromString(
                 string $property,
-            )
-            {
+            ) {
             }
         };
 
@@ -51,10 +49,9 @@ class DataMethodTest extends TestCase
         $this->assertTrue($method->isStatic);
         $this->assertTrue($method->isCustomCreationMethod);
     }
-    
+
     /** @test */
-    public function it_correctly_accepts_values() 
+    public function it_correctly_accepts_values()
     {
-        
     }
 }

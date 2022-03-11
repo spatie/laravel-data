@@ -8,7 +8,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapFrom;
-use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
@@ -311,8 +310,7 @@ class DataPropertyTest extends TestCase
         $helper = $this->resolveHelper(new class ('') {
             public function __construct(
                 public string $property,
-            )
-            {
+            ) {
             }
         });
 
