@@ -13,7 +13,7 @@ use Spatie\LaravelData\Support\DataProperty;
 
 class MapPropertiesPipe extends Pipe
 {
-    public function handle(mixed $initialValue, DataClass $class, Collection $properties, ): Collection|Data
+    public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
     {
         $classMapper = $this->resolveClassMapper($class);
 

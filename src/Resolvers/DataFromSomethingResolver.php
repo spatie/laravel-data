@@ -3,13 +3,14 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
 use Spatie\LaravelData\Pipes\AuthorizedPipe;
 use Spatie\LaravelData\Pipes\ValidatePropertiesPipe;
 use Spatie\LaravelData\Support\DataConfig;
-use stdClass;
+use Spatie\LaravelData\Support\DataMethod;
 
 class DataFromSomethingResolver
 {
@@ -19,78 +20,60 @@ class DataFromSomethingResolver
     ) {
     }
 
-    public function execute(string $class, mixed $value)
+    public function execute(string $class, mixed ...$payloads): Data
     {
-        if ($customCreationMethod = $this->resolveCustomCreationMethod($class, $value)) {
-            return $this->createDataFromCustomCreationMethod($class, $customCreationMethod, $value);
+        if ($data = $this->createFromCustomCreationMethod($class, $payloads)) {
+            return $data;
         }
 
-        /** @var \Spatie\LaravelData\DataPipeline $pipeline */
-        $pipeline = $class::pipeline();
+        $properties = array_reduce(
+            $payloads,
+            function (Collection $carry, mixed $payload) use ($class) {
+                /** @var \Spatie\LaravelData\DataPipeline $pipeline */
+                $pipeline = $class::pipeline();
 
-        $piped = $pipeline->using($value)->execute();
+                return $carry->merge($pipeline->using($payload)->execute());
+            },
+            collect(),
+        );
 
-        if ($piped instanceof Data) {
-            return $piped;
-        }
-
-        return $this->dataFromArrayResolver->execute($class, $piped);
+        return $this->dataFromArrayResolver->execute($class, $properties);
     }
 
-    private function resolveCustomCreationMethod(string $class, mixed $payload): ?string
+    private function createFromCustomCreationMethod(string $class, array $payloads): ?Data
     {
-        $customCreationMethods = $this->dataConfig->getDataClass($class)->creationMethods;
+        /** @var Collection<\Spatie\LaravelData\Support\DataMethod> $customCreationMethods */
+        $customCreationMethods = $this->dataConfig
+            ->getDataClass($class)
+            ->methods
+            ->filter(fn(DataMethod $method) => $method->isCustomCreationMethod);
 
-        $type = gettype($payload);
+        $methodName = null;
 
-        if ($type === 'object') {
-            return $this->resolveCustomCreationMethodForObject($customCreationMethods, $payload);
-        }
+        foreach ($customCreationMethods as $customCreationMethod) {
+            if ($customCreationMethod->accepts(...$payloads)) {
+                $methodName = $customCreationMethod->name;
 
-        $type = match ($type) {
-            'boolean' => 'bool',
-            'string' => 'string',
-            'integer' => 'int',
-            'double' => 'float',
-            'array' => 'array',
-            default => null,
-        };
-
-        return $customCreationMethods[$type] ?? null;
-    }
-
-    private function resolveCustomCreationMethodForObject(array $customCreationMethods, mixed $payload): ?string
-    {
-        $className = ltrim($payload::class, ' \\');
-
-        if (array_key_exists($className, $customCreationMethods)) {
-            return $customCreationMethods[$className];
-        }
-
-        foreach ($customCreationMethods as $customCreationMethodType => $customCreationMethod) {
-            if (is_a($className, $customCreationMethodType, true)) {
-                return $customCreationMethod;
+                break;
             }
         }
 
-        return null;
-    }
-
-    private function createDataFromCustomCreationMethod(
-        string $class,
-        string $method,
-        mixed $value,
-    ): Data {
-        if ($value instanceof Request) {
-            DataPipeline::create()
-                ->normalizer(ArraybleNormalizer::class)
-                ->into($class)
-                ->through(AuthorizedPipe::class)
-                ->through(ValidatePropertiesPipe::class)
-                ->using($value)
-                ->execute();
+        if ($methodName === null) {
+            return null;
         }
 
-        return $class::$method($value);
+        foreach ($payloads as $payload) {
+            if ($payload instanceof Request) {
+                DataPipeline::create()
+                    ->normalizer(ArraybleNormalizer::class)
+                    ->into($class)
+                    ->through(AuthorizedPipe::class)
+                    ->through(ValidatePropertiesPipe::class)
+                    ->using($payload)
+                    ->execute();
+            }
+        }
+
+        return $class::$methodName(...$payloads);
     }
 }

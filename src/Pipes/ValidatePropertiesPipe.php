@@ -27,7 +27,7 @@ class ValidatePropertiesPipe extends Pipe
         return new static(app(DataValidationRulesResolver::class), true);
     }
 
-    public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection|Data
+    public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
     {
         if (! $initialValue instanceof Request && $this->allTypes === false) {
             return $properties;
