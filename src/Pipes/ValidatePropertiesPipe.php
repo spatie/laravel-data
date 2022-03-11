@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Pipes;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
 use Spatie\LaravelData\Support\DataClass;

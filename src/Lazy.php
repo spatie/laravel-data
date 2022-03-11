@@ -27,7 +27,7 @@ abstract class Lazy
         return new RelationalLazy($relation, $model, $value);
     }
 
-    public abstract function resolve(): mixed;
+    abstract public function resolve(): mixed;
 
     public function defaultIncluded(bool $defaultIncluded = true): self
     {
