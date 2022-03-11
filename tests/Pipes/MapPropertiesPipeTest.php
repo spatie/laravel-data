@@ -1,18 +1,19 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Integration;
+namespace Spatie\LaravelData\Tests\Pipes;
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapFrom;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Mappers\SnakeToCamelCaseMapper;
+use Spatie\LaravelData\Pipes\MapPropertiesPipe;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 use Spatie\LaravelData\Tests\TestCase;
 
-class PropertyMapping extends TestCase
+class MapPropertiesPipeTest extends TestCase
 {
     /** @test */
     public function it_can_map_using_string()

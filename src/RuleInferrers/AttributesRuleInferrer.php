@@ -9,10 +9,11 @@ class AttributesRuleInferrer implements RuleInferrer
 {
     public function handle(DataProperty $property, array $rules): array
     {
-        $attributeRules = array_map(
-            fn (ValidationAttribute $attribute) => $attribute->getRules(),
-            $property->validationAttributes
-        );
+        $attributeRules = $property->attributes
+            ->filter(fn (object $attribute) => $attribute instanceof ValidationAttribute)
+            ->map(fn(ValidationAttribute $attribute) => $attribute->getRules())
+            ->all();
+
 
         return array_merge($rules, ...$attributeRules);
     }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Util\Exception;
+use Illuminate\Support\Facades\Route;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
@@ -15,6 +16,15 @@ use Spatie\LaravelData\Tests\TestCase;
 
 class DataFromSomethingResolverTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->handleExceptions([
+            ValidationException::class,
+        ]);
+    }
+
     /** @test */
     public function it_can_create_data_from_a_custom_method()
     {
@@ -95,16 +105,18 @@ class DataFromSomethingResolverTest extends TestCase
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+        $this->app->bind(Request::class, fn() => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
+
             public static function rules()
             {
                 return [
                     'name' => ['required'],
                 ];
             }
+
             public static function messages(Request $request): array
             {
                 return [
@@ -116,21 +128,24 @@ class DataFromSomethingResolverTest extends TestCase
         $this->expectExceptionMessage('Name is required');
         $data::validate(['name' => '']);
     }
+
     /** @test */
     public function it_can_resolve_validation_dependencies_for_attributes()
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+        $this->app->bind(Request::class, fn() => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
+
             public static function rules()
             {
                 return [
                     'name' => ['required'],
                 ];
             }
+
             public static function attributes(Request $request): array
             {
                 return [
@@ -141,5 +156,53 @@ class DataFromSomethingResolverTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('The Another name field is required');
         $data::validate(['name' => '']);
+    }
+
+    /** @test */
+    public function it_can_create_data_from_a_custom_method_with_multiple_parameters()
+    {
+        $data = new class ('', 0) extends Data {
+            public function __construct(
+                public string $string,
+                public int $number,
+            ) {
+            }
+
+            public static function fromMultiple(string $first, int $second)
+            {
+                return new self($first, $second);
+            }
+        };
+
+        $this->assertEquals(new $data('Rick Astley', 42), $data::from(
+            'Rick Astley',
+            42,
+        ));
+    }
+
+    /** @test */
+    public function it_will_validate_a_request_when_given_as_a_parameter_to_a_custom_creation_method()
+    {
+        $data = new class ('', 0) extends Data {
+            public function __construct(
+                public string $string,
+            ) {
+            }
+
+            public static function fromRequest(Request $request)
+            {
+                return new self($request->input('string'));
+            }
+        };
+
+        Route::post('/', fn(Request $request) => $data::from($request));
+
+        $this->postJson('/', [])->assertJsonValidationErrorFor('string');
+
+        $this->postJson('/', [
+            'string' => 'Rick Astley',
+        ])->assertJson([
+            'string' => 'Rick Astley',
+        ])->assertOk();
     }
 }

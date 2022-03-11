@@ -7,6 +7,7 @@ use Generator;
 use Illuminate\Contracts\Support\Arrayable;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\MapFrom;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithoutValidation;
@@ -41,7 +42,6 @@ class DataPropertyTest extends TestCase
         $this->assertFalse($helper->isDataCollection);
         $this->assertTrue($helper->types->isEmpty());
         $this->assertEquals('property', $helper->name);
-        $this->assertEquals([], $helper->validationAttributes);
     }
 
     /** @test */
@@ -210,17 +210,6 @@ class DataPropertyTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_validation_attributes()
-    {
-        $helper = $this->resolveHelper(new class () {
-            #[Max(10)]
-            public SimpleData $property;
-        });
-
-        $this->assertEquals([new Max(10)], $helper->validationAttributes);
-    }
-
-    /** @test */
     public function it_can_get_the_cast_attribute()
     {
         $helper = $this->resolveHelper(new class () {
@@ -265,6 +254,31 @@ class DataPropertyTest extends TestCase
     }
 
     /** @test */
+    public function it_can_get_the_map_from_attribute()
+    {
+        $helper = $this->resolveHelper(new class () {
+            #[MapFrom('other')]
+            public SimpleData $property;
+        });
+
+        $this->assertEquals(new MapFrom('other'), $helper->mapFrom);
+    }
+
+    /** @test */
+    public function it_can_get_all_attributes()
+    {
+        $helper = $this->resolveHelper(new class () {
+            #[MapFrom('other')]
+            #[WithTransformer(DateTimeInterfaceTransformer::class)]
+            #[WithCast(DateTimeInterfaceCast::class)]
+            #[DataCollectionOf(SimpleData::class)]
+            public DataCollection $property;
+        });
+
+        $this->assertCount(4, $helper->attributes);
+    }
+
+    /** @test */
     public function it_can_get_the_data_class_for_a_data_object()
     {
         $helper = $this->resolveHelper(new class () {
@@ -272,6 +286,43 @@ class DataPropertyTest extends TestCase
         });
 
         $this->assertEquals(SimpleData::class, $helper->dataClass);
+    }
+
+    /** @test */
+    public function it_can_get_the_default_value()
+    {
+        $helper = $this->resolveHelper(new class () {
+            public string $property;
+        });
+
+        $this->assertFalse($helper->hasDefaultValue);
+
+        $helper = $this->resolveHelper(new class () {
+            public string $property = 'hello';
+        });
+
+        $this->assertTrue($helper->hasDefaultValue);
+        $this->assertEquals('hello', $helper->defaultValue);
+    }
+
+    /** @test */
+    public function it_can_check_if_the_property_is_promoted()
+    {
+        $helper = $this->resolveHelper(new class ('') {
+            public function __construct(
+                public string $property,
+            )
+            {
+            }
+        });
+
+        $this->assertTrue($helper->isPromoted);
+
+        $helper = $this->resolveHelper(new class () {
+            public string $property;
+        });
+
+        $this->assertFalse($helper->isPromoted);
     }
 
     /** @test */
@@ -382,7 +433,7 @@ class DataPropertyTest extends TestCase
     ) {
         $this->expectException(CannotFindDataTypeForProperty::class);
 
-        $dataProperty = DataProperty::create(new ReflectionProperty(CollectionAnnotationsData::class, $property));
+        DataProperty::create(new ReflectionProperty(CollectionAnnotationsData::class, $property));
     }
 
     public function invalidAnnotationsDataProvider(): Generator
@@ -400,10 +451,10 @@ class DataPropertyTest extends TestCase
         ];
     }
 
-    private function resolveHelper(object $class): DataProperty
+    private function resolveHelper(object $class, bool $hasDefaultValue = false, mixed $defaultValue = null): DataProperty
     {
         $reflectionProperty = new ReflectionProperty($class, 'property');
 
-        return DataProperty::create($reflectionProperty);
+        return DataProperty::create($reflectionProperty, $hasDefaultValue, $defaultValue);
     }
 }

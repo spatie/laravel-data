@@ -39,13 +39,12 @@ class DataProperty
         public readonly bool $isDataCollection,
         public readonly bool $hasDefaultValue,
         public readonly mixed $defaultValue,
-        public readonly array $validationAttributes,
         public readonly ?Cast $cast,
         public readonly ?Transformer $transformer,
         public readonly ?MapFrom $mapFrom,
         /** @var class-string<\Spatie\LaravelData\Data> */
         public readonly ?string $dataClass,
-        public readonly array $attributes,
+        public readonly Collection $attributes,
     ) {
         $this->ensurePropertyIsValid();
     }
@@ -66,13 +65,12 @@ class DataProperty
             'className' => $property->class,
             'validate' => ! $attributes->contains(fn (object $attribute) => $attribute instanceof WithoutValidation),
             'isPromoted' => $property->isPromoted(),
-            'hasDefaultValue' => $hasDefaultValue,
-            'defaultValue' => $defaultValue,
-            'validationAttributes' => $attributes->filter(fn (object $attribute) => $attribute instanceof ValidationAttribute)->all(),
+            'hasDefaultValue' => $property->isPromoted() ? $hasDefaultValue : $property->hasDefaultValue(),
+            'defaultValue' => $property->isPromoted() ? $defaultValue : $property->getDefaultValue(),
             'cast' => $attributes->first(fn (object $attribute) => $attribute instanceof WithCast)?->get(),
             'transformer' => $attributes->first(fn (object $attribute) => $attribute instanceof WithTransformer)?->get(),
             'mapFrom' => $attributes->first(fn (object $attribute) => $attribute instanceof MapFrom),
-            'attributes' => $attributes->all(),
+            'attributes' => $attributes,
         ];
 
         $specificParameters = match (true) {
