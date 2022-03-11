@@ -7,6 +7,8 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
+use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Undefined;
 
@@ -88,8 +90,8 @@ class DataTransformer
             return true;
         }
 
-        if ($value->isConditional()) {
-            return ($value->getCondition())();
+        if($value instanceof RelationalLazy || $value instanceof ConditionalLazy){
+            return $value->shouldBeIncluded();
         }
 
         if ($this->isPropertyExcluded($name, $excludes, $allowedExcludes)) {
