@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Tests\Support;
 
-use ReflectionNamedType;
 use ReflectionParameter;
 use Spatie\BetterTypes\Type;
 use Spatie\LaravelData\Data;
@@ -14,7 +13,7 @@ class DataParameterTest extends TestCase
     /** @test */
     public function it_can_create_a_data_parameter()
     {
-        $class = new class('', '', '') extends Data {
+        $class = new class ('', '', '') extends Data {
             public function __construct(
                 string $nonPromoted,
                 public $withoutType,
