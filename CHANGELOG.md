@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 1.4.4 - 2022-03-18
+
+- use present validation rule instead of required for data collections
+
 ## 1.4.3 - 2022-02-16
 
 - allow using default password config in password validation attribute (#94)
