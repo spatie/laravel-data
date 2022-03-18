@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 1.4.5 - 2022-03-18
+
+- Add support for stdClass payload casting (#106)
+
 ## 1.4.4 - 2022-03-18
 
 - use present validation rule instead of required for data collections
