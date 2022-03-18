@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests\Support;
 
 use ReflectionClass;
-use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Mappers\SnakeToCamelCaseNameMapper;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataMethod;
