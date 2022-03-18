@@ -109,8 +109,9 @@ class DataValidationRulesResolverTest extends TestCase
             'age' => ['numeric', 'nullable'],
         ], $this->resolver->execute($data::class)->all());
     }
+
     /** @test */
-    public function it_can_resolve_dependencies_when_calling_methods()
+    public function it_can_resolve_dependencies_when_calling_rules()
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
