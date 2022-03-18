@@ -22,8 +22,8 @@ class DataValidatorResolver
         $validator = ValidatorFacade::make(
             $payload instanceof Arrayable ? $payload->toArray() : $payload,
             $rules,
-            $dataClass::messages(),
-            $dataClass::attributes()
+            method_exists($dataClass, 'messages') ? app()->call([$dataClass, 'messages']) : [],
+            method_exists($dataClass, 'attributes') ? app()->call([$dataClass, 'attributes']) : []
         );
 
         $dataClass::withValidator($validator);

@@ -16,8 +16,11 @@ class DataValidationRulesResolver
     {
         $resolver = app(DataPropertyValidationRulesResolver::class);
 
+        $overWrittenRules = [];
         /** @var class-string<\Spatie\LaravelData\Data> $class */
-        $overWrittenRules = $class::rules();
+        if(method_exists($class, 'rules')) {
+            $overWrittenRules = app()->call([$class, 'rules']);
+        }
 
         return $this->dataConfig->getDataClass($class)
             ->properties()

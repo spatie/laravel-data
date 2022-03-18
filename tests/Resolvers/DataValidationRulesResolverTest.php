@@ -2,6 +2,8 @@
 
 namespace Spatie\LaravelData\Tests\Resolvers;
 
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -106,6 +108,28 @@ class DataValidationRulesResolverTest extends TestCase
 
         $this->assertEquals([
             'age' => ['numeric', 'nullable'],
+        ], $this->resolver->execute($data::class)->all());
+    }
+    /** @test */
+    public function it_can_resolve_dependencies_when_calling_methods()
+    {
+        $requestMock = $this->mock(Request::class);
+        $requestMock->expects('input')->andReturns('value');
+        $this->app->bind(Request::class, fn() => $requestMock);
+
+        $data = new class () extends Data {
+            public string $name;
+
+            public static function rules(Request $request): array
+            {
+                return [
+                    'name' => $request->input('key') === 'value' ? ['required'] : ['bail']
+                ];
+            }
+        };
+
+        $this->assertEquals([
+            'name' => ['required'],
         ], $this->resolver->execute($data::class)->all());
     }
 }
