@@ -7,7 +7,7 @@ use DateTime;
 use DateTimeImmutable;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Pipes\CastPropertiesPipe;
+use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\Tests\Fakes\BuiltInTypeWithCastData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DateCastData;
@@ -28,7 +28,7 @@ class CastPropertiesPipeTest extends TestCase
     {
         parent::setUp();
 
-        $this->pipe = resolve(CastPropertiesPipe::class);
+        $this->pipe = resolve(CastPropertiesDataPipe::class);
     }
 
     /** @test */

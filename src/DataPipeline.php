@@ -5,7 +5,7 @@ namespace Spatie\LaravelData;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Exceptions\CannotCreateDataFromValue;
 use Spatie\LaravelData\Normalizers\Normalizer;
-use Spatie\LaravelData\Pipes\Pipe;
+use Spatie\LaravelData\DataPipes\DataPipe;
 use Spatie\LaravelData\Support\DataConfig;
 
 class DataPipeline
@@ -48,7 +48,7 @@ class DataPipeline
         return $this;
     }
 
-    public function through(string|Pipe $pipe): static
+    public function through(string|DataPipe $pipe): static
     {
         $this->pipes[] = $pipe;
 
@@ -63,9 +63,9 @@ class DataPipeline
             $this->normalizers
         );
 
-        /** @var \Spatie\LaravelData\Pipes\Pipe $pipes */
+        /** @var \Spatie\LaravelData\DataPipes\DataPipe $pipes */
         $pipes = array_map(
-            fn (string|Pipe $pipe) => is_string($pipe) ? app($pipe) : $pipe,
+            fn (string|DataPipe $pipe) => is_string($pipe) ? app($pipe) : $pipe,
             $this->pipes
         );
 

@@ -19,11 +19,11 @@ use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
 use Spatie\LaravelData\Normalizers\ArrayNormalizer;
 use Spatie\LaravelData\Normalizers\ModelNormalizer;
 use Spatie\LaravelData\Normalizers\ObjectNormalizer;
-use Spatie\LaravelData\Pipes\AuthorizedPipe;
-use Spatie\LaravelData\Pipes\CastPropertiesPipe;
-use Spatie\LaravelData\Pipes\DefaultValuesPipe;
-use Spatie\LaravelData\Pipes\MapPropertiesPipe;
-use Spatie\LaravelData\Pipes\ValidatePropertiesPipe;
+use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
+use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
+use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
@@ -34,6 +34,7 @@ use Spatie\LaravelData\Transformers\DataTransformer;
  * TODO: Make all supporting data structures cachable
  * TODO: add MapTo support and a more general Map attribute combining both
  * TODO: A TransformerPipeline?
+ * TODO: add support for only and except?
  * TODO: split DataCollection in DataCollection and PaginatedDataCollection
  * TODO: add more context to casts
  * TODO: test multiple from arguments more
@@ -78,11 +79,11 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
             ->normalizer(ArraybleNormalizer::class)
             ->normalizer(ObjectNormalizer::class)
             ->normalizer(ArrayNormalizer::class)
-            ->through(AuthorizedPipe::class)
-            ->through(ValidatePropertiesPipe::class)
-            ->through(MapPropertiesPipe::class)
-            ->through(DefaultValuesPipe::class)
-            ->through(CastPropertiesPipe::class);
+            ->through(AuthorizedDataPipe::class)
+            ->through(ValidatePropertiesDataPipe::class)
+            ->through(MapPropertiesDataPipe::class)
+            ->through(DefaultValuesDataPipe::class)
+            ->through(CastPropertiesDataPipe::class);
     }
 
     public static function collection(Enumerable|array|AbstractPaginator|AbstractCursorPaginator|Paginator|DataCollection $items): DataCollection

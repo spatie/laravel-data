@@ -1,11 +1,11 @@
 <?php
 
-namespace Spatie\LaravelData\Pipes;
+namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataClass;
 
-abstract class Pipe
+abstract class DataPipe
 {
     abstract public function handle(
         mixed $initialValue,

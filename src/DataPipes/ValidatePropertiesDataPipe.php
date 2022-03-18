@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelData\Pipes;
+namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -8,7 +8,7 @@ use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
 use Spatie\LaravelData\Support\DataClass;
 
-class ValidatePropertiesPipe extends Pipe
+class ValidatePropertiesDataPipe extends DataPipe
 {
     public function __construct(
         protected DataValidatorResolver $dataValidatorResolver,

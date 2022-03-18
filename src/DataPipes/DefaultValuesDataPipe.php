@@ -1,13 +1,13 @@
 <?php
 
-namespace Spatie\LaravelData\Pipes;
+namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Undefined;
 
-class DefaultValuesPipe extends Pipe
+class DefaultValuesDataPipe extends DataPipe
 {
     public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
     {

@@ -1,13 +1,13 @@
 <?php
 
-namespace Spatie\LaravelData\Pipes;
+namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataClass;
 
-class AuthorizedPipe extends Pipe
+class AuthorizedDataPipe extends DataPipe
 {
     public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
     {
