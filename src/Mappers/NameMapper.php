@@ -6,5 +6,7 @@ use Illuminate\Support\Collection;
 
 interface NameMapper
 {
-    public function map(string|int $name, Collection $properties): string|int;
+    public function map(string|int $name): string|int;
+
+    public function inverse(): NameMapper;
 }

@@ -23,7 +23,7 @@ class MapPropertiesDataPipe extends DataPipe
                 continue;
             }
 
-            $mapped = $mapper->map($dataProperty->name, $properties);
+            $mapped = $mapper->map($dataProperty->name);
 
             if (Arr::has($properties, $mapped)) {
                 $properties->put($dataProperty->name, Arr::get($properties, $mapped));
