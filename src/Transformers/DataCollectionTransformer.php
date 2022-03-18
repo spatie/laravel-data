@@ -8,6 +8,7 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Support\PropertyTrees;
 use Spatie\LaravelData\Support\TransformationType;
 
 class DataCollectionTransformer
@@ -15,8 +16,7 @@ class DataCollectionTransformer
     public function __construct(
         protected string $dataClass,
         protected TransformationType $transformationType,
-        protected array $inclusionTree,
-        protected array $exclusionTree,
+        protected PropertyTrees $propertyTrees,
         protected Enumerable|CursorPaginator|Paginator $items,
         protected ?Closure $through,
         protected ?Closure $filter,
@@ -55,7 +55,7 @@ class DataCollectionTransformer
     protected function transformItemClosure(): Closure
     {
         return function (Data $item) {
-            $item->withPartialsTrees($this->inclusionTree, $this->exclusionTree);
+            $item->withPropertyTrees($this->propertyTrees);
 
             if ($this->through) {
                 $item = ($this->through)($item);
