@@ -10,8 +10,13 @@ class ProvidedNameMapper implements NameMapper
     {
     }
 
-    public function map(int|string $name, Collection $properties): string|int
+    public function map(int|string $name): string|int
     {
         return $this->name;
+    }
+
+    public function inverse(): NameMapper
+    {
+        return $this;
     }
 }

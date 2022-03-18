@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Transformers;
 
+use Illuminate\Support\Str;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
@@ -47,10 +48,11 @@ class DataTransformer
             ? $data->allowedRequestExcludes()
             : null;
 
-        return $this->config
-            ->getDataClass($data::class)
+        $dataClass = $this->config->getDataClass($data::class);
+
+        return $dataClass
             ->properties
-            ->reduce(function (array $payload, DataProperty $property) use ($allowedExcludes, $allowedIncludes, $data, $exclusionTree, $inclusionTree) {
+            ->reduce(function (array $payload, DataProperty $property) use ($dataClass, $allowedExcludes, $allowedIncludes, $data, $exclusionTree, $inclusionTree) {
                 $name = $property->name;
 
                 if (! $this->shouldIncludeProperty($name, $data->{$name}, $inclusionTree, $exclusionTree, $allowedIncludes, $allowedExcludes)) {
@@ -66,6 +68,12 @@ class DataTransformer
 
                 if ($value instanceof Undefined) {
                     return $payload;
+                }
+
+                $mapper = $property->outputNameMapper ?? $dataClass->outputNameMapper;
+
+                if ($mapper) {
+                    $name = $mapper->inverse()->map($name);
                 }
 
                 $payload[$name] = $value;
