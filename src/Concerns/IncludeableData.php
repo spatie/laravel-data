@@ -15,7 +15,7 @@ trait IncludeableData
 
     public function withPropertyTrees(
         PropertyTrees $propertyTrees,
-    ): static  {
+    ): static {
         $this->propertyTrees = $propertyTrees;
 
         return $this;

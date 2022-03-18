@@ -9,7 +9,6 @@ class PropertyTrees
         public ?array $lazyExcluded,
         public ?array $only,
         public ?array $except,
-    )
-    {
+    ) {
     }
 }
