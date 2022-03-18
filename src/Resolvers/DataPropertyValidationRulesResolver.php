@@ -47,7 +47,7 @@ class DataPropertyValidationRulesResolver
                 $property->dataClassName(),
                 $nullable || ($property->isData() && $property->isNullable())
             )
-            ->mapWithKeys(fn(array $rules, string $name) => [
+            ->mapWithKeys(fn (array $rules, string $name) => [
                 "{$prefix}{$name}" => $rules,
             ])
             ->prepend([$toplevelRule, 'array'], $property->name());
@@ -57,7 +57,7 @@ class DataPropertyValidationRulesResolver
     {
         return array_reduce(
             $this->dataConfig->getRuleInferrers(),
-            fn(array $rules, RuleInferrer $ruleInferrer) => $ruleInferrer->handle($property, $rules),
+            fn (array $rules, RuleInferrer $ruleInferrer) => $ruleInferrer->handle($property, $rules),
             $nullable ? ['nullable'] : []
         );
     }

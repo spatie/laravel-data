@@ -23,7 +23,7 @@ class RequiredRuleInferrer implements RuleInferrer
             return false;
         }
 
-        if($property->isDataCollection() && in_array('present', $rules)){
+        if ($property->isDataCollection() && in_array('present', $rules)) {
             return false;
         }
 
