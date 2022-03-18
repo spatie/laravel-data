@@ -18,7 +18,7 @@ class NameMappersResolverTest extends TestCase
 {
     private NameMappersResolver $resolver;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -28,7 +28,7 @@ class NameMappersResolverTest extends TestCase
     /** @test */
     public function it_can_get_an_input_and_output_mapper()
     {
-        $attributes = $this->getAttributes(new class{
+        $attributes = $this->getAttributes(new class () {
             #[MapInputName('input'), MapOutputName('output')]
             public $property;
         });
@@ -45,7 +45,7 @@ class NameMappersResolverTest extends TestCase
     /** @test */
     public function it_can_have_no_mappers()
     {
-        $attributes = $this->getAttributes(new class{
+        $attributes = $this->getAttributes(new class () {
             public $property;
         });
 
@@ -61,7 +61,7 @@ class NameMappersResolverTest extends TestCase
     /** @test */
     public function it_can_have_a_single_map_attribute()
     {
-        $attributes = $this->getAttributes(new class{
+        $attributes = $this->getAttributes(new class () {
             #[MapName('input', 'output')]
             public $property;
         });
@@ -78,7 +78,7 @@ class NameMappersResolverTest extends TestCase
     /** @test */
     public function it_can_overwrite_a_general_map_attribute()
     {
-        $attributes = $this->getAttributes(new class{
+        $attributes = $this->getAttributes(new class () {
             #[MapName('input', 'output'), MapInputName('input_overwritten')]
             public $property;
         });
@@ -95,7 +95,7 @@ class NameMappersResolverTest extends TestCase
     /** @test */
     public function it_can_map_an_int()
     {
-        $attributes = $this->getAttributes(new class{
+        $attributes = $this->getAttributes(new class () {
             #[MapName(0, 3)]
             public $property;
         });
@@ -112,7 +112,7 @@ class NameMappersResolverTest extends TestCase
     /** @test */
     public function it_can_map_a_string()
     {
-        $attributes = $this->getAttributes(new class{
+        $attributes = $this->getAttributes(new class () {
             #[MapName('hello', 'world')]
             public $property;
         });
@@ -129,7 +129,7 @@ class NameMappersResolverTest extends TestCase
     /** @test */
     public function it_can_map_a_mapper_class()
     {
-        $attributes = $this->getAttributes(new class{
+        $attributes = $this->getAttributes(new class () {
             #[MapName(SnakeToCamelCaseNameMapper::class, CamelToSnakeCaseNameMapper::class)]
             public $property;
         });
@@ -145,7 +145,7 @@ class NameMappersResolverTest extends TestCase
 
     private function getAttributes(object $class): Collection
     {
-       return collect((new ReflectionProperty($class, 'property'))->getAttributes())
-            ->map(fn(ReflectionAttribute $attribute) => $attribute->newInstance());
+        return collect((new ReflectionProperty($class, 'property'))->getAttributes())
+            ->map(fn (ReflectionAttribute $attribute) => $attribute->newInstance());
     }
 }

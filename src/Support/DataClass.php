@@ -7,8 +7,6 @@ use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
-use Spatie\LaravelData\Attributes\MapInputName;
-use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Mappers\NameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 
@@ -28,7 +26,7 @@ class DataClass
     public static function create(ReflectionClass $class)
     {
         $attributes = collect($class->getAttributes())->map(
-            fn(ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
+            fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
         );
 
         $methods = static::resolveMethods($class);
@@ -49,10 +47,10 @@ class DataClass
     ): Collection {
         return collect($reflectionClass->getMethods())
             ->filter(
-                fn(ReflectionMethod $method) => $method->name === '__construct' || str_starts_with($method->name, 'from')
+                fn (ReflectionMethod $method) => $method->name === '__construct' || str_starts_with($method->name, 'from')
             )
             ->mapWithKeys(
-                fn(ReflectionMethod $method) => [$method->name => DataMethod::create($method)],
+                fn (ReflectionMethod $method) => [$method->name => DataMethod::create($method)],
             );
     }
 
@@ -63,8 +61,8 @@ class DataClass
         $defaultValues = static::resolveDefaultValues($class, $constructorMethod);
 
         return collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(fn(ReflectionProperty $property) => $property->isStatic())
-            ->map(fn(ReflectionProperty $property) => DataProperty::create(
+            ->reject(fn (ReflectionProperty $property) => $property->isStatic())
+            ->map(fn (ReflectionProperty $property) => DataProperty::create(
                 $property,
                 array_key_exists($property->getName(), $defaultValues),
                 $defaultValues[$property->getName()] ?? null,
@@ -83,8 +81,8 @@ class DataClass
 
         $values = $constructorMethod
             ->parameters
-            ->filter(fn(DataParameter $parameter) => $parameter->isPromoted && $parameter->hasDefaultValue)
-            ->mapWithKeys(fn(DataParameter $parameter) => [
+            ->filter(fn (DataParameter $parameter) => $parameter->isPromoted && $parameter->hasDefaultValue)
+            ->mapWithKeys(fn (DataParameter $parameter) => [
                 $parameter->name => $parameter->defaultValue,
             ])
             ->toArray();
