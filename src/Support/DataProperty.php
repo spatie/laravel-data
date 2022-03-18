@@ -9,7 +9,7 @@ use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Attributes\MapFrom;
+use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
@@ -19,6 +19,8 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotFindDataTypeForProperty;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Mappers\NameMapper;
+use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Transformers\Transformer;
 use Spatie\LaravelData\Undefined;
 use TypeError;
@@ -40,7 +42,8 @@ class DataProperty
         public readonly mixed $defaultValue,
         public readonly ?Cast $cast,
         public readonly ?Transformer $transformer,
-        public readonly ?MapFrom $mapFrom,
+        public readonly ?NameMapper $inputNameMapper,
+        public readonly ?NameMapper $outputNameMapper,
         /** @var class-string<\Spatie\LaravelData\Data> */
         public readonly ?string $dataClass,
         public readonly Collection $attributes,
@@ -68,8 +71,8 @@ class DataProperty
             'defaultValue' => $property->isPromoted() ? $defaultValue : $property->getDefaultValue(),
             'cast' => $attributes->first(fn (object $attribute) => $attribute instanceof WithCast)?->get(),
             'transformer' => $attributes->first(fn (object $attribute) => $attribute instanceof WithTransformer)?->get(),
-            'mapFrom' => $attributes->first(fn (object $attribute) => $attribute instanceof MapFrom),
             'attributes' => $attributes,
+            ...NameMappersResolver::create()->execute($attributes),
         ];
 
         $specificParameters = match (true) {

@@ -3,10 +3,10 @@
 namespace Spatie\LaravelData\Tests\Pipes;
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Attributes\MapFrom;
+use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Mappers\SnakeToCamelCaseMapper;
+use Spatie\LaravelData\Mappers\SnakeToCamelCaseNameMapper;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
@@ -18,7 +18,7 @@ class MapPropertiesPipeTest extends TestCase
     public function it_can_map_using_string()
     {
         $dataClass = new class () extends Data {
-            #[MapFrom('something')]
+            #[MapInputName('something')]
             public string $mapped;
         };
 
@@ -33,7 +33,7 @@ class MapPropertiesPipeTest extends TestCase
     public function it_can_map_in_nested_objects_using_strings()
     {
         $dataClass = new class () extends Data {
-            #[MapFrom('nested.something')]
+            #[MapInputName('nested.something')]
             public string $mapped;
         };
 
@@ -48,7 +48,7 @@ class MapPropertiesPipeTest extends TestCase
     public function it_replaces_properties_when_a_mapped_alternative_exists()
     {
         $dataClass = new class () extends Data {
-            #[MapFrom('something')]
+            #[MapInputName('something')]
             public string $mapped;
         };
 
@@ -64,7 +64,7 @@ class MapPropertiesPipeTest extends TestCase
     public function it_skips_properties_it_cannot_find()
     {
         $dataClass = new class () extends Data {
-            #[MapFrom('something')]
+            #[MapInputName('something')]
             public string $mapped;
         };
 
@@ -79,7 +79,7 @@ class MapPropertiesPipeTest extends TestCase
     public function it_can_use_integers_to_map_properties()
     {
         $dataClass = new class () extends Data {
-            #[MapFrom(1)]
+            #[MapInputName(1)]
             public string $mapped;
         };
 
@@ -95,7 +95,7 @@ class MapPropertiesPipeTest extends TestCase
     public function it_can_use_integers_to_map_properties_in_nested_data()
     {
         $dataClass = new class () extends Data {
-            #[MapFrom('1.0')]
+            #[MapInputName('1.0')]
             public string $mapped;
         };
 
@@ -111,7 +111,7 @@ class MapPropertiesPipeTest extends TestCase
     public function it_can_combine_integers_and_strings_to_map_properties()
     {
         $dataClass = new class () extends Data {
-            #[MapFrom('lines.1')]
+            #[MapInputName('lines.1')]
             public string $mapped;
         };
 
@@ -129,7 +129,7 @@ class MapPropertiesPipeTest extends TestCase
     public function it_can_use_a_dedicated_mapper()
     {
         $dataClass = new class () extends Data {
-            #[MapFrom(SnakeToCamelCaseMapper::class)]
+            #[MapInputName(SnakeToCamelCaseNameMapper::class)]
             public string $mappedLine;
         };
 
@@ -144,7 +144,7 @@ class MapPropertiesPipeTest extends TestCase
     public function it_can_map_properties_into_data_objects()
     {
         $dataClass = new class () extends Data {
-            #[MapFrom('something')]
+            #[MapInputName('something')]
             public SimpleData $mapped;
         };
 
@@ -161,7 +161,7 @@ class MapPropertiesPipeTest extends TestCase
     public function it_can_map_properties_into_data_objects_which_map_properties_again()
     {
         $dataClass = new class () extends Data {
-            #[MapFrom('something')]
+            #[MapInputName('something')]
             public SimpleDataWithMappedProperty $mapped;
         };
 
@@ -183,7 +183,7 @@ class MapPropertiesPipeTest extends TestCase
     public function it_can_map_properties_into_data_collections()
     {
         $dataClass = new class () extends Data {
-            #[MapFrom('something'), DataCollectionOf(SimpleData::class)]
+            #[MapInputName('something'), DataCollectionOf(SimpleData::class)]
             public DataCollection $mapped;
         };
 
@@ -209,7 +209,7 @@ class MapPropertiesPipeTest extends TestCase
     public function it_can_map_properties_into_data_collections_wich_map_properties_again()
     {
         $dataClass = new class () extends Data {
-            #[MapFrom('something'), DataCollectionOf(SimpleDataWithMappedProperty::class)]
+            #[MapInputName('something'), DataCollectionOf(SimpleDataWithMappedProperty::class)]
             public DataCollection $mapped;
         };
 

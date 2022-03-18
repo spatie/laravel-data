@@ -7,7 +7,7 @@ use Generator;
 use Illuminate\Contracts\Support\Arrayable;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Attributes\MapFrom;
+use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
@@ -16,6 +16,7 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotFindDataTypeForProperty;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\DataPropertyTypes;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
@@ -256,18 +257,18 @@ class DataPropertyTest extends TestCase
     public function it_can_get_the_map_from_attribute()
     {
         $helper = $this->resolveHelper(new class () {
-            #[MapFrom('other')]
+            #[MapInputName('other')]
             public SimpleData $property;
         });
 
-        $this->assertEquals(new MapFrom('other'), $helper->mapFrom);
+        $this->assertEquals(new ProvidedNameMapper('other'), $helper->inputNameMapper);
     }
 
     /** @test */
     public function it_can_get_all_attributes()
     {
         $helper = $this->resolveHelper(new class () {
-            #[MapFrom('other')]
+            #[MapInputName('other')]
             #[WithTransformer(DateTimeInterfaceTransformer::class)]
             #[WithCast(DateTimeInterfaceCast::class)]
             #[DataCollectionOf(SimpleData::class)]

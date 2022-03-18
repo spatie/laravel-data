@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Mappers;
 
 use Illuminate\Support\Collection;
 
-interface Mapper
+interface NameMapper
 {
     public function map(string|int $name, Collection $properties): string|int;
 }
