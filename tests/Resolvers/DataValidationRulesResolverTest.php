@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests\Resolvers;
 
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
