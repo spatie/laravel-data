@@ -7,8 +7,8 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
-use Spatie\LaravelData\Pipes\AuthorizedPipe;
-use Spatie\LaravelData\Pipes\ValidatePropertiesPipe;
+use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
+use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
 
@@ -67,8 +67,8 @@ class DataFromSomethingResolver
                 DataPipeline::create()
                     ->normalizer(ArraybleNormalizer::class)
                     ->into($class)
-                    ->through(AuthorizedPipe::class)
-                    ->through(ValidatePropertiesPipe::class)
+                    ->through(AuthorizedDataPipe::class)
+                    ->through(ValidatePropertiesDataPipe::class)
                     ->using($payload)
                     ->execute();
             }

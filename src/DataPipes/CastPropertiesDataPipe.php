@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelData\Pipes;
+namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Lazy;
@@ -9,7 +9,7 @@ use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Undefined;
 
-class CastPropertiesPipe extends Pipe
+class CastPropertiesDataPipe extends DataPipe
 {
     public function __construct(
         protected DataConfig $dataConfig,
