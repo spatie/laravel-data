@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Transformers;
 
-use Illuminate\Support\Str;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
