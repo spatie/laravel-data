@@ -53,6 +53,5 @@ class DataMethodTest extends TestCase
     /** @test */
     public function it_correctly_accepts_values()
     {
-
     }
 }
