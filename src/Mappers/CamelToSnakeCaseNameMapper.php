@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Mappers;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class CamelToSnakeCaseNameMapper implements NameMapper

@@ -85,7 +85,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::new('name')->lazy()->withType('string')
         )->create();
 
-        $data = new $dataClass(Lazy::create(fn() => 'test'));
+        $data = new $dataClass(Lazy::create(fn () => 'test'));
 
         $this->assertEquals([], $data->toArray());
 
@@ -121,8 +121,8 @@ class DataTest extends TestCase
         )->create();
 
         $data = new $dataClass(
-            Lazy::create(fn() => LazyData::from('Hello')),
-            Lazy::create(fn() => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
+            Lazy::create(fn () => LazyData::from('Hello')),
+            Lazy::create(fn () => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
         );
 
         $this->assertEquals([], (clone $data)->toArray());
@@ -165,7 +165,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::dataCollection('songs', MultiLazyData::class)->lazy()
         )->create();
 
-        $collection = Lazy::create(fn() => MultiLazyData::collection([
+        $collection = Lazy::create(fn () => MultiLazyData::collection([
             DummyDto::rick(),
             DummyDto::bon(),
         ]));
@@ -220,7 +220,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
+                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
                 );
             }
         };
@@ -246,7 +246,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
+                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
                 );
             }
         };
@@ -468,7 +468,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn() => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'),) extends Data {
+        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
             public function __construct(
                 public SimpleData $data,
                 #[DataCollectionOf(SimpleData::class)]
@@ -527,7 +527,7 @@ class DataTest extends TestCase
 
         $transformed = $data->additional([
             'company' => 'Spatie',
-            'alt_name' => fn(Data $data) => "{$data->name} from Spatie",
+            'alt_name' => fn (Data $data) => "{$data->name} from Spatie",
         ])->toArray();
 
         $this->assertEquals([
@@ -857,7 +857,7 @@ class DataTest extends TestCase
                 #[WithTransformer(ConfidentialDataTransformer::class)]
                 public Data $nestedData,
                 #[WithTransformer(ConfidentialDataCollectionTransformer::class),
-                    DataCollectionOf(SimpleData::class)]
+                DataCollectionOf(SimpleData::class)]
                 public DataCollection $nestedDataCollection,
             ) {
             }
@@ -1053,7 +1053,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_will_not_include_lazy_undefined_values_when_transforming()
     {
-        $data = new class ('Hello World', Lazy::create(fn() => Undefined::make())) extends Data {
+        $data = new class ('Hello World', Lazy::create(fn () => Undefined::make())) extends Data {
             public function __construct(
                 public string $string,
                 public string|Undefined|Lazy $lazy_undefined_string,
@@ -1095,10 +1095,10 @@ class DataTest extends TestCase
             ['description' => 'gonna'],
             ['description' => 'give'],
             ['description' => 'you'],
-            ['description' => 'up']
+            ['description' => 'up'],
         ]);
 
-        $dataClass = new class('hello', $data, $data, $dataCollection, $dataCollection) extends Data {
+        $dataClass = new class ('hello', $data, $data, $dataCollection, $dataCollection) extends Data {
             public function __construct(
                 #[MapOutputName('property')]
                 public string $string,
@@ -1107,7 +1107,8 @@ class DataTest extends TestCase
                 public SimpleDataWithMappedProperty $nested_renamed,
                 #[DataCollectionOf(SimpleDataWithMappedProperty::class)]
                 public DataCollection $nested_collection,
-                #[MapOutputName('nested_other_collection'), DataCollectionOf(SimpleDataWithMappedProperty::class)]
+                #[MapOutputName('nested_other_collection'),
+                DataCollectionOf(SimpleDataWithMappedProperty::class)]
                 public DataCollection $nested_renamed_collection,
             ) {
             }
@@ -1116,25 +1117,25 @@ class DataTest extends TestCase
         $this->assertEquals([
             'property' => 'hello',
             'nested' => [
-                'description' => 'hello'
+                'description' => 'hello',
             ],
             'nested_other' => [
-                'description' => 'hello'
+                'description' => 'hello',
             ],
             'nested_collection' => [
                 ['description' => 'never'],
                 ['description' => 'gonna'],
                 ['description' => 'give'],
                 ['description' => 'you'],
-                ['description' => 'up']
+                ['description' => 'up'],
             ],
             'nested_other_collection' => [
                 ['description' => 'never'],
                 ['description' => 'gonna'],
                 ['description' => 'give'],
                 ['description' => 'you'],
-                ['description' => 'up']
-            ]
+                ['description' => 'up'],
+            ],
         ], $dataClass->toArray());
     }
 
