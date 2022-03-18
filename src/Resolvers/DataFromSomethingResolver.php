@@ -6,9 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataPipeline;
-use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
+use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
 
