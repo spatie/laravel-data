@@ -633,6 +633,35 @@ class DataTest extends TestCase
     }
 
     /** @test */
+    public function it_can_create_a_data_object_from_a_stdClass_object()
+    {
+        $object = (object) [
+            'string' => 'test',
+            'boolean' => true,
+            'date' => CarbonImmutable::create(2020, 05, 16, 12, 00, 00),
+            'nullable_date' => null,
+        ];
+
+        $dataClass = new class () extends Data {
+            public string $string;
+
+            public bool $boolean;
+
+            public CarbonImmutable $date;
+
+            public ?Carbon $nullable_date;
+        };
+
+        $data = $dataClass::from($object);
+
+        $this->assertEquals('test', $data->string);
+        $this->assertTrue($data->boolean);
+        $this->assertTrue(CarbonImmutable::create(2020, 05, 16, 12, 00, 00)->eq($data->date));
+        $this->assertNull($data->nullable_date);
+    }
+
+
+    /** @test */
     public function it_can_add_the_with_data_trait_to_a_request()
     {
         $formRequest = new class () extends FormRequest {
