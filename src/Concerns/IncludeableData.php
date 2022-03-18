@@ -3,23 +3,20 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Spatie\LaravelData\Support\PartialsParser;
+use Spatie\LaravelData\Support\PropertyTrees;
 
 trait IncludeableData
 {
+    protected ?PropertyTrees $propertyTrees = null;
+
     protected array $includes = [];
 
     protected array $excludes = [];
 
-    protected ?array $inclusionTree = null;
-
-    protected ?array $exclusionTree = null;
-
-    public function withPartialsTrees(
-        array $inclusionTree,
-        array $exclusionTree
-    ): static {
-        $this->inclusionTree = $inclusionTree;
-        $this->exclusionTree = $exclusionTree;
+    public function withPropertyTrees(
+        PropertyTrees $propertyTrees,
+    ): static  {
+        $this->propertyTrees = $propertyTrees;
 
         return $this;
     }
@@ -38,13 +35,17 @@ trait IncludeableData
         return $this;
     }
 
-    public function getInclusionTree(): array
+    public function getPropertyTrees(): PropertyTrees
     {
-        return $this->inclusionTree ?? (new PartialsParser())->execute($this->includes);
-    }
+        if ($this->propertyTrees) {
+            return $this->propertyTrees;
+        }
 
-    public function getExclusionTree(): array
-    {
-        return $this->exclusionTree ?? (new PartialsParser())->execute($this->excludes);
+        return new PropertyTrees(
+            (new PartialsParser())->execute($this->includes),
+            (new PartialsParser())->execute($this->excludes),
+            [],
+            []
+        );
     }
 }

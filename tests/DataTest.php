@@ -17,6 +17,7 @@ use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Support\PropertyTrees;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
@@ -490,7 +491,7 @@ class DataTest extends TestCase
         $this->assertEquals([
             'data' => $dataObject,
             'dataCollection' => $dataCollection,
-            'lazy' => (new SimpleData('Lazy'))->withPartialsTrees([], []),
+            'lazy' => (new SimpleData('Lazy'))->withPropertyTrees(new PropertyTrees([], [], [], [])),
             'string' => 'Test',
             'transformable' => $transformable,
         ], $data->include('lazy')->all());

@@ -9,6 +9,7 @@ use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\RelationalLazy;
+use Spatie\LaravelData\Support\PropertyTrees;
 use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Undefined;
 
@@ -36,8 +37,8 @@ class DataTransformer
 
     protected function resolvePayload(Data $data): array
     {
-        $inclusionTree = $data->getInclusionTree();
-        $exclusionTree = $data->getExclusionTree();
+        $inclusionTree = $data->getPropertyTrees()->lazyIncluded;
+        $exclusionTree = $data->getPropertyTrees()->lazyExcluded;
 
         $allowedIncludes = $this->transformationType->limitIncludesAndExcludes()
             ? $data->allowedRequestIncludes()
@@ -168,7 +169,9 @@ class DataTransformer
         }
 
         if ($value instanceof Data || $value instanceof DataCollection) {
-            $value->withPartialsTrees($nestedInclusionTree, $nestedExclusionTree);
+            $value->withPropertyTrees(
+                new PropertyTrees($nestedInclusionTree, $nestedExclusionTree, [], [])
+            );
 
             return $this->transformationType->useTransformers()
                 ? $value->transform($this->transformationType)
