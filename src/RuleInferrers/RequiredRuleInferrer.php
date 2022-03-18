@@ -23,6 +23,10 @@ class RequiredRuleInferrer implements RuleInferrer
             return false;
         }
 
+        if($property->isDataCollection() && in_array('present', $rules)){
+            return false;
+        }
+
         foreach ($rules as $rule) {
             if (in_array($rule, ['boolean', 'nullable'])) {
                 return false;

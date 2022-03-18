@@ -140,7 +140,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
         });
 
         $this->assertEqualsCanonicalizing([
-            'property' => ['required', 'array'],
+            'property' => ['present', 'array'],
             'property.*.string' => ['required', 'string'],
         ], $rules);
 

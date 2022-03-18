@@ -83,7 +83,7 @@ class DataValidationRulesResolverTest extends TestCase
         $this->assertEqualsCanonicalizing([
             'nested' => ['array', 'required'],
             'nested.string' => ['string', 'required', 'min:10', 'max:100'],
-            'collection' => ['array', 'required'],
+            'collection' => ['array', 'present'],
             'collection.*.string' => ['string', 'required', 'min:10', 'max:100'],
         ], $this->resolver->execute($data::class)->all());
     }

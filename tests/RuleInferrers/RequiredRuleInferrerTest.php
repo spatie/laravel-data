@@ -5,10 +5,13 @@ namespace Spatie\LaravelData\Tests\RuleInferrers;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use ReflectionClass;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 
 class RequiredRuleInferrerTest extends TestCase
@@ -104,6 +107,19 @@ class RequiredRuleInferrerTest extends TestCase
         $rules = $this->inferrer->handle($dataProperty, [new Enum('SomeClass')]);
 
         $this->assertEqualsCanonicalizing(['required', new Enum('SomeClass')], $rules);
+    }
+
+    /** @test */
+    public function it_wont_add_required_to_a_data_collection_since_it_is_already_present()
+    {
+        $dataProperty = $this->getProperty(new class () extends Data {
+            #[DataCollectionOf(SimpleData::class)]
+            public DataCollection $collection;
+        });
+
+        $rules = $this->inferrer->handle($dataProperty, ['present', 'array']);
+
+        $this->assertEqualsCanonicalizing(['present', 'array'], $rules);
     }
 
     private function getProperty(object $class): DataProperty
