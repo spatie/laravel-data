@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Mappers;
 
 use Illuminate\Support\Collection;
 
-class NameProvidedMapper implements Mapper
+class ProvidedNameMapper implements NameMapper
 {
     public function __construct(private string|int $name)
     {
