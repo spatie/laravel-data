@@ -33,7 +33,6 @@ use Spatie\LaravelData\Transformers\DataTransformer;
 /**
  * TODO: Make all supporting data structures cachable
  * TODO: A TransformerPipeline?
- * TODO: add support for only and except?
  * TODO: split DataCollection in DataCollection and PaginatedDataCollection
  * TODO: add more context to casts
  * TODO: test multiple from arguments more
