@@ -37,8 +37,7 @@ class DataTransformer
 
     protected function resolvePayload(Data $data): array
     {
-        $inclusionTree = $data->getPropertyTrees()->lazyIncluded;
-        $exclusionTree = $data->getPropertyTrees()->lazyExcluded;
+        $trees = $data->getPropertyTrees();
 
         $allowedIncludes = $this->transformationType->limitIncludesAndExcludes()
             ? $data->allowedRequestIncludes()
@@ -52,18 +51,17 @@ class DataTransformer
 
         return $dataClass
             ->properties
-            ->reduce(function (array $payload, DataProperty $property) use ($dataClass, $allowedExcludes, $allowedIncludes, $data, $exclusionTree, $inclusionTree) {
+            ->reduce(function (array $payload, DataProperty $property) use ($dataClass, $allowedExcludes, $allowedIncludes, $data, $trees) {
                 $name = $property->name;
 
-                if (! $this->shouldIncludeProperty($name, $data->{$name}, $inclusionTree, $exclusionTree, $allowedIncludes, $allowedExcludes)) {
+                if (! $this->shouldIncludeProperty($name, $data->{$name}, $trees, $allowedIncludes, $allowedExcludes)) {
                     return $payload;
                 }
 
                 $value = $this->resolvePropertyValue(
                     $property,
                     $data->{$name},
-                    $inclusionTree[$name] ?? [],
-                    $exclusionTree[$name] ?? []
+                    $trees->getNested($name),
                 );
 
                 if ($value instanceof Undefined) {
@@ -85,8 +83,7 @@ class DataTransformer
     protected function shouldIncludeProperty(
         string $name,
         mixed $value,
-        array $includes,
-        array $excludes,
+        PropertyTrees $trees,
         ?array $allowedIncludes,
         ?array $allowedExcludes,
     ): bool {
@@ -102,11 +99,11 @@ class DataTransformer
             return $value->shouldBeIncluded();
         }
 
-        if ($this->isPropertyExcluded($name, $excludes, $allowedExcludes)) {
+        if ($this->isPropertyExcluded($name, $trees->lazyExcluded, $allowedExcludes)) {
             return false;
         }
 
-        return $this->isPropertyIncluded($name, $value, $includes, $allowedIncludes);
+        return $this->isPropertyIncluded($name, $value, $trees->lazyIncluded, $allowedIncludes);
     }
 
     protected function isPropertyExcluded(
@@ -153,8 +150,7 @@ class DataTransformer
     protected function resolvePropertyValue(
         DataProperty $property,
         mixed $value,
-        array $nestedInclusionTree,
-        array $nestedExclusionTree,
+        PropertyTrees $nestedPropertyTrees
     ): mixed {
         if ($value instanceof Lazy) {
             $value = $value->resolve();
@@ -169,9 +165,7 @@ class DataTransformer
         }
 
         if ($value instanceof Data || $value instanceof DataCollection) {
-            $value->withPropertyTrees(
-                new PropertyTrees($nestedInclusionTree, $nestedExclusionTree, [], [])
-            );
+            $value->withPropertyTrees($nestedPropertyTrees);
 
             return $this->transformationType->useTransformers()
                 ? $value->transform($this->transformationType)
