@@ -154,11 +154,7 @@ class DataTransformer
             return true;
         }
 
-        if (array_key_exists($name, $trees->lazyExcluded ?? [])) {
-            return true;
-        }
-
-        return false;
+        return array_key_exists($name, $trees->lazyExcluded ?? []);
     }
 
     protected function isPropertyLazyIncluded(
