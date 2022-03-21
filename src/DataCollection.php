@@ -105,7 +105,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
         $transformer = new DataCollectionTransformer(
             $this->dataClass,
             $type,
-            $this->getPropertyTrees(),
+            $this->getInclusionTrees(),
             $this->items,
             $this->through,
             $this->filter

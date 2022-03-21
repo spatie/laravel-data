@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Tests;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use DateTime;
+use Generator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
@@ -17,7 +18,7 @@ use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Support\PropertyTrees;
+use Spatie\LaravelData\Support\InclusionTrees;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
@@ -34,6 +35,7 @@ use Spatie\LaravelData\Tests\Fakes\FakeNestedModelData;
 use Spatie\LaravelData\Tests\Fakes\IntersectionTypeData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
+use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\ReadonlyData;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
@@ -86,7 +88,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::new('name')->lazy()->withType('string')
         )->create();
 
-        $data = new $dataClass(Lazy::create(fn () => 'test'));
+        $data = new $dataClass(Lazy::create(fn() => 'test'));
 
         $this->assertEquals([], $data->toArray());
 
@@ -122,8 +124,8 @@ class DataTest extends TestCase
         )->create();
 
         $data = new $dataClass(
-            Lazy::create(fn () => LazyData::from('Hello')),
-            Lazy::create(fn () => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
+            Lazy::create(fn() => LazyData::from('Hello')),
+            Lazy::create(fn() => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
         );
 
         $this->assertEquals([], (clone $data)->toArray());
@@ -166,7 +168,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::dataCollection('songs', MultiLazyData::class)->lazy()
         )->create();
 
-        $collection = Lazy::create(fn () => MultiLazyData::collection([
+        $collection = Lazy::create(fn() => MultiLazyData::collection([
             DummyDto::rick(),
             DummyDto::bon(),
         ]));
@@ -221,7 +223,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
                 );
             }
         };
@@ -247,7 +249,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
                 );
             }
         };
@@ -469,7 +471,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
+        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn() => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'),) extends Data {
             public function __construct(
                 public SimpleData $data,
                 #[DataCollectionOf(SimpleData::class)]
@@ -491,7 +493,7 @@ class DataTest extends TestCase
         $this->assertEquals([
             'data' => $dataObject,
             'dataCollection' => $dataCollection,
-            'lazy' => (new SimpleData('Lazy'))->withPropertyTrees(new PropertyTrees([], [], [], [])),
+            'lazy' => (new SimpleData('Lazy'))->withInclusionTrees(new InclusionTrees([], null, null, null)),
             'string' => 'Test',
             'transformable' => $transformable,
         ], $data->include('lazy')->all());
@@ -528,7 +530,7 @@ class DataTest extends TestCase
 
         $transformed = $data->additional([
             'company' => 'Spatie',
-            'alt_name' => fn (Data $data) => "{$data->name} from Spatie",
+            'alt_name' => fn(Data $data) => "{$data->name} from Spatie",
         ])->toArray();
 
         $this->assertEquals([
@@ -858,7 +860,7 @@ class DataTest extends TestCase
                 #[WithTransformer(ConfidentialDataTransformer::class)]
                 public Data $nestedData,
                 #[WithTransformer(ConfidentialDataCollectionTransformer::class),
-                DataCollectionOf(SimpleData::class)]
+                    DataCollectionOf(SimpleData::class)]
                 public DataCollection $nestedDataCollection,
             ) {
             }
@@ -1054,7 +1056,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_will_not_include_lazy_undefined_values_when_transforming()
     {
-        $data = new class ('Hello World', Lazy::create(fn () => Undefined::make())) extends Data {
+        $data = new class ('Hello World', Lazy::create(fn() => Undefined::make())) extends Data {
             public function __construct(
                 public string $string,
                 public string|Undefined|Lazy $lazy_undefined_string,
@@ -1109,7 +1111,7 @@ class DataTest extends TestCase
                 #[DataCollectionOf(SimpleDataWithMappedProperty::class)]
                 public DataCollection $nested_collection,
                 #[MapOutputName('nested_other_collection'),
-                DataCollectionOf(SimpleDataWithMappedProperty::class)]
+                    DataCollectionOf(SimpleDataWithMappedProperty::class)]
                 public DataCollection $nested_renamed_collection,
             ) {
             }
@@ -1162,5 +1164,238 @@ class DataTest extends TestCase
                 ['string' => 'But not too expensive!'],
             ],
         ], $data->toArray());
+    }
+
+    /**
+     * @test
+     * @dataProvider onlyInclusionDataProvider
+     */
+    public function it_can_include_only_specific_properties_when_transforming(
+        array $directive,
+        array $expectedOnly,
+        array $expectedExcept
+    ) {
+        $dataClass = new class extends Data {
+            public string $first;
+
+            public string $second;
+
+            public MultiData $nested;
+
+            #[DataCollectionOf(MultiData::class)]
+            public DataCollection $collection;
+        };
+
+        $data = $dataClass::from([
+            'first' => 'A',
+            'second' => 'B',
+            'nested' => ['first' => 'C', 'second' => 'D'],
+            'collection' => [
+                ['first' => 'E', 'second' => 'F'],
+                ['first' => 'G', 'second' => 'H'],
+            ],
+        ]);
+
+        $this->assertEquals($expectedOnly, $data->only(...$directive)->toArray());
+        $this->assertEquals($expectedExcept, $data->except(...$directive)->toArray());
+    }
+
+    public function onlyInclusionDataProvider(): Generator
+    {
+        yield 'single' => [
+            'directive' => ['first'],
+            'expectedOnly' => [
+                'first' => 'A',
+            ],
+            'expectedExcept' => [
+                'second' => 'B',
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'multi' => [
+            'directive' => ['first', 'second'],
+            'expectedOnly' => [
+                'first' => 'A',
+                'second' => 'B',
+            ],
+            'expectedExcept' => [
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'multi-2' => [
+            'directive' => ['{first,second}'],
+            'expectedOnly' => [
+                'first' => 'A',
+                'second' => 'B',
+            ],
+            'expectedExcept' => [
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'all' => [
+            'directive' => ['*'],
+            'expectedOnly' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+            'expectedExcept' => [],
+        ];
+
+        yield 'nested' => [
+            'directive' => ['nested'],
+            'expectedOnly' => [
+                'nested' => [],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'nested.single' => [
+            'directive' => ['nested.first'],
+            'expectedOnly' => [
+                'nested' => ['first' => 'C'],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => ['second' => 'D'],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'nested.multi' => [
+            'directive' => ['nested.{first, second}'],
+            'expectedOnly' => [
+                'nested' => ['first' => 'C', 'second' => 'D'],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => [],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'nested-all' => [
+            'directive' => ['nested.*'],
+            'expectedOnly' => [
+                'nested' => ['first' => 'C', 'second' => 'D'],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => [],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'collection' => [
+            'directive' => ['collection'],
+            'expectedOnly' => [
+                'collection' => [
+                    [],
+                    [],
+//                    ['first' => 'E', 'second' => 'F'],
+//                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => ['first' => 'C', 'second' => 'D'],
+            ],
+        ];
+
+        yield 'collection-single' => [
+            'directive' => ['collection.first'],
+            'expectedOnly' => [
+                'collection' => [
+                    ['first' => 'E'],
+                    ['first' => 'G'],
+                ],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    ['second' => 'F'],
+                    ['second' => 'H'],
+                ]
+            ],
+        ];
+
+        yield 'collection-multi' => [
+            'directive' => ['collection.first', 'collection.second'],
+            'expectedOnly' => [
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    [],
+                    [],
+                ]
+            ],
+        ];
+
+        yield 'collection-all' => [
+            'directive' => ['collection.*'],
+            'expectedOnly' => [
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    [],
+                    [],
+                ]
+            ],
+        ];
     }
 }

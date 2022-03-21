@@ -2,7 +2,7 @@
 
 namespace Spatie\LaravelData\Support;
 
-class PropertyTrees
+class InclusionTrees
 {
     public function __construct(
         public ?array $lazyIncluded,
@@ -15,10 +15,10 @@ class PropertyTrees
     public function getNested(string $name): self
     {
         return new self(
-            $this->lazyIncluded[$name] ?? [],
-            $this->lazyExcluded[$name] ?? [],
-            $this->only[$name] ?? [],
-            $this->except[$name] ?? [],
+            $this->lazyIncluded[$name] ?? null,
+            $this->lazyExcluded[$name] ?? null,
+            $this->only[$name] ?? null,
+            $this->except[$name] ?? null,
         );
     }
 }

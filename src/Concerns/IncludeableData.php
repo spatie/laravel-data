@@ -3,11 +3,11 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Spatie\LaravelData\Support\PartialsParser;
-use Spatie\LaravelData\Support\PropertyTrees;
+use Spatie\LaravelData\Support\InclusionTrees;
 
 trait IncludeableData
 {
-    protected ?PropertyTrees $propertyTrees = null;
+    protected ?InclusionTrees $inclusionTrees = null;
 
     protected array $includes = [];
 
@@ -17,10 +17,10 @@ trait IncludeableData
 
     protected array $except = [];
 
-    public function withPropertyTrees(
-        PropertyTrees $propertyTrees,
+    public function withInclusionTrees(
+        InclusionTrees $inclusionTrees,
     ): static {
-        $this->propertyTrees = $propertyTrees;
+        $this->inclusionTrees = $inclusionTrees;
 
         return $this;
     }
@@ -53,17 +53,17 @@ trait IncludeableData
         return $this;
     }
 
-    public function getPropertyTrees(): PropertyTrees
+    public function getInclusionTrees(): InclusionTrees
     {
-        if ($this->propertyTrees) {
-            return $this->propertyTrees;
+        if ($this->inclusionTrees) {
+            return $this->inclusionTrees;
         }
 
-        return new PropertyTrees(
-            (new PartialsParser())->execute($this->includes),
-            (new PartialsParser())->execute($this->excludes),
-            (new PartialsParser())->execute($this->only),
-            (new PartialsParser())->execute($this->except),
+        return new InclusionTrees(
+            !empty($this->includes) ? (new PartialsParser())->execute($this->includes) : null,
+            !empty($this->excludes) ? (new PartialsParser())->execute($this->excludes) : null,
+            !empty($this->only) ? (new PartialsParser())->execute($this->only) : null,
+            !empty($this->except) ? (new PartialsParser())->execute($this->except) : null,
         );
     }
 }
