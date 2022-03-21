@@ -13,6 +13,10 @@ trait IncludeableData
 
     protected array $excludes = [];
 
+    protected array $only = [];
+
+    protected array $except = [];
+
     public function withPropertyTrees(
         PropertyTrees $propertyTrees,
     ): static {
@@ -35,6 +39,20 @@ trait IncludeableData
         return $this;
     }
 
+    public function only(string ...$only): static
+    {
+        $this->only = array_unique(array_merge($this->only, $only));
+
+        return $this;
+    }
+
+    public function except(string ...$except): static
+    {
+        $this->except = array_unique(array_merge($this->except, $except));
+
+        return $this;
+    }
+
     public function getPropertyTrees(): PropertyTrees
     {
         if ($this->propertyTrees) {
@@ -44,8 +62,8 @@ trait IncludeableData
         return new PropertyTrees(
             (new PartialsParser())->execute($this->includes),
             (new PartialsParser())->execute($this->excludes),
-            [],
-            []
+            (new PartialsParser())->execute($this->only),
+            (new PartialsParser())->execute($this->except),
         );
     }
 }

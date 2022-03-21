@@ -11,4 +11,14 @@ class PropertyTrees
         public ?array $except,
     ) {
     }
+
+    public function getNested(string $name): self
+    {
+        return new self(
+            $this->lazyIncluded[$name] ?? [],
+            $this->lazyExcluded[$name] ?? [],
+            $this->only[$name] ?? [],
+            $this->except[$name] ?? [],
+        );
+    }
 }
