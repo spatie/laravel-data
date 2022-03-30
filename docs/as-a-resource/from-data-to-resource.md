@@ -351,3 +351,33 @@ Now each transformed data object contains an `endpoints` key with all the endpoi
     }
 }
 ```
+
+## Omitting properties
+
+It is possible to conditionnaly omit properties, which can be useful when not wanting to expose certain properties. 
+
+To achieve this, you can extend `excludeWhen` method, which should return an array. In the following example, `id` will be excluded from the resource unless the authenticated user is an administrator.
+
+```php
+class UserData extends Data
+{
+    public function __construct(
+        public int $id,
+        public string $name,
+    ) {
+    }
+    
+    public function excludeWhen(): array
+    {
+        return [
+          'id' => !auth()->user()?->is_admin
+        ];
+    }
+}
+```
+
+Alternatively, you can use the `except` method to omit properties at runtime:
+
+```php
+UserData::from($user)->exclude('id', 'password');
+```
