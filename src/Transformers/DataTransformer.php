@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Transformers;
 
+use Illuminate\Support\Arr;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
@@ -25,10 +26,10 @@ class DataTransformer
 
     public function transform(Data $data): array
     {
-        return array_merge(
+        return Arr::except(array_merge(
             $this->resolvePayload($data),
             $data->getAdditionalData()
-        );
+        ), $data->getExcludedData());
     }
 
     protected function resolvePayload(Data $data): array

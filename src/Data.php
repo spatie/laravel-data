@@ -12,6 +12,7 @@ use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Enumerable;
 use JsonSerializable;
 use Spatie\LaravelData\Concerns\AppendableData;
+use Spatie\LaravelData\Concerns\ExcludeableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\ValidateableData;
@@ -25,6 +26,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
 {
     use ResponsableData;
     use IncludeableData;
+    use ExcludeableData;
     use AppendableData;
     use ValidateableData;
 

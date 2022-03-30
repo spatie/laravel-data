@@ -975,4 +975,138 @@ class DataTest extends TestCase
         $this->assertEquals('string', $data->string);
         $this->assertTrue(Carbon::create(2020, 05, 16, 12, 00, 00)->equalTo($data->date));
     }
+
+    /** @test */
+    public function it_can_conditionally_exclude_properties()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                public ?int $id = null,
+                public ?string $name = null,
+            ) {
+            }
+
+            public function excludeWhen(): array
+            {
+                return [
+                    'id' => true,
+                    'name' => false,
+                ];
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Taylor',
+        ])->toArray());
+    }
+
+    /** @test */
+    public function it_can_conditionally_exclude_properties_with_a_callback()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                public ?int $id = null,
+                public ?string $name = null,
+            ) {
+            }
+
+            public function excludeWhen(): array
+            {
+                return [
+                    'id' => fn () => $this->name === 'Taylor',
+                ];
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Taylor',
+        ])->toArray());
+
+        $this->assertEquals([
+            'id' => 1,
+            'name' => 'Freek',
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Freek',
+        ])->toArray());
+    }
+
+    /** @test */
+    public function it_can_exclude_properties_at_runtime()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                public ?int $id = null,
+                public ?string $name = null,
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Taylor',
+        ])->except('id')->toArray());
+    }
+
+    /** @test */
+    public function it_can_exclude_nested_array_properties()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                public ?int $id = null,
+                public ?string $name = null,
+                public ?array $more = null
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+            'more' => [
+                'last_name' => 'Otwell',
+            ],
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Taylor',
+            'more' => [
+                'last_name' => 'Otwell',
+                'twitter_verified' => false,
+            ],
+        ])->except('id', 'more.twitter_verified')->toArray());
+    }
+
+    /** @test */
+    public function it_can_exclude_nested_data_properties()
+    {
+        $more = new class ('Otwell', false) extends Data {
+            public function __construct(
+                public string $last_name,
+                public bool $twitter_verified,
+            ) {
+            }
+        };
+
+        $data = new class ('Taylor', $more) extends Data {
+            public function __construct(
+                public string $name,
+                public Data $more,
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+            'more' => [
+                'last_name' => 'Otwell',
+            ],
+        ], $data->except('id', 'more.twitter_verified')->toArray());
+    }
 }
