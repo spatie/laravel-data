@@ -20,13 +20,12 @@ trait ExcludeableData
 
     public function getExcludedData(): array
     {
-        $exclusions = array_keys(array_filter($this->excludeWhen(), function ($value) {
-            $value = $value instanceof \Closure
+        $exclusions = array_keys(array_filter(
+            $this->excludeWhen(),
+            fn ($value) => $value instanceof \Closure
                 ? ($value)($this)
-                : $value;
-
-            return $value;
-        }));
+                : $value
+        ));
 
         return array_merge($exclusions, $this->except);
     }
