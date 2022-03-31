@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests\Support;
 
 use ReflectionParameter;
-use Spatie\BetterTypes\Type;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataType;

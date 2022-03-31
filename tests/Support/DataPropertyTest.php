@@ -2,9 +2,7 @@
 
 namespace Spatie\LaravelData\Tests\Support;
 
-use Countable;
 use Generator;
-use Illuminate\Contracts\Support\Arrayable;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
@@ -18,9 +16,7 @@ use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
-use Spatie\LaravelData\Tests\Fakes\IntersectionTypeData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;

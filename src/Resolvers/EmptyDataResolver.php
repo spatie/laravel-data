@@ -38,7 +38,7 @@ class EmptyDataResolver
             throw DataPropertyCanOnlyHaveOneType::create($property);
         }
 
-        if($property->type->acceptsType('array')){
+        if ($property->type->acceptsType('array')) {
             return [];
         }
 

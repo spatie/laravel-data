@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support;
 
 use ReflectionParameter;
-use Spatie\BetterTypes\Type;
 
 class DataParameter
 {
