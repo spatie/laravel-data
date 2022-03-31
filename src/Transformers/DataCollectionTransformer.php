@@ -9,7 +9,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\PartialTrees;
-use Spatie\LaravelData\Support\TransformationType;
 
 class DataCollectionTransformer
 {

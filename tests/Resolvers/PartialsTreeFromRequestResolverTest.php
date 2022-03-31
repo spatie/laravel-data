@@ -14,7 +14,7 @@ class PartialsTreeFromRequestResolverTest extends TestCase
 {
     private PartialsTreeFromRequestResolver $resolver;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -30,15 +30,14 @@ class PartialsTreeFromRequestResolverTest extends TestCase
         ?array $dataAllowedIncludes,
         ?string $requestedAllowedIncludes,
         ?array $expectedIncludes
-    )
-    {
+    ) {
         LazyData::$allowedIncludes = $lazyDataAllowedIncludes;
 
-        $data = new class(
+        $data = new class (
             'Hello',
             LazyData::from('Hello'),
             LazyData::collection(['Hello', 'World'])
-        ) extends Data{
+        ) extends Data {
             public static ?array $allowedIncludes;
 
             public function __construct(
@@ -46,8 +45,7 @@ class PartialsTreeFromRequestResolverTest extends TestCase
                 public LazyData $nested,
                 #[DataCollectionOf(LazyData::class)]
                 public DataCollection $collection,
-            )
-            {
+            ) {
             }
 
             public static function allowedRequestIncludes(): ?array
@@ -60,9 +58,9 @@ class PartialsTreeFromRequestResolverTest extends TestCase
 
         $request = request();
 
-        if($requestedAllowedIncludes !== null){
+        if ($requestedAllowedIncludes !== null) {
             $request->merge([
-                'include' => $requestedAllowedIncludes
+                'include' => $requestedAllowedIncludes,
             ]);
         }
 
@@ -76,11 +74,11 @@ class PartialsTreeFromRequestResolverTest extends TestCase
 
     public function allowedIncludesDataProvider(): Generator
     {
-        yield 'disallowed property inclusion' =>  [
+        yield 'disallowed property inclusion' => [
             'lazyDataAllowedIncludes' => [],
             'dataAllowedIncludes' => [],
             'requestedIncludes' => 'property',
-            'expectedIncludes' => []
+            'expectedIncludes' => [],
         ];
 
         yield 'allowed property inclusion' => [
@@ -88,8 +86,8 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'dataAllowedIncludes' => ['property'],
             'requestedIncludes' => 'property',
             'expectedIncludes' => [
-                'property' => []
-            ]
+                'property' => [],
+            ],
         ];
 
         yield 'allowed data property inclusion without nesting' => [
@@ -97,8 +95,8 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'dataAllowedIncludes' => ['nested'],
             'requestedIncludes' => 'nested.name',
             'expectedIncludes' => [
-                'nested' => []
-            ]
+                'nested' => [],
+            ],
         ];
 
         yield 'allowed data property inclusion with nesting' => [
@@ -107,9 +105,9 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'requestedIncludes' => 'nested.name',
             'expectedIncludes' => [
                 'nested' => [
-                    'name' => []
-                ]
-            ]
+                    'name' => [],
+                ],
+            ],
         ];
 
         yield 'allowed data collection property inclusion without nesting' => [
@@ -117,8 +115,8 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'dataAllowedIncludes' => ['collection'],
             'requestedIncludes' => 'collection.name',
             'expectedIncludes' => [
-                'collection' => []
-            ]
+                'collection' => [],
+            ],
         ];
 
         yield 'allowed data collection property inclusion with nesting' => [
@@ -127,9 +125,9 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'requestedIncludes' => 'collection.name',
             'expectedIncludes' => [
                 'collection' => [
-                    'name' => []
-                ]
-            ]
+                    'name' => [],
+                ],
+            ],
         ];
 
         yield 'allowed nested data property inclusion without defining allowed includes on nested' => [
@@ -138,9 +136,9 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'requestedIncludes' => 'nested.name',
             'expectedIncludes' => [
                 'nested' => [
-                    'name' => []
-                ]
-            ]
+                    'name' => [],
+                ],
+            ],
         ];
 
         yield 'allowed all nested data property inclusion without defining allowed includes on nested' => [
@@ -148,8 +146,8 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'dataAllowedIncludes' => ['nested'],
             'requestedIncludes' => 'nested.*',
             'expectedIncludes' => [
-                'nested' => ['*']
-            ]
+                'nested' => ['*'],
+            ],
         ];
 
         yield 'disallowed all nested data property inclusion ' => [
@@ -157,8 +155,8 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'dataAllowedIncludes' => ['nested'],
             'requestedIncludes' => 'nested.*',
             'expectedIncludes' => [
-                'nested' => []
-            ]
+                'nested' => [],
+            ],
         ];
 
         yield 'multi property inclusion' => [
@@ -167,15 +165,15 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'requestedIncludes' => 'nested.*,property',
             'expectedIncludes' => [
                 'property' => [],
-                'nested' => ['*']
-            ]
+                'nested' => ['*'],
+            ],
         ];
 
         yield 'without property inclusion' => [
             'lazyDataAllowedIncludes' => null,
             'dataAllowedIncludes' => ['nested', 'property'],
             'requestedIncludes' => null,
-            'expectedIncludes' => null
+            'expectedIncludes' => null,
         ];
     }
 }

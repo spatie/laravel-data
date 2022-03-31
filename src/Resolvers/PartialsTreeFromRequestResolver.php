@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\PartialsParser;
+use Spatie\LaravelData\Support\PartialTrees;
 
 class PartialsTreeFromRequestResolver
 {

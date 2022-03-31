@@ -492,7 +492,7 @@ class DataTest extends TestCase
         ]));
 
         $this->assertEquals([
-            'first_name' => 'Ruben'
+            'first_name' => 'Ruben',
         ], $response->getData(true));
 
         OnlyData::$allowedOnly = null;
@@ -503,7 +503,7 @@ class DataTest extends TestCase
 
         $this->assertEquals([
             'first_name' => 'Ruben',
-            'last_name' => 'Van Assche'
+            'last_name' => 'Van Assche',
         ], $response->getData(true));
     }
 
@@ -518,7 +518,7 @@ class DataTest extends TestCase
 
         $this->assertEquals([
             'first_name' => 'Ruben',
-            'last_name' => 'Van Assche'
+            'last_name' => 'Van Assche',
         ], $response->getData(true));
 
         ExceptData::$allowedExcept = ['first_name'];
@@ -528,7 +528,7 @@ class DataTest extends TestCase
         ]));
 
         $this->assertEquals([
-            'last_name' => 'Van Assche'
+            'last_name' => 'Van Assche',
         ], $response->getData(true));
 
         ExceptData::$allowedExcept = null;
