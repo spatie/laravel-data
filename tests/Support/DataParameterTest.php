@@ -6,6 +6,7 @@ use ReflectionParameter;
 use Spatie\BetterTypes\Type;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataParameter;
+use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Tests\TestCase;
 
 class DataParameterTest extends TestCase
@@ -30,7 +31,7 @@ class DataParameterTest extends TestCase
         $this->assertFalse($parameter->isPromoted);
         $this->assertFalse($parameter->hasDefaultValue);
         $this->assertNull($parameter->defaultValue);
-        $this->assertEquals(new Type($reflection->getType()), $parameter->types);
+        $this->assertEquals(DataType::create($reflection), $parameter->type);
 
         $reflection = new ReflectionParameter([$class::class, '__construct'], 'withoutType');
         $parameter = DataParameter::create($reflection);
@@ -39,7 +40,7 @@ class DataParameterTest extends TestCase
         $this->assertTrue($parameter->isPromoted);
         $this->assertFalse($parameter->hasDefaultValue);
         $this->assertNull($parameter->defaultValue);
-        $this->assertEquals(new Type($reflection->getType()), $parameter->types);
+        $this->assertEquals(DataType::create($reflection), $parameter->type);
 
         $reflection = new ReflectionParameter([$class::class, '__construct'], 'property');
         $parameter = DataParameter::create($reflection);
@@ -48,7 +49,7 @@ class DataParameterTest extends TestCase
         $this->assertTrue($parameter->isPromoted);
         $this->assertFalse($parameter->hasDefaultValue);
         $this->assertNull($parameter->defaultValue);
-        $this->assertEquals(new Type($reflection->getType()), $parameter->types);
+        $this->assertEquals(DataType::create($reflection), $parameter->type);
 
         $reflection = new ReflectionParameter([$class::class, '__construct'], 'propertyWithDefault');
         $parameter = DataParameter::create($reflection);
@@ -57,6 +58,6 @@ class DataParameterTest extends TestCase
         $this->assertTrue($parameter->isPromoted);
         $this->assertTrue($parameter->hasDefaultValue);
         $this->assertEquals('hello', $parameter->defaultValue);
-        $this->assertEquals(new Type($reflection->getType()), $parameter->types);
+        $this->assertEquals(DataType::create($reflection), $parameter->type);
     }
 }

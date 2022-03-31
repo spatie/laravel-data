@@ -47,12 +47,12 @@ class CastPropertiesDataPipe extends DataPipe
             return $cast->cast($property, $value);
         }
 
-        if ($property->isDataObject) {
-            return $property->dataClass::from($value);
+        if ($property->type->isDataObject) {
+            return $property->type->dataClass::from($value);
         }
 
-        if ($property->isDataCollection) {
-            return $property->dataClass::collection($value);
+        if ($property->type->isDataCollection) {
+            return $property->type->dataClass::collection($value);
         }
 
         return $value;
@@ -66,6 +66,6 @@ class CastPropertiesDataPipe extends DataPipe
             return true;
         }
 
-        return $property->types->canBe($type);
+        return $property->type->acceptsType($type);
     }
 }

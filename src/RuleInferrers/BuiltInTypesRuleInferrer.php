@@ -10,27 +10,27 @@ class BuiltInTypesRuleInferrer implements RuleInferrer
 {
     public function handle(DataProperty $property, array $rules): array
     {
-        if ($property->types->canBe('int')) {
+        if ($property->type->acceptsType('int')) {
             $rules[] = 'numeric';
         }
 
-        if ($property->types->canBe('string')) {
+        if ($property->type->acceptsType('string')) {
             $rules[] = 'string';
         }
 
-        if ($property->types->canBe('bool')) {
+        if ($property->type->acceptsType('bool')) {
             $rules[] = 'boolean';
         }
 
-        if ($property->types->canBe('float')) {
+        if ($property->type->acceptsType('float')) {
             $rules[] = 'numeric';
         }
 
-        if ($property->types->canBe('array')) {
+        if ($property->type->acceptsType('array')) {
             $rules[] = 'array';
         }
 
-        if ($enumClass = $property->types->getImplementedType(BackedEnum::class)) {
+        if ($enumClass = $property->type->findAcceptedTypeForClass(BackedEnum::class)) {
             $rules[] = new Enum($enumClass);
         }
 

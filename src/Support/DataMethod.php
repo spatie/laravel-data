@@ -39,8 +39,8 @@ class DataMethod
     public function accepts(mixed ...$input): bool
     {
         $types = array_is_list($input)
-            ? $this->parameters->map(fn (DataParameter $parameter) => $parameter->types)
-            : $this->parameters->mapWithKeys(fn (DataParameter $parameter) => [$parameter->name => $parameter->types]);
+            ? $this->parameters->map(fn (DataParameter $parameter) => $parameter->type)
+            : $this->parameters->mapWithKeys(fn (DataParameter $parameter) => [$parameter->name => $parameter->type]);
 
         if (count($input) !== $this->parameters->count()) {
             return false;
@@ -49,7 +49,7 @@ class DataMethod
         foreach ($types as $index => $type) {
             $currentInput = $input[$index] ?? null;
 
-            if (! $type->accepts($currentInput)) {
+            if (! $type->acceptsValue($currentInput)) {
                 return false;
             }
         }

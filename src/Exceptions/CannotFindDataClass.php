@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Exceptions;
 
 use Exception;
 
-class CannotFindDataTypeForProperty extends Exception
+class CannotFindDataClass extends Exception
 {
     public static function noDataReferenceFound(string $class, string $propertyName): self
     {
@@ -19,5 +19,10 @@ class CannotFindDataTypeForProperty extends Exception
     public static function wrongDataCollectionAnnotation(string $class, string $propertyName): self
     {
         return new self("Data collection property `{$propertyName}` in `{$class}` has an annotation that isn't a data object or is missing an annotation");
+    }
+
+    public static function cannotReadReflectionParameterDocblock(string $class, string $parameter): self
+    {
+        return new self("Data collection reflection parameter `{$parameter}` in `{$class}::__constructor` has an annotation that isn't a data object or is missing an annotation");
     }
 }
