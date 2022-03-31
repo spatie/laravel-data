@@ -28,7 +28,7 @@ class DataMethod
         return new self(
             $method->name,
             collect($method->getParameters())->map(
-                fn(ReflectionParameter $parameter) => DataParameter::create($parameter),
+                fn (ReflectionParameter $parameter) => DataParameter::create($parameter),
             ),
             $method->isStatic(),
             $method->isPublic(),
@@ -38,7 +38,7 @@ class DataMethod
 
     public static function createConstructor(?ReflectionMethod $method, Collection $properties): ?static
     {
-        if($method === null){
+        if ($method === null) {
             return null;
         }
 
@@ -62,8 +62,8 @@ class DataMethod
     public function accepts(mixed ...$input): bool
     {
         $types = array_is_list($input)
-            ? $this->parameters->map(fn(DataParameter|DataProperty $parameter) => $parameter->type)
-            : $this->parameters->mapWithKeys(fn(DataParameter|DataProperty $parameter) => [$parameter->name => $parameter->type]);
+            ? $this->parameters->map(fn (DataParameter|DataProperty $parameter) => $parameter->type)
+            : $this->parameters->mapWithKeys(fn (DataParameter|DataProperty $parameter) => [$parameter->name => $parameter->type]);
 
         if (count($input) !== $this->parameters->count()) {
             return false;
