@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Http\JsonResponse;
 use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
-use Spatie\LaravelData\Support\TransformationType;
 
 trait ResponsableData
 {

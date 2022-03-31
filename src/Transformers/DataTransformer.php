@@ -7,10 +7,9 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\RelationalLazy;
-use Spatie\LaravelData\Support\TransformationType;
+use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Undefined;
 
 class DataTransformer

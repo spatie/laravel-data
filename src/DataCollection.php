@@ -22,7 +22,6 @@ use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\InvalidDataCollectionModification;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
-use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 
 /**

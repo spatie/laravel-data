@@ -27,7 +27,6 @@ use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
-use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Transformers\DataTransformer;
 
 /**

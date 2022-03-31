@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests\Fakes;
 
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
 
 class ExceptData extends Data
 {
