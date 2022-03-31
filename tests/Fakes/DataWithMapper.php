@@ -8,7 +8,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 
-#[MapName(SnakeCaseMapper::class, SnakeCaseMapper::class)]
+#[MapName(SnakeCaseMapper::class)]
 class DataWithMapper extends Data
 {
     public string $casedProperty;

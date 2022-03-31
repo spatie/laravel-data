@@ -18,18 +18,24 @@ class DataPropertyValidationRulesResolver
 
     public function execute(DataProperty $property, bool $nullable = false): Collection
     {
+        $propertyName = $property->inputMappedName ?? $property->name;
+
         if ($property->isDataObject || $property->isDataCollection) {
-            return $this->getNestedRules($property, $nullable);
+            return $this->getNestedRules($property, $propertyName, $nullable);
         }
 
-        return collect([$property->name => $this->getRulesForProperty($property, $nullable)]);
+        return collect([$propertyName => $this->getRulesForProperty($property, $nullable)]);
     }
 
-    private function getNestedRules(DataProperty $property, bool $nullable): Collection
+    private function getNestedRules(
+        DataProperty $property,
+        string $propertyName,
+        bool $nullable
+    ): Collection
     {
         $prefix = match (true) {
-            $property->isDataObject => "{$property->name}.",
-            $property->isDataCollection => "{$property->name}.*.",
+            $property->isDataObject => "{$propertyName}.",
+            $property->isDataCollection => "{$propertyName}.*.",
             default => throw new TypeError()
         };
 
@@ -50,7 +56,7 @@ class DataPropertyValidationRulesResolver
             ->mapWithKeys(fn (array $rules, string $name) => [
                 "{$prefix}{$name}" => $rules,
             ])
-            ->prepend([$toplevelRule, 'array'], $property->name);
+            ->prepend([$toplevelRule, 'array'], $propertyName);
     }
 
     private function getRulesForProperty(DataProperty $property, bool $nullable): array
