@@ -41,8 +41,8 @@ class DataProperty
         public readonly mixed $defaultValue,
         public readonly ?Cast $cast,
         public readonly ?Transformer $transformer,
-        public readonly ?NameMapper $inputNameMapper,
-        public readonly ?NameMapper $outputNameMapper,
+        public readonly ?string $inputMappedName,
+        public readonly ?string $outputMappedName,
         /** @var class-string<\Spatie\LaravelData\Data> */
         public readonly ?string $dataClass,
         public readonly Collection $attributes,
@@ -53,25 +53,42 @@ class DataProperty
     public static function create(
         ReflectionProperty $property,
         bool $hasDefaultValue = false,
-        mixed $defaultValue = null
+        mixed $defaultValue = null,
+        ?NameMapper $classInputNameMapper = null,
+        ?NameMapper $classOutputNameMapper = null,
     ) {
         $type = $property->getType();
 
         $attributes = collect($property->getAttributes())->map(
-            fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
+            fn(ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
         );
+
+        $mappers = NameMappersResolver::create()->execute($attributes);
+
+        $inputMappedName = match (true) {
+            $mappers['inputNameMapper'] !== null => $mappers['inputNameMapper']->map($property->name),
+            $classInputNameMapper !== null => $classInputNameMapper->map($property->name),
+            default => null,
+        };
+
+        $outputMappedName = match (true) {
+            $mappers['outputNameMapper'] !== null => $mappers['outputNameMapper']->map($property->name),
+            $classOutputNameMapper !== null => $classOutputNameMapper->map($property->name),
+            default => null,
+        };
 
         $parameters = [
             'name' => $property->name,
             'className' => $property->class,
-            'validate' => ! $attributes->contains(fn (object $attribute) => $attribute instanceof WithoutValidation),
+            'validate' => ! $attributes->contains(fn(object $attribute) => $attribute instanceof WithoutValidation),
             'isPromoted' => $property->isPromoted(),
             'hasDefaultValue' => $property->isPromoted() ? $hasDefaultValue : $property->hasDefaultValue(),
             'defaultValue' => $property->isPromoted() ? $defaultValue : $property->getDefaultValue(),
-            'cast' => $attributes->first(fn (object $attribute) => $attribute instanceof WithCast)?->get(),
-            'transformer' => $attributes->first(fn (object $attribute) => $attribute instanceof WithTransformer)?->get(),
+            'cast' => $attributes->first(fn(object $attribute) => $attribute instanceof WithCast)?->get(),
+            'transformer' => $attributes->first(fn(object $attribute) => $attribute instanceof WithTransformer)?->get(),
             'attributes' => $attributes,
-            ...NameMappersResolver::create()->execute($attributes),
+            'inputMappedName' => $inputMappedName,
+            'outputMappedName' => $outputMappedName,
         ];
 
         $specificParameters = match (true) {
@@ -192,7 +209,7 @@ class DataProperty
         ReflectionProperty $property,
         Collection $attributes,
     ): string {
-        if ($dataCollectionOf = $attributes->first(fn (object $attribute) => $attribute instanceof DataCollectionOf)) {
+        if ($dataCollectionOf = $attributes->first(fn(object $attribute) => $attribute instanceof DataCollectionOf)) {
             return $dataCollectionOf->class;
         }
 

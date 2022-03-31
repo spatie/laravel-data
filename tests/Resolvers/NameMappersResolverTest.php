@@ -8,9 +8,9 @@ use ReflectionProperty;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\MapOutputName;
-use Spatie\LaravelData\Mappers\CamelToSnakeCaseNameMapper;
+use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
-use Spatie\LaravelData\Mappers\SnakeToCamelCaseNameMapper;
+use Spatie\LaravelData\Mappers\CamelCaseMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Tests\TestCase;
 
@@ -130,16 +130,33 @@ class NameMappersResolverTest extends TestCase
     public function it_can_map_a_mapper_class()
     {
         $attributes = $this->getAttributes(new class () {
-            #[MapName(SnakeToCamelCaseNameMapper::class, CamelToSnakeCaseNameMapper::class)]
+            #[MapName(CamelCaseMapper::class, SnakeCaseMapper::class)]
             public $property;
         });
 
         $this->assertEquals(
             [
-                'inputNameMapper' => new SnakeToCamelCaseNameMapper(),
-                'outputNameMapper' => new CamelToSnakeCaseNameMapper(),
+                'inputNameMapper' => new CamelCaseMapper(),
+                'outputNameMapper' => new SnakeCaseMapper(),
             ],
             $this->resolver->execute($attributes)
+        );
+    }
+
+    /** @test */
+    public function it_can_ignore_certain_mapper_types()
+    {
+        $attributes = $this->getAttributes(new class () {
+            #[MapInputName('input'), MapOutputName(CamelCaseMapper::class)]
+            public $property;
+        });
+
+        $this->assertEquals(
+            [
+                'inputNameMapper' => null,
+                'outputNameMapper' => new CamelCaseMapper(),
+            ],
+            NameMappersResolver::create([ProvidedNameMapper::class])->execute($attributes)
         );
     }
 

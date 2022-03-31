@@ -6,10 +6,10 @@ use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Mappers\CamelToSnakeCaseNameMapper;
-use Spatie\LaravelData\Mappers\SnakeToCamelCaseNameMapper;
+use Spatie\LaravelData\Mappers\SnakeCaseMapper;
+use Spatie\LaravelData\Mappers\CamelCaseMapper;
 
-#[MapName(SnakeToCamelCaseNameMapper::class, CamelToSnakeCaseNameMapper::class)]
+#[MapName(SnakeCaseMapper::class, SnakeCaseMapper::class)]
 class DataWithMapper extends Data
 {
     public string $casedProperty;

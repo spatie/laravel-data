@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
+use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
@@ -254,14 +255,25 @@ class DataPropertyTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_the_map_from_attribute()
+    public function it_can_get_the_mapped_input_name()
     {
         $helper = $this->resolveHelper(new class () {
             #[MapInputName('other')]
             public SimpleData $property;
         });
 
-        $this->assertEquals(new ProvidedNameMapper('other'), $helper->inputNameMapper);
+        $this->assertEquals('other', $helper->inputMappedName);
+    }
+
+    /** @test */
+    public function it_can_get_the_mapped_output_name()
+    {
+        $helper = $this->resolveHelper(new class () {
+            #[MapOutputName('other')]
+            public SimpleData $property;
+        });
+
+        $this->assertEquals('other', $helper->outputMappedName);
     }
 
     /** @test */

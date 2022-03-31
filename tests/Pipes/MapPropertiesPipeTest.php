@@ -6,7 +6,8 @@ use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Mappers\SnakeToCamelCaseNameMapper;
+use Spatie\LaravelData\Mappers\CamelCaseMapper;
+use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
@@ -129,7 +130,7 @@ class MapPropertiesPipeTest extends TestCase
     public function it_can_use_a_dedicated_mapper()
     {
         $dataClass = new class () extends Data {
-            #[MapInputName(SnakeToCamelCaseNameMapper::class)]
+            #[MapInputName(SnakeCaseMapper::class)]
             public string $mappedLine;
         };
 
