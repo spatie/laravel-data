@@ -33,11 +33,17 @@ class DataClassTest extends TestCase
     {
         $class = DataClass::create(new ReflectionClass(SimpleData::class));
 
-        $this->assertArrayHasKey('__construct', $class->methods);
-        $this->assertInstanceOf(DataMethod::class, $class->methods->get('__construct'));
-
         $this->assertArrayHasKey('fromString', $class->methods);
         $this->assertInstanceOf(DataMethod::class, $class->methods->get('fromString'));
+    }
+
+    /** @test */
+    public function it_will_provide_information_about_the_constrcutor()
+    {
+        $class = DataClass::create(new ReflectionClass(SimpleData::class));
+
+        $this->assertNotNull($class->constructorMethod);
+        $this->assertInstanceOf(DataMethod::class, $class->constructorMethod);
     }
 
     /** @test */
