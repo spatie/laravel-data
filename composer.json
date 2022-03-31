@@ -19,7 +19,6 @@
         "php": "^8.1",
         "illuminate/contracts": "^8.71|^9.0",
         "phpdocumentor/type-resolver": "^1.5",
-        "spatie/better-types": "^0.1.1",
         "spatie/laravel-package-tools": "^1.9.0"
     },
     "require-dev": {
@@ -56,7 +55,10 @@
         "format": "vendor/bin/php-cs-fixer fix --allow-risky=yes"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": false
+        }
     },
     "extra": {
         "laravel": {

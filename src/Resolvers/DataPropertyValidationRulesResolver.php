@@ -20,7 +20,7 @@ class DataPropertyValidationRulesResolver
     {
         $propertyName = $property->inputMappedName ?? $property->name;
 
-        if ($property->isDataObject || $property->isDataCollection) {
+        if ($property->type->isDataObject || $property->type->isDataCollection) {
             return $this->getNestedRules($property, $propertyName, $nullable);
         }
 
@@ -33,24 +33,24 @@ class DataPropertyValidationRulesResolver
         bool $nullable
     ): Collection {
         $prefix = match (true) {
-            $property->isDataObject => "{$propertyName}.",
-            $property->isDataCollection => "{$propertyName}.*.",
+            $property->type->isDataObject => "{$propertyName}.",
+            $property->type->isDataCollection => "{$propertyName}.*.",
             default => throw new TypeError()
         };
 
-        $isNullable = $nullable || $property->isNullable;
+        $isNullable = $nullable || $property->type->isNullable;
 
         $toplevelRule = match (true) {
             $isNullable => 'nullable',
-            $property->isDataObject => "required",
-            $property->isDataCollection => "present",
+            $property->type->isDataObject => "required",
+            $property->type->isDataCollection => "present",
             default => throw new TypeError()
         };
 
         return $this->dataValidationRulesResolver
             ->execute(
-                $property->dataClass,
-                $nullable || ($property->isDataObject && $property->isNullable)
+                $property->type->dataClass,
+                $nullable || ($property->type->isDataObject && $property->type->isNullable)
             )
             ->mapWithKeys(fn (array $rules, string $name) => [
                 "{$prefix}{$name}" => $rules,

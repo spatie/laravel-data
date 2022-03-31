@@ -19,11 +19,11 @@ class RequiredRuleInferrer implements RuleInferrer
 
     protected function shouldAddRule(DataProperty $property, array $rules): bool
     {
-        if ($property->isNullable || $property->isUndefinable) {
+        if ($property->type->isNullable || $property->type->isUndefinable) {
             return false;
         }
 
-        if ($property->isDataCollection && in_array('present', $rules)) {
+        if ($property->type->isDataCollection && in_array('present', $rules)) {
             return false;
         }
 

@@ -8,7 +8,7 @@ class NullableRuleInferrer implements RuleInferrer
 {
     public function handle(DataProperty $property, array $rules): array
     {
-        if ($property->isNullable && ! in_array('nullable', $rules)) {
+        if ($property->type->isNullable && ! in_array('nullable', $rules)) {
             $rules[] = 'nullable';
         }
 

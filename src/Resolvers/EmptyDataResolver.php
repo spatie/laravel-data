@@ -30,30 +30,28 @@ class EmptyDataResolver
 
     private function getValueForProperty(DataProperty $property): mixed
     {
-        if ($property->types->isEmpty()) {
+        if ($property->type->isMixed) {
             return null;
         }
 
-        if ($property->types->count() > 1) {
+        if ($property->type->count() > 1) {
             throw DataPropertyCanOnlyHaveOneType::create($property);
         }
 
-        $type = $property->types->first();
-
-        if ($type === 'array') {
+        if($property->type->acceptsType('array')){
             return [];
         }
 
-        if ($property->isDataObject) {
+        if ($property->type->isDataObject) {
             /** @var \Spatie\LaravelData\Data $type */
-            return $type::empty();
+            return $property->type->dataClass::empty();
         }
 
-        if ($property->isDataCollection) {
+        if ($property->type->isDataCollection) {
             return [];
         }
 
-        if (is_a($type, Traversable::class, true)) {
+        if ($property->type->acceptsType(Traversable::class)) {
             return [];
         }
 

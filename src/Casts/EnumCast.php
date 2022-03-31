@@ -16,7 +16,7 @@ class EnumCast implements Cast
 
     public function cast(DataProperty $property, mixed $value): BackedEnum | Uncastable
     {
-        $type = $this->type ?? $this->findType($property);
+        $type = $this->type ?? $property->type->findAcceptedTypeForClass(BackedEnum::class);
 
         if ($type === null) {
             return Uncastable::create();
@@ -28,16 +28,5 @@ class EnumCast implements Cast
         } catch (Throwable $e) {
             throw CannotCastEnum::create($type, $value);
         }
-    }
-
-    protected function findType(DataProperty $property): ?string
-    {
-        foreach ($property->types->all() as $type) {
-            if (is_a($type, BackedEnum::class, true)) {
-                return (string) $type;
-            }
-        }
-
-        return null;
     }
 }

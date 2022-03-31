@@ -110,12 +110,12 @@ class PartialsTreeFromRequestResolver
                 continue;
             }
 
-            $checkNested = $properties[$requestedPartial]?->isDataObject
-                || $properties[$requestedPartial]?->isDataCollection;
+            $checkNested = $properties[$requestedPartial]?->type?->isDataObject
+                || $properties[$requestedPartial]?->type?->isDataCollection;
 
             if ($checkNested) {
                 $requestedPartialsTree[$requestedPartial] = $this->{$methodName}(
-                    $properties[$requestedPartial]->dataClass,
+                    $properties[$requestedPartial]->type->dataClass,
                     $nested
                 );
             }

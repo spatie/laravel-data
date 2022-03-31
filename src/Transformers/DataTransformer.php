@@ -194,7 +194,7 @@ class DataTransformer
         $transformer = $property->transformer ?? $this->config->findGlobalTransformerForValue($value);
 
         $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
-            && ($property->isDataObject || $property->isDataCollection);
+            && ($property->type->isDataObject || $property->type->isDataCollection);
 
         if ($shouldUseDefaultDataTransformer) {
             return null;

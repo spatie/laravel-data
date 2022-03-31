@@ -12,7 +12,7 @@ class DataParameter
         public readonly bool $isPromoted,
         public readonly bool $hasDefaultValue,
         public readonly mixed $defaultValue,
-        public readonly Type $types,
+        public readonly DataType $type,
     ) {
     }
 
@@ -26,7 +26,7 @@ class DataParameter
             $parameter->isPromoted(),
             $hasDefaultValue,
             $hasDefaultValue ? $parameter->getDefaultValue() : null,
-            Type::new($parameter),
+            DataType::create($parameter),
         );
     }
 }
