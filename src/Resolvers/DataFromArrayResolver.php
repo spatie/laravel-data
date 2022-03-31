@@ -18,10 +18,10 @@ class DataFromArrayResolver
     {
         $dataClass = $this->dataConfig->getDataClass($class);
 
-        $constructorParameters = $dataClass->methods->get('__construct')?->parameters ?? collect();
+        $constructorParameters = $dataClass->constructorMethod?->parameters ?? collect();
 
         $data = $constructorParameters
-            ->mapWithKeys(function (DataParameter $parameter) use ($properties) {
+            ->mapWithKeys(function (DataParameter|DataProperty $parameter) use ($properties) {
                 if ($properties->has($parameter->name)) {
                     return [$parameter->name => $properties->get($parameter->name)];
                 }
@@ -32,12 +32,12 @@ class DataFromArrayResolver
 
                 return [];
             })
-            ->pipe(fn (Collection $parameters) => new $dataClass->name(...$parameters));
+            ->pipe(fn(Collection $parameters) => new $dataClass->name(...$parameters));
 
         $dataClass
             ->properties
             ->filter(
-                fn (DataProperty $property) => ! $property->isPromoted && $properties->has($property->name)
+                fn(DataProperty $property) => ! $property->isPromoted && $properties->has($property->name)
             )
             ->each(function (DataProperty $property) use ($properties, $data) {
                 $data->{$property->name} = $properties->get($property->name);
