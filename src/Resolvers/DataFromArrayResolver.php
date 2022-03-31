@@ -32,12 +32,12 @@ class DataFromArrayResolver
 
                 return [];
             })
-            ->pipe(fn(Collection $parameters) => new $dataClass->name(...$parameters));
+            ->pipe(fn (Collection $parameters) => new $dataClass->name(...$parameters));
 
         $dataClass
             ->properties
             ->filter(
-                fn(DataProperty $property) => ! $property->isPromoted && $properties->has($property->name)
+                fn (DataProperty $property) => ! $property->isPromoted && $properties->has($property->name)
             )
             ->each(function (DataProperty $property) use ($properties, $data) {
                 $data->{$property->name} = $properties->get($property->name);
