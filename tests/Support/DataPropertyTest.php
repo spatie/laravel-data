@@ -17,7 +17,6 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotFindDataTypeForProperty;
 use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\DataPropertyTypes;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;

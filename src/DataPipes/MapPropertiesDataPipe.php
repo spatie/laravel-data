@@ -4,9 +4,6 @@ namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Exceptions\InvalidDataClassMapper;
-use Spatie\LaravelData\Mappers\NameMapper;
-use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Support\DataClass;
 
 class MapPropertiesDataPipe extends DataPipe

@@ -8,9 +8,9 @@ use ReflectionProperty;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\MapOutputName;
-use Spatie\LaravelData\Mappers\SnakeCaseMapper;
-use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Mappers\CamelCaseMapper;
+use Spatie\LaravelData\Mappers\ProvidedNameMapper;
+use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Tests\TestCase;
 

@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests\Support;
 
 use ReflectionClass;
-use Spatie\LaravelData\Mappers\CamelCaseMapper;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Tests\DataWithDefaults;
