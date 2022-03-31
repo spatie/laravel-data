@@ -62,12 +62,12 @@ class DataClass
 
         return collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
             ->reject(fn (ReflectionProperty $property) => $property->isStatic())
-            ->map(fn (ReflectionProperty $property) => DataProperty::create(
+            ->values()
+            ->mapWithKeys(fn (ReflectionProperty $property) => [$property->name => DataProperty::create(
                 $property,
                 array_key_exists($property->getName(), $defaultValues),
                 $defaultValues[$property->getName()] ?? null,
-            ))
-            ->values();
+            )]);
     }
 
 

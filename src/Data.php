@@ -31,12 +31,13 @@ use Spatie\LaravelData\Support\TransformationType;
 use Spatie\LaravelData\Transformers\DataTransformer;
 
 /**
- * TODO: Make all supporting data structures cachable
- * TODO: A TransformerPipeline?
+ * TODO: Make all supporting data structures cachable -> we'll add caching later on
+ * TODO: A TransformerPipeline? -> no
  * TODO: split DataCollection in DataCollection and PaginatedDataCollection
  * TODO: add more context to casts
  * TODO: test multiple from arguments more
  * TODO: replace DataPropertyTypes and Types with one custom solution
+ * TODO: validation rules should take MapFrom attributes into account
  * TODO: test the pipeline
  */
 abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastable, JsonSerializable
@@ -94,19 +95,19 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
         return app(EmptyDataResolver::class)->execute(static::class, $extra);
     }
 
-    public function transform(TransformationType $type): array
+    public function transform(bool $transformValues): array
     {
-        return DataTransformer::create($type)->transform($this);
+        return DataTransformer::create($transformValues)->transform($this);
     }
 
     public function all(): array
     {
-        return $this->transform(TransformationType::withoutValueTransforming());
+        return $this->transform(false);
     }
 
     public function toArray(): array
     {
-        return $this->transform(TransformationType::full());
+        return $this->transform(true);
     }
 
     public function toJson($options = 0): string

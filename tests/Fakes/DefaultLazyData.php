@@ -7,7 +7,7 @@ use Spatie\LaravelData\Lazy;
 
 class DefaultLazyData extends Data
 {
-    public static ?array $allowedExcludes = null;
+    public static ?array $allowedExcludes;
 
     public function __construct(
         public string | Lazy $name
@@ -21,7 +21,7 @@ class DefaultLazyData extends Data
         );
     }
 
-    public function allowedRequestExcludes(): ?array
+    public static function allowedRequestExcludes(): ?array
     {
         return self::$allowedExcludes;
     }

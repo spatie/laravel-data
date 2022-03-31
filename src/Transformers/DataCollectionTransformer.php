@@ -8,15 +8,15 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Support\InclusionTrees;
+use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\TransformationType;
 
 class DataCollectionTransformer
 {
     public function __construct(
         protected string $dataClass,
-        protected TransformationType $transformationType,
-        protected InclusionTrees $inclusionTrees,
+        protected bool $transformValues,
+        protected PartialTrees $trees,
         protected Enumerable|CursorPaginator|Paginator $items,
         protected ?Closure $through,
         protected ?Closure $filter,
@@ -33,7 +33,7 @@ class DataCollectionTransformer
             $this->transformItemClosure()
         );
 
-        return $this->transformationType->useTransformers()
+        return $this->transformValues
             ? $this->wrapPaginatedArray($this->items->toArray())
             : $this->items->all();
     }
@@ -46,8 +46,8 @@ class DataCollectionTransformer
                 fn (Enumerable $collection) => $collection->filter($this->filter)->values()
             )
             ->when(
-                $this->transformationType->useTransformers(),
-                fn (Enumerable $collection) => $collection->map(fn (Data $data) => $data->transform($this->transformationType))
+                $this->transformValues,
+                fn (Enumerable $collection) => $collection->map(fn (Data $data) => $data->transform($this->transformValues))
             )
             ->all();
     }
@@ -55,7 +55,7 @@ class DataCollectionTransformer
     protected function transformItemClosure(): Closure
     {
         return function (Data $item) {
-            $item->withInclusionTrees($this->inclusionTrees);
+            $item->withPartialTrees($this->trees);
 
             if ($this->through) {
                 $item = ($this->through)($item);

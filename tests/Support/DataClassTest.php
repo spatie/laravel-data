@@ -38,7 +38,7 @@ class DataClassTest extends TestCase
     public function it_will_populate_defaults_to_properties_when_they_exist()
     {
         /** @var \Spatie\LaravelData\Support\DataProperty[] $properties */
-        $properties = DataClass::create(new ReflectionClass(DataWithDefaults::class))->properties;
+        $properties = DataClass::create(new ReflectionClass(DataWithDefaults::class))->properties->values();
 
         $this->assertEquals('property', $properties[0]->name);
         $this->assertFalse($properties[0]->hasDefaultValue);

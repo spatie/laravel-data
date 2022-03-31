@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Http\JsonResponse;
+use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
 use Spatie\LaravelData\Support\TransformationType;
 
 trait ResponsableData
@@ -14,23 +15,29 @@ trait ResponsableData
      */
     public function toResponse($request)
     {
-        if ($request->has('include')) {
-            $this->include(...explode(',', $request->get('include')));
-        }
+        $this->withPartialTrees(
+            resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request)
+        );
 
-        if ($request->has('exclude')) {
-            $this->exclude(...explode(',', $request->get('exclude')));
-        }
-
-        return new JsonResponse($this->transform(TransformationType::request()));
+        return new JsonResponse($this->toArray());
     }
 
-    public function allowedRequestIncludes(): ?array
+    public static function allowedRequestIncludes(): ?array
     {
         return null;
     }
 
-    public function allowedRequestExcludes(): ?array
+    public static function allowedRequestExcludes(): ?array
+    {
+        return null;
+    }
+
+    public static function allowedRequestOnly(): ?array
+    {
+        return null;
+    }
+
+    public static function allowedRequestExcept(): ?array
     {
         return null;
     }
