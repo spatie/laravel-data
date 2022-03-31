@@ -49,7 +49,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
      * @param array|Enumerable<array-key, TValue>|CursorPaginator<TValue>|Paginator $items
      */
     public function __construct(
-        private string $dataClass,
+        public readonly string $dataClass,
         Enumerable|array|CursorPaginator|Paginator|DataCollection $items
     ) {
         $this->items = match (true) {
@@ -96,16 +96,16 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * @param \Spatie\LaravelData\Support\TransformationType $type
+     * @param bool $transformValues
      *
      * @return array<array>
      */
-    public function transform(TransformationType $type): array
+    public function transform(bool $transformValues): array
     {
         $transformer = new DataCollectionTransformer(
             $this->dataClass,
-            $type,
-            $this->getInclusionTrees(),
+            $transformValues,
+            $this->getPartialTrees(),
             $this->items,
             $this->through,
             $this->filter
@@ -119,7 +119,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
      */
     public function all(): array
     {
-        return $this->transform(TransformationType::withoutValueTransforming());
+        return $this->transform(false);
     }
 
     /**
@@ -127,7 +127,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
      */
     public function toArray(): array
     {
-        return $this->transform(TransformationType::full());
+        return $this->transform(true);
     }
 
     public function toJson($options = 0): string
@@ -156,7 +156,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
     /**  @return \ArrayIterator<array-key, array> */
     public function getIterator(): ArrayIterator
     {
-        return new ArrayIterator($this->transform(TransformationType::withoutValueTransforming()));
+        return new ArrayIterator($this->transform(false));
     }
 
     public function count(): int

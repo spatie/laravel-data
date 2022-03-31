@@ -138,6 +138,6 @@ class RequiredRuleInferrerTest extends TestCase
     {
         $dataClass = DataClass::create(new ReflectionClass($class));
 
-        return $dataClass->properties[0];
+        return $dataClass->properties->first();
     }
 }

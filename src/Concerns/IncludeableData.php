@@ -3,11 +3,11 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Spatie\LaravelData\Support\PartialsParser;
-use Spatie\LaravelData\Support\InclusionTrees;
+use Spatie\LaravelData\Support\PartialTrees;
 
 trait IncludeableData
 {
-    protected ?InclusionTrees $inclusionTrees = null;
+    protected ?PartialTrees $partialTrees = null;
 
     protected array $includes = [];
 
@@ -17,10 +17,10 @@ trait IncludeableData
 
     protected array $except = [];
 
-    public function withInclusionTrees(
-        InclusionTrees $inclusionTrees,
+    public function withPartialTrees(
+        PartialTrees $partialTrees,
     ): static {
-        $this->inclusionTrees = $inclusionTrees;
+        $this->partialTrees = $partialTrees;
 
         return $this;
     }
@@ -53,13 +53,13 @@ trait IncludeableData
         return $this;
     }
 
-    public function getInclusionTrees(): InclusionTrees
+    public function getPartialTrees(): PartialTrees
     {
-        if ($this->inclusionTrees) {
-            return $this->inclusionTrees;
+        if ($this->partialTrees) {
+            return $this->partialTrees;
         }
 
-        return new InclusionTrees(
+        return new PartialTrees(
             !empty($this->includes) ? (new PartialsParser())->execute($this->includes) : null,
             !empty($this->excludes) ? (new PartialsParser())->execute($this->excludes) : null,
             !empty($this->only) ? (new PartialsParser())->execute($this->only) : null,

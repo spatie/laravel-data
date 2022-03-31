@@ -2,7 +2,7 @@
 
 namespace Spatie\LaravelData\Support;
 
-class InclusionTrees
+class PartialTrees
 {
     public function __construct(
         public ?array $lazyIncluded,

@@ -185,17 +185,21 @@ class DataCollectionTest extends TestCase
     /** @test */
     public function it_can_dynamically_include_data_based_upon_the_request()
     {
-        $response = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request());
+        LazyData::$allowedIncludes = [''];
 
-        $includedResponse = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
-            'include' => 'name',
-        ]));
+        $response = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request());
 
         $this->assertEquals([
             [],
             [],
             [],
         ], $response->getData(true));
+
+        LazyData::$allowedIncludes = ['name'];
+
+        $includedResponse = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+            'include' => 'name',
+        ]));
 
         $this->assertEquals(
             [
@@ -250,11 +254,9 @@ class DataCollectionTest extends TestCase
     /** @test */
     public function it_can_dynamically_exclude_data_based_upon_the_request()
     {
-        $response = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request());
+        DefaultLazyData::$allowedExcludes = [];
 
-        $excludedResponse = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
-            'exclude' => 'name',
-        ]));
+        $response = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request());
 
         $this->assertEquals(
             [
@@ -264,6 +266,12 @@ class DataCollectionTest extends TestCase
             ],
             $response->getData(true)
         );
+
+        DefaultLazyData::$allowedExcludes = ['name'];
+
+        $excludedResponse = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+            'exclude' => 'name',
+        ]));
 
         $this->assertEquals([
             [],
