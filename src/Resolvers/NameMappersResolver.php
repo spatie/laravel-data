@@ -33,8 +33,8 @@ class NameMappersResolver
         Collection $attributes
     ): ?NameMapper {
         /** @var \Spatie\LaravelData\Attributes\MapInputName&\Spatie\LaravelData\Attributes\MapName|null $mapper */
-        $mapper = $attributes->first(fn(object $attribute) => $attribute instanceof MapInputName)
-            ?? $attributes->first(fn(object $attribute) => $attribute instanceof MapName);
+        $mapper = $attributes->first(fn (object $attribute) => $attribute instanceof MapInputName)
+            ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName);
 
         if ($mapper) {
             return $this->resolveMapper($mapper->input);
@@ -47,8 +47,8 @@ class NameMappersResolver
         Collection $attributes
     ): ?NameMapper {
         /** @var \Spatie\LaravelData\Attributes\MapOutputName&\Spatie\LaravelData\Attributes\MapName|null $mapper */
-        $mapper = $attributes->first(fn(object $attribute) => $attribute instanceof MapOutputName)
-            ?? $attributes->first(fn(object $attribute) => $attribute instanceof MapName);
+        $mapper = $attributes->first(fn (object $attribute) => $attribute instanceof MapOutputName)
+            ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName);
 
         if ($mapper) {
             return $this->resolveMapper($mapper->output);

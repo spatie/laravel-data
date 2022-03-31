@@ -60,7 +60,7 @@ class DataProperty
         $type = $property->getType();
 
         $attributes = collect($property->getAttributes())->map(
-            fn(ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
+            fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
         );
 
         $mappers = NameMappersResolver::create()->execute($attributes);
@@ -80,12 +80,12 @@ class DataProperty
         $parameters = [
             'name' => $property->name,
             'className' => $property->class,
-            'validate' => ! $attributes->contains(fn(object $attribute) => $attribute instanceof WithoutValidation),
+            'validate' => ! $attributes->contains(fn (object $attribute) => $attribute instanceof WithoutValidation),
             'isPromoted' => $property->isPromoted(),
             'hasDefaultValue' => $property->isPromoted() ? $hasDefaultValue : $property->hasDefaultValue(),
             'defaultValue' => $property->isPromoted() ? $defaultValue : $property->getDefaultValue(),
-            'cast' => $attributes->first(fn(object $attribute) => $attribute instanceof WithCast)?->get(),
-            'transformer' => $attributes->first(fn(object $attribute) => $attribute instanceof WithTransformer)?->get(),
+            'cast' => $attributes->first(fn (object $attribute) => $attribute instanceof WithCast)?->get(),
+            'transformer' => $attributes->first(fn (object $attribute) => $attribute instanceof WithTransformer)?->get(),
             'attributes' => $attributes,
             'inputMappedName' => $inputMappedName,
             'outputMappedName' => $outputMappedName,
@@ -209,7 +209,7 @@ class DataProperty
         ReflectionProperty $property,
         Collection $attributes,
     ): string {
-        if ($dataCollectionOf = $attributes->first(fn(object $attribute) => $attribute instanceof DataCollectionOf)) {
+        if ($dataCollectionOf = $attributes->first(fn (object $attribute) => $attribute instanceof DataCollectionOf)) {
             return $dataCollectionOf->class;
         }
 
