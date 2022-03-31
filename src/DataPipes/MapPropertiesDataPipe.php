@@ -13,36 +13,16 @@ class MapPropertiesDataPipe extends DataPipe
 {
     public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
     {
-        $classMapper = $this->resolveClassMapper($class);
-
         foreach ($class->properties as $dataProperty) {
-            /** @var \Spatie\LaravelData\Support\DataProperty $dataProperty */
-            $mapper = $dataProperty->inputNameMapper ?? $classMapper;
-
-            if ($mapper === null) {
+            if ($dataProperty->inputMappedName === null) {
                 continue;
             }
 
-            $mapped = $mapper->map($dataProperty->name);
-
-            if (Arr::has($properties, $mapped)) {
-                $properties->put($dataProperty->name, Arr::get($properties, $mapped));
+            if (Arr::has($properties, $dataProperty->inputMappedName)) {
+                $properties->put($dataProperty->name, Arr::get($properties, $dataProperty->inputMappedName));
             }
         }
 
         return $properties;
-    }
-
-    private function resolveClassMapper(DataClass $class): ?NameMapper
-    {
-        if ($class->inputNameMapper === null) {
-            return null;
-        }
-
-        if ($class->inputNameMapper instanceof ProvidedNameMapper) {
-            InvalidDataClassMapper::create($class);
-        }
-
-        return $class->inputNameMapper;
     }
 }

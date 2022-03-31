@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Mappers;
 
 use Illuminate\Support\Str;
 
-class CamelToSnakeCaseNameMapper implements NameMapper
+class CamelCaseMapper implements NameMapper
 {
     public function map(int|string $name): string|int
     {
@@ -13,10 +13,5 @@ class CamelToSnakeCaseNameMapper implements NameMapper
         }
 
         return Str::camel($name);
-    }
-
-    public function inverse(): NameMapper
-    {
-        return new SnakeToCamelCaseNameMapper();
     }
 }

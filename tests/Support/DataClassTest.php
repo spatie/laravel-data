@@ -3,7 +3,7 @@
 namespace Spatie\LaravelData\Tests\Support;
 
 use ReflectionClass;
-use Spatie\LaravelData\Mappers\SnakeToCamelCaseNameMapper;
+use Spatie\LaravelData\Mappers\CamelCaseMapper;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Tests\DataWithDefaults;
@@ -16,9 +16,16 @@ class DataClassTest extends TestCase
     /** @test */
     public function it_keeps_track_of_a_global_map_from_attribute()
     {
+        $dataClass = DataClass::create(new ReflectionClass(DataWithMapper::class));
+
         $this->assertEquals(
-            new SnakeToCamelCaseNameMapper(),
-            DataClass::create(new ReflectionClass(DataWithMapper::class))->inputNameMapper,
+            'cased_property',
+            $dataClass->properties->get('casedProperty')->inputMappedName
+        );
+
+        $this->assertEquals(
+            'cased_property',
+            $dataClass->properties->get('casedProperty')->outputMappedName
         );
     }
 

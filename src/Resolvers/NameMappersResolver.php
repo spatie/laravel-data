@@ -11,9 +11,13 @@ use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 
 class NameMappersResolver
 {
-    public static function create(): static
+    public static function create(array $ignoredMappers = []): static
     {
-        return new self();
+        return new self($ignoredMappers);
+    }
+
+    public function __construct(private array $ignoredMappers = [])
+    {
     }
 
     public function execute(
@@ -29,8 +33,8 @@ class NameMappersResolver
         Collection $attributes
     ): ?NameMapper {
         /** @var \Spatie\LaravelData\Attributes\MapInputName&\Spatie\LaravelData\Attributes\MapName|null $mapper */
-        $mapper = $attributes->first(fn (object $attribute) => $attribute instanceof MapInputName)
-            ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName);
+        $mapper = $attributes->first(fn(object $attribute) => $attribute instanceof MapInputName)
+            ?? $attributes->first(fn(object $attribute) => $attribute instanceof MapName);
 
         if ($mapper) {
             return $this->resolveMapper($mapper->input);
@@ -43,8 +47,8 @@ class NameMappersResolver
         Collection $attributes
     ): ?NameMapper {
         /** @var \Spatie\LaravelData\Attributes\MapOutputName&\Spatie\LaravelData\Attributes\MapName|null $mapper */
-        $mapper = $attributes->first(fn (object $attribute) => $attribute instanceof MapOutputName)
-            ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName);
+        $mapper = $attributes->first(fn(object $attribute) => $attribute instanceof MapOutputName)
+            ?? $attributes->first(fn(object $attribute) => $attribute instanceof MapName);
 
         if ($mapper) {
             return $this->resolveMapper($mapper->output);
@@ -53,13 +57,21 @@ class NameMappersResolver
         return null;
     }
 
-    private function resolveMapper(string|int $value): NameMapper
+    private function resolveMapper(string|int $value): ?NameMapper
     {
-        return match (true) {
+        $mapper = match (true) {
             is_int($value) => new ProvidedNameMapper($value),
             is_a($value, NameMapper::class, true) => resolve($value),
             is_string($value) => new ProvidedNameMapper($value),
             default => null,
         };
+
+        foreach ($this->ignoredMappers as $ignoredMapper) {
+            if ($mapper instanceof $ignoredMapper) {
+                return null;
+            }
+        }
+
+        return $mapper;
     }
 }

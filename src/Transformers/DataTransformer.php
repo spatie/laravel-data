@@ -59,10 +59,8 @@ class DataTransformer
                     return $payload;
                 }
 
-                $mapper = $property->outputNameMapper ?? $dataClass->outputNameMapper;
-
-                if ($mapper) {
-                    $name = $mapper->inverse()->map($name);
+                if ($property->outputMappedName) {
+                    $name = $property->outputMappedName;
                 }
 
                 $payload[$name] = $value;
