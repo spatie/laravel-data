@@ -3,13 +3,9 @@
 namespace Spatie\LaravelData\Support;
 
 use Countable;
-use Illuminate\Support\Collection;
-use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
-use ReflectionType;
-use ReflectionUnionType;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;

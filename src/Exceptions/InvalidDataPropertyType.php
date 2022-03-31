@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Exceptions;
 use Exception;
 use ReflectionParameter;
 use ReflectionProperty;
-use Spatie\LaravelData\Support\DataProperty;
 
 class InvalidDataPropertyType extends Exception
 {
