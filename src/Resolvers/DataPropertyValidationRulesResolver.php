@@ -31,8 +31,7 @@ class DataPropertyValidationRulesResolver
         DataProperty $property,
         string $propertyName,
         bool $nullable
-    ): Collection
-    {
+    ): Collection {
         $prefix = match (true) {
             $property->isDataObject => "{$propertyName}.",
             $property->isDataCollection => "{$propertyName}.*.",
