@@ -126,6 +126,28 @@ class SongData extends Data
 ```
 Rules defined within the `rules` method will always overwrite automatically generated rules.
 
+You can even add dependencies to be automatically injected:
+```php
+use SongSettingsRepository;
+
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        public string $artist,
+    ) {
+    }
+    
+    public static function rules(SongSettingsRepository $settings): array
+    {
+        return [
+            'title' => [new RequiredIf($settings->forUser(auth()->user())->title_required), new StringType()],
+            'artist' => [new Required(), new StringType()],
+        ];
+    }
+}
+```
+
 ## Mapping a request onto a data object
 
 By default, the package will do a one to one mapping from request to the data object, which means that for each property within the data object, a value with the same key will be searched within the request values.
@@ -297,6 +319,28 @@ class SongData extends Data
     }
 }
 ```
+You can also provide dependencies to be injected:
+
+```php
+use SongSettingsRepository;
+
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        public string $artist,
+    ) {
+    }
+
+    public static function messages(SongSettingsRepository $repository): array
+    {
+        return [
+            'title.required' => 'A '. $repository->forUser(auth()->user())->title_word .' is required',
+            'artist.required' => 'An artist is required',
+        ];
+    }
+}
+```
 
 ### Overwriting attributes
 
@@ -317,6 +361,28 @@ class SongData extends Data
             'title' => 'titel',
             'artist' => 'artiest',
         ];
+    }
+}
+```
+
+You can also provide dependencies to be injected:
+
+```php
+use SongSettingsRepository;
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        public string $artist,
+    ) {
+    }
+
+    public static function attributes(SongSettingsRepository $repository): array
+    {
+        return [
+            'title' => 'titel',
+            'artist' => 'artiest',
+        ] + $repository->getAttributes();
     }
 }
 ```
