@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Util\Exception;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
@@ -147,22 +146,24 @@ class DataFromSomethingResolverTest extends TestCase
         $this->assertNull($data::optional(null));
     }
     /** @test */
-    public function it_can_resolve_validation_dependencies_for_messages(){
+    public function it_can_resolve_validation_dependencies_for_messages()
+    {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn() => $requestMock);
+        $this->app->bind(Request::class, fn () => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
-            public static function rules(){
+            public static function rules()
+            {
                 return [
-                    'name' => ['required']
+                    'name' => ['required'],
                 ];
             }
             public static function messages(Request $request): array
             {
                 return [
-                    'name.required' => $request->input('key') === 'value' ? 'Name is required' : 'Bad'
+                    'name.required' => $request->input('key') === 'value' ? 'Name is required' : 'Bad',
                 ];
             }
         };
@@ -171,22 +172,24 @@ class DataFromSomethingResolverTest extends TestCase
         $data::validate(['name' => '']);
     }
     /** @test */
-    public function it_can_resolve_validation_dependencies_for_attributes(){
+    public function it_can_resolve_validation_dependencies_for_attributes()
+    {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn() => $requestMock);
+        $this->app->bind(Request::class, fn () => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
-            public static function rules(){
+            public static function rules()
+            {
                 return [
-                    'name' => ['required']
+                    'name' => ['required'],
                 ];
             }
             public static function attributes(Request $request): array
             {
                 return [
-                    'name' => $request->input('key') === 'value' ? 'Another name' : 'Bad'
+                    'name' => $request->input('key') === 'value' ? 'Another name' : 'Bad',
                 ];
             }
         };

@@ -18,7 +18,7 @@ class DataValidationRulesResolver
 
         $overWrittenRules = [];
         /** @var class-string<\Spatie\LaravelData\Data> $class */
-        if(method_exists($class, 'rules')) {
+        if (method_exists($class, 'rules')) {
             $overWrittenRules = app()->call([$class, 'rules']);
         }
 
