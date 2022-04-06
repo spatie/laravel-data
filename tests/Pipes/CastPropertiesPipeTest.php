@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Tests\Fakes\BuiltInTypeWithCastData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DateCastData;
