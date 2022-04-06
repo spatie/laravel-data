@@ -23,6 +23,7 @@ use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
+use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
@@ -1236,6 +1237,27 @@ class DataTest extends TestCase
                 ['string' => 'But not too expensive!'],
             ],
         ], $data->toArray());
+    }
+
+    /** @test */
+    public function it_can_use_context_in_casts_based_upon_the_properties_of_the_data_object()
+    {
+        $dataClass = new class extends Data{
+            public SimpleData $nested;
+
+            public string $string;
+
+            #[WithCast(ContextAwareCast::class)]
+            public string $casted;
+        };
+
+        $data = $dataClass::from([
+            'nested' => 'Hello',
+            'string' => 'world',
+            'casted' => 'json:'
+        ]);
+
+        $this->assertEquals('json:+{"nested":"Hello","string":"world","casted":"json:"}', $data->casted);
     }
 
     /**

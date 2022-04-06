@@ -15,7 +15,7 @@ class DateTimeInterfaceCast implements Cast
     ) {
     }
 
-    public function cast(DataProperty $property, mixed $value): DateTimeInterface | Uncastable
+    public function cast(DataProperty $property, mixed $value, array $context): DateTimeInterface | Uncastable
     {
         $format = $this->format ?? config('data.date_format');
 

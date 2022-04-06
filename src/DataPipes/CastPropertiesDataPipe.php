@@ -18,6 +18,8 @@ class CastPropertiesDataPipe extends DataPipe
 
     public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
     {
+        $castContext = $properties->all();
+
         foreach ($properties as $name => $value) {
             $dataProperty = $class->properties->first(fn (DataProperty $dataProperty) => $dataProperty->name === $name);
 
@@ -29,22 +31,26 @@ class CastPropertiesDataPipe extends DataPipe
                 continue;
             }
 
-            $properties[$name] = $this->cast($dataProperty, $value);
+            $properties[$name] = $this->cast($dataProperty, $value, $castContext);
         }
 
         return $properties;
     }
 
-    private function cast(DataProperty $property, mixed $value): mixed
+    private function cast(
+        DataProperty $property,
+        mixed $value,
+        array $castContext,
+    ): mixed
     {
         $shouldCast = $this->shouldBeCasted($property, $value);
 
         if ($shouldCast && $cast = $property->cast) {
-            return $cast->cast($property, $value);
+            return $cast->cast($property, $value, $castContext);
         }
 
         if ($shouldCast && $cast = $this->dataConfig->findGlobalCastForProperty($property)) {
-            return $cast->cast($property, $value);
+            return $cast->cast($property, $value, $castContext);
         }
 
         if ($property->type->isDataObject) {
