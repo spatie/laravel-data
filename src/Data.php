@@ -34,9 +34,7 @@ use Spatie\LaravelData\Transformers\DataTransformer;
  * TODO: split DataCollection in DataCollection and PaginatedDataCollection
  * TODO: test multiple from arguments more
  * TODO: update the typescript transformer with new property data objects
- * TODO: test better types structure to be working all right
  * TODO: add support for wrapping data objects and collections within keys
- * TODO: allow the usage of native enums without casts
  */
 abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastable, JsonSerializable
 {
