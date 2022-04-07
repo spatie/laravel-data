@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 1.4.6 - 2022-04-06
+
+- Add Dependency Injection for rules, messages, and attributes methods (#114)
+
 ## 1.4.5 - 2022-03-18
 
 - Add support for stdClass payload casting (#106)
