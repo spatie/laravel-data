@@ -1278,6 +1278,64 @@ class DataTest extends TestCase
         ], $data->all());
     }
 
+    /** @test */
+    public function it_can_magically_create_a_data_object()
+    {
+        $dataClass = new class('', '') extends Data{
+            public function __construct(
+                public mixed $propertyA,
+                public mixed $propertyB,
+            )
+            {
+            }
+
+            public static function fromStringWithDefault(string $a, string $b = 'World')
+            {
+                return new self($a, $b);
+            }
+
+            public static function fromIntsWithDefault(int $a, int $b)
+            {
+                return new self($a, $b);
+            }
+
+            public static function fromSimpleDara(SimpleData $data)
+            {
+                return new self($data->string, $data->string);
+            }
+
+            public static function fromData(Data $data)
+            {
+                return new self('data', json_encode($data));
+            }
+        };
+
+        $this->assertEquals(
+            new $dataClass('Hello', 'World'),
+            $dataClass::from('Hello')
+        );
+
+        $this->assertEquals(
+            new $dataClass('Hello', 'World'),
+            $dataClass::from('Hello', 'World')
+        );
+
+        $this->assertEquals(
+            new $dataClass(42, 69),
+            $dataClass::from(42, 69)
+        );
+
+        $this->assertEquals(
+            new $dataClass('Hello', 'Hello'),
+            $dataClass::from(SimpleData::from('Hello'))
+        );
+
+        $this->assertEquals(
+            new $dataClass('data', '{"enum":"foo"}'),
+            $dataClass::from(new EnumData(DummyBackedEnum::FOO))
+        );
+    }
+
     /**
      * @test
      * @dataProvider onlyInclusionDataProvider

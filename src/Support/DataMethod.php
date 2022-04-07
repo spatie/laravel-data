@@ -28,7 +28,7 @@ class DataMethod
         return new self(
             $method->name,
             collect($method->getParameters())->map(
-                fn (ReflectionParameter $parameter) => DataParameter::create($parameter),
+                fn(ReflectionParameter $parameter) => DataParameter::create($parameter),
             ),
             $method->isStatic(),
             $method->isPublic(),
@@ -61,19 +61,27 @@ class DataMethod
 
     public function accepts(mixed ...$input): bool
     {
-        /** @var \Spatie\LaravelData\Support\DataType[] $types */
-        $types = array_is_list($input)
-            ? $this->parameters->map(fn (DataParameter|DataProperty $parameter) => $parameter->type)
-            : $this->parameters->mapWithKeys(fn (DataParameter|DataProperty $parameter) => [$parameter->name => $parameter->type]);
+        /** @var array<\Spatie\LaravelData\Support\DataParameter|\Spatie\LaravelData\Support\DataProperty> $parameters */
+        $parameters = array_is_list($input)
+            ? $this->parameters
+            : $this->parameters->mapWithKeys(fn(DataParameter|DataProperty $parameter) => [$parameter->name => $parameter]);
 
-        if (count($input) !== $this->parameters->count()) {
+        if (count($input) > $parameters->count()) {
             return false;
         }
 
-        foreach ($types as $index => $type) {
-            $currentInput = $input[$index] ?? null;
+        foreach ($parameters as $index => $parameter) {
+            $parameterProvided = array_key_exists($index, $input);
 
-            if (! $type->acceptsValue($currentInput)) {
+            if (! $parameterProvided && $parameter->hasDefaultValue === false) {
+                return false;
+            }
+
+            if (! $parameterProvided && $parameter->hasDefaultValue) {
+                continue;
+            }
+
+            if (! $parameter->type->acceptsValue($input[$index])) {
                 return false;
             }
         }
