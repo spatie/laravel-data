@@ -28,7 +28,7 @@ class DataMethod
         return new self(
             $method->name,
             collect($method->getParameters())->map(
-                fn(ReflectionParameter $parameter) => DataParameter::create($parameter),
+                fn (ReflectionParameter $parameter) => DataParameter::create($parameter),
             ),
             $method->isStatic(),
             $method->isPublic(),
@@ -64,7 +64,7 @@ class DataMethod
         /** @var array<\Spatie\LaravelData\Support\DataParameter|\Spatie\LaravelData\Support\DataProperty> $parameters */
         $parameters = array_is_list($input)
             ? $this->parameters
-            : $this->parameters->mapWithKeys(fn(DataParameter|DataProperty $parameter) => [$parameter->name => $parameter]);
+            : $this->parameters->mapWithKeys(fn (DataParameter|DataProperty $parameter) => [$parameter->name => $parameter]);
 
         if (count($input) > $parameters->count()) {
             return false;
