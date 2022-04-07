@@ -21,7 +21,7 @@ class CastPropertiesDataPipe extends DataPipe
         $castContext = $properties->all();
 
         foreach ($properties as $name => $value) {
-            $dataProperty = $class->properties->first(fn(DataProperty $dataProperty) => $dataProperty->name === $name);
+            $dataProperty = $class->properties->first(fn (DataProperty $dataProperty) => $dataProperty->name === $name);
 
             if ($dataProperty === null) {
                 continue;

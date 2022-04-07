@@ -2,11 +2,9 @@
 
 namespace Spatie\LaravelData\Support;
 
-use BackedEnum;
 use ReflectionClass;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Transformers\Transformer;
-use StringBackedEnum;
 
 class DataConfig
 {
@@ -25,7 +23,7 @@ class DataConfig
     public function __construct(array $config)
     {
         $this->ruleInferrers = array_map(
-            fn(string $ruleInferrerClass) => app($ruleInferrerClass),
+            fn (string $ruleInferrerClass) => app($ruleInferrerClass),
             $config['rule_inferrers'] ?? []
         );
 

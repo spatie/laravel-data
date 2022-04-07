@@ -12,7 +12,6 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Undefined;
 
 class DataType implements Countable

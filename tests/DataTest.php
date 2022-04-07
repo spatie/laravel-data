@@ -1244,7 +1244,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_use_context_in_casts_based_upon_the_properties_of_the_data_object()
     {
-        $dataClass = new class extends Data{
+        $dataClass = new class () extends Data {
             public SimpleData $nested;
 
             public string $string;
@@ -1256,7 +1256,7 @@ class DataTest extends TestCase
         $data = $dataClass::from([
             'nested' => 'Hello',
             'string' => 'world',
-            'casted' => 'json:'
+            'casted' => 'json:',
         ]);
 
         $this->assertEquals('json:+{"nested":"Hello","string":"world","casted":"json:"}', $data->casted);
@@ -1270,11 +1270,11 @@ class DataTest extends TestCase
         ]);
 
         $this->assertEquals([
-            'enum' => 'foo'
+            'enum' => 'foo',
         ], $data->toArray());
 
         $this->assertEquals([
-            'enum' => DummyBackedEnum::FOO
+            'enum' => DummyBackedEnum::FOO,
         ], $data->all());
     }
 
