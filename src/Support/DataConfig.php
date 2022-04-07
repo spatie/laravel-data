@@ -2,9 +2,11 @@
 
 namespace Spatie\LaravelData\Support;
 
+use BackedEnum;
 use ReflectionClass;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Transformers\Transformer;
+use StringBackedEnum;
 
 class DataConfig
 {
@@ -23,7 +25,7 @@ class DataConfig
     public function __construct(array $config)
     {
         $this->ruleInferrers = array_map(
-            fn (string $ruleInferrerClass) => app($ruleInferrerClass),
+            fn(string $ruleInferrerClass) => app($ruleInferrerClass),
             $config['rule_inferrers'] ?? []
         );
 
@@ -47,9 +49,11 @@ class DataConfig
 
     public function findGlobalCastForProperty(DataProperty $property): ?Cast
     {
-        foreach ($property->type->acceptedTypes as $type) {
-            if ($cast = $this->findSuitableTransformerForClass($this->casts, $type)) {
-                return $cast;
+        foreach ($property->type->acceptedTypes as $acceptedType => $baseTypes) {
+            foreach ([$acceptedType, ...$baseTypes] as $type) {
+                if ($cast = $this->casts[$type] ?? null) {
+                    return $cast;
+                }
             }
         }
 
@@ -62,28 +66,21 @@ class DataConfig
             return null;
         }
 
-        return $this->findSuitableTransformerForClass($this->transformers, get_class($value));
+        foreach ($this->transformers as $transformable => $transformer) {
+            if ($value::class === $transformable) {
+                return $transformer;
+            }
+
+            if (is_a($value::class, $transformable, true)) {
+                return $transformer;
+            }
+        }
+
+        return null;
     }
 
     public function getRuleInferrers(): array
     {
         return $this->ruleInferrers;
-    }
-
-    protected function findSuitableTransformerForClass(
-        array $replacers,
-        string $class
-    ) {
-        foreach ($replacers as $replaceable => $replacer) {
-            if ($class === $replaceable) {
-                return $replacer;
-            }
-
-            if (is_a($class, $replaceable, true)) {
-                return $replacer;
-            }
-        }
-
-        return null;
     }
 }

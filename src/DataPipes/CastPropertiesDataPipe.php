@@ -21,7 +21,7 @@ class CastPropertiesDataPipe extends DataPipe
         $castContext = $properties->all();
 
         foreach ($properties as $name => $value) {
-            $dataProperty = $class->properties->first(fn (DataProperty $dataProperty) => $dataProperty->name === $name);
+            $dataProperty = $class->properties->first(fn(DataProperty $dataProperty) => $dataProperty->name === $name);
 
             if ($dataProperty === null) {
                 continue;
@@ -41,8 +41,7 @@ class CastPropertiesDataPipe extends DataPipe
         DataProperty $property,
         mixed $value,
         array $castContext,
-    ): mixed
-    {
+    ): mixed {
         $shouldCast = $this->shouldBeCasted($property, $value);
 
         if ($shouldCast && $cast = $property->cast) {
@@ -66,12 +65,8 @@ class CastPropertiesDataPipe extends DataPipe
 
     private function shouldBeCasted(DataProperty $property, mixed $value): bool
     {
-        $type = gettype($value);
-
-        if ($type !== 'object') {
-            return true;
-        }
-
-        return $property->type->acceptsType($type);
+        return gettype($value) === 'object'
+            ? ! $property->type->acceptsValue($value)
+            : true;
     }
 }

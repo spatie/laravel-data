@@ -28,9 +28,11 @@ use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\DefaultUndefinedData;
+use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\EmptyData;
+use Spatie\LaravelData\Tests\Fakes\EnumData;
 use Spatie\LaravelData\Tests\Fakes\ExceptData;
 use Spatie\LaravelData\Tests\Fakes\FakeModelData;
 use Spatie\LaravelData\Tests\Fakes\FakeNestedModelData;
@@ -1258,6 +1260,22 @@ class DataTest extends TestCase
         ]);
 
         $this->assertEquals('json:+{"nested":"Hello","string":"world","casted":"json:"}', $data->casted);
+    }
+
+    /** @test */
+    public function it_will_transform_native_enums()
+    {
+        $data = EnumData::from([
+            'enum' => DummyBackedEnum::FOO,
+        ]);
+
+        $this->assertEquals([
+            'enum' => 'foo'
+        ], $data->toArray());
+
+        $this->assertEquals([
+            'enum' => DummyBackedEnum::FOO
+        ], $data->all());
     }
 
     /**

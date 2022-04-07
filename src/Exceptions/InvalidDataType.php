@@ -6,7 +6,7 @@ use Exception;
 use ReflectionParameter;
 use ReflectionProperty;
 
-class InvalidDataPropertyType extends Exception
+class InvalidDataType extends Exception
 {
     public static function onlyLazy(ReflectionProperty|ReflectionParameter $property)
     {

@@ -51,7 +51,7 @@ class EmptyDataResolver
             return [];
         }
 
-        if ($property->type->acceptsType(Traversable::class)) {
+        if ($property->type->findAcceptedTypeForBaseType(Traversable::class) !== null) {
             return [];
         }
 
