@@ -23,7 +23,7 @@ class ComplicatedData extends Data
         public int|Undefined $undefinable,
         public mixed $mixed,
         #[WithCast(DateTimeInterfaceCast::class, format: 'd-m-Y', type: CarbonImmutable::class)]
-        public $explicitCast,
+        public  $explicitCast,
         public DateTime $defaultCast,
         public SimpleData $nestedData,
         /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */

@@ -14,7 +14,7 @@ use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DateCastData;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
-use Spatie\LaravelData\Tests\Fakes\EnumCastData;
+use Spatie\LaravelData\Tests\Fakes\EnumData;
 use Spatie\LaravelData\Tests\Fakes\ModelData;
 use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
@@ -214,7 +214,7 @@ class CastPropertiesPipeTest extends TestCase
     {
         $this->onlyPHP81();
 
-        $data = EnumCastData::from([
+        $data = EnumData::from([
             'enum' => 'foo',
         ]);
 

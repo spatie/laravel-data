@@ -10,8 +10,9 @@ use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
-use Spatie\LaravelData\Exceptions\InvalidDataPropertyType;
+use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Undefined;
 
 class DataType implements Countable
@@ -56,16 +57,18 @@ class DataType implements Countable
 
         if ($type instanceof ReflectionNamedType) {
             if (is_a($type->getName(), Lazy::class, true)) {
-                throw InvalidDataPropertyType::onlyLazy($reflection);
+                throw InvalidDataType::onlyLazy($reflection);
             }
 
             if (is_a($type->getName(), Undefined::class, true)) {
-                throw InvalidDataPropertyType::onlyUndefined($reflection);
+                throw InvalidDataType::onlyUndefined($reflection);
             }
 
-            $this->acceptedTypes = [$type->getName()];
             $this->isNullable = $type->allowsNull();
             $this->isMixed = $type->getName() === 'mixed';
+            $this->acceptedTypes = $this->isMixed ? [] : [
+                $type->getName() => $this->resolveBaseTypes($type->getName()),
+            ];
             $this->isLazy = false;
             $this->isUndefinable = false;
             $this->isDataObject = is_a($type->getName(), Data::class, true);
@@ -90,7 +93,7 @@ class DataType implements Countable
 
         foreach ($type->getTypes() as $namedType) {
             if (! in_array($namedType, ['null', Lazy::class, Undefined::class])) {
-                $acceptedTypes[] = $namedType->getName();
+                $acceptedTypes[$namedType->getName()] = $this->resolveBaseTypes($namedType->getName());
             }
 
             $isNullable = $isNullable || $namedType->allowsNull();
@@ -110,15 +113,15 @@ class DataType implements Countable
         $this->isDataCollection = $isDataCollection;
 
         if ($this->isDataObject && count($this->acceptedTypes) > 1) {
-            throw InvalidDataPropertyType::unionWithData($reflection);
+            throw InvalidDataType::unionWithData($reflection);
         }
 
         if ($this->isDataCollection && count($this->acceptedTypes) > 1) {
-            throw InvalidDataPropertyType::unionWithDataCollection($reflection);
+            throw InvalidDataType::unionWithDataCollection($reflection);
         }
 
         $this->dataClass = match (true) {
-            $this->isDataObject => $acceptedTypes[0],
+            $this->isDataObject => array_key_first($acceptedTypes),
             $this->isDataCollection => $this->resolveDataCollectionClass($reflection),
             default => null
         };
@@ -134,37 +137,31 @@ class DataType implements Countable
         return count($this->acceptedTypes);
     }
 
-    public function acceptsValue(mixed $input): bool
+    public function acceptsValue(mixed $value): bool
     {
-        if ($this->isMixed) {
+        if ($this->isNullable && $value === null) {
             return true;
         }
 
-        if ($this->isNullable && $input === null) {
-            return true;
-        }
+        $type = gettype($value);
 
-        $type = gettype($input);
-
-        $mapping = [
+        $type = match ($type) {
             'integer' => 'int',
             'boolean' => 'bool',
-        ];
-
-        if (array_key_exists($type, $mapping)) {
-            $type = $mapping[$type];
-        }
-
-        if ($type === 'object') {
-            $type = $input::class;
-        }
+            'object' => $value::class,
+            default => $type,
+        };
 
         return $this->acceptsType($type);
     }
 
     public function acceptsType(string $type): bool
     {
-        if (in_array($type, $this->acceptedTypes)) {
+        if ($this->isMixed) {
+            return true;
+        }
+
+        if (array_key_exists($type, $this->acceptedTypes)) {
             return true;
         }
 
@@ -172,22 +169,40 @@ class DataType implements Countable
             return false;
         }
 
-        return $this->findAcceptedTypeForClass($type) !== null;
+        foreach ([$type, ...$this->resolveBaseTypes($type)] as $givenType) {
+            if (array_key_exists($givenType, $this->acceptedTypes)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public function findAcceptedTypeForClass(string $class): ?string
+    public function findAcceptedTypeForBaseType(string $class): ?string
     {
-        foreach ($this->acceptedTypes as $acceptedType) {
+        foreach ($this->acceptedTypes as $acceptedType => $acceptedBaseTypes) {
             if ($class === $acceptedType) {
                 return $acceptedType;
             }
 
-            if (is_a($acceptedType, $class, true)) {
+            if (in_array($class, $acceptedBaseTypes)) {
                 return $acceptedType;
             }
         }
 
         return null;
+    }
+
+    private function resolveBaseTypes(string $type): array
+    {
+        if (! class_exists($type)) {
+            return [];
+        }
+
+        return array_unique([
+            ...array_values(class_parents($type)),
+            ...array_values(class_implements($type)),
+        ]);
     }
 
     private function resolveDataCollectionClass(

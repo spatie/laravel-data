@@ -19,7 +19,7 @@ class DateTimeInterfaceCast implements Cast
     {
         $format = $this->format ?? config('data.date_format');
 
-        $type = $this->type ?? $property->type->findAcceptedTypeForClass(DateTimeInterface::class);
+        $type = $this->type ?? $property->type->findAcceptedTypeForBaseType(DateTimeInterface::class);
 
         if ($type === null) {
             return Uncastable::create();

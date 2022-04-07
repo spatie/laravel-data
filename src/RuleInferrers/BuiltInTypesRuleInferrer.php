@@ -30,7 +30,7 @@ class BuiltInTypesRuleInferrer implements RuleInferrer
             $rules[] = 'array';
         }
 
-        if ($enumClass = $property->type->findAcceptedTypeForClass(BackedEnum::class)) {
+        if ($enumClass = $property->type->findAcceptedTypeForBaseType(BackedEnum::class)) {
             $rules[] = new Enum($enumClass);
         }
 

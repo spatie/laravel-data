@@ -61,6 +61,7 @@ class DataMethod
 
     public function accepts(mixed ...$input): bool
     {
+        /** @var \Spatie\LaravelData\Support\DataType[] $types */
         $types = array_is_list($input)
             ? $this->parameters->map(fn (DataParameter|DataProperty $parameter) => $parameter->type)
             : $this->parameters->mapWithKeys(fn (DataParameter|DataProperty $parameter) => [$parameter->name => $parameter->type]);

@@ -31,15 +31,12 @@ use Spatie\LaravelData\Transformers\DataTransformer;
 
 /**
  * TODO: Make all supporting data structures cachable -> we'll add caching later on
- * TODO: A TransformerPipeline? -> no
  * TODO: split DataCollection in DataCollection and PaginatedDataCollection
- * TODO: add more context to casts
  * TODO: test multiple from arguments more
- * TODO: replace DataPropertyTypes and Types with one custom solution  -> ok
- * TODO: validation rules should take MapFrom attributes into account -> ok
  * TODO: update the typescript transformer with new property data objects
  * TODO: test better types structure to be working all right
- * TODO: test the pipeline -> ok
+ * TODO: add support for wrapping data objects and collections within keys
+ * TODO: allow the usage of native enums without casts
  */
 abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastable, JsonSerializable
 {
