@@ -8,13 +8,11 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Generator;
 use Illuminate\Contracts\Database\Eloquent\Castable;
-use Illuminate\Contracts\Database\Eloquent\Castable as EloquentCastable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use JsonSerializable;
-use phpDocumentor\Reflection\Types\ClassString;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
@@ -22,15 +20,10 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
-use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
-use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
-use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
-use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 use Spatie\LaravelData\Tests\TestCase;
@@ -42,7 +35,7 @@ class DataTypeTest extends TestCase
     /** @test */
     public function it_can_deduce_a_type_without_definition()
     {
-        $type = $this->resolveDataType(new class {
+        $type = $this->resolveDataType(new class () {
             public $property;
         });
 
@@ -59,7 +52,7 @@ class DataTypeTest extends TestCase
     /** @test */
     public function it_can_deduce_a_type_with_definition()
     {
-        $type = $this->resolveDataType(new class {
+        $type = $this->resolveDataType(new class () {
             public string $property;
         });
 
@@ -76,7 +69,7 @@ class DataTypeTest extends TestCase
     /** @test */
     public function it_can_deduce_a_nullable_type_with_definition()
     {
-        $type = $this->resolveDataType(new class {
+        $type = $this->resolveDataType(new class () {
             public ?string $property;
         });
 
@@ -93,7 +86,7 @@ class DataTypeTest extends TestCase
     /** @test */
     public function it_can_deduce_a_union_type_definition()
     {
-        $type = $this->resolveDataType(new class {
+        $type = $this->resolveDataType(new class () {
             public string|int $property;
         });
 
@@ -110,7 +103,7 @@ class DataTypeTest extends TestCase
     /** @test */
     public function it_can_deduce_a_nullable_union_type_definition()
     {
-        $type = $this->resolveDataType(new class {
+        $type = $this->resolveDataType(new class () {
             public string|int|null $property;
         });
 
@@ -127,8 +120,8 @@ class DataTypeTest extends TestCase
     /** @test */
     public function it_can_deduce_an_intersection_type_definition()
     {
-        $type = $this->resolveDataType(new class {
-            public DateTime&DateTimeImmutable $property;
+        $type = $this->resolveDataType(new class () {
+            public DateTime & DateTimeImmutable $property;
         });
 
         $this->assertFalse($type->isNullable);
@@ -147,7 +140,7 @@ class DataTypeTest extends TestCase
     /** @test */
     public function it_can_deduce_a_mixed_type()
     {
-        $type = $this->resolveDataType(new class {
+        $type = $this->resolveDataType(new class () {
             public mixed $property;
         });
 
@@ -164,7 +157,7 @@ class DataTypeTest extends TestCase
     /** @test */
     public function it_can_deduce_a_lazy_type()
     {
-        $type = $this->resolveDataType(new class {
+        $type = $this->resolveDataType(new class () {
             public string|Lazy $property;
         });
 
@@ -181,7 +174,7 @@ class DataTypeTest extends TestCase
     /** @test */
     public function it_can_deduce_an_undefined_type()
     {
-        $type = $this->resolveDataType(new class {
+        $type = $this->resolveDataType(new class () {
             public string|Undefined $property;
         });
 
@@ -208,7 +201,7 @@ class DataTypeTest extends TestCase
     /** @test */
     public function it_can_deduce_a_data_type()
     {
-        $type = $this->resolveDataType(new class {
+        $type = $this->resolveDataType(new class () {
             public SimpleData $property;
         });
 
@@ -225,7 +218,7 @@ class DataTypeTest extends TestCase
     /** @test */
     public function it_can_deduce_a_data_union_type()
     {
-        $type = $this->resolveDataType(new class {
+        $type = $this->resolveDataType(new class () {
             public SimpleData|Lazy $property;
         });
 
@@ -242,7 +235,7 @@ class DataTypeTest extends TestCase
     /** @test */
     public function it_can_deduce_a_data_collection_type()
     {
-        $type = $this->resolveDataType(new class {
+        $type = $this->resolveDataType(new class () {
             #[DataCollectionOf(SimpleData::class)]
             public DataCollection $property;
         });
@@ -260,7 +253,7 @@ class DataTypeTest extends TestCase
     /** @test */
     public function it_can_deduce_a_data_collection_union_type()
     {
-        $type = $this->resolveDataType(new class {
+        $type = $this->resolveDataType(new class () {
             #[DataCollectionOf(SimpleData::class)]
             public DataCollection|Lazy $property;
         });
@@ -280,7 +273,7 @@ class DataTypeTest extends TestCase
     {
         $this->expectException(InvalidDataType::class);
 
-        $this->resolveDataType(new class {
+        $this->resolveDataType(new class () {
             public SimpleData|ComplicatedData $property;
         });
     }
@@ -321,28 +314,28 @@ class DataTypeTest extends TestCase
     public function acceptedBaseTypesDataProvider(): Generator
     {
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public $property;
             },
             'expected' => [],
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public mixed $property;
             },
             'expected' => [],
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public string $property;
             },
             'expected' => ['string' => []],
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public string|int|bool|float|array $property;
             },
             'expected' => [
@@ -355,7 +348,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public SimpleData $property;
             },
             'expected' => [
@@ -371,7 +364,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public DummyBackedEnum $property;
             },
             'expected' => [
@@ -400,7 +393,7 @@ class DataTypeTest extends TestCase
         // Base types
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public $property;
             },
             'type' => 'string',
@@ -408,7 +401,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public mixed $property;
             },
             'type' => 'string',
@@ -416,7 +409,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public string $property;
             },
             'type' => 'string',
@@ -424,7 +417,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public bool $property;
             },
             'type' => 'bool',
@@ -432,7 +425,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public int $property;
             },
             'type' => 'int',
@@ -440,7 +433,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public float $property;
             },
             'type' => 'float',
@@ -448,7 +441,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public array $property;
             },
             'type' => 'array',
@@ -456,7 +449,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public string $property;
             },
             'type' => 'array',
@@ -466,7 +459,7 @@ class DataTypeTest extends TestCase
         // Objects
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public SimpleData $property;
             },
             'type' => SimpleData::class,
@@ -474,7 +467,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public SimpleData $property;
             },
             'type' => ComplicatedData::class,
@@ -484,7 +477,7 @@ class DataTypeTest extends TestCase
         // Objects with inheritance
 
         yield 'simple inheritance' => [
-            'class' => new class {
+            'class' => new class () {
                 public Data $property;
             },
             'type' => SimpleData::class,
@@ -492,7 +485,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield 'reversed inheritance' => [
-            'class' => new class {
+            'class' => new class () {
                 public SimpleData $property;
             },
             'type' => Data::class,
@@ -500,7 +493,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield 'false inheritance' => [
-            'class' => new class {
+            'class' => new class () {
                 public Model $property;
             },
             'type' => SimpleData::class,
@@ -510,7 +503,7 @@ class DataTypeTest extends TestCase
         // Objects with interfaces
 
         yield 'simple interface implementation' => [
-            'class' => new class {
+            'class' => new class () {
                 public DateTimeInterface $property;
             },
             'type' => DateTime::class,
@@ -518,7 +511,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield 'reversed interface implementation' => [
-            'class' => new class {
+            'class' => new class () {
                 public DateTime $property;
             },
             'type' => DateTimeInterface::class,
@@ -526,7 +519,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield 'false interface implementation' => [
-            'class' => new class {
+            'class' => new class () {
                 public Model $property;
             },
             'type' => DateTime::class,
@@ -536,7 +529,7 @@ class DataTypeTest extends TestCase
         // Enums
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public DummyBackedEnum $property;
             },
             'type' => DummyBackedEnum::class,
@@ -559,7 +552,7 @@ class DataTypeTest extends TestCase
     public function acceptValueDataProvider(): Generator
     {
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public ?string $property;
             },
             'value' => null,
@@ -567,7 +560,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public string $property;
             },
             'value' => 'Hello',
@@ -575,7 +568,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public string $property;
             },
             'value' => 3.14,
@@ -583,7 +576,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public mixed $property;
             },
             'value' => 3.14,
@@ -591,7 +584,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public Data $property;
             },
             'value' => new SimpleData('Hello'),
@@ -599,7 +592,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public SimpleData $property;
             },
             'value' => new SimpleData('Hello'),
@@ -607,7 +600,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public SimpleData $property;
             },
             'value' => new SimpleDataWithMappedProperty('Hello'),
@@ -615,7 +608,7 @@ class DataTypeTest extends TestCase
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public DummyBackedEnum $property;
             },
             'value' => DummyBackedEnum::FOO,
@@ -638,35 +631,35 @@ class DataTypeTest extends TestCase
     public function acceptedTypeForBaseTypesDataProvider(): Generator
     {
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public SimpleData $property;
             },
             'type' => SimpleData::class,
-            'expectedType' => SimpleData::class
+            'expectedType' => SimpleData::class,
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public SimpleData $property;
             },
             'type' => Data::class,
-            'expectedType' => SimpleData::class
+            'expectedType' => SimpleData::class,
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public DummyBackedEnum $property;
             },
             'type' => BackedEnum::class,
-            'expectedType' => DummyBackedEnum::class
+            'expectedType' => DummyBackedEnum::class,
         ];
 
         yield [
-            'class' => new class {
+            'class' => new class () {
                 public SimpleData $property;
             },
             'type' => DataCollection::class,
-            'expectedType' => null
+            'expectedType' => null,
         ];
     }
 
