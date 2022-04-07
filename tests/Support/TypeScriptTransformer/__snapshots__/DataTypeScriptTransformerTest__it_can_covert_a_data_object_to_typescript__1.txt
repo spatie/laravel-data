@@ -1,5 +1,5 @@
 {
-nullable: number | null;
+nullable?: number | null;
 int: number;
 bool: boolean;
 string: string;

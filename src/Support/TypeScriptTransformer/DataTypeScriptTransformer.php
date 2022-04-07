@@ -56,7 +56,7 @@ class DataTypeScriptTransformer extends DtoTransformer
                     $property->getDeclaringClass()->getName()
                 );
 
-                return $this->isPropertyLazy($property)
+                return $this->shouldBeOptional($property)
                     ? "{$carry}{$property->getName()}?: {$transformed};" . PHP_EOL
                     : "{$carry}{$property->getName()}: {$transformed};" . PHP_EOL;
             },
@@ -64,9 +64,13 @@ class DataTypeScriptTransformer extends DtoTransformer
         );
     }
 
-    protected function isPropertyLazy(ReflectionProperty $property): bool
+    protected function shouldBeOptional(ReflectionProperty $property): bool
     {
         $type = $property->getType();
+
+        if ($type->allowsNull()) {
+            return true;
+        }
 
         if ($type === null || $type instanceof ReflectionNamedType) {
             return false;
