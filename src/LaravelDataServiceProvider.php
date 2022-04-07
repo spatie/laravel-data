@@ -17,7 +17,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
     public function packageRegistered()
     {
-        $this->app->singleton(
+        $this->app->scoped(
             DataConfig::class,
             fn () => new DataConfig(config('data'))
         );
