@@ -1281,12 +1281,11 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_magically_create_a_data_object()
     {
-        $dataClass = new class('', '') extends Data{
+        $dataClass = new class ('', '') extends Data {
             public function __construct(
                 public mixed $propertyA,
                 public mixed $propertyB,
-            )
-            {
+            ) {
             }
 
             public static function fromStringWithDefault(string $a, string $b = 'World')
