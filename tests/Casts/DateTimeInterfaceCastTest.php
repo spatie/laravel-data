@@ -54,7 +54,7 @@ class DateTimeInterfaceCastTest extends TestCase
     /** @test */
     public function it_fails_when_it_cannot_cast_a_date_into_the_correct_format()
     {
-        $caster = new DateTimeInterfaceCast('d-m-Y H:i:s');
+        $caster = new DateTimeInterfaceCast(\DATE_RFC822);
 
         $class = new class () {
             public DateTime $carbon;

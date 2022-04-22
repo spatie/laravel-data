@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Casts;
 use DateTimeInterface;
 use Spatie\LaravelData\Exceptions\CannotCastDate;
 use Spatie\LaravelData\Support\DataProperty;
-use Throwable;
 
 class DateTimeInterfaceCast implements Cast
 {
@@ -17,24 +16,20 @@ class DateTimeInterfaceCast implements Cast
 
     public function cast(DataProperty $property, mixed $value): DateTimeInterface | Uncastable
     {
-        $format = $this->format ?? config('data.date_format');
-
+        $formats = collect($this->format ?? config('data.date_format'));
         $type = $this->type ?? $this->findType($property);
 
         if ($type === null) {
             return Uncastable::create();
         }
 
-        /** @var \DateTime|\DateTimeImmutable $type */
-        try {
-            $datetime = $type::createFromFormat($format, $value);
-        } catch (Throwable $e) {
-            $datetime = false;
-        }
+        $datetime = $formats
+            ->map(fn (string $format) => rescue(fn () => $type::createFromFormat($format, $value)))
+            ->first(fn ($value) => (bool) $value);
 
-        if ($datetime === false) {
+        if (! $datetime) {
             /** @psalm-suppress InvalidCast,InvalidArgument */
-            throw CannotCastDate::create($format, $type, $value);
+            throw CannotCastDate::create($formats->toArray(), $type, $value);
         }
 
         return $datetime;

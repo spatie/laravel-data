@@ -12,9 +12,8 @@ class DateTimeInterfaceTransformer implements Transformer
 
     public function transform(DataProperty $property, mixed $value): string
     {
-        $format = $this->format ?? config('data.date_format');
-
-        /** @var \DateTimeInterface $value */
-        return $value->format($format);
+        return collect($this->format ?? config('data.date_format'))
+            ->map(fn (string $format) => rescue(fn () => $value->format($format)))
+            ->first(fn ($value) => (bool) $value, '');
     }
 }

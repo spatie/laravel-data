@@ -4,7 +4,11 @@ return [
     /*
      * The package will use this date format when working with dates through the app
      */
-    'date_format' => DATE_ATOM,
+    'date_format' => [
+        DATE_ATOM,
+        DATE_ISO8601,
+        'Y-m-d H:i:s',
+    ],
 
     /*
      * Global transformers will take complex types and transform them into simple
