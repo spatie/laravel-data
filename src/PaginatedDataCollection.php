@@ -27,11 +27,10 @@ use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 /**
  * @template TValue
  *
- * @implements \ArrayAccess<array-key, TValue>
  * @implements  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>
  * @implements  \IteratorAggregate<array-key, TValue>
  */
-class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializable, IteratorAggregate, Countable, ArrayAccess, EloquentCastable
+class PaginatedDataCollection implements Responsable, Arrayable, Jsonable, JsonSerializable, IteratorAggregate, Countable, EloquentCastable
 {
     use ResponsableData;
     use IncludeableData;
@@ -40,25 +39,19 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
 
     private ?Closure $filter = null;
 
-    /** @var Enumerable<array-key, TValue> */
-    private Enumerable $items;
+    /** @var CursorPaginator<TValue>|Paginator */
+    private CursorPaginator|Paginator $items;
 
     /**
      * @param class-string<\Spatie\LaravelData\Data> $dataClass
-     * @param array|Enumerable<array-key, TValue>|DataCollection $items
+     * @param CursorPaginator<TValue>|Paginator $items
      */
     public function __construct(
         public readonly string $dataClass,
-        Enumerable|array|DataCollection $items
+        CursorPaginator|Paginator $items
     ) {
-        $items = match (true) {
-            is_array($items) => new Collection($items),
-            $items instanceof DataCollection => $items->toCollection(),
-            default => $items
-        };
-
-        $this->items = $items->map(
-            fn($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
+        $this->items = $items->through(
+            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
     }
 
@@ -87,11 +80,11 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * @return array<array-key, TValue>
+     * @return CursorPaginator<TValue>|Paginator
      */
-    public function items(): array
+    public function items(): CursorPaginator|Paginator
     {
-        return $this->items->all();
+        return $this->items;
     }
 
     /**
@@ -139,12 +132,6 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
         return $this->toArray();
     }
 
-    /** @return \Illuminate\Support\Enumerable<array-key, TValue> */
-    public function toCollection(): Enumerable
-    {
-        return $this->items;
-    }
-
     /**  @return \ArrayIterator<array-key, array> */
     public function getIterator(): ArrayIterator
     {
@@ -154,59 +141,6 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
     public function count(): int
     {
         return count($this->items);
-    }
-
-    /**
-     * @param array-key $offset
-     *
-     * @return bool
-     */
-    public function offsetExists($offset): bool
-    {
-        return $this->items->offsetExists($offset);
-    }
-
-    /**
-     * @param array-key $offset
-     *
-     * @return TValue
-     */
-    public function offsetGet($offset): mixed
-    {
-        return $this->items->offsetGet($offset);
-    }
-
-    /**
-     * @param array-key|null $offset
-     * @param TValue $value
-     *
-     * @return void
-     */
-    public function offsetSet($offset, $value): void
-    {
-        if ($this->items instanceof LazyCollection) {
-            throw InvalidDataCollectionModification::cannotSetItem();
-        }
-
-        $value = $value instanceof Data
-            ? $value
-            : $this->dataClass::from($value);
-
-        $this->items->offsetSet($offset, $value);
-    }
-
-    /**
-     * @param array-key $offset
-     *
-     * @return void
-     */
-    public function offsetUnset($offset): void
-    {
-        if ($this->items instanceof LazyCollection) {
-            throw InvalidDataCollectionModification::cannotUnSetItem();
-        }
-
-        $this->items->offsetUnset($offset);
     }
 
     public static function castUsing(array $arguments)
