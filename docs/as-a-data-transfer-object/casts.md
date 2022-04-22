@@ -87,7 +87,7 @@ public Format $format
 
 ### Casting dates
 
-By default, the package ships with a `DateTimeInterface` cast to transform a date string into a date object. You can define the format used to parse the date in the `data.php` config file. By default, it is the `DATE_ATOM` format.
+By default, the package ships with a `DateTimeInterface` cast to transform a date string into a date object. You can define the formats used to parse the date in the `data.php` config file. By default, the `DATE_ATOM` and the `DATE_ISO8601` formats are supported, with or without period.
 
 It is also possible to manually set the format on the cast:
 
@@ -106,7 +106,6 @@ public Carbon $date
 You can even manually specify the type the date string should be cast to:
 
 ```php
-
 #[WithCast(DateTimeInterfaceCast::class, type: CarbonImmutable::class)]
 public $date
 ```
@@ -146,4 +145,3 @@ class SongData extends Data
 ## Creating your own casts
 
 It is possible to create your casts. You can read more about this in the [advanced chapter](/docs/laravel-data/v1/advanced-usage/creating-a-cast).
-

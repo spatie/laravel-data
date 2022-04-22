@@ -22,7 +22,11 @@ return [
     /*
      * The date format to be used when converting a DateTimeInterface from and to json
      */
-    'date_format' => DATE_ATOM,
+    'date_format' => [
+        DATE_ATOM,
+        DATE_ISO8601,
+        'Y-m-d H:i:s',
+    ],
 
     /*
      * Transformers will take properties within your data objects and transform
@@ -52,4 +56,3 @@ return [
     ],
 ];
 ```
-
