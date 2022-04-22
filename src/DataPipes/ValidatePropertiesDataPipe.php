@@ -16,14 +16,14 @@ class ValidatePropertiesDataPipe extends DataPipe
     ) {
     }
 
-    public static function onlyRequests(): static
+    public static function onlyRequests(): self
     {
-        return new static(app(DataValidationRulesResolver::class), false);
+        return new self(app(DataValidatorResolver::class), false);
     }
 
-    public static function allTypes(): static
+    public static function allTypes(): self
     {
-        return new static(app(DataValidationRulesResolver::class), true);
+        return new self(app(DataValidatorResolver::class), true);
     }
 
     public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection

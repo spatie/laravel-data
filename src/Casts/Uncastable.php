@@ -4,8 +4,8 @@ namespace Spatie\LaravelData\Casts;
 
 class Uncastable
 {
-    public static function create(): static
+    public static function create(): self
     {
-        return new static();
+        return new self();
     }
 }

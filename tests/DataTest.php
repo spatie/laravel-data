@@ -13,11 +13,23 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapOutputName;
+use Spatie\LaravelData\Attributes\Validation\In;
+use Spatie\LaravelData\Attributes\Validation\InArray;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\DataPipeline;
+use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
+use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
+use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
+use Spatie\LaravelData\Normalizers\ArrayNormalizer;
+use Spatie\LaravelData\Normalizers\ModelNormalizer;
+use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
@@ -93,7 +105,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::new('name')->lazy()->withType('string')
         )->create();
 
-        $data = new $dataClass(Lazy::create(fn () => 'test'));
+        $data = new $dataClass(Lazy::create(fn() => 'test'));
 
         $this->assertEquals([], $data->toArray());
 
@@ -129,8 +141,8 @@ class DataTest extends TestCase
         )->create();
 
         $data = new $dataClass(
-            Lazy::create(fn () => LazyData::from('Hello')),
-            Lazy::create(fn () => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
+            Lazy::create(fn() => LazyData::from('Hello')),
+            Lazy::create(fn() => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
         );
 
         $this->assertEquals([], (clone $data)->toArray());
@@ -173,7 +185,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::dataCollection('songs', MultiLazyData::class)->lazy()
         )->create();
 
-        $collection = Lazy::create(fn () => MultiLazyData::collection([
+        $collection = Lazy::create(fn() => MultiLazyData::collection([
             DummyDto::rick(),
             DummyDto::bon(),
         ]));
@@ -228,7 +240,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
                 );
             }
         };
@@ -254,7 +266,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
                 );
             }
         };
@@ -546,7 +558,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
+        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn() => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'),) extends Data {
             public function __construct(
                 public SimpleData $data,
                 #[DataCollectionOf(SimpleData::class)]
@@ -605,7 +617,7 @@ class DataTest extends TestCase
 
         $transformed = $data->additional([
             'company' => 'Spatie',
-            'alt_name' => fn (Data $data) => "{$data->name} from Spatie",
+            'alt_name' => fn(Data $data) => "{$data->name} from Spatie",
         ])->toArray();
 
         $this->assertEquals([
@@ -935,7 +947,7 @@ class DataTest extends TestCase
                 #[WithTransformer(ConfidentialDataTransformer::class)]
                 public Data $nestedData,
                 #[WithTransformer(ConfidentialDataCollectionTransformer::class),
-                DataCollectionOf(SimpleData::class)]
+                    DataCollectionOf(SimpleData::class)]
                 public DataCollection $nestedDataCollection,
             ) {
             }
@@ -1131,7 +1143,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_will_not_include_lazy_undefined_values_when_transforming()
     {
-        $data = new class ('Hello World', Lazy::create(fn () => Undefined::make())) extends Data {
+        $data = new class ('Hello World', Lazy::create(fn() => Undefined::make())) extends Data {
             public function __construct(
                 public string $string,
                 public string|Undefined|Lazy $lazy_undefined_string,
@@ -1186,7 +1198,7 @@ class DataTest extends TestCase
                 #[DataCollectionOf(SimpleDataWithMappedProperty::class)]
                 public DataCollection $nested_collection,
                 #[MapOutputName('nested_other_collection'),
-                DataCollectionOf(SimpleDataWithMappedProperty::class)]
+                    DataCollectionOf(SimpleDataWithMappedProperty::class)]
                 public DataCollection $nested_renamed_collection,
             ) {
             }
@@ -1333,6 +1345,50 @@ class DataTest extends TestCase
             new $dataClass('data', '{"enum":"foo"}'),
             $dataClass::from(new EnumData(DummyBackedEnum::FOO))
         );
+    }
+
+    /** @test */
+    public function it_can_validate_non_request_payloads()
+    {
+        $dataClass = new class extends Data {
+            public static bool $validateAllTypes = false;
+
+            #[In('Hello World')]
+            public string $string;
+
+            public static function pipeline(): DataPipeline
+            {
+                return DataPipeline::create()
+                    ->into(static::class)
+                    ->normalizer(ModelNormalizer::class)
+                    ->normalizer(ArraybleNormalizer::class)
+                    ->normalizer(ObjectNormalizer::class)
+                    ->normalizer(ArrayNormalizer::class)
+                    ->through(AuthorizedDataPipe::class)
+                    ->through(self::$validateAllTypes
+                        ? ValidatePropertiesDataPipe::allTypes()
+                        : ValidatePropertiesDataPipe::onlyRequests()
+                    )
+                    ->through(MapPropertiesDataPipe::class)
+                    ->through(DefaultValuesDataPipe::class)
+                    ->through(CastPropertiesDataPipe::class);
+            }
+        };
+
+        $data = $dataClass::from([
+            'string' => 'nowp'
+        ]);
+
+        $this->assertInstanceOf(Data::class, $data);
+        $this->assertEquals('nowp', $data->string);
+
+        $dataClass::$validateAllTypes = true;
+
+        $this->expectException(ValidationException::class);
+
+        $data = $dataClass::from([
+            'string' => 'nowp'
+        ]);
     }
 
     /**

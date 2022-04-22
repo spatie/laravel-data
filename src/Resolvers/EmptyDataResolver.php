@@ -43,7 +43,6 @@ class EmptyDataResolver
         }
 
         if ($property->type->isDataObject) {
-            /** @var \Spatie\LaravelData\Data $type */
             return $property->type->dataClass::empty();
         }
 

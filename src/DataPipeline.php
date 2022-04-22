@@ -63,7 +63,7 @@ class DataPipeline
             $this->normalizers
         );
 
-        /** @var \Spatie\LaravelData\DataPipes\DataPipe $pipes */
+        /** @var \Spatie\LaravelData\DataPipes\DataPipe[] $pipes */
         $pipes = array_map(
             fn (string|DataPipe $pipe) => is_string($pipe) ? app($pipe) : $pipe,
             $this->pipes
@@ -79,11 +79,11 @@ class DataPipeline
             }
         }
 
-        $properties = collect($properties);
-
         if ($properties === null) {
             throw CannotCreateDataFromValue::create($this->classString, $this->value);
         }
+
+        $properties = collect($properties);
 
         $class = $this->dataConfig->getDataClass($this->classString);
 

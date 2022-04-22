@@ -3,9 +3,11 @@
 namespace Spatie\LaravelData\Support;
 
 use Countable;
+use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
+use ReflectionUnionType;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -13,6 +15,7 @@ use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Undefined;
+use TypeError;
 
 class DataType implements Countable
 {
@@ -28,6 +31,7 @@ class DataType implements Countable
 
     public readonly bool $isDataCollection;
 
+    /** @var class-string<\Spatie\LaravelData\Data>|null */
     public readonly ?string $dataClass;
 
     public readonly array $acceptedTypes;
@@ -80,6 +84,10 @@ class DataType implements Countable
             };
 
             return;
+        }
+
+        if (! ($type instanceof ReflectionUnionType || $type instanceof ReflectionIntersectionType)) {
+            throw new TypeError('Invalid reflection type');
         }
 
         $acceptedTypes = [];

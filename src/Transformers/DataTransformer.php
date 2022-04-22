@@ -42,7 +42,7 @@ class DataTransformer
 
         return $dataClass
             ->properties
-            ->reduce(function (array $payload, DataProperty $property) use ($dataClass, $data, $trees) {
+            ->reduce(function (array $payload, DataProperty $property) use ($data, $trees) {
                 $name = $property->name;
 
                 if (! $this->shouldIncludeProperty($name, $data->{$name}, $trees)) {

@@ -12,17 +12,17 @@ abstract class Lazy
 {
     private ?bool $defaultIncluded = null;
 
-    public static function create(Closure $value): static
+    public static function create(Closure $value): DefaultLazy
     {
         return new DefaultLazy($value);
     }
 
-    public static function when(Closure $condition, Closure $value): static
+    public static function when(Closure $condition, Closure $value): ConditionalLazy
     {
         return new ConditionalLazy($condition, $value);
     }
 
-    public static function whenLoaded(string $relation, Model $model, Closure $value): static
+    public static function whenLoaded(string $relation, Model $model, Closure $value): RelationalLazy
     {
         return new RelationalLazy($relation, $model, $value);
     }

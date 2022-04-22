@@ -15,7 +15,7 @@ class DataClass
 {
     public function __construct(
         public readonly string $name,
-        /** @var Collection<\Spatie\LaravelData\Support\DataProperty> */
+        /** @var Collection<string, \Spatie\LaravelData\Support\DataProperty> */
         public readonly Collection $properties,
         /** @var Collection<string, \Spatie\LaravelData\Support\DataMethod> */
         public readonly Collection $methods,
@@ -33,7 +33,7 @@ class DataClass
 
         $constructor = $methods->first(fn (ReflectionMethod $method) => $method->isConstructor());
 
-        $properties = static::resolveProperties(
+        $properties = self::resolveProperties(
             $class,
             $constructor,
             NameMappersResolver::create(ignoredMappers: [ProvidedNameMapper::class])->execute($attributes)
@@ -42,7 +42,7 @@ class DataClass
         return new self(
             name: $class->name,
             properties: $properties,
-            methods: static::resolveMethods($class),
+            methods: self::resolveMethods($class),
             constructorMethod: DataMethod::createConstructor($constructor, $properties),
         );
     }
@@ -62,7 +62,7 @@ class DataClass
         ?ReflectionMethod $constructorMethod,
         array $mappers,
     ): Collection {
-        $defaultValues = static::resolveDefaultValues($class, $constructorMethod);
+        $defaultValues = self::resolveDefaultValues($class, $constructorMethod);
 
         return collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
             ->reject(fn (ReflectionProperty $property) => $property->isStatic())
