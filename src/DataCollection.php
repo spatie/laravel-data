@@ -7,11 +7,9 @@ use ArrayIterator;
 use Closure;
 use Countable;
 use Illuminate\Contracts\Database\Eloquent\Castable as EloquentCastable;
-use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\LazyCollection;
@@ -58,7 +56,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
         };
 
         $this->items = $items->map(
-            fn($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
+            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
     }
 

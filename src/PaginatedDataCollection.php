@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData;
 
-use ArrayAccess;
 use ArrayIterator;
 use Closure;
 use Countable;
@@ -12,15 +11,11 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\CursorPaginator;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Enumerable;
-use Illuminate\Support\LazyCollection;
 use IteratorAggregate;
 use JsonSerializable;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
-use Spatie\LaravelData\Exceptions\InvalidDataCollectionModification;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
 use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 
