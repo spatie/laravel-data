@@ -168,18 +168,6 @@ class DataCollectionTest extends TestCase
                 'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ]),
         ];
-
-        yield "paginator" => [
-            fn () => SimpleData::collection(new LengthAwarePaginator([
-                'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
-            ], 4, 15)),
-        ];
-
-        yield "cursor paginator" => [
-            fn () => SimpleData::collection(new CursorPaginator([
-                'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
-            ], 4)),
-        ];
     }
 
     /** @test */

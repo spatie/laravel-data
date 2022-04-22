@@ -80,9 +80,15 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
             ->through(CastPropertiesDataPipe::class);
     }
 
-    public static function collection(Enumerable|array|AbstractPaginator|AbstractCursorPaginator|Paginator|DataCollection $items): DataCollection
+    public static function collection(Enumerable|array|AbstractPaginator|AbstractCursorPaginator|Paginator|DataCollection $items): DataCollection|PaginatedDataCollection
     {
-        return new DataCollection(static::class, $items);
+        $isPaginated = $items instanceof AbstractPaginator
+            || $items instanceof AbstractCursorPaginator
+            || $items instanceof Paginator;
+
+        return $isPaginated
+            ? new PaginatedDataCollection(static::class, $items)
+            : new DataCollection(static::class, $items);
     }
 
     public static function empty(array $extra = []): array
