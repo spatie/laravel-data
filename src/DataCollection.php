@@ -18,7 +18,7 @@ use JsonSerializable;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
-use Spatie\LaravelData\Exceptions\InvalidDataCollectionModification;
+use Spatie\LaravelData\Exceptions\InvalidDataCollectionOperation;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
 use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 
@@ -42,18 +42,20 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
     private Enumerable $items;
 
     /**
-     * @param class-string<\Spatie\LaravelData\Data> $dataClass
+     * @param class-string<TValue> $dataClass
      * @param array|Enumerable<array-key, TValue>|DataCollection $items
      */
     public function __construct(
         public readonly string $dataClass,
         Enumerable|array|DataCollection $items
     ) {
-        $items = match (true) {
-            is_array($items) => new Collection($items),
-            $items instanceof DataCollection => $items->toCollection(),
-            default => $items
-        };
+        if(is_array($items)){
+            $items = new Collection($items);
+        }
+
+        if($items instanceof DataCollection){
+            $items = $items->toCollection();
+        }
 
         $this->items = $items->map(
             fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
@@ -161,6 +163,10 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
      */
     public function offsetExists($offset): bool
     {
+        if (! $this->items instanceof ArrayAccess) {
+            throw InvalidDataCollectionOperation::create();
+        }
+
         return $this->items->offsetExists($offset);
     }
 
@@ -171,6 +177,10 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
      */
     public function offsetGet($offset): mixed
     {
+        if (! $this->items instanceof ArrayAccess) {
+            throw InvalidDataCollectionOperation::create();
+        }
+
         return $this->items->offsetGet($offset);
     }
 
@@ -182,8 +192,8 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
      */
     public function offsetSet($offset, $value): void
     {
-        if ($this->items instanceof LazyCollection) {
-            throw InvalidDataCollectionModification::cannotSetItem();
+        if (! $this->items instanceof ArrayAccess) {
+            throw InvalidDataCollectionOperation::create();
         }
 
         $value = $value instanceof Data
@@ -200,8 +210,8 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
      */
     public function offsetUnset($offset): void
     {
-        if ($this->items instanceof LazyCollection) {
-            throw InvalidDataCollectionModification::cannotUnSetItem();
+        if (! $this->items instanceof ArrayAccess) {
+            throw InvalidDataCollectionOperation::create();
         }
 
         $this->items->offsetUnset($offset);

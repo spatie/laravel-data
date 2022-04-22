@@ -17,7 +17,7 @@ class DataParameter
 
     public static function create(
         ReflectionParameter $parameter
-    ): static {
+    ): self {
         $hasDefaultValue = $parameter->isDefaultValueAvailable();
 
         return new self(

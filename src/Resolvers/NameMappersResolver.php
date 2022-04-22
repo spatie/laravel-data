@@ -11,7 +11,7 @@ use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 
 class NameMappersResolver
 {
-    public static function create(array $ignoredMappers = []): static
+    public static function create(array $ignoredMappers = []): self
     {
         return new self($ignoredMappers);
     }
@@ -32,9 +32,9 @@ class NameMappersResolver
     private function resolveInputNameMapper(
         Collection $attributes
     ): ?NameMapper {
-        /** @var \Spatie\LaravelData\Attributes\MapInputName&\Spatie\LaravelData\Attributes\MapName|null $mapper */
-        $mapper = $attributes->first(fn (object $attribute) => $attribute instanceof MapInputName)
-            ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName);
+        /** @var \Spatie\LaravelData\Attributes\MapInputName|\Spatie\LaravelData\Attributes\MapName|null $mapper */
+        $mapper = $attributes->first(fn(object $attribute) => $attribute instanceof MapInputName)
+            ?? $attributes->first(fn(object $attribute) => $attribute instanceof MapName);
 
         if ($mapper) {
             return $this->resolveMapper($mapper->input);
@@ -46,9 +46,9 @@ class NameMappersResolver
     private function resolveOutputNameMapper(
         Collection $attributes
     ): ?NameMapper {
-        /** @var \Spatie\LaravelData\Attributes\MapOutputName&\Spatie\LaravelData\Attributes\MapName|null $mapper */
-        $mapper = $attributes->first(fn (object $attribute) => $attribute instanceof MapOutputName)
-            ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName);
+        /** @var \Spatie\LaravelData\Attributes\MapOutputName|\Spatie\LaravelData\Attributes\MapName|null $mapper */
+        $mapper = $attributes->first(fn(object $attribute) => $attribute instanceof MapOutputName)
+            ?? $attributes->first(fn(object $attribute) => $attribute instanceof MapName);
 
         if ($mapper) {
             return $this->resolveMapper($mapper->output);
@@ -59,12 +59,7 @@ class NameMappersResolver
 
     private function resolveMapper(string|int $value): ?NameMapper
     {
-        $mapper = match (true) {
-            is_int($value) => new ProvidedNameMapper($value),
-            is_a($value, NameMapper::class, true) => resolve($value),
-            is_string($value) => new ProvidedNameMapper($value),
-            default => null,
-        };
+        $mapper = $this->resolveMapperClass($value);
 
         foreach ($this->ignoredMappers as $ignoredMapper) {
             if ($mapper instanceof $ignoredMapper) {
@@ -73,5 +68,18 @@ class NameMappersResolver
         }
 
         return $mapper;
+    }
+
+    private function resolveMapperClass(int|string $value): NameMapper
+    {
+        if (is_int($value)) {
+            return new ProvidedNameMapper($value);
+        }
+
+        if (is_a($value, NameMapper::class, true)) {
+            return resolve($value);
+        }
+
+        return new ProvidedNameMapper($value);
     }
 }

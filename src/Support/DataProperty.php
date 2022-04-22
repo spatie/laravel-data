@@ -27,7 +27,6 @@ class DataProperty
         public readonly ?Transformer $transformer,
         public readonly ?string $inputMappedName,
         public readonly ?string $outputMappedName,
-        /** @var class-string<\Spatie\LaravelData\Data> */
         public readonly Collection $attributes,
     ) {
     }
@@ -38,7 +37,7 @@ class DataProperty
         mixed $defaultValue = null,
         ?NameMapper $classInputNameMapper = null,
         ?NameMapper $classOutputNameMapper = null,
-    ) {
+    ): self {
         $attributes = collect($property->getAttributes())->map(
             fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
         );
@@ -57,7 +56,7 @@ class DataProperty
             default => null,
         };
 
-        return new static(
+        return new self(
             name: $property->name,
             className: $property->class,
             type: DataType::create($property),

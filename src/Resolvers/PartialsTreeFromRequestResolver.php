@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\PartialTrees;
@@ -18,7 +19,7 @@ class PartialsTreeFromRequestResolver
     }
 
     public function execute(
-        Data|DataCollection $data,
+        Data|DataCollection|PaginatedDataCollection $data,
         Request $request,
     ): PartialTrees {
         $includesTree = $this->partialsParser->execute(explode(',', $request->get('include', '')));
@@ -92,7 +93,6 @@ class PartialsTreeFromRequestResolver
         ?array $allowedPartials,
         string $methodName,
     ): array {
-        /** @var \Spatie\LaravelData\Support\DataProperty[] $properties */
         $properties = $this->dataConfig->getDataClass($class)->properties;
 
         if ($allowedPartials === null) {
@@ -110,8 +110,12 @@ class PartialsTreeFromRequestResolver
                 continue;
             }
 
-            $checkNested = $properties[$requestedPartial]?->type?->isDataObject
-                || $properties[$requestedPartial]?->type?->isDataCollection;
+            if (! $properties->has($requestedPartial)) {
+                continue;
+            }
+
+            $checkNested = $properties[$requestedPartial]->type->isDataObject
+                || $properties[$requestedPartial]->type->isDataCollection;
 
             if ($checkNested) {
                 $requestedPartialsTree[$requestedPartial] = $this->{$methodName}(

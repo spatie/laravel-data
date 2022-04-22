@@ -31,7 +31,6 @@ use Spatie\LaravelData\Transformers\DataTransformer;
 
 /**
  * TODO: Make all supporting data structures cachable -> we'll add caching later on
- * TODO: split DataCollection in DataCollection and PaginatedDataCollection
  * TODO: update the typescript transformer with new property data objects
  * TODO: add support for wrapping data objects and collections within keys
  */

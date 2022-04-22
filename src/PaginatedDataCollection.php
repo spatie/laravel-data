@@ -38,7 +38,7 @@ class PaginatedDataCollection implements Responsable, Arrayable, Jsonable, JsonS
     private CursorPaginator|Paginator $items;
 
     /**
-     * @param class-string<\Spatie\LaravelData\Data> $dataClass
+     * @param class-string<TValue> $dataClass
      * @param CursorPaginator<TValue>|Paginator $items
      */
     public function __construct(
