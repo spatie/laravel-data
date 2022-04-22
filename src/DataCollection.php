@@ -12,7 +12,6 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
-use Illuminate\Support\LazyCollection;
 use IteratorAggregate;
 use JsonSerializable;
 use Spatie\LaravelData\Concerns\IncludeableData;
@@ -49,11 +48,11 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
         public readonly string $dataClass,
         Enumerable|array|DataCollection $items
     ) {
-        if(is_array($items)){
+        if (is_array($items)) {
             $items = new Collection($items);
         }
 
-        if($items instanceof DataCollection){
+        if ($items instanceof DataCollection) {
             $items = $items->toCollection();
         }
 
