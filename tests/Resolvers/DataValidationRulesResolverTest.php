@@ -132,4 +132,23 @@ class DataValidationRulesResolverTest extends TestCase
             'name' => ['required'],
         ], $this->resolver->execute($data::class)->all());
     }
+
+    /** @test */
+    public function it_can_resolve_payload_when_calling_rules()
+    {
+        $data = new class () extends Data {
+            public string $name;
+
+            public static function rules(array $payload): array
+            {
+                return [
+                    'name' => $payload['name'] === 'foo' ? ['required'] : ['sometimes'],
+                ];
+            }
+        };
+
+        $this->assertEquals([
+            'name' => ['required'],
+        ], $this->resolver->execute($data::class, ['name' => 'foo'])->all());
+    }
 }

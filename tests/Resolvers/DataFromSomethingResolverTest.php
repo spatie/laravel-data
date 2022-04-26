@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Tests\Resolvers;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Util\Exception;
 use Spatie\LaravelData\Data;
@@ -196,5 +197,32 @@ class DataFromSomethingResolverTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('The Another name field is required');
         $data::validate(['name' => '']);
+    }
+
+    /** @test */
+    public function it_can_resolve_payload_dependency_for_rules()
+    {
+        $data = new class () extends Data {
+            public string $payment_method;
+            public ?string $paypal_email;
+
+            public static function rules(array $payload)
+            {
+                return [
+                    'payment_method' => ['required'],
+                    'paypal_email' => Rule::requiredIf($payload['payment_method'] === 'paypal'),
+                ];
+            }
+        };
+
+        $result = $data::validate(['payment_method' => 'credit_card']);
+        $this->assertEquals([
+            'payment_method' => 'credit_card',
+            'paypal_email' => null,
+        ], $result->toArray());
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('The paypal email field is required');
+        $data::validate(['payment_method' => 'paypal']);
     }
 }
