@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Transformers;
 
+use Illuminate\Support\Arr;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
@@ -166,6 +167,14 @@ class DataTransformer
 
         if ($value === null) {
             return null;
+        }
+
+        if (is_array($value) && ! empty($trees->only)) {
+            $value = Arr::only($value, array_keys($trees->only));
+        }
+
+        if (is_array($value) && ! empty($trees->except)) {
+            $value = Arr::except($value, array_keys($trees->except));
         }
 
         if ($transformer = $this->resolveTransformerForValue($property, $value)) {
