@@ -53,17 +53,40 @@ trait IncludeableData
         return $this;
     }
 
+    public function includeWhen(): array
+    {
+        return [];
+    }
+
+    public function excludeWhen(): array
+    {
+        return [];
+    }
+
     public function getPartialTrees(): PartialTrees
     {
         if ($this->partialTrees) {
             return $this->partialTrees;
         }
 
+        $only = $this->conditionalKeys($this->only, $this->includeWhen());
+        $except = $this->conditionalKeys($this->except, $this->excludeWhen());
+
         return new PartialTrees(
             ! empty($this->includes) ? (new PartialsParser())->execute($this->includes) : null,
             ! empty($this->excludes) ? (new PartialsParser())->execute($this->excludes) : null,
-            ! empty($this->only) ? (new PartialsParser())->execute($this->only) : null,
-            ! empty($this->except) ? (new PartialsParser())->execute($this->except) : null,
+            ! empty($only) ? (new PartialsParser())->execute($only) : null,
+            ! empty($except) ? (new PartialsParser())->execute($except) : null,
         );
+    }
+
+    protected function conditionalKeys(array $array, array $conditions): array
+    {
+        return array_merge(array_keys(array_filter(
+            $conditions,
+            fn ($value) => $value instanceof \Closure
+                ? ($value)($this)
+                : $value
+        )), $array);
     }
 }
