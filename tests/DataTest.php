@@ -1732,7 +1732,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_wraps_additional_data()
     {
-        $dataClass = new class('Hello World') extends Data {
+        $dataClass = new class ('Hello World') extends Data {
             public function __construct(
                 public string $string
             ) {

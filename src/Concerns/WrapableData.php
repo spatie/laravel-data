@@ -2,11 +2,8 @@
 
 namespace Spatie\LaravelData\Concerns;
 
-use Illuminate\Http\JsonResponse;
-use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapType;
-use function _PHPStan_8862d57cc\React\Promise\reject;
 
 trait WrapableData
 {

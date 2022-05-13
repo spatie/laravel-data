@@ -3,11 +3,8 @@
 namespace Spatie\LaravelData\Support\TypeScriptTransformer;
 
 use ReflectionClass;
-use ReflectionNamedType;
 use ReflectionProperty;
-use ReflectionUnionType;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelTypeScriptTransformer\Transformers\DtoTransformer;
 use Spatie\TypeScriptTransformer\Structures\MissingSymbolsCollection;

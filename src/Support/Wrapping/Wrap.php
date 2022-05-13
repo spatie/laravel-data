@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support\Wrapping;
 
 use TypeError;
-use function _PHPStan_8862d57cc\React\Promise\reject;
 
 class Wrap
 {
