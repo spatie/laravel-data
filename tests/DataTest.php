@@ -52,12 +52,15 @@ use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
+use Spatie\LaravelData\Tests\Fakes\MultiNestedData;
+use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\OnlyData;
 use Spatie\LaravelData\Tests\Fakes\ReadonlyData;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithWrap;
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataCollectionTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
@@ -1637,6 +1640,190 @@ class DataTest extends TestCase
                 'last_name' => 'Otwell',
             ],
         ], $data->except('id', 'more.twitter_verified')->toArray());
+    }
+
+    /** @test */
+    public function it_can_wrap_data_objects()
+    {
+        $this->assertEquals(
+            ['wrap' => ['string' => 'Hello World']],
+            SimpleData::from('Hello World')->wrap('wrap')->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            [
+                'wrap' => [
+                    ['string' => 'Hello'],
+                    ['string' => 'World'],
+                ],
+            ],
+            SimpleData::collection(['Hello', 'World'])->wrap('wrap')->toResponse(\request())->getData(true),
+        );
+    }
+
+    /** @test */
+    public function it_can_wrap_data_objects_using_a_global_default()
+    {
+        config()->set('data.wrap', 'wrap');
+
+        $this->assertEquals(
+            ['wrap' => ['string' => 'Hello World']],
+            SimpleData::from('Hello World')->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            ['other-wrap' => ['string' => 'Hello World']],
+            SimpleData::from('Hello World')->wrap('other-wrap')->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            ['string' => 'Hello World'],
+            SimpleData::from('Hello World')->withoutWrapping()->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            [
+                'wrap' => [
+                    ['string' => 'Hello'],
+                    ['string' => 'World'],
+                ],
+            ],
+            SimpleData::collection(['Hello', 'World'])->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            [
+                'other-wrap' => [
+                    ['string' => 'Hello'],
+                    ['string' => 'World'],
+                ],
+            ],
+            SimpleData::collection(['Hello', 'World'])->wrap('other-wrap')->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            [
+                ['string' => 'Hello'],
+                ['string' => 'World'],
+            ],
+            SimpleData::collection(['Hello', 'World'])->withoutWrapping()->toResponse(\request())->getData(true),
+        );
+    }
+
+    /** @test */
+    public function it_can_set_a_default_wrap_on_a_data_object()
+    {
+        $this->assertEquals(
+            ['wrap' => ['string' => 'Hello World']],
+            SimpleDataWithWrap::from('Hello World')->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            ['other-wrap' => ['string' => 'Hello World']],
+            SimpleDataWithWrap::from('Hello World')->wrap('other-wrap')->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            ['string' => 'Hello World'],
+            SimpleDataWithWrap::from('Hello World')->withoutWrapping()->toResponse(\request())->getData(true),
+        );
+    }
+
+    /** @test */
+    public function it_wraps_additional_data()
+    {
+        $dataClass = new class('Hello World') extends Data {
+            public function __construct(
+                public string $string
+            ) {
+            }
+
+            public function with(): array
+            {
+                return ['with' => 'this'];
+            }
+        };
+
+        $data = $dataClass->additional(['additional' => 'this'])
+            ->wrap('wrap')
+            ->toResponse(\request())
+            ->getData(true);
+
+        $this->assertEquals(
+            [
+                'wrap' => ['string' => 'Hello World'],
+                'additional' => 'this',
+                'with' => 'this',
+            ],
+            $data,
+        );
+    }
+
+    /** @test */
+    public function it_wraps_complex_data_structures()
+    {
+        $data = new MultiNestedData(
+            new NestedData(SimpleData::from('Hello')),
+            NestedData::collection([
+                new NestedData(SimpleData::from('World')),
+            ]),
+        );
+
+        $this->assertEquals(
+            [
+                'wrap' => [
+                    'nested' => ['simple' => ['string' => 'Hello']],
+                    'nestedCollection' => [
+                        ['simple' => ['string' => 'World']],
+                    ],
+                ],
+            ],
+            $data->wrap('wrap')->toResponse(\request())->getData(true)
+        );
+    }
+
+    /** @test */
+    public function it_wraps_complex_data_structures_with_a_global()
+    {
+        config()->set('data.wrap', 'wrap');
+
+        $data = new MultiNestedData(
+            new NestedData(SimpleData::from('Hello')),
+            NestedData::collection([
+                new NestedData(SimpleData::from('World')),
+            ]),
+        );
+
+        $this->assertEquals(
+            [
+                'wrap' => [
+                    'nested' => ['simple' => ['string' => 'Hello']],
+                    'nestedCollection' => [
+                        'wrap' => [
+                            ['simple' => ['string' => 'World']],
+                        ],
+                    ],
+                ],
+            ],
+            $data->wrap('wrap')->toResponse(\request())->getData(true)
+        );
+    }
+
+    /** @test */
+    public function it_only_wraps_responses()
+    {
+        $this->assertEquals(
+            ['string' => 'Hello World'],
+            SimpleData::from('Hello World')->wrap('wrap')->toArray(),
+        );
+
+        $this->assertEquals(
+            [
+                ['string' => 'Hello'],
+                ['string' => 'World'],
+            ],
+            SimpleData::collection(['Hello', 'World'])->wrap('wrap')->toArray(),
+        );
     }
 
     /**

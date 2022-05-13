@@ -37,4 +37,11 @@ return [
         Spatie\LaravelData\RuleInferrers\NullableRuleInferrer::class,
         Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer::class,
     ],
+
+    /*
+     * Data objects can be wrapped into a key like 'data' when used as a resource,
+     * this key can be set globally here for all data objects. You can pass in
+     * `null` if you want to disable wrapping.
+     */
+    'wrap' => null,
 ];

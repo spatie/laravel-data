@@ -1,6 +1,6 @@
 {
 nullable: number | null;
-undefineable: number;
+undefineable?: number;
 int: number;
 bool: boolean;
 string: string;

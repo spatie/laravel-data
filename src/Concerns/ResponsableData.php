@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Http\JsonResponse;
 use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
+use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 trait ResponsableData
 {
@@ -18,7 +19,9 @@ trait ResponsableData
             resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request)
         );
 
-        return new JsonResponse($this->toArray());
+        return new JsonResponse($this->transform(
+            wrapExecutionType: WrapExecutionType::Enabled,
+        ));
     }
 
     public static function allowedRequestIncludes(): ?array
