@@ -184,7 +184,7 @@ class DataTransformer
         if ($value instanceof Data || $value instanceof DataCollection) {
             $value->withPartialTrees($trees);
 
-            $wrapExecutionType = match (true){
+            $wrapExecutionType = match (true) {
                 $value instanceof Data && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
                 $value instanceof Data && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
                 $value instanceof Data && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled,

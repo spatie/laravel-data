@@ -2,9 +2,7 @@
 
 namespace Spatie\LaravelData\Tests\Fakes;
 
-use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Support\Wrapping\Wrap;
 
 class SimpleDataWithWrap extends Data
 {

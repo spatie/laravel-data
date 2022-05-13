@@ -98,8 +98,7 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
     public function transform(
         bool $transformValues = true,
         WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
-    ): array
-    {
+    ): array {
         return DataTransformer::create($transformValues, $wrapExecutionType)->transform($this);
     }
 

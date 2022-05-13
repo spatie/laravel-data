@@ -11,7 +11,6 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
-use function Symfony\Component\Translation\t;
 
 class DataCollectionTransformer
 {
@@ -47,11 +46,11 @@ class DataCollectionTransformer
         $items = $items->map($this->transformItemClosure())
             ->when(
                 $this->filter !== null,
-                fn(Enumerable $collection) => $collection->filter($this->filter)->values()
+                fn (Enumerable $collection) => $collection->filter($this->filter)->values()
             )
             ->when(
                 $this->transformValues,
-                fn(Enumerable $collection) => $collection->map(fn(Data $data) => $data->transform(
+                fn (Enumerable $collection) => $collection->map(fn (Data $data) => $data->transform(
                     $this->transformValues,
                     $this->wrapExecutionType->shouldExecute()
                         ? WrapExecutionType::TemporarilyDisabled

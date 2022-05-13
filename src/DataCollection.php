@@ -62,7 +62,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
         }
 
         $this->items = $items->map(
-            fn($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
+            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
     }
 
@@ -104,8 +104,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
     public function transform(
         bool $transformValues = true,
         WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
-    ): array
-    {
+    ): array {
         $transformer = new DataCollectionTransformer(
             $this->dataClass,
             $transformValues,
