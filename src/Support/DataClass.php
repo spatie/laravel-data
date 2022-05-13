@@ -14,6 +14,7 @@ use Spatie\LaravelData\Resolvers\NameMappersResolver;
 class DataClass
 {
     public function __construct(
+        /** @var class-string<\Spatie\LaravelData\Data> */
         public readonly string $name,
         /** @var Collection<string, \Spatie\LaravelData\Support\DataProperty> */
         public readonly Collection $properties,

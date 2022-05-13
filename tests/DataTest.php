@@ -671,7 +671,7 @@ class DataTest extends TestCase
             ->withProperty(DataPropertyBlueprintFactory::new('string')->withType('string'))
             ->create();
 
-        $data = $dataClass::validate(['string' => 'Hello World']);
+        $data = $dataClass::validateAndCreate(['string' => 'Hello World']);
 
         $this->assertEquals('Hello World', $data->string);
     }

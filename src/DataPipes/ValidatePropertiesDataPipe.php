@@ -10,19 +10,18 @@ use Spatie\LaravelData\Support\DataClass;
 class ValidatePropertiesDataPipe extends DataPipe
 {
     public function __construct(
-        protected DataValidatorResolver $dataValidatorResolver,
         protected bool $allTypes = false,
     ) {
     }
 
     public static function onlyRequests(): self
     {
-        return new self(app(DataValidatorResolver::class), false);
+        return new self(false);
     }
 
     public static function allTypes(): self
     {
-        return new self(app(DataValidatorResolver::class), true);
+        return new self(true);
     }
 
     public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
@@ -31,7 +30,7 @@ class ValidatePropertiesDataPipe extends DataPipe
             return $properties;
         }
 
-        $this->dataValidatorResolver->execute($class->name, $properties)->validate();
+        ($class->name)::validate($properties);
 
         return $properties;
     }

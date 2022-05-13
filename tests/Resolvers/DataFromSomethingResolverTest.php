@@ -104,7 +104,7 @@ class DataFromSomethingResolverTest extends TestCase
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+        $this->app->bind(Request::class, fn() => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
@@ -144,7 +144,7 @@ class DataFromSomethingResolverTest extends TestCase
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+        $this->app->bind(Request::class, fn() => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
@@ -172,6 +172,74 @@ class DataFromSomethingResolverTest extends TestCase
                     "The Another name field is required.",
                 ],
             ], $exception->errors());
+
+            return;
+        }
+
+        $this->fail('We should not end up here');
+    }
+
+    /** @test */
+    public function it_can_resolve_validation_dependencies_for_redirect_url()
+    {
+        $requestMock = $this->mock(Request::class);
+        $requestMock->expects('input')->andReturns('value');
+        $this->app->bind(Request::class, fn() => $requestMock);
+
+        $data = new class () extends Data {
+            public string $name;
+
+            public static function rules()
+            {
+                return [
+                    'name' => ['required'],
+                ];
+            }
+
+            public static function redirect(Request $request): string
+            {
+                return $request->input('key') === 'value' ? 'Another name' : 'Bad';
+            }
+        };
+
+        try {
+            $data::validate(['name' => '']);
+        } catch (ValidationException $exception) {
+            $this->assertEquals('Another name', $exception->redirectTo);
+
+            return;
+        }
+
+        $this->fail('We should not end up here');
+    }
+
+    /** @test */
+    public function it_can_resolve_validation_dependencies_for_error_bag()
+    {
+        $requestMock = $this->mock(Request::class);
+        $requestMock->expects('input')->andReturns('value');
+        $this->app->bind(Request::class, fn() => $requestMock);
+
+        $data = new class () extends Data {
+            public string $name;
+
+            public static function rules()
+            {
+                return [
+                    'name' => ['required'],
+                ];
+            }
+
+            public static function errorBag(Request $request): string
+            {
+                return $request->input('key') === 'value' ? 'Another name' : 'Bad';
+            }
+        };
+
+        try {
+            $data::validate(['name' => '']);
+        } catch (ValidationException $exception) {
+            $this->assertEquals('Another name', $exception->errorBag);
 
             return;
         }
@@ -216,7 +284,7 @@ class DataFromSomethingResolverTest extends TestCase
             }
         };
 
-        Route::post('/', fn (Request $request) => $data::from($request));
+        Route::post('/', fn(Request $request) => $data::from($request));
 
         $this->postJson('/', [])->assertJsonValidationErrorFor('string');
 
