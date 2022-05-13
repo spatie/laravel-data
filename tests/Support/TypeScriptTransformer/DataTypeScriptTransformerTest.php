@@ -34,7 +34,9 @@ class DataTypeScriptTransformerTest extends TestCase
                 public SimpleData $simpleData,
                 /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */
                 public DataCollection $dataCollection,
-                /** @var DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData> */
+//              Types package is not smart enough
+//                /** @var DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData> */
+                #[DataCollectionOf(SimpleData::class)]
                 public DataCollection $dataCollectionAlternative,
                 #[DataCollectionOf(SimpleData::class)]
                 public DataCollection $dataCollectionWithAttribute,

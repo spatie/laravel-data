@@ -104,7 +104,7 @@ class DataFromSomethingResolverTest extends TestCase
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+        $this->app->bind(Request::class, fn() => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
@@ -123,9 +123,20 @@ class DataFromSomethingResolverTest extends TestCase
                 ];
             }
         };
-        $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('Name is required');
-        $data::validate(['name' => '']);
+
+        try {
+            $data::validate(['name' => '']);
+        } catch (ValidationException $exception) {
+            $this->assertEquals([
+                "name" => [
+                    "Name is required",
+                ],
+            ], $exception->errors());
+
+            return;
+        }
+
+        $this->fail('We should not end up here');
     }
 
     /** @test */
@@ -133,7 +144,7 @@ class DataFromSomethingResolverTest extends TestCase
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+        $this->app->bind(Request::class, fn() => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
@@ -152,9 +163,20 @@ class DataFromSomethingResolverTest extends TestCase
                 ];
             }
         };
-        $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('The Another name field is required');
-        $data::validate(['name' => '']);
+
+        try {
+            $data::validate(['name' => '']);
+        } catch (ValidationException $exception) {
+            $this->assertEquals([
+                "name" => [
+                    "The Another name field is required.",
+                ],
+            ], $exception->errors());
+
+            return;
+        }
+
+        $this->fail('We should not end up here');
     }
 
     /** @test */
@@ -194,7 +216,7 @@ class DataFromSomethingResolverTest extends TestCase
             }
         };
 
-        Route::post('/', fn (Request $request) => $data::from($request));
+        Route::post('/', fn(Request $request) => $data::from($request));
 
         $this->postJson('/', [])->assertJsonValidationErrorFor('string');
 
