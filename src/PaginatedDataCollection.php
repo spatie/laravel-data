@@ -15,8 +15,12 @@ use IteratorAggregate;
 use JsonSerializable;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
+use Spatie\LaravelData\Concerns\TransformableData;
+use Spatie\LaravelData\Concerns\WrapableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
+use Spatie\LaravelData\Exceptions\PaginatedCollectionIsAlwaysWrapped;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
+use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 
 /**
@@ -29,6 +33,8 @@ class PaginatedDataCollection implements Responsable, Arrayable, Jsonable, JsonS
 {
     use ResponsableData;
     use IncludeableData;
+    use WrapableData;
+    use TransformableData;
 
     private ?Closure $through = null;
 
@@ -46,7 +52,7 @@ class PaginatedDataCollection implements Responsable, Arrayable, Jsonable, JsonS
         CursorPaginator|Paginator $items
     ) {
         $this->items = $items->through(
-            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
+            fn($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
     }
 
@@ -87,50 +93,31 @@ class PaginatedDataCollection implements Responsable, Arrayable, Jsonable, JsonS
      *
      * @return array<array>
      */
-    public function transform(bool $transformValues): array
+    public function transform(
+        bool $transformValues = true,
+        WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
+    ): array
     {
         $transformer = new DataCollectionTransformer(
             $this->dataClass,
             $transformValues,
+            $wrapExecutionType,
             $this->getPartialTrees(),
             $this->items,
             $this->through,
-            $this->filter
+            $this->filter,
+            $this->getWrap(),
         );
 
         return $transformer->transform();
     }
 
-    /**
-     * @return array<array>
-     */
-    public function all(): array
-    {
-        return $this->transform(false);
-    }
-
-    /**
-     * @return array<array>
-     */
-    public function toArray(): array
-    {
-        return $this->transform(true);
-    }
-
-    public function toJson($options = 0): string
-    {
-        return json_encode($this->toArray(), $options);
-    }
-
-    public function jsonSerialize(): array
-    {
-        return $this->toArray();
-    }
-
     /**  @return \ArrayIterator<array-key, array> */
     public function getIterator(): ArrayIterator
     {
-        return new ArrayIterator($this->transform(false));
+        return new ArrayIterator($this->transform(
+            transformValues: false,
+        ));
     }
 
     public function count(): int
@@ -145,5 +132,10 @@ class PaginatedDataCollection implements Responsable, Arrayable, Jsonable, JsonS
         }
 
         return new DataCollectionEloquentCast(current($arguments));
+    }
+
+    public function withoutWrapping(): static
+    {
+        throw PaginatedCollectionIsAlwaysWrapped::create();
     }
 }

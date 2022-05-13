@@ -14,7 +14,9 @@ use JsonSerializable;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
+use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\ValidateableData;
+use Spatie\LaravelData\Concerns\WrapableData;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
@@ -27,19 +29,17 @@ use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
+use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Transformers\DataTransformer;
 
-/**
- * TODO: Make all supporting data structures cachable -> we'll add caching later on
- * TODO: update the typescript transformer with new property data objects
- * TODO: add support for wrapping data objects and collections within keys
- */
 abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastable, JsonSerializable
 {
     use ResponsableData;
     use IncludeableData;
     use AppendableData;
     use ValidateableData;
+    use WrapableData;
+    use TransformableData;
 
     public static function optional(mixed ...$payloads): ?static
     {
@@ -95,29 +95,12 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
         return app(EmptyDataResolver::class)->execute(static::class, $extra);
     }
 
-    public function transform(bool $transformValues): array
+    public function transform(
+        bool $transformValues = true,
+        WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
+    ): array
     {
-        return DataTransformer::create($transformValues)->transform($this);
-    }
-
-    public function all(): array
-    {
-        return $this->transform(false);
-    }
-
-    public function toArray(): array
-    {
-        return $this->transform(true);
-    }
-
-    public function toJson($options = 0): string
-    {
-        return json_encode($this->toArray(), $options);
-    }
-
-    public function jsonSerialize(): array
-    {
-        return $this->toArray();
+        return DataTransformer::create($transformValues, $wrapExecutionType)->transform($this);
     }
 
     public static function castUsing(array $arguments)

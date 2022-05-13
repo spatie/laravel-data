@@ -10,28 +10,37 @@ use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 use Spatie\LaravelData\Support\PartialTrees;
+use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Undefined;
+use TypeError;
 
 class DataTransformer
 {
     private DataConfig $config;
 
-    public static function create(bool $transformValues): self
-    {
-        return new self($transformValues);
+    public static function create(
+        bool $transformValues,
+        WrapExecutionType $wrapExecutionType
+    ): self {
+        return new self($transformValues, $wrapExecutionType);
     }
 
-    public function __construct(protected bool $transformValues)
-    {
+    public function __construct(
+        protected bool $transformValues,
+        protected WrapExecutionType $wrapExecutionType,
+    ) {
         $this->config = app(DataConfig::class);
     }
 
     public function transform(Data $data): array
     {
-        return array_merge(
-            $this->resolvePayload($data),
-            $data->getAdditionalData()
-        );
+        $transformed = $this->resolvePayload($data);
+
+        if ($this->wrapExecutionType->shouldExecute()) {
+            $transformed = $data->getWrap()->wrap($transformed);
+        }
+
+        return array_merge($transformed, $data->getAdditionalData());
     }
 
     protected function resolvePayload(Data $data): array
@@ -175,8 +184,18 @@ class DataTransformer
         if ($value instanceof Data || $value instanceof DataCollection) {
             $value->withPartialTrees($trees);
 
+            $wrapExecutionType = match (true){
+                $value instanceof Data && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
+                $value instanceof Data && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
+                $value instanceof Data && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled,
+                $value instanceof DataCollection && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::Enabled,
+                $value instanceof DataCollection && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
+                $value instanceof DataCollection && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled,
+                default => throw new TypeError('Invalid wrap execution type')
+            };
+
             return $this->transformValues
-                ? $value->transform($this->transformValues)
+                ? $value->transform($this->transformValues, $wrapExecutionType)
                 : $value;
         }
 
