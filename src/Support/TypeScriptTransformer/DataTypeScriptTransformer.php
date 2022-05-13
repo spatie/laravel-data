@@ -3,11 +3,9 @@
 namespace Spatie\LaravelData\Support\TypeScriptTransformer;
 
 use ReflectionClass;
-use ReflectionNamedType;
 use ReflectionProperty;
-use ReflectionUnionType;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelTypeScriptTransformer\Transformers\DtoTransformer;
 use Spatie\TypeScriptTransformer\Structures\MissingSymbolsCollection;
 use Spatie\TypeScriptTransformer\TypeProcessors\DtoCollectionTypeProcessor;
@@ -38,9 +36,11 @@ class DataTypeScriptTransformer extends DtoTransformer
         ReflectionClass $class,
         MissingSymbolsCollection $missingSymbols
     ): string {
+        $dataClass = app(DataConfig::class)->getDataClass($class->getName());
+
         return array_reduce(
             $this->resolveProperties($class),
-            function (string $carry, ReflectionProperty $property) use ($missingSymbols) {
+            function (string $carry, ReflectionProperty $property) use ($dataClass, $missingSymbols) {
                 $type = $this->reflectionToType(
                     $property,
                     $missingSymbols,
@@ -57,30 +57,14 @@ class DataTypeScriptTransformer extends DtoTransformer
                     $property->getDeclaringClass()->getName()
                 );
 
-                return $this->isPropertyLazy($property)
+                /** @var \Spatie\LaravelData\Support\DataProperty $dataProperty */
+                $dataProperty = $dataClass->properties[$property->getName()];
+
+                return $dataProperty->type->isLazy || $dataProperty->type->isUndefinable
                     ? "{$carry}{$property->getName()}?: {$transformed};" . PHP_EOL
                     : "{$carry}{$property->getName()}: {$transformed};" . PHP_EOL;
             },
             ''
         );
-    }
-
-    protected function isPropertyLazy(ReflectionProperty $property): bool
-    {
-        $type = $property->getType();
-
-        if ($type === null || $type instanceof ReflectionNamedType) {
-            return false;
-        }
-
-        if ($type instanceof ReflectionUnionType) {
-            foreach ($type->getTypes() as $childType) {
-                if ($childType->getName() === Lazy::class) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 }

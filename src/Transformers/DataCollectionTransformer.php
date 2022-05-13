@@ -9,16 +9,20 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\PartialTrees;
+use Spatie\LaravelData\Support\Wrapping\Wrap;
+use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 class DataCollectionTransformer
 {
     public function __construct(
         protected string $dataClass,
         protected bool $transformValues,
+        protected WrapExecutionType $wrapExecutionType,
         protected PartialTrees $trees,
         protected Enumerable|CursorPaginator|Paginator $items,
         protected ?Closure $through,
         protected ?Closure $filter,
+        protected Wrap $wrap,
     ) {
     }
 
@@ -39,16 +43,25 @@ class DataCollectionTransformer
 
     protected function transformCollection(Enumerable $items): array
     {
-        return $items->map($this->transformItemClosure())
+        $items = $items->map($this->transformItemClosure())
             ->when(
                 $this->filter !== null,
                 fn (Enumerable $collection) => $collection->filter($this->filter)->values()
             )
             ->when(
                 $this->transformValues,
-                fn (Enumerable $collection) => $collection->map(fn (Data $data) => $data->transform($this->transformValues))
+                fn (Enumerable $collection) => $collection->map(fn (Data $data) => $data->transform(
+                    $this->transformValues,
+                    $this->wrapExecutionType->shouldExecute()
+                        ? WrapExecutionType::TemporarilyDisabled
+                        : $this->wrapExecutionType
+                ))
             )
             ->all();
+
+        return $this->wrapExecutionType->shouldExecute()
+            ? $this->wrap->wrap($items)
+            : $items;
     }
 
     protected function transformItemClosure(): Closure
@@ -66,8 +79,10 @@ class DataCollectionTransformer
 
     protected function wrapPaginatedArray(array $paginated): array
     {
+        $wrapKey = $this->wrap->getKey() ?? 'data';
+
         return [
-            'data' => $paginated['data'],
+            $wrapKey => $paginated['data'],
             'links' => $paginated['links'] ?? [],
             'meta' => Arr::except($paginated, [
                 'data',
