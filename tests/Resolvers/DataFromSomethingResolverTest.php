@@ -6,12 +6,14 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\TestCase;
+use Spatie\LaravelData\Undefined;
 
 class DataFromSomethingResolverTest extends TestCase
 {
@@ -293,5 +295,33 @@ class DataFromSomethingResolverTest extends TestCase
         ])->assertJson([
             'string' => 'Rick Astley',
         ])->assertOk();
+    }
+
+    /** @test */
+    public function it_can_resolve_payload_dependency_for_rules()
+    {
+        $data = new class () extends Data {
+            public string $payment_method;
+            public string|Undefined $paypal_email;
+
+            public static function rules(array $payload)
+            {
+                return [
+                    'payment_method' => ['required'],
+                    'paypal_email' => Rule::requiredIf($payload['payment_method'] === 'paypal'),
+                ];
+            }
+        };
+
+        $result = $data::validateAndCreate(['payment_method' => 'credit_card']);
+
+        $this->assertEquals([
+            'payment_method' => 'credit_card',
+        ], $result->toArray());
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('The paypal email field is required');
+
+        $data::validate(['payment_method' => 'paypal']);
     }
 }

@@ -12,20 +12,22 @@ class DataValidationRulesResolver
     {
     }
 
-    public function execute(string $class, bool $nullable = false): Collection
+    public function execute(string $class, array $payload = [], bool $nullable = false): Collection
     {
         $resolver = app(DataPropertyValidationRulesResolver::class);
 
         $overWrittenRules = [];
         /** @var class-string<\Spatie\LaravelData\Data> $class */
         if (method_exists($class, 'rules')) {
-            $overWrittenRules = app()->call([$class, 'rules']);
+            $overWrittenRules = app()->call([$class, 'rules'], [
+                'payload' => $payload,
+            ]);
         }
 
         return $this->dataConfig->getDataClass($class)
             ->properties
             ->reject(fn (DataProperty $property) => array_key_exists($property->name, $overWrittenRules) || ! $property->validate)
-            ->mapWithKeys(fn (DataProperty $property) => $resolver->execute($property, $nullable)->all())
+            ->mapWithKeys(fn (DataProperty $property) => $resolver->execute($property, $payload, $nullable)->all())
             ->merge($overWrittenRules);
     }
 }

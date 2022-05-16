@@ -15,12 +15,13 @@ class DataValidatorResolver
     /** @param class-string<\Spatie\LaravelData\Data> $dataClass */
     public function execute(string $dataClass, Arrayable|array $payload): Validator
     {
+        $payload = $payload instanceof Arrayable ? $payload->toArray() : $payload;
         $rules = app(DataValidationRulesResolver::class)
-            ->execute($dataClass)
+            ->execute($dataClass, $payload)
             ->toArray();
 
         $validator = ValidatorFacade::make(
-            $payload instanceof Arrayable ? $payload->toArray() : $payload,
+            $payload,
             $rules,
             method_exists($dataClass, 'messages') ? app()->call([$dataClass, 'messages']) : [],
             method_exists($dataClass, 'attributes') ? app()->call([$dataClass, 'attributes']) : []

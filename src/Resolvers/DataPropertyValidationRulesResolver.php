@@ -16,12 +16,12 @@ class DataPropertyValidationRulesResolver
     ) {
     }
 
-    public function execute(DataProperty $property, bool $nullable = false): Collection
+    public function execute(DataProperty $property, array $payload = [], bool $nullable = false): Collection
     {
         $propertyName = $property->inputMappedName ?? $property->name;
 
         if ($property->type->isDataObject || $property->type->isDataCollection) {
-            return $this->getNestedRules($property, $propertyName, $nullable);
+            return $this->getNestedRules($property, $propertyName, $payload, $nullable);
         }
 
         return collect([$propertyName => $this->getRulesForProperty($property, $nullable)]);
@@ -30,6 +30,7 @@ class DataPropertyValidationRulesResolver
     private function getNestedRules(
         DataProperty $property,
         string $propertyName,
+        array $payload,
         bool $nullable
     ): Collection {
         $prefix = match (true) {
@@ -50,6 +51,7 @@ class DataPropertyValidationRulesResolver
         return $this->dataValidationRulesResolver
             ->execute(
                 $property->type->dataClass,
+                $payload,
                 $nullable || ($property->type->isDataObject && $property->type->isNullable)
             )
             ->mapWithKeys(fn (array $rules, string $name) => [
