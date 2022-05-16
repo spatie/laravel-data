@@ -148,6 +148,27 @@ class SongData extends Data
 }
 ```
 
+Additionally, if you need to access the data payload, you can use `$payload` parameter:
+
+```php
+class PaymentData extends Data
+{
+    public function __construct(
+        public string $payment_method,
+        public ?string $paypal_email,
+    ) {
+    }
+    
+    public static function rules(array $payload): array
+    {
+        return [
+            'payment_method' => ['required'],
+            'paypal_email' => Rule::requiredIf($payload['payment_method'] === 'paypal'),
+        ];
+    }
+}
+```
+
 ## Mapping a request onto a data object
 
 By default, the package will do a one to one mapping from request to the data object, which means that for each property within the data object, a value with the same key will be searched within the request values.
