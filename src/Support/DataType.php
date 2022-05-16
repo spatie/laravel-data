@@ -15,6 +15,7 @@ use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\TypeScriptTransformer\Attributes\Optional as OptionalAttribute;
 use TypeError;
 
 class DataType implements Countable
@@ -44,13 +45,14 @@ class DataType implements Countable
     public function __construct(ReflectionParameter|ReflectionProperty $reflection)
     {
         $type = $reflection->getType();
+        $hasOptionalAttribute = count($reflection->getAttributes(OptionalAttribute::class)) > 0;
 
         if ($type === null) {
             $this->acceptedTypes = [];
             $this->isNullable = true;
             $this->isMixed = true;
             $this->isLazy = false;
-            $this->isUndefinable = false;
+            $this->isUndefinable = $hasOptionalAttribute;
             $this->isDataObject = false;
             $this->isDataCollection = false;
             $this->dataClass = null;
@@ -73,7 +75,7 @@ class DataType implements Countable
                 $type->getName() => $this->resolveBaseTypes($type->getName()),
             ];
             $this->isLazy = false;
-            $this->isUndefinable = false;
+            $this->isUndefinable = $hasOptionalAttribute;
             $this->isDataObject = is_a($type->getName(), Data::class, true);
             $this->isDataCollection = is_a($type->getName(), DataCollection::class, true);
 
@@ -94,7 +96,7 @@ class DataType implements Countable
         $isNullable = false;
         $isMixed = false;
         $isLazy = false;
-        $isUndefinable = false;
+        $isUndefinable = $hasOptionalAttribute;
         $isDataObject = false;
         $isDataCollection = false;
 
