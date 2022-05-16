@@ -12,12 +12,12 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\WithoutValidation;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataMagicMethodFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Undefined;
 
 class RequestDataTest extends TestCase
 {
@@ -272,14 +272,14 @@ class RequestDataTest extends TestCase
     }
 
     /** @test */
-    public function it_wont_validate_undefined_properties()
+    public function it_wont_validate_optional_properties()
     {
         DataBlueprintFactory::new('UndefinableDataFromRequest')
             ->withProperty(
                 DataPropertyBlueprintFactory::new('name')
                     ->withType('string'),
                 DataPropertyBlueprintFactory::new('age')
-                    ->withType('int', Undefined::class)
+                    ->withType('int', Optional::class)
             )
             ->create();
 

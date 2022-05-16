@@ -30,6 +30,7 @@ use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
 use Spatie\LaravelData\Normalizers\ArrayNormalizer;
 use Spatie\LaravelData\Normalizers\ModelNormalizer;
 use Spatie\LaravelData\Normalizers\ObjectNormalizer;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
@@ -39,7 +40,7 @@ use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
-use Spatie\LaravelData\Tests\Fakes\DefaultUndefinedData;
+use Spatie\LaravelData\Tests\Fakes\DefaultOptionalData;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
@@ -66,7 +67,6 @@ use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataCollectionTransf
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
-use Spatie\LaravelData\Undefined;
 use Spatie\LaravelData\WithData;
 
 class DataTest extends TestCase
@@ -1080,12 +1080,12 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_create_an_partial_data_object()
     {
-        $dataClass = new class ('', Undefined::create(), Undefined::create()) extends Data {
+        $dataClass = new class ('', Optional::create(), Optional::create()) extends Data {
             public function __construct(
                 public string $string,
-                public string|Undefined $undefinable_string,
+                public string|Optional $undefinable_string,
                 #[WithCast(StringToUpperCast::class)]
-                public string|Undefined $undefinable_string_with_cast,
+                public string|Optional $undefinable_string_with_cast,
             ) {
             }
         };
@@ -1095,8 +1095,8 @@ class DataTest extends TestCase
         ]);
 
         $this->assertEquals('Hello World', $partialData->string);
-        $this->assertEquals(Undefined::create(), $partialData->undefinable_string);
-        $this->assertEquals(Undefined::create(), $partialData->undefinable_string_with_cast);
+        $this->assertEquals(Optional::create(), $partialData->undefinable_string);
+        $this->assertEquals(Optional::create(), $partialData->undefinable_string_with_cast);
 
         $fullData = $dataClass::from([
             'string' => 'Hello World',
@@ -1112,12 +1112,12 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_transform_a_partial_object()
     {
-        $dataClass = new class ('', Undefined::create(), Undefined::create()) extends Data {
+        $dataClass = new class ('', Optional::create(), Optional::create()) extends Data {
             public function __construct(
                 public string $string,
-                public string|Undefined $undefinable_string,
+                public string|Optional $undefinable_string,
                 #[WithTransformer(StringToUpperTransformer::class)]
-                public string|Undefined $undefinable_string_with_transformer,
+                public string|Optional $undefinable_string_with_transformer,
             ) {
             }
         };
@@ -1144,12 +1144,12 @@ class DataTest extends TestCase
     }
 
     /** @test */
-    public function it_will_not_include_lazy_undefined_values_when_transforming()
+    public function it_will_not_include_lazy_optional_values_when_transforming()
     {
-        $data = new class ('Hello World', Lazy::create(fn () => Undefined::make())) extends Data {
+        $data = new class ('Hello World', Lazy::create(fn () => Optional::make())) extends Data {
             public function __construct(
                 public string $string,
-                public string|Undefined|Lazy $lazy_undefined_string,
+                public string|Optional|Lazy $lazy_optional_string,
             ) {
             }
         };
@@ -1160,17 +1160,17 @@ class DataTest extends TestCase
     }
 
     /** @test */
-    public function it_excludes_undefined_values_data()
+    public function it_excludes_optional_values_data()
     {
-        $data = DefaultUndefinedData::from([]);
+        $data = DefaultOptionalData::from([]);
 
         $this->assertEquals([], $data->toArray());
     }
 
     /** @test */
-    public function it_includes_value_if_not_undefined_data()
+    public function it_includes_value_if_not_optional_data()
     {
-        $data = DefaultUndefinedData::from([
+        $data = DefaultOptionalData::from([
             'name' => 'Freek',
         ]);
 

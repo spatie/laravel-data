@@ -6,13 +6,13 @@ use Illuminate\Support\Arr;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
-use Spatie\LaravelData\Undefined;
 use TypeError;
 
 class DataTransformer
@@ -65,7 +65,7 @@ class DataTransformer
                     $trees->getNested($name),
                 );
 
-                if ($value instanceof Undefined) {
+                if ($value instanceof Optional) {
                     return $payload;
                 }
 
@@ -84,7 +84,7 @@ class DataTransformer
         mixed $value,
         PartialTrees $trees,
     ): bool {
-        if ($value instanceof Undefined) {
+        if ($value instanceof Optional) {
             return false;
         }
 

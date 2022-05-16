@@ -20,6 +20,7 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
@@ -27,7 +28,6 @@ use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 use Spatie\LaravelData\Tests\TestCase;
-use Spatie\LaravelData\Undefined;
 use UnitEnum;
 
 class DataTypeTest extends TestCase
@@ -172,10 +172,10 @@ class DataTypeTest extends TestCase
     }
 
     /** @test */
-    public function it_can_deduce_an_undefined_type()
+    public function it_can_deduce_an_optional_type()
     {
         $type = $this->resolveDataType(new class () {
-            public string|Undefined $property;
+            public string|Optional $property;
         });
 
         $this->assertFalse($type->isNullable);
@@ -189,12 +189,12 @@ class DataTypeTest extends TestCase
     }
 
     /** @test */
-    public function a_type_cannot_be_undefined_alone()
+    public function a_type_cannot_be_optional_alone()
     {
         $this->expectException(InvalidDataType::class);
 
         $this->resolveDataType(new class () {
-            public Undefined $property;
+            public Optional $property;
         });
     }
 

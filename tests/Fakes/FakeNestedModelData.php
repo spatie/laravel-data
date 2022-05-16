@@ -5,8 +5,8 @@ namespace Spatie\LaravelData\Tests\Fakes;
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
-use Spatie\LaravelData\Undefined;
 
 class FakeNestedModelData extends Data
 {
@@ -14,7 +14,7 @@ class FakeNestedModelData extends Data
         public string $string,
         public ?string $nullable,
         public CarbonImmutable $date,
-        public Undefined|Lazy|FakeModelData|null $fake_model
+        public Optional|Lazy|FakeModelData|null $fake_model
     ) {
     }
 

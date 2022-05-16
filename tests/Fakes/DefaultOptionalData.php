@@ -3,12 +3,12 @@
 namespace Spatie\LaravelData\Tests\Fakes;
 
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Undefined;
+use Spatie\LaravelData\Optional;
 
-class DefaultUndefinedData extends Data
+class DefaultOptionalData extends Data
 {
     public function __construct(
-        public string | Undefined $name
+        public string | Optional $name
     ) {
     }
 }

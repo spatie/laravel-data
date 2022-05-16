@@ -14,7 +14,7 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Undefined;
+use Spatie\LaravelData\Optional;
 use TypeError;
 
 class DataType implements Countable
@@ -63,8 +63,8 @@ class DataType implements Countable
                 throw InvalidDataType::onlyLazy($reflection);
             }
 
-            if (is_a($type->getName(), Undefined::class, true)) {
-                throw InvalidDataType::onlyUndefined($reflection);
+            if (is_a($type->getName(), Optional::class, true)) {
+                throw InvalidDataType::onlyOptional($reflection);
             }
 
             $this->isNullable = $type->allowsNull();
@@ -99,14 +99,14 @@ class DataType implements Countable
         $isDataCollection = false;
 
         foreach ($type->getTypes() as $namedType) {
-            if (! in_array($namedType, ['null', Lazy::class, Undefined::class])) {
+            if (! in_array($namedType, ['null', Lazy::class, Optional::class])) {
                 $acceptedTypes[$namedType->getName()] = $this->resolveBaseTypes($namedType->getName());
             }
 
             $isNullable = $isNullable || $namedType->allowsNull();
             $isMixed = $namedType->getName() === 'mixed';
             $isLazy = $isLazy || is_a($namedType->getName(), Lazy::class, true);
-            $isUndefinable = $isUndefinable || is_a($namedType->getName(), Undefined::class, true);
+            $isUndefinable = $isUndefinable || is_a($namedType->getName(), Optional::class, true);
             $isDataObject = $isDataObject || is_a($namedType->getName(), Data::class, true);
             $isDataCollection = $isDataCollection || is_a($namedType->getName(), DataCollection::class, true);
         }
