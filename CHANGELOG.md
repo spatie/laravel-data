@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 1.4.7 - 2022-05-16
+
+- support $payload as a dependency in rules (#123)
+
 ## 1.4.6 - 2022-04-06
 
 - Add Dependency Injection for rules, messages, and attributes methods (#114)
