@@ -11,6 +11,7 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
+use Spatie\TypeScriptTransformer\Attributes\Optional as TypeScriptOptional;
 use Spatie\TypeScriptTransformer\TypeScriptTransformerConfig;
 
 class DataTypeScriptTransformerTest extends TestCase
@@ -50,5 +51,58 @@ class DataTypeScriptTransformerTest extends TestCase
 
         $this->assertTrue($transformer->canTransform($reflection));
         $this->assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
+    }
+
+    /** @test */
+    public function it_respects_optional_attribute()
+    {
+        $config = TypeScriptTransformerConfig::create();
+        $config->nullToOptional(false);
+
+        $data = new class (10, 'Ruben') extends Data {
+            public function __construct(
+                #[TypeScriptOptional]
+                public ?int $id,
+                public string $first_name,
+            ) {
+            }
+        };
+
+        $transformer = new DataTypeScriptTransformer($config);
+        $reflection = new ReflectionClass($data);
+
+        $this->assertTrue($transformer->canTransform($reflection));
+        $this->assertEquals(<<<TXT
+        {
+        id?: number;
+        first_name: string;
+        }
+        TXT, $transformer->transform($reflection, 'DataObject')->transformed);
+    }
+
+    /** @test */
+    public function it_converts_nullable_properties_to_optional_ones()
+    {
+        $config = TypeScriptTransformerConfig::create();
+        $config->nullToOptional(true);
+
+        $data = new class (10, 'Ruben') extends Data {
+            public function __construct(
+                public ?int $id,
+                public ?string $first_name,
+            ) {
+            }
+        };
+
+        $transformer = new DataTypeScriptTransformer($config);
+        $reflection = new ReflectionClass($data);
+
+        $this->assertTrue($transformer->canTransform($reflection));
+        $this->assertEquals(<<<TXT
+        {
+        id?: number;
+        first_name?: string;
+        }
+        TXT, $transformer->transform($reflection, 'DataObject')->transformed);
     }
 }
