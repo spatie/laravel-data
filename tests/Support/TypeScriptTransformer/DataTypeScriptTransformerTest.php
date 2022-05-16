@@ -105,4 +105,30 @@ class DataTypeScriptTransformerTest extends TestCase
         }
         TXT, $transformer->transform($reflection, 'DataObject')->transformed);
     }
+
+    /** @test */
+    public function it_does_not_convert_to_optional_by_default()
+    {
+        $config = TypeScriptTransformerConfig::create();
+        $config->nullToOptional(true);
+
+        $data = new class (10, 'Ruben') extends Data {
+            public function __construct(
+                public int $id,
+                public string $first_name,
+            ) {
+            }
+        };
+
+        $transformer = new DataTypeScriptTransformer($config);
+        $reflection = new ReflectionClass($data);
+
+        $this->assertTrue($transformer->canTransform($reflection));
+        $this->assertEquals(<<<TXT
+        {
+        id: number;
+        first_name: string;
+        }
+        TXT, $transformer->transform($reflection, 'DataObject')->transformed);
+    }
 }
