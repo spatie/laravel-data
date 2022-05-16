@@ -27,7 +27,7 @@ class DataValidatorResolver
             method_exists($dataClass, 'attributes') ? app()->call([$dataClass, 'attributes']) : []
         );
 
-        if(method_exists($dataClass, 'stopOnFirstFailure')){
+        if (method_exists($dataClass, 'stopOnFirstFailure')) {
             $validator->stopOnFirstFailure(app()->call([$dataClass, 'stopOnFirstFailure']));
         }
 

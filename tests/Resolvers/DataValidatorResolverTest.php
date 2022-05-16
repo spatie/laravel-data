@@ -10,7 +10,7 @@ class DataValidatorResolverTest extends TestCase
 {
     private DataValidatorResolver $resolver;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -20,7 +20,7 @@ class DataValidatorResolverTest extends TestCase
     /** @test */
     public function it_can_set_the_validator_to_stop_on_the_first_failure()
     {
-        $dataClass = new class extends Data{
+        $dataClass = new class () extends Data {
             public static function stopOnFirstFailure(): bool
             {
                 return true;
