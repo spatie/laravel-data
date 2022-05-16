@@ -2,9 +2,9 @@
 
 namespace Spatie\LaravelData;
 
-class Undefined
+class Optional
 {
-    public static function create(): Undefined
+    public static function create(): Optional
     {
         return new self();
     }

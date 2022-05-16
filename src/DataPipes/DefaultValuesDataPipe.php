@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\DataPipes;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Undefined;
+use Spatie\LaravelData\Optional;
 
 class DefaultValuesDataPipe extends DataPipe
 {
@@ -20,7 +20,7 @@ class DefaultValuesDataPipe extends DataPipe
                 }
 
                 if ($property->type->isUndefinable) {
-                    $properties[$property->name] = Undefined::create();
+                    $properties[$property->name] = Optional::create();
                 }
             });
 

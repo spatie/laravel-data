@@ -13,7 +13,7 @@ use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\TestCase;
-use Spatie\LaravelData\Undefined;
+use Spatie\LaravelData\Optional;
 
 class DataFromSomethingResolverTest extends TestCase
 {
@@ -302,7 +302,7 @@ class DataFromSomethingResolverTest extends TestCase
     {
         $data = new class () extends Data {
             public string $payment_method;
-            public string|Undefined $paypal_email;
+            public string|Optional $paypal_email;
 
             public static function rules(array $payload)
             {

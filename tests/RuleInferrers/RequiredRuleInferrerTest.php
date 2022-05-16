@@ -13,7 +13,7 @@ use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
-use Spatie\LaravelData\Undefined;
+use Spatie\LaravelData\Optional;
 
 class RequiredRuleInferrerTest extends TestCase
 {
@@ -126,7 +126,7 @@ class RequiredRuleInferrerTest extends TestCase
     public function it_wont_add_required_rules_to_undefinable_properties()
     {
         $dataProperty = $this->getProperty(new class () extends Data {
-            public string|Undefined $string;
+            public string|Optional $string;
         });
 
         $rules = $this->inferrer->handle($dataProperty, []);

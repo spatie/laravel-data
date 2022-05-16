@@ -11,7 +11,7 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
-use Spatie\LaravelData\Undefined;
+use Spatie\LaravelData\Optional;
 
 class EmptyDataResolverTest extends TestCase
 {
@@ -108,18 +108,18 @@ class EmptyDataResolverTest extends TestCase
         });
     }
 
-    public function it_will_return_the_base_type_for_lazy_types_that_can_be_undefined()
+    public function it_will_return_the_base_type_for_lazy_types_that_can_be_optional()
     {
         $this->assertEmptyPropertyValue(null, new class () {
-            public Lazy | string | Undefined $property;
+            public Lazy | string | Optional $property;
         });
 
         $this->assertEmptyPropertyValue([], new class () {
-            public Lazy | array | Undefined $property;
+            public Lazy | array | Optional $property;
         });
 
         $this->assertEmptyPropertyValue(['string' => null], new class () {
-            public Lazy | SimpleData | Undefined $property;
+            public Lazy | SimpleData | Optional $property;
         });
     }
 
@@ -127,15 +127,15 @@ class EmptyDataResolverTest extends TestCase
     public function it_will_return_the_base_type_for_undefinable_types()
     {
         $this->assertEmptyPropertyValue(null, new class () {
-            public Undefined | string $property;
+            public Optional | string $property;
         });
 
         $this->assertEmptyPropertyValue([], new class () {
-            public Undefined | array $property;
+            public Optional | array $property;
         });
 
         $this->assertEmptyPropertyValue(['string' => null], new class () {
-            public Undefined | SimpleData $property;
+            public Optional | SimpleData $property;
         });
     }
 
@@ -170,22 +170,22 @@ class EmptyDataResolverTest extends TestCase
     }
 
     /** @test */
-    public function it_cannot_have_multiple_types_with_a_undefined()
+    public function it_cannot_have_multiple_types_with_a_optional()
     {
         $this->expectException(DataPropertyCanOnlyHaveOneType::class);
 
         $this->assertEmptyPropertyValue(null, new class () {
-            public int | string | Undefined $property;
+            public int | string | Optional $property;
         });
     }
 
     /** @test */
-    public function it_cannot_have_multiple_types_with_a_nullable_undefined()
+    public function it_cannot_have_multiple_types_with_a_nullable_optional()
     {
         $this->expectException(DataPropertyCanOnlyHaveOneType::class);
 
         $this->assertEmptyPropertyValue(null, new class () {
-            public int | string | Undefined | null $property;
+            public int | string | Optional | null $property;
         });
     }
 

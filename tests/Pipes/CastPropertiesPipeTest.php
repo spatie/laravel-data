@@ -20,7 +20,7 @@ use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
-use Spatie\LaravelData\Undefined;
+use Spatie\LaravelData\Optional;
 
 class CastPropertiesPipeTest extends TestCase
 {
@@ -65,7 +65,7 @@ class CastPropertiesPipeTest extends TestCase
         $this->assertEquals('Hello world', $data->string);
         $this->assertEquals([1, 1, 2, 3, 5, 8], $data->array);
         $this->assertNull($data->nullable);
-        $this->assertInstanceOf(Undefined::class, $data->undefinable);
+        $this->assertInstanceOf(Optional::class, $data->undefinable);
         $this->assertEquals(42, $data->mixed);
         $this->assertEquals(DateTime::createFromFormat(DATE_ATOM, '1994-05-16T12:00:00+01:00'), $data->defaultCast);
         $this->assertEquals(CarbonImmutable::createFromFormat('d-m-Y', '16-06-1994'), $data->explicitCast);

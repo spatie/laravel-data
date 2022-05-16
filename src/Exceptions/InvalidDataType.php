@@ -13,9 +13,9 @@ class InvalidDataType extends Exception
         return new self("A data property/parameter cannot have Lazy as it's only type ({$property->class}::{$property->name})");
     }
 
-    public static function onlyUndefined(ReflectionProperty|ReflectionParameter $property)
+    public static function onlyOptional(ReflectionProperty|ReflectionParameter $property)
     {
-        return new self("A data property/parameter cannot have Undefined as it's only type ({$property->class}::{$property->name})");
+        return new self("A data property/parameter cannot have Optional as it's only type ({$property->class}::{$property->name})");
     }
 
     public static function unionWithData(ReflectionProperty|ReflectionParameter $property)

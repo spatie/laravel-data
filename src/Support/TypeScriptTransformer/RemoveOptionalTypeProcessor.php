@@ -9,11 +9,11 @@ use phpDocumentor\Reflection\Types\Object_;
 use ReflectionMethod;
 use ReflectionParameter;
 use ReflectionProperty;
-use Spatie\LaravelData\Undefined;
+use Spatie\LaravelData\Optional;
 use Spatie\TypeScriptTransformer\Structures\MissingSymbolsCollection;
 use Spatie\TypeScriptTransformer\TypeProcessors\TypeProcessor;
 
-class RemoveUndefinedTypeProcessor implements TypeProcessor
+class RemoveOptionalTypeProcessor implements TypeProcessor
 {
     public function process(
         Type $type,
@@ -31,11 +31,11 @@ class RemoveUndefinedTypeProcessor implements TypeProcessor
                     return false;
                 }
 
-                return is_a((string)$type->getFqsen(), Undefined::class, true);
+                return is_a((string)$type->getFqsen(), Optional::class, true);
             });
 
         if ($types->isEmpty()) {
-            throw new Exception("Type {$reflection->getDeclaringClass()->name}:{$reflection->getName()} cannot be only Undefined");
+            throw new Exception("Type {$reflection->getDeclaringClass()->name}:{$reflection->getName()} cannot be only Optional");
         }
 
         if ($types->count() === 1) {

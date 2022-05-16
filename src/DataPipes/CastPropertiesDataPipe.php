@@ -7,7 +7,7 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Undefined;
+use Spatie\LaravelData\Optional;
 
 class CastPropertiesDataPipe extends DataPipe
 {
@@ -27,7 +27,7 @@ class CastPropertiesDataPipe extends DataPipe
                 continue;
             }
 
-            if ($value === null || $value instanceof Undefined || $value instanceof Lazy) {
+            if ($value === null || $value instanceof Optional || $value instanceof Lazy) {
                 continue;
             }
 
