@@ -51,16 +51,21 @@ class DataTypeScriptTransformer extends DtoTransformer
                     return $carry;
                 }
 
-                $transformed = $this->typeToTypeScript(
-                    $type,
-                    $missingSymbols,
-                    $property->getDeclaringClass()->getName()
-                );
-
                 /** @var \Spatie\LaravelData\Support\DataProperty $dataProperty */
                 $dataProperty = $dataClass->properties[$property->getName()];
 
-                return $dataProperty->type->isLazy || $dataProperty->type->isUndefinable
+                $isOptional = ($this->config->shouldConsiderNullAsOptional() && $dataProperty->type->isNullable)
+                    || $dataProperty->type->isLazy
+                    || $dataProperty->type->isUndefinable;
+
+                $transformed = $this->typeToTypeScript(
+                    $type,
+                    $missingSymbols,
+                    $isOptional,
+                    $property->getDeclaringClass()->getName(),
+                );
+
+                return $isOptional
                     ? "{$carry}{$property->getName()}?: {$transformed};" . PHP_EOL
                     : "{$carry}{$property->getName()}: {$transformed};" . PHP_EOL;
             },
