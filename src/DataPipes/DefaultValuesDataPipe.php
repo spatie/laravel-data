@@ -3,9 +3,9 @@
 namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Optional;
 
 class DefaultValuesDataPipe extends DataPipe
 {

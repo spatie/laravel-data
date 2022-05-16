@@ -29,6 +29,7 @@ use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
 use Spatie\LaravelData\Normalizers\ArrayNormalizer;
 use Spatie\LaravelData\Normalizers\ModelNormalizer;
 use Spatie\LaravelData\Normalizers\ObjectNormalizer;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
@@ -65,7 +66,6 @@ use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataCollectionTransf
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
-use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\WithData;
 
 class DataTest extends TestCase
