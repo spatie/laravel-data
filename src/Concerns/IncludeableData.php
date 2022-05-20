@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Concerns;
 
+use Closure;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\PartialTrees;
 
@@ -53,14 +54,30 @@ trait IncludeableData
         return $this;
     }
 
-    public function includeWhen(): array
+    public function onlyWhen(string $only, bool|Closure $condition): static
     {
-        return [];
+        $condition = $condition instanceof Closure
+            ? $condition($this)
+            : $condition;
+
+        if($condition){
+            $this->only($only);
+        }
+
+        return $this;
     }
 
-    public function excludeWhen(): array
+    public function exceptWhen(string $except, bool|Closure $condition): self
     {
-        return [];
+        $condition = $condition instanceof Closure
+            ? $condition($this)
+            : $condition;
+
+        if($condition){
+            $this->except($except);
+        }
+
+        return $this;
     }
 
     public function getPartialTrees(): PartialTrees
@@ -69,24 +86,11 @@ trait IncludeableData
             return $this->partialTrees;
         }
 
-        $only = $this->conditionalKeys($this->only, $this->includeWhen());
-        $except = $this->conditionalKeys($this->except, $this->excludeWhen());
-
         return new PartialTrees(
             ! empty($this->includes) ? (new PartialsParser())->execute($this->includes) : null,
             ! empty($this->excludes) ? (new PartialsParser())->execute($this->excludes) : null,
-            ! empty($only) ? (new PartialsParser())->execute($only) : null,
-            ! empty($except) ? (new PartialsParser())->execute($except) : null,
+            ! empty($this->only) ? (new PartialsParser())->execute($this->only) : null,
+            ! empty($this->except) ? (new PartialsParser())->execute($this->except) : null,
         );
-    }
-
-    protected function conditionalKeys(array $array, array $conditions): array
-    {
-        return array_merge(array_keys(array_filter(
-            $conditions,
-            fn ($value) => $value instanceof \Closure
-                ? ($value)($this)
-                : $value
-        )), $array);
     }
 }

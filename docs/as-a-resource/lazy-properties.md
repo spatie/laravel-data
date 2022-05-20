@@ -1,6 +1,6 @@
 ---
-title: Lazy properties
-weight: 3
+title: Including and excluding properties
+weight: 2
 ---
 
 Sometimes you don't want all the properties included when transforming a data object to an array, for example:
@@ -181,7 +181,48 @@ The property will now always be included when the data object is transformed. Yo
 AlbumData::create(Album::first())->exclude('songs');
 ```
 
-## Including by query string
+## Only and Except
+
+Lazy properties are great for reducing payloads sent over the wire. However, when you completely want to remove a property Laravel's `only` and `except` methods can be used:
+
+```php
+AlbumData::from(Album::first())->only('songs'); // will only show `songs`
+AlbumData::from(Album::first())->except('songs'); // will show everything except `songs`
+```
+
+It is also possible to use multiple keys:
+
+```php
+AlbumData::from(Album::first())->only('songs.name', 'songs.artist');
+AlbumData::from(Album::first())->except('songs.name', 'songs.artist');
+```
+
+And special keys like described above:
+
+```php
+AlbumData::from(Album::first())->only('songs.{name, artist}');
+AlbumData::from(Album::first())->except('songs.{name, artist}');
+```
+
+Only and except always take precedence over include and exclude, which means that when a property is hidden by `only` or `except` it is impossible to show it again using `include`.
+
+### Specific `only` and `except`
+
+It is possible to add an `only` or `exclude` if a certain condition is met:
+
+```php
+AlbumData::from(Album::first())->onlyWhen('songs', auth()->user()->isAdmin);
+AlbumData::from(Album::first())->except('songs', auth()->user()->isAdmin);
+```
+
+You can also use the values of the data object in such condition:
+
+```php
+AlbumData::from(Album::first())->onlyWhen('songs', fn(AlbumData $data) => count($data->songs) > 0);
+AlbumData::from(Album::first())->except('songs', fn(AlbumData $data) => count($data->songs) > 0);
+```
+
+## Using query strings
 
 It is possible to include or exclude lazy properties by the URL query string:
 
@@ -191,6 +232,20 @@ For example, when we create a route `my-account`:
 // in web.php
 
 Route::get('my-account', fn() => UserData::from(User::first()));
+```
+
+We now specify that a key of the data object is allowed to be included by query string on the data object:
+
+```php
+class UserData extends Data
+{
+    public static function allowedRequestIncludes(): ?array
+    {
+        return ['favorite_song'];
+    }
+
+    // ...
+}
 ```
 
 Our JSON would look like this when we request `https://spatie.be/my-account`:
@@ -207,6 +262,61 @@ We can include `favorite_song` by adding it to the query in the URL as such:
 https://spatie.be/my-account?include=favorite_song
 ```
 
-It is also possible to define excludes with the `exclude` key in the URL query.
+```json
+{
+    "name": "Ruben Van Assche",
+    "favorite_song": {
+        "name" : "Never Gonna Give You Up",
+        "artist" : "Rick Astley"
+    }
+}
+```
 
-Including and excluding lazy properties works for data objects and data collections.
+Including properties works for data objects and data collections.
+
+### Allowing includes by query string
+
+By default, it is disallowed to include properties by query string:
+
+```php
+class UserData extends Data
+{
+    public static function allowedRequestIncludes(): ?array
+    {
+        return [];
+    }
+}
+```
+
+You can pass several names of properties which are allowed to be included by query string:
+
+```php
+class UserData extends Data
+{
+    public static function allowedRequestIncludes(): ?array
+    {
+        return ['favorite_song', 'name'];
+    }
+}
+```
+
+Or you can allow all properties to be included by query string:
+
+```php
+class UserData extends Data
+{
+    public static function allowedRequestIncludes(): ?array
+    {
+        return null;
+    }
+}
+```
+
+### Other operations
+
+It is also possible to run exclude, except and only operations on a data object:
+
+- You can define **excludes** in `allowedRequestExcludes` and use the `exclude` key in your query string
+- You can define **except** in `allowedRequestExcept` and use the `except` key in your query string
+- You can define **only** in `allowedRequestOnly` and use the `only` key in your query string
+

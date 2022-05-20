@@ -26,21 +26,21 @@ trait ResponsableData
 
     public static function allowedRequestIncludes(): ?array
     {
-        return null;
+        return [];
     }
 
     public static function allowedRequestExcludes(): ?array
     {
-        return null;
+        return [];
     }
 
     public static function allowedRequestOnly(): ?array
     {
-        return null;
+        return [];
     }
 
     public static function allowedRequestExcept(): ?array
     {
-        return null;
+        return [];
     }
 }

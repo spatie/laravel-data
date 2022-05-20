@@ -409,13 +409,13 @@ class DataTest extends TestCase
     {
         $response = LazyData::from('Ruben')->toResponse(request());
 
+        $this->assertEquals([], $response->getData(true));
+
         LazyData::$allowedIncludes = ['name'];
 
         $includedResponse = LazyData::from('Ruben')->toResponse(request()->merge([
             'include' => 'name',
         ]));
-
-        $this->assertEquals([], $response->getData(true));
 
         $this->assertEquals(['name' => 'Ruben'], $includedResponse->getData(true));
     }
@@ -453,13 +453,13 @@ class DataTest extends TestCase
     {
         $response = DefaultLazyData::from('Ruben')->toResponse(request());
 
+        $this->assertEquals(['name' => 'Ruben'], $response->getData(true));
+
         DefaultLazyData::$allowedExcludes = ['name'];
 
         $excludedResponse = DefaultLazyData::from('Ruben')->toResponse(request()->merge([
             'exclude' => 'name',
         ]));
-
-        $this->assertEquals(['name' => 'Ruben'], $response->getData(true));
 
         $this->assertEquals([], $excludedResponse->getData(true));
     }
@@ -1404,14 +1404,6 @@ class DataTest extends TestCase
                 public ?string $name = null,
             ) {
             }
-
-            public function includeWhen(): array
-            {
-                return [
-                    'id' => false,
-                    'name' => true,
-                ];
-            }
         };
 
         $this->assertEquals([
@@ -1419,7 +1411,7 @@ class DataTest extends TestCase
         ], $data::from([
             'id' => 1,
             'name' => 'Taylor',
-        ])->toArray());
+        ])->onlyWhen('id', false)->onlyWhen('name', true)->toArray());
     }
 
     /** @test */
@@ -1431,20 +1423,6 @@ class DataTest extends TestCase
                 public ?string $name = null,
             ) {
             }
-
-            public function includeWhen(): array
-            {
-                return [
-                    'name' => true,
-                ];
-            }
-
-            public function excludeWhen(): array
-            {
-                return [
-                    'name' => true,
-                ];
-            }
         };
 
         $this->assertEquals([
@@ -1452,7 +1430,7 @@ class DataTest extends TestCase
         ], $data::from([
             'id' => 1,
             'name' => 'Taylor',
-        ])->toArray());
+        ])->onlyWhen('name', true)->exceptWhen('name', true)->toArray());
     }
 
     /** @test */
@@ -1464,14 +1442,6 @@ class DataTest extends TestCase
                 public ?string $name = null,
             ) {
             }
-
-            public function excludeWhen(): array
-            {
-                return [
-                    'id' => true,
-                    'name' => false,
-                ];
-            }
         };
 
         $this->assertEquals([
@@ -1479,7 +1449,7 @@ class DataTest extends TestCase
         ], $data::from([
             'id' => 1,
             'name' => 'Taylor',
-        ])->toArray());
+        ])->exceptWhen('id', true)->exceptWhen('name', false)->toArray());
     }
 
     /** @test */
@@ -1491,13 +1461,6 @@ class DataTest extends TestCase
                 public ?string $name = null,
             ) {
             }
-
-            public function excludeWhen(): array
-            {
-                return [
-                    'id' => fn () => $this->name === 'Taylor',
-                ];
-            }
         };
 
         $this->assertEquals([
@@ -1505,7 +1468,7 @@ class DataTest extends TestCase
         ], $data::from([
             'id' => 1,
             'name' => 'Taylor',
-        ])->toArray());
+        ])->exceptWhen('id', fn (Data $data) => $data->name === 'Taylor')->toArray());
 
         $this->assertEquals([
             'id' => 1,
@@ -1513,7 +1476,7 @@ class DataTest extends TestCase
         ], $data::from([
             'id' => 1,
             'name' => 'Freek',
-        ])->toArray());
+        ])->exceptWhen('id', fn (Data $data) => $data->name === 'Taylor')->toArray());
     }
 
     /** @test */
