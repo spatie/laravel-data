@@ -18,10 +18,12 @@ class EmptyDataResolver
         $dataClass = $this->dataConfig->getDataClass($class);
 
         return $dataClass->properties->reduce(function (array $payload, DataProperty $property) use ($extra) {
+            $name = $property->outputMappedName ?? $property->name;
+
             if ($property->hasDefaultValue) {
-                $payload[$property->name] = $property->defaultValue;
+                $payload[$name] = $property->defaultValue;
             } else {
-                $payload[$property->name] = $extra[$property->name] ?? $this->getValueForProperty($property);
+                $payload[$name] = $extra[$property->name] ?? $this->getValueForProperty($property);
             }
 
             return $payload;
