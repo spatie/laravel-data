@@ -60,7 +60,7 @@ trait IncludeableData
             ? $condition($this)
             : $condition;
 
-        if($condition){
+        if ($condition) {
             $this->only($only);
         }
 
@@ -73,7 +73,7 @@ trait IncludeableData
             ? $condition($this)
             : $condition;
 
-        if($condition){
+        if ($condition) {
             $this->except($except);
         }
 
