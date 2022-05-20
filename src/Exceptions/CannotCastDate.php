@@ -6,8 +6,8 @@ use Exception;
 
 class CannotCastDate extends Exception
 {
-    public static function create(string $format, string $type, mixed $value): self
+    public static function create(array $formats, string $type, mixed $value): self
     {
-        return new self("Could not cast date: `{$value}` into a `{$type}` using format {$format}");
+        return new self("Could not cast date `{$value}` into a `{$type}` using formats: ".implode(', ', $formats));
     }
 }

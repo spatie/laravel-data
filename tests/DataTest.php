@@ -16,6 +16,7 @@ use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\Validation\In;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
+use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataPipeline;
@@ -2057,5 +2058,20 @@ class DataTest extends TestCase
                 ],
             ],
         ];
+    }
+
+    /** @test */
+    public function it_supports_conversion_from_multiple_date_formats()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                #[WithCast(DateTimeInterfaceCast::class, ['Y-m-d\TH:i:sP', 'Y-m-d H:i:s'])]
+                public ?DateTime $date = null
+            ) {
+            }
+        };
+
+        $this->assertEquals(['date' => '2022-05-16T14:37:56+00:00'], $data::from(['date' => '2022-05-16T14:37:56+00:00'])->toArray());
+        $this->assertEquals(['date' => '2022-05-16T17:00:00+00:00'], $data::from(['date' => '2022-05-16 17:00:00'])->toArray());
     }
 }
