@@ -60,7 +60,7 @@ class DataTypeScriptTransformer extends DtoTransformer
                 /** @var \Spatie\LaravelData\Support\DataProperty $dataProperty */
                 $dataProperty = $dataClass->properties[$property->getName()];
 
-                return $dataProperty->type->isLazy || $dataProperty->type->isUndefinable
+                return $dataProperty->type->isLazy || $dataProperty->type->isOptional
                     ? "{$carry}{$property->getName()}?: {$transformed};" . PHP_EOL
                     : "{$carry}{$property->getName()}: {$transformed};" . PHP_EOL;
             },

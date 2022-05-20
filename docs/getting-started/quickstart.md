@@ -5,7 +5,7 @@ weight: 1
 
 In this quickstart, we'll guide you through the most important functionalities of the package and how to use them. 
 
-First, you should [install the package](https://spatie.be/docs/laravel-data/v1/installation-setup).
+First, you should [install the package](https://spatie.be/docs/laravel-data/v2/installation-setup).
 
 We're going to create a blog with different posts so let's get started with the `PostData` object. A post has a title, some content, a status and a date when it was published:
 
@@ -149,7 +149,7 @@ By default, the global casts list looks like this:
 
 This means that if a class property is of type `DateTime`, `Carbon`, `CarbonImmutable`, ... it will be automatically converted.
 
-You can read more about casting [here](/docs/laravel-data/v1/as-a-data-transfer-object/casts).
+You can read more about casting [here](/docs/laravel-data/v2/as-a-data-transfer-object/casts).
 
 ## Validation using form requests
 
@@ -223,7 +223,7 @@ class PostData extends Data
 }
 ```
 
-There's still much more you can do with validating data objects. Read more about it [here](/docs/laravel-data/v1/as-a-data-transfer-object/request-to-data-object#validating-a-request).
+There's still much more you can do with validating data objects. Read more about it [here](/docs/laravel-data/v2/as-a-data-transfer-object/request-to-data-object#validating-a-request).
 
 ## Working with Eloquent models
 
@@ -295,7 +295,7 @@ class PostData extends Data
 ```
 
 Magic creation methods allow you to create data objects from any type by passing them to the `from` method of a data
-object, you can read more about it [here](/laravel-data/v1/as-a-data-transfer-object/creating-a-data-object#magical-creation).
+object, you can read more about it [here](/laravel-data/v2/as-a-data-transfer-object/creating-a-data-object#magical-creation).
 
 It can be convenient to transform more complex models than our `Post` into data objects because you can decide how a model
 would be mapped onto a data object.
@@ -352,7 +352,7 @@ AuthorData::from([
 
 The data object is smart enough to convert an array of posts into a data collection of post data. Mapping data coming from the frontend was never that easy!
 
-You can do a lot more with data collections. Read more about it [here](/docs/laravel-data/v1/as-a-data-transfer-object/collections).
+You can do a lot more with data collections. Read more about it [here](/docs/laravel-data/v2/as-a-data-transfer-object/collections).
 
 ## Usage in controllers
 
@@ -463,7 +463,7 @@ class PostData extends Data
 }
 ```
 
-You can read a lot more about transformers [here](/docs/laravel-data/v1/as-a-resource/transformers).
+You can read a lot more about transformers [here](/docs/laravel-data/v2/as-a-resource/transformers).
 
 ## Generating a blueprint
 
@@ -706,11 +706,11 @@ You can do quite a lot with lazy properties like including them:
 - when they are requested in the URL query
 - by default with an option to exclude them
 
-And a lot more. You can read all about it [here](/docs/laravel-data/v1/as-a-resource/lazy-properties).
+And a lot more. You can read all about it [here](/docs/laravel-data/v2/as-a-resource/lazy-properties).
 
 So that's it, a quick overview of this package. There's still a lot more you can do with data objects like:
 
-- [casting](/docs/laravel-data/v1/advanced-usage/eloquent-casting) them into Eloquent models
-- [transforming](/docs/laravel-data/v1/advanced-usage/typescript) the structure to typescript
-- [working](https://spatie.be/docs/laravel-data/v1/as-a-data-transfer-object/collections) with `DataCollections`
+- [casting](/docs/laravel-data/v2/advanced-usage/eloquent-casting) them into Eloquent models
+- [transforming](/docs/laravel-data/v2/advanced-usage/typescript) the structure to typescript
+- [working](https://spatie.be/docs/laravel-data/v2/as-a-data-transfer-object/collections) with `DataCollections`
 - you find it all in these docs

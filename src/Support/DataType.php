@@ -15,6 +15,7 @@ use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\PaginatedDataCollection;
 use TypeError;
 
 class DataType implements Countable
@@ -25,7 +26,7 @@ class DataType implements Countable
 
     public readonly bool $isLazy;
 
-    public readonly bool $isUndefinable;
+    public readonly bool $isOptional;
 
     public readonly bool $isDataObject;
 
@@ -50,7 +51,7 @@ class DataType implements Countable
             $this->isNullable = true;
             $this->isMixed = true;
             $this->isLazy = false;
-            $this->isUndefinable = false;
+            $this->isOptional = false;
             $this->isDataObject = false;
             $this->isDataCollection = false;
             $this->dataClass = null;
@@ -73,9 +74,9 @@ class DataType implements Countable
                 $type->getName() => $this->resolveBaseTypes($type->getName()),
             ];
             $this->isLazy = false;
-            $this->isUndefinable = false;
+            $this->isOptional = false;
             $this->isDataObject = is_a($type->getName(), Data::class, true);
-            $this->isDataCollection = is_a($type->getName(), DataCollection::class, true);
+            $this->isDataCollection = is_a($type->getName(), DataCollection::class, true) || is_a($type->getName(), PaginatedDataCollection::class, true);
 
             $this->dataClass = match (true) {
                 $this->isDataObject => $type->getName(),
@@ -94,7 +95,7 @@ class DataType implements Countable
         $isNullable = false;
         $isMixed = false;
         $isLazy = false;
-        $isUndefinable = false;
+        $isOptional = false;
         $isDataObject = false;
         $isDataCollection = false;
 
@@ -106,16 +107,16 @@ class DataType implements Countable
             $isNullable = $isNullable || $namedType->allowsNull();
             $isMixed = $namedType->getName() === 'mixed';
             $isLazy = $isLazy || is_a($namedType->getName(), Lazy::class, true);
-            $isUndefinable = $isUndefinable || is_a($namedType->getName(), Optional::class, true);
+            $isOptional = $isOptional || is_a($namedType->getName(), Optional::class, true);
             $isDataObject = $isDataObject || is_a($namedType->getName(), Data::class, true);
-            $isDataCollection = $isDataCollection || is_a($namedType->getName(), DataCollection::class, true);
+            $isDataCollection = $isDataCollection || is_a($namedType->getName(), DataCollection::class, true) || is_a($namedType->getName(), PaginatedDataCollection::class, true);
         }
 
         $this->acceptedTypes = $acceptedTypes;
         $this->isNullable = $isNullable;
         $this->isMixed = $isMixed;
         $this->isLazy = $isLazy;
-        $this->isUndefinable = $isUndefinable;
+        $this->isOptional = $isOptional;
         $this->isDataObject = $isDataObject;
         $this->isDataCollection = $isDataCollection;
 

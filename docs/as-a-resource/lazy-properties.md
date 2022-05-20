@@ -10,7 +10,7 @@ class AlbumData extends Data
 {
     public function __construct(
         public string $title,
-        /** @var SongData[] */
+        #[DataCollectionOf(SongData::class)]
         public DataCollection $songs,
     ) {
     }
@@ -28,7 +28,7 @@ class AlbumData extends Data
 {
     public function __construct(
         public string $title,
-        /** @var SongData[] */
+        #[DataCollectionOf(SongData::class)]
         public Lazy|DataCollection $songs,
     ) {
     }

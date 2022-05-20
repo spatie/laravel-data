@@ -1,9 +1,9 @@
 ---
 title: Collections
-weight: 3
+weight: 4
 ---
 
-The package provides next to the `Data` class also a `DataCollection` class. This collection can store a set of data objects, and we advise you to use it when storing a collection of data objects within a data object.
+The package provides next to the `Data` class also a `DataCollection` and `PaginatedCollection` class. This collection can store a set of data objects, and we advise you to use it when storing a collection of data objects within a data object.
 
 For example:
 
@@ -12,7 +12,7 @@ class AlbumData extends Data
 {
     public function __construct(
         public string $title,
-        /** @var SongData[] */
+        #[DataCollectionOf(SongData::class)]
         public DataCollection $songs,
     ) {
     }
@@ -90,14 +90,14 @@ class AlbumData extends Data
 {
     public function __construct(
         public string $title,
-        /** @var SongData[] */
+        #[DataCollectionOf(SongData::class)]
         public DataCollection $songs,
     ) {
     }
 }
 ```
 
-Because we typed `$songs` as `SongData[]`, the package automatically knows it should create `SongData` objects when creating an `AlbumData` object from an array.
+Because we typed `$songs` as `SongData`, the package automatically knows it should create `SongData` objects when creating an `AlbumData` object from an array.
 
 There are quite a few ways to type data collections:
 
