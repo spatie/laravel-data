@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
@@ -21,7 +22,7 @@ class DataFromSomethingResolver
     ) {
     }
 
-    public function execute(string $class, mixed ...$payloads): Data
+    public function execute(string $class, mixed ...$payloads): DataObject
     {
         if ($data = $this->createFromCustomCreationMethod($class, $payloads)) {
             return $data;
@@ -45,7 +46,7 @@ class DataFromSomethingResolver
         return $this->dataFromArrayResolver->execute($class, $properties);
     }
 
-    private function createFromCustomCreationMethod(string $class, array $payloads): ?Data
+    private function createFromCustomCreationMethod(string $class, array $payloads): ?DataObject
     {
         /** @var Collection<\Spatie\LaravelData\Support\DataMethod> $customCreationMethods */
         $customCreationMethods = $this->dataConfig

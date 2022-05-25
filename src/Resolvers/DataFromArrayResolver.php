@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;
@@ -14,7 +15,7 @@ class DataFromArrayResolver
     {
     }
 
-    public function execute(string $class, Collection $properties): Data
+    public function execute(string $class, Collection $properties): DataObject
     {
         $dataClass = $this->dataConfig->getDataClass($class);
 
