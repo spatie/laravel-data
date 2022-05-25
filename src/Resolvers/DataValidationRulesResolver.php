@@ -25,10 +25,6 @@ class DataValidationRulesResolver
             $overWrittenRules = app()->call([$class, 'rules'], [
                 'payload' => $payload,
             ]);
-
-            array_map(
-                fn(mixed $rules) => $this->ruleAttributesResolver->execute($rules),
-            )
         }
 
         return $this->dataConfig->getDataClass($class)

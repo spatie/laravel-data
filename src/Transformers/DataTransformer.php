@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Transformers;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataConfig;
@@ -33,7 +34,7 @@ class DataTransformer
         $this->config = app(DataConfig::class);
     }
 
-    public function transform(Data $data): array
+    public function transform(DataObject $data): array
     {
         $transformed = $this->resolvePayload($data);
 
@@ -44,7 +45,7 @@ class DataTransformer
         return array_merge($transformed, $data->getAdditionalData());
     }
 
-    protected function resolvePayload(Data $data): array
+    protected function resolvePayload(DataObject $data): array
     {
         $trees = $data->getPartialTrees();
 
