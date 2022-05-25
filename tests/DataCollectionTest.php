@@ -395,4 +395,21 @@ class DataCollectionTest extends TestCase
         $this->assertEquals('[{"string":"A"},{"string":"B"},{"string":"C"}]', $collection->toJson());
         $this->assertEquals('[{"string":"A"},{"string":"B"},{"string":"C"}]', json_encode($collection));
     }
+
+    /** @test */
+    public function it_can_reset_the_keys()
+    {
+        $collection = SimpleData::collection([
+            1 => SimpleData::from('a'),
+            3 => SimpleData::from('b'),
+        ]);
+
+        $this->assertEquals(
+            SimpleData::collection([
+                0 => SimpleData::from('a'),
+                1 => SimpleData::from('b'),
+            ]),
+            $collection->values()
+        );
+    }
 }
