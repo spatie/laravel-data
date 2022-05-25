@@ -4,9 +4,10 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class MimeTypes extends ValidationAttribute
+class MimeTypes extends StringValidationAttribute
 {
     private array $mimeTypes;
 
@@ -15,8 +16,13 @@ class MimeTypes extends ValidationAttribute
         $this->mimeTypes = Arr::flatten($mimeTypes);
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["mimestypes:{$this->normalizeValue($this->mimeTypes)}"];
+        return 'mimestypes';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->normalizeValue($this->mimeTypes)];
     }
 }

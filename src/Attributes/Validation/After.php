@@ -3,17 +3,30 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Carbon\Carbon;
 use DateTimeInterface;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class After extends ValidationAttribute
+class After extends StringValidationAttribute
 {
-    public function __construct(private string | DateTimeInterface $date)
+    public function __construct(private string|DateTimeInterface $date)
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["after:{$this->normalizeValue($this->date)}"];
+        return 'after';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->normalizeValue($this->date)];
+    }
+
+    public static function create(string ...$parameters): static
+    {
+        return parent::create(
+            self::parseDateValue($parameters[0]),
+        );
     }
 }

@@ -4,9 +4,11 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Support\Validation\RequiringRule;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class RequiredIf extends ValidationAttribute
+class RequiredIf extends StringValidationAttribute implements RequiringRule
 {
     private string|array $values;
 
@@ -17,8 +19,16 @@ class RequiredIf extends ValidationAttribute
         $this->values = Arr::flatten($values);
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["required_if:{$this->field},{$this->normalizeValue($this->values)}"];
+        return 'required_if';
+    }
+
+    public function parameters(): array
+    {
+        return [
+            $this->field,
+            $this->normalizeValue($this->values)
+        ];
     }
 }

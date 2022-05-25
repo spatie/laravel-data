@@ -3,12 +3,18 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class AlphaDash extends ValidationAttribute
+class AlphaDash extends StringValidationAttribute
 {
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ['alpha_dash'];
+        return 'alpha_dash';
+    }
+
+    public function parameters(): array
+    {
+        return [];
     }
 }

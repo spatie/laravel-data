@@ -4,9 +4,10 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class ProhibitedIf extends ValidationAttribute
+class ProhibitedIf extends StringValidationAttribute
 {
     private string|array $values;
 
@@ -17,8 +18,16 @@ class ProhibitedIf extends ValidationAttribute
         $this->values = Arr::flatten($values);
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["prohibited_if:{$this->field},{$this->normalizeValue($this->values)}"];
+        return 'prohibited_if';
+    }
+
+    public function parameters(): array
+    {
+        return [
+            $this->field,
+            $this->normalizeValue($this->values)
+        ];
     }
 }

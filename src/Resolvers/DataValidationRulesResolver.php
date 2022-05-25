@@ -8,7 +8,10 @@ use Spatie\LaravelData\Support\DataProperty;
 
 class DataValidationRulesResolver
 {
-    public function __construct(protected DataConfig $dataConfig)
+    public function __construct(
+        protected DataConfig $dataConfig,
+        protected RuleAttributesResolver $ruleAttributesResolver,
+    )
     {
     }
 
@@ -22,6 +25,10 @@ class DataValidationRulesResolver
             $overWrittenRules = app()->call([$class, 'rules'], [
                 'payload' => $payload,
             ]);
+
+            array_map(
+                fn(mixed $rules) => $this->ruleAttributesResolver->execute($rules),
+            )
         }
 
         return $this->dataConfig->getDataClass($class)

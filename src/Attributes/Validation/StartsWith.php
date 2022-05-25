@@ -4,9 +4,10 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class StartsWith extends ValidationAttribute
+class StartsWith extends StringValidationAttribute
 {
     private string|array $values;
 
@@ -15,8 +16,13 @@ class StartsWith extends ValidationAttribute
         $this->values = Arr::flatten($values);
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["starts_with:{$this->normalizeValue($this->values)}"];
+        return 'starts_with';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->normalizeValue($this->values)];
     }
 }

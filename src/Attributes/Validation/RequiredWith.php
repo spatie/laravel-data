@@ -4,9 +4,11 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Support\Validation\RequiringRule;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class RequiredWith extends ValidationAttribute
+class RequiredWith extends StringValidationAttribute  implements RequiringRule
 {
     private string|array $fields;
 
@@ -16,8 +18,16 @@ class RequiredWith extends ValidationAttribute
         $this->fields = Arr::flatten($fields);
     }
 
-    public function getRules(): array
+
+    public static function keyword(): string
     {
-        return ["required_with:{$this->normalizeValue($this->fields)}"];
+        return 'required_with';
+    }
+
+    public function parameters(): array
+    {
+        return [
+            $this->normalizeValue($this->fields)
+        ];
     }
 }

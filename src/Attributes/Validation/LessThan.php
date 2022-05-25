@@ -3,16 +3,22 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class LessThan extends ValidationAttribute
+class LessThan extends StringValidationAttribute
 {
     public function __construct(private string $field)
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["lt:{$this->field}"];
+        return 'lt';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->field];
     }
 }

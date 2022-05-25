@@ -3,12 +3,18 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Bail extends ValidationAttribute
+class Bail extends StringValidationAttribute
 {
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ['bail'];
+        return 'bail';
+    }
+
+    public function parameters(): array
+    {
+        return [];
     }
 }

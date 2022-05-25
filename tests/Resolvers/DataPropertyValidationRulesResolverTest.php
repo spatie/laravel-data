@@ -8,6 +8,7 @@ use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\Max;
+use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\DataCollection;
@@ -95,7 +96,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
         });
 
         $this->assertEquals([
-            'property' => [new EnumRule(FakeEnum::class), 'required'],
+            'property' => [new Enum(FakeEnum::class), 'required'],
         ], $rules);
     }
 
@@ -189,7 +190,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
         });
 
         $this->assertEquals([
-            'property' => ['string', 'nullable'],
+            'property' => ['string', new Nullable()],
         ], $rules);
 
         $rules = $this->resolveRules(new class () {

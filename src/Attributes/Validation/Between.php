@@ -3,16 +3,22 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Between extends ValidationAttribute
+class Between extends StringValidationAttribute
 {
     public function __construct(private int | float $min, private int | float $max)
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["between:{$this->min},{$this->max}"];
+        return 'between';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->min, $this->max];
     }
 }

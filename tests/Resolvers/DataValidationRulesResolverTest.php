@@ -116,7 +116,7 @@ class DataValidationRulesResolverTest extends TestCase
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+        $this->app->bind(Request::class, fn() => $requestMock);
 
         $data = new class () extends Data {
             public string $name;

@@ -3,12 +3,18 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class IPv6 extends ValidationAttribute
+class IPv6 extends StringValidationAttribute
 {
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ['ipv6'];
+        return 'ipv6';
+    }
+
+    public function parameters(): array
+    {
+        return [];
     }
 }

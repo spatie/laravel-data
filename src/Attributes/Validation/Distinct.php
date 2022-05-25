@@ -4,9 +4,10 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Distinct extends ValidationAttribute
+class Distinct extends StringValidationAttribute
 {
     public const Strict = 'strict';
     public const IgnoreCase = 'ignore_case';
@@ -15,16 +16,21 @@ class Distinct extends ValidationAttribute
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
+    {
+        return 'distinct';
+    }
+
+    public function parameters(): array
     {
         if ($this->mode === null) {
-            return ['distinct'];
+            return [];
         }
 
         if (! in_array($this->mode, [self::IgnoreCase, self::Strict])) {
             throw CannotBuildValidationRule::create('Distinct mode should be ignore_case or strict.');
         }
 
-        return ["distinct:{$this->mode}"];
+        return [$this->mode];
     }
 }

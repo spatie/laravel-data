@@ -7,7 +7,7 @@ use Faker\Generator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Spatie\LaravelData\LaravelDataServiceProvider;
 use Spatie\Snapshots\MatchesSnapshots;
 
@@ -47,7 +47,7 @@ class TestCase extends Orchestra
 
     public function assertValidationAttributeRules(
         array $expected,
-        ValidationAttribute $attribute
+        ValidationRule $attribute
     ) {
         $this->assertEquals($expected, $attribute->getRules());
     }

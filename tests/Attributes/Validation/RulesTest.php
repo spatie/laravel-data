@@ -7,10 +7,13 @@ use Generator;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Validation\Rules\Enum as EnumRule;
+use Illuminate\Validation\Rules\ExcludeIf as BaseExcludeIf;
 use Illuminate\Validation\Rules\Exists as BaseExists;
 use Illuminate\Validation\Rules\In as BaseIn;
 use Illuminate\Validation\Rules\NotIn as BaseNotIn;
 use Illuminate\Validation\Rules\Password as BasePassword;
+use Illuminate\Validation\Rules\ProhibitedIf as BaseProhibitedIf;
+use Illuminate\Validation\Rules\RequiredIf as BaseRequiredIf;
 use Illuminate\Validation\Rules\Unique as BaseUnique;
 use Spatie\LaravelData\Attributes\Validation\Accepted;
 use Spatie\LaravelData\Attributes\Validation\AcceptedIf;
@@ -90,6 +93,18 @@ use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
+use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
+use Spatie\LaravelData\Resolvers\RuleAttributesResolver;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationEnum;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationExcludeIf;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationExists;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationIn;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationNotIn;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationPassword;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationProhibitedIf;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationRequiredIf;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationUnique;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 use Spatie\LaravelData\Tests\TestCase;
 use Spatie\TestTime\TestTime;
@@ -101,15 +116,35 @@ class RulesTest extends TestCase
      * @dataProvider attributesDataProvider
      */
     public function it_gets_the_correct_rules(
-        ValidationAttribute $attribute,
-        array $expected = [],
-        ?string $exception = null
+        ValidationRule $attribute,
+        string|object $expected,
+        ValidationRule|null $expectedCreatedAttribute,
+        ?string $exception = null,
     ) {
         if ($exception) {
             $this->expectException($exception);
         }
 
-        $this->assertEquals($expected, $attribute->getRules());
+        $this->assertEquals([$expected], $attribute->getRules());
+    }
+
+    /**
+     * @test
+     * @dataProvider attributesDataProvider
+     */
+    public function it_creates_the_correct_attributes(
+        ValidationRule $attribute,
+        string|object $expected,
+        ValidationRule|null $expectedCreatedAttribute,
+        ?string $exception = null,
+    ) {
+        if ($exception) {
+            $this->markTestSkipped();
+        }
+
+        $resolved = app(RuleAttributesResolver::class)->execute([$expected]);
+
+        $this->assertEquals($expectedCreatedAttribute, $resolved[0]);
     }
 
     public function attributesDataProvider(): Generator
@@ -144,768 +179,871 @@ class RulesTest extends TestCase
         yield from $this->requiredWithAllAttributesDataProvider();
         yield from $this->requiredWithoutAttributesDataProvider();
         yield from $this->requiredWithoutAllAttributesDataProvider();
-        yield from $this->ruleAttributesDataProvider();
         yield from $this->startsWithAttributesDataProvider();
         yield from $this->uniqueAttributesDataProvider();
 
-        yield [
-            'attribute' => new Accepted(),
-            'expected' => ['accepted'],
-        ];
+        yield $this->fixature(
+            attribute: new Accepted(),
+            expected: 'accepted',
+        );
 
-        yield [
-            'attribute' => new ActiveUrl(),
-            'expected' => ['active_url'],
-        ];
+        yield $this->fixature(
+            attribute: new ActiveUrl(),
+            expected: 'active_url',
+        );
 
-        yield [
-            'attribute' => new Alpha(),
-            'expected' => ['alpha'],
-        ];
+        yield $this->fixature(
+            attribute: new Alpha(),
+            expected: 'alpha',
+        );
 
-        yield [
-            'attribute' => new AlphaDash(),
-            'expected' => ['alpha_dash'],
-        ];
+        yield $this->fixature(
+            attribute: new AlphaDash(),
+            expected: 'alpha_dash',
+        );
 
-        yield [
-            'attribute' => new AlphaNumeric(),
-            'expected' => ['alpha_num'],
-        ];
+        yield $this->fixature(
+            attribute: new AlphaNumeric(),
+            expected: 'alpha_num',
+        );
 
-        yield [
-            'attribute' => new Bail(),
-            'expected' => ['bail'],
-        ];
+        yield $this->fixature(
+            attribute: new Bail(),
+            expected: 'bail',
+        );
 
-        yield [
-            'attribute' => new BooleanType(),
-            'expected' => ['boolean'],
-        ];
+        yield $this->fixature(
+            attribute: new BooleanType(),
+            expected: 'boolean',
+        );
 
-        yield [
-            'attribute' => new Confirmed(),
-            'expected' => ['confirmed'],
-        ];
+        yield $this->fixature(
+            attribute: new Confirmed(),
+            expected: 'confirmed',
+        );
 
-        yield [
-            'attribute' => new Date(),
-            'expected' => ['date'],
-        ];
+        yield $this->fixature(
+            attribute: new Date(),
+            expected: 'date',
+        );
 
-        yield [
-            'attribute' => new DateFormat('Y-m-d'),
-            'expected' => ['date_format:Y-m-d'],
-        ];
+        yield $this->fixature(
+            attribute: new DateFormat('Y-m-d'),
+            expected: 'date_format:Y-m-d',
+        );
 
-        yield [
-            'attribute' => new Different('field'),
-            'expected' => ['different:field'],
-        ];
+        yield $this->fixature(
+            attribute: new Different('field'),
+            expected: 'different:field',
+        );
 
-        yield [
-            'attribute' => new Digits(10),
-            'expected' => ['digits:10'],
-        ];
+        yield $this->fixature(
+            attribute: new Digits(10),
+            expected: 'digits:10',
+        );
 
-        yield [
-            'attribute' => new DigitsBetween(5, 10),
-            'expected' => ['digits_between:5,10'],
-        ];
+        yield $this->fixature(
+            attribute: new DigitsBetween(5, 10),
+            expected: 'digits_between:5,10',
+        );
 
-        yield [
-            'attribute' => new Enum('enum_class'),
-            'expected' => [new EnumRule('enum_class')],
-        ];
-
-
-        yield [
-            'attribute' => new ExcludeIf('field', true),
-            'expected' => ['exclude_if:field,true'],
-        ];
-
-        yield [
-            'attribute' => new ExcludeUnless('field', 42),
-            'expected' => ['exclude_unless:field,42'],
-        ];
-
-        yield [
-            'attribute' => new File(),
-            'expected' => ['file'],
-        ];
-
-        yield [
-            'attribute' => new Filled(),
-            'expected' => ['filled'],
-        ];
-
-        yield [
-            'attribute' => new GreaterThan('field'),
-            'expected' => ['gt:field'],
-        ];
-
-        yield [
-            'attribute' => new GreaterThanOrEqualTo('field'),
-            'expected' => ['gte:field'],
-        ];
-
-        yield [
-            'attribute' => new Image(),
-            'expected' => ['image'],
-        ];
-
-        yield [
-            'attribute' => new InArray('field'),
-            'expected' => ['in_array:field'],
-        ];
-
-        yield [
-            'attribute' => new IntegerType(),
-            'expected' => ['integer'],
-        ];
-
-        yield [
-            'attribute' => new IP(),
-            'expected' => ['ip'],
-        ];
-
-        yield [
-            'attribute' => new IPv4(),
-            'expected' => ['ipv4'],
-        ];
-
-        yield [
-            'attribute' => new IPv6(),
-            'expected' => ['ipv6'],
-        ];
+        yield $this->fixature(
+            attribute: new Enum('enum_class'),
+            expected: new EnumRule('enum_class'),
+            expectCreatedAttribute: new FoundationEnum(new EnumRule('enum_class'))
+        );
 
 
-        yield [
-            'attribute' => new Json(),
-            'expected' => ['json'],
-        ];
+        yield $this->fixature(
+            attribute: new ExcludeIf('field', true),
+            expected: 'exclude_if:field,true',
+            expectCreatedAttribute: new ExcludeIf('field', true)
+        );
 
-        yield [
-            'attribute' => new LessThan('field'),
-            'expected' => ['lt:field'],
-        ];
+        yield $this->fixature(
+            attribute: new ExcludeUnless('field', 42),
+            expected: 'exclude_unless:field,42',
+        );
 
-        yield [
-            'attribute' => new LessThanOrEqualTo('field'),
-            'expected' => ['lte:field'],
-        ];
+        yield $this->fixature(
+            attribute: new File(),
+            expected: 'file',
+        );
 
-        yield [
-            'attribute' => new Max(10),
-            'expected' => ['max:10'],
-        ];
+        yield $this->fixature(
+            attribute: new Filled(),
+            expected: 'filled',
+        );
 
-        yield [
-            'attribute' => new Min(10),
-            'expected' => ['min:10'],
-        ];
+        yield $this->fixature(
+            attribute: new GreaterThan('field'),
+            expected: 'gt:field',
+        );
 
-        yield [
-            'attribute' => new MultipleOf(10),
-            'expected' => ['multiple_of:10'],
-        ];
+        yield $this->fixature(
+            attribute: new GreaterThanOrEqualTo('field'),
+            expected: 'gte:field',
+        );
 
-        yield [
-            'attribute' => new NotRegex('/^.+$/i'),
-            'expected' => ['not_regex:/^.+$/i'],
-        ];
+        yield $this->fixature(
+            attribute: new Image(),
+            expected: 'image',
+        );
 
-        yield [
-            'attribute' => new Nullable(),
-            'expected' => ['nullable'],
-        ];
+        yield $this->fixature(
+            attribute: new InArray('field'),
+            expected: 'in_array:field',
+        );
 
-        yield [
-            'attribute' => new Numeric(),
-            'expected' => ['numeric'],
-        ];
+        yield $this->fixature(
+            attribute: new IntegerType(),
+            expected: 'integer',
+        );
 
-        yield [
-            'attribute' => new Present(),
-            'expected' => ['present'],
-        ];
+        yield $this->fixature(
+            attribute: new IP(),
+            expected: 'ip',
+        );
 
-        yield [
-            'attribute' => new Prohibited(),
-            'expected' => ['prohibited'],
-        ];
+        yield $this->fixature(
+            attribute: new IPv4(),
+            expected: 'ipv4',
+        );
 
-        yield [
-            'attribute' => new Regex('/^.+$/i'),
-            'expected' => ['regex:/^.+$/i'],
-        ];
+        yield $this->fixature(
+            attribute: new IPv6(),
+            expected: 'ipv6',
+        );
 
-        yield [
-            'attribute' => new Required(),
-            'expected' => ['required'],
-        ];
 
-        yield [
-            'attribute' => new Same('field'),
-            'expected' => ['same:field'],
-        ];
+        yield $this->fixature(
+            attribute: new Json(),
+            expected: 'json',
+        );
 
-        yield [
-            'attribute' => new Size(10),
-            'expected' => ['size:10'],
-        ];
+        yield $this->fixature(
+            attribute: new LessThan('field'),
+            expected: 'lt:field',
+        );
 
-        yield [
-            'attribute' => new StringType(),
-            'expected' => ['string'],
-        ];
+        yield $this->fixature(
+            attribute: new LessThanOrEqualTo('field'),
+            expected: 'lte:field',
+        );
 
-        yield [
-            'attribute' => new Timezone(),
-            'expected' => ['timezone'],
-        ];
+        yield $this->fixature(
+            attribute: new Max(10),
+            expected: 'max:10',
+        );
 
-        yield [
-            'attribute' => new Url(),
-            'expected' => ['url'],
-        ];
+        yield $this->fixature(
+            attribute: new Min(10),
+            expected: 'min:10',
+        );
 
-        yield [
-            'attribute' => new Uuid(),
-            'expected' => ['uuid'],
-        ];
+        yield $this->fixature(
+            attribute: new MultipleOf(10),
+            expected: 'multiple_of:10',
+        );
 
-        yield [
-            'attribute' => new Sometimes(),
-            'expected' => ['sometimes'],
-        ];
+        yield $this->fixature(
+            attribute: new NotRegex('/^.+$/i'),
+            expected: 'not_regex:/^.+$/i',
+        );
+
+        yield $this->fixature(
+            attribute: new Nullable(),
+            expected: 'nullable',
+        );
+
+        yield $this->fixature(
+            attribute: new Numeric(),
+            expected: 'numeric',
+        );
+
+        yield $this->fixature(
+            attribute: new Present(),
+            expected: 'present',
+        );
+
+        yield $this->fixature(
+            attribute: new Prohibited(),
+            expected: 'prohibited',
+        );
+
+        yield $this->fixature(
+            attribute: new Regex('/^.+$/i'),
+            expected: 'regex:/^.+$/i',
+        );
+
+        yield $this->fixature(
+            attribute: new Required(),
+            expected: 'required',
+        );
+
+        yield $this->fixature(
+            attribute: new Same('field'),
+            expected: 'same:field',
+        );
+
+        yield $this->fixature(
+            attribute: new Size(10),
+            expected: 'size:10',
+        );
+
+        yield $this->fixature(
+            attribute: new StringType(),
+            expected: 'string',
+        );
+
+        yield $this->fixature(
+            attribute: new Timezone(),
+            expected: 'timezone',
+        );
+
+        yield $this->fixature(
+            attribute: new Url(),
+            expected: 'url',
+        );
+
+        yield $this->fixature(
+            attribute: new Uuid(),
+            expected: 'uuid',
+        );
+
+        yield $this->fixature(
+            attribute: new Sometimes(),
+            expected: 'sometimes',
+        );
     }
 
     public function acceptedIfAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new AcceptedIf('value', 'string'),
-            'expected' => ['accepted_if:value,string'],
-        ];
+        yield $this->fixature(
+            attribute: new AcceptedIf('value', 'string'),
+            expected: 'accepted_if:value,string',
+        );
 
-        yield [
-            'attribute' => new AcceptedIf('value', true),
-            'expected' => ['accepted_if:value,true'],
-        ];
+        yield $this->fixature(
+            attribute: new AcceptedIf('value', true),
+            expected: 'accepted_if:value,true',
+        );
 
-        yield [
-            'attribute' => new AcceptedIf('value', 42),
-            'expected' => ['accepted_if:value,42'],
-        ];
+        yield $this->fixature(
+            attribute: new AcceptedIf('value', 42),
+            expected: 'accepted_if:value,42',
+        );
 
-        yield [
-            'attribute' => new AcceptedIf('value', 3.14),
-            'expected' => ['accepted_if:value,3.14'],
-        ];
+        yield $this->fixature(
+            attribute: new AcceptedIf('value', 3.14),
+            expected: 'accepted_if:value,3.14',
+        );
     }
 
     public function afterAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new After('some_field'),
-            'expected' => ['after:some_field'],
-        ];
+        yield $this->fixature(
+            attribute: new After('some_field'),
+            expected: 'after:some_field',
+        );
 
-        yield [
-            'attribute' => new After(Carbon::yesterday()),
-            'expected' => ['after:2020-05-15T00:00:00+00:00'],
-        ];
+        yield $this->fixature(
+            attribute: new After(Carbon::yesterday()),
+            expected: 'after:2020-05-15T00:00:00+00:00',
+        );
     }
 
     public function afterOrEqualAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new AfterOrEqual('some_field'),
-            'expected' => ['after_or_equal:some_field'],
-        ];
+        yield $this->fixature(
+            attribute: new AfterOrEqual('some_field'),
+            expected: 'after_or_equal:some_field',
+        );
 
-        yield [
-            'attribute' => new AfterOrEqual(Carbon::yesterday()),
-            'expected' => ['after_or_equal:2020-05-15T00:00:00+00:00'],
-        ];
+        yield $this->fixature(
+            attribute: new AfterOrEqual(Carbon::yesterday()),
+            expected: 'after_or_equal:2020-05-15T00:00:00+00:00',
+        );
     }
 
     public function arrayTypeAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new ArrayType(),
-            'expected' => ['array'],
-        ];
+        yield $this->fixature(
+            attribute: new ArrayType(),
+            expected: 'array',
+        );
 
-        yield [
-            'attribute' => new ArrayType(['a', 'b', 'c']),
-            'expected' => ['array:a,b,c'],
-        ];
+        yield $this->fixature(
+            attribute: new ArrayType(['a', 'b', 'c']),
+            expected: 'array:a,b,c',
+        );
 
-        yield [
-            'attribute' => new ArrayType('a', 'b', 'c'),
-            'expected' => ['array:a,b,c'],
-        ];
+        yield $this->fixature(
+            attribute: new ArrayType('a', 'b', 'c'),
+            expected: 'array:a,b,c',
+        );
 
-        yield [
-            'attribute' => new ArrayType('a', ['b', 'c']),
-            'expected' => ['array:a,b,c'],
-        ];
+        yield $this->fixature(
+            attribute: new ArrayType('a', ['b', 'c']),
+            expected: 'array:a,b,c',
+        );
     }
 
     public function beforeAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new Before('some_field'),
-            'expected' => ['before:some_field'],
-        ];
+        yield $this->fixature(
+            attribute: new Before('some_field'),
+            expected: 'before:some_field',
+        );
 
-        yield [
-            'attribute' => new Before(Carbon::yesterday()),
-            'expected' => ['before:2020-05-15T00:00:00+00:00'],
-        ];
+        yield $this->fixature(
+            attribute: new Before(Carbon::yesterday()),
+            expected: 'before:2020-05-15T00:00:00+00:00',
+        );
     }
 
     public function beforeOrEqualAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new BeforeOrEqual('some_field'),
-            'expected' => ['before_or_equal:some_field'],
-        ];
+        yield $this->fixature(
+            attribute: new BeforeOrEqual('some_field'),
+            expected: 'before_or_equal:some_field',
+        );
 
-        yield [
-            'attribute' => new BeforeOrEqual(Carbon::yesterday()),
-            'expected' => ['before_or_equal:2020-05-15T00:00:00+00:00'],
-        ];
+        yield $this->fixature(
+            attribute: new BeforeOrEqual(Carbon::yesterday()),
+            expected: 'before_or_equal:2020-05-15T00:00:00+00:00',
+        );
     }
 
     public function betweenAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new Between(-42, 42),
-            'expected' => ['between:-42,42'],
-        ];
+        yield $this->fixature(
+            attribute: new Between(-42, 42),
+            expected: 'between:-42,42',
+        );
 
-        yield [
-            'attribute' => new Between(-3.14, 3.14),
-            'expected' => ['between:-3.14,3.14'],
-        ];
+        yield $this->fixature(
+            attribute: new Between(-3.14, 3.14),
+            expected: 'between:-3.14,3.14',
+        );
 
-        yield [
-            'attribute' => new Between(-3.14, 42),
-            'expected' => ['between:-3.14,42'],
-        ];
+        yield $this->fixature(
+            attribute: new Between(-3.14, 42),
+            expected: 'between:-3.14,42',
+        );
     }
 
     public function currentPasswordAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new CurrentPassword(),
-            'expected' => ['current_password'],
-        ];
+        yield $this->fixature(
+            attribute: new CurrentPassword(),
+            expected: 'current_password',
+        );
 
-        yield [
-            'attribute' => new CurrentPassword('api'),
-            'expected' => ['current_password:api'],
-        ];
+        yield $this->fixature(
+            attribute: new CurrentPassword('api'),
+            expected: 'current_password:api',
+        );
     }
 
     public function dateEqualsAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new DateEquals('tomorrow'),
-            'expected' => ['date_equals:tomorrow'],
-        ];
+        yield $this->fixature(
+            attribute: new DateEquals('tomorrow'),
+            expected: 'date_equals:tomorrow',
+        );
 
-        yield [
-            'attribute' => new DateEquals(Carbon::yesterday()),
-            'expected' => ['date_equals:2020-05-15T00:00:00+00:00'],
-        ];
+        yield $this->fixature(
+            attribute: new DateEquals(Carbon::yesterday()),
+            expected: 'date_equals:2020-05-15T00:00:00+00:00',
+        );
     }
 
     public function dimensionsAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new Dimensions(minWidth: 15, minHeight: 10, maxWidth: 150, maxHeight: 100, ratio: 1),
-            'expected' => ['dimensions:min_width=15,min_height=10,max_width=150,max_height=100,ratio=1'],
-        ];
+        yield $this->fixature(
+            attribute: new Dimensions(minWidth: 15, minHeight: 10, maxWidth: 150, maxHeight: 100, ratio: 1),
+            expected: 'dimensions:min_width=15,min_height=10,max_width=150,max_height=100,ratio=1',
+        );
 
-        yield [
-            'attribute' => new Dimensions(maxWidth: 150, maxHeight: 100),
-            'expected' => ['dimensions:max_width=150,max_height=100'],
-        ];
+        yield $this->fixature(
+            attribute: new Dimensions(maxWidth: 150, maxHeight: 100),
+            expected: 'dimensions:max_width=150,max_height=100',
+        );
 
-        yield [
-            'attribute' => new Dimensions(ratio: 1.5),
-            'expected' => ['dimensions:ratio=1.5'],
-        ];
+        yield $this->fixature(
+            attribute: new Dimensions(ratio: 1.5),
+            expected: 'dimensions:ratio=1.5',
+        );
 
-        yield [
-            'attribute' => new Dimensions(ratio: '3/4'),
-            'expected' => ['dimensions:ratio=3/4'],
-        ];
+        yield $this->fixature(
+            attribute: new Dimensions(ratio: '3/4'),
+            expected: 'dimensions:ratio=3/4',
+        );
 
-        yield [
-            'attribute' => new Dimensions(),
-            'expected' => [],
-            'exception' => CannotBuildValidationRule::class,
-        ];
+//        yield $this->fixature(
+//            attribute: new Dimensions(),
+//            expected: '',
+//            exception: CannotBuildValidationRule::class,
+//        );
     }
 
     public function distinctAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new Distinct(),
-            'expected' => ['distinct'],
-        ];
+        yield $this->fixature(
+            attribute: new Distinct(),
+            expected: 'distinct',
+        );
 
-        yield [
-            'attribute' => new Distinct(Distinct::Strict),
-            'expected' => ['distinct:strict'],
-        ];
+        yield $this->fixature(
+            attribute: new Distinct(Distinct::Strict),
+            expected: 'distinct:strict',
+        );
 
-        yield [
-            'attribute' => new Distinct(Distinct::IgnoreCase),
-            'expected' => ['distinct:ignore_case'],
-        ];
+        yield $this->fixature(
+            attribute: new Distinct(Distinct::IgnoreCase),
+            expected: 'distinct:ignore_case',
+        );
 
-        yield [
-            'attribute' => new Distinct('fake'),
-            'expected' => [],
-            'exception' => CannotBuildValidationRule::class,
-        ];
+        yield $this->fixature(
+            attribute: new Distinct('fake'),
+            expected: '',
+            exception: CannotBuildValidationRule::class
+        );
     }
 
     public function emailAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new Email(),
-            'expected' => ['email:rfc'],
-        ];
+        yield $this->fixature(
+            attribute: new Email(),
+            expected: 'email:rfc',
+            expectCreatedAttribute: new Email(Email::RfcValidation),
+        );
 
-        yield [
-            'attribute' => new Email(Email::RfcValidation),
-            'expected' => ['email:rfc'],
-        ];
+        yield $this->fixature(
+            attribute: new Email(Email::RfcValidation),
+            expected: 'email:rfc',
+        );
 
-        yield [
-            'attribute' => new Email([Email::RfcValidation, Email::NoRfcWarningsValidation]),
-            'expected' => ['email:rfc,strict'],
-        ];
+        yield $this->fixature(
+            attribute: new Email([Email::RfcValidation, Email::NoRfcWarningsValidation]),
+            expected: 'email:rfc,strict',
+        );
 
-        yield [
-            'attribute' => new Email([Email::RfcValidation, Email::NoRfcWarningsValidation, Email::DnsCheckValidation, Email::SpoofCheckValidation, Email::FilterEmailValidation]),
-            'expected' => ['email:rfc,strict,dns,spoof,filter'],
-        ];
+        yield $this->fixature(
+            attribute: new Email([Email::RfcValidation, Email::NoRfcWarningsValidation, Email::DnsCheckValidation, Email::SpoofCheckValidation, Email::FilterEmailValidation]),
+            expected: 'email:rfc,strict,dns,spoof,filter',
+        );
 
-        yield [
-            'attribute' => new Email(Email::RfcValidation, Email::NoRfcWarningsValidation),
-            'expected' => ['email:rfc,strict'],
-        ];
+        yield $this->fixature(
+            attribute: new Email(Email::RfcValidation, Email::NoRfcWarningsValidation),
+            expected: 'email:rfc,strict',
+        );
 
-        yield [
-            'attribute' => new Email(['fake']),
-            'expected' => [],
-            'exception' => CannotBuildValidationRule::class,
-        ];
+        yield $this->fixature(
+            attribute: new Email(['fake']),
+            expected: '',
+            exception: CannotBuildValidationRule::class,
+        );
     }
 
     public function endsWithAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new EndsWith('x'),
-            'expected' => ['ends_with:x'],
-        ];
+        yield $this->fixature(
+            attribute: new EndsWith('x'),
+            expected: 'ends_with:x',
+        );
 
-        yield [
-            'attribute' => new EndsWith(['x', 'y']),
-            'expected' => ['ends_with:x,y'],
-        ];
+        yield $this->fixature(
+            attribute: new EndsWith(['x', 'y']),
+            expected: 'ends_with:x,y',
+        );
 
-        yield [
-            'attribute' => new EndsWith('x', 'y'),
-            'expected' => ['ends_with:x,y'],
-        ];
+        yield $this->fixature(
+            attribute: new EndsWith('x', 'y'),
+            expected: 'ends_with:x,y',
+        );
     }
 
     public function existsAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new Exists('users'),
-            'expected' => [new BaseExists('users')],
-        ];
+        yield $this->fixature(
+            attribute: new Exists('users'),
+            expected: new BaseExists('users'),
+            expectCreatedAttribute: new FoundationExists(new BaseExists('users'))
+        );
 
-        yield [
-            'attribute' => new Exists('users', 'email'),
-            'expected' => [new BaseExists('users', 'email')],
-        ];
+        yield $this->fixature(
+            attribute: new Exists('users', 'email'),
+            expected: new BaseExists('users', 'email'),
+            expectCreatedAttribute: new FoundationExists(new BaseExists('users', 'email'))
+        );
 
-        yield [
-            'attribute' => new Exists('users', 'email', connection: 'tenant'),
-            'expected' => [new BaseExists('tenant.users', 'email')],
-        ];
+        yield $this->fixature(
+            attribute: new Exists('users', 'email', connection: 'tenant'),
+            expected: new BaseExists('tenant.users', 'email'),
+            expectCreatedAttribute: new FoundationExists(new BaseExists('tenant.users', 'email'))
+        );
 
-        $closure = fn (Builder $builder) => $builder;
+        $closure = fn(Builder $builder) => $builder;
 
-        yield [
-            'attribute' => new Exists('users', 'email', where: $closure),
-            'expected' => [(new BaseExists('users', 'email'))->where($closure)],
-        ];
+        yield $this->fixature(
+            attribute: new Exists('users', 'email', where: $closure),
+            expected: (new BaseExists('users', 'email'))->where($closure),
+            expectCreatedAttribute: new FoundationExists((new BaseExists('users', 'email'))->where($closure))
+        );
     }
 
     public function inAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new In('key'),
-            'expected' => [new BaseIn(['key'])],
-        ];
+        yield $this->fixature(
+            attribute: new In('key'),
+            expected: new BaseIn(['key']),
+            expectCreatedAttribute: new FoundationIn(new BaseIn(['key']))
+        );
 
-        yield [
-            'attribute' => new In(['key', 'other']),
-            'expected' => [new BaseIn(['key', 'other'])],
-        ];
+        yield $this->fixature(
+            attribute: new In(['key', 'other']),
+            expected: new BaseIn(['key', 'other']),
+            expectCreatedAttribute: new FoundationIn(new BaseIn(['key', 'other']))
+        );
 
-        yield [
-            'attribute' => new In('key', 'other'),
-            'expected' => [new BaseIn(['key', 'other'])],
-        ];
+        yield $this->fixature(
+            attribute: new In('key', 'other'),
+            expected: new BaseIn(['key', 'other']),
+            expectCreatedAttribute: new FoundationIn(new BaseIn(['key', 'other']))
+        );
     }
 
     public function mimesAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new MimeTypes('video/quicktime'),
-            'expected' => ['mimestypes:video/quicktime'],
-        ];
+        yield $this->fixature(
+            attribute: new MimeTypes('video/quicktime'),
+            expected: 'mimestypes:video/quicktime',
+        );
 
-        yield [
-            'attribute' => new MimeTypes(['video/quicktime', 'video/avi']),
-            'expected' => ['mimestypes:video/quicktime,video/avi'],
-        ];
+        yield $this->fixature(
+            attribute: new MimeTypes(['video/quicktime', 'video/avi']),
+            expected: 'mimestypes:video/quicktime,video/avi',
+        );
 
-        yield [
-            'attribute' => new MimeTypes('video/quicktime', 'video/avi'),
-            'expected' => ['mimestypes:video/quicktime,video/avi'],
-        ];
+        yield $this->fixature(
+            attribute: new MimeTypes('video/quicktime', 'video/avi'),
+            expected: 'mimestypes:video/quicktime,video/avi',
+        );
     }
 
     public function mimeTypesAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new Mimes('jpg'),
-            'expected' => ['mimes:jpg'],
-        ];
+        yield $this->fixature(
+            attribute: new Mimes('jpg'),
+            expected: 'mimes:jpg',
+        );
 
-        yield [
-            'attribute' => new Mimes(['jpg', 'png']),
-            'expected' => ['mimes:jpg,png'],
-        ];
+        yield $this->fixature(
+            attribute: new Mimes(['jpg', 'png']),
+            expected: 'mimes:jpg,png',
+        );
 
-        yield [
-            'attribute' => new Mimes('jpg', 'png'),
-            'expected' => ['mimes:jpg,png'],
-        ];
+        yield $this->fixature(
+            attribute: new Mimes('jpg', 'png'),
+            expected: 'mimes:jpg,png',
+        );
     }
 
     public function notInAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new NotIn('key'),
-            'expected' => [new BaseNotIn(['key'])],
-        ];
+        yield $this->fixature(
+            attribute: new NotIn('key'),
+            expected: new BaseNotIn(['key']),
+            expectCreatedAttribute: new FoundationNotIn(new BaseNotIn(['key']))
+        );
 
-        yield [
-            'attribute' => new NotIn(['key', 'other']),
-            'expected' => [new BaseNotIn(['key', 'other'])],
-        ];
+        yield $this->fixature(
+            attribute: new NotIn(['key', 'other']),
+            expected: new BaseNotIn(['key', 'other']),
+            expectCreatedAttribute: new FoundationNotIn(new BaseNotIn(['key', 'other']))
+        );
 
-        yield [
-            'attribute' => new NotIn('key', 'other'),
-            'expected' => [new BaseNotIn(['key', 'other'])],
-        ];
+        yield $this->fixature(
+            attribute: new NotIn('key', 'other'),
+            expected: new BaseNotIn(['key', 'other']),
+            expectCreatedAttribute: new FoundationNotIn(new BaseNotIn(['key', 'other']))
+        );
     }
 
     public function passwordAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new Password(),
-            'expected' => [new BasePassword(12)],
-        ];
+        yield $this->fixature(
+            attribute: new Password(),
+            expected: new BasePassword(12),
+            expectCreatedAttribute: new FoundationPassword(new BasePassword(12)),
+        );
 
-        yield [
-            'attribute' => new Password(min: 20),
-            'expected' => [new BasePassword(20)],
-        ];
+        yield $this->fixature(
+            attribute: new Password(min: 20),
+            expected: new BasePassword(20),
+            expectCreatedAttribute: new FoundationPassword(new BasePassword(20)),
 
-        yield [
-            'attribute' => new Password(letters: true, mixedCase: true, numbers: true, uncompromised: true, uncompromisedThreshold: 12),
-            'expected' => [(new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12)],
-        ];
+        );
+
+        yield $this->fixature(
+            attribute: new Password(letters: true, mixedCase: true, numbers: true, uncompromised: true, uncompromisedThreshold: 12),
+            expected: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12),
+            expectCreatedAttribute: new FoundationPassword((new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12),),
+
+        );
     }
 
     public function prohibitedIfAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new ProhibitedIf('field', 'key'),
-            'expected' => ['prohibited_if:field,key'],
-        ];
+        yield $this->fixature(
+            attribute: new ProhibitedIf('field', 'key'),
+            expected: 'prohibited_if:field,key',
+        );
 
-        yield [
-            'attribute' => new ProhibitedIf('field', ['key', 'other']),
-            'expected' => ['prohibited_if:field,key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new ProhibitedIf('field', ['key', 'other']),
+            expected: 'prohibited_if:field,key,other',
+        );
 
-        yield [
-            'attribute' => new ProhibitedIf('field', 'key', 'other'),
-            'expected' => ['prohibited_if:field,key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new ProhibitedIf('field', 'key', 'other'),
+            expected: 'prohibited_if:field,key,other',
+        );
     }
 
     public function prohibitedUnlessAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new ProhibitedUnless('field', 'key'),
-            'expected' => ['prohibited_unless:field,key'],
-        ];
+        yield $this->fixature(
+            attribute: new ProhibitedUnless('field', 'key'),
+            expected: 'prohibited_unless:field,key',
+        );
 
-        yield [
-            'attribute' => new ProhibitedUnless('field', ['key', 'other']),
-            'expected' => ['prohibited_unless:field,key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new ProhibitedUnless('field', ['key', 'other']),
+            expected: 'prohibited_unless:field,key,other',
+        );
 
-        yield [
-            'attribute' => new ProhibitedUnless('field', 'key', 'other'),
-            'expected' => ['prohibited_unless:field,key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new ProhibitedUnless('field', 'key', 'other'),
+            expected: 'prohibited_unless:field,key,other',
+        );
     }
 
     public function prohibitsAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new Prohibits('key'),
-            'expected' => ['prohibits:key'],
-        ];
+        yield $this->fixature(
+            attribute: new Prohibits('key'),
+            expected: 'prohibits:key',
+        );
 
-        yield [
-            'attribute' => new Prohibits(['key', 'other']),
-            'expected' => ['prohibits:key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new Prohibits(['key', 'other']),
+            expected: 'prohibits:key,other',
+        );
 
-        yield [
-            'attribute' => new Prohibits('key', 'other'),
-            'expected' => ['prohibits:key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new Prohibits('key', 'other'),
+            expected: 'prohibits:key,other',
+        );
     }
 
     public function requiredIfAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new RequiredIf('field', 'key'),
-            'expected' => ['required_if:field,key'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredIf('field', 'key'),
+            expected: 'required_if:field,key',
+        );
 
-        yield [
-            'attribute' => new RequiredIf('field', ['key', 'other']),
-            'expected' => ['required_if:field,key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredIf('field', ['key', 'other']),
+            expected: 'required_if:field,key,other',
+        );
 
-        yield [
-            'attribute' => new RequiredIf('field', 'key', 'other'),
-            'expected' => ['required_if:field,key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredIf('field', 'key', 'other'),
+            expected: 'required_if:field,key,other',
+        );
     }
 
     public function requiredUnlessAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new RequiredUnless('field', 'key'),
-            'expected' => ['required_unless:field,key'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredUnless('field', 'key'),
+            expected: 'required_unless:field,key',
+        );
 
-        yield [
-            'attribute' => new RequiredUnless('field', ['key', 'other']),
-            'expected' => ['required_unless:field,key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredUnless('field', ['key', 'other']),
+            expected: 'required_unless:field,key,other',
+        );
 
-        yield [
-            'attribute' => new RequiredUnless('field', 'key', 'other'),
-            'expected' => ['required_unless:field,key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredUnless('field', 'key', 'other'),
+            expected: 'required_unless:field,key,other',
+        );
     }
 
     public function requiredWithAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new RequiredWith('key'),
-            'expected' => ['required_with:key'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredWith('key'),
+            expected: 'required_with:key',
+        );
 
-        yield [
-            'attribute' => new RequiredWith(['key', 'other']),
-            'expected' => ['required_with:key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredWith(['key', 'other']),
+            expected: 'required_with:key,other',
+        );
 
-        yield [
-            'attribute' => new RequiredWith('key', 'other'),
-            'expected' => ['required_with:key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredWith('key', 'other'),
+            expected: 'required_with:key,other',
+        );
     }
 
     public function requiredWithAllAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new RequiredWithAll('key'),
-            'expected' => ['required_with_all:key'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredWithAll('key'),
+            expected: 'required_with_all:key',
+        );
 
-        yield [
-            'attribute' => new RequiredWithAll(['key', 'other']),
-            'expected' => ['required_with_all:key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredWithAll(['key', 'other']),
+            expected: 'required_with_all:key,other',
+        );
 
-        yield [
-            'attribute' => new RequiredWithAll('key', 'other'),
-            'expected' => ['required_with_all:key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredWithAll('key', 'other'),
+            expected: 'required_with_all:key,other',
+        );
     }
 
     public function requiredWithoutAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new RequiredWithout('key'),
-            'expected' => ['required_without:key'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredWithout('key'),
+            expected: 'required_without:key',
+        );
 
-        yield [
-            'attribute' => new RequiredWithout(['key', 'other']),
-            'expected' => ['required_without:key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredWithout(['key', 'other']),
+            expected: 'required_without:key,other',
+        );
 
-        yield [
-            'attribute' => new RequiredWithout('key', 'other'),
-            'expected' => ['required_without:key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredWithout('key', 'other'),
+            expected: 'required_without:key,other',
+        );
     }
 
     public function requiredWithoutAllAttributesDataProvider(): Generator
     {
-        yield [
-            'attribute' => new RequiredWithoutAll('key'),
-            'expected' => ['required_without_all:key'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredWithoutAll('key'),
+            expected: 'required_without_all:key',
+        );
 
-        yield [
-            'attribute' => new RequiredWithoutAll(['key', 'other']),
-            'expected' => ['required_without_all:key,other'],
-        ];
+        yield $this->fixature(
+            attribute: new RequiredWithoutAll(['key', 'other']),
+            expected: 'required_without_all:key,other',
+        );
 
-        yield [
-            'attribute' => new RequiredWithoutAll('key', 'other'),
-            'expected' => ['required_without_all:key,other'],
+        yield $this->fixature(
+            attribute: new RequiredWithoutAll('key', 'other'),
+            expected: 'required_without_all:key,other',
+        );
+    }
+
+    public function startsWithAttributesDataProvider(): Generator
+    {
+        yield $this->fixature(
+            attribute: new StartsWith('x'),
+            expected: 'starts_with:x',
+        );
+
+        yield $this->fixature(
+            attribute: new StartsWith(['x', 'y']),
+            expected: 'starts_with:x,y',
+        );
+
+        yield $this->fixature(
+            attribute: new StartsWith('x', 'y'),
+            expected: 'starts_with:x,y',
+        );
+    }
+
+    public function uniqueAttributesDataProvider(): Generator
+    {
+        yield $this->fixature(
+            attribute: new Unique('users'),
+            expected: new BaseUnique('users'),
+            expectCreatedAttribute: new FoundationUnique(new BaseUnique('users'))
+        );
+
+        yield $this->fixature(
+            attribute: new Unique('users', 'email'),
+            expected: new BaseUnique('users', 'email'),
+            expectCreatedAttribute: new FoundationUnique(new BaseUnique('users', 'email'))
+        );
+
+        yield $this->fixature(
+            attribute: new Unique('users', 'email', connection: 'tenant'),
+            expected: new BaseUnique('tenant.users', 'email'),
+            expectCreatedAttribute: new FoundationUnique(new BaseUnique('tenant.users', 'email'))
+        );
+
+        yield $this->fixature(
+            attribute: new Unique('users', 'email', withoutTrashed: true),
+            expected: (new BaseUnique('users', 'email'))->withoutTrashed(),
+            expectCreatedAttribute: new FoundationUnique((new BaseUnique('users', 'email'))->withoutTrashed())
+        );
+
+        yield $this->fixature(
+            attribute: new Unique('users', 'email', withoutTrashed: true, deletedAtColumn: 'deleted_when'),
+            expected: (new BaseUnique('users', 'email'))->withoutTrashed('deleted_when'),
+            expectCreatedAttribute: new FoundationUnique((new BaseUnique('users', 'email'))->withoutTrashed('deleted_when'))
+        );
+
+        yield $this->fixature(
+            attribute: new Unique('users', 'email', ignore: 5),
+            expected: (new BaseUnique('users', 'email'))->ignore(5),
+            expectCreatedAttribute: new FoundationUnique((new BaseUnique('users', 'email'))->ignore(5))
+        );
+
+        yield $this->fixature(
+            attribute: new Unique('users', 'email', ignore: 5, ignoreColumn: 'uuid'),
+            expected: (new BaseUnique('users', 'email'))->ignore(5, 'uuid'),
+            expectCreatedAttribute: new FoundationUnique((new BaseUnique('users', 'email'))->ignore(5, 'uuid'))
+        );
+
+        $closure = fn(Builder $builder) => $builder;
+
+        yield $this->fixature(
+            attribute: new Unique('users', 'email', where: $closure),
+            expected: (new BaseUnique('users', 'email'))->where($closure),
+            expectCreatedAttribute: new FoundationUnique((new BaseUnique('users', 'email'))->where($closure))
+        );
+    }
+
+    private function fixature(
+        ValidationRule $attribute,
+        object|string|array $expected,
+        object|string|null $expectCreatedAttribute = null,
+        string $exception = null
+    ) {
+        return [
+            'attribute' => $attribute,
+            'expected' => $expected,
+            'expectedCreatedAttribute' => $expectCreatedAttribute ?? $attribute,
+            'exception' => $exception,
         ];
     }
 
-    public function ruleAttributesDataProvider(): Generator
+    /** @test */
+    public function it_can_use_the_rule_rule()
     {
         $laravelRule = new class () implements RuleContract {
             public function passes($attribute, $value)
@@ -917,15 +1055,16 @@ class RulesTest extends TestCase
             }
         };
 
-        yield [
-            'attribute' => new Rule(
-                'test',
-                ['a', 'b', 'c'],
-                'x|y',
-                $laravelRule,
-                new Required()
-            ),
-            'expected' => [
+        $rule = new Rule(
+            'test',
+            ['a', 'b', 'c'],
+            'x|y',
+            $laravelRule,
+            new Required()
+        );
+
+        $this->assertEquals(
+            [
                 'test',
                 'a',
                 'b',
@@ -935,69 +1074,7 @@ class RulesTest extends TestCase
                 $laravelRule,
                 'required',
             ],
-        ];
-    }
-
-    public function startsWithAttributesDataProvider(): Generator
-    {
-        yield [
-            'attribute' => new StartsWith('x'),
-            'expected' => ['starts_with:x'],
-        ];
-
-        yield [
-            'attribute' => new StartsWith(['x', 'y']),
-            'expected' => ['starts_with:x,y'],
-        ];
-
-        yield [
-            'attribute' => new StartsWith('x', 'y'),
-            'expected' => ['starts_with:x,y'],
-        ];
-    }
-
-    public function uniqueAttributesDataProvider(): Generator
-    {
-        yield [
-            'attribute' => new Unique('users'),
-            'expected' => [new BaseUnique('users')],
-        ];
-
-        yield [
-            'attribute' => new Unique('users', 'email'),
-            'expected' => [new BaseUnique('users', 'email')],
-        ];
-
-        yield [
-            'attribute' => new Unique('users', 'email', connection: 'tenant'),
-            'expected' => [new BaseUnique('tenant.users', 'email')],
-        ];
-
-        yield [
-            'attribute' => new Unique('users', 'email', withoutTrashed: true),
-            'expected' => [(new BaseUnique('users', 'email'))->withoutTrashed()],
-        ];
-
-        yield [
-            'attribute' => new Unique('users', 'email', withoutTrashed: true, deletedAtColumn: 'deleted_when'),
-            'expected' => [(new BaseUnique('users', 'email'))->withoutTrashed('deleted_when')],
-        ];
-
-        yield [
-            'attribute' => new Unique('users', 'email', ignore: 5),
-            'expected' => [(new BaseUnique('users', 'email'))->ignore(5)],
-        ];
-
-        yield [
-            'attribute' => new Unique('users', 'email', ignore: 5, ignoreColumn: 'uuid'),
-            'expected' => [(new BaseUnique('users', 'email'))->ignore(5, 'uuid')],
-        ];
-
-        $closure = fn (Builder $builder) => $builder;
-
-        yield [
-            'attribute' => new Unique('users', 'email', where: $closure),
-            'expected' => [(new BaseUnique('users', 'email'))->where($closure)],
-        ];
+            $rule->getRules()
+        );
     }
 }

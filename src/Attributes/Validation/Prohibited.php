@@ -3,12 +3,20 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Illuminate\Validation\Rules\ProhibitedIf;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationProhibitedIf;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Prohibited extends ValidationAttribute
+class Prohibited extends FoundationProhibitedIf
 {
-    public function getRules(): array
+    public function __construct()
     {
-        return ['prohibited'];
+        parent::__construct(new ProhibitedIf(true));
+    }
+
+    public static function create(string ...$parameters): static
+    {
+        return new self();
     }
 }

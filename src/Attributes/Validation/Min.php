@@ -3,16 +3,22 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Min extends ValidationAttribute
+class Min extends StringValidationAttribute
 {
     public function __construct(private int $value)
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["min:{$this->value}"];
+        return 'min';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->value];
     }
 }

@@ -4,21 +4,25 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class ArrayType extends ValidationAttribute
+class ArrayType extends StringValidationAttribute
 {
     private array $keys;
 
     public function __construct(array|string ...$keys)
     {
-        $this->keys = $keys;
+        $this->keys = Arr::flatten($keys);
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return empty($this->keys)
-            ? ['array']
-            : ['array:' . implode(',', Arr::flatten($this->keys))];
+        return 'array';
+    }
+
+    public function parameters(): array
+    {
+        return $this->keys;
     }
 }

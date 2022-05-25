@@ -3,16 +3,22 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class NotRegex extends ValidationAttribute
+class NotRegex extends StringValidationAttribute
 {
     public function __construct(private string $pattern)
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["not_regex:{$this->pattern}"];
+        return 'not_regex';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->pattern];
     }
 }

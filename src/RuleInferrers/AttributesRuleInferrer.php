@@ -2,19 +2,18 @@
 
 namespace Spatie\LaravelData\RuleInferrers;
 
-use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
+use Spatie\LaravelData\Support\Validation\RulesCollection;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Spatie\LaravelData\Support\DataProperty;
 
 class AttributesRuleInferrer implements RuleInferrer
 {
-    public function handle(DataProperty $property, array $rules): array
+    public function handle(DataProperty $property, RulesCollection $rules): RulesCollection
     {
-        $attributeRules = $property->attributes
-            ->filter(fn (object $attribute) => $attribute instanceof ValidationAttribute)
-            ->map(fn (ValidationAttribute $attribute) => $attribute->getRules())
-            ->all();
+        $property->attributes
+            ->filter(fn(object $attribute) => $attribute instanceof ValidationRule)
+            ->each(fn(ValidationRule $rule) => $rules->add($rule));
 
-
-        return array_merge($rules, ...$attributeRules);
+        return $rules;
     }
 }

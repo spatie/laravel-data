@@ -6,12 +6,14 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use ReflectionClass;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\Validation\RequiredIf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Validation\RulesCollection;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 
@@ -33,9 +35,9 @@ class RequiredRuleInferrerTest extends TestCase
             public string $string;
         });
 
-        $rules = $this->inferrer->handle($dataProperty, []);
+        $rules = $this->inferrer->handle($dataProperty, new RulesCollection());
 
-        $this->assertEqualsCanonicalizing(['required'], $rules);
+        $this->assertEqualsCanonicalizing(['required'], $rules->all());
     }
 
     /** @test */
@@ -45,9 +47,9 @@ class RequiredRuleInferrerTest extends TestCase
             public ?string $string;
         });
 
-        $rules = $this->inferrer->handle($dataProperty, []);
+        $rules = $this->inferrer->handle($dataProperty, new RulesCollection());
 
-        $this->assertEqualsCanonicalizing([], $rules);
+        $this->assertEqualsCanonicalizing([], $rules->all());
     }
 
     /** @test */
@@ -57,9 +59,9 @@ class RequiredRuleInferrerTest extends TestCase
             public string $string;
         });
 
-        $rules = $this->inferrer->handle($dataProperty, ['required_if:bla']);
+        $rules = $this->inferrer->handle($dataProperty, RulesCollection::create()->add(new RequiredIf('bla')));
 
-        $this->assertEqualsCanonicalizing(['required_if:bla'], $rules);
+        $this->assertEqualsCanonicalizing(['required_if:bla'], $rules->all());
     }
 
     /** @test */

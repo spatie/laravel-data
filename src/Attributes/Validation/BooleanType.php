@@ -3,12 +3,18 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class BooleanType extends ValidationAttribute
+class BooleanType extends StringValidationAttribute
 {
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ['boolean'];
+        return 'boolean';
+    }
+
+    public function parameters(): array
+    {
+        return [];
     }
 }

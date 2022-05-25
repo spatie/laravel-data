@@ -4,50 +4,50 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Validation\Rules\Password as BasePassword;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationPassword;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Password extends ValidationAttribute
+class Password extends FoundationPassword
 {
     public function __construct(
-        private int $min = 12,
-        private bool $letters = false,
-        private bool $mixedCase = false,
-        private bool $numbers = false,
-        private bool $symbols = false,
-        private bool $uncompromised = false,
-        private int $uncompromisedThreshold = 0,
-        private bool $default = false,
+        int $min = 12,
+        bool $letters = false,
+        bool $mixedCase = false,
+        bool $numbers = false,
+        bool $symbols = false,
+        bool $uncompromised = false,
+        int $uncompromisedThreshold = 0,
+        bool $default = false,
     ) {
-    }
+        if ($default) {
+            parent::__construct(BasePassword::default());
 
-    public function getRules(): array
-    {
-        if ($this->default) {
-            return [BasePassword::default()];
+            return;
         }
 
-        $rule = BasePassword::min($this->min);
+        $rule = BasePassword::min($min);
 
-        if ($this->letters) {
+        if ($letters) {
             $rule->letters();
         }
 
-        if ($this->mixedCase) {
+        if ($mixedCase) {
             $rule->mixedCase();
         }
 
-        if ($this->numbers) {
+        if ($numbers) {
             $rule->numbers();
         }
 
-        if ($this->symbols) {
+        if ($symbols) {
             $rule->symbols();
         }
 
-        if ($this->uncompromised) {
-            $rule->uncompromised($this->uncompromisedThreshold);
+        if ($uncompromised) {
+            $rule->uncompromised($uncompromisedThreshold);
         }
 
-        return [$rule];
+        parent::__construct($rule);
     }
 }

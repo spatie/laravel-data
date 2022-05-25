@@ -5,29 +5,27 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Closure;
 use Illuminate\Validation\Rules\Exists as BaseExists;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationExists;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Exists extends ValidationAttribute
+class Exists extends FoundationExists
 {
     public function __construct(
-        private string $table,
-        private ?string $column = 'NULL',
-        private ?string $connection = null,
-        private ?Closure $where = null,
+        string $table,
+        ?string $column = 'NULL',
+        ?string $connection = null,
+        ?Closure $where = null,
     ) {
-    }
-
-    public function getRules(): array
-    {
         $rule = new BaseExists(
-            $this->connection ? "{$this->connection}.{$this->table}" : $this->table,
-            $this->column
+            $connection ? "{$connection}.{$table}" : $table,
+            $column
         );
 
-        if ($this->where) {
-            $rule->where($this->where);
+        if ($where) {
+            $rule->where($where);
         }
 
-        return [$rule];
+        parent::__construct($rule);
     }
 }

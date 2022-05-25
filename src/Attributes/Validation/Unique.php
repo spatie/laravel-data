@@ -5,41 +5,39 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Closure;
 use Illuminate\Validation\Rules\Unique as BaseUnique;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationUnique;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Unique extends ValidationAttribute
+class Unique extends FoundationUnique
 {
     public function __construct(
-        private string $table,
-        private ?string $column = 'NULL',
-        private ?string $connection = null,
-        private ?string $ignore = null,
-        private ?string $ignoreColumn = null,
-        private bool $withoutTrashed = false,
-        private string $deletedAtColumn = 'deleted_at',
-        private ?Closure $where = null,
+        string $table,
+        ?string $column = 'NULL',
+        ?string $connection = null,
+        ?string $ignore = null,
+        ?string $ignoreColumn = null,
+        bool $withoutTrashed = false,
+        string $deletedAtColumn = 'deleted_at',
+        ?Closure $where = null,
     ) {
-    }
-
-    public function getRules(): array
-    {
         $rule = new BaseUnique(
-            $this->connection ? "{$this->connection}.{$this->table}" : $this->table,
-            $this->column
+            $connection ? "{$connection}.{$table}" : $table,
+            $column
         );
 
-        if ($this->withoutTrashed) {
-            $rule->withoutTrashed($this->deletedAtColumn);
+        if ($withoutTrashed) {
+            $rule->withoutTrashed($deletedAtColumn);
         }
 
-        if ($this->ignore) {
-            $rule->ignore($this->ignore, $this->ignoreColumn);
+        if ($ignore) {
+            $rule->ignore($ignore, $ignoreColumn);
         }
 
-        if ($this->where) {
-            $rule->where($this->where);
+        if ($where) {
+            $rule->where($where);
         }
 
-        return [$rule];
+        parent::__construct($rule);
     }
 }
