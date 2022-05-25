@@ -90,6 +90,13 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
         return $this->transform(TransformationType::withoutValueTransforming());
     }
 
+    public function values(): static
+    {
+        $this->items = $this->items->values();
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return $this->transform(TransformationType::full());
