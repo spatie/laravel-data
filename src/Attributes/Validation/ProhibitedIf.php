@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
-use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ProhibitedIf extends StringValidationAttribute
@@ -27,7 +26,7 @@ class ProhibitedIf extends StringValidationAttribute
     {
         return [
             $this->field,
-            $this->normalizeValue($this->values)
+            $this->normalizeValue($this->values),
         ];
     }
 }

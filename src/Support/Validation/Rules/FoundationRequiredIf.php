@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Validation\Rules;
 
-use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\RequiredIf;
 use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 use Spatie\LaravelData\Support\Validation\RequiringRule;

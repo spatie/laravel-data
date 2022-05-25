@@ -22,7 +22,7 @@ abstract class StringValidationAttribute extends ValidationAttribute
         }
 
         $parameters = collect($this->parameters())
-            ->map(fn(mixed $value, int|string $key) => is_string($key) ? "{$key}={$value}" : $value)
+            ->map(fn (mixed $value, int|string $key) => is_string($key) ? "{$key}={$value}" : $value)
             ->join(',');
 
         return ["{$this->keyword()}:{$parameters}"];

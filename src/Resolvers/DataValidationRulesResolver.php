@@ -11,8 +11,7 @@ class DataValidationRulesResolver
     public function __construct(
         protected DataConfig $dataConfig,
         protected RuleAttributesResolver $ruleAttributesResolver,
-    )
-    {
+    ) {
     }
 
     public function execute(string $class, array $payload = [], bool $nullable = false): Collection

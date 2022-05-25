@@ -2028,7 +2028,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_use_a_trait()
     {
-        $data = new class('') implements DataObject {
+        $data = new class ('') implements DataObject {
             use DataTrait;
 
             public function __construct(public string $string)

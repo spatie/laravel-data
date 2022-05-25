@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Traits\ForwardsCalls;
 use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 

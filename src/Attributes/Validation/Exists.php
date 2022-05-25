@@ -6,7 +6,6 @@ use Attribute;
 use Closure;
 use Illuminate\Validation\Rules\Exists as BaseExists;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationExists;
-use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Exists extends FoundationExists

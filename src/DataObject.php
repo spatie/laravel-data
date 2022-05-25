@@ -10,5 +10,4 @@ use JsonSerializable;
 
 interface DataObject extends Arrayable, Responsable, Jsonable, EloquentCastable, JsonSerializable
 {
-
 }

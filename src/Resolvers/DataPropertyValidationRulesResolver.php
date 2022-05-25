@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
-use Spatie\LaravelData\RuleInferrers\RuleInferrer;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\RulesCollection;
@@ -66,11 +65,11 @@ class DataPropertyValidationRulesResolver
     {
         $rules = new RulesCollection();
 
-        if($nullable){
+        if ($nullable) {
             $rules->add(new Nullable());
         }
 
-        foreach ($this->dataConfig->getRuleInferrers() as $inferrer){
+        foreach ($this->dataConfig->getRuleInferrers() as $inferrer) {
             $rules = $inferrer->handle($property, $rules);
         }
 

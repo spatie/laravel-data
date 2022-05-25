@@ -15,7 +15,6 @@ use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
 use Spatie\LaravelData\Attributes\Validation\Rule;
-use Spatie\LaravelData\Support\Validation\CustomValidationRule;
 use Spatie\LaravelData\Support\Validation\RuleFactory;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationDimensions;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationEnum;
@@ -27,7 +26,6 @@ use Spatie\LaravelData\Support\Validation\Rules\FoundationPassword;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationProhibitedIf;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationRequiredIf;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationUnique;
-use Spatie\LaravelData\Support\Validation\UnknownValidationRule;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 class RuleAttributesResolver
@@ -38,7 +36,7 @@ class RuleAttributesResolver
 
     public function execute(array $rules): array
     {
-        $rules = array_map(fn(mixed $rule) => match (true) {
+        $rules = array_map(fn (mixed $rule) => match (true) {
             is_string($rule) => $this->resolveStringRule($rule),
             $rule instanceof ValidationRule => $rule,
             $rule instanceof Dimensions => new FoundationDimensions($rule),

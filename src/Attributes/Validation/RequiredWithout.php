@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
-use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredWithout extends StringValidationAttribute implements RequiringRule
@@ -26,7 +25,7 @@ class RequiredWithout extends StringValidationAttribute implements RequiringRule
     public function parameters(): array
     {
         return [
-            $this->normalizeValue($this->fields)
+            $this->normalizeValue($this->fields),
         ];
     }
 }

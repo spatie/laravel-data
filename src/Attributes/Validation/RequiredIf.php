@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
-use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredIf extends StringValidationAttribute implements RequiringRule
@@ -28,7 +27,7 @@ class RequiredIf extends StringValidationAttribute implements RequiringRule
     {
         return [
             $this->field,
-            $this->normalizeValue($this->values)
+            $this->normalizeValue($this->values),
         ];
     }
 }

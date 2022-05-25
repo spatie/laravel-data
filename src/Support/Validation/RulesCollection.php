@@ -2,8 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Validation;
 
-use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
-
 class RulesCollection
 {
     protected array $rules = [];
@@ -17,7 +15,7 @@ class RulesCollection
     {
         $this->rules = array_filter(
             $this->rules,
-            fn(ValidationRule $initialRule) => ! $initialRule instanceof $rule
+            fn (ValidationRule $initialRule) => ! $initialRule instanceof $rule
         );
 
         $this->rules[] = $rule;

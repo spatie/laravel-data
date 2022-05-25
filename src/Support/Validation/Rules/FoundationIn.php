@@ -2,9 +2,8 @@
 
 namespace Spatie\LaravelData\Support\Validation\Rules;
 
-use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
-use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Illuminate\Validation\Rules\In;
+use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 
 class FoundationIn extends ObjectValidationAttribute
 {

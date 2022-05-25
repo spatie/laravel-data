@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support\Validation\Rules;
 
 use Illuminate\Validation\Rules\NotIn;
-use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 
 class FoundationNotIn extends ObjectValidationAttribute

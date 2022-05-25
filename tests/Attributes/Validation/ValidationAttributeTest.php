@@ -7,7 +7,6 @@ use DateTimeZone;
 use Generator;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
-use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Spatie\LaravelData\Tests\TestCase;
 
 class ValidationAttributeTest extends TestCase

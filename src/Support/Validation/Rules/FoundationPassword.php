@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Support\Validation\Rules;
 
 use Exception;
 use Illuminate\Validation\Rules\Password;
-use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 
 class FoundationPassword extends ObjectValidationAttribute
