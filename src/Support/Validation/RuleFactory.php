@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Validation;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Spatie\LaravelData\Attributes\Validation\Accepted;
 use Spatie\LaravelData\Attributes\Validation\AcceptedIf;
@@ -93,7 +92,7 @@ class RuleFactory
             : [];
 
         /** @var \Spatie\LaravelData\Attributes\Validation\StringValidationAttribute|\Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute|null $ruleClass */
-        $ruleClass = $this->mapping()->get($keyword);
+        $ruleClass = $this->mapping()[$keyword] ?? null;
 
         if ($ruleClass === null) {
             throw CouldNotCreateValidationRule::create($rule);
@@ -109,15 +108,15 @@ class RuleFactory
         }
 
         return collect(explode(',', $parameters))->mapWithKeys(
-            fn(string $parameter, int $index) => str_contains($parameter, '=')
+            fn (string $parameter, int $index) => Str::contains($parameter, '=')
                 ? [Str::before($parameter, '=') => Str::after($parameter, '=')]
                 : [$index => $parameter]
         )->all();
     }
 
-    private function mapping(): Collection
+    private function mapping(): array
     {
-        return collect([
+        return [
             Accepted::keyword() => Accepted::class,
             AcceptedIf::keyword() => AcceptedIf::class,
             ActiveUrl::keyword() => ActiveUrl::class,
@@ -195,6 +194,6 @@ class RuleFactory
             Unique::keyword() => Unique::class,
             Url::keyword() => Url::class,
             Uuid::keyword() => Uuid::class,
-        ]);
+        ];
     }
 }
