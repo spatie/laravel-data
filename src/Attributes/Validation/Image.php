@@ -7,13 +7,6 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Image extends StringValidationAttribute
 {
-    public static function keyword(): string
-    {
-        return 'image';
-    }
+    use GenericRule;
 
-    public function parameters(): array
-    {
-        return [];
-    }
 }

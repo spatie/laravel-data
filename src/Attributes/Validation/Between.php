@@ -7,13 +7,10 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Between extends StringValidationAttribute
 {
-    public function __construct(private int | float $min, private int | float $max)
-    {
-    }
+    use GenericRule;
 
-    public static function keyword(): string
+    public function __construct(private int|float $min, private int|float $max)
     {
-        return 'between';
     }
 
     public function parameters(): array

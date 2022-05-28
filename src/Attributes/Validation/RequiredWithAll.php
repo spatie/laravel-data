@@ -9,23 +9,18 @@ use Spatie\LaravelData\Support\Validation\RequiringRule;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredWithAll extends StringValidationAttribute implements RequiringRule
 {
+    use GenericRule;
+
     private string|array $fields;
 
     public function __construct(
-        array | string ...$fields,
+        array|string ...$fields,
     ) {
         $this->fields = Arr::flatten($fields);
     }
 
-    public static function keyword(): string
-    {
-        return 'required_with_all';
-    }
-
     public function parameters(): array
     {
-        return [
-            $this->normalizeValue($this->fields),
-        ];
+        return [$this->normalizeValue($this->fields)];
     }
 }

@@ -7,13 +7,11 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class BooleanType extends StringValidationAttribute
 {
+    use GenericRule;
+
+
     public static function keyword(): string
     {
         return 'boolean';
-    }
-
-    public function parameters(): array
-    {
-        return [];
     }
 }

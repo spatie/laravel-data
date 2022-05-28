@@ -7,13 +7,10 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Same extends StringValidationAttribute
 {
+    use GenericRule;
+
     public function __construct(private string $field)
     {
-    }
-
-    public static function keyword(): string
-    {
-        return 'same';
     }
 
     public function parameters(): array

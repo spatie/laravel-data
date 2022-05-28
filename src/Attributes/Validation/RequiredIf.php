@@ -9,18 +9,15 @@ use Spatie\LaravelData\Support\Validation\RequiringRule;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredIf extends StringValidationAttribute implements RequiringRule
 {
+    use GenericRule;
+
     private string|array $values;
 
     public function __construct(
         private string $field,
-        array | string ...$values
+        array|string ...$values
     ) {
         $this->values = Arr::flatten($values);
-    }
-
-    public static function keyword(): string
-    {
-        return 'required_if';
     }
 
     public function parameters(): array

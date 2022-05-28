@@ -8,13 +8,10 @@ use DateTimeInterface;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class AfterOrEqual extends StringValidationAttribute
 {
-    public function __construct(private string | DateTimeInterface $date)
-    {
-    }
+    use GenericRule;
 
-    public static function keyword(): string
+    public function __construct(private string|DateTimeInterface $date)
     {
-        return 'after_or_equal';
     }
 
     public function parameters(): array

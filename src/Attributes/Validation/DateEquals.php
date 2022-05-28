@@ -8,13 +8,10 @@ use DateTimeInterface;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class DateEquals extends StringValidationAttribute
 {
-    public function __construct(private string | DateTimeInterface $date)
-    {
-    }
+    use GenericRule;
 
-    public static function keyword(): string
+    public function __construct(private string|DateTimeInterface $date)
     {
-        return 'date_equals';
     }
 
     public function parameters(): array

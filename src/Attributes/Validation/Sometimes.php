@@ -7,13 +7,6 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Sometimes extends StringValidationAttribute
 {
-    public static function keyword(): string
-    {
-        return 'sometimes';
-    }
+    use GenericRule;
 
-    public function parameters(): array
-    {
-        return [];
-    }
 }

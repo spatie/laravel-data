@@ -7,13 +7,6 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Url extends StringValidationAttribute
 {
-    public static function keyword(): string
-    {
-        return 'url';
-    }
+    use GenericRule;
 
-    public function parameters(): array
-    {
-        return [];
-    }
 }

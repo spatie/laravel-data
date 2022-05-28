@@ -7,13 +7,10 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class DateFormat extends StringValidationAttribute
 {
+    use GenericRule;
+
     public function __construct(private string $format)
     {
-    }
-
-    public static function keyword(): string
-    {
-        return 'date_format';
     }
 
     public function parameters(): array

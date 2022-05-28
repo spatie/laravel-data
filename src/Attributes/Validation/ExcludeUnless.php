@@ -7,14 +7,11 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ExcludeUnless extends StringValidationAttribute
 {
+    use GenericRule;
     public function __construct(private string $field, private string | bool | int | float $value)
     {
     }
 
-    public static function keyword(): string
-    {
-        return 'exclude_unless';
-    }
 
     public function parameters(): array
     {

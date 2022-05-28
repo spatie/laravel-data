@@ -7,13 +7,6 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Bail extends StringValidationAttribute
 {
-    public static function keyword(): string
-    {
-        return 'bail';
-    }
+    use GenericRule;
 
-    public function parameters(): array
-    {
-        return [];
-    }
 }

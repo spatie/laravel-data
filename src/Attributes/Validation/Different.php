@@ -7,13 +7,9 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Different extends StringValidationAttribute
 {
+    use GenericRule;
     public function __construct(private string $field)
     {
-    }
-
-    public static function keyword(): string
-    {
-        return 'different';
     }
 
     public function parameters(): array

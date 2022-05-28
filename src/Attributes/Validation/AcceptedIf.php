@@ -7,13 +7,10 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class AcceptedIf extends StringValidationAttribute
 {
+    use GenericRule;
+
     public function __construct(private string $field, private string|bool|int|float $value)
     {
-    }
-
-    public static function keyword(): string
-    {
-        return 'accepted_if';
     }
 
     public function parameters(): array

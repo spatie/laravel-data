@@ -7,13 +7,9 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Min extends StringValidationAttribute
 {
+    use GenericRule;
     public function __construct(private int $value)
     {
-    }
-
-    public static function keyword(): string
-    {
-        return 'min';
     }
 
     public function parameters(): array

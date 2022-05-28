@@ -10,6 +10,8 @@ use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Email extends StringValidationAttribute
 {
+    use GenericRule;
+
     public const RfcValidation = 'rfc';
     public const NoRfcWarningsValidation = 'strict';
     public const DnsCheckValidation = 'dns';
@@ -21,11 +23,6 @@ class Email extends StringValidationAttribute
     public function __construct(array | string ...$modes)
     {
         $this->modes = Arr::flatten($modes);
-    }
-
-    public static function keyword(): string
-    {
-        return 'email';
     }
 
     public function parameters(): array

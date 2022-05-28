@@ -7,13 +7,6 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Present extends StringValidationAttribute
 {
-    public static function keyword(): string
-    {
-        return 'present';
-    }
+    use GenericRule;
 
-    public function parameters(): array
-    {
-        return [];
-    }
 }

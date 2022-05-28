@@ -7,6 +7,8 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Regex extends StringValidationAttribute
 {
+    use GenericRule;
+
     public function __construct(private string $pattern)
     {
     }

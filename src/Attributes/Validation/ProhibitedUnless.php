@@ -8,14 +8,15 @@ use Illuminate\Support\Arr;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ProhibitedUnless extends StringValidationAttribute
 {
+    use GenericRule;
+
     private string|array $values;
 
     public function __construct(
         private string $field,
-        array | string ...$values
+        array|string ...$values
     ) {
-        $this->values = Arr::flatten($values);
-        ;
+        $this->values = Arr::flatten($values);;
     }
 
     public static function keyword(): string

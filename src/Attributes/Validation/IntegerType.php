@@ -7,13 +7,10 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class IntegerType extends StringValidationAttribute
 {
+    use GenericRule;
     public static function keyword(): string
     {
         return 'integer';
     }
 
-    public function parameters(): array
-    {
-        return [];
-    }
 }

@@ -10,6 +10,7 @@ use Spatie\LaravelData\Support\Validation\Rules\FoundationDimensions;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Dimensions extends FoundationDimensions
 {
+
     public function __construct(
         ?int $minWidth = null,
         ?int $minHeight = null,

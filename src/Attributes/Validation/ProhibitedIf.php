@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ProhibitedIf extends StringValidationAttribute
 {
+    use GenericRule;
     private string|array $values;
 
     public function __construct(
@@ -15,11 +16,6 @@ class ProhibitedIf extends StringValidationAttribute
         array | string ...$values
     ) {
         $this->values = Arr::flatten($values);
-    }
-
-    public static function keyword(): string
-    {
-        return 'prohibited_if';
     }
 
     public function parameters(): array

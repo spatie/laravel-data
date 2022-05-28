@@ -8,16 +8,12 @@ use Illuminate\Support\Arr;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Mimes extends StringValidationAttribute
 {
+    use GenericRule;
     private array $mimes;
 
     public function __construct(string | array ...$mimes)
     {
         $this->mimes = Arr::flatten($mimes);
-    }
-
-    public static function keyword(): string
-    {
-        return 'mimes';
     }
 
     public function parameters(): array

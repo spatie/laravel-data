@@ -7,14 +7,12 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class InArray extends StringValidationAttribute
 {
+    use GenericRule;
+
     public function __construct(private string $field)
     {
     }
 
-    public static function keyword(): string
-    {
-        return 'in_array';
-    }
 
     public function parameters(): array
     {

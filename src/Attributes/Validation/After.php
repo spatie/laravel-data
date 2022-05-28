@@ -8,14 +8,12 @@ use DateTimeInterface;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class After extends StringValidationAttribute
 {
+    use GenericRule;
+
     public function __construct(private string|DateTimeInterface $date)
     {
     }
 
-    public static function keyword(): string
-    {
-        return 'after';
-    }
 
     public function parameters(): array
     {

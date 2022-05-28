@@ -8,16 +8,13 @@ use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Distinct extends StringValidationAttribute
 {
+    use GenericRule;
+
     public const Strict = 'strict';
     public const IgnoreCase = 'ignore_case';
 
     public function __construct(private ?string $mode = null)
     {
-    }
-
-    public static function keyword(): string
-    {
-        return 'distinct';
     }
 
     public function parameters(): array

@@ -9,6 +9,8 @@ use Spatie\LaravelData\Support\Validation\RequiringRule;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredWithoutAll extends StringValidationAttribute implements RequiringRule
 {
+    use GenericRule;
+
     private string|array $fields;
 
     public function __construct(
@@ -17,15 +19,8 @@ class RequiredWithoutAll extends StringValidationAttribute implements RequiringR
         $this->fields = Arr::flatten($fields);
     }
 
-    public static function keyword(): string
-    {
-        return 'required_without_all';
-    }
-
     public function parameters(): array
     {
-        return [
-            $this->normalizeValue($this->fields),
-        ];
+        return [$this->normalizeValue($this->fields),];
     }
 }

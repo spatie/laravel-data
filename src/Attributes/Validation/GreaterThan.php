@@ -7,6 +7,8 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class GreaterThan extends StringValidationAttribute
 {
+    use GenericRule;
+
     public function __construct(private string $field)
     {
     }

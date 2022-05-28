@@ -7,13 +7,9 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class MultipleOf extends StringValidationAttribute
 {
+    use GenericRule;
     public function __construct(private int | float $value)
     {
-    }
-
-    public static function keyword(): string
-    {
-        return 'multiple_of';
     }
 
     public function parameters(): array
