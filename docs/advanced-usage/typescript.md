@@ -18,6 +18,7 @@ class DataObject extends Data{
         /** @var string[] */
         public array $array,
         public Lazy|string $lazy,
+        public Optional|string $optional,
         public SimpleData $simpleData,
         /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */
         public DataCollection $dataCollection,
@@ -38,6 +39,7 @@ Would be transformed to the following TypeScript type:
     float: number;
     array: Array<string>;
     lazy?: string;
+    optional?: string;
     simpleData: SimpleData;
     dataCollection: Array<SimpleData>;
 }

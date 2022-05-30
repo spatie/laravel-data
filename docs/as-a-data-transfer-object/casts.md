@@ -1,6 +1,6 @@
 ---
 title: Casts
-weight: 4
+weight: 5
 ---
 
 We extend our example data object just a little bit:
@@ -79,36 +79,9 @@ SongData::from([
 
 It is possible to provide parameters to the casts like this:
 
-
 ```php
 #[WithCast(EnumCast::class, class: Format::class)]
 public Format $format
-```
-
-### Casting dates
-
-By default, the package ships with a `DateTimeInterface` cast to transform a date string into a date object. You can define the format used to parse the date in the `data.php` config file. By default, it is the `DATE_ATOM` format.
-
-It is also possible to manually set the format on the cast:
-
-```php
-#[WithCast(DateTimeInterfaceCast::class, format: DATE_ATOM)]
-public DateTime $date
-```
-
-The data object will use the type of the property to cast a date string into, so if you want to use `Carbon`, that's perfectly possible:
-
-```php
-#[WithCast(DateTimeInterfaceCast::class)]
-public Carbon $date
-```
-
-You can even manually specify the type the date string should be cast to:
-
-```php
-
-#[WithCast(DateTimeInterfaceCast::class, type: CarbonImmutable::class)]
-public $date
 ```
 
 ## Global casts
@@ -145,5 +118,4 @@ class SongData extends Data
 
 ## Creating your own casts
 
-It is possible to create your casts. You can read more about this in the [advanced chapter](/docs/laravel-data/v1/advanced-usage/creating-a-cast).
-
+It is possible to create your casts. You can read more about this in the [advanced chapter](/docs/laravel-data/v2/advanced-usage/creating-a-cast).

@@ -19,7 +19,7 @@ class DefaultValuesDataPipe extends DataPipe
                     $properties[$property->name] = $property->defaultValue;
                 }
 
-                if ($property->type->isUndefinable) {
+                if ($property->type->isOptional) {
                     $properties[$property->name] = Optional::create();
                 }
             });

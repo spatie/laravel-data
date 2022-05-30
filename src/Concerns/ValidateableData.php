@@ -37,8 +37,6 @@ trait ValidateableData
                 $exception->errorBag(app()->call([static::class, 'errorBag']));
             }
 
-            ray()->backtrace();
-
             throw $exception;
         }
 

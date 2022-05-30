@@ -8,7 +8,7 @@ High impact changes
 
 - Please check the most recent `data.php` config file and change yours accordingly
 - The `Cast` interface now has a `$context` argument in the `cast` method
-- By default, it is now impossible to include/exclude properties using a request parameter. This can be manually overwritten
+- By default, it is now impossible to include/exclude properties using a request parameter. This can be manually overwritten.
 - The `validate` method on a data object will not create a data object after validation, use `validateAndCreate` instead
 - `DataCollection` is now being split into a `DataCollection` and `PaginatedDataCollection`
 

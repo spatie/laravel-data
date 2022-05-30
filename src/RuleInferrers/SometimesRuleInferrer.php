@@ -8,7 +8,7 @@ class SometimesRuleInferrer implements RuleInferrer
 {
     public function handle(DataProperty $property, array $rules): array
     {
-        if ($property->type->isUndefinable && ! in_array('sometimes', $rules)) {
+        if ($property->type->isOptional && ! in_array('sometimes', $rules)) {
             $rules[] = 'sometimes';
         }
 

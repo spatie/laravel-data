@@ -42,7 +42,7 @@ class DataTypeTest extends TestCase
         $this->assertTrue($type->isNullable);
         $this->assertTrue($type->isMixed);
         $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isUndefinable);
+        $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollection);
         $this->assertNull($type->dataClass);
@@ -59,7 +59,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isNullable);
         $this->assertFalse($type->isMixed);
         $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isUndefinable);
+        $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollection);
         $this->assertNull($type->dataClass);
@@ -76,7 +76,7 @@ class DataTypeTest extends TestCase
         $this->assertTrue($type->isNullable);
         $this->assertFalse($type->isMixed);
         $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isUndefinable);
+        $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollection);
         $this->assertNull($type->dataClass);
@@ -93,7 +93,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isNullable);
         $this->assertFalse($type->isMixed);
         $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isUndefinable);
+        $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollection);
         $this->assertNull($type->dataClass);
@@ -110,7 +110,7 @@ class DataTypeTest extends TestCase
         $this->assertTrue($type->isNullable);
         $this->assertFalse($type->isMixed);
         $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isUndefinable);
+        $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollection);
         $this->assertNull($type->dataClass);
@@ -127,7 +127,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isNullable);
         $this->assertFalse($type->isMixed);
         $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isUndefinable);
+        $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollection);
         $this->assertNull($type->dataClass);
@@ -147,7 +147,7 @@ class DataTypeTest extends TestCase
         $this->assertTrue($type->isNullable);
         $this->assertTrue($type->isMixed);
         $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isUndefinable);
+        $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollection);
         $this->assertNull($type->dataClass);
@@ -164,7 +164,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isNullable);
         $this->assertFalse($type->isMixed);
         $this->assertTrue($type->isLazy);
-        $this->assertFalse($type->isUndefinable);
+        $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollection);
         $this->assertNull($type->dataClass);
@@ -181,7 +181,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isNullable);
         $this->assertFalse($type->isMixed);
         $this->assertFalse($type->isLazy);
-        $this->assertTrue($type->isUndefinable);
+        $this->assertTrue($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollection);
         $this->assertNull($type->dataClass);
@@ -208,7 +208,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isNullable);
         $this->assertFalse($type->isMixed);
         $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isUndefinable);
+        $this->assertFalse($type->isOptional);
         $this->assertTrue($type->isDataObject);
         $this->assertFalse($type->isDataCollection);
         $this->assertEquals(SimpleData::class, $type->dataClass);
@@ -225,7 +225,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isNullable);
         $this->assertFalse($type->isMixed);
         $this->assertTrue($type->isLazy);
-        $this->assertFalse($type->isUndefinable);
+        $this->assertFalse($type->isOptional);
         $this->assertTrue($type->isDataObject);
         $this->assertFalse($type->isDataCollection);
         $this->assertEquals(SimpleData::class, $type->dataClass);
@@ -243,7 +243,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isNullable);
         $this->assertFalse($type->isMixed);
         $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isUndefinable);
+        $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertTrue($type->isDataCollection);
         $this->assertEquals(SimpleData::class, $type->dataClass);
@@ -261,7 +261,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isNullable);
         $this->assertFalse($type->isMixed);
         $this->assertTrue($type->isLazy);
-        $this->assertFalse($type->isUndefinable);
+        $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertTrue($type->isDataCollection);
         $this->assertEquals(SimpleData::class, $type->dataClass);
