@@ -27,6 +27,6 @@ class Enum extends ValidationAttribute
 
     public static function create(string ...$parameters): static
     {
-        return new self(new EnumRule($parameters[0]));
+        return new static(new EnumRule($parameters[0]));
     }
 }

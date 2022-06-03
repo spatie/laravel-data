@@ -3,14 +3,14 @@
 namespace Spatie\LaravelData\RuleInferrers;
 
 use Spatie\LaravelData\Attributes\Validation\Rule;
-use Spatie\LaravelData\Resolvers\RuleAttributesResolver;
+use Spatie\LaravelData\Support\Validation\RulesMapper;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\RulesCollection;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 class AttributesRuleInferrer implements RuleInferrer
 {
-    public function __construct(private RuleAttributesResolver $ruleAttributesResolver)
+    public function __construct(private RulesMapper $ruleAttributesResolver)
     {
     }
 

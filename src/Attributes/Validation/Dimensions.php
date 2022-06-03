@@ -21,8 +21,6 @@ class Dimensions extends ValidationAttribute
         ?int $height = null,
         ?BaseDimensions $rule = null,
     ) {
-        $rule = $rule ?? new BaseDimensions();
-
         if (
             $minWidth === null
             && $minHeight === null
@@ -35,6 +33,8 @@ class Dimensions extends ValidationAttribute
         ) {
             throw CannotBuildValidationRule::create('You must specify one of width, height, minWidth, minHeight, maxWidth, maxHeight, ratio or a dimensions rule.');
         }
+
+        $rule = $rule ?? new BaseDimensions();
 
         if ($minWidth !== null) {
             $rule->minWidth($minWidth);

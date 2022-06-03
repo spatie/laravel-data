@@ -34,6 +34,6 @@ class In extends ValidationAttribute
 
     public static function create(string ...$parameters): static
     {
-        return new self(new BaseIn($parameters));
+        return new static(new BaseIn($parameters));
     }
 }

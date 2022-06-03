@@ -5,12 +5,13 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Validation\RulesMapper;
 
 class DataClassValidationRulesResolver
 {
     public function __construct(
         protected DataConfig $dataConfig,
-        protected RuleAttributesResolver $ruleAttributesResolver,
+        protected RulesMapper $ruleAttributesResolver,
     ) {
     }
 

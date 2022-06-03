@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelData\Resolvers;
+namespace Spatie\LaravelData\Support\Validation;
 
 use Exception;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
@@ -29,7 +29,7 @@ use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Support\Validation\RuleFactory;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 
-class RuleAttributesResolver
+class RulesMapper
 {
     public function __construct(private RuleFactory $ruleFactory)
     {

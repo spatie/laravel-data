@@ -24,6 +24,6 @@ class Prohibited extends ValidationAttribute
 
     public static function create(string ...$parameters): static
     {
-        return new self();
+        return new static();
     }
 }

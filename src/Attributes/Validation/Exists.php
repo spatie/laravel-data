@@ -47,6 +47,6 @@ class Exists extends ValidationAttribute
 
     public static function create(string ...$parameters): static
     {
-        return new self(new BaseExists($parameters[0], $parameters[1] ?? null));
+        return new static(new BaseExists($parameters[0], $parameters[1] ?? null));
     }
 }

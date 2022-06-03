@@ -1,6 +1,61 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Attributes/Validation/Dimensions.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Attributes/Validation/Enum.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Attributes/Validation/Exclude.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Attributes/Validation/Exists.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Attributes/Validation/In.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Attributes/Validation/NotIn.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Attributes/Validation/Prohibited.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Attributes/Validation/Required.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Attributes/Validation/StringValidationAttribute.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Attributes/Validation/Unique.php
+
+		-
+			message: "#^Parameter \\#1 \\$time of static method Carbon\\\\Carbon\\:\\:parse\\(\\) expects DateTimeInterface\\|string\\|null, int given\\.$#"
+			count: 1
+			path: src/Attributes/Validation/ValidationAttribute.php
+
+		-
 			message: "#^Method Spatie\\\\LaravelData\\\\Data\\:\\:from\\(\\) should return static\\(Spatie\\\\LaravelData\\\\Data\\) but returns Spatie\\\\LaravelData\\\\Data\\.$#"
 			count: 1
 			path: src/Data.php
@@ -41,7 +96,17 @@ parameters:
 			path: src/Support/DataType.php
 
 		-
-			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$isUndefinable is already assigned\\.$#"
+			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$isOptional is already assigned\\.$#"
 			count: 2
 			path: src/Support/DataType.php
+
+		-
+			message: "#^Instanceof between mixed and Spatie\\\\LaravelData\\\\Attributes\\\\Validation\\\\Rule will always evaluate to false\\.$#"
+			count: 1
+			path: src/Support/Validation/RulesMapper.php
+
+		-
+			message: "#^Match arm comparison between true and false is always false\\.$#"
+			count: 1
+			path: src/Support/Validation/RulesMapper.php
 

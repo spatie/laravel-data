@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 
 class RulesCollection
 {
-    /** @var \Spatie\LaravelData\Support\Validation\ValidationRule[] */
+    /** @var Collection<\Spatie\LaravelData\Support\Validation\ValidationRule> */
     protected Collection $rules;
 
     public function __construct()
@@ -14,9 +14,9 @@ class RulesCollection
         $this->rules = new Collection();
     }
 
-    public static function create(): static
+    public static function create(): self
     {
-        return new static();
+        return new self();
     }
 
     public function add(ValidationRule ...$rules): static
@@ -44,13 +44,13 @@ class RulesCollection
 
     public function hasType(string $class): bool
     {
-        return $this->rules->contains(fn (ValidationRule $rule) => $rule instanceof $class);
+        return $this->rules->contains(fn(ValidationRule $rule) => $rule instanceof $class);
     }
 
     public function normalize(): array
     {
         return $this->rules
-            ->map(fn (ValidationRule $rule) => $rule->getRules())
+            ->map(fn(ValidationRule $rule) => $rule->getRules())
             ->flatten()
             ->all();
     }

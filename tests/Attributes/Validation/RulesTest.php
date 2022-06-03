@@ -90,7 +90,7 @@ use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
-use Spatie\LaravelData\Resolvers\RuleAttributesResolver;
+use Spatie\LaravelData\Support\Validation\RulesMapper;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Spatie\LaravelData\Tests\TestCase;
 use Spatie\TestTime\TestTime;
@@ -128,7 +128,7 @@ class RulesTest extends TestCase
             $this->markTestSkipped();
         }
 
-        $resolved = app(RuleAttributesResolver::class)->execute([$expected]);
+        $resolved = app(RulesMapper::class)->execute([$expected]);
 
         $this->assertEquals($expectedCreatedAttribute, $resolved[0]);
     }

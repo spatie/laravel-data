@@ -34,6 +34,6 @@ class NotIn extends ValidationAttribute
 
     public static function create(string ...$parameters): static
     {
-        return new self(new BaseNotIn($parameters));
+        return new static(new BaseNotIn($parameters));
     }
 }

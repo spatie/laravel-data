@@ -184,7 +184,6 @@ class RuleFactory
             RequiredWithAll::keyword() => RequiredWithAll::class,
             RequiredWithout::keyword() => RequiredWithout::class,
             RequiredWithoutAll::keyword() => RequiredWithoutAll::class,
-//            Rule::keyword() => Rule::class,
             Same::keyword() => Same::class,
             Size::keyword() => Size::class,
             Sometimes::keyword() => Sometimes::class,
