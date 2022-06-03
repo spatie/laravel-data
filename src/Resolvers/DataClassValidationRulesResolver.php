@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\RulesMapper;
@@ -21,7 +22,7 @@ class DataClassValidationRulesResolver
 
         $overWrittenRules = [];
 
-        /** @var class-string<\Spatie\LaravelData\Data> $class */
+        /** @var class-string<DataObject> $class */
         if (method_exists($class, 'rules')) {
             $overWrittenRules = app()->call([$class, 'rules'], [
                 'payload' => $payload,

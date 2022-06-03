@@ -8,6 +8,7 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
@@ -50,7 +51,7 @@ class DataCollectionTransformer
             )
             ->when(
                 $this->transformValues,
-                fn (Enumerable $collection) => $collection->map(fn (Data $data) => $data->transform(
+                fn (Enumerable $collection) => $collection->map(fn (DataObject $data) => $data->transform(
                     $this->transformValues,
                     $this->wrapExecutionType->shouldExecute()
                         ? WrapExecutionType::TemporarilyDisabled
@@ -66,7 +67,7 @@ class DataCollectionTransformer
 
     protected function transformItemClosure(): Closure
     {
-        return function (Data $item) {
+        return function (DataObject $item) {
             $item->withPartialTrees($this->trees);
 
             if ($this->through) {

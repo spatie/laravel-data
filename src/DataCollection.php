@@ -178,7 +178,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
             throw InvalidDataCollectionOperation::create();
         }
 
-        $value = $value instanceof Data
+        $value = $value instanceof DataObject
             ? $value
             : $this->dataClass::from($value);
 

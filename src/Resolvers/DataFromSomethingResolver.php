@@ -31,7 +31,7 @@ class DataFromSomethingResolver
         $properties = array_reduce(
             $payloads,
             function (Collection $carry, mixed $payload) use ($class) {
-                /** @var Data $class */
+                /** @var DataObject $class */
                 $pipeline = $class::pipeline();
 
                 foreach ($class::normalizers() as $normalizer) {

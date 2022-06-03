@@ -191,13 +191,13 @@ class DataTransformer
             return $transformer->transform($property, $value);
         }
 
-        if ($value instanceof Data || $value instanceof DataCollection) {
+        if ($value instanceof DataObject || $value instanceof DataCollection) {
             $value->withPartialTrees($trees);
 
             $wrapExecutionType = match (true) {
-                $value instanceof Data && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
-                $value instanceof Data && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
-                $value instanceof Data && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled,
+                $value instanceof DataObject && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
+                $value instanceof DataObject && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
+                $value instanceof DataObject && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled,
                 $value instanceof DataCollection && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::Enabled,
                 $value instanceof DataCollection && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
                 $value instanceof DataCollection && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled,

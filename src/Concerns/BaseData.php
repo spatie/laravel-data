@@ -7,6 +7,7 @@ use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
@@ -26,7 +27,7 @@ use Spatie\LaravelData\Transformers\DataTransformer;
 
 trait BaseData
 {
-    public static function optional(mixed ...$payloads): ?static
+    public static function optional(mixed ...$payloads): ?DataObject
     {
         if (count($payloads) === 0) {
             return null;
@@ -41,7 +42,7 @@ trait BaseData
         return null;
     }
 
-    public static function from(mixed ...$payloads): static
+    public static function from(mixed ...$payloads): DataObject
     {
         return app(DataFromSomethingResolver::class)->execute(
             static::class,

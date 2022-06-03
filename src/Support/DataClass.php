@@ -8,13 +8,14 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
 use ReflectionProperty;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 
 class DataClass
 {
     public function __construct(
-        /** @var class-string<\Spatie\LaravelData\Data> */
+        /** @var class-string<DataObject> */
         public readonly string $name,
         /** @var Collection<string, \Spatie\LaravelData\Support\DataProperty> */
         public readonly Collection $properties,
