@@ -2,8 +2,21 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
-## 2.0.0 - 2022-04-??
+## 1.5.0 - 2022-05-25
 
+## What's Changed
+
+- add values() on DataCollection by @Nielsvanpach in https://github.com/spatie/laravel-data/pull/135
+
+## New Contributors
+
+- @Nielsvanpach made their first contribution in https://github.com/spatie/laravel-data/pull/135
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/1.4.7...1.5.0
+
+## 1.4.7 - 2022-05-16
+
+- support $payload as a dependency in rules (#123)
 
 ## 1.4.6 - 2022-04-06
 

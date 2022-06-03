@@ -119,7 +119,13 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
         return $transformer->transform();
     }
 
-    /** @return \Illuminate\Support\Enumerable<array-key, TValue> */
+    public function values(): static
+    {
+        $this->items = $this->items->values();
+
+        return $this;
+    }
+
     public function toCollection(): Enumerable
     {
         return $this->items;
