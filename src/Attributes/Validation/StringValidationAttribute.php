@@ -15,16 +15,16 @@ abstract class StringValidationAttribute extends ValidationAttribute
 
     public function getRules(): array
     {
-        $parameters = $this->parameters();
+        $parameters = collect($this->parameters())->reject(fn(mixed $value) => $value === null);
 
-        if (empty($parameters)) {
+        if ($parameters->isEmpty()) {
             return [$this->keyword()];
         }
 
-        $parameters = collect($this->parameters())
-            ->map(fn(mixed $value, int|string $key) => is_string($key) ? "{$key}={$value}" : $value)
-            ->join(',');
+        $parameters = $parameters->map(
+            fn(mixed $value, int|string $key) => is_string($key) ? "{$key}={$value}" : $value
+        );
 
-        return ["{$this->keyword()}:{$parameters}"];
+        return ["{$this->keyword()}:{$parameters->join(',')}"];
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Validation\Validator;
 
 class DataValidatorResolver
 {
-    public function __construct(protected DataValidationRulesResolver $dataValidationRulesResolver)
+    public function __construct(protected DataClassValidationRulesResolver $dataValidationRulesResolver)
     {
     }
 
@@ -16,7 +16,7 @@ class DataValidatorResolver
     public function execute(string $dataClass, Arrayable|array $payload): Validator
     {
         $payload = $payload instanceof Arrayable ? $payload->toArray() : $payload;
-        $rules = app(DataValidationRulesResolver::class)
+        $rules = app(DataClassValidationRulesResolver::class)
             ->execute($dataClass, $payload)
             ->toArray();
 

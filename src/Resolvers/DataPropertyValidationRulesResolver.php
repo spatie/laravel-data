@@ -13,7 +13,7 @@ use TypeError;
 class DataPropertyValidationRulesResolver
 {
     public function __construct(
-        protected DataValidationRulesResolver $dataValidationRulesResolver,
+        protected DataClassValidationRulesResolver $dataValidationRulesResolver,
         protected DataConfig $dataConfig
     ) {
     }
@@ -74,6 +74,6 @@ class DataPropertyValidationRulesResolver
             $rules = $inferrer->handle($property, $rules);
         }
 
-        return $rules->all();
+        return $rules->normalize();
     }
 }

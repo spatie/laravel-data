@@ -2,10 +2,12 @@
 
 namespace Spatie\LaravelData\Support\Validation;
 
+use Illuminate\Support\Arr;
 use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
 
 class RulesCollection
 {
+    /** @var \Spatie\LaravelData\Support\Validation\ValidationRule[] */
     protected array $rules = [];
 
     public static function create(): static
@@ -13,14 +15,18 @@ class RulesCollection
         return new static();
     }
 
-    public function add(ValidationRule $rule): static
+    public function add(ValidationRule ...$rules): static
     {
-        $this->rules = array_filter(
-            $this->rules,
-            fn(ValidationRule $initialRule) => ! $initialRule instanceof $rule
-        );
+        foreach ($rules as $rule) {
+            $this->rules = array_filter(
+                $this->rules,
+                fn(ValidationRule $initialRule) => ! $initialRule instanceof $rule
+            );
 
-        $this->rules[] = $rule;
+            $this->rules[] = $rule;
+        }
+
+        $this->rules = array_values($this->rules);
 
         return $this;
     }
@@ -34,6 +40,14 @@ class RulesCollection
         }
 
         return false;
+    }
+
+    public function normalize(): array
+    {
+        return Arr::flatten(array_map(
+            fn(ValidationRule $rule) => $rule->getRules(),
+            $this->rules
+        ));
     }
 
     public function all(): array

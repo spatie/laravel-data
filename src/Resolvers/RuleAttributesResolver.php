@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
+use Exception;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rules\Dimensions;
@@ -52,14 +53,23 @@ class RuleAttributesResolver
             $rule instanceof RequiredIf => new FoundationRequiredIf($rule),
             $rule instanceof Unique => new FoundationUnique($rule),
             $rule instanceof RuleContract => new Rule($rule),
+            $rule instanceof Rule => $this->execute($rule->getRules()),
             default => new Rule($rule),
         }, $rules);
 
         return Arr::flatten($rules);
     }
 
-    private function resolveStringRule(string $rule): array
+    private function resolveStringRule(string $rule): mixed
     {
+        if (! str_contains($rule, '|')) {
+            try {
+                return $this->ruleFactory->create($rule);
+            } catch (Exception) {
+                return new Rule($rule);
+            }
+        }
+
         $rules = explode('|', $rule);
 
         return $this->execute($rules);

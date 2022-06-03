@@ -4,23 +4,26 @@ namespace Spatie\LaravelData\Tests\Resolvers;
 
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\Validation\Nullable;
+use Spatie\LaravelData\Attributes\Validation\Numeric;
+use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
+use Spatie\LaravelData\Resolvers\DataClassValidationRulesResolver;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\TestCase;
 
-class DataValidationRulesResolverTest extends TestCase
+class DataClassValidationRulesResolverTest extends TestCase
 {
-    private DataValidationRulesResolver $resolver;
+    private DataClassValidationRulesResolver $resolver;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->resolver = app(DataValidationRulesResolver::class);
+        $this->resolver = app(DataClassValidationRulesResolver::class);
     }
 
     /** @test */
@@ -47,9 +50,9 @@ class DataValidationRulesResolverTest extends TestCase
             public ?int $age;
         };
 
-        $this->assertEqualsCanonicalizing([
-            'name' => ['string', 'nullable'],
-            'age' => ['numeric', 'nullable'],
+        $this->assertEquals([
+            'name' => [new Nullable(), new StringType()],
+            'age' => [new Numeric(),  new Nullable()],
         ], $this->resolver->execute($data::class, nullable: true)->all());
     }
 

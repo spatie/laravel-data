@@ -93,7 +93,7 @@ use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
-use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
+use Spatie\LaravelData\Resolvers\DataClassValidationRulesResolver;
 use Spatie\LaravelData\Resolvers\RuleAttributesResolver;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationEnum;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationExcludeIf;
@@ -851,6 +851,11 @@ class RulesTest extends TestCase
 
     public function requiredIfAttributesDataProvider(): Generator
     {
+        yield $this->fixature(
+            attribute: new RequiredIf('field'),
+            expected: 'required_if:field',
+        );
+
         yield $this->fixature(
             attribute: new RequiredIf('field', 'key'),
             expected: 'required_if:field,key',

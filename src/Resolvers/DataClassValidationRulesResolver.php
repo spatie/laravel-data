@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 
-class DataValidationRulesResolver
+class DataClassValidationRulesResolver
 {
     public function __construct(
         protected DataConfig $dataConfig,
@@ -20,15 +20,12 @@ class DataValidationRulesResolver
         $resolver = app(DataPropertyValidationRulesResolver::class);
 
         $overWrittenRules = [];
+
         /** @var class-string<\Spatie\LaravelData\Data> $class */
         if (method_exists($class, 'rules')) {
             $overWrittenRules = app()->call([$class, 'rules'], [
                 'payload' => $payload,
             ]);
-
-            array_map(
-                fn(mixed $rules) => $this->ruleAttributesResolver->execute($rules),
-            )
         }
 
         return $this->dataConfig->getDataClass($class)
@@ -37,4 +34,5 @@ class DataValidationRulesResolver
             ->mapWithKeys(fn (DataProperty $property) => $resolver->execute($property, $payload, $nullable)->all())
             ->merge($overWrittenRules);
     }
+
 }

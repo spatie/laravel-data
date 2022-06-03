@@ -4,8 +4,13 @@ namespace Spatie\LaravelData\Tests\RuleInferrers;
 
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rules\RequiredIf as BaseRequiredIf;
 use ReflectionClass;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\Validation\ArrayType;
+use Spatie\LaravelData\Attributes\Validation\BooleanType;
+use Spatie\LaravelData\Attributes\Validation\Nullable;
+use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Attributes\Validation\RequiredIf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -13,6 +18,8 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationEnum;
+use Spatie\LaravelData\Support\Validation\Rules\FoundationRequiredIf;
 use Spatie\LaravelData\Support\Validation\RulesCollection;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
@@ -71,9 +78,12 @@ class RequiredRuleInferrerTest extends TestCase
             public string $string;
         });
 
-        $rules = $this->inferrer->handle($dataProperty, [Rule::requiredIf(true)]);
+        $rules = $this->inferrer->handle(
+            $dataProperty,
+            RulesCollection::create()->add(FoundationRequiredIf::create())
+        );
 
-        $this->assertEqualsCanonicalizing([Rule::requiredIf(true)], $rules);
+        $this->assertEqualsCanonicalizing([new BaseRequiredIf(true)], $rules->normalize());
     }
 
     /** @test */
@@ -83,9 +93,12 @@ class RequiredRuleInferrerTest extends TestCase
             public string $string;
         });
 
-        $rules = $this->inferrer->handle($dataProperty, ['boolean']);
+        $rules = $this->inferrer->handle(
+            $dataProperty,
+            RulesCollection::create()->add(BooleanType::create())
+        );
 
-        $this->assertEqualsCanonicalizing(['boolean'], $rules);
+        $this->assertEqualsCanonicalizing([new BooleanType()], $rules->normalize());
     }
 
     /** @test */
@@ -95,9 +108,12 @@ class RequiredRuleInferrerTest extends TestCase
             public string $string;
         });
 
-        $rules = $this->inferrer->handle($dataProperty, ['nullable']);
+        $rules = $this->inferrer->handle(
+            $dataProperty,
+            RulesCollection::create()->add(Nullable::create())
+        );
 
-        $this->assertEqualsCanonicalizing(['nullable'], $rules);
+        $this->assertEqualsCanonicalizing([new Nullable()], $rules->normalize());
     }
 
     /** @test */
@@ -107,9 +123,12 @@ class RequiredRuleInferrerTest extends TestCase
             public string $string;
         });
 
-        $rules = $this->inferrer->handle($dataProperty, [new Enum('SomeClass')]);
+        $rules = $this->inferrer->handle(
+            $dataProperty,
+            RulesCollection::create()->add(new FoundationEnum(new Enum('SomeClass')))
+        );
 
-        $this->assertEqualsCanonicalizing(['required', new Enum('SomeClass')], $rules);
+        $this->assertEqualsCanonicalizing(['required', new Enum('SomeClass')], $rules->normalize());
     }
 
     /** @test */
@@ -120,9 +139,12 @@ class RequiredRuleInferrerTest extends TestCase
             public DataCollection $collection;
         });
 
-        $rules = $this->inferrer->handle($dataProperty, ['present', 'array']);
+        $rules = $this->inferrer->handle(
+            $dataProperty,
+            RulesCollection::create()->add(new Present(), new ArrayType())
+        );
 
-        $this->assertEqualsCanonicalizing(['present', 'array'], $rules);
+        $this->assertEqualsCanonicalizing(['present', 'array'], $rules->normalize());
     }
 
     public function it_wont_add_required_rules_to_undefinable_properties()

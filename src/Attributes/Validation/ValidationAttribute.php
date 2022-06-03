@@ -18,14 +18,22 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
         return implode('|', $this->getRules());
     }
 
-    protected function normalizeValue(mixed $mixed): string
+    protected function normalizeValue(mixed $mixed): ?string
     {
+        if($mixed === null){
+            return null;
+        }
+
         if (is_string($mixed) || is_numeric($mixed)) {
             return (string) $mixed;
         }
 
         if (is_bool($mixed)) {
             return $mixed ? 'true' : 'false';
+        }
+
+        if (is_array($mixed) && count($mixed) === 0) {
+            return null;
         }
 
         if (is_array($mixed)) {
