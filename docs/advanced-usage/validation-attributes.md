@@ -233,7 +233,7 @@ public Carbon $value;
 public Carbon $value; 
 ```
 
-### DateEquals
+### DateFormat
 
 [Docs](https://laravel.com/docs/8.x/validation#rule-date-format)
 
