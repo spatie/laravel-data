@@ -17,6 +17,7 @@ use ReflectionProperty;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
@@ -308,7 +309,7 @@ class DataTypeTest extends TestCase
         object $class,
         array $expected,
     ) {
-        $this->assertEquals($expected, $this->resolveDataType($class)->acceptedTypes);
+        $this->assertEqualsCanonicalizing($expected, $this->resolveDataType($class)->acceptedTypes);
     }
 
     public function acceptedBaseTypesDataProvider(): Generator
@@ -359,6 +360,7 @@ class DataTypeTest extends TestCase
                     Jsonable::class,
                     Responsable::class,
                     Arrayable::class,
+                    DataObject::class,
                 ],
             ],
         ];
