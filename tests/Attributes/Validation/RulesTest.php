@@ -242,7 +242,7 @@ class RulesTest extends TestCase
         yield $this->fixature(
             attribute: new Enum('enum_class'),
             expected: new EnumRule('enum_class'),
-            expectCreatedAttribute: new FoundationEnum(new EnumRule('enum_class'))
+            expectCreatedAttribute: new Enum(new EnumRule('enum_class'))
         );
 
 
@@ -662,19 +662,19 @@ class RulesTest extends TestCase
         yield $this->fixature(
             attribute: new Exists('users'),
             expected: new BaseExists('users'),
-            expectCreatedAttribute: new FoundationExists(new BaseExists('users'))
+            expectCreatedAttribute: new Exists(rule: new BaseExists('users'))
         );
 
         yield $this->fixature(
             attribute: new Exists('users', 'email'),
             expected: new BaseExists('users', 'email'),
-            expectCreatedAttribute: new FoundationExists(new BaseExists('users', 'email'))
+            expectCreatedAttribute: new Exists(rule: new BaseExists('users', 'email'))
         );
 
         yield $this->fixature(
             attribute: new Exists('users', 'email', connection: 'tenant'),
             expected: new BaseExists('tenant.users', 'email'),
-            expectCreatedAttribute: new FoundationExists(new BaseExists('tenant.users', 'email'))
+            expectCreatedAttribute: new Exists(rule: new BaseExists('tenant.users', 'email'))
         );
 
         $closure = fn (Builder $builder) => $builder;
@@ -682,7 +682,7 @@ class RulesTest extends TestCase
         yield $this->fixature(
             attribute: new Exists('users', 'email', where: $closure),
             expected: (new BaseExists('users', 'email'))->where($closure),
-            expectCreatedAttribute: new FoundationExists((new BaseExists('users', 'email'))->where($closure))
+            expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'email'))->where($closure))
         );
     }
 
@@ -691,19 +691,19 @@ class RulesTest extends TestCase
         yield $this->fixature(
             attribute: new In('key'),
             expected: new BaseIn(['key']),
-            expectCreatedAttribute: new FoundationIn(new BaseIn(['key']))
+            expectCreatedAttribute: new In(new BaseIn(['key']))
         );
 
         yield $this->fixature(
             attribute: new In(['key', 'other']),
             expected: new BaseIn(['key', 'other']),
-            expectCreatedAttribute: new FoundationIn(new BaseIn(['key', 'other']))
+            expectCreatedAttribute: new In(new BaseIn(['key', 'other']))
         );
 
         yield $this->fixature(
             attribute: new In('key', 'other'),
             expected: new BaseIn(['key', 'other']),
-            expectCreatedAttribute: new FoundationIn(new BaseIn(['key', 'other']))
+            expectCreatedAttribute: new In(new BaseIn(['key', 'other']))
         );
     }
 
@@ -748,19 +748,19 @@ class RulesTest extends TestCase
         yield $this->fixature(
             attribute: new NotIn('key'),
             expected: new BaseNotIn(['key']),
-            expectCreatedAttribute: new FoundationNotIn(new BaseNotIn(['key']))
+            expectCreatedAttribute: new NotIn(new BaseNotIn(['key']))
         );
 
         yield $this->fixature(
             attribute: new NotIn(['key', 'other']),
             expected: new BaseNotIn(['key', 'other']),
-            expectCreatedAttribute: new FoundationNotIn(new BaseNotIn(['key', 'other']))
+            expectCreatedAttribute: new NotIn(new BaseNotIn(['key', 'other']))
         );
 
         yield $this->fixature(
             attribute: new NotIn('key', 'other'),
             expected: new BaseNotIn(['key', 'other']),
-            expectCreatedAttribute: new FoundationNotIn(new BaseNotIn(['key', 'other']))
+            expectCreatedAttribute: new NotIn(new BaseNotIn(['key', 'other']))
         );
     }
 
@@ -769,19 +769,19 @@ class RulesTest extends TestCase
         yield $this->fixature(
             attribute: new Password(),
             expected: new BasePassword(12),
-            expectCreatedAttribute: new FoundationPassword(new BasePassword(12)),
+            expectCreatedAttribute: new Password(rule: new BasePassword(12)),
         );
 
         yield $this->fixature(
             attribute: new Password(min: 20),
             expected: new BasePassword(20),
-            expectCreatedAttribute: new FoundationPassword(new BasePassword(20)),
+            expectCreatedAttribute: new Password(rule: new BasePassword(20)),
         );
 
         yield $this->fixature(
             attribute: new Password(letters: true, mixedCase: true, numbers: true, uncompromised: true, uncompromisedThreshold: 12),
             expected: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12),
-            expectCreatedAttribute: new FoundationPassword((new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12), ),
+            expectCreatedAttribute: new Password(rule: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12), ),
         );
     }
 
@@ -975,43 +975,43 @@ class RulesTest extends TestCase
         yield $this->fixature(
             attribute: new Unique('users'),
             expected: new BaseUnique('users'),
-            expectCreatedAttribute: new FoundationUnique(new BaseUnique('users'))
+            expectCreatedAttribute: new Unique(rule: new BaseUnique('users'))
         );
 
         yield $this->fixature(
             attribute: new Unique('users', 'email'),
             expected: new BaseUnique('users', 'email'),
-            expectCreatedAttribute: new FoundationUnique(new BaseUnique('users', 'email'))
+            expectCreatedAttribute: new Unique(rule: new BaseUnique('users', 'email'))
         );
 
         yield $this->fixature(
             attribute: new Unique('users', 'email', connection: 'tenant'),
             expected: new BaseUnique('tenant.users', 'email'),
-            expectCreatedAttribute: new FoundationUnique(new BaseUnique('tenant.users', 'email'))
+            expectCreatedAttribute: new Unique(rule: new BaseUnique('tenant.users', 'email'))
         );
 
         yield $this->fixature(
             attribute: new Unique('users', 'email', withoutTrashed: true),
             expected: (new BaseUnique('users', 'email'))->withoutTrashed(),
-            expectCreatedAttribute: new FoundationUnique((new BaseUnique('users', 'email'))->withoutTrashed())
+            expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->withoutTrashed())
         );
 
         yield $this->fixature(
             attribute: new Unique('users', 'email', withoutTrashed: true, deletedAtColumn: 'deleted_when'),
             expected: (new BaseUnique('users', 'email'))->withoutTrashed('deleted_when'),
-            expectCreatedAttribute: new FoundationUnique((new BaseUnique('users', 'email'))->withoutTrashed('deleted_when'))
+            expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->withoutTrashed('deleted_when'))
         );
 
         yield $this->fixature(
             attribute: new Unique('users', 'email', ignore: 5),
             expected: (new BaseUnique('users', 'email'))->ignore(5),
-            expectCreatedAttribute: new FoundationUnique((new BaseUnique('users', 'email'))->ignore(5))
+            expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->ignore(5))
         );
 
         yield $this->fixature(
             attribute: new Unique('users', 'email', ignore: 5, ignoreColumn: 'uuid'),
             expected: (new BaseUnique('users', 'email'))->ignore(5, 'uuid'),
-            expectCreatedAttribute: new FoundationUnique((new BaseUnique('users', 'email'))->ignore(5, 'uuid'))
+            expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->ignore(5, 'uuid'))
         );
 
         $closure = fn (Builder $builder) => $builder;
@@ -1019,7 +1019,7 @@ class RulesTest extends TestCase
         yield $this->fixature(
             attribute: new Unique('users', 'email', where: $closure),
             expected: (new BaseUnique('users', 'email'))->where($closure),
-            expectCreatedAttribute: new FoundationUnique((new BaseUnique('users', 'email'))->where($closure))
+            expectCreatedAttribute: new Unique(rule:(new BaseUnique('users', 'email'))->where($closure))
         );
     }
 

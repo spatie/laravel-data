@@ -3,12 +3,15 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Exception;
 use Illuminate\Validation\Rules\Password as BasePassword;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationPassword;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Password extends FoundationPassword
+class Password extends ValidationAttribute
 {
+    private BasePassword $rule;
+
     public function __construct(
         int $min = 12,
         bool $letters = false,
@@ -18,14 +21,15 @@ class Password extends FoundationPassword
         bool $uncompromised = false,
         int $uncompromisedThreshold = 0,
         bool $default = false,
+        ?BasePassword $rule = null,
     ) {
-        if ($default) {
-            parent::__construct(BasePassword::default());
+        if ($default && $rule === null) {
+            $this->rule = BasePassword::default();
 
             return;
         }
 
-        $rule = BasePassword::min($min);
+        $rule ??= BasePassword::min($min);
 
         if ($letters) {
             $rule->letters();
@@ -47,6 +51,21 @@ class Password extends FoundationPassword
             $rule->uncompromised($uncompromisedThreshold);
         }
 
-        parent::__construct($rule);
+        $this->rule = $rule;
+    }
+
+    public function getRules(): array
+    {
+        return [$this->rule];
+    }
+
+    public static function keyword(): string
+    {
+        return 'password';
+    }
+
+    public static function create(string ...$parameters): static
+    {
+        throw new Exception('Cannot create a password rule');
     }
 }

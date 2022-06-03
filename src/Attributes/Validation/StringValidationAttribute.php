@@ -4,8 +4,6 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 abstract class StringValidationAttribute extends ValidationAttribute
 {
-    abstract public static function keyword(): string;
-
     abstract public function parameters(): array;
 
     public static function create(string ...$parameters): static

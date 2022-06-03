@@ -91,7 +91,7 @@ class RuleFactory
             ? $this->resolveParameters(Str::after($rule, ':'))
             : [];
 
-        /** @var \Spatie\LaravelData\Attributes\Validation\StringValidationAttribute|\Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute|null $ruleClass */
+        /** @var \Spatie\LaravelData\Attributes\Validation\StringValidationAttribute|null $ruleClass */
         $ruleClass = $this->mapping()[$keyword] ?? null;
 
         if ($ruleClass === null) {

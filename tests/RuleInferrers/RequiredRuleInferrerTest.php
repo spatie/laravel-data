@@ -2,7 +2,7 @@
 
 namespace Spatie\LaravelData\Tests\RuleInferrers;
 
-use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rules\Enum as BaseEnum;
 use Illuminate\Validation\Rules\RequiredIf as BaseRequiredIf;
 use ReflectionClass;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
@@ -10,6 +10,7 @@ use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\BooleanType;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Present;
+use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\RequiredIf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -43,7 +44,7 @@ class RequiredRuleInferrerTest extends TestCase
 
         $rules = $this->inferrer->handle($dataProperty, new RulesCollection());
 
-        $this->assertEqualsCanonicalizing(['required'], $rules->all());
+        $this->assertEqualsCanonicalizing([new Required()], $rules->all());
     }
 
     /** @test */
@@ -79,10 +80,10 @@ class RequiredRuleInferrerTest extends TestCase
 
         $rules = $this->inferrer->handle(
             $dataProperty,
-            RulesCollection::create()->add(FoundationRequiredIf::create())
+            RulesCollection::create()->add(Required::create())
         );
 
-        $this->assertEqualsCanonicalizing([new BaseRequiredIf(true)], $rules->normalize());
+        $this->assertEqualsCanonicalizing(['required'], $rules->normalize());
     }
 
     /** @test */
@@ -124,10 +125,10 @@ class RequiredRuleInferrerTest extends TestCase
 
         $rules = $this->inferrer->handle(
             $dataProperty,
-            RulesCollection::create()->add(new FoundationEnum(new Enum('SomeClass')))
+            RulesCollection::create()->add(new \Spatie\LaravelData\Attributes\Validation\Enum(new BaseEnum('SomeClass')))
         );
 
-        $this->assertEqualsCanonicalizing(['required', new Enum('SomeClass')], $rules->normalize());
+        $this->assertEqualsCanonicalizing(['required', new BaseEnum('SomeClass')], $rules->normalize());
     }
 
     /** @test */

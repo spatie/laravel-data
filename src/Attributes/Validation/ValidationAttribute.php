@@ -9,6 +9,8 @@ use Stringable;
 
 abstract class ValidationAttribute extends ValidationRule implements Stringable
 {
+    abstract public static function keyword(): string;
+
     abstract public function getRules(): array;
 
     abstract public static function create(string ...$parameters): static;

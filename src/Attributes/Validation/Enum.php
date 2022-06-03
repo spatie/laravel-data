@@ -7,10 +7,27 @@ use Illuminate\Validation\Rules\Enum as EnumRule;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationEnum;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Enum extends FoundationEnum
+class Enum extends ValidationAttribute
 {
-    public function __construct(string $enumClass)
+    private EnumRule $enum;
+
+    public function __construct(string|EnumRule $enum)
     {
-        parent::__construct(new EnumRule($enumClass));
+        $this->enum = $enum instanceof EnumRule ? $enum : new EnumRule($enum);
+    }
+
+    public static function keyword(): string
+    {
+        return 'enum';
+    }
+
+    public function getRules(): array
+    {
+        return [$this->enum];
+    }
+
+    public static function create(string ...$parameters): static
+    {
+        return new self(new EnumRule($parameters[0]));
     }
 }

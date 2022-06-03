@@ -4,14 +4,24 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Validation\Rules\RequiredIf;
+use Spatie\LaravelData\Support\Validation\RequiringRule;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationRequiredIf;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Required extends FoundationRequiredIf
+class Required extends ValidationAttribute implements RequiringRule
 {
-    public function __construct()
+    public function __construct(private ?RequiredIf $rule = null)
     {
-        parent::__construct(new RequiredIf(true));
+    }
+
+    public function getRules(): array
+    {
+        return [$this->rule ?? static::keyword()];
+    }
+
+    public static function keyword(): string
+    {
+        return 'required';
     }
 
     public static function create(string ...$parameters): static

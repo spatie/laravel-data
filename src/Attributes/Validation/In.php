@@ -8,10 +8,33 @@ use Illuminate\Validation\Rules\In as BaseIn;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationIn;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class In extends FoundationIn
+class In extends ValidationAttribute
 {
-    public function __construct(array|string ...$values)
+    private BaseIn $rule;
+
+    public function __construct(array|string|BaseIn ...$values)
     {
-        parent::__construct(new BaseIn(Arr::flatten($values)));
+        if (count($values) === 1 && $values[0] instanceof BaseIn) {
+            $this->rule = $values[0];
+
+            return;
+        }
+
+        $this->rule = new BaseIn(Arr::flatten($values));
+    }
+
+    public function getRules(): array
+    {
+        return [$this->rule];
+    }
+
+    public static function keyword(): string
+    {
+        return 'in';
+    }
+
+    public static function create(string ...$parameters): static
+    {
+        return new self(new BaseIn($parameters));
     }
 }

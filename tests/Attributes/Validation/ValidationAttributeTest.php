@@ -40,6 +40,11 @@ class ValidationAttributeTest extends TestCase
             {
                 return new self();
             }
+
+            public static function keyword(): string
+            {
+                return '';
+            }
         };
 
         $this->assertEquals($output, $normalizer->execute($input));

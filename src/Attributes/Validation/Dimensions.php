@@ -4,12 +4,15 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Validation\Rules\Dimensions as BaseDimensions;
+use Spatie\LaravelData\Attributes\Validation\Dimensions as DimensionsAttribute;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationDimensions;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Dimensions extends FoundationDimensions
+class Dimensions extends ValidationAttribute
 {
+    private BaseDimensions $rule;
+
     public function __construct(
         ?int $minWidth = null,
         ?int $minHeight = null,
@@ -18,8 +21,9 @@ class Dimensions extends FoundationDimensions
         null|float|string $ratio = null,
         ?int $width = null,
         ?int $height = null,
+        ?BaseDimensions $rule = null,
     ) {
-        $rule = new BaseDimensions();
+        $rule = $rule ?? new BaseDimensions();
 
         if (
             $minWidth === null
@@ -29,8 +33,9 @@ class Dimensions extends FoundationDimensions
             && $ratio === null
             && $width === null
             && $height === null
+            && $rule === null
         ) {
-            throw CannotBuildValidationRule::create('You must specify one of width, height, minWidth, minHeight, maxWidth, maxHeight, or ratio.');
+            throw CannotBuildValidationRule::create('You must specify one of width, height, minWidth, minHeight, maxWidth, maxHeight, ratio or a dimensions rule.');
         }
 
         if ($minWidth !== null) {
@@ -61,6 +66,29 @@ class Dimensions extends FoundationDimensions
             $rule->ratio($ratio);
         }
 
-        parent::__construct($rule);
+        $this->rule = $rule;
+    }
+
+    public function getRules(): array
+    {
+        return [$this->rule];
+    }
+
+    public static function keyword(): string
+    {
+        return 'dimensions';
+    }
+
+    public static function create(string ...$parameters): static
+    {
+        return new static(
+            $parameters['min_width'] ?? null,
+            $parameters['min_height'] ?? null,
+            $parameters['max_width'] ?? null,
+            $parameters['max_height'] ?? null,
+            $parameters['ratio'] ?? null,
+            $parameters['width'] ?? null,
+            $parameters['height'] ?? null,
+        );
     }
 }

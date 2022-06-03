@@ -4,14 +4,38 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
+use Illuminate\Validation\Rules\In as BaseIn;
 use Illuminate\Validation\Rules\NotIn as BaseNotIn;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationNotIn;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class NotIn extends FoundationNotIn
+class NotIn extends ValidationAttribute
 {
-    public function __construct(array|string ...$values)
+    private BaseNotIn $rule;
+
+    public function __construct(array|string|BaseNotIn ...$values)
     {
-        parent::__construct(new BaseNotIn(Arr::flatten($values)));
+        if (count($values) === 1 && $values[0] instanceof BaseNotIn) {
+            $this->rule = $values[0];
+
+            return;
+        }
+
+        $this->rule = new BaseNotIn(Arr::flatten($values));
+    }
+
+    public function getRules(): array
+    {
+        return [$this->rule];
+    }
+
+    public static function keyword(): string
+    {
+        return 'not_in';
+    }
+
+    public static function create(string ...$parameters): static
+    {
+        return new self(new BaseNotIn($parameters));
     }
 }
