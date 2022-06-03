@@ -9,7 +9,6 @@ use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;

@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Transformers;
 
 use Illuminate\Support\Arr;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Lazy;

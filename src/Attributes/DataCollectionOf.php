@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Attributes;
 
 use Attribute;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 

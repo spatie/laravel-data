@@ -7,7 +7,6 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Enumerable;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\Wrapping\Wrap;

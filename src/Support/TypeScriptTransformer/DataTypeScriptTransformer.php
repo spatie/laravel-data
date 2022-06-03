@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Support\TypeScriptTransformer;
 
 use ReflectionClass;
 use ReflectionProperty;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelTypeScriptTransformer\Transformers\DtoTransformer;

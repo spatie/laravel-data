@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Support;
 use phpDocumentor\Reflection\FqsenResolver;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use ReflectionProperty;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataObject;
 
 class DataCollectionAnnotationReader

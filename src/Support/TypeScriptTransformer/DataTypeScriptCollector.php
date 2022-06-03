@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support\TypeScriptTransformer;
 
 use ReflectionClass;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataObject;
 use Spatie\TypeScriptTransformer\Collectors\Collector;
 use Spatie\TypeScriptTransformer\Structures\TransformedType;

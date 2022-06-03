@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Http\Request;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\PaginatedDataCollection;
