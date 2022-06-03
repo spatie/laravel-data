@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Closure;
+use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\PartialTrees;
 
@@ -20,41 +21,41 @@ trait IncludeableData
 
     public function withPartialTrees(
         PartialTrees $partialTrees,
-    ): static {
+    ): IncludeableDataContract {
         $this->partialTrees = $partialTrees;
 
         return $this;
     }
 
-    public function include(string ...$includes): static
+    public function include(string ...$includes): IncludeableDataContract
     {
         $this->includes = array_unique(array_merge($this->includes, $includes));
 
         return $this;
     }
 
-    public function exclude(string ...$excludes): static
+    public function exclude(string ...$excludes): IncludeableDataContract
     {
         $this->excludes = array_unique(array_merge($this->excludes, $excludes));
 
         return $this;
     }
 
-    public function only(string ...$only): static
+    public function only(string ...$only): IncludeableDataContract
     {
         $this->only = array_unique(array_merge($this->only, $only));
 
         return $this;
     }
 
-    public function except(string ...$except): static
+    public function except(string ...$except): IncludeableDataContract
     {
         $this->except = array_unique(array_merge($this->except, $except));
 
         return $this;
     }
 
-    public function onlyWhen(string $only, bool|Closure $condition): static
+    public function onlyWhen(string $only, bool|Closure $condition): IncludeableDataContract
     {
         $condition = $condition instanceof Closure
             ? $condition($this)
@@ -67,7 +68,7 @@ trait IncludeableData
         return $this;
     }
 
-    public function exceptWhen(string $except, bool|Closure $condition): self
+    public function exceptWhen(string $except, bool|Closure $condition): IncludeableDataContract
     {
         $condition = $condition instanceof Closure
             ? $condition($this)

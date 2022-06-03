@@ -5,7 +5,8 @@ namespace Spatie\LaravelData\Concerns;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
-use Spatie\LaravelData\DataObject;
+use Spatie\LaravelData\Contracts\DataObject;
+use Spatie\LaravelData\Contracts\ValidateableData as ValidateableDataContract;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
 
 /**
@@ -44,7 +45,7 @@ trait ValidateableData
         return $validator->validated();
     }
 
-    public static function validateAndCreate(Arrayable|array $payload): DataObject
+    public static function validateAndCreate(Arrayable|array $payload): ValidateableDataContract
     {
         return static::from(static::validate($payload));
     }

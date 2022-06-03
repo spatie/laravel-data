@@ -66,7 +66,7 @@ parameters:
 			path: src/Support/DataType.php
 
 		-
-			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$isDataCollection is already assigned\\.$#"
+			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$isDataCollectable is already assigned\\.$#"
 			count: 2
 			path: src/Support/DataType.php
 

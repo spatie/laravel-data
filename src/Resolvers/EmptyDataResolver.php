@@ -48,7 +48,7 @@ class EmptyDataResolver
             return $property->type->dataClass::empty();
         }
 
-        if ($property->type->isDataCollection) {
+        if ($property->type->isDataCollectable) {
             return [];
         }
 

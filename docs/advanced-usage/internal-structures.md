@@ -57,7 +57,7 @@ A data parameter represents a single parameter/property within a data method.
 - `isLazy` can the type be lazy
 - `isOptional` can the type be optional
 - `isDataObject` is the type a data object
-- `isDataCollection` is the type a data collection
+- `isDataCollectable` is the type a data collection
 - `dataClass` the class of the data object/collection
 - `acceptedTypes` an array of types accepted by this type + their base types
 

@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Concerns;
 
+use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapType;
 
@@ -9,14 +10,14 @@ trait WrappableData
 {
     protected null|Wrap $wrap = null;
 
-    public function withoutWrapping(): static
+    public function withoutWrapping(): WrappableDataContract
     {
         $this->wrap = new Wrap(WrapType::Disabled);
 
         return $this;
     }
 
-    public function wrap(string $key): static
+    public function wrap(string $key): WrappableDataContract
     {
         $this->wrap = new Wrap(WrapType::Defined, $key);
 

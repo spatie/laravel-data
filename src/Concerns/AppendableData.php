@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Closure;
+use Spatie\LaravelData\Contracts\AppendableData as AppendableDataContract;
 
 trait AppendableData
 {
@@ -13,7 +14,7 @@ trait AppendableData
         return [];
     }
 
-    public function additional(array $additional): static
+    public function additional(array $additional): AppendableDataContract
     {
         $this->additional = array_merge($this->additional, $additional);
 

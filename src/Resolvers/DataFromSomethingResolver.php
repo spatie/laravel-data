@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\DataObject;
+use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;

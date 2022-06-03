@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData;
 
+use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Exceptions\InvalidDataClass;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 

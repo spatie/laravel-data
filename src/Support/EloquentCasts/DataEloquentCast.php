@@ -3,7 +3,7 @@
 namespace Spatie\LaravelData\Support\EloquentCasts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use Spatie\LaravelData\DataObject;
+use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 
 class DataEloquentCast implements CastsAttributes

@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Validator;
-use Spatie\LaravelData\DataObject;
+use Spatie\LaravelData\Contracts\DataObject;
 
 class DataValidatorResolver
 {

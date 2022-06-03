@@ -6,8 +6,9 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Enumerable;
+use Spatie\LaravelData\Contracts\BaseData as BaseDataContract;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\DataObject;
+use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
@@ -27,7 +28,7 @@ use Spatie\LaravelData\Transformers\DataTransformer;
 
 trait BaseData
 {
-    public static function optional(mixed ...$payloads): ?DataObject
+    public static function optional(mixed ...$payloads): ?BaseDataContract
     {
         if (count($payloads) === 0) {
             return null;
@@ -42,7 +43,7 @@ trait BaseData
         return null;
     }
 
-    public static function from(mixed ...$payloads): DataObject
+    public static function from(mixed ...$payloads): BaseDataContract
     {
         return app(DataFromSomethingResolver::class)->execute(
             static::class,
@@ -92,10 +93,5 @@ trait BaseData
         WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
     ): array {
         return DataTransformer::create($transformValues, $wrapExecutionType)->transform($this);
-    }
-
-    public static function castUsing(array $arguments)
-    {
-        return new DataEloquentCast(static::class);
     }
 }

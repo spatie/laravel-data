@@ -3,8 +3,10 @@
 namespace Spatie\LaravelData\Transformers;
 
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Contracts\AppendableData;
+use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\DataObject;
+use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataConfig;
@@ -33,7 +35,7 @@ class DataTransformer
         $this->config = app(DataConfig::class);
     }
 
-    public function transform(DataObject $data): array
+    public function transform(TransformableData $data): array
     {
         $transformed = $this->resolvePayload($data);
 
@@ -41,10 +43,14 @@ class DataTransformer
             $transformed = $data->getWrap()->wrap($transformed);
         }
 
-        return array_merge($transformed, $data->getAdditionalData());
+        if($data instanceof AppendableData){
+            $transformed = array_merge($transformed, $data->getAdditionalData());
+        }
+
+        return $transformed;
     }
 
-    protected function resolvePayload(DataObject $data): array
+    protected function resolvePayload(TransformableData $data): array
     {
         $trees = $data->getPartialTrees();
 
@@ -222,7 +228,7 @@ class DataTransformer
         $transformer = $property->transformer ?? $this->config->findGlobalTransformerForValue($value);
 
         $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
-            && ($property->type->isDataObject || $property->type->isDataCollection);
+            && ($property->type->isDataObject || $property->type->isDataCollectable);
 
         if ($shouldUseDefaultDataTransformer) {
             return null;

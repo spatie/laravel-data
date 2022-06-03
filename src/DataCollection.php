@@ -18,6 +18,13 @@ use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\WrappableData;
+use Spatie\LaravelData\Contracts\DataCollectable;
+use Spatie\LaravelData\Contracts\DataCollectable as DataCollectionContract;
+use Spatie\LaravelData\Contracts\DataObject;
+use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
+use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
+use Spatie\LaravelData\Contracts\TransformableData as TransformableDataContract;
+use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\InvalidDataCollectionOperation;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
@@ -31,7 +38,7 @@ use Spatie\LaravelData\Transformers\DataCollectionTransformer;
  * @implements  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>
  * @implements  \IteratorAggregate<array-key, TValue>
  */
-class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializable, IteratorAggregate, Countable, ArrayAccess, EloquentCastable
+class DataCollection implements DataCollectable, ArrayAccess
 {
     use ResponsableData;
     use IncludeableData;

@@ -17,6 +17,8 @@ use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\WrappableData;
+use Spatie\LaravelData\Contracts\DataCollectable;
+use Spatie\LaravelData\Contracts\DataCollectable as DataCollectionContract;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\PaginatedCollectionIsAlwaysWrapped;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
@@ -29,7 +31,7 @@ use Spatie\LaravelData\Transformers\DataCollectionTransformer;
  * @implements  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>
  * @implements  \IteratorAggregate<array-key, TValue>
  */
-class PaginatedDataCollection implements Responsable, Arrayable, Jsonable, JsonSerializable, IteratorAggregate, Countable, EloquentCastable
+class PaginatedDataCollection implements DataCollectable
 {
     use ResponsableData;
     use IncludeableData;
