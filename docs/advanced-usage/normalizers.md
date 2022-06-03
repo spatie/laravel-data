@@ -2,3 +2,61 @@
 title: Normalizers
 weight: 4
 ---
+
+This package allows you to dynamically create data objects from any kind of object. For example, you can use an
+eloquent model to create a data object like this:
+
+```php
+SongData::from(Song::findOrFail($id));
+```
+
+A `Normalizer` will take a payload like a model and transforms it into an array so it can be used in the pipeline (see further).
+
+By default, there are four normalizers for each data object:
+
+- **ModelNormalizer** will cast eloquent models
+- **ArraybleNormalizer** will cast `Arrayable`'s
+- **ObjectNormalizer** will cast `stdObject`'s
+- **ArrayNormalizer** will cast arrays
+
+Normalizers are defined in the data object `normalizers` method and can be overwritten on an individual data object:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        // ...
+    ) {
+    }
+
+    public static function normalizers(): array
+    {
+        return [
+            ModelNormalizer::class,
+            ArraybleNormalizer::class,
+            ObjectNormalizer::class,
+            ArrayNormalizer::class,
+        ];
+    }
+}
+```
+
+A normalizer implements the `Normalizer` interface and should return an array representation of the payload or null if it cannot normalize the payload:
+
+```php
+class ArraybleNormalizer implements Normalizer
+{
+    public function normalize(mixed $value): ?array
+    {
+        if (! $value instanceof Arrayable) {
+            return null;
+        }
+
+        return $value->toArray();
+    }
+}
+```
+
+Normalizers are executed the order as they are defined in the `normalize` method. The first normalizer not returning null will be used to normalize the payload. Magical creation methods always have precedence on normalizers.
+
+

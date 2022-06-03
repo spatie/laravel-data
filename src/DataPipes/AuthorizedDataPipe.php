@@ -7,11 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataClass;
 
-class AuthorizedDataPipe extends DataPipe
+class AuthorizedDataPipe implements DataPipe
 {
-    public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
+    public function handle(mixed $payload, DataClass $class, Collection $properties): Collection
     {
-        if (! $initialValue instanceof Request) {
+        if (! $payload instanceof Request) {
             return $properties;
         }
 

@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Normalizers;
 
 use Illuminate\Contracts\Support\Arrayable;
 
-class ArraybleNormalizer extends Normalizer
+class ArraybleNormalizer implements Normalizer
 {
     public function normalize(mixed $value): ?array
     {

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataClass;
 
-class ValidatePropertiesDataPipe extends DataPipe
+class ValidatePropertiesDataPipe implements DataPipe
 {
     public function __construct(
         protected bool $allTypes = false,
@@ -23,9 +23,9 @@ class ValidatePropertiesDataPipe extends DataPipe
         return new self(true);
     }
 
-    public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
+    public function handle(mixed $payload, DataClass $class, Collection $properties): Collection
     {
-        if (! $initialValue instanceof Request && $this->allTypes === false) {
+        if (! $payload instanceof Request && $this->allTypes === false) {
             return $properties;
         }
 

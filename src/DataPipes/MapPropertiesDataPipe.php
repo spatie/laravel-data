@@ -6,9 +6,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataClass;
 
-class MapPropertiesDataPipe extends DataPipe
+class MapPropertiesDataPipe implements DataPipe
 {
-    public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
+    public function handle(mixed $payload, DataClass $class, Collection $properties): Collection
     {
         foreach ($class->properties as $dataProperty) {
             if ($dataProperty->inputMappedName === null) {

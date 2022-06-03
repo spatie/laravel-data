@@ -64,17 +64,23 @@ abstract class Data implements Arrayable, Responsable, Jsonable, EloquentCastabl
         );
     }
 
+    public static function normalizers(): array
+    {
+        return [
+            ModelNormalizer::class,
+            ArraybleNormalizer::class,
+            ObjectNormalizer::class,
+            ArrayNormalizer::class,
+        ];
+    }
+
     public static function pipeline(): DataPipeline
     {
         return DataPipeline::create()
             ->into(static::class)
-            ->normalizer(ModelNormalizer::class)
-            ->normalizer(ArraybleNormalizer::class)
-            ->normalizer(ObjectNormalizer::class)
-            ->normalizer(ArrayNormalizer::class)
             ->through(AuthorizedDataPipe::class)
-            ->through(ValidatePropertiesDataPipe::class)
             ->through(MapPropertiesDataPipe::class)
+            ->through(ValidatePropertiesDataPipe::class)
             ->through(DefaultValuesDataPipe::class)
             ->through(CastPropertiesDataPipe::class);
     }

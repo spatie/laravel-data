@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Normalizers;
 
 use stdClass;
 
-class ObjectNormalizer extends Normalizer
+class ObjectNormalizer implements Normalizer
 {
     public function normalize(mixed $value): ?array
     {

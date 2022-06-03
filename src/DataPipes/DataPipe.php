@@ -5,11 +5,7 @@ namespace Spatie\LaravelData\DataPipes;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataClass;
 
-abstract class DataPipe
+interface DataPipe
 {
-    abstract public function handle(
-        mixed $initialValue,
-        DataClass $class,
-        Collection $properties,
-    ): Collection;
+    public function handle(mixed $payload, DataClass $class, Collection $properties): Collection;
 }

@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Normalizers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class ModelNormalizer extends Normalizer
+class ModelNormalizer implements Normalizer
 {
     public function normalize(mixed $value): ?array
     {

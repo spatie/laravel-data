@@ -2,6 +2,9 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.0 - 2022-04-??
+
+
 ## 1.4.6 - 2022-04-06
 
 - Add Dependency Injection for rules, messages, and attributes methods (#114)

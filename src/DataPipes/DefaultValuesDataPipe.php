@@ -7,9 +7,9 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
 
-class DefaultValuesDataPipe extends DataPipe
+class DefaultValuesDataPipe implements DataPipe
 {
-    public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
+    public function handle(mixed $payload, DataClass $class, Collection $properties): Collection
     {
         $class
             ->properties

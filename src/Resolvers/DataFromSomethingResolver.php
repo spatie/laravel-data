@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
+use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
 use Spatie\LaravelData\Support\DataConfig;
@@ -29,8 +30,12 @@ class DataFromSomethingResolver
         $properties = array_reduce(
             $payloads,
             function (Collection $carry, mixed $payload) use ($class) {
-                /** @var \Spatie\LaravelData\DataPipeline $pipeline */
+                /** @var Data $class */
                 $pipeline = $class::pipeline();
+
+                foreach ($class::normalizers() as $normalizer) {
+                    $pipeline->normalizer($normalizer);
+                }
 
                 return $carry->merge($pipeline->using($payload)->execute());
             },
@@ -46,7 +51,7 @@ class DataFromSomethingResolver
         $customCreationMethods = $this->dataConfig
             ->getDataClass($class)
             ->methods
-            ->filter(fn (DataMethod $method) => $method->isCustomCreationMethod);
+            ->filter(fn(DataMethod $method) => $method->isCustomCreationMethod);
 
         $methodName = null;
 
@@ -68,6 +73,7 @@ class DataFromSomethingResolver
                     ->normalizer(ArraybleNormalizer::class)
                     ->into($class)
                     ->through(AuthorizedDataPipe::class)
+                    ->through(MapPropertiesDataPipe::class)
                     ->through(ValidatePropertiesDataPipe::class)
                     ->using($payload)
                     ->execute();

@@ -9,14 +9,14 @@ use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 
-class CastPropertiesDataPipe extends DataPipe
+class CastPropertiesDataPipe implements DataPipe
 {
     public function __construct(
         protected DataConfig $dataConfig,
     ) {
     }
 
-    public function handle(mixed $initialValue, DataClass $class, Collection $properties): Collection
+    public function handle(mixed $payload, DataClass $class, Collection $properties): Collection
     {
         $castContext = $properties->all();
 

@@ -2,7 +2,7 @@
 
 namespace Spatie\LaravelData\Normalizers;
 
-class ArrayNormalizer extends Normalizer
+class ArrayNormalizer implements Normalizer
 {
     public function normalize(mixed $value): ?array
     {
