@@ -221,15 +221,6 @@ public string $value;
 public Carbon $value; 
 ```
 
-### Date
-
-[Docs](https://laravel.com/docs/8.x/validation#rule-date)
-
-```php
-#[Date]
-public Carbon $value; 
-```
-
 ### DateEquals
 
 [Docs](https://laravel.com/docs/8.x/validation#rule-date-equals)
