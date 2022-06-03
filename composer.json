@@ -27,7 +27,7 @@
         "nette/php-generator": "^3.5",
         "phpunit/phpunit": "^9.3",
         "spatie/laravel-typescript-transformer": "^2.0",
-        "orchestra/testbench": "^6.23|^7.5",
+        "orchestra/testbench": "^6.24|^7.5",
         "spatie/phpunit-snapshot-assertions": "^4.2",
         "spatie/test-time": "^1.2",
         "spatie/invade": "^1.0",
