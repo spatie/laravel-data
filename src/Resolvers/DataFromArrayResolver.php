@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataParameter;
