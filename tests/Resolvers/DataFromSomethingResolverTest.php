@@ -106,7 +106,7 @@ class DataFromSomethingResolverTest extends TestCase
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+        $this->app->bind(Request::class, fn() => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
@@ -146,7 +146,7 @@ class DataFromSomethingResolverTest extends TestCase
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+        $this->app->bind(Request::class, fn() => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
@@ -186,7 +186,7 @@ class DataFromSomethingResolverTest extends TestCase
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+        $this->app->bind(Request::class, fn() => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
@@ -220,7 +220,7 @@ class DataFromSomethingResolverTest extends TestCase
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+        $this->app->bind(Request::class, fn() => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
@@ -286,7 +286,7 @@ class DataFromSomethingResolverTest extends TestCase
             }
         };
 
-        Route::post('/', fn (Request $request) => $data::from($request));
+        Route::post('/', fn(Request $request) => $data::from($request));
 
         $this->postJson('/', [])->assertJsonValidationErrorFor('string');
 
@@ -302,6 +302,7 @@ class DataFromSomethingResolverTest extends TestCase
     {
         $data = new class () extends Data {
             public string $payment_method;
+
             public string|Optional $paypal_email;
 
             public static function rules(array $payload)
@@ -319,9 +320,14 @@ class DataFromSomethingResolverTest extends TestCase
             'payment_method' => 'credit_card',
         ], $result->toArray());
 
-        $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('The paypal email field is required');
+        try {
+            $data::validate(['payment_method' => 'paypal']);
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('paypal_email', $exception->validator->failed());
 
-        $data::validate(['payment_method' => 'paypal']);
+            return;
+        }
+
+        $this->fail('We should not end up here');
     }
 }
