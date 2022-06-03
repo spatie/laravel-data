@@ -16,7 +16,7 @@ use JsonSerializable;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
-use Spatie\LaravelData\Concerns\WrapableData;
+use Spatie\LaravelData\Concerns\WrappableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\PaginatedCollectionIsAlwaysWrapped;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
@@ -33,7 +33,7 @@ class PaginatedDataCollection implements Responsable, Arrayable, Jsonable, JsonS
 {
     use ResponsableData;
     use IncludeableData;
-    use WrapableData;
+    use WrappableData;
     use TransformableData;
 
     private ?Closure $through = null;

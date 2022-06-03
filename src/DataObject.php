@@ -96,7 +96,7 @@ interface DataObject extends Arrayable, Responsable, Jsonable, EloquentCastable,
 
     public static function withValidator(Validator $validator): void;
 
-    // WrapableData
+    // WrappableData
 
     public function withoutWrapping(): static;
 

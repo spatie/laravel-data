@@ -8,7 +8,7 @@ trait DataTrait
     use IncludeableData;
     use AppendableData;
     use ValidateableData;
-    use WrapableData;
+    use WrappableData;
     use TransformableData;
     use BaseData;
 }

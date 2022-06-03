@@ -8,7 +8,7 @@ use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\ValidateableData;
-use Spatie\LaravelData\Concerns\WrapableData;
+use Spatie\LaravelData\Concerns\WrappableData;
 
 abstract class Data implements DataObject
 {
@@ -16,7 +16,7 @@ abstract class Data implements DataObject
     use IncludeableData;
     use AppendableData;
     use ValidateableData;
-    use WrapableData;
+    use WrappableData;
     use TransformableData;
     use DataTrait;
 }

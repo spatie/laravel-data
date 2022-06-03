@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Concerns;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapType;
 
-trait WrapableData
+trait WrappableData
 {
     protected null|Wrap $wrap = null;
 
