@@ -102,14 +102,14 @@ class RuleFactory
 
     private function resolveParameters(string $parameters): array
     {
-        if (empty($parameters)) {
+        if ($parameters === '') {
             return [];
         }
 
         return collect(explode(',', $parameters))->mapWithKeys(
-            fn (string $parameter, int $index) => str_contains($parameter, '=')
-            ? [Str::before($parameter, '=') => Str::after($parameter, '=')]
-            : [$index => $parameter]
+            fn(string $parameter, int $index) => str_contains($parameter, '=')
+                ? [Str::before($parameter, '=') => Str::after($parameter, '=')]
+                : [$index => $parameter]
         )->all();
     }
 

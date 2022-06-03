@@ -26,6 +26,9 @@ use Spatie\LaravelData\Attributes\Validation\Prohibited;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\Unique;
+use Spatie\LaravelData\Support\Validation\RuleFactory;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
+use Throwable;
 
 class RulesMapper
 {
@@ -35,7 +38,7 @@ class RulesMapper
 
     public function execute(array $rules): array
     {
-        $rules = array_map(fn (mixed $rule) => match (true) {
+        $rules = array_map(fn(mixed $rule) => match (true) {
             is_string($rule) => $this->resolveStringRule($rule),
             $rule instanceof ValidationRule => $rule,
             $rule instanceof DimensionsRule => new Dimensions(rule: $rule),
@@ -61,7 +64,7 @@ class RulesMapper
         if (! str_contains($rule, '|')) {
             try {
                 return $this->ruleFactory->create($rule);
-            } catch (Exception) {
+            } catch (Throwable $t) {
                 return new Rule($rule);
             }
         }
