@@ -3,18 +3,18 @@
 namespace Spatie\LaravelData\Support\EloquentCasts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 
 class DataEloquentCast implements CastsAttributes
 {
     public function __construct(
-        /** @var class-string<\Spatie\LaravelData\Data> $dataClass */
+        /** @var class-string<DataObject> $dataClass */
         protected string $dataClass
     ) {
     }
 
-    public function get($model, string $key, $value, array $attributes): ?Data
+    public function get($model, string $key, $value, array $attributes): ?DataObject
     {
         if ($value === null) {
             return null;
@@ -35,7 +35,7 @@ class DataEloquentCast implements CastsAttributes
             $value = ($this->dataClass)::from($value);
         }
 
-        if (! $value instanceof Data) {
+        if (! $value instanceof DataObject) {
             throw CannotCastData::shouldBeData($model::class, $key);
         }
 

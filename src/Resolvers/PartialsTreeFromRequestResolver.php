@@ -3,8 +3,8 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Http\Request;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\PartialsParser;
@@ -19,7 +19,7 @@ class PartialsTreeFromRequestResolver
     }
 
     public function execute(
-        Data|DataCollection|PaginatedDataCollection $data,
+        DataObject|DataCollection|PaginatedDataCollection $data,
         Request $request,
     ): PartialTrees {
         $includesTree = $this->partialsParser->execute(explode(',', $request->get('include', '')));
@@ -27,7 +27,7 @@ class PartialsTreeFromRequestResolver
         $onlyTree = $this->partialsParser->execute(explode(',', $request->get('only', '')));
         $exceptTree = $this->partialsParser->execute(explode(',', $request->get('except', '')));
 
-        $dataClass = $data instanceof Data
+        $dataClass = $data instanceof DataObject
             ? $data::class
             : $data->dataClass;
 

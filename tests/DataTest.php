@@ -17,8 +17,10 @@ use Spatie\LaravelData\Attributes\Validation\In;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
+use Spatie\LaravelData\Concerns\DataTrait;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
@@ -2021,6 +2023,27 @@ class DataTest extends TestCase
                 ],
             ],
         ];
+    }
+
+    /** @test */
+    public function it_can_use_a_trait()
+    {
+        $data = new class ('') implements DataObject {
+            use DataTrait;
+
+            public function __construct(public string $string)
+            {
+            }
+
+            public static function fromString(string $string): static
+            {
+                return new self($string);
+            }
+        };
+
+        $this->assertEquals(['string' => 'Hi'], $data::from('Hi')->toArray());
+        $this->assertEquals(new $data('Hi'), $data::from(['string' => 'Hi']));
+        $this->assertEquals(new $data('Hi'), $data::from('Hi'));
     }
 
     /** @test */

@@ -9,8 +9,8 @@ use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
@@ -32,7 +32,7 @@ class DataType implements Countable
 
     public readonly bool $isDataCollection;
 
-    /** @var class-string<\Spatie\LaravelData\Data>|null */
+    /** @var class-string<DataObject>|null */
     public readonly ?string $dataClass;
 
     public readonly array $acceptedTypes;
@@ -75,7 +75,7 @@ class DataType implements Countable
             ];
             $this->isLazy = false;
             $this->isOptional = false;
-            $this->isDataObject = is_a($type->getName(), Data::class, true);
+            $this->isDataObject = is_a($type->getName(), DataObject::class, true);
             $this->isDataCollection = is_a($type->getName(), DataCollection::class, true) || is_a($type->getName(), PaginatedDataCollection::class, true);
 
             $this->dataClass = match (true) {
@@ -108,7 +108,7 @@ class DataType implements Countable
             $isMixed = $namedType->getName() === 'mixed';
             $isLazy = $isLazy || is_a($namedType->getName(), Lazy::class, true);
             $isOptional = $isOptional || is_a($namedType->getName(), Optional::class, true);
-            $isDataObject = $isDataObject || is_a($namedType->getName(), Data::class, true);
+            $isDataObject = $isDataObject || is_a($namedType->getName(), DataObject::class, true);
             $isDataCollection = $isDataCollection || is_a($namedType->getName(), DataCollection::class, true) || is_a($namedType->getName(), PaginatedDataCollection::class, true);
         }
 

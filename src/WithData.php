@@ -7,7 +7,7 @@ use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 
 trait WithData
 {
-    public function getData(): Data
+    public function getData(): DataObject
     {
         $dataClass = match (true) {
             /** @psalm-suppress UndefinedThisPropertyFetch */
@@ -16,7 +16,7 @@ trait WithData
             default => null,
         };
 
-        if (! is_a($dataClass, Data::class, true)) {
+        if (! is_a($dataClass, DataObject::class, true)) {
             throw InvalidDataClass::create($dataClass);
         }
 

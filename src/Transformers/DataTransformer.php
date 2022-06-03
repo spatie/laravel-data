@@ -3,8 +3,8 @@
 namespace Spatie\LaravelData\Transformers;
 
 use Illuminate\Support\Arr;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataConfig;
@@ -33,7 +33,7 @@ class DataTransformer
         $this->config = app(DataConfig::class);
     }
 
-    public function transform(Data $data): array
+    public function transform(DataObject $data): array
     {
         $transformed = $this->resolvePayload($data);
 
@@ -44,7 +44,7 @@ class DataTransformer
         return array_merge($transformed, $data->getAdditionalData());
     }
 
-    protected function resolvePayload(Data $data): array
+    protected function resolvePayload(DataObject $data): array
     {
         $trees = $data->getPartialTrees();
 
@@ -190,13 +190,13 @@ class DataTransformer
             return $transformer->transform($property, $value);
         }
 
-        if ($value instanceof Data || $value instanceof DataCollection) {
+        if ($value instanceof DataObject || $value instanceof DataCollection) {
             $value->withPartialTrees($trees);
 
             $wrapExecutionType = match (true) {
-                $value instanceof Data && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
-                $value instanceof Data && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
-                $value instanceof Data && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled,
+                $value instanceof DataObject && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
+                $value instanceof DataObject && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
+                $value instanceof DataObject && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled,
                 $value instanceof DataCollection && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::Enabled,
                 $value instanceof DataCollection && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
                 $value instanceof DataCollection && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled,

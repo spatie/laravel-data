@@ -3,14 +3,14 @@
 namespace Spatie\LaravelData\Support\EloquentCasts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\DataObject;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 
 class DataCollectionEloquentCast implements CastsAttributes
 {
     public function __construct(
-        /** @var class-string<\Spatie\LaravelData\Data> $dataClass */
+        /** @var class-string<DataObject> $dataClass */
         protected string $dataClass
     ) {
     }
@@ -46,7 +46,7 @@ class DataCollectionEloquentCast implements CastsAttributes
         }
 
         $data = array_map(
-            fn (array | Data $item) => is_array($item)
+            fn (array | DataObject $item) => is_array($item)
                 ? ($this->dataClass)::from($item)
                 : $item,
             $value

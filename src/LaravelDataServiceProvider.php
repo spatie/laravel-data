@@ -23,7 +23,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
         );
 
         /** @psalm-suppress UndefinedInterfaceMethod */
-        $this->app->beforeResolving(Data::class, function ($class, $parameters, $app) {
+        $this->app->beforeResolving(DataObject::class, function ($class, $parameters, $app) {
             if ($app->has($class)) {
                 return;
             }
