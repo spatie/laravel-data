@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
-use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ExcludeUnless extends StringValidationAttribute
@@ -21,7 +20,7 @@ class ExcludeUnless extends StringValidationAttribute
     {
         return [
             $this->field,
-            $this->normalizeValue($this->value)
+            $this->normalizeValue($this->value),
         ];
     }
 }

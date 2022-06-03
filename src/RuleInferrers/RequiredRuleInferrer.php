@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\RuleInferrers;
 
-use Illuminate\Validation\Rules\RequiredIf;
 use Spatie\LaravelData\Attributes\Validation\BooleanType;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Present;

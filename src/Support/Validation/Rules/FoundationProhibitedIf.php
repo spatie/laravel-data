@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Validation\Rules;
 
-use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 

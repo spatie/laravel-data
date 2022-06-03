@@ -5,10 +5,8 @@ namespace Spatie\LaravelData\Tests\Attributes\Validation;
 use Carbon\CarbonImmutable;
 use DateTimeZone;
 use Generator;
-use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
-use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Spatie\LaravelData\Tests\TestCase;
 
 class ValidationAttributeTest extends TestCase

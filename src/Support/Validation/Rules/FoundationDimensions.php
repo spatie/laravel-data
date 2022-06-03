@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support\Validation\Rules;
 
 use Illuminate\Validation\Rules\Dimensions;
-use Illuminate\Validation\Rules\Enum;
 use Spatie\LaravelData\Attributes\Validation\Dimensions as DimensionsAttribute;
 use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 

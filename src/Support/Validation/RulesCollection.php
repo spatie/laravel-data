@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support\Validation;
 
 use Illuminate\Support\Arr;
-use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
 
 class RulesCollection
 {
@@ -20,7 +19,7 @@ class RulesCollection
         foreach ($rules as $rule) {
             $this->rules = array_filter(
                 $this->rules,
-                fn(ValidationRule $initialRule) => ! $initialRule instanceof $rule
+                fn (ValidationRule $initialRule) => ! $initialRule instanceof $rule
             );
 
             $this->rules[] = $rule;
@@ -45,7 +44,7 @@ class RulesCollection
     public function normalize(): array
     {
         return Arr::flatten(array_map(
-            fn(ValidationRule $rule) => $rule->getRules(),
+            fn (ValidationRule $rule) => $rule->getRules(),
             $this->rules
         ));
     }

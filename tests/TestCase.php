@@ -7,8 +7,8 @@ use Faker\Generator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Spatie\LaravelData\LaravelDataServiceProvider;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Spatie\Snapshots\MatchesSnapshots;
 
 class TestCase extends Orchestra

@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
-use Spatie\LaravelData\Resolvers\RuleAttributesResolver;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]

@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Validation\Rules;
 
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
 use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 

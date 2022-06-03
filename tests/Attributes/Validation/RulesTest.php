@@ -7,13 +7,10 @@ use Generator;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Validation\Rules\Enum as EnumRule;
-use Illuminate\Validation\Rules\ExcludeIf as BaseExcludeIf;
 use Illuminate\Validation\Rules\Exists as BaseExists;
 use Illuminate\Validation\Rules\In as BaseIn;
 use Illuminate\Validation\Rules\NotIn as BaseNotIn;
 use Illuminate\Validation\Rules\Password as BasePassword;
-use Illuminate\Validation\Rules\ProhibitedIf as BaseProhibitedIf;
-use Illuminate\Validation\Rules\RequiredIf as BaseRequiredIf;
 use Illuminate\Validation\Rules\Unique as BaseUnique;
 use Spatie\LaravelData\Attributes\Validation\Accepted;
 use Spatie\LaravelData\Attributes\Validation\AcceptedIf;
@@ -92,20 +89,15 @@ use Spatie\LaravelData\Attributes\Validation\Timezone;
 use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
-use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
-use Spatie\LaravelData\Resolvers\DataClassValidationRulesResolver;
+use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 use Spatie\LaravelData\Resolvers\RuleAttributesResolver;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationEnum;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationExcludeIf;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationExists;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationIn;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationNotIn;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationPassword;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationProhibitedIf;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationRequiredIf;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationUnique;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
-use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 use Spatie\LaravelData\Tests\TestCase;
 use Spatie\TestTime\TestTime;
 
@@ -685,7 +677,7 @@ class RulesTest extends TestCase
             expectCreatedAttribute: new FoundationExists(new BaseExists('tenant.users', 'email'))
         );
 
-        $closure = fn(Builder $builder) => $builder;
+        $closure = fn (Builder $builder) => $builder;
 
         yield $this->fixature(
             attribute: new Exists('users', 'email', where: $closure),
@@ -784,14 +776,12 @@ class RulesTest extends TestCase
             attribute: new Password(min: 20),
             expected: new BasePassword(20),
             expectCreatedAttribute: new FoundationPassword(new BasePassword(20)),
-
         );
 
         yield $this->fixature(
             attribute: new Password(letters: true, mixedCase: true, numbers: true, uncompromised: true, uncompromisedThreshold: 12),
             expected: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12),
-            expectCreatedAttribute: new FoundationPassword((new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12),),
-
+            expectCreatedAttribute: new FoundationPassword((new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12), ),
         );
     }
 
@@ -1024,7 +1014,7 @@ class RulesTest extends TestCase
             expectCreatedAttribute: new FoundationUnique((new BaseUnique('users', 'email'))->ignore(5, 'uuid'))
         );
 
-        $closure = fn(Builder $builder) => $builder;
+        $closure = fn (Builder $builder) => $builder;
 
         yield $this->fixature(
             attribute: new Unique('users', 'email', where: $closure),

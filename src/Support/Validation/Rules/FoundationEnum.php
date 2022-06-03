@@ -2,8 +2,8 @@
 
 namespace Spatie\LaravelData\Support\Validation\Rules;
 
-use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 use Illuminate\Validation\Rules\Enum;
+use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 
 class FoundationEnum extends ObjectValidationAttribute
 {

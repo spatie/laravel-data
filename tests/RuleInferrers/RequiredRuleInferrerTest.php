@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Tests\RuleInferrers;
 
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\RequiredIf as BaseRequiredIf;
 use ReflectionClass;

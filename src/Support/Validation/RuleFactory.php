@@ -107,7 +107,8 @@ class RuleFactory
             return [];
         }
 
-        return collect(explode(',', $parameters))->mapWithKeys(fn(string $parameter, int $index) => str_contains($parameter, '=')
+        return collect(explode(',', $parameters))->mapWithKeys(
+            fn (string $parameter, int $index) => str_contains($parameter, '=')
             ? [Str::before($parameter, '=') => Str::after($parameter, '=')]
             : [$index => $parameter]
         )->all();

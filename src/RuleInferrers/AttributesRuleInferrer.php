@@ -4,9 +4,9 @@ namespace Spatie\LaravelData\RuleInferrers;
 
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Resolvers\RuleAttributesResolver;
+use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\RulesCollection;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
-use Spatie\LaravelData\Support\DataProperty;
 
 class AttributesRuleInferrer implements RuleInferrer
 {
@@ -18,7 +18,7 @@ class AttributesRuleInferrer implements RuleInferrer
     {
         $property
             ->attributes
-            ->filter(fn(object $attribute) => $attribute instanceof ValidationRule)
+            ->filter(fn (object $attribute) => $attribute instanceof ValidationRule)
             ->each(function (ValidationRule $rule) use ($rules) {
                 if (! $rule instanceof Rule) {
                     $rules->add($rule);

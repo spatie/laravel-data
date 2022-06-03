@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Illuminate\Validation\Rules\Password as BasePassword;
 use Spatie\LaravelData\Support\Validation\Rules\FoundationPassword;
-use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Password extends FoundationPassword
