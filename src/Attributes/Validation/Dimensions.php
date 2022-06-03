@@ -4,9 +4,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Validation\Rules\Dimensions as BaseDimensions;
-use Spatie\LaravelData\Attributes\Validation\Dimensions as DimensionsAttribute;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationDimensions;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Dimensions extends ValidationAttribute

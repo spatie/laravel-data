@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Validation\Rules\ProhibitedIf;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationProhibitedIf;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Prohibited extends ValidationAttribute

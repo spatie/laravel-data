@@ -18,7 +18,6 @@ use Illuminate\Validation\Rules\Unique as UniqueRule;
 use Spatie\LaravelData\Attributes\Validation\Dimensions;
 use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\Exclude;
-use Spatie\LaravelData\Attributes\Validation\ExcludeIf;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\In;
 use Spatie\LaravelData\Attributes\Validation\NotIn;
@@ -28,16 +27,6 @@ use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Support\Validation\RuleFactory;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationDimensions;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationEnum;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationExcludeIf;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationExists;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationIn;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationNotIn;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationPassword;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationProhibitedIf;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationRequiredIf;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationUnique;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 class RuleAttributesResolver

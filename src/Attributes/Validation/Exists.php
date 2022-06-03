@@ -5,9 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Closure;
 use Exception;
-use Faker\Provider\Base;
 use Illuminate\Validation\Rules\Exists as BaseExists;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationExists;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Exists extends ValidationAttribute

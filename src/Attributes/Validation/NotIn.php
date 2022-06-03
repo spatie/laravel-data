@@ -4,9 +4,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
-use Illuminate\Validation\Rules\In as BaseIn;
 use Illuminate\Validation\Rules\NotIn as BaseNotIn;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationNotIn;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class NotIn extends ValidationAttribute

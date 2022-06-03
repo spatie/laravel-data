@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests\RuleInferrers;
 
 use Illuminate\Validation\Rules\Enum as BaseEnum;
-use Illuminate\Validation\Rules\RequiredIf as BaseRequiredIf;
 use ReflectionClass;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
@@ -18,8 +17,6 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationEnum;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationRequiredIf;
 use Spatie\LaravelData\Support\Validation\RulesCollection;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;

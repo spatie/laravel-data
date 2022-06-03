@@ -6,8 +6,6 @@ use Attribute;
 use Closure;
 use Exception;
 use Illuminate\Validation\Rules\Unique as BaseUnique;
-use Illuminate\Validation\Rules\Unique as UniqueAlias;
-use Spatie\LaravelData\Support\Validation\Rules\FoundationUnique;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Unique extends ValidationAttribute
