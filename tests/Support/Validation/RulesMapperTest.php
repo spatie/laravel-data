@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests\Support\Validation;
 
 use Illuminate\Contracts\Validation\Rule as CustomRuleContract;
-use Illuminate\Validation\Rules\Dimensions as BaseDimensions;
 use Illuminate\Validation\Rules\Exists as BaseExists;
 use Spatie\LaravelData\Attributes\Validation\Dimensions;
 use Spatie\LaravelData\Attributes\Validation\Exists;
@@ -17,7 +16,7 @@ class RulesMapperTest extends TestCase
 {
     private RulesMapper $mapper;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -90,16 +89,13 @@ class RulesMapperTest extends TestCase
     /** @test */
     public function it_can_map_custom_laravel_rule_objects()
     {
-        $rule = new class implements CustomRuleContract {
-
+        $rule = new class () implements CustomRuleContract {
             public function passes($attribute, $value)
             {
-
             }
 
             public function message()
             {
-
             }
         };
 
