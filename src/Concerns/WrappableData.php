@@ -10,14 +10,14 @@ trait WrappableData
 {
     protected null|Wrap $wrap = null;
 
-    public function withoutWrapping(): WrappableDataContract
+    public function withoutWrapping(): static
     {
         $this->wrap = new Wrap(WrapType::Disabled);
 
         return $this;
     }
 
-    public function wrap(string $key): WrappableDataContract
+    public function wrap(string $key): static
     {
         $this->wrap = new Wrap(WrapType::Defined, $key);
 

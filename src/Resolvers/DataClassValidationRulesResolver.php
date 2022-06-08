@@ -22,7 +22,6 @@ class DataClassValidationRulesResolver
 
         $overWrittenRules = [];
 
-        /** @var class-string<DataObject> $class */
         if (method_exists($class, 'rules')) {
             $overWrittenRules = app()->call([$class, 'rules'], [
                 'payload' => $payload,
@@ -31,8 +30,8 @@ class DataClassValidationRulesResolver
 
         return $this->dataConfig->getDataClass($class)
             ->properties
-            ->reject(fn (DataProperty $property) => array_key_exists($property->name, $overWrittenRules) || ! $property->validate)
-            ->mapWithKeys(fn (DataProperty $property) => $resolver->execute($property, $payload, $nullable)->all())
+            ->reject(fn(DataProperty $property) => array_key_exists($property->name, $overWrittenRules) || ! $property->validate)
+            ->mapWithKeys(fn(DataProperty $property) => $resolver->execute($property, $payload, $nullable)->all())
             ->merge($overWrittenRules);
     }
 }

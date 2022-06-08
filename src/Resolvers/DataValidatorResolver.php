@@ -17,6 +17,7 @@ class DataValidatorResolver
     public function execute(string $dataClass, Arrayable|array $payload): Validator
     {
         $payload = $payload instanceof Arrayable ? $payload->toArray() : $payload;
+
         $rules = app(DataClassValidationRulesResolver::class)
             ->execute($dataClass, $payload)
             ->toArray();

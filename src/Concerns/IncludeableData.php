@@ -21,41 +21,41 @@ trait IncludeableData
 
     public function withPartialTrees(
         PartialTrees $partialTrees,
-    ): IncludeableDataContract {
+    ): static {
         $this->partialTrees = $partialTrees;
 
         return $this;
     }
 
-    public function include(string ...$includes): IncludeableDataContract
+    public function include(string ...$includes): static
     {
         $this->includes = array_unique(array_merge($this->includes, $includes));
 
         return $this;
     }
 
-    public function exclude(string ...$excludes): IncludeableDataContract
+    public function exclude(string ...$excludes): static
     {
         $this->excludes = array_unique(array_merge($this->excludes, $excludes));
 
         return $this;
     }
 
-    public function only(string ...$only): IncludeableDataContract
+    public function only(string ...$only): static
     {
         $this->only = array_unique(array_merge($this->only, $only));
 
         return $this;
     }
 
-    public function except(string ...$except): IncludeableDataContract
+    public function except(string ...$except): static
     {
         $this->except = array_unique(array_merge($this->except, $except));
 
         return $this;
     }
 
-    public function onlyWhen(string $only, bool|Closure $condition): IncludeableDataContract
+    public function onlyWhen(string $only, bool|Closure $condition): static
     {
         $condition = $condition instanceof Closure
             ? $condition($this)
@@ -68,7 +68,7 @@ trait IncludeableData
         return $this;
     }
 
-    public function exceptWhen(string $except, bool|Closure $condition): IncludeableDataContract
+    public function exceptWhen(string $except, bool|Closure $condition): static
     {
         $condition = $condition instanceof Closure
             ? $condition($this)

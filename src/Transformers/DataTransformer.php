@@ -4,7 +4,11 @@ namespace Spatie\LaravelData\Transformers;
 
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Contracts\AppendableData;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Contracts\TransformableData;
+use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Lazy;
@@ -39,11 +43,11 @@ class DataTransformer
     {
         $transformed = $this->resolvePayload($data);
 
-        if ($this->wrapExecutionType->shouldExecute()) {
+        if ($data instanceof WrappableData && $this->wrapExecutionType->shouldExecute()) {
             $transformed = $data->getWrap()->wrap($transformed);
         }
 
-        if($data instanceof AppendableData){
+        if ($data instanceof AppendableData) {
             $transformed = array_merge($transformed, $data->getAdditionalData());
         }
 
@@ -52,7 +56,9 @@ class DataTransformer
 
     protected function resolvePayload(TransformableData $data): array
     {
-        $trees = $data->getPartialTrees();
+        $trees = $data instanceof IncludeableData
+            ? $data->getPartialTrees()
+            : new PartialTrees();
 
         $dataClass = $this->config->getDataClass($data::class);
 
@@ -196,22 +202,26 @@ class DataTransformer
             return $transformer->transform($property, $value);
         }
 
-        if ($value instanceof DataObject || $value instanceof DataCollection) {
+        if (! $value instanceof BaseData && ! $value instanceof BaseDataCollectable) {
+            return $value;
+        }
+
+        if ($value instanceof IncludeableData) {
             $value->withPartialTrees($trees);
+        }
 
-            $wrapExecutionType = match (true) {
-                $value instanceof DataObject && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
-                $value instanceof DataObject && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
-                $value instanceof DataObject && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled,
-                $value instanceof DataCollection && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::Enabled,
-                $value instanceof DataCollection && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
-                $value instanceof DataCollection && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled,
-                default => throw new TypeError('Invalid wrap execution type')
-            };
+        $wrapExecutionType = match (true) {
+            $value instanceof BaseData && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
+            $value instanceof BaseData && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
+            $value instanceof BaseData && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled,
+            $value instanceof BaseDataCollectable && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::Enabled,
+            $value instanceof BaseDataCollectable && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
+            $value instanceof BaseDataCollectable && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled,
+            default => throw new TypeError('Invalid wrap execution type')
+        };
 
-            return $this->transformValues
-                ? $value->transform($this->transformValues, $wrapExecutionType)
-                : $value;
+        if ($value instanceof TransformableData && $this->transformValues) {
+            return $value->transform($this->transformValues, $wrapExecutionType);
         }
 
         return $value;

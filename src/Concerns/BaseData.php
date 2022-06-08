@@ -28,7 +28,7 @@ use Spatie\LaravelData\Transformers\DataTransformer;
 
 trait BaseData
 {
-    public static function optional(mixed ...$payloads): ?BaseDataContract
+    public static function optional(mixed ...$payloads): ?static
     {
         if (count($payloads) === 0) {
             return null;
@@ -43,7 +43,7 @@ trait BaseData
         return null;
     }
 
-    public static function from(mixed ...$payloads): BaseDataContract
+    public static function from(mixed ...$payloads): static
     {
         return app(DataFromSomethingResolver::class)->execute(
             static::class,

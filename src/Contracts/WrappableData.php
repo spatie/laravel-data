@@ -6,9 +6,9 @@ use Spatie\LaravelData\Support\Wrapping\Wrap;
 
 interface WrappableData
 {
-    public function withoutWrapping(): WrappableData;
+    public function withoutWrapping();
 
-    public function wrap(string $key): WrappableData;
+    public function wrap(string $key);
 
     public function getWrap(): Wrap;
 }

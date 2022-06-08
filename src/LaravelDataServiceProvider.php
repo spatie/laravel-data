@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData;
 
+use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelPackageTools\Package;
@@ -24,7 +25,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
         );
 
         /** @psalm-suppress UndefinedInterfaceMethod */
-        $this->app->beforeResolving(DataObject::class, function ($class, $parameters, $app) {
+        $this->app->beforeResolving(BaseData::class, function ($class, $parameters, $app) {
             if ($app->has($class)) {
                 return;
             }

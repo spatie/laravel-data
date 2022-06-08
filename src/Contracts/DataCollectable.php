@@ -6,7 +6,11 @@ use Countable;
 use IteratorAggregate;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 
-interface DataCollectable extends ResponsableData, TransformableData, IncludeableData, WrappableData, IteratorAggregate, Countable
+/**
+ * @template TValue
+ *
+ * @extends   \IteratorAggregate<array-key, TValue>
+ */
+interface DataCollectable extends BaseDataCollectable, ResponsableData, TransformableData, IncludeableData, WrappableData, IteratorAggregate, Countable
 {
-
 }

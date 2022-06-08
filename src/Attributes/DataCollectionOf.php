@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Attributes;
 
 use Attribute;
+use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 
@@ -10,10 +11,10 @@ use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 class DataCollectionOf
 {
     public function __construct(
-        /** @var class-string<DataObject> $class */
+        /** @var class-string<\Spatie\LaravelData\Contracts\BaseData> $class */
         public string $class
     ) {
-        if (! is_subclass_of($this->class, DataObject::class)) {
+        if (! is_subclass_of($this->class, BaseData::class)) {
             throw new CannotFindDataClass('Class given does not implement `DataObject::class`');
         }
     }

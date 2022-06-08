@@ -14,12 +14,14 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
 use JsonSerializable;
+use Spatie\LaravelData\Concerns\BaseDataCollectable;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\WrappableData;
+use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\DataCollectable;
-use Spatie\LaravelData\Contracts\DataCollectable as DataCollectionContract;
+use Spatie\LaravelData\Contracts\DataCollectable as BaseDataCollectableContract;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
@@ -35,15 +37,16 @@ use Spatie\LaravelData\Transformers\DataCollectionTransformer;
  * @template TValue
  *
  * @implements \ArrayAccess<array-key, TValue>
- * @implements  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>
- * @implements  \IteratorAggregate<array-key, TValue>
+ * @implements  DataCollectable<TValue>
  */
 class DataCollection implements DataCollectable, ArrayAccess
 {
+    use BaseDataCollectable;
     use ResponsableData;
     use IncludeableData;
     use WrappableData;
     use TransformableData;
+    use BaseDataCollectable;
 
     private ?Closure $through = null;
 
@@ -69,7 +72,7 @@ class DataCollection implements DataCollectable, ArrayAccess
         }
 
         $this->items = $items->map(
-            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
+            fn($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
     }
 
@@ -191,7 +194,7 @@ class DataCollection implements DataCollectable, ArrayAccess
             throw InvalidDataCollectionOperation::create();
         }
 
-        $value = $value instanceof DataObject
+        $value = $value instanceof BaseData
             ? $value
             : $this->dataClass::from($value);
 

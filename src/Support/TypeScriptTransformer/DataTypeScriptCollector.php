@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support\TypeScriptTransformer;
 
 use ReflectionClass;
+use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\TypeScriptTransformer\Collectors\Collector;
 use Spatie\TypeScriptTransformer\Structures\TransformedType;
@@ -11,7 +12,7 @@ class DataTypeScriptCollector extends Collector
 {
     public function getTransformedType(ReflectionClass $class): ?TransformedType
     {
-        if (! $class->isSubclassOf(DataObject::class)) {
+        if (! $class->isSubclassOf(BaseData::class)) {
             return null;
         }
 

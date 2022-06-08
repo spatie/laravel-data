@@ -14,7 +14,7 @@ trait AppendableData
         return [];
     }
 
-    public function additional(array $additional): AppendableDataContract
+    public function additional(array $additional): static
     {
         $this->additional = array_merge($this->additional, $additional);
 

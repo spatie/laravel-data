@@ -5,9 +5,11 @@ namespace Spatie\LaravelData\Concerns;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use Spatie\LaravelData\Contracts\BaseData as BaseDataContract;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Contracts\ValidateableData as ValidateableDataContract;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
+use Spatie\LaravelData\Support\DataFeature;
 
 /**
  * @method static array rules(...$args)
@@ -45,8 +47,10 @@ trait ValidateableData
         return $validator->validated();
     }
 
-    public static function validateAndCreate(Arrayable|array $payload): ValidateableDataContract
+    public static function validateAndCreate(Arrayable|array $payload): static
     {
+        DataFeature::require(static::class, BaseDataContract::class);
+
         return static::from(static::validate($payload));
     }
 

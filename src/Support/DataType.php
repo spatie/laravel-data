@@ -9,6 +9,8 @@ use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\DataCollectable;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Contracts\DataObject;
@@ -33,7 +35,7 @@ class DataType implements Countable
 
     public readonly bool $isDataCollectable;
 
-    /** @var class-string<DataObject>|null */
+    /** @var class-string<BaseData>|null */
     public readonly ?string $dataClass;
 
     public readonly array $acceptedTypes;
@@ -76,8 +78,8 @@ class DataType implements Countable
             ];
             $this->isLazy = false;
             $this->isOptional = false;
-            $this->isDataObject = is_a($type->getName(), DataObject::class, true);
-            $this->isDataCollectable = is_a($type->getName(), DataCollectable::class, true);
+            $this->isDataObject = is_a($type->getName(), BaseData::class, true);
+            $this->isDataCollectable = is_a($type->getName(), BaseDataCollectable::class, true);
 
             $this->dataClass = match (true) {
                 $this->isDataObject => $type->getName(),
@@ -109,8 +111,8 @@ class DataType implements Countable
             $isMixed = $namedType->getName() === 'mixed';
             $isLazy = $isLazy || is_a($namedType->getName(), Lazy::class, true);
             $isOptional = $isOptional || is_a($namedType->getName(), Optional::class, true);
-            $isDataObject = $isDataObject || is_a($namedType->getName(), DataObject::class, true);
-            $isDataCollection = $isDataCollection || is_a($namedType->getName(), DataCollectable::class, true);
+            $isDataObject = $isDataObject || is_a($namedType->getName(), BaseData::class, true);
+            $isDataCollection = $isDataCollection || is_a($namedType->getName(), BaseDataCollectable::class, true);
         }
 
         $this->acceptedTypes = $acceptedTypes;

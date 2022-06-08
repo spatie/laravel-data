@@ -7,7 +7,10 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Enumerable;
+use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\DataObject;
+use Spatie\LaravelData\Contracts\IncludeableData;
+use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
@@ -50,7 +53,7 @@ class DataCollectionTransformer
             )
             ->when(
                 $this->transformValues,
-                fn (Enumerable $collection) => $collection->map(fn (DataObject $data) => $data->transform(
+                fn (Enumerable $collection) => $collection->map(fn (TransformableData $data) => $data->transform(
                     $this->transformValues,
                     $this->wrapExecutionType->shouldExecute()
                         ? WrapExecutionType::TemporarilyDisabled
@@ -66,8 +69,10 @@ class DataCollectionTransformer
 
     protected function transformItemClosure(): Closure
     {
-        return function (DataObject $item) {
-            $item->withPartialTrees($this->trees);
+        return function (BaseData $item) {
+            if($item instanceof IncludeableData){
+                $item->withPartialTrees($this->trees);
+            }
 
             if ($this->through) {
                 $item = ($this->through)($item);

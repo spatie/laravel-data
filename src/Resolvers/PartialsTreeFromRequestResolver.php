@@ -3,13 +3,17 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Http\Request;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\DataCollectable;
+use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\PartialTrees;
+use TypeError;
 
 class PartialsTreeFromRequestResolver
 {
@@ -20,7 +24,7 @@ class PartialsTreeFromRequestResolver
     }
 
     public function execute(
-        DataObject|DataCollectable $data,
+        IncludeableData $data,
         Request $request,
     ): PartialTrees {
         $includesTree = $this->partialsParser->execute(explode(',', $request->get('include', '')));
@@ -28,9 +32,11 @@ class PartialsTreeFromRequestResolver
         $onlyTree = $this->partialsParser->execute(explode(',', $request->get('only', '')));
         $exceptTree = $this->partialsParser->execute(explode(',', $request->get('except', '')));
 
-        $dataClass = $data instanceof DataObject
-            ? $data::class
-            : $data->dataClass;
+        $dataClass = match (true) {
+            $data instanceof BaseData => $data::class,
+            $data instanceof BaseDataCollectable => $data->getDataClass(),
+            default => throw new TypeError('Invalid type of data')
+        };
 
         return new PartialTrees(
             $request->has('include') ? $this->getValidIncludesForDataClass($dataClass, $includesTree) : null,

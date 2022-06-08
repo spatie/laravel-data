@@ -13,6 +13,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\CursorPaginator;
 use IteratorAggregate;
 use JsonSerializable;
+use Spatie\LaravelData\Concerns\BaseDataCollectable;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
@@ -28,8 +29,7 @@ use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 /**
  * @template TValue
  *
- * @implements  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>
- * @implements  \IteratorAggregate<array-key, TValue>
+ * @implements  DataCollectable<TValue>
  */
 class PaginatedDataCollection implements DataCollectable
 {
@@ -37,6 +37,7 @@ class PaginatedDataCollection implements DataCollectable
     use IncludeableData;
     use WrappableData;
     use TransformableData;
+    use BaseDataCollectable;
 
     private ?Closure $through = null;
 
