@@ -14,10 +14,19 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
 use JsonSerializable;
+use Spatie\LaravelData\Concerns\BaseDataCollectable;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\WrappableData;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\DataCollectable;
+use Spatie\LaravelData\Contracts\DataCollectable as BaseDataCollectableContract;
+use Spatie\LaravelData\Contracts\DataObject;
+use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
+use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
+use Spatie\LaravelData\Contracts\TransformableData as TransformableDataContract;
+use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\InvalidDataCollectionOperation;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
@@ -28,15 +37,16 @@ use Spatie\LaravelData\Transformers\DataCollectionTransformer;
  * @template TValue
  *
  * @implements \ArrayAccess<array-key, TValue>
- * @implements  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>
- * @implements  \IteratorAggregate<array-key, TValue>
+ * @implements  DataCollectable<TValue>
  */
-class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializable, IteratorAggregate, Countable, ArrayAccess, EloquentCastable
+class DataCollection implements DataCollectable, ArrayAccess
 {
+    use BaseDataCollectable;
     use ResponsableData;
     use IncludeableData;
     use WrappableData;
     use TransformableData;
+    use BaseDataCollectable;
 
     private ?Closure $through = null;
 
@@ -62,7 +72,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
         }
 
         $this->items = $items->map(
-            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
+            fn($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
     }
 
@@ -184,7 +194,7 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
             throw InvalidDataCollectionOperation::create();
         }
 
-        $value = $value instanceof DataObject
+        $value = $value instanceof BaseData
             ? $value
             : $this->dataClass::from($value);
 

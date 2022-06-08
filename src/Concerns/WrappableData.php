@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Concerns;
 
+use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapType;
 

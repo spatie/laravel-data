@@ -2,15 +2,10 @@
 
 namespace Spatie\LaravelData\Concerns;
 
-use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
+use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
 
 trait TransformableData
 {
-    abstract public function transform(
-        bool $transformValues = true,
-        WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
-    ): array;
-
     public function all(): array
     {
         return $this->transform(transformValues: false);
@@ -29,5 +24,10 @@ trait TransformableData
     public function jsonSerialize(): array
     {
         return $this->toArray();
+    }
+
+    public static function castUsing(array $arguments)
+    {
+        return new DataEloquentCast(static::class);
     }
 }

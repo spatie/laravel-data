@@ -56,7 +56,7 @@ class CastPropertiesDataPipe implements DataPipe
             return $property->type->dataClass::from($value);
         }
 
-        if ($property->type->isDataCollection) {
+        if ($property->type->isDataCollectable) {
             return $property->type->dataClass::collection($value);
         }
 

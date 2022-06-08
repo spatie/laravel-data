@@ -3,7 +3,9 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Http\JsonResponse;
+use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
+use Spatie\LaravelData\Support\DataFeature;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 trait ResponsableData
@@ -15,9 +17,11 @@ trait ResponsableData
      */
     public function toResponse($request)
     {
-        $this->withPartialTrees(
-            resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request)
-        );
+        if (DataFeature::has($this, IncludeableDataContract::class)) {
+            $this->withPartialTrees(
+                resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request)
+            );
+        }
 
         return new JsonResponse($this->transform(
             wrapExecutionType: WrapExecutionType::Enabled,

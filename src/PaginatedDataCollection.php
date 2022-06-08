@@ -13,10 +13,13 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\CursorPaginator;
 use IteratorAggregate;
 use JsonSerializable;
+use Spatie\LaravelData\Concerns\BaseDataCollectable;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\WrappableData;
+use Spatie\LaravelData\Contracts\DataCollectable;
+use Spatie\LaravelData\Contracts\DataCollectable as DataCollectionContract;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\PaginatedCollectionIsAlwaysWrapped;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
@@ -26,15 +29,15 @@ use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 /**
  * @template TValue
  *
- * @implements  \Illuminate\Contracts\Support\Arrayable<array-key, TValue>
- * @implements  \IteratorAggregate<array-key, TValue>
+ * @implements  DataCollectable<TValue>
  */
-class PaginatedDataCollection implements Responsable, Arrayable, Jsonable, JsonSerializable, IteratorAggregate, Countable, EloquentCastable
+class PaginatedDataCollection implements DataCollectable
 {
     use ResponsableData;
     use IncludeableData;
     use WrappableData;
     use TransformableData;
+    use BaseDataCollectable;
 
     private ?Closure $through = null;
 

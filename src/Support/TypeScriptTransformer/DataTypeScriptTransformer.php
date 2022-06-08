@@ -4,7 +4,8 @@ namespace Spatie\LaravelData\Support\TypeScriptTransformer;
 
 use ReflectionClass;
 use ReflectionProperty;
-use Spatie\LaravelData\DataObject;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelTypeScriptTransformer\Transformers\DtoTransformer;
 use Spatie\TypeScriptTransformer\Structures\MissingSymbolsCollection;
@@ -15,7 +16,7 @@ class DataTypeScriptTransformer extends DtoTransformer
 {
     public function canTransform(ReflectionClass $class): bool
     {
-        return $class->isSubclassOf(DataObject::class);
+        return $class->isSubclassOf(BaseData::class);
     }
 
     protected function typeProcessors(): array

@@ -15,9 +15,16 @@ use Illuminate\Database\Eloquent\Model;
 use JsonSerializable;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Contracts\AppendableData;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\IncludeableData;
+use Spatie\LaravelData\Contracts\ResponsableData;
+use Spatie\LaravelData\Contracts\TransformableData;
+use Spatie\LaravelData\Contracts\ValidateableData;
+use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\DataObject;
+use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
@@ -45,7 +52,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isLazy);
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollection);
+        $this->assertFalse($type->isDataCollectable);
         $this->assertNull($type->dataClass);
         $this->assertEmpty($type->acceptedTypes);
     }
@@ -62,7 +69,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isLazy);
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollection);
+        $this->assertFalse($type->isDataCollectable);
         $this->assertNull($type->dataClass);
         $this->assertEquals(['string'], array_keys($type->acceptedTypes));
     }
@@ -79,7 +86,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isLazy);
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollection);
+        $this->assertFalse($type->isDataCollectable);
         $this->assertNull($type->dataClass);
         $this->assertEquals(['string'], array_keys($type->acceptedTypes));
     }
@@ -96,7 +103,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isLazy);
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollection);
+        $this->assertFalse($type->isDataCollectable);
         $this->assertNull($type->dataClass);
         $this->assertEquals(['string', 'int'], array_keys($type->acceptedTypes));
     }
@@ -113,7 +120,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isLazy);
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollection);
+        $this->assertFalse($type->isDataCollectable);
         $this->assertNull($type->dataClass);
         $this->assertEquals(['string', 'int'], array_keys($type->acceptedTypes));
     }
@@ -130,7 +137,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isLazy);
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollection);
+        $this->assertFalse($type->isDataCollectable);
         $this->assertNull($type->dataClass);
         $this->assertEquals([
             DateTime::class,
@@ -150,7 +157,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isLazy);
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollection);
+        $this->assertFalse($type->isDataCollectable);
         $this->assertNull($type->dataClass);
         $this->assertEquals([], $type->acceptedTypes);
     }
@@ -167,7 +174,7 @@ class DataTypeTest extends TestCase
         $this->assertTrue($type->isLazy);
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollection);
+        $this->assertFalse($type->isDataCollectable);
         $this->assertNull($type->dataClass);
         $this->assertEquals(['string'], array_keys($type->acceptedTypes));
     }
@@ -184,7 +191,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isLazy);
         $this->assertTrue($type->isOptional);
         $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollection);
+        $this->assertFalse($type->isDataCollectable);
         $this->assertNull($type->dataClass);
         $this->assertEquals(['string'], array_keys($type->acceptedTypes));
     }
@@ -211,7 +218,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isLazy);
         $this->assertFalse($type->isOptional);
         $this->assertTrue($type->isDataObject);
-        $this->assertFalse($type->isDataCollection);
+        $this->assertFalse($type->isDataCollectable);
         $this->assertEquals(SimpleData::class, $type->dataClass);
         $this->assertEquals([SimpleData::class], array_keys($type->acceptedTypes));
     }
@@ -228,7 +235,7 @@ class DataTypeTest extends TestCase
         $this->assertTrue($type->isLazy);
         $this->assertFalse($type->isOptional);
         $this->assertTrue($type->isDataObject);
-        $this->assertFalse($type->isDataCollection);
+        $this->assertFalse($type->isDataCollectable);
         $this->assertEquals(SimpleData::class, $type->dataClass);
         $this->assertEquals([SimpleData::class], array_keys($type->acceptedTypes));
     }
@@ -246,7 +253,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isLazy);
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
-        $this->assertTrue($type->isDataCollection);
+        $this->assertTrue($type->isDataCollectable);
         $this->assertEquals(SimpleData::class, $type->dataClass);
         $this->assertEquals([DataCollection::class], array_keys($type->acceptedTypes));
     }
@@ -264,7 +271,7 @@ class DataTypeTest extends TestCase
         $this->assertTrue($type->isLazy);
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
-        $this->assertTrue($type->isDataCollection);
+        $this->assertTrue($type->isDataCollectable);
         $this->assertEquals(SimpleData::class, $type->dataClass);
         $this->assertEquals([DataCollection::class], array_keys($type->acceptedTypes));
     }
@@ -361,6 +368,13 @@ class DataTypeTest extends TestCase
                     Responsable::class,
                     Arrayable::class,
                     DataObject::class,
+                    AppendableData::class,
+                    BaseData::class,
+                    IncludeableData::class,
+                    ResponsableData::class,
+                    TransformableData::class,
+                    ValidateableData::class,
+                    WrappableData::class
                 ],
             ],
         ];

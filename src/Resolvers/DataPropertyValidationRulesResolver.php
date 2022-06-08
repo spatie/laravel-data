@@ -21,7 +21,7 @@ class DataPropertyValidationRulesResolver
     {
         $propertyName = $property->inputMappedName ?? $property->name;
 
-        if ($property->type->isDataObject || $property->type->isDataCollection) {
+        if ($property->type->isDataObject || $property->type->isDataCollectable) {
             return $this->getNestedRules($property, $propertyName, $payload, $nullable);
         }
 
@@ -36,7 +36,7 @@ class DataPropertyValidationRulesResolver
     ): Collection {
         $prefix = match (true) {
             $property->type->isDataObject => "{$propertyName}.",
-            $property->type->isDataCollection => "{$propertyName}.*.",
+            $property->type->isDataCollectable => "{$propertyName}.*.",
             default => throw new TypeError()
         };
 
@@ -45,7 +45,7 @@ class DataPropertyValidationRulesResolver
         $toplevelRule = match (true) {
             $isNullable => 'nullable',
             $property->type->isDataObject => "required",
-            $property->type->isDataCollection => "present",
+            $property->type->isDataCollectable => "present",
             default => throw new TypeError()
         };
 

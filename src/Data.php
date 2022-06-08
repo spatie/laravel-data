@@ -9,14 +9,10 @@ use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\ValidateableData;
 use Spatie\LaravelData\Concerns\WrappableData;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\DataObject;
 
 abstract class Data implements DataObject
 {
-    use ResponsableData;
-    use IncludeableData;
-    use AppendableData;
-    use ValidateableData;
-    use WrappableData;
-    use TransformableData;
     use DataTrait;
 }

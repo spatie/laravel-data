@@ -5,7 +5,8 @@ namespace Spatie\LaravelData\Support;
 use phpDocumentor\Reflection\FqsenResolver;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use ReflectionProperty;
-use Spatie\LaravelData\DataObject;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\DataObject;
 
 class DataCollectionAnnotationReader
 {
@@ -32,7 +33,7 @@ class DataCollectionAnnotationReader
 
         $class = ltrim($class, '\\');
 
-        if (is_subclass_of($class, DataObject::class)) {
+        if (is_subclass_of($class, BaseData::class)) {
             return $class;
         }
 
@@ -41,7 +42,7 @@ class DataCollectionAnnotationReader
 
         $class = ltrim((string) $type, '\\');
 
-        if (is_subclass_of($class, DataObject::class)) {
+        if (is_subclass_of($class, BaseData::class)) {
             return $class;
         }
 

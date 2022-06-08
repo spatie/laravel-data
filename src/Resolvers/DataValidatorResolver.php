@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Validator;
-use Spatie\LaravelData\DataObject;
+use Spatie\LaravelData\Contracts\DataObject;
 
 class DataValidatorResolver
 {
@@ -17,6 +17,7 @@ class DataValidatorResolver
     public function execute(string $dataClass, Arrayable|array $payload): Validator
     {
         $payload = $payload instanceof Arrayable ? $payload->toArray() : $payload;
+
         $rules = app(DataClassValidationRulesResolver::class)
             ->execute($dataClass, $payload)
             ->toArray();

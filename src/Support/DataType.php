@@ -9,8 +9,11 @@ use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Contracts\DataCollectable;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\DataObject;
+use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
@@ -30,9 +33,9 @@ class DataType implements Countable
 
     public readonly bool $isDataObject;
 
-    public readonly bool $isDataCollection;
+    public readonly bool $isDataCollectable;
 
-    /** @var class-string<DataObject>|null */
+    /** @var class-string<BaseData>|null */
     public readonly ?string $dataClass;
 
     public readonly array $acceptedTypes;
@@ -53,7 +56,7 @@ class DataType implements Countable
             $this->isLazy = false;
             $this->isOptional = false;
             $this->isDataObject = false;
-            $this->isDataCollection = false;
+            $this->isDataCollectable = false;
             $this->dataClass = null;
 
             return;
@@ -75,12 +78,12 @@ class DataType implements Countable
             ];
             $this->isLazy = false;
             $this->isOptional = false;
-            $this->isDataObject = is_a($type->getName(), DataObject::class, true);
-            $this->isDataCollection = is_a($type->getName(), DataCollection::class, true) || is_a($type->getName(), PaginatedDataCollection::class, true);
+            $this->isDataObject = is_a($type->getName(), BaseData::class, true);
+            $this->isDataCollectable = is_a($type->getName(), BaseDataCollectable::class, true);
 
             $this->dataClass = match (true) {
                 $this->isDataObject => $type->getName(),
-                $this->isDataCollection => $this->resolveDataCollectionClass($reflection),
+                $this->isDataCollectable => $this->resolveDataCollectionClass($reflection),
                 default => null
             };
 
@@ -108,8 +111,8 @@ class DataType implements Countable
             $isMixed = $namedType->getName() === 'mixed';
             $isLazy = $isLazy || is_a($namedType->getName(), Lazy::class, true);
             $isOptional = $isOptional || is_a($namedType->getName(), Optional::class, true);
-            $isDataObject = $isDataObject || is_a($namedType->getName(), DataObject::class, true);
-            $isDataCollection = $isDataCollection || is_a($namedType->getName(), DataCollection::class, true) || is_a($namedType->getName(), PaginatedDataCollection::class, true);
+            $isDataObject = $isDataObject || is_a($namedType->getName(), BaseData::class, true);
+            $isDataCollection = $isDataCollection || is_a($namedType->getName(), BaseDataCollectable::class, true);
         }
 
         $this->acceptedTypes = $acceptedTypes;
@@ -118,19 +121,19 @@ class DataType implements Countable
         $this->isLazy = $isLazy;
         $this->isOptional = $isOptional;
         $this->isDataObject = $isDataObject;
-        $this->isDataCollection = $isDataCollection;
+        $this->isDataCollectable = $isDataCollection;
 
         if ($this->isDataObject && count($this->acceptedTypes) > 1) {
             throw InvalidDataType::unionWithData($reflection);
         }
 
-        if ($this->isDataCollection && count($this->acceptedTypes) > 1) {
+        if ($this->isDataCollectable && count($this->acceptedTypes) > 1) {
             throw InvalidDataType::unionWithDataCollection($reflection);
         }
 
         $this->dataClass = match (true) {
             $this->isDataObject => array_key_first($acceptedTypes),
-            $this->isDataCollection => $this->resolveDataCollectionClass($reflection),
+            $this->isDataCollectable => $this->resolveDataCollectionClass($reflection),
             default => null
         };
     }

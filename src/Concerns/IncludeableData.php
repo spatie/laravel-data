@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Closure;
+use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\PartialTrees;
 
@@ -67,7 +68,7 @@ trait IncludeableData
         return $this;
     }
 
-    public function exceptWhen(string $except, bool|Closure $condition): self
+    public function exceptWhen(string $except, bool|Closure $condition): static
     {
         $condition = $condition instanceof Closure
             ? $condition($this)

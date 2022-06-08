@@ -5,10 +5,10 @@ namespace Spatie\LaravelData\Support;
 class PartialTrees
 {
     public function __construct(
-        public ?array $lazyIncluded,
-        public ?array $lazyExcluded,
-        public ?array $only,
-        public ?array $except,
+        public ?array $lazyIncluded = null,
+        public ?array $lazyExcluded = null,
+        public ?array $only = null,
+        public ?array $except = null,
     ) {
     }
 
