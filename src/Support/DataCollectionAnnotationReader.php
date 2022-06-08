@@ -6,7 +6,6 @@ use phpDocumentor\Reflection\FqsenResolver;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use ReflectionProperty;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\DataObject;
 
 class DataCollectionAnnotationReader
 {

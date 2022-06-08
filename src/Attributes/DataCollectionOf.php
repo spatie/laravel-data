@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Attributes;
 
 use Attribute;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]

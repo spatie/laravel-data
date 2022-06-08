@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Closure;
-use Spatie\LaravelData\Contracts\AppendableData as AppendableDataContract;
 
 trait AppendableData
 {

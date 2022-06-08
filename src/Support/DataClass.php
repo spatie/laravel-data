@@ -40,12 +40,12 @@ class DataClass
     public static function create(ReflectionClass $class)
     {
         $attributes = collect($class->getAttributes())->map(
-            fn(ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
+            fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
         );
 
         $methods = collect($class->getMethods());
 
-        $constructor = $methods->first(fn(ReflectionMethod $method) => $method->isConstructor());
+        $constructor = $methods->first(fn (ReflectionMethod $method) => $method->isConstructor());
 
         $properties = self::resolveProperties(
             $class,
@@ -71,9 +71,9 @@ class DataClass
         ReflectionClass $reflectionClass,
     ): Collection {
         return collect($reflectionClass->getMethods())
-            ->filter(fn(ReflectionMethod $method) => str_starts_with($method->name, 'from'))
+            ->filter(fn (ReflectionMethod $method) => str_starts_with($method->name, 'from'))
             ->mapWithKeys(
-                fn(ReflectionMethod $method) => [$method->name => DataMethod::create($method)],
+                fn (ReflectionMethod $method) => [$method->name => DataMethod::create($method)],
             );
     }
 
@@ -85,9 +85,9 @@ class DataClass
         $defaultValues = self::resolveDefaultValues($class, $constructorMethod);
 
         return collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(fn(ReflectionProperty $property) => $property->isStatic())
+            ->reject(fn (ReflectionProperty $property) => $property->isStatic())
             ->values()
-            ->mapWithKeys(fn(ReflectionProperty $property) => [
+            ->mapWithKeys(fn (ReflectionProperty $property) => [
                 $property->name => DataProperty::create(
                     $property,
                     array_key_exists($property->getName(), $defaultValues),
@@ -107,8 +107,8 @@ class DataClass
         }
 
         $values = collect($constructorMethod->getParameters())
-            ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-            ->mapWithKeys(fn(ReflectionParameter $parameter) => [
+            ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+            ->mapWithKeys(fn (ReflectionParameter $parameter) => [
                 $parameter->name => $parameter->getDefaultValue(),
             ])
             ->toArray();

@@ -17,6 +17,7 @@ use ReflectionProperty;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Contracts\ResponsableData;
 use Spatie\LaravelData\Contracts\TransformableData;
@@ -24,7 +25,6 @@ use Spatie\LaravelData\Contracts\ValidateableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
@@ -374,7 +374,7 @@ class DataTypeTest extends TestCase
                     ResponsableData::class,
                     TransformableData::class,
                     ValidateableData::class,
-                    WrappableData::class
+                    WrappableData::class,
                 ],
             ],
         ];

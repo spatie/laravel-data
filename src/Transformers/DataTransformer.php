@@ -9,8 +9,6 @@ use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
-use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataConfig;

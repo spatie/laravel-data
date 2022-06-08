@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Support\TypeScriptTransformer;
 
 use ReflectionClass;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\TypeScriptTransformer\Collectors\Collector;
 use Spatie\TypeScriptTransformer\Structures\TransformedType;
 

@@ -7,7 +7,6 @@ use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 
 class DataCollectionEloquentCast implements CastsAttributes

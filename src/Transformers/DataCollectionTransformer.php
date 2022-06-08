@@ -8,7 +8,6 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Support\PartialTrees;
@@ -70,7 +69,7 @@ class DataCollectionTransformer
     protected function transformItemClosure(): Closure
     {
         return function (BaseData $item) {
-            if($item instanceof IncludeableData){
+            if ($item instanceof IncludeableData) {
                 $item->withPartialTrees($this->trees);
             }
 

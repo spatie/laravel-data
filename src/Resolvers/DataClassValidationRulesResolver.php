@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\RulesMapper;
@@ -30,8 +29,8 @@ class DataClassValidationRulesResolver
 
         return $this->dataConfig->getDataClass($class)
             ->properties
-            ->reject(fn(DataProperty $property) => array_key_exists($property->name, $overWrittenRules) || ! $property->validate)
-            ->mapWithKeys(fn(DataProperty $property) => $resolver->execute($property, $payload, $nullable)->all())
+            ->reject(fn (DataProperty $property) => array_key_exists($property->name, $overWrittenRules) || ! $property->validate)
+            ->mapWithKeys(fn (DataProperty $property) => $resolver->execute($property, $payload, $nullable)->all())
             ->merge($overWrittenRules);
     }
 }

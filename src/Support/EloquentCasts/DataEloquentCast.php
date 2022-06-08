@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Support\EloquentCasts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 
@@ -41,7 +40,7 @@ class DataEloquentCast implements CastsAttributes
             throw CannotCastData::shouldBeData($model::class, $key);
         }
 
-        if(! $value instanceof TransformableData){
+        if (! $value instanceof TransformableData) {
             throw CannotCastData::shouldBeTransformableData($model::class, $key);
         }
 

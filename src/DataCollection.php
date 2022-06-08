@@ -5,15 +5,8 @@ namespace Spatie\LaravelData;
 use ArrayAccess;
 use ArrayIterator;
 use Closure;
-use Countable;
-use Illuminate\Contracts\Database\Eloquent\Castable as EloquentCastable;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
-use IteratorAggregate;
-use JsonSerializable;
 use Spatie\LaravelData\Concerns\BaseDataCollectable;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
@@ -21,12 +14,6 @@ use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\WrappableData;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\DataCollectable;
-use Spatie\LaravelData\Contracts\DataCollectable as BaseDataCollectableContract;
-use Spatie\LaravelData\Contracts\DataObject;
-use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
-use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
-use Spatie\LaravelData\Contracts\TransformableData as TransformableDataContract;
-use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\InvalidDataCollectionOperation;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
@@ -72,7 +59,7 @@ class DataCollection implements DataCollectable, ArrayAccess
         }
 
         $this->items = $items->map(
-            fn($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
+            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
     }
 

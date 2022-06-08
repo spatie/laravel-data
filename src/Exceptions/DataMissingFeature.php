@@ -27,9 +27,9 @@ class DataMissingFeature extends Exception
             ValidateableData::class,
             WrappableData::class,
         ])
-            ->filter(fn(string $interface) => in_array($interface, class_implements($dataClass)))
-            ->map(fn(string $interface) => Str::afterLast($interface, '\\'))
-            ->map(fn(string $interface) => "`{$interface}`")
+            ->filter(fn (string $interface) => in_array($interface, class_implements($dataClass)))
+            ->map(fn (string $interface) => Str::afterLast($interface, '\\'))
+            ->map(fn (string $interface) => "`{$interface}`")
             ->join(', ');
 
         return new self("Feature `{$featureClass}` missing in data object `{$dataClass}` implementing {$implemented}");
