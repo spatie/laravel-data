@@ -47,8 +47,6 @@ trait ValidateableData
 
     public static function validateAndCreate(Arrayable|array $payload): static
     {
-        DataFeature::require(static::class, BaseDataContract::class);
-
         return static::from(static::validate($payload));
     }
 

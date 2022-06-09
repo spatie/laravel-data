@@ -17,7 +17,7 @@ trait ResponsableData
      */
     public function toResponse($request)
     {
-        if (DataFeature::has($this, IncludeableDataContract::class)) {
+        if ($this instanceof IncludeableDataContract) {
             $this->withPartialTrees(
                 resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request)
             );

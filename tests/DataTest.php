@@ -2070,13 +2070,4 @@ class DataTest extends TestCase
 
         SimpleData::from([]);
     }
-
-    /** @test */
-    public function it_will_throw_a_custom_exception_when_a_data_constructor_cannot_be_called_due_to_invalid_arguments()
-    {
-        $this->expectException(CannotCreateData::class);
-        $this->expectExceptionMessage('the constructor requires 1 parameters');
-
-        SimpleData::from(['string' => new Optional()]);
-    }
 }
