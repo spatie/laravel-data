@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests\DataPipes;
 
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Tests\TestCase;
 
