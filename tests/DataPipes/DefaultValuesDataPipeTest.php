@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Tests\DataPipes;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Tests\TestCase;
+use stdClass;
 
 class DefaultValuesDataPipeTest extends TestCase
 {

@@ -4,7 +4,7 @@ namespace Spatie\LaravelData;
 
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\DataPipes\DataPipe;
-use Spatie\LaravelData\Exceptions\CannotCreateDataFromValue;
+use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Normalizers\Normalizer;
 use Spatie\LaravelData\Support\DataConfig;
 
@@ -80,7 +80,7 @@ class DataPipeline
         }
 
         if ($properties === null) {
-            throw CannotCreateDataFromValue::create($this->classString, $this->value);
+            throw CannotCreateData::noNormalizerFound($this->classString, $this->value);
         }
 
         $properties = collect($properties);

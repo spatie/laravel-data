@@ -27,6 +27,7 @@ use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
+use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
 use Spatie\LaravelData\Normalizers\ArrayNormalizer;
@@ -2059,5 +2060,23 @@ class DataTest extends TestCase
 
         $this->assertEquals(['date' => '2022-05-16T14:37:56+00:00'], $data::from(['date' => '2022-05-16T14:37:56+00:00'])->toArray());
         $this->assertEquals(['date' => '2022-05-16T17:00:00+00:00'], $data::from(['date' => '2022-05-16 17:00:00'])->toArray());
+    }
+
+    /** @test */
+    public function it_will_throw_a_custom_exception_when_a_data_constructor_cannot_be_called_due_to_missing_arguments()
+    {
+        $this->expectException(CannotCreateData::class);
+        $this->expectExceptionMessage('the constructor requires 1 parameters');
+
+        SimpleData::from([]);
+    }
+
+    /** @test */
+    public function it_will_throw_a_custom_exception_when_a_data_constructor_cannot_be_called_due_to_invalid_arguments()
+    {
+        $this->expectException(CannotCreateData::class);
+        $this->expectExceptionMessage('the constructor requires 1 parameters');
+
+        SimpleData::from(['string' => new Optional()]);
     }
 }

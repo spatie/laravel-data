@@ -2,11 +2,15 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
+use ArgumentCountError;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Exceptions\CannotCreateData;
+use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;
+use TypeError;
 
 class DataFromArrayResolver
 {
@@ -32,17 +36,32 @@ class DataFromArrayResolver
 
                 return [];
             })
-            ->pipe(fn (Collection $parameters) => new $dataClass->name(...$parameters));
+            ->pipe(fn(Collection $parameters) => $this->createData($dataClass, $parameters));
 
         $dataClass
             ->properties
             ->filter(
-                fn (DataProperty $property) => ! $property->isPromoted && $properties->has($property->name)
+                fn(DataProperty $property) => ! $property->isPromoted && $properties->has($property->name)
             )
             ->each(function (DataProperty $property) use ($properties, $data) {
                 $data->{$property->name} = $properties->get($property->name);
             });
 
         return $data;
+    }
+
+    private function createData(
+        DataClass $dataClass,
+        Collection $parameters,
+    ) {
+        try {
+            return new $dataClass->name(...$parameters);
+        } catch (ArgumentCountError $error) {
+            throw CannotCreateData::constructorMissingParameters(
+                $dataClass,
+                $parameters,
+                $error
+            );
+        }
     }
 }
