@@ -91,8 +91,7 @@ class ContractData extends Data
 }
 ```
 
-TODO LINK
-You can also use the `MapName` attribute when you want to combine input (see transforming data objects) and output property name mapping:
+You can also use the `MapName` attribute when you want to combine input (see [transforming data objects](https://spatie.be/docs/laravel-data/v2/as-a-resource/from-data-to-resource#mapping-property-names)) and output property name mapping:
 
 ```php
 #[MapName(SnakeCaseMapper::class)]
@@ -204,7 +203,7 @@ will try to create itself from the following types:
 - An *Arrayable* by calling `toArray` on it
 - An *array*
 
-This list can be extended using extra normalizers, find more about it here. // TODO link
+This list can be extended using extra normalizers, find more about it [here](https://spatie.be/docs/laravel-data/v2/advanced-usage/normalizers).
 
 When a data object cannot be created using magical methods or the default methods, a `CannotCreateDataFromValue`
 exception will be thrown.

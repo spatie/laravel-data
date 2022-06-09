@@ -159,8 +159,7 @@ class ContractData extends Data
 }
 ```
 
-TODO link
-You can also use the `MapName` attribute when you want to combine input and output (see later) property name mapping:
+You can also use the `MapName` attribute when you want to combine input and output property name mapping:
 
 ```php
 #[MapName(SnakeCaseMapper::class)]
