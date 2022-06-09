@@ -10,7 +10,6 @@ use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;
-use TypeError;
 
 class DataFromArrayResolver
 {
@@ -36,12 +35,12 @@ class DataFromArrayResolver
 
                 return [];
             })
-            ->pipe(fn(Collection $parameters) => $this->createData($dataClass, $parameters));
+            ->pipe(fn (Collection $parameters) => $this->createData($dataClass, $parameters));
 
         $dataClass
             ->properties
             ->filter(
-                fn(DataProperty $property) => ! $property->isPromoted && $properties->has($property->name)
+                fn (DataProperty $property) => ! $property->isPromoted && $properties->has($property->name)
             )
             ->each(function (DataProperty $property) use ($properties, $data) {
                 $data->{$property->name} = $properties->get($property->name);
