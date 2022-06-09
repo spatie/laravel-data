@@ -86,9 +86,7 @@ class RuleFactory
     public function create(string $rule): ValidationRule
     {
         $keyword = Str::before($rule, ':');
-        $parameters = str_contains($rule, ':')
-            ? $this->resolveParameters(Str::after($rule, ':'))
-            : [];
+        $parameters = $this->resolveParameters($rule);
 
         /** @var \Spatie\LaravelData\Attributes\Validation\StringValidationAttribute|null $ruleClass */
         $ruleClass = $this->mapping()[$keyword] ?? null;
@@ -100,14 +98,20 @@ class RuleFactory
         return $ruleClass::create(...$parameters);
     }
 
-    private function resolveParameters(string $parameters): array
+    private function resolveParameters(string $rule): array
     {
-        if ($parameters === '') {
+        if (! str_contains($rule, ':')) {
             return [];
         }
 
-        return collect(explode(',', $parameters))->mapWithKeys(
-            fn (string $parameter, int $index) => str_contains($parameter, '=')
+        $parametersString = Str::after($rule, ':');
+
+        if ($parametersString === '') {
+            return [];
+        }
+
+        return collect(explode(',', $parametersString))->mapWithKeys(
+            fn(string $parameter, int $index) => str_contains($parameter, '=')
                 ? [Str::before($parameter, '=') => Str::after($parameter, '=')]
                 : [$index => $parameter]
         )->all();

@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData;
 
+use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Exceptions\InvalidDataClass;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
@@ -17,13 +18,10 @@ trait WithData
             default => null,
         };
 
-        if (! is_a($dataClass, DataObject::class, true)) {
+        if (! is_a($dataClass, BaseData::class, true)) {
             throw InvalidDataClass::create($dataClass);
         }
 
-        return resolve(DataFromSomethingResolver::class)->execute(
-            $dataClass,
-            $this
-        );
+        return $dataClass::from($this);
     }
 }

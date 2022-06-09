@@ -37,6 +37,7 @@ class DataTransformer
         $this->config = app(DataConfig::class);
     }
 
+    /** @return array<mixed> */
     public function transform(TransformableData $data): array
     {
         $transformed = $this->resolvePayload($data);
@@ -52,6 +53,7 @@ class DataTransformer
         return $transformed;
     }
 
+    /** @return array<mixed> */
     protected function resolvePayload(TransformableData $data): array
     {
         $trees = $data instanceof IncludeableData
