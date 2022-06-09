@@ -8,6 +8,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Tests\Fakes\DataWithMultipleArgumentCreationMethod;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 
@@ -92,19 +93,11 @@ class DataMethodTest extends TestCase
     /** @test */
     public function it_correctly_accepts_multiple_values_as_magic_creation_method()
     {
-        $class = new class () extends Data {
-            public static function fromMultiple(
-                string $string,
-                int $int,
-            ) {
-            }
-        };
-
-        $method = DataMethod::create(new ReflectionMethod($class, 'fromMultiple'));
+        $method = DataMethod::create(new ReflectionMethod(DataWithMultipleArgumentCreationMethod::class, 'fromMultiple'));
 
         $this->assertTrue($method->accepts('Hello', 42));
         $this->assertTrue($method->accepts(...[
-            'int' => 42,
+            'number' => 42,
             'string' => 'hello',
         ]));
 

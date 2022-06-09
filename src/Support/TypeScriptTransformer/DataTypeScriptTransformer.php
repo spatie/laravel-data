@@ -25,6 +25,7 @@ class DataTypeScriptTransformer extends DtoTransformer
                 $this->config->getDefaultTypeReplacements()
             ),
             new RemoveLazyTypeProcessor(),
+            new RemoveOptionalTypeProcessor(),
             new DataCollectionTypeProcessor(),
             new RemoveOptionalTypeProcessor(),
             new DtoCollectionTypeProcessor(),

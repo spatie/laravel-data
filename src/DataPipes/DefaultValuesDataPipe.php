@@ -17,10 +17,20 @@ class DefaultValuesDataPipe implements DataPipe
             ->each(function (DataProperty $property) use (&$properties) {
                 if ($property->hasDefaultValue) {
                     $properties[$property->name] = $property->defaultValue;
+
+                    return;
                 }
 
                 if ($property->type->isOptional) {
                     $properties[$property->name] = Optional::create();
+
+                    return;
+                }
+
+                if ($property->type->isNullable) {
+                    $properties[$property->name] = null;
+
+                    return;
                 }
             });
 
