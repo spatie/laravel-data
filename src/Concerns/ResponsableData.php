@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Concerns;
 use Illuminate\Http\JsonResponse;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
-use Spatie\LaravelData\Support\DataFeature;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 trait ResponsableData

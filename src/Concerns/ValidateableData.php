@@ -5,9 +5,7 @@ namespace Spatie\LaravelData\Concerns;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
-use Spatie\LaravelData\Contracts\BaseData as BaseDataContract;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
-use Spatie\LaravelData\Support\DataFeature;
 
 /**
  * @method static array rules(...$args)
