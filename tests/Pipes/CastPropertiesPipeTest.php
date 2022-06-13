@@ -1,5 +1,4 @@
 it('ma
-uses(TestCase::class);
 ps default types', function () {
     $data = ComplicatedData::from([
         'withoutType' => 42,

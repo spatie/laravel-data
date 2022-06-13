@@ -1,5 +1,4 @@
 it('ca
-uses(TestCase::class);
 n map using string', function () {
     $dataClass = new class () extends Data {
         #[MapInputName('something')]

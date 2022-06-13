@@ -1,5 +1,4 @@
 it('wo
-uses(TestCase::class);
 nt add a required rule when a property is non nullable', function () {
     $dataProperty = getProperty(new class () extends Data {
         public string $string;

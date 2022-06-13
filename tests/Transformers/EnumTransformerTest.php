@@ -1,5 +1,4 @@
 it('ca
-uses(TestCase::class);
 n transform enums', function () {
     $this->onlyPHP81();
 

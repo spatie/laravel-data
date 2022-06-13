@@ -1,5 +1,4 @@
 it('ca
-uses(TestCase::class);
 n create a data object with defaults empty', function () {
     $dataClass = new class ('', '', '') extends Data {
         public function __construct(

@@ -1,5 +1,4 @@
 it('wi
-uses(TestCase::class);
 ll add a required or nullable rule based upon the property nullability', function () {
     $rules = resolveRules(new class () {
         public int $property;

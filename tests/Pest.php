@@ -1,5 +1,14 @@
 <?php
 
+uses(\Spatie\LaravelData\Tests\Attributes\Validation\TestCase::class)->in('Attributes');
+uses(\Spatie\LaravelData\Tests\Casts\TestCase::class)->in('Casts');
+uses(\Spatie\LaravelData\Tests\Resolvers\TestCase::class)->in('Resolvers');
+uses(\Spatie\LaravelData\Tests\RuleInferrers\TestCase::class)->in('RuleInferrers');
+uses(\Spatie\LaravelData\Tests\Transformers\TestCase::class)->in('Transformers');
+uses(\Spatie\LaravelData\Tests\DataPipes\TestCase::class)->in('DataPipes');
+uses(\Spatie\LaravelData\Tests\Normalizers\TestCase::class)->in('Normalizers');
+uses(\Spatie\LaravelData\Tests\Pipes\TestCase::class)->in('Pipes');
+
 /*
 |--------------------------------------------------------------------------
 | Test Case

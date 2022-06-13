@@ -1,5 +1,4 @@
 it('ca
-uses(TestCase::class);
 n cast enum', function () {
     $class = new class () {
         public DummyBackedEnum $enum;

@@ -1,5 +1,4 @@
 it('ca
-uses(TestCase::class);
 n get a data object from model', function () {
     $model = FakeModel::factory()->create();
 

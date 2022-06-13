@@ -1,5 +1,4 @@
 it('ca
-uses(TestCase::class);
 n get an input and output mapper', function () {
     $attributes = getAttributes(new class () {
         #[MapInputName('input'), MapOutputName('output')]

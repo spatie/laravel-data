@@ -1,6 +1,5 @@
 
 // Da
-uses(TestCase::class);
 tasets
 dataset('attributes', function () {
     TestTime::freeze(Carbon::create(2020, 05, 16, 0, 0, 0));

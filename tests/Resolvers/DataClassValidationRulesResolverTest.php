@@ -1,5 +1,4 @@
 it('wi
-uses(TestCase::class);
 ll resolve rules for a data object', function () {
     $data = new class () extends Data {
         public string $name;

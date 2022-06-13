@@ -1,5 +1,4 @@
 it('wi
-uses(TestCase::class);
 ll return null if the property has no type', function () {
     assertEmptyPropertyValue(null, new class () {
         public $property;

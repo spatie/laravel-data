@@ -1,5 +1,4 @@
 it('ca
-uses(TestCase::class);
 n cast date times', function () {
     $caster = new DateTimeInterfaceCast('d-m-Y H:i:s');
 

@@ -1,5 +1,4 @@
 it('ca
-uses(TestCase::class);
 n create data from a custom method', function () {
     $data = new class ('') extends Data {
         public function __construct(public string $string) {

@@ -1,5 +1,4 @@
 it('ca
-uses(TestCase::class);
 n set the validator to stop on the first failure', function () {
     $dataClass = new class () extends Data {
         public static function stopOnFirstFailure(): bool
