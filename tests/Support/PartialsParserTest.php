@@ -1,203 +1,181 @@
-<?php
 
-namespace Spatie\LaravelData\Tests\Support;
+// Da
+uses(TestCase::class);
+tasets
+dataset('directivesProvider', function () {
+    yield from rootPartialsProvider();
+    yield from nestedPartialsProvider();
+    yield from invalidPartialsProvider();
+    yield from complexPartialsProvider();
+});
 
-use Generator;
-use Spatie\LaravelData\Support\PartialsParser;
-use Spatie\LaravelData\Tests\TestCase;
-
-class PartialsParserTest extends TestCase
+// Helpers
+function rootPartialsProvider(): Generator
 {
-    /**
-     * @test
-     * @dataProvider directivesProvider
-     *
-     * @param array $partials
-     * @param array $expected
-     */
-    public function it_can_parse_directives(array $partials, array $expected)
-    {
-        $this->assertEquals(
-            $expected,
-            (new PartialsParser())->execute($partials),
-        );
-    }
+    yield "root property" => [
+        'partials' => [
+            'name',
+        ],
+        'expected' => [
+            'name' => [],
+        ],
+    ];
 
-    public function directivesProvider(): Generator
-    {
-        yield from $this->rootPartialsProvider();
-        yield from $this->nestedPartialsProvider();
-        yield from $this->invalidPartialsProvider();
-        yield from $this->complexPartialsProvider();
-    }
+    yield "root multi-property" => [
+        'partials' => [
+            '{name, age}',
+        ],
+        'expected' => [
+            'name' => [],
+            'age' => [],
+        ],
+    ];
 
-    public function rootPartialsProvider(): Generator
-    {
-        yield "root property" => [
-            'partials' => [
-                'name',
-            ],
-            'expected' => [
+    yield "root star" => [
+        'partials' => [
+            '*',
+        ],
+        'expected' => [
+            '*',
+        ],
+    ];
+
+    yield "root star overrules" => [
+        'partials' => [
+            'name',
+            '*',
+            'age',
+        ],
+        'expected' => [
+            '*',
+        ],
+    ];
+
+    yield "root combination" => [
+        'partials' => [
+            'name',
+            '{name, age}',
+            'age',
+            'gender',
+        ],
+        'expected' => [
+            'name' => [],
+            'age' => [],
+            'gender' => [],
+        ],
+    ];
+}
+
+function nestedPartialsProvider(): Generator
+{
+    yield "nested property" => [
+        'partials' => [
+            'struct.name',
+        ],
+        'expected' => [
+            'struct' => [
                 'name' => [],
             ],
-        ];
+        ],
+    ];
 
-        yield "root multi-property" => [
-            'partials' => [
-                '{name, age}',
-            ],
-            'expected' => [
+    yield "nested multi-property" => [
+        'partials' => [
+            'struct.{name, age}',
+        ],
+        'expected' => [
+            'struct' => [
                 'name' => [],
                 'age' => [],
             ],
-        ];
+        ],
+    ];
 
-        yield "root star" => [
-            'partials' => [
-                '*',
-            ],
-            'expected' => [
-                '*',
-            ],
-        ];
+    yield "nested star" => [
+        'partials' => [
+            'struct.*',
+        ],
+        'expected' => [
+            'struct' => ['*'],
+        ],
+    ];
 
-        yield "root star overrules" => [
-            'partials' => [
-                'name',
-                '*',
-                'age',
-            ],
-            'expected' => [
-                '*',
-            ],
-        ];
+    yield "nested star overrules" => [
+        'partials' => [
+            'struct.name',
+            'struct.*',
+            'struct.age',
+        ],
+        'expected' => [
+            'struct' => ['*'],
+        ],
+    ];
 
-        yield "root combination" => [
-            'partials' => [
-                'name',
-                '{name, age}',
-                'age',
-                'gender',
-            ],
-            'expected' => [
+    yield "nested combination" => [
+        'partials' => [
+            'struct.name',
+            'struct.{name, age}',
+            'struct.age',
+            'struct.gender',
+        ],
+        'expected' => [
+            'struct' => [
                 'name' => [],
                 'age' => [],
                 'gender' => [],
             ],
-        ];
-    }
+        ],
+    ];
+}
 
-    public function nestedPartialsProvider(): Generator
-    {
-        yield "nested property" => [
-            'partials' => [
-                'struct.name',
-            ],
-            'expected' => [
-                'struct' => [
-                    'name' => [],
-                ],
-            ],
-        ];
+function invalidPartialsProvider(): Generator
+{
+    yield "nested property on all" => [
+        'partials' => [
+            '*.name',
+        ],
+        'expected' => [
+            '*',
+        ],
+    ];
 
-        yield "nested multi-property" => [
-            'partials' => [
-                'struct.{name, age}',
-            ],
-            'expected' => [
-                'struct' => [
-                    'name' => [],
-                    'age' => [],
-                ],
-            ],
-        ];
+    yield "nested property on multi-property" => [
+        'partials' => [
+            '{name, age}.name',
+        ],
+        'expected' => [
+            'name' => [],
+            'age' => [],
+        ],
+    ];
+}
 
-        yield "nested star" => [
-            'partials' => [
-                'struct.*',
-            ],
-            'expected' => [
-                'struct' => ['*'],
-            ],
-        ];
-
-        yield "nested star overrules" => [
-            'partials' => [
-                'struct.name',
-                'struct.*',
-                'struct.age',
-            ],
-            'expected' => [
-                'struct' => ['*'],
-            ],
-        ];
-
-        yield "nested combination" => [
-            'partials' => [
-                'struct.name',
-                'struct.{name, age}',
-                'struct.age',
-                'struct.gender',
-            ],
-            'expected' => [
-                'struct' => [
-                    'name' => [],
-                    'age' => [],
-                    'gender' => [],
-                ],
-            ],
-        ];
-    }
-
-    public function invalidPartialsProvider(): Generator
-    {
-        yield "nested property on all" => [
-            'partials' => [
-                '*.name',
-            ],
-            'expected' => [
-                '*',
-            ],
-        ];
-
-        yield "nested property on multi-property" => [
-            'partials' => [
-                '{name, age}.name',
-            ],
-            'expected' => [
+function complexPartialsProvider(): Generator
+{
+    yield "a complex example" => [
+        'partials' => [
+            'name',
+            'age',
+            'posts.name',
+            'posts.tags.*',
+            'identities.auth0.{name,email}',
+            'books.title',
+            'books.*',
+        ],
+        'expected' => [
+            'name' => [],
+            'age' => [],
+            'posts' => [
                 'name' => [],
-                'age' => [],
+                'tags' => ['*'],
             ],
-        ];
-    }
-
-    public function complexPartialsProvider(): Generator
-    {
-        yield "a complex example" => [
-            'partials' => [
-                'name',
-                'age',
-                'posts.name',
-                'posts.tags.*',
-                'identities.auth0.{name,email}',
-                'books.title',
-                'books.*',
-            ],
-            'expected' => [
-                'name' => [],
-                'age' => [],
-                'posts' => [
+            'identities' => [
+                'auth0' => [
                     'name' => [],
-                    'tags' => ['*'],
+                    'email' => [],
                 ],
-                'identities' => [
-                    'auth0' => [
-                        'name' => [],
-                        'email' => [],
-                    ],
-                ],
-                'books' => ['*'],
             ],
-        ];
-    }
+            'books' => ['*'],
+        ],
+    ];
 }
