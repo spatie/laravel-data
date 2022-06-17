@@ -11,7 +11,9 @@ use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
 use Spatie\LaravelData\Attributes\Validation\Rule;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Resolvers\DataPropertyValidationRulesResolver;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
@@ -279,6 +281,32 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             'other.data_collection_cased_property' => ['present', 'array'],
             'other.data_collection_cased_property.*.string' => ['string', 'required'],
         ], $rules);
+    }
+
+    /** @test */
+    public function it_will_nullify_nested_nullable_data_objects()
+    {
+        $data = new class () extends Data {
+            public ?SimpleData $property;
+        };
+
+        $this->assertEquals([
+            'property' => ['nullable', 'array'],
+            'property.string' => ['nullable', 'string'],
+        ], $this->resolveRules($data));
+    }
+
+    /** @test */
+    public function it_will_nullify_optional_nested_data_objects()
+    {
+        $data = new class () extends Data {
+            public Optional|SimpleData $property;
+        };
+
+        $this->assertEquals([
+            'property' => ['nullable', 'array'],
+            'property.string' => ['nullable', 'string'],
+        ], $this->resolveRules($data));
     }
 
     private function resolveRules(object $class): array

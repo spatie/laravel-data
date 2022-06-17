@@ -40,7 +40,7 @@ class DataPropertyValidationRulesResolver
             default => throw new TypeError()
         };
 
-        $isNullable = $nullable || $property->type->isNullable;
+        $isNullable = $nullable || $property->type->isNullable || $property->type->isOptional;
 
         $toplevelRule = match (true) {
             $isNullable => 'nullable',
@@ -53,7 +53,7 @@ class DataPropertyValidationRulesResolver
             ->execute(
                 $property->type->dataClass,
                 $payload,
-                $nullable || ($property->type->isDataObject && $property->type->isNullable)
+                $this->isNestedDataNullable($nullable, $property)
             )
             ->mapWithKeys(fn (array $rules, string $name) => [
                 "{$prefix}{$name}" => $rules,
@@ -74,5 +74,18 @@ class DataPropertyValidationRulesResolver
         }
 
         return $rules->normalize();
+    }
+
+    private function isNestedDataNullable(bool $nullable, DataProperty $property): bool
+    {
+        if($nullable){
+            return true;
+        }
+
+        if($property->type->isDataObject){
+            return $property->type->isNullable || $property->type->isOptional;
+        }
+
+        return false;
     }
 }
