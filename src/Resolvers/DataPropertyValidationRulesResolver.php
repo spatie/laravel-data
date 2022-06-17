@@ -78,11 +78,11 @@ class DataPropertyValidationRulesResolver
 
     private function isNestedDataNullable(bool $nullable, DataProperty $property): bool
     {
-        if($nullable){
+        if ($nullable) {
             return true;
         }
 
-        if($property->type->isDataObject){
+        if ($property->type->isDataObject) {
             return $property->type->isNullable || $property->type->isOptional;
         }
 
