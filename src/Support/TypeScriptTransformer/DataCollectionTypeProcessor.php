@@ -36,7 +36,7 @@ class DataCollectionTypeProcessor implements TypeProcessor
             return $type;
         }
 
-        $baseType = new Array_(new Object_(new Fqsen("\\{$class}")), new Integer());
+        $baseType = new Array_(new Object_(new Fqsen("\\{$class}")));
 
         if ($type instanceof Nullable) {
             return new Nullable($baseType);
