@@ -10,6 +10,7 @@ use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Resolvers\DataClassValidationRulesResolver;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;

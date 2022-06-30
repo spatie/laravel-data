@@ -10,6 +10,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Tests\Fakes\CustomDataCollection;
+use Spatie\LaravelData\Tests\Fakes\CustomPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -19,7 +21,7 @@ class DataCollectionTest extends TestCase
     /** @test */
     public function it_can_get_a_paginated_data_collection()
     {
-        $items = Collection::times(100, fn (int $index) => "Item {$index}");
+        $items = Collection::times(100, fn(int $index) => "Item {$index}");
 
         $paginator = new LengthAwarePaginator(
             $items->forPage(1, 15),
@@ -51,34 +53,20 @@ class DataCollectionTest extends TestCase
     {
         $collection = SimpleData::collection(['A', 'B']);
 
-        $filtered = $collection->filter(fn (SimpleData $data) => $data->string === 'A')->toArray();
+        $filtered = $collection->filter(fn(SimpleData $data) => $data->string === 'A')->toArray();
 
         $this->assertEquals([
             ['string' => 'A'],
         ], $filtered);
     }
 
-    /** @test */
-    public function a_paginated_collection_cannot_be_filtered()
-    {
-        $collection = SimpleData::collection(
-            new LengthAwarePaginator(['A', 'B'], 2, 15)
-        );
-
-        $filtered = $collection->filter(fn (SimpleData $data) => $data->string === 'A')->toArray();
-
-        $this->assertEquals([
-            ['string' => 'A'],
-            ['string' => 'B'],
-        ], $filtered['data']);
-    }
 
     /** @test */
     public function a_collection_can_be_transformed()
     {
         $collection = SimpleData::collection(['A', 'B']);
 
-        $filtered = $collection->through(fn (SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
+        $filtered = $collection->through(fn(SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
 
         $this->assertEquals([
             ['string' => 'Ax'],
@@ -93,7 +81,7 @@ class DataCollectionTest extends TestCase
             new LengthAwarePaginator(['A', 'B'], 2, 15)
         );
 
-        $filtered = $collection->through(fn (SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
+        $filtered = $collection->through(fn(SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
 
         $this->assertEquals([
             ['string' => 'Ax'],
@@ -158,13 +146,13 @@ class DataCollectionTest extends TestCase
     public function arrayAccessCollections(): Generator
     {
         yield "array" => [
-            fn () => SimpleData::collection([
+            fn() => SimpleData::collection([
                 'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ]),
         ];
 
         yield "collection" => [
-            fn () => SimpleData::collection([
+            fn() => SimpleData::collection([
                 'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ]),
         ];
@@ -364,7 +352,7 @@ class DataCollectionTest extends TestCase
             $data->string = strtoupper($data->string);
 
             return $data;
-        })->filter(fn (SimpleData $data) => $data->string === strtoupper('Never gonna give you up!'))->toArray();
+        })->filter(fn(SimpleData $data) => $data->string === strtoupper('Never gonna give you up!'))->toArray();
 
         $this->assertEquals([
             ['string' => strtoupper('Never gonna give you up!')],
@@ -444,5 +432,68 @@ class DataCollectionTest extends TestCase
             [SimpleData::from('A'), SimpleData::from('B')],
             $collection->toCollection()->all()
         );
+    }
+
+    /** @test */
+    public function it_can_return_a_custom_data_collection_when_collecting_data()
+    {
+        $class = new class('') extends Data {
+            protected static string $collectionClass = CustomDataCollection::class;
+
+            public function __construct(public string $string)
+            {
+            }
+        };
+
+        $collection = $class::collection([
+            ['string' => 'A'],
+            ['string' => 'B'],
+        ]);
+
+        $this->assertInstanceOf(CustomDataCollection::class, $collection);
+    }
+
+    /** @test */
+    public function it_can_return_a_custom_paginated_data_collection_when_collecting_data()
+    {
+        $class = new class('') extends Data {
+            protected static string $paginatedCollectionClass = CustomPaginatedDataCollection::class;
+
+            public function __construct(public string $string)
+            {
+            }
+        };
+
+        $collection = $class::collection(new LengthAwarePaginator([['string' => 'A'], ['string' => 'B']], 2, 15));
+
+        $this->assertInstanceOf(CustomPaginatedDataCollection::class, $collection);
+    }
+
+    /**
+     * @test
+     * @dataProvider collectionOperationsProvider
+     */
+    public function it_can_perform_some_collection_operations(
+        string $operation,
+        array $arguments,
+        array $expected,
+    ) {
+        $collection = SimpleData::collection(['A', 'B', 'C']);
+
+        $changedCollection = $collection->{$operation}(...$arguments);
+
+        $this->assertEquals(
+            $expected,
+            $changedCollection->toArray(),
+        );
+    }
+
+    public function collectionOperationsProvider(): Generator
+    {
+        yield [
+            'operation' => 'filter',
+            'arguments' => [fn(SimpleData $data) => $data->string !== 'B'],
+            'expected' => [0 => ['string' => 'A'],2 => ['string' => 'C']],
+        ];
     }
 }

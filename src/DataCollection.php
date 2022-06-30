@@ -5,6 +5,7 @@ namespace Spatie\LaravelData;
 use ArrayAccess;
 use ArrayIterator;
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Concerns\BaseDataCollectable;
@@ -33,7 +34,6 @@ class DataCollection implements DataCollectable, ArrayAccess
     use IncludeableData;
     use WrappableData;
     use TransformableData;
-    use BaseDataCollectable;
 
     private ?Closure $through = null;
 
@@ -59,7 +59,7 @@ class DataCollection implements DataCollectable, ArrayAccess
         }
 
         $this->items = $items->map(
-            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
+            fn($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
     }
 
@@ -70,9 +70,11 @@ class DataCollection implements DataCollectable, ArrayAccess
      */
     public function through(Closure $through): static
     {
-        $this->through = $through;
+        $cloned = clone $this;
 
-        return $this;
+        $cloned->items = $cloned->items->map($through);
+
+        return $cloned;
     }
 
     /**
@@ -82,9 +84,11 @@ class DataCollection implements DataCollectable, ArrayAccess
      */
     public function filter(Closure $filter): static
     {
-        $this->filter = $filter;
+        $cloned = clone $this;
 
-        return $this;
+        $cloned->items = $cloned->items->filter($filter);
+
+        return $cloned;
     }
 
     /**
@@ -108,8 +112,6 @@ class DataCollection implements DataCollectable, ArrayAccess
             $wrapExecutionType,
             $this->getPartialTrees(),
             $this->items,
-            $this->through,
-            $this->filter,
             $this->getWrap(),
         );
 

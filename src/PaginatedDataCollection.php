@@ -31,10 +31,6 @@ class PaginatedDataCollection implements DataCollectable
     use TransformableData;
     use BaseDataCollectable;
 
-    private ?Closure $through = null;
-
-    private ?Closure $filter = null;
-
     /** @var CursorPaginator<TValue>|Paginator */
     private CursorPaginator|Paginator $items;
 
@@ -47,7 +43,7 @@ class PaginatedDataCollection implements DataCollectable
         CursorPaginator|Paginator $items
     ) {
         $this->items = $items->through(
-            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
+            fn($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
     }
 
@@ -58,21 +54,11 @@ class PaginatedDataCollection implements DataCollectable
      */
     public function through(Closure $through): static
     {
-        $this->through = $through;
+        $clone = clone $this;
 
-        return $this;
-    }
+        $clone->items = $clone->items->through($through);
 
-    /**
-     * @param Closure(TValue, array-key): bool $filter
-     *
-     * @return static
-     */
-    public function filter(Closure $filter): static
-    {
-        $this->filter = $filter;
-
-        return $this;
+        return $clone;
     }
 
     /**
@@ -98,8 +84,6 @@ class PaginatedDataCollection implements DataCollectable
             $wrapExecutionType,
             $this->getPartialTrees(),
             $this->items,
-            $this->through,
-            $this->filter,
             $this->getWrap(),
         );
 

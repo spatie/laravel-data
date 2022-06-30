@@ -22,8 +22,6 @@ class DataCollectionTransformer
         protected WrapExecutionType $wrapExecutionType,
         protected PartialTrees $trees,
         protected Enumerable|CursorPaginator|Paginator $items,
-        protected ?Closure $through,
-        protected ?Closure $filter,
         protected Wrap $wrap,
     ) {
     }
@@ -47,12 +45,8 @@ class DataCollectionTransformer
     {
         $items = $items->map($this->transformItemClosure())
             ->when(
-                $this->filter !== null,
-                fn (Enumerable $collection) => $collection->filter($this->filter)->values()
-            )
-            ->when(
                 $this->transformValues,
-                fn (Enumerable $collection) => $collection->map(fn (TransformableData $data) => $data->transform(
+                fn(Enumerable $collection) => $collection->map(fn(TransformableData $data) => $data->transform(
                     $this->transformValues,
                     $this->wrapExecutionType->shouldExecute()
                         ? WrapExecutionType::TemporarilyDisabled
@@ -68,17 +62,9 @@ class DataCollectionTransformer
 
     protected function transformItemClosure(): Closure
     {
-        return function (BaseData $item) {
-            if ($item instanceof IncludeableData) {
-                $item->withPartialTrees($this->trees);
-            }
-
-            if ($this->through) {
-                $item = ($this->through)($item);
-            }
-
-            return $item;
-        };
+        return fn(BaseData $item) => $item instanceof IncludeableData
+            ? $item->withPartialTrees($this->trees)
+            : $item;
     }
 
     protected function wrapPaginatedArray(array $paginated): array

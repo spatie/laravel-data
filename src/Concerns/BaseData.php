@@ -25,6 +25,10 @@ use Spatie\LaravelData\Transformers\DataTransformer;
 
 trait BaseData
 {
+    protected static string $collectionClass = DataCollection::class;
+
+    protected static string $paginatedCollectionClass = PaginatedDataCollection::class;
+
     public static function optional(mixed ...$payloads): ?static
     {
         if (count($payloads) === 0) {
@@ -76,8 +80,8 @@ trait BaseData
             || $items instanceof Paginator;
 
         return $isPaginated
-            ? new PaginatedDataCollection(static::class, $items)
-            : new DataCollection(static::class, $items);
+            ? new (static::$paginatedCollectionClass)(static::class, $items)
+            : new (static::$collectionClass)(static::class, $items);
     }
 
     public static function empty(array $extra = []): array

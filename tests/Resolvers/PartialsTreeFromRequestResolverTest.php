@@ -6,8 +6,10 @@ use Generator;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
+use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\TestCase;
 
 class PartialsTreeFromRequestResolverTest extends TestCase
@@ -175,5 +177,29 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'requestedIncludes' => null,
             'expectedIncludes' => null,
         ];
+    }
+
+    /** @test */
+    public function it_can_combine_request_and_manual_includes()
+    {
+        $dataclass = new class(
+            Lazy::create(fn() => 'Rick Astley'),
+            Lazy::create(fn() => 'Never gonna give you up'),
+            Lazy::create(fn() => 1986),
+        ) extends MultiLazyData{
+            public static function allowedRequestIncludes(): ?array
+            {
+                return null;
+            }
+        };
+
+        $data = $dataclass->include('name')->toResponse(request()->merge([
+            'include' => 'artist',
+        ]))->getData(true);
+
+        $this->assertEquals([
+            'artist' => 'Rick Astley',
+            'name' => 'Never gonna give you up'
+        ], $data);
     }
 }
