@@ -55,8 +55,6 @@ class PartialsTreeFromRequestResolver
         $allowedRequestOnlyTree = $this->buildAllowedPartialsTree('allowedRequestOnly', $this->dataConfig->getDataClass($dataClass));
         $allowedRequestExceptTree = $this->buildAllowedPartialsTree('allowedRequestExcept', $this->dataConfig->getDataClass($dataClass));
 
-        ray($requestedOnlyTree, $allowedRequestOnlyTree);
-
         $partialTrees = $data->getPartialTrees();
 
         return new PartialTrees(

@@ -63,8 +63,6 @@ class DataTransformer
             ? $data->getPartialTrees()
             : new PartialTrees();
 
-        ray($data::class, $trees);
-
         $dataClass = $this->config->getDataClass($data::class);
 
         return $dataClass
