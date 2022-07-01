@@ -25,7 +25,7 @@ class DateTimeInterfaceCast implements Cast
         }
 
         $datetime = $formats
-            ->map(fn (string $format) => rescue(fn () => $type::createFromFormat($format, $value)))
+            ->map(fn (string $format) => rescue(fn () => $type::createFromFormat($format, $value), report: false))
             ->first(fn ($value) => (bool) $value);
 
         if (! $datetime) {
