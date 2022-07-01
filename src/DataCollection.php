@@ -34,10 +34,6 @@ class DataCollection implements DataCollectable, ArrayAccess
     use WrappableData;
     use TransformableData;
 
-    private ?Closure $through = null;
-
-    private ?Closure $filter = null;
-
     /** @var Enumerable<array-key, TValue> */
     private Enumerable $items;
 
@@ -77,7 +73,7 @@ class DataCollection implements DataCollectable, ArrayAccess
     }
 
     /**
-     * @param Closure(TValue, array-key): bool $filter
+     * @param Closure(TValue): bool $filter
      *
      * @return static
      */

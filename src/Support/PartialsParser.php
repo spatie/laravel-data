@@ -11,7 +11,7 @@ use Spatie\LaravelData\Support\TreeNodes\TreeNode;
 
 class PartialsParser
 {
-    public function execute(array $partials): ?TreeNode
+    public function execute(array $partials): TreeNode
     {
         $nodes = new DisabledTreeNode();
 

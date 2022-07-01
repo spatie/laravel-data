@@ -7,7 +7,7 @@ use TypeError;
 class PartialTreeNode implements TreeNode
 {
     public function __construct(
-        /** @var Array<string, \Spatie\LaravelData\Support\TreeNodes\PartialTreeNode> */
+        /** @var Array<string, \Spatie\LaravelData\Support\TreeNodes\TreeNode> */
         protected array $children = []
     ) {
     }

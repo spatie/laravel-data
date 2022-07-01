@@ -19,10 +19,10 @@ class PartialTrees implements Stringable
     public function getNested(string $field): self
     {
         return new self(
-            $this->lazyIncluded?->getNested($field),
-            $this->lazyExcluded?->getNested($field),
-            $this->only?->getNested($field),
-            $this->except?->getNested($field),
+            $this->lazyIncluded->getNested($field),
+            $this->lazyExcluded->getNested($field),
+            $this->only->getNested($field),
+            $this->except->getNested($field),
         );
     }
 
