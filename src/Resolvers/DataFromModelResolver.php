@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 class DataFromModelResolver
 {
     public function __construct(
-        private DataFromArrayResolver $dataFromArrayResolver
+        protected DataFromArrayResolver $dataFromArrayResolver
     ) {
     }
 

@@ -4,9 +4,9 @@ namespace Spatie\LaravelData\Support;
 
 class TransformationType
 {
-    private const FULL = 'full';
-    private const REQUEST = 'request';
-    private const WITHOUT_VALUE_TRANSFORMING = 'without_value_transforming';
+    protected const FULL = 'full';
+    protected const REQUEST = 'request';
+    protected const WITHOUT_VALUE_TRANSFORMING = 'without_value_transforming';
 
     private function __construct(protected string $type)
     {
