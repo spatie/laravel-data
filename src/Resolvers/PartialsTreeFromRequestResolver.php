@@ -11,7 +11,6 @@ use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
-use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\TreeNode;
@@ -79,7 +78,7 @@ class PartialsTreeFromRequestResolver
         }
 
         $nodes = collect($allowed)
-            ->filter(fn(string $field) => $dataClass->properties->has($field))
+            ->filter(fn (string $field) => $dataClass->properties->has($field))
             ->mapWithKeys(function (string $field) use ($type, $dataClass) {
                 /** @var \Spatie\LaravelData\Support\DataProperty $dataProperty */
                 $dataProperty = $dataClass->properties->get($field);

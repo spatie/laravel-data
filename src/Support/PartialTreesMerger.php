@@ -6,6 +6,5 @@ class PartialTreesMerger
 {
     public function execute()
     {
-        
     }
 }

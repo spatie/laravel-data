@@ -78,7 +78,7 @@ class PartialTreeNode implements TreeNode
 
     public function __toString(): string
     {
-        return '{' . collect($this->children)->map(fn(TreeNode $child, string $field) => "\"{$field}\":{$child}")->join(',') . '}';
+        return '{' . collect($this->children)->map(fn (TreeNode $child, string $field) => "\"{$field}\":{$child}")->join(',') . '}';
     }
 
     public function getFields(): array

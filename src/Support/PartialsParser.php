@@ -29,7 +29,7 @@ class PartialsParser
                 $children = collect(explode(',', substr($field, 1, -1)))
                     ->values()
                     ->flip()
-                    ->map(fn() => new ExcludedTreeNode())
+                    ->map(fn () => new ExcludedTreeNode())
                     ->all();
 
                 $nodes = $nodes->merge(new PartialTreeNode($children));

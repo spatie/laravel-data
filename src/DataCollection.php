@@ -5,7 +5,6 @@ namespace Spatie\LaravelData;
 use ArrayAccess;
 use ArrayIterator;
 use Closure;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Concerns\BaseDataCollectable;
@@ -59,7 +58,7 @@ class DataCollection implements DataCollectable, ArrayAccess
         }
 
         $this->items = $items->map(
-            fn($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
+            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
     }
 

@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support;
 
 use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
-use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\TreeNode;
 use Stringable;
 
@@ -35,8 +34,7 @@ class PartialTrees implements Stringable
                 'only' => $this->only,
                 'except' => $this->except,
             ])
-                ->map(fn(TreeNode $node, string $type) => "\"{$type}\":{$node}")
+                ->map(fn (TreeNode $node, string $type) => "\"{$type}\":{$node}")
                 ->join(',' . PHP_EOL) . PHP_EOL . '}';
-
     }
 }

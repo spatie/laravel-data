@@ -93,7 +93,7 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'dataAllowedIncludes' => ['property'],
             'requestedIncludes' => 'property',
             'expectedIncludes' => new PartialTreeNode([
-                'property' => new ExcludedTreeNode()
+                'property' => new ExcludedTreeNode(),
             ]),
         ];
 
@@ -102,7 +102,7 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'dataAllowedIncludes' => ['nested'],
             'requestedIncludes' => 'nested.name',
             'expectedIncludes' => new PartialTreeNode([
-                'nested' => new ExcludedTreeNode()
+                'nested' => new ExcludedTreeNode(),
             ]),
         ];
 
@@ -113,7 +113,7 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'expectedIncludes' => new PartialTreeNode([
                 'nested' => new PartialTreeNode([
                     'name' => new ExcludedTreeNode(),
-                ])
+                ]),
             ]),
         ];
 
@@ -153,7 +153,7 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'dataAllowedIncludes' => ['nested'],
             'requestedIncludes' => 'nested.*',
             'expectedIncludes' => new PartialTreeNode([
-                'nested' => new AllTreeNode()
+                'nested' => new AllTreeNode(),
             ]),
         ];
 
@@ -187,11 +187,11 @@ class PartialsTreeFromRequestResolverTest extends TestCase
     /** @test */
     public function it_can_combine_request_and_manual_includes()
     {
-        $dataclass = new class(
-            Lazy::create(fn() => 'Rick Astley'),
-            Lazy::create(fn() => 'Never gonna give you up'),
-            Lazy::create(fn() => 1986),
-        ) extends MultiLazyData{
+        $dataclass = new class (
+            Lazy::create(fn () => 'Rick Astley'),
+            Lazy::create(fn () => 'Never gonna give you up'),
+            Lazy::create(fn () => 1986),
+        ) extends MultiLazyData {
             public static function allowedRequestIncludes(): ?array
             {
                 return null;
@@ -204,7 +204,7 @@ class PartialsTreeFromRequestResolverTest extends TestCase
 
         $this->assertEquals([
             'artist' => 'Rick Astley',
-            'name' => 'Never gonna give you up'
+            'name' => 'Never gonna give you up',
         ], $data);
     }
 }

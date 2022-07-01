@@ -43,7 +43,7 @@ class PaginatedDataCollection implements DataCollectable
         CursorPaginator|Paginator $items
     ) {
         $this->items = $items->through(
-            fn($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
+            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
     }
 

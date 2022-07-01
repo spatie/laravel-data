@@ -14,7 +14,7 @@ class PartialTreeNodeTest extends TestCase
     public function it_can_merge_a_node()
     {
         $node = new PartialTreeNode([
-            'item' => new ExcludedTreeNode()
+            'item' => new ExcludedTreeNode(),
         ]);
 
         $this->assertEquals(
@@ -40,7 +40,7 @@ class PartialTreeNodeTest extends TestCase
         $this->assertEquals(
             new PartialTreeNode([
                 'item' => new ExcludedTreeNode(),
-                'nested' => new ExcludedTreeNode()
+                'nested' => new ExcludedTreeNode(),
             ]),
             $node->merge(new PartialTreeNode(['nested' => new ExcludedTreeNode()]))
         );
@@ -50,7 +50,7 @@ class PartialTreeNodeTest extends TestCase
     public function it_can_intersect_a_node()
     {
         $node = new PartialTreeNode([
-            'item' => new ExcludedTreeNode()
+            'item' => new ExcludedTreeNode(),
         ]);
 
         $this->assertEquals(
