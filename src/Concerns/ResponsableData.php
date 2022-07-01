@@ -17,9 +17,9 @@ trait ResponsableData
     public function toResponse($request)
     {
         if ($this instanceof IncludeableDataContract) {
-            $this->withPartialTrees(
-                resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request)
-            );
+            $partialTrees = resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request);
+
+            $this->withPartialTrees($partialTrees);
         }
 
         return new JsonResponse($this->transform(

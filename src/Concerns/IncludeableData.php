@@ -87,10 +87,10 @@ trait IncludeableData
         }
 
         return new PartialTrees(
-            ! empty($this->includes) ? (new PartialsParser())->execute($this->includes) : null,
-            ! empty($this->excludes) ? (new PartialsParser())->execute($this->excludes) : null,
-            ! empty($this->only) ? (new PartialsParser())->execute($this->only) : null,
-            ! empty($this->except) ? (new PartialsParser())->execute($this->except) : null,
+            (new PartialsParser())->execute($this->includes),
+            (new PartialsParser())->execute($this->excludes),
+            (new PartialsParser())->execute($this->only),
+            (new PartialsParser())->execute($this->except),
         );
     }
 }

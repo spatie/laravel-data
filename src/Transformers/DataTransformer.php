@@ -16,6 +16,10 @@ use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 use Spatie\LaravelData\Support\PartialTrees;
+use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use TypeError;
 
@@ -59,6 +63,8 @@ class DataTransformer
         $trees = $data instanceof IncludeableData
             ? $data->getPartialTrees()
             : new PartialTrees();
+
+        ray($data::class, $trees);
 
         $dataClass = $this->config->getDataClass($data::class);
 
@@ -123,27 +129,31 @@ class DataTransformer
         string $name,
         PartialTrees $trees,
     ): bool {
-        if ($trees->except === ['*']) {
+        if ($trees->except instanceof AllTreeNode) {
             return true;
         }
 
-        if (array_key_exists($name, $trees->except ?? []) && empty($trees->except[$name])) {
+        if (
+            $trees->except instanceof PartialTreeNode
+            && $trees->except->hasField($name)
+            && $trees->except->getNested($name) instanceof ExcludedTreeNode
+        ) {
             return true;
         }
 
-        if ($trees->except !== null) {
+        if ($trees->except instanceof PartialTreeNode) {
             return false;
         }
 
-        if ($trees->only === ['*']) {
+        if ($trees->only instanceof AllTreeNode) {
             return false;
         }
 
-        if (array_key_exists($name, $trees->only ?? [])) {
+        if ($trees->only instanceof PartialTreeNode && $trees->only->hasField($name)) {
             return false;
         }
 
-        if ($trees->only !== null) {
+        if ($trees->only instanceof PartialTreeNode || $trees->only instanceof ExcludedTreeNode) {
             return true;
         }
 
@@ -154,11 +164,11 @@ class DataTransformer
         string $name,
         PartialTrees $trees,
     ): bool {
-        if ($trees->lazyExcluded === ['*']) {
+        if ($trees->lazyExcluded instanceof AllTreeNode) {
             return true;
         }
 
-        return array_key_exists($name, $trees->lazyExcluded ?? []);
+        return $trees->lazyExcluded instanceof PartialTreeNode && $trees->lazyExcluded->hasField($name);
     }
 
     protected function isPropertyLazyIncluded(
@@ -166,7 +176,7 @@ class DataTransformer
         Lazy $value,
         PartialTrees $trees,
     ): bool {
-        if ($trees->lazyIncluded === ['*']) {
+        if ($trees->lazyIncluded instanceof AllTreeNode) {
             return true;
         }
 
@@ -174,7 +184,7 @@ class DataTransformer
             return true;
         }
 
-        return array_key_exists($name, $trees->lazyIncluded ?? []);
+        return $trees->lazyIncluded instanceof PartialTreeNode && $trees->lazyIncluded->hasField($name);
     }
 
     protected function resolvePropertyValue(
@@ -190,12 +200,12 @@ class DataTransformer
             return null;
         }
 
-        if (is_array($value) && ! empty($trees->only)) {
-            $value = Arr::only($value, array_keys($trees->only));
+        if (is_array($value) && ($trees->only instanceof AllTreeNode || $trees->only instanceof PartialTreeNode)) {
+            $value = Arr::only($value, $trees->only->getFields());
         }
 
-        if (is_array($value) && ! empty($trees->except)) {
-            $value = Arr::except($value, array_keys($trees->except));
+        if (is_array($value) && ($trees->except instanceof AllTreeNode || $trees->except instanceof PartialTreeNode)) {
+            $value = Arr::except($value, $trees->except->getFields());
         }
 
         if ($transformer = $this->resolveTransformerForValue($property, $value)) {

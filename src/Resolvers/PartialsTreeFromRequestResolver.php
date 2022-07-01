@@ -6,9 +6,15 @@ use Illuminate\Http\Request;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\IncludeableData;
+use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\PartialTrees;
+use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\TreeNode;
 use TypeError;
 
 class PartialsTreeFromRequestResolver
@@ -23,10 +29,21 @@ class PartialsTreeFromRequestResolver
         IncludeableData $data,
         Request $request,
     ): PartialTrees {
-        $includesTree = $this->partialsParser->execute(explode(',', $request->get('include', '')));
-        $excludesTree = $this->partialsParser->execute(explode(',', $request->get('exclude', '')));
-        $onlyTree = $this->partialsParser->execute(explode(',', $request->get('only', '')));
-        $exceptTree = $this->partialsParser->execute(explode(',', $request->get('except', '')));
+        // Create a partial tree from the request includes and do an intersection with the allowed request includes
+        // Then merge with the manually defined includes
+
+        $requestedIncludesTree = $this->partialsParser->execute(
+            $request->has('include') ? explode(',', $request->get('include')) : []
+        );
+        $requestedExcludesTree = $this->partialsParser->execute(
+            $request->has('exclude') ? explode(',', $request->get('exclude')) : []
+        );
+        $requestedOnlyTree = $this->partialsParser->execute(
+            $request->has('only') ? explode(',', $request->get('only')) : []
+        );
+        $requestedExceptTree = $this->partialsParser->execute(
+            $request->has('except') ? explode(',', $request->get('except')) : []
+        );
 
         $dataClass = match (true) {
             $data instanceof BaseData => $data::class,
@@ -34,100 +51,55 @@ class PartialsTreeFromRequestResolver
             default => throw new TypeError('Invalid type of data')
         };
 
+        $allowedRequestIncludesTree = $this->buildAllowedPartialsTree('allowedRequestIncludes', $this->dataConfig->getDataClass($dataClass));
+        $allowedRequestExcludesTree = $this->buildAllowedPartialsTree('allowedRequestExcludes', $this->dataConfig->getDataClass($dataClass));
+        $allowedRequestOnlyTree = $this->buildAllowedPartialsTree('allowedRequestOnly', $this->dataConfig->getDataClass($dataClass));
+        $allowedRequestExceptTree = $this->buildAllowedPartialsTree('allowedRequestExcept', $this->dataConfig->getDataClass($dataClass));
+
+        ray($requestedOnlyTree, $allowedRequestOnlyTree);
+
+        $partialTrees = $data->getPartialTrees();
+
         return new PartialTrees(
-            $request->has('include') ? $this->getValidIncludesForDataClass($dataClass, $includesTree) : null,
-            $request->has('exclude') ? $this->getValidExcludesForDataClass($dataClass, $excludesTree) : null,
-            $request->has('only') ? $this->getValidOnlyForDataClass($dataClass, $onlyTree) : null,
-            $request->has('except') ? $this->getValidExceptForDataClass($dataClass, $exceptTree) : null,
+            $partialTrees->lazyIncluded->merge($requestedIncludesTree->intersect($allowedRequestIncludesTree)),
+            $partialTrees->lazyExcluded->merge($requestedExcludesTree->intersect($allowedRequestExcludesTree)),
+            $partialTrees->only->merge($requestedOnlyTree->intersect($allowedRequestOnlyTree)),
+            $partialTrees->except->merge($requestedExceptTree->intersect($allowedRequestExceptTree))
         );
     }
 
-    private function getValidIncludesForDataClass(
-        string $class,
-        array $requestedPartialsTree
-    ): array {
-        return $this->reducePartialsTree(
-            $class,
-            $requestedPartialsTree,
-            $class::allowedRequestIncludes(),
-            __FUNCTION__
-        );
-    }
+    private function buildAllowedPartialsTree(
+        string $type,
+        DataClass $dataClass
+    ): TreeNode {
+        $allowed = $dataClass->name::{$type}();
 
-    private function getValidExcludesForDataClass(
-        string $class,
-        array $requestedPartialsTree
-    ): array {
-        return $this->reducePartialsTree(
-            $class,
-            $requestedPartialsTree,
-            $class::allowedRequestExcludes(),
-            __FUNCTION__
-        );
-    }
-
-    private function getValidOnlyForDataClass(
-        string $class,
-        array $requestedPartialsTree
-    ): array {
-        return $this->reducePartialsTree(
-            $class,
-            $requestedPartialsTree,
-            $class::allowedRequestOnly(),
-            __FUNCTION__
-        );
-    }
-
-    private function getValidExceptForDataClass(
-        string $class,
-        array $requestedPartialsTree
-    ): array {
-        return $this->reducePartialsTree(
-            $class,
-            $requestedPartialsTree,
-            $class::allowedRequestExcept(),
-            __FUNCTION__
-        );
-    }
-
-    private function reducePartialsTree(
-        string $class,
-        array $requestedPartialsTree,
-        ?array $allowedPartials,
-        string $methodName,
-    ): array {
-        $properties = $this->dataConfig->getDataClass($class)->properties;
-
-        if ($allowedPartials === null) {
-            return $requestedPartialsTree;
+        if ($allowed === ['*'] || $allowed === null) {
+            return new AllTreeNode();
         }
 
-        if ($requestedPartialsTree === ['*']) {
-            return [];
+        $nodes = collect($allowed)
+            ->filter(fn(string $field) => $dataClass->properties->has($field))
+            ->mapWithKeys(function (string $field) use ($type, $dataClass) {
+                /** @var \Spatie\LaravelData\Support\DataProperty $dataProperty */
+                $dataProperty = $dataClass->properties->get($field);
+
+                if ($dataProperty->type->isDataObject || $dataProperty->type->isDataCollectable) {
+                    return [
+                        $field => $this->buildAllowedPartialsTree(
+                            $type,
+                            $this->dataConfig->getDataClass($dataProperty->type->dataClass)
+                        ),
+                    ];
+                }
+
+                return [$field => new ExcludedTreeNode()];
+            });
+
+        if ($nodes->isEmpty()) {
+            return new ExcludedTreeNode();
         }
 
-        foreach ($requestedPartialsTree as $requestedPartial => $nested) {
-            if (! in_array($requestedPartial, $allowedPartials)) {
-                unset($requestedPartialsTree[$requestedPartial]);
-
-                continue;
-            }
-
-            if (! $properties->has($requestedPartial)) {
-                continue;
-            }
-
-            $checkNested = $properties[$requestedPartial]->type->isDataObject
-                || $properties[$requestedPartial]->type->isDataCollectable;
-
-            if ($checkNested) {
-                $requestedPartialsTree[$requestedPartial] = $this->{$methodName}(
-                    $properties[$requestedPartial]->type->dataClass,
-                    $nested
-                );
-            }
-        }
-
-        return $requestedPartialsTree;
+        return new PartialTreeNode($nodes->all());
     }
 }

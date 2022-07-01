@@ -8,6 +8,11 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
+use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\TreeNode;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\TestCase;
@@ -31,7 +36,7 @@ class PartialsTreeFromRequestResolverTest extends TestCase
         ?array $lazyDataAllowedIncludes,
         ?array $dataAllowedIncludes,
         ?string $requestedAllowedIncludes,
-        ?array $expectedIncludes
+        TreeNode $expectedIncludes
     ) {
         LazyData::$allowedIncludes = $lazyDataAllowedIncludes;
 
@@ -80,102 +85,102 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'lazyDataAllowedIncludes' => [],
             'dataAllowedIncludes' => [],
             'requestedIncludes' => 'property',
-            'expectedIncludes' => [],
+            'expectedIncludes' => new ExcludedTreeNode(),
         ];
 
         yield 'allowed property inclusion' => [
             'lazyDataAllowedIncludes' => [],
             'dataAllowedIncludes' => ['property'],
             'requestedIncludes' => 'property',
-            'expectedIncludes' => [
-                'property' => [],
-            ],
+            'expectedIncludes' => new PartialTreeNode([
+                'property' => new ExcludedTreeNode()
+            ]),
         ];
 
         yield 'allowed data property inclusion without nesting' => [
             'lazyDataAllowedIncludes' => [],
             'dataAllowedIncludes' => ['nested'],
             'requestedIncludes' => 'nested.name',
-            'expectedIncludes' => [
-                'nested' => [],
-            ],
+            'expectedIncludes' => new PartialTreeNode([
+                'nested' => new ExcludedTreeNode()
+            ]),
         ];
 
         yield 'allowed data property inclusion with nesting' => [
             'lazyDataAllowedIncludes' => ['name'],
             'dataAllowedIncludes' => ['nested'],
             'requestedIncludes' => 'nested.name',
-            'expectedIncludes' => [
-                'nested' => [
-                    'name' => [],
-                ],
-            ],
+            'expectedIncludes' => new PartialTreeNode([
+                'nested' => new PartialTreeNode([
+                    'name' => new ExcludedTreeNode(),
+                ])
+            ]),
         ];
 
         yield 'allowed data collection property inclusion without nesting' => [
             'lazyDataAllowedIncludes' => [],
             'dataAllowedIncludes' => ['collection'],
             'requestedIncludes' => 'collection.name',
-            'expectedIncludes' => [
-                'collection' => [],
-            ],
+            'expectedIncludes' => new PartialTreeNode([
+                'collection' => new ExcludedTreeNode(),
+            ]),
         ];
 
         yield 'allowed data collection property inclusion with nesting' => [
             'lazyDataAllowedIncludes' => ['name'],
             'dataAllowedIncludes' => ['collection'],
             'requestedIncludes' => 'collection.name',
-            'expectedIncludes' => [
-                'collection' => [
-                    'name' => [],
-                ],
-            ],
+            'expectedIncludes' => new PartialTreeNode([
+                'collection' => new PartialTreeNode([
+                    'name' => new ExcludedTreeNode(),
+                ]),
+            ]),
         ];
 
         yield 'allowed nested data property inclusion without defining allowed includes on nested' => [
             'lazyDataAllowedIncludes' => null,
             'dataAllowedIncludes' => ['nested'],
             'requestedIncludes' => 'nested.name',
-            'expectedIncludes' => [
-                'nested' => [
-                    'name' => [],
-                ],
-            ],
+            'expectedIncludes' => new PartialTreeNode([
+                'nested' => new PartialTreeNode([
+                    'name' => new ExcludedTreeNode(),
+                ]),
+            ]),
         ];
 
         yield 'allowed all nested data property inclusion without defining allowed includes on nested' => [
             'lazyDataAllowedIncludes' => null,
             'dataAllowedIncludes' => ['nested'],
             'requestedIncludes' => 'nested.*',
-            'expectedIncludes' => [
-                'nested' => ['*'],
-            ],
+            'expectedIncludes' => new PartialTreeNode([
+                'nested' => new AllTreeNode()
+            ]),
         ];
 
         yield 'disallowed all nested data property inclusion ' => [
-            'lazyDataAllowedIncludes' => ['name'],
+            'lazyDataAllowedIncludes' => [],
             'dataAllowedIncludes' => ['nested'],
             'requestedIncludes' => 'nested.*',
-            'expectedIncludes' => [
-                'nested' => [],
-            ],
+            'expectedIncludes' => new PartialTreeNode([
+                'nested' => new ExcludedTreeNode(),
+            ]),
         ];
 
         yield 'multi property inclusion' => [
             'lazyDataAllowedIncludes' => null,
             'dataAllowedIncludes' => ['nested', 'property'],
             'requestedIncludes' => 'nested.*,property',
-            'expectedIncludes' => [
-                'property' => [],
-                'nested' => ['*'],
-            ],
+            'expectedIncludes' => new PartialTreeNode([
+                'property' => new ExcludedTreeNode(),
+                'nested' => new AllTreeNode(),
+            ]),
         ];
 
         yield 'without property inclusion' => [
             'lazyDataAllowedIncludes' => null,
             'dataAllowedIncludes' => ['nested', 'property'],
             'requestedIncludes' => null,
-            'expectedIncludes' => null,
+            'expectedIncludes' => new DisabledTreeNode(),
         ];
     }
 

@@ -35,6 +35,7 @@ use Spatie\LaravelData\Normalizers\ModelNormalizer;
 use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\PartialTrees;
+use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
@@ -410,6 +411,8 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_dynamically_include_data_based_upon_the_request()
     {
+        LazyData::$allowedIncludes = [];
+
         $response = LazyData::from('Ruben')->toResponse(request());
 
         $this->assertEquals([], $response->getData(true));
@@ -454,6 +457,8 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_dynamically_exclude_data_based_upon_the_request()
     {
+        DefaultLazyData::$allowedExcludes = [];
+
         $response = DefaultLazyData::from('Ruben')->toResponse(request());
 
         $this->assertEquals(['name' => 'Ruben'], $response->getData(true));
@@ -501,7 +506,7 @@ class DataTest extends TestCase
         OnlyData::$allowedOnly = [];
 
         $response = OnlyData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
-            'only' => 'first_name, last_name',
+            'only' => 'first_name',
         ]));
 
         $this->assertEquals([], $response->getData(true));
@@ -509,7 +514,7 @@ class DataTest extends TestCase
         OnlyData::$allowedOnly = ['first_name'];
 
         $response = OnlyData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
-            'only' => 'first_name,last_name',
+            'only' => 'first_name',
         ]));
 
         $this->assertEquals([
@@ -519,12 +524,11 @@ class DataTest extends TestCase
         OnlyData::$allowedOnly = null;
 
         $response = OnlyData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
-            'only' => 'first_name,last_name',
+            'only' => 'first_name',
         ]));
 
         $this->assertEquals([
             'first_name' => 'Ruben',
-            'last_name' => 'Van Assche',
         ], $response->getData(true));
     }
 
@@ -534,7 +538,7 @@ class DataTest extends TestCase
         ExceptData::$allowedExcept = [];
 
         $response = ExceptData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
-            'except' => 'first_name, last_name',
+            'except' => 'first_name',
         ]));
 
         $this->assertEquals([
@@ -545,7 +549,7 @@ class DataTest extends TestCase
         ExceptData::$allowedExcept = ['first_name'];
 
         $response = ExceptData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
-            'except' => 'first_name,last_name',
+            'except' => 'first_name',
         ]));
 
         $this->assertEquals([
@@ -555,10 +559,12 @@ class DataTest extends TestCase
         ExceptData::$allowedExcept = null;
 
         $response = ExceptData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
-            'except' => 'first_name,last_name',
+            'except' => 'first_name',
         ]));
 
-        $this->assertEquals([], $response->getData(true));
+        $this->assertEquals([
+            'last_name' => 'Van Assche',
+        ], $response->getData(true));
     }
 
     /** @test */
@@ -586,7 +592,7 @@ class DataTest extends TestCase
         $this->assertEquals([
             'data' => $dataObject,
             'dataCollection' => $dataCollection,
-            'lazy' => (new SimpleData('Lazy'))->withPartialTrees(new PartialTrees([], null, null, null)),
+            'lazy' => (new SimpleData('Lazy'))->withPartialTrees(new PartialTrees(new ExcludedTreeNode())),
             'string' => 'Test',
             'transformable' => $transformable,
         ], $data->include('lazy')->all());
@@ -1797,7 +1803,7 @@ class DataTest extends TestCase
      * @test
      * @dataProvider onlyInclusionDataProvider
      */
-    public function it_can_include_only_specific_properties_when_transforming(
+    public function it_can_use_only_when_transforming(
         array $directive,
         array $expectedOnly,
         array $expectedExcept
@@ -1824,6 +1830,38 @@ class DataTest extends TestCase
         ]);
 
         $this->assertEquals($expectedOnly, $data->only(...$directive)->toArray());
+    }
+
+    /**
+     * @test
+     * @dataProvider onlyInclusionDataProvider
+     */
+    public function it_can_use_except_when_transforming(
+        array $directive,
+        array $expectedOnly,
+        array $expectedExcept
+    ) {
+        $dataClass = new class () extends Data {
+            public string $first;
+
+            public string $second;
+
+            public MultiData $nested;
+
+            #[DataCollectionOf(MultiData::class)]
+            public DataCollection $collection;
+        };
+
+        $data = $dataClass::from([
+            'first' => 'A',
+            'second' => 'B',
+            'nested' => ['first' => 'C', 'second' => 'D'],
+            'collection' => [
+                ['first' => 'E', 'second' => 'F'],
+                ['first' => 'G', 'second' => 'H'],
+            ],
+        ]);
+
         $this->assertEquals($expectedExcept, $data->except(...$directive)->toArray());
     }
 
