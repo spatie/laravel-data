@@ -19,9 +19,10 @@ use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 
 /**
+ * @template TKey of array-key
  * @template TValue
  *
- * @implements  DataCollectable<TValue>
+ * @implements  DataCollectable<TKey, TValue>
  */
 class PaginatedDataCollection implements DataCollectable
 {
@@ -48,7 +49,7 @@ class PaginatedDataCollection implements DataCollectable
     }
 
     /**
-     * @param Closure(TValue, array-key): TValue $through
+     * @param Closure(TValue, TKey): TValue $through
      *
      * @return static
      */
@@ -90,7 +91,7 @@ class PaginatedDataCollection implements DataCollectable
         return $transformer->transform();
     }
 
-    /**  @return \ArrayIterator<array-key, array> */
+    /**  @return \ArrayIterator<TKey, array> */
     public function getIterator(): ArrayIterator
     {
         return new ArrayIterator($this->transform(

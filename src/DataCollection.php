@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Concerns\BaseDataCollectable;
+use Spatie\LaravelData\Concerns\EnumerableMethods;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
@@ -21,10 +22,11 @@ use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 
 /**
+ * @template TKey of array-key
  * @template TValue
  *
- * @implements \ArrayAccess<array-key, TValue>
- * @implements  DataCollectable<TValue>
+ * @implements \ArrayAccess<TKey, TValue>
+ * @implements  DataCollectable<TKey, TValue>
  */
 class DataCollection implements DataCollectable, ArrayAccess
 {
@@ -33,13 +35,14 @@ class DataCollection implements DataCollectable, ArrayAccess
     use IncludeableData;
     use WrappableData;
     use TransformableData;
+    use EnumerableMethods;
 
-    /** @var Enumerable<array-key, TValue> */
+    /** @var Enumerable<TKey, TValue> */
     private Enumerable $items;
 
     /**
      * @param class-string<TValue> $dataClass
-     * @param array|Enumerable<array-key, TValue>|DataCollection $items
+     * @param array|Enumerable<TKey, TValue>|DataCollection $items
      */
     public function __construct(
         public readonly string $dataClass,
@@ -54,40 +57,12 @@ class DataCollection implements DataCollectable, ArrayAccess
         }
 
         $this->items = $items->map(
-            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
+            fn($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
     }
 
     /**
-     * @param Closure(TValue, array-key): TValue $through
-     *
-     * @return static
-     */
-    public function through(Closure $through): static
-    {
-        $cloned = clone $this;
-
-        $cloned->items = $cloned->items->map($through);
-
-        return $cloned;
-    }
-
-    /**
-     * @param Closure(TValue): bool $filter
-     *
-     * @return static
-     */
-    public function filter(Closure $filter): static
-    {
-        $cloned = clone $this;
-
-        $cloned->items = $cloned->items->filter($filter);
-
-        return $cloned;
-    }
-
-    /**
-     * @return array<array-key, TValue>
+     * @return array<TKey, TValue>
      */
     public function items(): array
     {
@@ -113,19 +88,12 @@ class DataCollection implements DataCollectable, ArrayAccess
         return $transformer->transform();
     }
 
-    public function values(): static
-    {
-        $this->items = $this->items->values();
-
-        return $this;
-    }
-
     public function toCollection(): Enumerable
     {
         return $this->items;
     }
 
-    /**  @return \ArrayIterator<array-key, array> */
+    /**  @return \ArrayIterator<TKey, array> */
     public function getIterator(): ArrayIterator
     {
         return new ArrayIterator($this->transform(
@@ -139,7 +107,7 @@ class DataCollection implements DataCollectable, ArrayAccess
     }
 
     /**
-     * @param array-key $offset
+     * @param TKey $offset
      *
      * @return bool
      */
@@ -153,7 +121,7 @@ class DataCollection implements DataCollectable, ArrayAccess
     }
 
     /**
-     * @param array-key $offset
+     * @param TKey $offset
      *
      * @return TValue
      */
@@ -167,7 +135,7 @@ class DataCollection implements DataCollectable, ArrayAccess
     }
 
     /**
-     * @param array-key|null $offset
+     * @param TKey|null $offset
      * @param TValue $value
      *
      * @return void
@@ -186,7 +154,7 @@ class DataCollection implements DataCollectable, ArrayAccess
     }
 
     /**
-     * @param array-key $offset
+     * @param TKey $offset
      *
      * @return void
      */
