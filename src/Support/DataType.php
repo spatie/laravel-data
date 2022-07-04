@@ -7,11 +7,9 @@ use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
-use ReflectionType;
 use ReflectionUnionType;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Enums\DataCollectableType;
@@ -252,7 +250,7 @@ class DataType implements Countable
     ): ?DataCollectableType {
         $className = $reflection->getName();
 
-        return match(true){
+        return match (true) {
             is_a($className, DataCollection::class, true) => DataCollectableType::Default,
             is_a($className, PaginatedDataCollection::class, true) => DataCollectableType::Paginated,
             is_a($className, CursorPaginatedDataCollection::class, true) => DataCollectableType::CursorPaginated,

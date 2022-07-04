@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Concerns;
 
 use ArrayIterator;
-use Spatie\LaravelData\Contracts\DataCollectable;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Transformers\DataCollectableTransformer;
 

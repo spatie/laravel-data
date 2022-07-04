@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData;
 
 use ArrayAccess;
-use ArrayIterator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Concerns\BaseDataCollectable;
@@ -17,8 +16,6 @@ use Spatie\LaravelData\Contracts\DataCollectable;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\InvalidDataCollectionOperation;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
-use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
-use Spatie\LaravelData\Transformers\DataCollectableTransformer;
 
 /**
  * @template TKey of array-key

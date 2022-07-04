@@ -22,7 +22,6 @@ use Spatie\TypeScriptTransformer\Structures\MissingSymbolsCollection;
 use Spatie\TypeScriptTransformer\TypeProcessors\DtoCollectionTypeProcessor;
 use Spatie\TypeScriptTransformer\TypeProcessors\ReplaceDefaultsTypeProcessor;
 use Spatie\TypeScriptTransformer\Types\StructType;
-use TypeError;
 
 class DataTypeScriptTransformer extends DtoTransformer
 {
