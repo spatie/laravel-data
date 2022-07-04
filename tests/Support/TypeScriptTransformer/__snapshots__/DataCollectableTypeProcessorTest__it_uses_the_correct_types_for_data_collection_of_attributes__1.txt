@@ -1,0 +1,5 @@
+{
+dataCollection: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
+dataCollectionWithNull: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}> | null;
+dataCollectionWithNullable: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}> | null;
+}

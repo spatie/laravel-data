@@ -2,10 +2,12 @@
 
 namespace Spatie\LaravelData\Concerns;
 
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Enumerable;
+use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
@@ -28,6 +30,8 @@ trait BaseData
     protected static string $collectionClass = DataCollection::class;
 
     protected static string $paginatedCollectionClass = PaginatedDataCollection::class;
+
+    protected static string $cursorPaginatedCollectionClass = CursorPaginatedDataCollection::class;
 
     public static function optional(mixed ...$payloads): ?static
     {
@@ -73,15 +77,17 @@ trait BaseData
             ->through(CastPropertiesDataPipe::class);
     }
 
-    public static function collection(Enumerable|array|AbstractPaginator|AbstractCursorPaginator|Paginator|DataCollection $items): DataCollection|PaginatedDataCollection
+    public static function collection(Enumerable|array|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator|DataCollection $items): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
-        $isPaginated = $items instanceof AbstractPaginator
-            || $items instanceof AbstractCursorPaginator
-            || $items instanceof Paginator;
+        if ($items instanceof Paginator || $items instanceof AbstractPaginator) {
+            return new (static::$paginatedCollectionClass)(static::class, $items);
+        }
 
-        return $isPaginated
-            ? new (static::$paginatedCollectionClass)(static::class, $items)
-            : new (static::$collectionClass)(static::class, $items);
+        if ($items instanceof AbstractCursorPaginator || $items instanceof CursorPaginator) {
+            return new (static::$cursorPaginatedCollectionClass)(static::class, $items);
+        }
+
+        return new (static::$collectionClass)(static::class, $items);
     }
 
     public static function empty(array $extra = []): array

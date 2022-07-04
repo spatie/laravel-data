@@ -24,7 +24,7 @@ use Spatie\LaravelData\Transformers\DataCollectableTransformer;
  *
  * @implements  DataCollectable<TKey, TValue>
  */
-class PaginatedDataCollection implements DataCollectable
+class CursorPaginatedDataCollection implements DataCollectable
 {
     use ResponsableData;
     use IncludeableData;
@@ -32,18 +32,19 @@ class PaginatedDataCollection implements DataCollectable
     use TransformableData;
     use BaseDataCollectable;
 
-    private Paginator $items;
+    /** @var CursorPaginator<TValue> */
+    private CursorPaginator $items;
 
     /**
      * @param class-string<TValue> $dataClass
-     * @param Paginator $items
+     * @param CursorPaginator<TValue> $items
      */
     public function __construct(
         public readonly string $dataClass,
-        Paginator $items
+        CursorPaginator $items
     ) {
         $this->items = $items->through(
-            fn($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
+            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
     }
 
@@ -61,7 +62,10 @@ class PaginatedDataCollection implements DataCollectable
         return $clone;
     }
 
-    public function items(): Paginator
+    /**
+     * @return CursorPaginator<TValue>
+     */
+    public function items(): CursorPaginator
     {
         return $this->items;
     }

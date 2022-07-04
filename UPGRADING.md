@@ -11,7 +11,7 @@ High impact changes
 - The `RuleInferrer` interface now has a `RulesCollection` argument instead of an `array`
 - By default, it is now impossible to include/exclude properties using a request parameter. This can be manually overwritten.
 - The `validate` method on a data object will not create a data object after validation, use `validateAndCreate` instead
-- `DataCollection` is now being split into a `DataCollection` and `PaginatedDataCollection`
+- `DataCollection` is now being split into a `DataCollection`, `PaginatedDataCollection` and `CursorPaginatedDataCollection`
 
 Low impact changes
 
@@ -23,3 +23,5 @@ Low impact changes
 - If you were directly using Resolvers, please take a look, they have changed a lot
 - The `DataTypeScriptTransformer` is updated for this new version, if you extend this then please take a look
 - The `DataTransformer` and `DataCollectionTransformer` now use a `WrapExecutionType`
+- The `filter` method was removed from paginated data collections
+- The `through` and `filter` operations on a `DataCollection` will now happen instant instead of waiting for the transforming process

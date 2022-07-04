@@ -61,6 +61,11 @@ parameters:
 			path: src/Data.php
 
 		-
+			message: "#^PHPDoc tag @return with type Spatie\\\\LaravelData\\\\DataCollection\\<int, mixed\\> is not subtype of native type static\\(Spatie\\\\LaravelData\\\\DataCollection\\<TKey of \\(int\\|string\\), TValue\\>\\)\\.$#"
+			count: 1
+			path: src/DataCollection.php
+
+		-
 			message: "#^Dead catch \\- ArgumentCountError is never thrown in the try block\\.$#"
 			count: 1
 			path: src/Resolvers/DataFromArrayResolver.php
@@ -72,6 +77,11 @@ parameters:
 
 		-
 			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$dataClass is already assigned\\.$#"
+			count: 2
+			path: src/Support/DataType.php
+
+		-
+			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$dataCollectableType is already assigned\\.$#"
 			count: 2
 			path: src/Support/DataType.php
 

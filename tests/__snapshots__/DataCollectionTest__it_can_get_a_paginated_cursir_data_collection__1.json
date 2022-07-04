@@ -1,0 +1,12 @@
+{
+    "data": [],
+    "links": [],
+    "meta": {
+        "path": "\/",
+        "per_page": 100,
+        "next_cursor": null,
+        "next_page_url": null,
+        "prev_cursor": null,
+        "prev_page_url": null
+    }
+}

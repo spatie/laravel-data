@@ -23,12 +23,15 @@ use Spatie\LaravelData\Contracts\ResponsableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\ValidateableData;
 use Spatie\LaravelData\Contracts\WrappableData;
+use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Enums\DataCollectableType;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
@@ -104,6 +107,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollectable);
+        $this->assertNull($type->dataCollectableType);
         $this->assertNull($type->dataClass);
         $this->assertEquals(['string', 'int'], array_keys($type->acceptedTypes));
     }
@@ -121,6 +125,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollectable);
+        $this->assertNull($type->dataCollectableType);
         $this->assertNull($type->dataClass);
         $this->assertEquals(['string', 'int'], array_keys($type->acceptedTypes));
     }
@@ -138,6 +143,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollectable);
+        $this->assertNull($type->dataCollectableType);
         $this->assertNull($type->dataClass);
         $this->assertEquals([
             DateTime::class,
@@ -158,6 +164,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollectable);
+        $this->assertNull($type->dataCollectableType);
         $this->assertNull($type->dataClass);
         $this->assertEquals([], $type->acceptedTypes);
     }
@@ -175,6 +182,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollectable);
+        $this->assertNull($type->dataCollectableType);
         $this->assertNull($type->dataClass);
         $this->assertEquals(['string'], array_keys($type->acceptedTypes));
     }
@@ -192,6 +200,7 @@ class DataTypeTest extends TestCase
         $this->assertTrue($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertFalse($type->isDataCollectable);
+        $this->assertNull($type->dataCollectableType);
         $this->assertNull($type->dataClass);
         $this->assertEquals(['string'], array_keys($type->acceptedTypes));
     }
@@ -219,6 +228,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isOptional);
         $this->assertTrue($type->isDataObject);
         $this->assertFalse($type->isDataCollectable);
+        $this->assertNull($type->dataCollectableType);
         $this->assertEquals(SimpleData::class, $type->dataClass);
         $this->assertEquals([SimpleData::class], array_keys($type->acceptedTypes));
     }
@@ -236,6 +246,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isOptional);
         $this->assertTrue($type->isDataObject);
         $this->assertFalse($type->isDataCollectable);
+        $this->assertNull($type->dataCollectableType);
         $this->assertEquals(SimpleData::class, $type->dataClass);
         $this->assertEquals([SimpleData::class], array_keys($type->acceptedTypes));
     }
@@ -254,6 +265,7 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertTrue($type->isDataCollectable);
+        $this->assertEquals(DataCollectableType::Default, $type->dataCollectableType);
         $this->assertEquals(SimpleData::class, $type->dataClass);
         $this->assertEquals([DataCollection::class], array_keys($type->acceptedTypes));
     }
@@ -272,8 +284,85 @@ class DataTypeTest extends TestCase
         $this->assertFalse($type->isOptional);
         $this->assertFalse($type->isDataObject);
         $this->assertTrue($type->isDataCollectable);
+        $this->assertEquals(DataCollectableType::Default, $type->dataCollectableType);
         $this->assertEquals(SimpleData::class, $type->dataClass);
         $this->assertEquals([DataCollection::class], array_keys($type->acceptedTypes));
+    }
+
+    /** @test */
+    public function it_can_deduce_a_paginated_data_collection_type()
+    {
+        $type = $this->resolveDataType(new class () {
+            #[DataCollectionOf(SimpleData::class)]
+            public PaginatedDataCollection $property;
+        });
+
+        $this->assertFalse($type->isNullable);
+        $this->assertFalse($type->isMixed);
+        $this->assertFalse($type->isLazy);
+        $this->assertFalse($type->isOptional);
+        $this->assertFalse($type->isDataObject);
+        $this->assertTrue($type->isDataCollectable);
+        $this->assertEquals(DataCollectableType::Paginated, $type->dataCollectableType);
+        $this->assertEquals(SimpleData::class, $type->dataClass);
+        $this->assertEquals([PaginatedDataCollection::class], array_keys($type->acceptedTypes));
+    }
+
+    /** @test */
+    public function it_can_deduce_a_paginated_data_collection_union_type()
+    {
+        $type = $this->resolveDataType(new class () {
+            #[DataCollectionOf(SimpleData::class)]
+            public PaginatedDataCollection|Lazy $property;
+        });
+
+        $this->assertFalse($type->isNullable);
+        $this->assertFalse($type->isMixed);
+        $this->assertTrue($type->isLazy);
+        $this->assertFalse($type->isOptional);
+        $this->assertFalse($type->isDataObject);
+        $this->assertTrue($type->isDataCollectable);
+        $this->assertEquals(DataCollectableType::Paginated, $type->dataCollectableType);
+        $this->assertEquals(SimpleData::class, $type->dataClass);
+        $this->assertEquals([PaginatedDataCollection::class], array_keys($type->acceptedTypes));
+    }
+
+    /** @test */
+    public function it_can_deduce_a_cursor_paginated_data_collection_type()
+    {
+        $type = $this->resolveDataType(new class () {
+            #[DataCollectionOf(SimpleData::class)]
+            public CursorPaginatedDataCollection $property;
+        });
+
+        $this->assertFalse($type->isNullable);
+        $this->assertFalse($type->isMixed);
+        $this->assertFalse($type->isLazy);
+        $this->assertFalse($type->isOptional);
+        $this->assertFalse($type->isDataObject);
+        $this->assertTrue($type->isDataCollectable);
+        $this->assertEquals(DataCollectableType::CursorPaginated, $type->dataCollectableType);
+        $this->assertEquals(SimpleData::class, $type->dataClass);
+        $this->assertEquals([CursorPaginatedDataCollection::class], array_keys($type->acceptedTypes));
+    }
+
+    /** @test */
+    public function it_can_deduce_a_cursor_paginated_data_collection_union_type()
+    {
+        $type = $this->resolveDataType(new class () {
+            #[DataCollectionOf(SimpleData::class)]
+            public CursorPaginatedDataCollection|Lazy $property;
+        });
+
+        $this->assertFalse($type->isNullable);
+        $this->assertFalse($type->isMixed);
+        $this->assertTrue($type->isLazy);
+        $this->assertFalse($type->isOptional);
+        $this->assertFalse($type->isDataObject);
+        $this->assertTrue($type->isDataCollectable);
+        $this->assertEquals(DataCollectableType::CursorPaginated, $type->dataCollectableType);
+        $this->assertEquals(SimpleData::class, $type->dataClass);
+        $this->assertEquals([CursorPaginatedDataCollection::class], array_keys($type->acceptedTypes));
     }
 
     /** @test */

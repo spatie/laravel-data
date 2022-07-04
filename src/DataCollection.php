@@ -18,7 +18,7 @@ use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\InvalidDataCollectionOperation;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
-use Spatie\LaravelData\Transformers\DataCollectionTransformer;
+use Spatie\LaravelData\Transformers\DataCollectableTransformer;
 
 /**
  * @template TKey of array-key
@@ -68,41 +68,9 @@ class DataCollection implements DataCollectable, ArrayAccess
         return $this->items->all();
     }
 
-    /**
-     * @return array<array>
-     */
-    public function transform(
-        bool $transformValues = true,
-        WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
-    ): array {
-        $transformer = new DataCollectionTransformer(
-            $this->dataClass,
-            $transformValues,
-            $wrapExecutionType,
-            $this->getPartialTrees(),
-            $this->items,
-            $this->getWrap(),
-        );
-
-        return $transformer->transform();
-    }
-
     public function toCollection(): Enumerable
     {
         return $this->items;
-    }
-
-    /**  @return \ArrayIterator<TKey, array> */
-    public function getIterator(): ArrayIterator
-    {
-        return new ArrayIterator($this->transform(
-            transformValues: false,
-        ));
-    }
-
-    public function count(): int
-    {
-        return count($this->items);
     }
 
     /**

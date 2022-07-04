@@ -7,14 +7,19 @@ use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
+use ReflectionType;
 use ReflectionUnionType;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\CursorPaginatedDataCollection;
+use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Enums\DataCollectableType;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\PaginatedDataCollection;
 use TypeError;
 
 class DataType implements Countable
@@ -30,6 +35,8 @@ class DataType implements Countable
     public readonly bool $isDataObject;
 
     public readonly bool $isDataCollectable;
+
+    public readonly ?DataCollectableType $dataCollectableType;
 
     /** @var class-string<BaseData>|null */
     public readonly ?string $dataClass;
@@ -53,6 +60,7 @@ class DataType implements Countable
             $this->isOptional = false;
             $this->isDataObject = false;
             $this->isDataCollectable = false;
+            $this->dataCollectableType = null;
             $this->dataClass = null;
 
             return;
@@ -75,11 +83,12 @@ class DataType implements Countable
             $this->isLazy = false;
             $this->isOptional = false;
             $this->isDataObject = is_a($type->getName(), BaseData::class, true);
-            $this->isDataCollectable = is_a($type->getName(), BaseDataCollectable::class, true);
+            $this->dataCollectableType = $this->resolveDataCollectableType($type);
+            $this->isDataCollectable = $this->dataCollectableType !== null;
 
             $this->dataClass = match (true) {
                 $this->isDataObject => $type->getName(),
-                $this->isDataCollectable => $this->resolveDataCollectionClass($reflection),
+                $this->isDataCollectable => $this->resolveDataCollectableClass($reflection),
                 default => null
             };
 
@@ -96,7 +105,7 @@ class DataType implements Countable
         $isLazy = false;
         $isOptional = false;
         $isDataObject = false;
-        $isDataCollection = false;
+        $dataCollectableType = null;
 
         foreach ($type->getTypes() as $namedType) {
             if (! in_array($namedType, ['null', Lazy::class, Optional::class])) {
@@ -108,7 +117,7 @@ class DataType implements Countable
             $isLazy = $isLazy || is_a($namedType->getName(), Lazy::class, true);
             $isOptional = $isOptional || is_a($namedType->getName(), Optional::class, true);
             $isDataObject = $isDataObject || is_a($namedType->getName(), BaseData::class, true);
-            $isDataCollection = $isDataCollection || is_a($namedType->getName(), BaseDataCollectable::class, true);
+            $dataCollectableType = $dataCollectableType ?? $this->resolveDataCollectableType($namedType);
         }
 
         $this->acceptedTypes = $acceptedTypes;
@@ -117,7 +126,8 @@ class DataType implements Countable
         $this->isLazy = $isLazy;
         $this->isOptional = $isOptional;
         $this->isDataObject = $isDataObject;
-        $this->isDataCollectable = $isDataCollection;
+        $this->dataCollectableType = $dataCollectableType;
+        $this->isDataCollectable = $this->dataCollectableType !== null;
 
         if ($this->isDataObject && count($this->acceptedTypes) > 1) {
             throw InvalidDataType::unionWithData($reflection);
@@ -129,7 +139,7 @@ class DataType implements Countable
 
         $this->dataClass = match (true) {
             $this->isDataObject => array_key_first($acceptedTypes),
-            $this->isDataCollectable => $this->resolveDataCollectionClass($reflection),
+            $this->isDataCollectable => $this->resolveDataCollectableClass($reflection),
             default => null
         };
     }
@@ -212,7 +222,7 @@ class DataType implements Countable
         ]);
     }
 
-    private function resolveDataCollectionClass(
+    private function resolveDataCollectableClass(
         ReflectionProperty|ReflectionParameter $reflection,
     ): ?string {
         $attributes = $reflection->getAttributes(DataCollectionOf::class);
@@ -235,5 +245,18 @@ class DataType implements Countable
         }
 
         return $class;
+    }
+
+    private function resolveDataCollectableType(
+        ReflectionNamedType $reflection,
+    ): ?DataCollectableType {
+        $className = $reflection->getName();
+
+        return match(true){
+            is_a($className, DataCollection::class, true) => DataCollectableType::Default,
+            is_a($className, PaginatedDataCollection::class, true) => DataCollectableType::Paginated,
+            is_a($className, CursorPaginatedDataCollection::class, true) => DataCollectableType::CursorPaginated,
+            default => null,
+        };
     }
 }

@@ -9,7 +9,9 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\CustomDataCollection;
 use Spatie\LaravelData\Tests\Fakes\CustomPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
@@ -29,8 +31,28 @@ class DataCollectionTest extends TestCase
             15
         );
 
-        $this->assertMatchesJsonSnapshot(SimpleData::collection($paginator)->toArray());
+        $collection = SimpleData::collection($paginator);
+
+        $this->assertInstanceOf(PaginatedDataCollection::class, $collection);
+        $this->assertMatchesJsonSnapshot($collection->toArray());
     }
+
+    /** @test */
+    public function it_can_get_a_paginated_cursor_data_collection()
+    {
+        $items = Collection::times(100, fn (int $index) => "Item {$index}");
+
+        $paginator = new CursorPaginator(
+            $items,
+            15,
+        );
+
+        $collection = SimpleData::collection($paginator);
+
+        $this->assertInstanceOf(CursorPaginatedDataCollection::class, $collection);
+        $this->assertMatchesJsonSnapshot($collection->toArray());
+    }
+
 
     /** @test */
     public function a_collection_can_be_constructed_with_data_objects()

@@ -14,7 +14,7 @@ use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
-class DataCollectionTransformer
+class DataCollectableTransformer
 {
     public function __construct(
         protected string $dataClass,
