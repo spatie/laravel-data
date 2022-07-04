@@ -126,6 +126,7 @@ class RulesTest extends TestCase
     ) {
         if ($exception) {
             $this->assertTrue(true);
+
             return;
         }
 
