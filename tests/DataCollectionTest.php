@@ -49,6 +49,10 @@ class DataCollectionTest extends TestCase
 
         $collection = SimpleData::collection($paginator);
 
+        if(version_compare(app()->version(), '9.0.0', '<=')){
+            $this->markTestIncomplete('Laravel 8 uses a different format');
+        }
+
         $this->assertInstanceOf(CursorPaginatedDataCollection::class, $collection);
         $this->assertMatchesJsonSnapshot($collection->toArray());
     }
