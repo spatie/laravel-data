@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 1.5.1 - 2022-07-08
+
+- Fix optional parameters (#152)
+- Use protected properties and methods (#147 )
+
 ## 1.5.0 - 2022-05-25
 
 ## What's Changed
