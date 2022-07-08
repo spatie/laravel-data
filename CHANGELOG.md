@@ -2,6 +2,23 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.0 - 2022-07-08
+
+Version 2 of laravel-data is a complete overhaul, we've almost completely rewritten the package.
+
+This is a (non-complete) list of the new features:
+
+- A DataPipeline
+- Data normalizers
+- Mappable property names
+- Wrapping of data in responses
+- `only` and `except` methods on Data and DataCollections
+- Multiple parameter magic methods
+- Optional properties
+- Split DataCollections
+- Better support for TypeScript Transformer
+- And a lot more ...
+
 ## 1.5.1 - 2022-07-08
 
 - Fix optional parameters (#152)
