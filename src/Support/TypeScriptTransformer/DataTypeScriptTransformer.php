@@ -67,9 +67,11 @@ class DataTypeScriptTransformer extends DtoTransformer
                     $property->getDeclaringClass()->getName()
                 );
 
+                $propertyName = $dataProperty->outputMappedName ?? $dataProperty->name;
+
                 return $dataProperty->type->isLazy || $dataProperty->type->isOptional
-                    ? "{$carry}{$property->getName()}?: {$transformed};" . PHP_EOL
-                    : "{$carry}{$property->getName()}: {$transformed};" . PHP_EOL;
+                    ? "{$carry}{$propertyName}?: {$transformed};" . PHP_EOL
+                    : "{$carry}{$propertyName}: {$transformed};" . PHP_EOL;
             },
             ''
         );
