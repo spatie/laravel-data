@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Lazy
 {
-    private ?Closure $condition = null;
+    protected ?Closure $condition = null;
 
-    private ?bool $defaultIncluded = null;
+    protected ?bool $defaultIncluded = null;
 
     protected function __construct(
-        private Closure $value
+        protected Closure $value
     ) {
     }
 

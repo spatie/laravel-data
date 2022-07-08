@@ -30,14 +30,14 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
     use ResponsableData;
     use IncludeableData;
 
-    private ?Closure $through = null;
+    protected ?Closure $through = null;
 
-    private ?Closure $filter = null;
+    protected ?Closure $filter = null;
 
-    private Enumerable|CursorPaginator|Paginator $items;
+    protected Enumerable|CursorPaginator|Paginator $items;
 
     public function __construct(
-        private string $dataClass,
+        protected string $dataClass,
         Enumerable|array|CursorPaginator|Paginator|DataCollection $items
     ) {
         $this->items = match (true) {
