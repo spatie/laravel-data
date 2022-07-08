@@ -38,7 +38,6 @@ class DataTypeScriptTransformer extends DtoTransformer
             ),
             new RemoveLazyTypeProcessor(),
             new RemoveOptionalTypeProcessor(),
-            new RemoveOptionalTypeProcessor(),
             new DtoCollectionTypeProcessor(),
         ];
     }
