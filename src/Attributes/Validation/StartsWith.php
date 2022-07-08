@@ -6,17 +6,22 @@ use Attribute;
 use Illuminate\Support\Arr;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class StartsWith extends ValidationAttribute
+class StartsWith extends StringValidationAttribute
 {
-    private string|array $values;
+    protected string|array $values;
 
     public function __construct(string | array ...$values)
     {
         $this->values = Arr::flatten($values);
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["starts_with:{$this->normalizeValue($this->values)}"];
+        return 'starts_with';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->normalizeValue($this->values)];
     }
 }

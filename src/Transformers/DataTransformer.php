@@ -2,62 +2,93 @@
 
 namespace Spatie\LaravelData\Transformers;
 
-use Spatie\LaravelData\Data;
-use Spatie\LaravelData\DataCollection;
+use Illuminate\Support\Arr;
+use Spatie\LaravelData\Contracts\AppendableData;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Contracts\IncludeableData;
+use Spatie\LaravelData\Contracts\TransformableData;
+use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Support\TransformationType;
+use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
+use Spatie\LaravelData\Support\Lazy\RelationalLazy;
+use Spatie\LaravelData\Support\PartialTrees;
+use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
+use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
+use TypeError;
 
 class DataTransformer
 {
-    private DataConfig $config;
+    protected DataConfig $config;
 
-    public static function create(TransformationType $transformationType): self
-    {
-        return new self($transformationType);
+    public static function create(
+        bool $transformValues,
+        WrapExecutionType $wrapExecutionType
+    ): self {
+        return new self($transformValues, $wrapExecutionType);
     }
 
-    public function __construct(protected TransformationType $transformationType)
-    {
+    public function __construct(
+        protected bool $transformValues,
+        protected WrapExecutionType $wrapExecutionType,
+    ) {
         $this->config = app(DataConfig::class);
     }
 
-    public function transform(Data $data): array
+    /** @return array<mixed> */
+    public function transform(TransformableData $data): array
     {
-        return array_merge(
-            $this->resolvePayload($data),
-            $data->getAdditionalData()
-        );
+        $transformed = $this->resolvePayload($data);
+
+        if ($data instanceof WrappableData && $this->wrapExecutionType->shouldExecute()) {
+            $transformed = $data->getWrap()->wrap($transformed);
+        }
+
+        if ($data instanceof AppendableData) {
+            $transformed = array_merge($transformed, $data->getAdditionalData());
+        }
+
+        return $transformed;
     }
 
-    protected function resolvePayload(Data $data): array
+    /** @return array<mixed> */
+    protected function resolvePayload(TransformableData $data): array
     {
-        $inclusionTree = $data->getInclusionTree();
-        $exclusionTree = $data->getExclusionTree();
+        $trees = $data instanceof IncludeableData
+            ? $data->getPartialTrees()
+            : new PartialTrees();
 
-        $allowedIncludes = $this->transformationType->limitIncludesAndExcludes()
-            ? $data->allowedRequestIncludes()
-            : null;
+        $dataClass = $this->config->getDataClass($data::class);
 
-        $allowedExcludes = $this->transformationType->limitIncludesAndExcludes()
-            ? $data->allowedRequestExcludes()
-            : null;
+        return $dataClass
+            ->properties
+            ->reduce(function (array $payload, DataProperty $property) use ($data, $trees) {
+                $name = $property->name;
 
-        return $this->config
-            ->getDataClass($data::class)
-            ->properties()
-            ->reduce(function (array $payload, DataProperty $property) use ($allowedExcludes, $allowedIncludes, $data, $exclusionTree, $inclusionTree) {
-                $name = $property->name();
-
-                if ($this->shouldIncludeProperty($name, $data->{$name}, $inclusionTree, $exclusionTree, $allowedIncludes, $allowedExcludes)) {
-                    $payload[$name] = $this->resolvePropertyValue(
-                        $property,
-                        $data->{$name},
-                        $inclusionTree[$name] ?? [],
-                        $exclusionTree[$name] ?? []
-                    );
+                if (! $this->shouldIncludeProperty($name, $data->{$name}, $trees)) {
+                    return $payload;
                 }
+
+                $value = $this->resolvePropertyValue(
+                    $property,
+                    $data->{$name},
+                    $trees->getNested($name),
+                );
+
+                if ($value instanceof Optional) {
+                    return $payload;
+                }
+
+                if ($property->outputMappedName) {
+                    $name = $property->outputMappedName;
+                }
+
+                $payload[$name] = $value;
 
                 return $payload;
             }, []);
@@ -66,57 +97,83 @@ class DataTransformer
     protected function shouldIncludeProperty(
         string $name,
         mixed $value,
-        array $includes,
-        array $excludes,
-        ?array $allowedIncludes,
-        ?array $allowedExcludes,
+        PartialTrees $trees,
     ): bool {
+        if ($value instanceof Optional) {
+            return false;
+        }
+
+        if ($this->isPropertyHidden($name, $trees)) {
+            return false;
+        }
+
         if (! $value instanceof Lazy) {
             return true;
         }
 
-        if ($value->isConditional()) {
-            return ($value->getCondition())();
+        if ($value instanceof RelationalLazy || $value instanceof ConditionalLazy) {
+            return $value->shouldBeIncluded();
         }
 
-        if ($this->isPropertyExcluded($name, $excludes, $allowedExcludes)) {
+        if ($this->isPropertyLazyExcluded($name, $trees)) {
             return false;
         }
 
-        return $this->isPropertyIncluded($name, $value, $includes, $allowedIncludes);
+        return $this->isPropertyLazyIncluded($name, $value, $trees);
     }
 
-    protected function isPropertyExcluded(
+    protected function isPropertyHidden(
         string $name,
-        array $excludes,
-        ?array $allowedExcludes,
+        PartialTrees $trees,
     ): bool {
-        if ($allowedExcludes !== null && ! in_array($name, $allowedExcludes)) {
-            return false;
-        }
-
-        if ($excludes === ['*']) {
+        if ($trees->except instanceof AllTreeNode) {
             return true;
         }
 
-        if (array_key_exists($name, $excludes)) {
+        if (
+            $trees->except instanceof PartialTreeNode
+            && $trees->except->hasField($name)
+            && $trees->except->getNested($name) instanceof ExcludedTreeNode
+        ) {
+            return true;
+        }
+
+        if ($trees->except instanceof PartialTreeNode) {
+            return false;
+        }
+
+        if ($trees->only instanceof AllTreeNode) {
+            return false;
+        }
+
+        if ($trees->only instanceof PartialTreeNode && $trees->only->hasField($name)) {
+            return false;
+        }
+
+        if ($trees->only instanceof PartialTreeNode || $trees->only instanceof ExcludedTreeNode) {
             return true;
         }
 
         return false;
     }
 
-    protected function isPropertyIncluded(
+    protected function isPropertyLazyExcluded(
         string $name,
-        Lazy $value,
-        array $includes,
-        ?array $allowedIncludes,
+        PartialTrees $trees,
     ): bool {
-        if ($allowedIncludes !== null && ! in_array($name, $allowedIncludes)) {
-            return false;
+        if ($trees->lazyExcluded instanceof AllTreeNode) {
+            return true;
         }
 
-        if ($includes === ['*']) {
+        return $trees->lazyExcluded instanceof PartialTreeNode && $trees->lazyExcluded->hasField($name);
+    }
+
+    protected function isPropertyLazyIncluded(
+        string $name,
+        Lazy $value,
+        PartialTrees $trees,
+    ): bool {
+        if ($trees->lazyIncluded instanceof AllTreeNode) {
             return true;
         }
 
@@ -124,14 +181,13 @@ class DataTransformer
             return true;
         }
 
-        return array_key_exists($name, $includes);
+        return $trees->lazyIncluded instanceof PartialTreeNode && $trees->lazyIncluded->hasField($name);
     }
 
     protected function resolvePropertyValue(
         DataProperty $property,
         mixed $value,
-        array $nestedInclusionTree,
-        array $nestedExclusionTree,
+        PartialTrees $trees
     ): mixed {
         if ($value instanceof Lazy) {
             $value = $value->resolve();
@@ -141,33 +197,55 @@ class DataTransformer
             return null;
         }
 
+        if (is_array($value) && ($trees->only instanceof AllTreeNode || $trees->only instanceof PartialTreeNode)) {
+            $value = Arr::only($value, $trees->only->getFields());
+        }
+
+        if (is_array($value) && ($trees->except instanceof AllTreeNode || $trees->except instanceof PartialTreeNode)) {
+            $value = Arr::except($value, $trees->except->getFields());
+        }
+
         if ($transformer = $this->resolveTransformerForValue($property, $value)) {
             return $transformer->transform($property, $value);
         }
 
-        if ($value instanceof Data || $value instanceof DataCollection) {
-            $value->withPartialsTrees($nestedInclusionTree, $nestedExclusionTree);
+        if (! $value instanceof BaseData && ! $value instanceof BaseDataCollectable) {
+            return $value;
+        }
 
-            return $this->transformationType->useTransformers()
-                ? $value->transform($this->transformationType)
-                : $value;
+        if ($value instanceof IncludeableData) {
+            $value->withPartialTrees($trees);
+        }
+
+        $wrapExecutionType = match (true) {
+            $value instanceof BaseData && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
+            $value instanceof BaseData && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
+            $value instanceof BaseData && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled,
+            $value instanceof BaseDataCollectable && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::Enabled,
+            $value instanceof BaseDataCollectable && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
+            $value instanceof BaseDataCollectable && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled,
+            default => throw new TypeError('Invalid wrap execution type')
+        };
+
+        if ($value instanceof TransformableData && $this->transformValues) {
+            return $value->transform($this->transformValues, $wrapExecutionType);
         }
 
         return $value;
     }
 
-    private function resolveTransformerForValue(
+    protected function resolveTransformerForValue(
         DataProperty $property,
         mixed $value,
     ): ?Transformer {
-        if (! $this->transformationType->useTransformers()) {
+        if (! $this->transformValues) {
             return null;
         }
 
-        $transformer = $property->transformerAttribute()?->get() ?? $this->config->findGlobalTransformerForValue($value);
+        $transformer = $property->transformer ?? $this->config->findGlobalTransformerForValue($value);
 
         $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
-            && ($property->isData() || $property->isDataCollection());
+            && ($property->type->isDataObject || $property->type->isDataCollectable);
 
         if ($shouldUseDefaultDataTransformer) {
             return null;

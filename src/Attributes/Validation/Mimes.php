@@ -6,17 +6,22 @@ use Attribute;
 use Illuminate\Support\Arr;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Mimes extends ValidationAttribute
+class Mimes extends StringValidationAttribute
 {
-    private array $mimes;
+    protected array $mimes;
 
     public function __construct(string | array ...$mimes)
     {
         $this->mimes = Arr::flatten($mimes);
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["mimes:{$this->normalizeValue($this->mimes)}"];
+        return 'mimes';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->normalizeValue($this->mimes)];
     }
 }

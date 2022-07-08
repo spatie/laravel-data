@@ -3,14 +3,15 @@
 namespace Spatie\LaravelData\Support\EloquentCasts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 
 class DataCollectionEloquentCast implements CastsAttributes
 {
     public function __construct(
-        /** @var class-string<\Spatie\LaravelData\Data> $dataClass */
         protected string $dataClass
     ) {
     }
@@ -37,7 +38,7 @@ class DataCollectionEloquentCast implements CastsAttributes
             return null;
         }
 
-        if ($value instanceof DataCollection) {
+        if ($value instanceof BaseDataCollectable && $value instanceof TransformableData) {
             $value = $value->all();
         }
 
@@ -46,7 +47,7 @@ class DataCollectionEloquentCast implements CastsAttributes
         }
 
         $data = array_map(
-            fn (array | Data $item) => is_array($item)
+            fn (array | BaseData $item) => is_array($item)
                 ? ($this->dataClass)::from($item)
                 : $item,
             $value

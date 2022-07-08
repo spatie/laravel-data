@@ -3,35 +3,40 @@
 namespace Spatie\LaravelData\RuleInferrers;
 
 use BackedEnum;
-use Illuminate\Validation\Rules\Enum;
+use Spatie\LaravelData\Attributes\Validation\ArrayType;
+use Spatie\LaravelData\Attributes\Validation\BooleanType;
+use Spatie\LaravelData\Attributes\Validation\Enum;
+use Spatie\LaravelData\Attributes\Validation\Numeric;
+use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Validation\RulesCollection;
 
 class BuiltInTypesRuleInferrer implements RuleInferrer
 {
-    public function handle(DataProperty $property, array $rules): array
+    public function handle(DataProperty $property, RulesCollection $rules): RulesCollection
     {
-        if ($property->types()->canBe('int')) {
-            $rules[] = 'numeric';
+        if ($property->type->acceptsType('int')) {
+            $rules->add(new Numeric());
         }
 
-        if ($property->types()->canBe('string')) {
-            $rules[] = 'string';
+        if ($property->type->acceptsType('string')) {
+            $rules->add(new StringType());
         }
 
-        if ($property->types()->canBe('bool')) {
-            $rules[] = 'boolean';
+        if ($property->type->acceptsType('bool')) {
+            $rules->add(new BooleanType());
         }
 
-        if ($property->types()->canBe('float')) {
-            $rules[] = 'numeric';
+        if ($property->type->acceptsType('float')) {
+            $rules->add(new Numeric());
         }
 
-        if ($property->types()->canBe('array')) {
-            $rules[] = 'array';
+        if ($property->type->acceptsType('array')) {
+            $rules->add(new ArrayType());
         }
 
-        if ($enumClass = $property->types()->getImplementedType(BackedEnum::class)) {
-            $rules[] = new Enum($enumClass);
+        if ($enumClass = $property->type->findAcceptedTypeForBaseType(BackedEnum::class)) {
+            $rules->add(new Enum($enumClass));
         }
 
         return $rules;

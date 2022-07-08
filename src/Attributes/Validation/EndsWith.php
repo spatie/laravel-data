@@ -6,17 +6,22 @@ use Attribute;
 use Illuminate\Support\Arr;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class EndsWith extends ValidationAttribute
+class EndsWith extends StringValidationAttribute
 {
-    private string|array $values;
+    protected string|array $values;
 
     public function __construct(string | array ...$values)
     {
-        $this->values = $values;
+        $this->values = Arr::flatten($values);
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["ends_with:{$this->normalizeValue(Arr::flatten($this->values))}"];
+        return 'ends_with';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->normalizeValue($this->values)];
     }
 }

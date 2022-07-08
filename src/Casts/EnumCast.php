@@ -14,31 +14,19 @@ class EnumCast implements Cast
     ) {
     }
 
-    public function cast(DataProperty $property, mixed $value): BackedEnum | Uncastable
+    public function cast(DataProperty $property, mixed $value, array $context): BackedEnum | Uncastable
     {
-        $type = $this->type ?? $this->findType($property);
+        $type = $this->type ?? $property->type->findAcceptedTypeForBaseType(BackedEnum::class);
 
         if ($type === null) {
             return Uncastable::create();
         }
 
-        /** @var \BackedEnum $type */
+        /** @var class-string<\BackedEnum> $type */
         try {
             return $type::from($value);
         } catch (Throwable $e) {
-            /** @psalm-suppress InvalidCast,InvalidArgument */
             throw CannotCastEnum::create($type, $value);
         }
-    }
-
-    protected function findType(DataProperty $property): ?string
-    {
-        foreach ($property->types()->all() as $type) {
-            if (is_a($type, BackedEnum::class, true)) {
-                return (string) $type;
-            }
-        }
-
-        return null;
     }
 }

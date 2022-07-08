@@ -45,6 +45,66 @@ SongData::from(Song::firstOrFail($id));
 
 The package will find the required properties within the model and use them to construct the data object.
 
+Although the PHP 8.0 constructor properties look great in data objects, it is perfectly valid to use regular properties without a constructor like so:
+
+```php
+class SongData extends Data
+{
+    public string $title;
+    public string $artist;
+}
+```
+
+## Mapping property names
+
+Sometimes the property names in the array from which you're creating a data object might be different. You can define another name for a property when it is created from array using attributes:
+
+```php
+class ContractData extends Data
+{
+    public function __construct(
+        public string $name,
+        #[MapInputName('record_company')]
+        public string $recordCompany,
+    ) {
+    }
+}
+```
+
+Creating the data object can now be done as such:
+
+```php
+SongData::from(['name' => 'Rick Astley', 'record_company' => 'RCA Records']);
+```
+
+Changing all camelCased property names in a data object to snake_case can be done as such:
+
+```php
+#[MapInputName(SnakeCaseMapper::class)]
+class ContractData extends Data
+{
+    public function __construct(
+        public string $name,
+        public string $recordCompany,
+    ) {
+    }
+}
+```
+
+You can also use the `MapName` attribute when you want to combine input (see [transforming data objects](https://spatie.be/docs/laravel-data/v2/as-a-resource/from-data-to-resource#mapping-property-names)) and output property name mapping:
+
+```php
+#[MapName(SnakeCaseMapper::class)]
+class ContractData extends Data
+{
+    public function __construct(
+        public string $name,
+        public string $recordCompany,
+    ) {
+    }
+}
+```
+
 ## Magical creation
 
 It is possible to overwrite or extend the behaviour of the `from` method for specific types. So you can construct a data
@@ -105,11 +165,34 @@ From now on, you can create a data object like this:
 SongData::from('Never gonna give you up|Rick Astley');
 ```
 
+It is also possible to use multiple arguments in a magical creation method:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        public string $artist,
+    ) {
+    }
+    
+    public static function fromMultiple(string $title, string $artist): self
+    {
+        return new self($title, $artist);
+    }
+}
+```
+
+Now we can create the data object like this:
+
+```php
+SongData::from('Never gonna give you up', 'Rick Astley');
+```
+
 There are a few requirements to enable magical data object creation:
 
 - The method must be **static and public**
 - The method must **start with from**
-- The method can only take **one typed parameter** for which you want to create an object
 - The method cannot be called **from**
 
 When the package cannot find such a method for a type given to the data object's `from` method. Then the data object
@@ -119,6 +202,8 @@ will try to create itself from the following types:
 - A *Laravel request* by calling `all` on it
 - An *Arrayable* by calling `toArray` on it
 - An *array*
+
+This list can be extended using extra normalizers, find more about it [here](https://spatie.be/docs/laravel-data/v2/advanced-usage/normalizers).
 
 When a data object cannot be created using magical methods or the default methods, a `CannotCreateDataFromValue`
 exception will be thrown.

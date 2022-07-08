@@ -5,14 +5,21 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Regex extends ValidationAttribute
+class Regex extends StringValidationAttribute
 {
-    public function __construct(private string $pattern)
+    public function __construct(protected string $pattern)
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["regex:{$this->pattern}"];
+        return 'regex';
+    }
+
+    public function parameters(): array
+    {
+        return [
+            $this->normalizeValue($this->pattern),
+        ];
     }
 }

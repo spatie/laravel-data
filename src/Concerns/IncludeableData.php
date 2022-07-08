@@ -2,24 +2,26 @@
 
 namespace Spatie\LaravelData\Concerns;
 
+use Closure;
 use Spatie\LaravelData\Support\PartialsParser;
+use Spatie\LaravelData\Support\PartialTrees;
 
 trait IncludeableData
 {
+    protected ?PartialTrees $partialTrees = null;
+
     protected array $includes = [];
 
     protected array $excludes = [];
 
-    protected ?array $inclusionTree = null;
+    protected array $only = [];
 
-    protected ?array $exclusionTree = null;
+    protected array $except = [];
 
-    public function withPartialsTrees(
-        array $inclusionTree,
-        array $exclusionTree
+    public function withPartialTrees(
+        PartialTrees $partialTrees,
     ): static {
-        $this->inclusionTree = $inclusionTree;
-        $this->exclusionTree = $exclusionTree;
+        $this->partialTrees = $partialTrees;
 
         return $this;
     }
@@ -38,13 +40,57 @@ trait IncludeableData
         return $this;
     }
 
-    public function getInclusionTree(): array
+    public function only(string ...$only): static
     {
-        return $this->inclusionTree ?? (new PartialsParser())->execute($this->includes);
+        $this->only = array_unique(array_merge($this->only, $only));
+
+        return $this;
     }
 
-    public function getExclusionTree(): array
+    public function except(string ...$except): static
     {
-        return $this->exclusionTree ?? (new PartialsParser())->execute($this->excludes);
+        $this->except = array_unique(array_merge($this->except, $except));
+
+        return $this;
+    }
+
+    public function onlyWhen(string $only, bool|Closure $condition): static
+    {
+        $condition = $condition instanceof Closure
+            ? $condition($this)
+            : $condition;
+
+        if ($condition) {
+            $this->only($only);
+        }
+
+        return $this;
+    }
+
+    public function exceptWhen(string $except, bool|Closure $condition): static
+    {
+        $condition = $condition instanceof Closure
+            ? $condition($this)
+            : $condition;
+
+        if ($condition) {
+            $this->except($except);
+        }
+
+        return $this;
+    }
+
+    public function getPartialTrees(): PartialTrees
+    {
+        if ($this->partialTrees) {
+            return $this->partialTrees;
+        }
+
+        return new PartialTrees(
+            (new PartialsParser())->execute($this->includes),
+            (new PartialsParser())->execute($this->excludes),
+            (new PartialsParser())->execute($this->only),
+            (new PartialsParser())->execute($this->except),
+        );
     }
 }

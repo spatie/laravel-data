@@ -5,14 +5,19 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class DigitsBetween extends ValidationAttribute
+class DigitsBetween extends StringValidationAttribute
 {
-    public function __construct(private int $min, private int $max)
+    public function __construct(protected int $min, protected int $max)
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["digits_between:{$this->min},{$this->max}"];
+        return 'digits_between';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->min, $this->max];
     }
 }

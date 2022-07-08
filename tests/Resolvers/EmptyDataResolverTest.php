@@ -4,9 +4,12 @@ namespace Spatie\LaravelData\Tests\Resolvers;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
@@ -61,6 +64,7 @@ class EmptyDataResolverTest extends TestCase
         });
 
         $this->assertEmptyPropertyValue([], new class () {
+            #[DataCollectionOf(SimpleData::class)]
             public DataCollection $property;
         });
     }
@@ -81,11 +85,11 @@ class EmptyDataResolverTest extends TestCase
 //        });
 
         $this->assertEmptyPropertyValue([], new class () {
-            public Lazy | array $property;
+            public Lazy|array $property;
         });
 
         $this->assertEmptyPropertyValue(['string' => null], new class () {
-            public Lazy | SimpleData $property;
+            public Lazy|SimpleData $property;
         });
     }
 
@@ -93,15 +97,46 @@ class EmptyDataResolverTest extends TestCase
     public function it_will_return_the_base_type_for_lazy_types_that_can_be_null()
     {
         $this->assertEmptyPropertyValue(null, new class () {
-            public Lazy | string | null $property;
+            public Lazy|string|null $property;
         });
 
         $this->assertEmptyPropertyValue([], new class () {
-            public Lazy | array | null $property;
+            public Lazy|array|null $property;
         });
 
         $this->assertEmptyPropertyValue(['string' => null], new class () {
-            public Lazy | SimpleData | null $property;
+            public Lazy|SimpleData|null $property;
+        });
+    }
+
+    public function it_will_return_the_base_type_for_lazy_types_that_can_be_optional()
+    {
+        $this->assertEmptyPropertyValue(null, new class () {
+            public Lazy|string|Optional $property;
+        });
+
+        $this->assertEmptyPropertyValue([], new class () {
+            public Lazy|array|Optional $property;
+        });
+
+        $this->assertEmptyPropertyValue(['string' => null], new class () {
+            public Lazy|SimpleData|Optional $property;
+        });
+    }
+
+    /** @test */
+    public function it_will_return_the_base_type_for_undefinable_types()
+    {
+        $this->assertEmptyPropertyValue(null, new class () {
+            public Optional|string $property;
+        });
+
+        $this->assertEmptyPropertyValue([], new class () {
+            public Optional|array $property;
+        });
+
+        $this->assertEmptyPropertyValue(['string' => null], new class () {
+            public Optional|SimpleData $property;
         });
     }
 
@@ -111,7 +146,7 @@ class EmptyDataResolverTest extends TestCase
         $this->expectException(DataPropertyCanOnlyHaveOneType::class);
 
         $this->assertEmptyPropertyValue(null, new class () {
-            public int | string $property;
+            public int|string $property;
         });
     }
 
@@ -121,7 +156,7 @@ class EmptyDataResolverTest extends TestCase
         $this->expectException(DataPropertyCanOnlyHaveOneType::class);
 
         $this->assertEmptyPropertyValue(null, new class () {
-            public int | string | Lazy $property;
+            public int|string|Lazy $property;
         });
     }
 
@@ -131,7 +166,27 @@ class EmptyDataResolverTest extends TestCase
         $this->expectException(DataPropertyCanOnlyHaveOneType::class);
 
         $this->assertEmptyPropertyValue(null, new class () {
-            public int | string | Lazy | null $property;
+            public int|string|Lazy|null $property;
+        });
+    }
+
+    /** @test */
+    public function it_cannot_have_multiple_types_with_a_optional()
+    {
+        $this->expectException(DataPropertyCanOnlyHaveOneType::class);
+
+        $this->assertEmptyPropertyValue(null, new class () {
+            public int|string|Optional $property;
+        });
+    }
+
+    /** @test */
+    public function it_cannot_have_multiple_types_with_a_nullable_optional()
+    {
+        $this->expectException(DataPropertyCanOnlyHaveOneType::class);
+
+        $this->assertEmptyPropertyValue(null, new class () {
+            public int|string|Optional|null $property;
         });
     }
 
@@ -162,10 +217,26 @@ class EmptyDataResolverTest extends TestCase
         });
     }
 
-    private function assertEmptyPropertyValue(mixed $expected, object $class, array $extra = [])
+    /** @test */
+    public function it_has_support_for_mapping_property_names()
     {
+        $this->assertEmptyPropertyValue(null, new class () {
+            #[MapOutputName('other_property')]
+            public string $property;
+        }, propertyName: 'other_property');
+    }
+
+    private function assertEmptyPropertyValue(
+        mixed $expected,
+        object $class,
+        array $extra = [],
+        string $propertyName = 'property',
+    ) {
         $resolver = app(EmptyDataResolver::class);
 
-        $this->assertEquals($expected, $resolver->execute($class::class, $extra)['property']);
+        $empty = $resolver->execute($class::class, $extra);
+
+        $this->assertArrayHasKey($propertyName, $empty);
+        $this->assertEquals($expected, $empty[$propertyName]);
     }
 }

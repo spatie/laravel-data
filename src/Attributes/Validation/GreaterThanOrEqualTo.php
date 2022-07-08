@@ -5,14 +5,19 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class GreaterThanOrEqualTo extends ValidationAttribute
+class GreaterThanOrEqualTo extends StringValidationAttribute
 {
-    public function __construct(private string $field)
+    public function __construct(protected string $field)
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["gte:{$this->field}"];
+        return 'gte';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->field];
     }
 }

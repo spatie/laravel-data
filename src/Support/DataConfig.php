@@ -47,9 +47,11 @@ class DataConfig
 
     public function findGlobalCastForProperty(DataProperty $property): ?Cast
     {
-        foreach ($property->types()->all() as $type) {
-            if ($cast = $this->findSuitableReplacerForClass($this->casts, $type)) {
-                return $cast;
+        foreach ($property->type->acceptedTypes as $acceptedType => $baseTypes) {
+            foreach ([$acceptedType, ...$baseTypes] as $type) {
+                if ($cast = $this->casts[$type] ?? null) {
+                    return $cast;
+                }
             }
         }
 
@@ -62,28 +64,21 @@ class DataConfig
             return null;
         }
 
-        return $this->findSuitableReplacerForClass($this->transformers, get_class($value));
+        foreach ($this->transformers as $transformable => $transformer) {
+            if ($value::class === $transformable) {
+                return $transformer;
+            }
+
+            if (is_a($value::class, $transformable, true)) {
+                return $transformer;
+            }
+        }
+
+        return null;
     }
 
     public function getRuleInferrers(): array
     {
         return $this->ruleInferrers;
-    }
-
-    protected function findSuitableReplacerForClass(
-        array $replacers,
-        string $class
-    ) {
-        foreach ($replacers as $replaceable => $replacer) {
-            if ($class === $replaceable) {
-                return $replacer;
-            }
-
-            if (is_a($class, $replaceable, true)) {
-                return $replacer;
-            }
-        }
-
-        return null;
     }
 }

@@ -32,22 +32,22 @@ class DateTimeInterfaceCastTest extends TestCase
 
         $this->assertEquals(
             new Carbon('19-05-1994 00:00:00'),
-            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'carbon')), '19-05-1994 00:00:00')
+            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'carbon')), '19-05-1994 00:00:00', [])
         );
 
         $this->assertEquals(
             new CarbonImmutable('19-05-1994 00:00:00'),
-            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')), '19-05-1994 00:00:00')
+            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')), '19-05-1994 00:00:00', [])
         );
 
         $this->assertEquals(
             new DateTime('19-05-1994 00:00:00'),
-            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'dateTime')), '19-05-1994 00:00:00')
+            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'dateTime')), '19-05-1994 00:00:00', [])
         );
 
         $this->assertEquals(
             new DateTimeImmutable('19-05-1994 00:00:00'),
-            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')), '19-05-1994 00:00:00')
+            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')), '19-05-1994 00:00:00', [])
         );
     }
 
@@ -64,7 +64,7 @@ class DateTimeInterfaceCastTest extends TestCase
 
         $this->assertEquals(
             new DateTime('19-05-1994 00:00:00'),
-            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'carbon')), '19-05-1994')
+            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'carbon')), '19-05-1994', [])
         );
     }
 
@@ -79,7 +79,7 @@ class DateTimeInterfaceCastTest extends TestCase
 
         $this->assertEquals(
             Uncastable::create(),
-            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'int')), '1994-05-16 12:20:00')
+            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'int')), '1994-05-16 12:20:00', [])
         );
     }
 }

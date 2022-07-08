@@ -5,13 +5,18 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class AcceptedIf extends ValidationAttribute
+class AcceptedIf extends StringValidationAttribute
 {
-    public function __construct(private string $field, private string | bool | int | float $value)
+    public function __construct(protected string $field, protected string|bool|int|float $value)
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
+    {
+        return 'accepted_if';
+    }
+
+    public function parameters(): array
     {
         $value = $this->value;
 
@@ -19,6 +24,17 @@ class AcceptedIf extends ValidationAttribute
             $value = $value ? 'true' : 'false';
         }
 
-        return ["accepted_if:{$this->field},{$value}"];
+        return [
+            $this->field,
+            $value,
+        ];
+    }
+
+    public static function create(string ...$parameters): static
+    {
+        return parent::create(
+            $parameters[0],
+            self::parseBooleanValue($parameters[1])
+        );
     }
 }

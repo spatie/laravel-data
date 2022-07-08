@@ -6,19 +6,27 @@ use Attribute;
 use Illuminate\Support\Arr;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class ProhibitedIf extends ValidationAttribute
+class ProhibitedIf extends StringValidationAttribute
 {
-    private string|array $values;
+    protected string|array $values;
 
     public function __construct(
-        private string $field,
+        protected string $field,
         array | string ...$values
     ) {
         $this->values = Arr::flatten($values);
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["prohibited_if:{$this->field},{$this->normalizeValue($this->values)}"];
+        return 'prohibited_if';
+    }
+
+    public function parameters(): array
+    {
+        return [
+            $this->field,
+            $this->normalizeValue($this->values),
+        ];
     }
 }

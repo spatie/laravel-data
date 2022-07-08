@@ -9,6 +9,11 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Spatie\LaravelData\CursorPaginatedDataCollection;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\PaginatedDataCollection;
+use Spatie\LaravelData\Tests\Fakes\CustomDataCollection;
+use Spatie\LaravelData\Tests\Fakes\CustomPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -26,8 +31,32 @@ class DataCollectionTest extends TestCase
             15
         );
 
-        $this->assertMatchesJsonSnapshot(SimpleData::collection($paginator)->toArray());
+        $collection = SimpleData::collection($paginator);
+
+        $this->assertInstanceOf(PaginatedDataCollection::class, $collection);
+        $this->assertMatchesJsonSnapshot($collection->toArray());
     }
+
+    /** @test */
+    public function it_can_get_a_paginated_cursor_data_collection()
+    {
+        $items = Collection::times(100, fn (int $index) => "Item {$index}");
+
+        $paginator = new CursorPaginator(
+            $items,
+            15,
+        );
+
+        $collection = SimpleData::collection($paginator);
+
+        if (version_compare(app()->version(), '9.0.0', '<=')) {
+            $this->markTestIncomplete('Laravel 8 uses a different format');
+        }
+
+        $this->assertInstanceOf(CursorPaginatedDataCollection::class, $collection);
+        $this->assertMatchesJsonSnapshot($collection->toArray());
+    }
+
 
     /** @test */
     public function a_collection_can_be_constructed_with_data_objects()
@@ -57,20 +86,6 @@ class DataCollectionTest extends TestCase
         ], $filtered);
     }
 
-    /** @test */
-    public function a_paginated_collection_cannot_be_filtered()
-    {
-        $collection = SimpleData::collection(
-            new LengthAwarePaginator(['A', 'B'], 2, 15)
-        );
-
-        $filtered = $collection->filter(fn (SimpleData $data) => $data->string === 'A')->toArray();
-
-        $this->assertEquals([
-            ['string' => 'A'],
-            ['string' => 'B'],
-        ], $filtered['data']);
-    }
 
     /** @test */
     public function a_collection_can_be_transformed()
@@ -167,34 +182,26 @@ class DataCollectionTest extends TestCase
                 'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
             ]),
         ];
-
-        yield "paginator" => [
-            fn () => SimpleData::collection(new LengthAwarePaginator([
-                'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
-            ], 4, 15)),
-        ];
-
-        yield "cursor paginator" => [
-            fn () => SimpleData::collection(new CursorPaginator([
-                'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
-            ], 4)),
-        ];
     }
 
     /** @test */
     public function it_can_dynamically_include_data_based_upon_the_request()
     {
-        $response = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request());
+        LazyData::$allowedIncludes = [''];
 
-        $includedResponse = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
-            'include' => 'name',
-        ]));
+        $response = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request());
 
         $this->assertEquals([
             [],
             [],
             [],
         ], $response->getData(true));
+
+        LazyData::$allowedIncludes = ['name'];
+
+        $includedResponse = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+            'include' => 'name',
+        ]));
 
         $this->assertEquals(
             [
@@ -249,11 +256,9 @@ class DataCollectionTest extends TestCase
     /** @test */
     public function it_can_dynamically_exclude_data_based_upon_the_request()
     {
-        $response = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request());
+        DefaultLazyData::$allowedExcludes = [];
 
-        $excludedResponse = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
-            'exclude' => 'name',
-        ]));
+        $response = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request());
 
         $this->assertEquals(
             [
@@ -263,6 +268,12 @@ class DataCollectionTest extends TestCase
             ],
             $response->getData(true)
         );
+
+        DefaultLazyData::$allowedExcludes = ['name'];
+
+        $excludedResponse = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+            'exclude' => 'name',
+        ]));
 
         $this->assertEquals([
             [],
@@ -397,6 +408,31 @@ class DataCollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_will_cast_data_object_into_the_data_collection_objects()
+    {
+        $dataClass = new class ('') extends Data {
+            public function __construct(public string $otherString)
+            {
+            }
+
+            public static function fromSimpleData(SimpleData $simpleData): static
+            {
+                return new self($simpleData->string);
+            }
+        };
+
+        $collection = $dataClass::collection([
+            SimpleData::from('A'),
+            SimpleData::from('B'),
+        ]);
+
+        $this->assertInstanceOf($dataClass::class, $collection[0]);
+        $this->assertEquals('A', $collection[0]->otherString);
+
+        $this->assertInstanceOf($dataClass::class, $collection[1]);
+        $this->assertEquals('B', $collection[1]->otherString);
+    }
+
     public function it_can_reset_the_keys()
     {
         $collection = SimpleData::collection([
@@ -411,5 +447,79 @@ class DataCollectionTest extends TestCase
             ]),
             $collection->values()
         );
+    }
+
+    /** @test */
+    public function it_can_use_magical_creation_methods_to_create_a_collection()
+    {
+        $collection = SimpleData::collection(['A', 'B']);
+
+        $this->assertEquals(
+            [SimpleData::from('A'), SimpleData::from('B')],
+            $collection->toCollection()->all()
+        );
+    }
+
+    /** @test */
+    public function it_can_return_a_custom_data_collection_when_collecting_data()
+    {
+        $class = new class ('') extends Data {
+            protected static string $collectionClass = CustomDataCollection::class;
+
+            public function __construct(public string $string)
+            {
+            }
+        };
+
+        $collection = $class::collection([
+            ['string' => 'A'],
+            ['string' => 'B'],
+        ]);
+
+        $this->assertInstanceOf(CustomDataCollection::class, $collection);
+    }
+
+    /** @test */
+    public function it_can_return_a_custom_paginated_data_collection_when_collecting_data()
+    {
+        $class = new class ('') extends Data {
+            protected static string $paginatedCollectionClass = CustomPaginatedDataCollection::class;
+
+            public function __construct(public string $string)
+            {
+            }
+        };
+
+        $collection = $class::collection(new LengthAwarePaginator([['string' => 'A'], ['string' => 'B']], 2, 15));
+
+        $this->assertInstanceOf(CustomPaginatedDataCollection::class, $collection);
+    }
+
+    /**
+     * @test
+     * @dataProvider collectionOperationsProvider
+     */
+    public function it_can_perform_some_collection_operations(
+        string $operation,
+        array $arguments,
+        array $expected,
+    ) {
+        $collection = SimpleData::collection(['A', 'B', 'C']);
+
+        $changedCollection = $collection->{$operation}(...$arguments);
+
+        $this->assertEquals(
+            $expected,
+            $changedCollection->toArray(),
+        );
+    }
+
+    public function collectionOperationsProvider(): Generator
+    {
+        yield [
+            'operation' => 'filter',
+            'arguments' => [fn (SimpleData $data) => $data->string !== 'B'],
+            'expected' => [0 => ['string' => 'A'],2 => ['string' => 'C']],
+        ];
     }
 }

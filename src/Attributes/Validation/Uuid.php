@@ -5,10 +5,15 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Uuid extends ValidationAttribute
+class Uuid extends StringValidationAttribute
 {
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ['uuid'];
+        return 'uuid';
+    }
+
+    public function parameters(): array
+    {
+        return [];
     }
 }

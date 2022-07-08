@@ -1,11 +1,11 @@
 ---
 title: Transforming data
-weight: 2
+weight: 4
 ---
 
 Each property of a data object should be transformed into a usable type to communicate via JSON.
 
-No complex transformations are required for the default types (string, bool, int, float and array), but special types like `Carbon` or a Laravel Model will need extra attention.
+No complex transformations are required for the default types (string, bool, int, float, enum and array), but special types like `Carbon` or a Laravel Model will need extra attention.
 
 Transformers are simple classes that will convert a complex type to something simple like a `string` or `int`. For example, we can transform a `Carbon` object to `16-05-1994`, `16-05-1994T00:00:00+00` or something completely different.
 
@@ -43,7 +43,7 @@ class ArtistData extends Data{
 
 Next to a `DateTimeInterfaceTransformer` the package also ships with an `ArraybleTransformer` that transforms an `Arrayable` object to an array.
 
-It is possible to create transformers for your specific types. You can find more info [here](/docs/laravel-data/v1/advanced-usage/creating-a-transformer).
+It is possible to create transformers for your specific types. You can find more info [here](/docs/laravel-data/v2/advanced-usage/creating-a-transformer).
 
 ## Global transformers
 

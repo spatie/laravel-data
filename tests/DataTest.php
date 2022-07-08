@@ -5,36 +5,68 @@ namespace Spatie\LaravelData\Tests;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use DateTime;
+use Generator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\MapOutputName;
+use Spatie\LaravelData\Attributes\Validation\In;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
+use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
+use Spatie\LaravelData\Concerns\DataTrait;
+use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\DataPipeline;
+use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
+use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
+use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
+use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
+use Spatie\LaravelData\Normalizers\ArrayNormalizer;
+use Spatie\LaravelData\Normalizers\ModelNormalizer;
+use Spatie\LaravelData\Normalizers\ObjectNormalizer;
+use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\PartialTrees;
+use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
+use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
+use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
+use Spatie\LaravelData\Tests\Fakes\DefaultOptionalData;
+use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\EmptyData;
+use Spatie\LaravelData\Tests\Fakes\EnumData;
+use Spatie\LaravelData\Tests\Fakes\ExceptData;
 use Spatie\LaravelData\Tests\Fakes\FakeModelData;
 use Spatie\LaravelData\Tests\Fakes\FakeNestedModelData;
 use Spatie\LaravelData\Tests\Fakes\IntersectionTypeData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
+use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
+use Spatie\LaravelData\Tests\Fakes\MultiNestedData;
+use Spatie\LaravelData\Tests\Fakes\NestedData;
+use Spatie\LaravelData\Tests\Fakes\OnlyData;
 use Spatie\LaravelData\Tests\Fakes\ReadonlyData;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithWrap;
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataCollectionTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
@@ -379,13 +411,17 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_dynamically_include_data_based_upon_the_request()
     {
+        LazyData::$allowedIncludes = [];
+
         $response = LazyData::from('Ruben')->toResponse(request());
+
+        $this->assertEquals([], $response->getData(true));
+
+        LazyData::$allowedIncludes = ['name'];
 
         $includedResponse = LazyData::from('Ruben')->toResponse(request()->merge([
             'include' => 'name',
         ]));
-
-        $this->assertEquals([], $response->getData(true));
 
         $this->assertEquals(['name' => 'Ruben'], $includedResponse->getData(true));
     }
@@ -421,13 +457,17 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_dynamically_exclude_data_based_upon_the_request()
     {
+        DefaultLazyData::$allowedExcludes = [];
+
         $response = DefaultLazyData::from('Ruben')->toResponse(request());
+
+        $this->assertEquals(['name' => 'Ruben'], $response->getData(true));
+
+        DefaultLazyData::$allowedExcludes = ['name'];
 
         $excludedResponse = DefaultLazyData::from('Ruben')->toResponse(request()->merge([
             'exclude' => 'name',
         ]));
-
-        $this->assertEquals(['name' => 'Ruben'], $response->getData(true));
 
         $this->assertEquals([], $excludedResponse->getData(true));
     }
@@ -461,11 +501,79 @@ class DataTest extends TestCase
     }
 
     /** @test */
+    public function it_can_disable_only_data_dynamically_from_the_request()
+    {
+        OnlyData::$allowedOnly = [];
+
+        $response = OnlyData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
+            'only' => 'first_name',
+        ]));
+
+        $this->assertEquals([], $response->getData(true));
+
+        OnlyData::$allowedOnly = ['first_name'];
+
+        $response = OnlyData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
+            'only' => 'first_name',
+        ]));
+
+        $this->assertEquals([
+            'first_name' => 'Ruben',
+        ], $response->getData(true));
+
+        OnlyData::$allowedOnly = null;
+
+        $response = OnlyData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
+            'only' => 'first_name',
+        ]));
+
+        $this->assertEquals([
+            'first_name' => 'Ruben',
+        ], $response->getData(true));
+    }
+
+    /** @test */
+    public function it_can_disable_except_data_dynamically_from_the_request()
+    {
+        ExceptData::$allowedExcept = [];
+
+        $response = ExceptData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
+            'except' => 'first_name',
+        ]));
+
+        $this->assertEquals([
+            'first_name' => 'Ruben',
+            'last_name' => 'Van Assche',
+        ], $response->getData(true));
+
+        ExceptData::$allowedExcept = ['first_name'];
+
+        $response = ExceptData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
+            'except' => 'first_name',
+        ]));
+
+        $this->assertEquals([
+            'last_name' => 'Van Assche',
+        ], $response->getData(true));
+
+        ExceptData::$allowedExcept = null;
+
+        $response = ExceptData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
+            'except' => 'first_name',
+        ]));
+
+        $this->assertEquals([
+            'last_name' => 'Van Assche',
+        ], $response->getData(true));
+    }
+
+    /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
+        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
             public function __construct(
                 public SimpleData $data,
+                #[DataCollectionOf(SimpleData::class)]
                 public DataCollection $dataCollection,
                 public Lazy|Data $lazy,
                 public string $string,
@@ -484,7 +592,7 @@ class DataTest extends TestCase
         $this->assertEquals([
             'data' => $dataObject,
             'dataCollection' => $dataCollection,
-            'lazy' => (new SimpleData('Lazy'))->withPartialsTrees([], []),
+            'lazy' => (new SimpleData('Lazy'))->withPartialTrees(new PartialTrees(new ExcludedTreeNode())),
             'string' => 'Test',
             'transformable' => $transformable,
         ], $data->include('lazy')->all());
@@ -573,7 +681,7 @@ class DataTest extends TestCase
             ->withProperty(DataPropertyBlueprintFactory::new('string')->withType('string'))
             ->create();
 
-        $data = $dataClass::validate(['string' => 'Hello World']);
+        $data = $dataClass::validateAndCreate(['string' => 'Hello World']);
 
         $this->assertEquals('Hello World', $data->string);
     }
@@ -840,6 +948,7 @@ class DataTest extends TestCase
         $dataWithDefaultTransformers = new class ($nestedData, $nestedDataCollection) extends Data {
             public function __construct(
                 public Data $nestedData,
+                #[DataCollectionOf(SimpleData::class)]
                 public DataCollection $nestedDataCollection,
             ) {
             }
@@ -849,7 +958,8 @@ class DataTest extends TestCase
             public function __construct(
                 #[WithTransformer(ConfidentialDataTransformer::class)]
                 public Data $nestedData,
-                #[WithTransformer(ConfidentialDataCollectionTransformer::class)]
+                #[WithTransformer(ConfidentialDataCollectionTransformer::class),
+                DataCollectionOf(SimpleData::class)]
                 public DataCollection $nestedDataCollection,
             ) {
             }
@@ -974,5 +1084,1028 @@ class DataTest extends TestCase
         $this->assertTrue($data->true);
         $this->assertEquals('string', $data->string);
         $this->assertTrue(Carbon::create(2020, 05, 16, 12, 00, 00)->equalTo($data->date));
+    }
+
+    /** @test */
+    public function it_can_create_an_partial_data_object()
+    {
+        $dataClass = new class ('', Optional::create(), Optional::create()) extends Data {
+            public function __construct(
+                public string $string,
+                public string|Optional $undefinable_string,
+                #[WithCast(StringToUpperCast::class)]
+                public string|Optional $undefinable_string_with_cast,
+            ) {
+            }
+        };
+
+        $partialData = $dataClass::from([
+            'string' => 'Hello World',
+        ]);
+
+        $this->assertEquals('Hello World', $partialData->string);
+        $this->assertEquals(Optional::create(), $partialData->undefinable_string);
+        $this->assertEquals(Optional::create(), $partialData->undefinable_string_with_cast);
+
+        $fullData = $dataClass::from([
+            'string' => 'Hello World',
+            'undefinable_string' => 'Hello World',
+            'undefinable_string_with_cast' => 'Hello World',
+        ]);
+
+        $this->assertEquals('Hello World', $fullData->string);
+        $this->assertEquals('Hello World', $fullData->undefinable_string);
+        $this->assertEquals('HELLO WORLD', $fullData->undefinable_string_with_cast);
+    }
+
+    /** @test */
+    public function it_can_transform_a_partial_object()
+    {
+        $dataClass = new class ('', Optional::create(), Optional::create()) extends Data {
+            public function __construct(
+                public string $string,
+                public string|Optional $undefinable_string,
+                #[WithTransformer(StringToUpperTransformer::class)]
+                public string|Optional $undefinable_string_with_transformer,
+            ) {
+            }
+        };
+
+        $partialData = $dataClass::from([
+            'string' => 'Hello World',
+        ]);
+
+        $fullData = $dataClass::from([
+            'string' => 'Hello World',
+            'undefinable_string' => 'Hello World',
+            'undefinable_string_with_transformer' => 'Hello World',
+        ]);
+
+        $this->assertEquals([
+            'string' => 'Hello World',
+        ], $partialData->toArray());
+
+        $this->assertEquals([
+            'string' => 'Hello World',
+            'undefinable_string' => 'Hello World',
+            'undefinable_string_with_transformer' => 'HELLO WORLD',
+        ], $fullData->toArray());
+    }
+
+    /** @test */
+    public function it_will_not_include_lazy_optional_values_when_transforming()
+    {
+        $data = new class ('Hello World', Lazy::create(fn () => Optional::make())) extends Data {
+            public function __construct(
+                public string $string,
+                public string|Optional|Lazy $lazy_optional_string,
+            ) {
+            }
+        };
+
+        $this->assertEquals($data->toArray(), [
+            'string' => 'Hello World',
+        ]);
+    }
+
+    /** @test */
+    public function it_excludes_optional_values_data()
+    {
+        $data = DefaultOptionalData::from([]);
+
+        $this->assertEquals([], $data->toArray());
+    }
+
+    /** @test */
+    public function it_includes_value_if_not_optional_data()
+    {
+        $data = DefaultOptionalData::from([
+            'name' => 'Freek',
+        ]);
+
+        $this->assertEquals([
+            'name' => 'Freek',
+        ], $data->toArray());
+    }
+
+    /** @test */
+    public function it_can_map_transformed_property_names()
+    {
+        $data = new SimpleDataWithMappedProperty('hello');
+        $dataCollection = SimpleDataWithMappedProperty::collection([
+            ['description' => 'never'],
+            ['description' => 'gonna'],
+            ['description' => 'give'],
+            ['description' => 'you'],
+            ['description' => 'up'],
+        ]);
+
+        $dataClass = new class ('hello', $data, $data, $dataCollection, $dataCollection) extends Data {
+            public function __construct(
+                #[MapOutputName('property')]
+                public string $string,
+                public SimpleDataWithMappedProperty $nested,
+                #[MapOutputName('nested_other')]
+                public SimpleDataWithMappedProperty $nested_renamed,
+                #[DataCollectionOf(SimpleDataWithMappedProperty::class)]
+                public DataCollection $nested_collection,
+                #[MapOutputName('nested_other_collection'),
+                DataCollectionOf(SimpleDataWithMappedProperty::class)]
+                public DataCollection $nested_renamed_collection,
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'property' => 'hello',
+            'nested' => [
+                'description' => 'hello',
+            ],
+            'nested_other' => [
+                'description' => 'hello',
+            ],
+            'nested_collection' => [
+                ['description' => 'never'],
+                ['description' => 'gonna'],
+                ['description' => 'give'],
+                ['description' => 'you'],
+                ['description' => 'up'],
+            ],
+            'nested_other_collection' => [
+                ['description' => 'never'],
+                ['description' => 'gonna'],
+                ['description' => 'give'],
+                ['description' => 'you'],
+                ['description' => 'up'],
+            ],
+        ], $dataClass->toArray());
+    }
+
+    /** @test */
+    public function it_can_map_transformed_properties_from_a_complete_class()
+    {
+        $data = DataWithMapper::from([
+            'cased_property' => 'We are the knights who say, ni!',
+            'data_cased_property' =>
+                ['string' => 'Bring us a, shrubbery!'],
+            'data_collection_cased_property' => [
+                ['string' => 'One that looks nice!'],
+                ['string' => 'But not too expensive!'],
+            ],
+        ]);
+
+        $this->assertEquals([
+            'cased_property' => 'We are the knights who say, ni!',
+            'data_cased_property' =>
+                ['string' => 'Bring us a, shrubbery!'],
+            'data_collection_cased_property' => [
+                ['string' => 'One that looks nice!'],
+                ['string' => 'But not too expensive!'],
+            ],
+        ], $data->toArray());
+    }
+
+    /** @test */
+    public function it_can_use_context_in_casts_based_upon_the_properties_of_the_data_object()
+    {
+        $dataClass = new class () extends Data {
+            public SimpleData $nested;
+
+            public string $string;
+
+            #[WithCast(ContextAwareCast::class)]
+            public string $casted;
+        };
+
+        $data = $dataClass::from([
+            'nested' => 'Hello',
+            'string' => 'world',
+            'casted' => 'json:',
+        ]);
+
+        $this->assertEquals('json:+{"nested":"Hello","string":"world","casted":"json:"}', $data->casted);
+    }
+
+    /** @test */
+    public function it_will_transform_native_enums()
+    {
+        $data = EnumData::from([
+            'enum' => DummyBackedEnum::FOO,
+        ]);
+
+        $this->assertEquals([
+            'enum' => 'foo',
+        ], $data->toArray());
+
+        $this->assertEquals([
+            'enum' => DummyBackedEnum::FOO,
+        ], $data->all());
+    }
+
+    /** @test */
+    public function it_can_magically_create_a_data_object()
+    {
+        $dataClass = new class ('', '') extends Data {
+            public function __construct(
+                public mixed $propertyA,
+                public mixed $propertyB,
+            ) {
+            }
+
+            public static function fromStringWithDefault(string $a, string $b = 'World')
+            {
+                return new self($a, $b);
+            }
+
+            public static function fromIntsWithDefault(int $a, int $b)
+            {
+                return new self($a, $b);
+            }
+
+            public static function fromSimpleDara(SimpleData $data)
+            {
+                return new self($data->string, $data->string);
+            }
+
+            public static function fromData(Data $data)
+            {
+                return new self('data', json_encode($data));
+            }
+        };
+
+        $this->assertEquals(
+            new $dataClass('Hello', 'World'),
+            $dataClass::from('Hello')
+        );
+
+        $this->assertEquals(
+            new $dataClass('Hello', 'World'),
+            $dataClass::from('Hello', 'World')
+        );
+
+        $this->assertEquals(
+            new $dataClass(42, 69),
+            $dataClass::from(42, 69)
+        );
+
+        $this->assertEquals(
+            new $dataClass('Hello', 'Hello'),
+            $dataClass::from(SimpleData::from('Hello'))
+        );
+
+        $this->assertEquals(
+            new $dataClass('data', '{"enum":"foo"}'),
+            $dataClass::from(new EnumData(DummyBackedEnum::FOO))
+        );
+    }
+
+    /** @test */
+    public function it_can_validate_non_request_payloads()
+    {
+        $dataClass = new class () extends Data {
+            public static bool $validateAllTypes = false;
+
+            #[In('Hello World')]
+            public string $string;
+
+            public static function pipeline(): DataPipeline
+            {
+                return DataPipeline::create()
+                    ->into(static::class)
+                    ->normalizer(ModelNormalizer::class)
+                    ->normalizer(ArraybleNormalizer::class)
+                    ->normalizer(ObjectNormalizer::class)
+                    ->normalizer(ArrayNormalizer::class)
+                    ->through(AuthorizedDataPipe::class)
+                    ->through(
+                        self::$validateAllTypes
+                        ? ValidatePropertiesDataPipe::allTypes()
+                        : ValidatePropertiesDataPipe::onlyRequests()
+                    )
+                    ->through(MapPropertiesDataPipe::class)
+                    ->through(DefaultValuesDataPipe::class)
+                    ->through(CastPropertiesDataPipe::class);
+            }
+        };
+
+        $data = $dataClass::from([
+            'string' => 'nowp',
+        ]);
+
+        $this->assertInstanceOf(Data::class, $data);
+        $this->assertEquals('nowp', $data->string);
+
+        $dataClass::$validateAllTypes = true;
+
+        $this->expectException(ValidationException::class);
+
+        $data = $dataClass::from([
+            'string' => 'nowp',
+        ]);
+    }
+
+    /** @test */
+    public function it_can_conditionally_include_properties()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                public ?int $id = null,
+                public ?string $name = null,
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Taylor',
+        ])->onlyWhen('id', false)->onlyWhen('name', true)->toArray());
+    }
+
+    /** @test */
+    public function exclusions_have_priority_over_inclusions()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                public ?int $id = null,
+                public ?string $name = null,
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'id' => 1,
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Taylor',
+        ])->onlyWhen('name', true)->exceptWhen('name', true)->toArray());
+    }
+
+    /** @test */
+    public function it_can_conditionally_exclude_properties()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                public ?int $id = null,
+                public ?string $name = null,
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Taylor',
+        ])->exceptWhen('id', true)->exceptWhen('name', false)->toArray());
+    }
+
+    /** @test */
+    public function it_can_conditionally_exclude_properties_with_a_callback()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                public ?int $id = null,
+                public ?string $name = null,
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Taylor',
+        ])->exceptWhen('id', fn (Data $data) => $data->name === 'Taylor')->toArray());
+
+        $this->assertEquals([
+            'id' => 1,
+            'name' => 'Freek',
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Freek',
+        ])->exceptWhen('id', fn (Data $data) => $data->name === 'Taylor')->toArray());
+    }
+
+    /** @test */
+    public function it_can_exclude_properties_at_runtime()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                public ?int $id = null,
+                public ?string $name = null,
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Taylor',
+        ])->except('id')->toArray());
+    }
+
+    /** @test */
+    public function it_can_include_nested_array_properties()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                public ?int $id = null,
+                public ?string $name = null,
+                public ?array $more = null
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'id' => 1,
+            'more' => [
+                'twitter_verified' => false,
+            ],
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Taylor',
+            'more' => [
+                'last_name' => 'Otwell',
+                'twitter_verified' => false,
+            ],
+        ])->only('id', 'more.twitter_verified')->toArray());
+    }
+
+    /** @test */
+    public function it_can_exclude_nested_array_properties()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                public ?int $id = null,
+                public ?string $name = null,
+                public ?array $more = null
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+            'more' => [
+                'last_name' => 'Otwell',
+            ],
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Taylor',
+            'more' => [
+                'last_name' => 'Otwell',
+                'twitter_verified' => false,
+            ],
+        ])->except('id', 'more.twitter_verified')->toArray());
+    }
+
+    /** @test */
+    public function it_can_include_nested_data_properties()
+    {
+        $more = new class ('Otwell', false) extends Data {
+            public function __construct(
+                public string $last_name,
+                public bool $twitter_verified,
+            ) {
+            }
+        };
+
+        $data = new class ('Taylor', $more) extends Data {
+            public function __construct(
+                public string $name,
+                public Data $more,
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+            'more' => [
+                'last_name' => 'Otwell',
+            ],
+        ], $data->only('name', 'more.last_name')->toArray());
+    }
+
+    /** @test */
+    public function it_can_exclude_nested_data_properties()
+    {
+        $more = new class ('Otwell', false) extends Data {
+            public function __construct(
+                public string $last_name,
+                public bool $twitter_verified,
+            ) {
+            }
+        };
+
+        $data = new class ('Taylor', $more) extends Data {
+            public function __construct(
+                public string $name,
+                public Data $more,
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+            'more' => [
+                'last_name' => 'Otwell',
+            ],
+        ], $data->except('id', 'more.twitter_verified')->toArray());
+    }
+
+    /** @test */
+    public function it_can_wrap_data_objects()
+    {
+        $this->assertEquals(
+            ['wrap' => ['string' => 'Hello World']],
+            SimpleData::from('Hello World')->wrap('wrap')->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            [
+                'wrap' => [
+                    ['string' => 'Hello'],
+                    ['string' => 'World'],
+                ],
+            ],
+            SimpleData::collection(['Hello', 'World'])->wrap('wrap')->toResponse(\request())->getData(true),
+        );
+    }
+
+    /** @test */
+    public function it_can_wrap_data_objects_using_a_global_default()
+    {
+        config()->set('data.wrap', 'wrap');
+
+        $this->assertEquals(
+            ['wrap' => ['string' => 'Hello World']],
+            SimpleData::from('Hello World')->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            ['other-wrap' => ['string' => 'Hello World']],
+            SimpleData::from('Hello World')->wrap('other-wrap')->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            ['string' => 'Hello World'],
+            SimpleData::from('Hello World')->withoutWrapping()->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            [
+                'wrap' => [
+                    ['string' => 'Hello'],
+                    ['string' => 'World'],
+                ],
+            ],
+            SimpleData::collection(['Hello', 'World'])->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            [
+                'other-wrap' => [
+                    ['string' => 'Hello'],
+                    ['string' => 'World'],
+                ],
+            ],
+            SimpleData::collection(['Hello', 'World'])->wrap('other-wrap')->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            [
+                ['string' => 'Hello'],
+                ['string' => 'World'],
+            ],
+            SimpleData::collection(['Hello', 'World'])->withoutWrapping()->toResponse(\request())->getData(true),
+        );
+    }
+
+    /** @test */
+    public function it_can_set_a_default_wrap_on_a_data_object()
+    {
+        $this->assertEquals(
+            ['wrap' => ['string' => 'Hello World']],
+            SimpleDataWithWrap::from('Hello World')->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            ['other-wrap' => ['string' => 'Hello World']],
+            SimpleDataWithWrap::from('Hello World')->wrap('other-wrap')->toResponse(\request())->getData(true),
+        );
+
+        $this->assertEquals(
+            ['string' => 'Hello World'],
+            SimpleDataWithWrap::from('Hello World')->withoutWrapping()->toResponse(\request())->getData(true),
+        );
+    }
+
+    /** @test */
+    public function it_wraps_additional_data()
+    {
+        $dataClass = new class ('Hello World') extends Data {
+            public function __construct(
+                public string $string
+            ) {
+            }
+
+            public function with(): array
+            {
+                return ['with' => 'this'];
+            }
+        };
+
+        $data = $dataClass->additional(['additional' => 'this'])
+            ->wrap('wrap')
+            ->toResponse(\request())
+            ->getData(true);
+
+        $this->assertEquals(
+            [
+                'wrap' => ['string' => 'Hello World'],
+                'additional' => 'this',
+                'with' => 'this',
+            ],
+            $data,
+        );
+    }
+
+    /** @test */
+    public function it_wraps_complex_data_structures()
+    {
+        $data = new MultiNestedData(
+            new NestedData(SimpleData::from('Hello')),
+            NestedData::collection([
+                new NestedData(SimpleData::from('World')),
+            ]),
+        );
+
+        $this->assertEquals(
+            [
+                'wrap' => [
+                    'nested' => ['simple' => ['string' => 'Hello']],
+                    'nestedCollection' => [
+                        ['simple' => ['string' => 'World']],
+                    ],
+                ],
+            ],
+            $data->wrap('wrap')->toResponse(\request())->getData(true)
+        );
+    }
+
+    /** @test */
+    public function it_wraps_complex_data_structures_with_a_global()
+    {
+        config()->set('data.wrap', 'wrap');
+
+        $data = new MultiNestedData(
+            new NestedData(SimpleData::from('Hello')),
+            NestedData::collection([
+                new NestedData(SimpleData::from('World')),
+            ]),
+        );
+
+        $this->assertEquals(
+            [
+                'wrap' => [
+                    'nested' => ['simple' => ['string' => 'Hello']],
+                    'nestedCollection' => [
+                        'wrap' => [
+                            ['simple' => ['string' => 'World']],
+                        ],
+                    ],
+                ],
+            ],
+            $data->wrap('wrap')->toResponse(\request())->getData(true)
+        );
+    }
+
+    /** @test */
+    public function it_only_wraps_responses()
+    {
+        $this->assertEquals(
+            ['string' => 'Hello World'],
+            SimpleData::from('Hello World')->wrap('wrap')->toArray(),
+        );
+
+        $this->assertEquals(
+            [
+                ['string' => 'Hello'],
+                ['string' => 'World'],
+            ],
+            SimpleData::collection(['Hello', 'World'])->wrap('wrap')->toArray(),
+        );
+    }
+
+    /**
+     * @test
+     * @dataProvider onlyInclusionDataProvider
+     */
+    public function it_can_use_only_when_transforming(
+        array $directive,
+        array $expectedOnly,
+        array $expectedExcept
+    ) {
+        $dataClass = new class () extends Data {
+            public string $first;
+
+            public string $second;
+
+            public MultiData $nested;
+
+            #[DataCollectionOf(MultiData::class)]
+            public DataCollection $collection;
+        };
+
+        $data = $dataClass::from([
+            'first' => 'A',
+            'second' => 'B',
+            'nested' => ['first' => 'C', 'second' => 'D'],
+            'collection' => [
+                ['first' => 'E', 'second' => 'F'],
+                ['first' => 'G', 'second' => 'H'],
+            ],
+        ]);
+
+        $this->assertEquals($expectedOnly, $data->only(...$directive)->toArray());
+    }
+
+    /**
+     * @test
+     * @dataProvider onlyInclusionDataProvider
+     */
+    public function it_can_use_except_when_transforming(
+        array $directive,
+        array $expectedOnly,
+        array $expectedExcept
+    ) {
+        $dataClass = new class () extends Data {
+            public string $first;
+
+            public string $second;
+
+            public MultiData $nested;
+
+            #[DataCollectionOf(MultiData::class)]
+            public DataCollection $collection;
+        };
+
+        $data = $dataClass::from([
+            'first' => 'A',
+            'second' => 'B',
+            'nested' => ['first' => 'C', 'second' => 'D'],
+            'collection' => [
+                ['first' => 'E', 'second' => 'F'],
+                ['first' => 'G', 'second' => 'H'],
+            ],
+        ]);
+
+        $this->assertEquals($expectedExcept, $data->except(...$directive)->toArray());
+    }
+
+    public function onlyInclusionDataProvider(): Generator
+    {
+        yield 'single' => [
+            'directive' => ['first'],
+            'expectedOnly' => [
+                'first' => 'A',
+            ],
+            'expectedExcept' => [
+                'second' => 'B',
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'multi' => [
+            'directive' => ['first', 'second'],
+            'expectedOnly' => [
+                'first' => 'A',
+                'second' => 'B',
+            ],
+            'expectedExcept' => [
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'multi-2' => [
+            'directive' => ['{first,second}'],
+            'expectedOnly' => [
+                'first' => 'A',
+                'second' => 'B',
+            ],
+            'expectedExcept' => [
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'all' => [
+            'directive' => ['*'],
+            'expectedOnly' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+            'expectedExcept' => [],
+        ];
+
+        yield 'nested' => [
+            'directive' => ['nested'],
+            'expectedOnly' => [
+                'nested' => [],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'nested.single' => [
+            'directive' => ['nested.first'],
+            'expectedOnly' => [
+                'nested' => ['first' => 'C'],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => ['second' => 'D'],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'nested.multi' => [
+            'directive' => ['nested.{first, second}'],
+            'expectedOnly' => [
+                'nested' => ['first' => 'C', 'second' => 'D'],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => [],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'nested-all' => [
+            'directive' => ['nested.*'],
+            'expectedOnly' => [
+                'nested' => ['first' => 'C', 'second' => 'D'],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => [],
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'collection' => [
+            'directive' => ['collection'],
+            'expectedOnly' => [
+                'collection' => [
+                    [],
+                    [],
+//                    ['first' => 'E', 'second' => 'F'],
+//                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => ['first' => 'C', 'second' => 'D'],
+            ],
+        ];
+
+        yield 'collection-single' => [
+            'directive' => ['collection.first'],
+            'expectedOnly' => [
+                'collection' => [
+                    ['first' => 'E'],
+                    ['first' => 'G'],
+                ],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    ['second' => 'F'],
+                    ['second' => 'H'],
+                ],
+            ],
+        ];
+
+        yield 'collection-multi' => [
+            'directive' => ['collection.first', 'collection.second'],
+            'expectedOnly' => [
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    [],
+                    [],
+                ],
+            ],
+        ];
+
+        yield 'collection-all' => [
+            'directive' => ['collection.*'],
+            'expectedOnly' => [
+                'collection' => [
+                    ['first' => 'E', 'second' => 'F'],
+                    ['first' => 'G', 'second' => 'H'],
+                ],
+            ],
+            'expectedExcept' => [
+                'first' => 'A',
+                'second' => 'B',
+                'nested' => ['first' => 'C', 'second' => 'D'],
+                'collection' => [
+                    [],
+                    [],
+                ],
+            ],
+        ];
+    }
+
+    /** @test */
+    public function it_can_use_a_trait()
+    {
+        $data = new class ('') implements DataObject {
+            use DataTrait;
+
+            public function __construct(public string $string)
+            {
+            }
+
+            public static function fromString(string $string): static
+            {
+                return new self($string);
+            }
+        };
+
+        $this->assertEquals(['string' => 'Hi'], $data::from('Hi')->toArray());
+        $this->assertEquals(new $data('Hi'), $data::from(['string' => 'Hi']));
+        $this->assertEquals(new $data('Hi'), $data::from('Hi'));
+    }
+
+    /** @test */
+    public function it_supports_conversion_from_multiple_date_formats()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                #[WithCast(DateTimeInterfaceCast::class, ['Y-m-d\TH:i:sP', 'Y-m-d H:i:s'])]
+                public ?DateTime $date = null
+            ) {
+            }
+        };
+
+        $this->assertEquals(['date' => '2022-05-16T14:37:56+00:00'], $data::from(['date' => '2022-05-16T14:37:56+00:00'])->toArray());
+        $this->assertEquals(['date' => '2022-05-16T17:00:00+00:00'], $data::from(['date' => '2022-05-16 17:00:00'])->toArray());
+    }
+
+    /** @test */
+    public function it_will_throw_a_custom_exception_when_a_data_constructor_cannot_be_called_due_to_missing_arguments()
+    {
+        $this->expectException(CannotCreateData::class);
+        $this->expectExceptionMessage('the constructor requires 1 parameters');
+
+        SimpleData::from([]);
     }
 }

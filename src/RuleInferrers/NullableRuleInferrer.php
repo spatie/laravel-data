@@ -2,14 +2,16 @@
 
 namespace Spatie\LaravelData\RuleInferrers;
 
+use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Validation\RulesCollection;
 
 class NullableRuleInferrer implements RuleInferrer
 {
-    public function handle(DataProperty $property, array $rules): array
+    public function handle(DataProperty $property, RulesCollection $rules): RulesCollection
     {
-        if ($property->isNullable() && ! in_array('nullable', $rules)) {
-            $rules[] = 'nullable';
+        if ($property->type->isNullable) {
+            $rules->add(new Nullable());
         }
 
         return $rules;

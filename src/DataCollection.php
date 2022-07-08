@@ -3,172 +3,132 @@
 namespace Spatie\LaravelData;
 
 use ArrayAccess;
-use ArrayIterator;
-use Closure;
-use Countable;
-use Illuminate\Contracts\Database\Eloquent\Castable as EloquentCastable;
-use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
-use Illuminate\Support\LazyCollection;
-use IteratorAggregate;
-use JsonSerializable;
+use Spatie\LaravelData\Concerns\BaseDataCollectable;
+use Spatie\LaravelData\Concerns\EnumerableMethods;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
+use Spatie\LaravelData\Concerns\TransformableData;
+use Spatie\LaravelData\Concerns\WrappableData;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\DataCollectable;
 use Spatie\LaravelData\Exceptions\CannotCastData;
-use Spatie\LaravelData\Exceptions\InvalidDataCollectionModification;
+use Spatie\LaravelData\Exceptions\InvalidDataCollectionOperation;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
-use Spatie\LaravelData\Support\TransformationType;
-use Spatie\LaravelData\Transformers\DataCollectionTransformer;
 
-class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializable, IteratorAggregate, Countable, ArrayAccess, EloquentCastable
+/**
+ * @template TKey of array-key
+ * @template TValue
+ *
+ * @implements \ArrayAccess<TKey, TValue>
+ * @implements  DataCollectable<TKey, TValue>
+ */
+class DataCollection implements DataCollectable, ArrayAccess
 {
+    use BaseDataCollectable;
     use ResponsableData;
     use IncludeableData;
+    use WrappableData;
+    use TransformableData;
+    use EnumerableMethods;
 
-    protected ?Closure $through = null;
+    /** @var Enumerable<TKey, TValue> */
+    protected Enumerable $items;
 
-    protected ?Closure $filter = null;
-
-    protected Enumerable|CursorPaginator|Paginator $items;
-
+    /**
+     * @param class-string<TValue> $dataClass
+     * @param array|Enumerable<TKey, TValue>|DataCollection $items
+     */
     public function __construct(
-        protected string $dataClass,
-        Enumerable|array|CursorPaginator|Paginator|DataCollection $items
+        public readonly string $dataClass,
+        Enumerable|array|DataCollection $items
     ) {
-        $this->items = match (true) {
-            is_array($items) => new Collection($items),
-            $items instanceof DataCollection => $items->toCollection(),
-            default => $items
-        };
+        if (is_array($items)) {
+            $items = new Collection($items);
+        }
 
-        $this->ensureAllItemsAreData();
-    }
+        if ($items instanceof DataCollection) {
+            $items = $items->toCollection();
+        }
 
-    public function through(Closure $through): static
-    {
-        $this->through = $through;
-
-        return $this;
-    }
-
-    public function filter(Closure $filter): static
-    {
-        $this->filter = $filter;
-
-        return $this;
-    }
-
-    public function items(): array|CursorPaginator|Paginator
-    {
-        return $this->isPaginated()
-            ? $this->items
-            : $this->items->all();
-    }
-
-    public function transform(TransformationType $type): array
-    {
-        $transformer = new DataCollectionTransformer(
-            $this->dataClass,
-            $type,
-            $this->getInclusionTree(),
-            $this->getExclusionTree(),
-            $this->items,
-            $this->through,
-            $this->filter
+        $this->items = $items->map(
+            fn ($item) => $item instanceof $this->dataClass ? $item : $this->dataClass::from($item)
         );
-
-        return $transformer->transform();
     }
 
-    public function all(): array
+    /**
+     * @return array<TKey, TValue>
+     */
+    public function items(): array
     {
-        return $this->transform(TransformationType::withoutValueTransforming());
-    }
-
-    public function values(): static
-    {
-        $this->items = $this->items->values();
-
-        return $this;
-    }
-
-    public function toArray(): array
-    {
-        return $this->transform(TransformationType::full());
-    }
-
-    public function toJson($options = 0): string
-    {
-        return json_encode($this->toArray(), $options);
-    }
-
-    public function jsonSerialize(): array
-    {
-        return $this->toArray();
+        return $this->items->all();
     }
 
     public function toCollection(): Enumerable
     {
-        if ($this->isPaginated()) {
-            throw InvalidDataCollectionModification::cannotCastToCollection();
-        }
-
-        /** @var \Illuminate\Support\Enumerable $items */
-        $items = $this->items;
-
-        return $items;
+        return $this->items;
     }
 
-    public function getIterator(): ArrayIterator
-    {
-        return new ArrayIterator($this->transform(TransformationType::withoutValueTransforming()));
-    }
-
-    public function count(): int
-    {
-        return count($this->items);
-    }
-
+    /**
+     * @param TKey $offset
+     *
+     * @return bool
+     */
     public function offsetExists($offset): bool
     {
+        if (! $this->items instanceof ArrayAccess) {
+            throw InvalidDataCollectionOperation::create();
+        }
+
         return $this->items->offsetExists($offset);
     }
 
-    public function offsetGet($offset): Data
+    /**
+     * @param TKey $offset
+     *
+     * @return TValue
+     */
+    public function offsetGet($offset): mixed
     {
+        if (! $this->items instanceof ArrayAccess) {
+            throw InvalidDataCollectionOperation::create();
+        }
+
         return $this->items->offsetGet($offset);
     }
 
+    /**
+     * @param TKey|null $offset
+     * @param TValue $value
+     *
+     * @return void
+     */
     public function offsetSet($offset, $value): void
     {
-        if ($this->isPaginated() || $this->items instanceof LazyCollection) {
-            throw InvalidDataCollectionModification::cannotSetItem();
+        if (! $this->items instanceof ArrayAccess) {
+            throw InvalidDataCollectionOperation::create();
         }
 
-        $value = $value instanceof Data
+        $value = $value instanceof BaseData
             ? $value
             : $this->dataClass::from($value);
 
         $this->items->offsetSet($offset, $value);
     }
 
+    /**
+     * @param TKey $offset
+     *
+     * @return void
+     */
     public function offsetUnset($offset): void
     {
-        if ($this->isPaginated() || $this->items instanceof LazyCollection) {
-            throw InvalidDataCollectionModification::cannotUnSetItem();
+        if (! $this->items instanceof ArrayAccess) {
+            throw InvalidDataCollectionOperation::create();
         }
 
         $this->items->offsetUnset($offset);
-    }
-
-    public function isPaginated(): bool
-    {
-        return $this->items instanceof CursorPaginator || $this->items instanceof Paginator;
     }
 
     public static function castUsing(array $arguments)
@@ -178,14 +138,5 @@ class DataCollection implements Responsable, Arrayable, Jsonable, JsonSerializab
         }
 
         return new DataCollectionEloquentCast(current($arguments));
-    }
-
-    protected function ensureAllItemsAreData()
-    {
-        $closure = fn ($item) => $item instanceof Data ? $item : $this->dataClass::from($item);
-
-        $this->items = $this->isPaginated()
-            ? $this->items->through($closure)
-            : $this->items->map($closure);
     }
 }

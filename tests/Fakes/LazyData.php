@@ -7,7 +7,7 @@ use Spatie\LaravelData\Lazy;
 
 class LazyData extends Data
 {
-    public static ?array $allowedIncludes = null;
+    public static ?array $allowedIncludes;
 
     public function __construct(
         public string | Lazy $name
@@ -19,7 +19,7 @@ class LazyData extends Data
         return new self(Lazy::create(fn () => $name));
     }
 
-    public function allowedRequestIncludes(): ?array
+    public static function allowedRequestIncludes(): ?array
     {
         return self::$allowedIncludes;
     }

@@ -3,63 +3,89 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\RuleInferrers\RuleInferrer;
+use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Validation\RulesCollection;
 use TypeError;
 
 class DataPropertyValidationRulesResolver
 {
     public function __construct(
-        protected DataValidationRulesResolver $dataValidationRulesResolver,
+        protected DataClassValidationRulesResolver $dataValidationRulesResolver,
         protected DataConfig $dataConfig
     ) {
     }
 
     public function execute(DataProperty $property, array $payload = [], bool $nullable = false): Collection
     {
-        if ($property->isData() || $property->isDataCollection()) {
-            return $this->getNestedRules($property, $payload, $nullable);
+        $propertyName = $property->inputMappedName ?? $property->name;
+
+        if ($property->type->isDataObject || $property->type->isDataCollectable) {
+            return $this->getNestedRules($property, $propertyName, $payload, $nullable);
         }
 
-        return collect([$property->name() => $this->getRulesForProperty($property, $nullable)]);
+        return collect([$propertyName => $this->getRulesForProperty($property, $nullable)]);
     }
 
-    private function getNestedRules(DataProperty $property, array $payload = [], bool $nullable = false): Collection
-    {
+    protected function getNestedRules(
+        DataProperty $property,
+        string $propertyName,
+        array $payload,
+        bool $nullable
+    ): Collection {
         $prefix = match (true) {
-            $property->isData() => "{$property->name()}.",
-            $property->isDataCollection() => "{$property->name()}.*.",
+            $property->type->isDataObject => "{$propertyName}.",
+            $property->type->isDataCollectable => "{$propertyName}.*.",
             default => throw new TypeError()
         };
 
-        $isNullable = $nullable || $property->isNullable();
+        $isNullable = $nullable || $property->type->isNullable || $property->type->isOptional;
 
         $toplevelRule = match (true) {
             $isNullable => 'nullable',
-            $property->isData() => "required",
-            $property->isDataCollection() => "present",
+            $property->type->isDataObject => "required",
+            $property->type->isDataCollectable => "present",
             default => throw new TypeError()
         };
 
         return $this->dataValidationRulesResolver
             ->execute(
-                $property->dataClassName(),
+                $property->type->dataClass,
                 $payload,
-                $nullable || ($property->isData() && $property->isNullable())
+                $this->isNestedDataNullable($nullable, $property)
             )
             ->mapWithKeys(fn (array $rules, string $name) => [
                 "{$prefix}{$name}" => $rules,
             ])
-            ->prepend([$toplevelRule, 'array'], $property->name());
+            ->prepend([$toplevelRule, 'array'], $propertyName);
     }
 
-    private function getRulesForProperty(DataProperty $property, bool $nullable): array
+    protected function getRulesForProperty(DataProperty $property, bool $nullable): array
     {
-        return array_reduce(
-            $this->dataConfig->getRuleInferrers(),
-            fn (array $rules, RuleInferrer $ruleInferrer) => $ruleInferrer->handle($property, $rules),
-            $nullable ? ['nullable'] : []
-        );
+        $rules = new RulesCollection();
+
+        if ($nullable) {
+            $rules->add(new Nullable());
+        }
+
+        foreach ($this->dataConfig->getRuleInferrers() as $inferrer) {
+            $rules = $inferrer->handle($property, $rules);
+        }
+
+        return $rules->normalize();
+    }
+
+    protected function isNestedDataNullable(bool $nullable, DataProperty $property): bool
+    {
+        if ($nullable) {
+            return true;
+        }
+
+        if ($property->type->isDataObject) {
+            return $property->type->isNullable || $property->type->isOptional;
+        }
+
+        return false;
     }
 }

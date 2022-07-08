@@ -18,7 +18,7 @@ class BuiltInTypeWithCastData extends Data
 
 class MoneyCast implements Cast
 {
-    public function cast(DataProperty $property, mixed $value): int
+    public function cast(DataProperty $property, mixed $value, array $context): int
     {
         return (int) ($value * 100);
     }

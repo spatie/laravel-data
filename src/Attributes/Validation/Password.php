@@ -3,51 +3,68 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Exception;
 use Illuminate\Validation\Rules\Password as BasePassword;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Password extends ValidationAttribute
 {
+    protected BasePassword $rule;
+
     public function __construct(
-        private int $min = 12,
-        private bool $letters = false,
-        private bool $mixedCase = false,
-        private bool $numbers = false,
-        private bool $symbols = false,
-        private bool $uncompromised = false,
-        private int $uncompromisedThreshold = 0,
-        private bool $default = false,
+        int $min = 12,
+        bool $letters = false,
+        bool $mixedCase = false,
+        bool $numbers = false,
+        bool $symbols = false,
+        bool $uncompromised = false,
+        int $uncompromisedThreshold = 0,
+        bool $default = false,
+        ?BasePassword $rule = null,
     ) {
+        if ($default && $rule === null) {
+            $this->rule = BasePassword::default();
+
+            return;
+        }
+
+        $rule ??= BasePassword::min($min);
+
+        if ($letters) {
+            $rule->letters();
+        }
+
+        if ($mixedCase) {
+            $rule->mixedCase();
+        }
+
+        if ($numbers) {
+            $rule->numbers();
+        }
+
+        if ($symbols) {
+            $rule->symbols();
+        }
+
+        if ($uncompromised) {
+            $rule->uncompromised($uncompromisedThreshold);
+        }
+
+        $this->rule = $rule;
     }
 
     public function getRules(): array
     {
-        if ($this->default) {
-            return [BasePassword::default()];
-        }
+        return [$this->rule];
+    }
 
-        $rule = BasePassword::min($this->min);
+    public static function keyword(): string
+    {
+        return 'password';
+    }
 
-        if ($this->letters) {
-            $rule->letters();
-        }
-
-        if ($this->mixedCase) {
-            $rule->mixedCase();
-        }
-
-        if ($this->numbers) {
-            $rule->numbers();
-        }
-
-        if ($this->symbols) {
-            $rule->symbols();
-        }
-
-        if ($this->uncompromised) {
-            $rule->uncompromised($this->uncompromisedThreshold);
-        }
-
-        return [$rule];
+    public static function create(string ...$parameters): static
+    {
+        throw new Exception('Cannot create a password rule');
     }
 }

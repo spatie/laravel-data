@@ -2,119 +2,84 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Exceptions\CannotCreateDataFromValue;
+use Illuminate\Support\Collection;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\DataPipeline;
+use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
+use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
+use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
 use Spatie\LaravelData\Support\DataConfig;
-use stdClass;
+use Spatie\LaravelData\Support\DataMethod;
 
 class DataFromSomethingResolver
 {
     public function __construct(
         protected DataConfig $dataConfig,
-        protected DataValidatorResolver $dataValidatorResolver,
-        protected DataFromModelResolver $dataFromModelResolver,
         protected DataFromArrayResolver $dataFromArrayResolver,
     ) {
     }
 
-    public function execute(string $class, mixed $value): Data
+    public function execute(string $class, mixed ...$payloads): BaseData
     {
-        if ($value instanceof Request) {
-            $this->ensureRequestIsValid($class, $value);
+        if ($data = $this->createFromCustomCreationMethod($class, $payloads)) {
+            return $data;
         }
 
-        /** @var class-string<\Spatie\LaravelData\Data>|\Spatie\LaravelData\Data $class */
-        if ($customCreationMethod = $this->resolveCustomCreationMethod($class, $value)) {
-            return $class::$customCreationMethod($value);
-        }
+        $properties = array_reduce(
+            $payloads,
+            function (Collection $carry, mixed $payload) use ($class) {
+                /** @var BaseData $class */
+                $pipeline = $class::pipeline();
 
-        if ($value instanceof Model) {
-            return $this->dataFromModelResolver->execute($class, $value);
-        }
+                foreach ($class::normalizers() as $normalizer) {
+                    $pipeline->normalizer($normalizer);
+                }
 
-        if ($value instanceof Request) {
-            return $this->dataFromArrayResolver->execute($class, $value->all());
-        }
+                return $carry->merge($pipeline->using($payload)->execute());
+            },
+            collect(),
+        );
 
-        if ($value instanceof Arrayable) {
-            return $this->dataFromArrayResolver->execute($class, $value->toArray());
-        }
-
-        if ($value instanceof stdClass) {
-            $value = (array) $value;
-        }
-
-        if (is_array($value)) {
-            return $this->dataFromArrayResolver->execute($class, $value);
-        }
-
-        throw CannotCreateDataFromValue::create($class, $value);
+        return $this->dataFromArrayResolver->execute($class, $properties);
     }
 
-    private function ensureRequestIsValid(string $class, Request $value): void
+    protected function createFromCustomCreationMethod(string $class, array $payloads): ?BaseData
     {
-        /** @var \Spatie\LaravelData\Data|string $class */
-        if ($this->dataConfig->getDataClass($class)->hasAuthorizationMethod()) {
-            $this->ensureRequestIsAuthorized($class);
-        }
+        /** @var Collection<\Spatie\LaravelData\Support\DataMethod> $customCreationMethods */
+        $customCreationMethods = $this->dataConfig
+            ->getDataClass($class)
+            ->methods
+            ->filter(fn (DataMethod $method) => $method->isCustomCreationMethod);
 
-        $this->dataValidatorResolver->execute($class, $value)->validate();
-    }
+        $methodName = null;
 
-    private function ensureRequestIsAuthorized(string $class): void
-    {
-        /** @psalm-suppress UndefinedMethod */
-        // TODO: remove this with the next major release
-        if (method_exists($class, 'authorized') && $class::authorized() === false) {
-            throw new AuthorizationException();
-        }
+        foreach ($customCreationMethods as $customCreationMethod) {
+            if ($customCreationMethod->accepts(...$payloads)) {
+                $methodName = $customCreationMethod->name;
 
-        /** @psalm-suppress UndefinedMethod */
-        if (method_exists($class, 'authorize') && $class::authorize() === false) {
-            throw new AuthorizationException();
-        }
-    }
-
-    private function resolveCustomCreationMethod(string $class, mixed $payload): ?string
-    {
-        $customCreationMethods = $this->dataConfig->getDataClass($class)->creationMethods();
-
-        $type = gettype($payload);
-
-        if ($type === 'object') {
-            return $this->resolveCustomCreationMethodForObject($customCreationMethods, $payload);
-        }
-
-        $type = match ($type) {
-            'boolean' => 'bool',
-            'string' => 'string',
-            'integer' => 'int',
-            'double' => 'float',
-            'array' => 'array',
-            default => null,
-        };
-
-        return $customCreationMethods[$type] ?? null;
-    }
-
-    private function resolveCustomCreationMethodForObject(array $customCreationMethods, mixed $payload): ?string
-    {
-        $className = ltrim($payload::class, ' \\');
-
-        if (array_key_exists($className, $customCreationMethods)) {
-            return $customCreationMethods[$className];
-        }
-
-        foreach ($customCreationMethods as $customCreationMethodType => $customCreationMethod) {
-            if (is_a($className, $customCreationMethodType, true)) {
-                return $customCreationMethod;
+                break;
             }
         }
 
-        return null;
+        if ($methodName === null) {
+            return null;
+        }
+
+        foreach ($payloads as $payload) {
+            if ($payload instanceof Request) {
+                DataPipeline::create()
+                    ->normalizer(ArraybleNormalizer::class)
+                    ->into($class)
+                    ->through(AuthorizedDataPipe::class)
+                    ->through(MapPropertiesDataPipe::class)
+                    ->through(ValidatePropertiesDataPipe::class)
+                    ->using($payload)
+                    ->execute();
+            }
+        }
+
+        return $class::$methodName(...$payloads);
     }
 }

@@ -4,35 +4,30 @@ namespace Spatie\LaravelData;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
+use Spatie\LaravelData\Support\Lazy\DefaultLazy;
+use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 
-class Lazy
+abstract class Lazy
 {
-    protected ?Closure $condition = null;
-
     protected ?bool $defaultIncluded = null;
 
-    protected function __construct(
-        protected Closure $value
-    ) {
+    public static function create(Closure $value): DefaultLazy
+    {
+        return new DefaultLazy($value);
     }
 
-    public static function create(Closure $value): self
+    public static function when(Closure $condition, Closure $value): ConditionalLazy
     {
-        return new self($value);
+        return new ConditionalLazy($condition, $value);
     }
 
-    public static function when(Closure $condition, Closure $value): self
+    public static function whenLoaded(string $relation, Model $model, Closure $value): RelationalLazy
     {
-        return self::create($value)->condition($condition);
+        return new RelationalLazy($relation, $model, $value);
     }
 
-    public static function whenLoaded(string $relation, Model $model, Closure $value): static
-    {
-        return self::when(
-            fn () => $model->relationLoaded($relation),
-            fn () => $model->{$relation} !== null ? $value() : null,
-        );
-    }
+    abstract public function resolve(): mixed;
 
     public function defaultIncluded(bool $defaultIncluded = true): self
     {
@@ -41,30 +36,8 @@ class Lazy
         return $this;
     }
 
-    public function condition(Closure $condition): self
-    {
-        $this->condition = $condition;
-
-        return $this;
-    }
-
-    public function isConditional(): bool
-    {
-        return $this->condition !== null;
-    }
-
-    public function getCondition(): ?Closure
-    {
-        return $this->condition;
-    }
-
     public function isDefaultIncluded(): bool
     {
         return $this->defaultIncluded ?? false;
-    }
-
-    public function resolve(): mixed
-    {
-        return ($this->value)();
     }
 }

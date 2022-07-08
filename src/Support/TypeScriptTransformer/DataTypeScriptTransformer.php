@@ -2,22 +2,32 @@
 
 namespace Spatie\LaravelData\Support\TypeScriptTransformer;
 
+use phpDocumentor\Reflection\Fqsen;
+use phpDocumentor\Reflection\Type;
+use phpDocumentor\Reflection\Types\Array_;
+use phpDocumentor\Reflection\Types\Boolean;
+use phpDocumentor\Reflection\Types\Integer;
+use phpDocumentor\Reflection\Types\Nullable;
+use phpDocumentor\Reflection\Types\Object_;
+use phpDocumentor\Reflection\Types\String_;
 use ReflectionClass;
-use ReflectionNamedType;
 use ReflectionProperty;
-use ReflectionUnionType;
-use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use RuntimeException;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Enums\DataCollectableType;
+use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelTypeScriptTransformer\Transformers\DtoTransformer;
 use Spatie\TypeScriptTransformer\Structures\MissingSymbolsCollection;
 use Spatie\TypeScriptTransformer\TypeProcessors\DtoCollectionTypeProcessor;
 use Spatie\TypeScriptTransformer\TypeProcessors\ReplaceDefaultsTypeProcessor;
+use Spatie\TypeScriptTransformer\Types\StructType;
 
 class DataTypeScriptTransformer extends DtoTransformer
 {
     public function canTransform(ReflectionClass $class): bool
     {
-        return $class->isSubclassOf(Data::class);
+        return $class->isSubclassOf(BaseData::class);
     }
 
     protected function typeProcessors(): array
@@ -27,7 +37,8 @@ class DataTypeScriptTransformer extends DtoTransformer
                 $this->config->getDefaultTypeReplacements()
             ),
             new RemoveLazyTypeProcessor(),
-            new DataCollectionTypeProcessor(),
+            new RemoveOptionalTypeProcessor(),
+            new RemoveOptionalTypeProcessor(),
             new DtoCollectionTypeProcessor(),
         ];
     }
@@ -37,14 +48,15 @@ class DataTypeScriptTransformer extends DtoTransformer
         ReflectionClass $class,
         MissingSymbolsCollection $missingSymbols
     ): string {
+        $dataClass = app(DataConfig::class)->getDataClass($class->getName());
+
         return array_reduce(
             $this->resolveProperties($class),
-            function (string $carry, ReflectionProperty $property) use ($missingSymbols) {
-                $type = $this->reflectionToType(
-                    $property,
-                    $missingSymbols,
-                    ...$this->typeProcessors()
-                );
+            function (string $carry, ReflectionProperty $property) use ($dataClass, $missingSymbols) {
+                /** @var \Spatie\LaravelData\Support\DataProperty $dataProperty */
+                $dataProperty = $dataClass->properties[$property->getName()];
+
+                $type = $this->resolveTypeForProperty($property, $dataProperty, $missingSymbols);
 
                 if ($type === null) {
                     return $carry;
@@ -56,7 +68,7 @@ class DataTypeScriptTransformer extends DtoTransformer
                     $property->getDeclaringClass()->getName()
                 );
 
-                return $this->isPropertyLazy($property)
+                return $dataProperty->type->isLazy || $dataProperty->type->isOptional
                     ? "{$carry}{$property->getName()}?: {$transformed};" . PHP_EOL
                     : "{$carry}{$property->getName()}: {$transformed};" . PHP_EOL;
             },
@@ -64,22 +76,77 @@ class DataTypeScriptTransformer extends DtoTransformer
         );
     }
 
-    protected function isPropertyLazy(ReflectionProperty $property): bool
+    protected function resolveTypeForProperty(
+        ReflectionProperty $property,
+        DataProperty $dataProperty,
+        MissingSymbolsCollection $missingSymbols,
+    ): ?Type {
+        if (! $dataProperty->type->isDataCollectable) {
+            return $this->reflectionToType(
+                $property,
+                $missingSymbols,
+                ...$this->typeProcessors()
+            );
+        }
+
+        $collectionType = match ($dataProperty->type->dataCollectableType) {
+            DataCollectableType::Default => $this->defaultCollectionType($dataProperty->type->dataClass),
+            DataCollectableType::Paginated => $this->paginatedCollectionType($dataProperty->type->dataClass),
+            DataCollectableType::CursorPaginated => $this->cursorPaginatedCollectionType($dataProperty->type->dataClass),
+            null => throw new RuntimeException('Cannot end up here since the type is dataCollectable')
+        };
+
+        if ($dataProperty->type->isNullable) {
+            return new Nullable($collectionType);
+        }
+
+        return $collectionType;
+    }
+
+    protected function defaultCollectionType(string $class): Type
     {
-        $type = $property->getType();
+        return new Array_(new Object_(new Fqsen("\\{$class}")));
+    }
 
-        if ($type === null || $type instanceof ReflectionNamedType) {
-            return false;
-        }
+    protected function paginatedCollectionType(string $class): Type
+    {
+        return new StructType([
+            'data' => $this->defaultCollectionType($class),
+            'links' => new Array_(new StructType([
+                'url' => new Nullable(new String_()),
+                'label' => new String_(),
+                'active' => new Boolean(),
+            ])),
+            'meta' => new StructType([
+                'current_page' => new Integer(),
+                'first_page_url' => new Nullable(new String_()),
+                'from' => new Nullable(new Integer()),
+                'last_page' => new Integer(),
+                'last_page_url' => new Nullable(new String_()),
+                'next_page_url' => new Nullable(new String_()),
+                'path' => new String_(),
+                'per_page' => new Integer(),
+                'prev_page_url' => new Nullable(new String_()),
+                'to' => new Nullable(new Integer()),
+                'total' => new Integer(),
 
-        if ($type instanceof ReflectionUnionType) {
-            foreach ($type->getTypes() as $childType) {
-                if ($childType->getName() === Lazy::class) {
-                    return true;
-                }
-            }
-        }
+            ]),
+        ]);
+    }
 
-        return false;
+    protected function cursorPaginatedCollectionType(string $class): Type
+    {
+        return new StructType([
+            'data' => $this->defaultCollectionType($class),
+            'links' => new Array_(),
+            'meta' => new StructType([
+                'path' => new String_(),
+                'per_page' => new Integer(),
+                'next_cursor' => new Nullable(new String_()),
+                'next_cursor_url' => new Nullable(new String_()),
+                'prev_cursor' => new Nullable(new String_()),
+                'prev_cursor_url' => new Nullable(new String_()),
+            ]),
+        ]);
     }
 }

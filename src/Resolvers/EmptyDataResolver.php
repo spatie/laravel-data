@@ -17,43 +17,42 @@ class EmptyDataResolver
     {
         $dataClass = $this->dataConfig->getDataClass($class);
 
-        return $dataClass->properties()->reduce(function (array $payload, DataProperty $property) use ($extra) {
-            if ($property->hasDefaultValue()) {
-                $payload[$property->name()] = $property->defaultValue();
+        return $dataClass->properties->reduce(function (array $payload, DataProperty $property) use ($extra) {
+            $name = $property->outputMappedName ?? $property->name;
+
+            if ($property->hasDefaultValue) {
+                $payload[$name] = $property->defaultValue;
             } else {
-                $payload[$property->name()] = $extra[$property->name()] ?? $this->getValueForProperty($property);
+                $payload[$name] = $extra[$property->name] ?? $this->getValueForProperty($property);
             }
 
             return $payload;
         }, []);
     }
 
-    private function getValueForProperty(DataProperty $property): mixed
+    protected function getValueForProperty(DataProperty $property): mixed
     {
-        if ($property->types()->isEmpty()) {
+        if ($property->type->isMixed) {
             return null;
         }
 
-        if ($property->types()->count() > 1) {
+        if ($property->type->count() > 1) {
             throw DataPropertyCanOnlyHaveOneType::create($property);
         }
 
-        $type = $property->types()->first();
-
-        if ($type === 'array') {
+        if ($property->type->acceptsType('array')) {
             return [];
         }
 
-        if ($property->isData()) {
-            /** @var \Spatie\LaravelData\Data $type */
-            return $type::empty();
+        if ($property->type->isDataObject) {
+            return $property->type->dataClass::empty();
         }
 
-        if ($property->isDataCollection()) {
+        if ($property->type->isDataCollectable) {
             return [];
         }
 
-        if (is_a($type, Traversable::class, true)) {
+        if ($property->type->findAcceptedTypeForBaseType(Traversable::class) !== null) {
             return [];
         }
 

@@ -2,10 +2,13 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
+use ArgumentCountError;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Exceptions\CannotCreateData;
+use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;
 
 class DataFromArrayResolver
@@ -14,87 +17,50 @@ class DataFromArrayResolver
     {
     }
 
-    public function execute(string $class, array $values): Data
+    public function execute(string $class, Collection $properties): BaseData
     {
-        [$promotedProperties, $classProperties] = $this->dataConfig
-            ->getDataClass($class)
-            ->properties()
-            ->reject(fn (DataProperty $property) => $this->shouldIgnoreProperty($property, $values))
-            ->partition(fn (DataProperty $property) => $property->isPromoted());
+        $dataClass = $this->dataConfig->getDataClass($class);
 
-        return $this->createDataObjectWithProperties(
-            $class,
-            $promotedProperties->mapWithKeys(fn (DataProperty $property) => [
-                $property->name() => $this->resolveValue($property, $values),
-            ]),
-            $classProperties->mapWithKeys(fn (DataProperty $property) => [
-                $property->name() => $this->resolveValue($property, $values),
-            ])
-        );
-    }
+        $constructorParameters = $dataClass->constructorMethod?->parameters ?? collect();
 
-    private function shouldIgnoreProperty(DataProperty $property, array $values): bool
-    {
-        return ! array_key_exists($property->name(), $values) && $property->hasDefaultValue();
-    }
+        $data = $constructorParameters
+            ->mapWithKeys(function (DataParameter|DataProperty $parameter) use ($properties) {
+                if ($properties->has($parameter->name)) {
+                    return [$parameter->name => $properties->get($parameter->name)];
+                }
 
-    private function resolveValue(DataProperty $property, array $values): mixed
-    {
-        $value = $values[$property->name()] ?? null;
+                if (! $parameter->isPromoted && $parameter->hasDefaultValue) {
+                    return [$parameter->name => $parameter->defaultValue];
+                }
 
-        if ($value === null) {
-            return $value;
-        }
+                return [];
+            })
+            ->pipe(fn (Collection $parameters) => $this->createData($dataClass, $parameters));
 
-        if ($value instanceof Lazy) {
-            return $value;
-        }
-
-        $shouldCast = $this->shouldBeCasted($property, $value);
-
-        if ($shouldCast && $castAttribute = $property->castAttribute()) {
-            return $castAttribute->get()->cast($property, $value);
-        }
-
-        if ($shouldCast && $cast = $this->dataConfig->findGlobalCastForProperty($property)) {
-            return $cast->cast($property, $value);
-        }
-
-        if ($property->isData()) {
-            return $property->dataClassName()::from($value);
-        }
-
-        if ($property->isDataCollection()) {
-            return $property->dataClassName()::collection($value);
-        }
-
-        return $value;
-    }
-
-    private function shouldBeCasted(DataProperty $property, mixed $value): bool
-    {
-        $type = gettype($value);
-
-        if ($type !== 'object') {
-            return true;
-        }
-
-        return $property->types()->canBe($type);
-    }
-
-    private function createDataObjectWithProperties(
-        string $class,
-        Collection $promotedProperties,
-        Collection $classProperties
-    ): Data {
-        $data = new $class(...$promotedProperties);
-
-        $classProperties->each(
-            function (mixed $value, string $name) use ($data) {
-                $data->{$name} = $value;
-            }
-        );
+        $dataClass
+            ->properties
+            ->filter(
+                fn (DataProperty $property) => ! $property->isPromoted && $properties->has($property->name)
+            )
+            ->each(function (DataProperty $property) use ($properties, $data) {
+                $data->{$property->name} = $properties->get($property->name);
+            });
 
         return $data;
+    }
+
+    protected function createData(
+        DataClass $dataClass,
+        Collection $parameters,
+    ) {
+        try {
+            return new $dataClass->name(...$parameters);
+        } catch (ArgumentCountError $error) {
+            throw CannotCreateData::constructorMissingParameters(
+                $dataClass,
+                $parameters,
+                $error
+            );
+        }
     }
 }

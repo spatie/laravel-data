@@ -33,7 +33,7 @@ class EnumCastTest extends TestCase
 
         $this->assertEquals(
             DummyBackedEnum::FOO,
-            $this->caster->cast(DataProperty::create(new ReflectionProperty($class, 'enum')), 'foo')
+            $this->caster->cast(DataProperty::create(new ReflectionProperty($class, 'enum')), 'foo', [])
         );
     }
 
@@ -48,7 +48,7 @@ class EnumCastTest extends TestCase
 
         $this->assertEquals(
             DummyBackedEnum::FOO,
-            $this->caster->cast(DataProperty::create(new ReflectionProperty($class, 'enum')), 'bar')
+            $this->caster->cast(DataProperty::create(new ReflectionProperty($class, 'enum')), 'bar', [])
         );
     }
 
@@ -61,7 +61,7 @@ class EnumCastTest extends TestCase
 
         $this->assertEquals(
             Uncastable::create(),
-            $this->caster->cast(DataProperty::create(new ReflectionProperty($class, 'enum')), 'foo')
+            $this->caster->cast(DataProperty::create(new ReflectionProperty($class, 'enum')), 'foo', [])
         );
     }
 
@@ -74,7 +74,7 @@ class EnumCastTest extends TestCase
 
         $this->assertEquals(
             Uncastable::create(),
-            $this->caster->cast(DataProperty::create(new ReflectionProperty($class, 'int')), 'foo')
+            $this->caster->cast(DataProperty::create(new ReflectionProperty($class, 'int')), 'foo', [])
         );
     }
 }

@@ -5,14 +5,19 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Digits extends ValidationAttribute
+class Digits extends StringValidationAttribute
 {
-    public function __construct(private int $value)
+    public function __construct(protected int $value)
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["digits:{$this->value}"];
+        return 'digits';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->value];
     }
 }

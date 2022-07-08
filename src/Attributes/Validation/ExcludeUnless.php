@@ -5,14 +5,22 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class ExcludeUnless extends ValidationAttribute
+class ExcludeUnless extends StringValidationAttribute
 {
-    public function __construct(private string $field, private string | bool | int | float $value)
+    public function __construct(protected string $field, protected string | bool | int | float $value)
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["exclude_unless:{$this->field},{$this->normalizeValue($this->value)}"];
+        return 'exclude_unless';
+    }
+
+    public function parameters(): array
+    {
+        return [
+            $this->field,
+            $this->normalizeValue($this->value),
+        ];
     }
 }

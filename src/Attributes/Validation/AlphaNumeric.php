@@ -5,10 +5,15 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class AlphaNumeric extends ValidationAttribute
+class AlphaNumeric extends StringValidationAttribute
 {
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ['alpha_num'];
+        return 'alpha_num';
+    }
+
+    public function parameters(): array
+    {
+        return [];
     }
 }

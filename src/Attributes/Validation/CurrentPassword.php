@@ -5,16 +5,21 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class CurrentPassword extends ValidationAttribute
+class CurrentPassword extends StringValidationAttribute
 {
-    public function __construct(private ?string $guard = null)
+    public function __construct(protected ?string $guard = null)
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
+    {
+        return 'current_password';
+    }
+
+    public function parameters(): array
     {
         return $this->guard === null
-            ? ['current_password']
-            : ["current_password:{$this->guard}"];
+            ? []
+            : [$this->guard];
     }
 }

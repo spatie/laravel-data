@@ -5,14 +5,19 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class MultipleOf extends ValidationAttribute
+class MultipleOf extends StringValidationAttribute
 {
-    public function __construct(private int | float $value)
+    public function __construct(protected int | float $value)
     {
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ["multiple_of:{$this->value}"];
+        return 'multiple_of';
+    }
+
+    public function parameters(): array
+    {
+        return [$this->value];
     }
 }

@@ -4,6 +4,11 @@ namespace Spatie\LaravelData\Tests\Support;
 
 use Generator;
 use Spatie\LaravelData\Support\PartialsParser;
+use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
+use Spatie\LaravelData\Support\TreeNodes\TreeNode;
 use Spatie\LaravelData\Tests\TestCase;
 
 class PartialsParserTest extends TestCase
@@ -15,7 +20,7 @@ class PartialsParserTest extends TestCase
      * @param array $partials
      * @param array $expected
      */
-    public function it_can_parse_directives(array $partials, array $expected)
+    public function it_can_parse_directives(array $partials, TreeNode $expected)
     {
         $this->assertEquals(
             $expected,
@@ -33,32 +38,35 @@ class PartialsParserTest extends TestCase
 
     public function rootPartialsProvider(): Generator
     {
+        yield "empty" => [
+            'partials' => [],
+            'expected' => new DisabledTreeNode(),
+        ];
+
         yield "root property" => [
             'partials' => [
                 'name',
             ],
-            'expected' => [
-                'name' => [],
-            ],
+            'expected' => new PartialTreeNode([
+                'name' => new ExcludedTreeNode(),
+            ]),
         ];
 
         yield "root multi-property" => [
             'partials' => [
                 '{name, age}',
             ],
-            'expected' => [
-                'name' => [],
-                'age' => [],
-            ],
+            'expected' => new PartialTreeNode([
+                'name' => new ExcludedTreeNode(),
+                'age' => new ExcludedTreeNode(),
+            ]),
         ];
 
         yield "root star" => [
             'partials' => [
                 '*',
             ],
-            'expected' => [
-                '*',
-            ],
+            'expected' => new AllTreeNode(),
         ];
 
         yield "root star overrules" => [
@@ -67,9 +75,7 @@ class PartialsParserTest extends TestCase
                 '*',
                 'age',
             ],
-            'expected' => [
-                '*',
-            ],
+            'expected' => new AllTreeNode(),
         ];
 
         yield "root combination" => [
@@ -79,11 +85,11 @@ class PartialsParserTest extends TestCase
                 'age',
                 'gender',
             ],
-            'expected' => [
-                'name' => [],
-                'age' => [],
-                'gender' => [],
-            ],
+            'expected' => new PartialTreeNode([
+                'name' => new ExcludedTreeNode(),
+                'age' => new ExcludedTreeNode(),
+                'gender' => new ExcludedTreeNode(),
+            ]),
         ];
     }
 
@@ -93,32 +99,32 @@ class PartialsParserTest extends TestCase
             'partials' => [
                 'struct.name',
             ],
-            'expected' => [
-                'struct' => [
-                    'name' => [],
-                ],
-            ],
+            'expected' => new PartialTreeNode([
+                'struct' => new PartialTreeNode([
+                    'name' => new ExcludedTreeNode(),
+                ]),
+            ]),
         ];
 
         yield "nested multi-property" => [
             'partials' => [
                 'struct.{name, age}',
             ],
-            'expected' => [
-                'struct' => [
-                    'name' => [],
-                    'age' => [],
-                ],
-            ],
+            'expected' => new PartialTreeNode([
+                'struct' => new PartialTreeNode([
+                    'name' => new ExcludedTreeNode(),
+                    'age' => new ExcludedTreeNode(),
+                ]),
+            ]),
         ];
 
         yield "nested star" => [
             'partials' => [
                 'struct.*',
             ],
-            'expected' => [
-                'struct' => ['*'],
-            ],
+            'expected' => new PartialTreeNode([
+                'struct' => new AllTreeNode(),
+            ]),
         ];
 
         yield "nested star overrules" => [
@@ -127,9 +133,9 @@ class PartialsParserTest extends TestCase
                 'struct.*',
                 'struct.age',
             ],
-            'expected' => [
-                'struct' => ['*'],
-            ],
+            'expected' => new PartialTreeNode([
+                'struct' => new AllTreeNode(),
+            ]),
         ];
 
         yield "nested combination" => [
@@ -139,13 +145,13 @@ class PartialsParserTest extends TestCase
                 'struct.age',
                 'struct.gender',
             ],
-            'expected' => [
-                'struct' => [
-                    'name' => [],
-                    'age' => [],
-                    'gender' => [],
-                ],
-            ],
+            'expected' => new PartialTreeNode([
+                'struct' => new PartialTreeNode([
+                    'name' => new ExcludedTreeNode(),
+                    'age' => new ExcludedTreeNode(),
+                    'gender' => new ExcludedTreeNode(),
+                ]),
+            ]),
         ];
     }
 
@@ -155,19 +161,17 @@ class PartialsParserTest extends TestCase
             'partials' => [
                 '*.name',
             ],
-            'expected' => [
-                '*',
-            ],
+            'expected' => new AllTreeNode(),
         ];
 
         yield "nested property on multi-property" => [
             'partials' => [
                 '{name, age}.name',
             ],
-            'expected' => [
-                'name' => [],
-                'age' => [],
-            ],
+            'expected' => new PartialTreeNode([
+                'name' => new ExcludedTreeNode(),
+                'age' => new ExcludedTreeNode(),
+            ]),
         ];
     }
 
@@ -183,21 +187,21 @@ class PartialsParserTest extends TestCase
                 'books.title',
                 'books.*',
             ],
-            'expected' => [
-                'name' => [],
-                'age' => [],
-                'posts' => [
-                    'name' => [],
-                    'tags' => ['*'],
-                ],
-                'identities' => [
-                    'auth0' => [
-                        'name' => [],
-                        'email' => [],
-                    ],
-                ],
-                'books' => ['*'],
-            ],
+            'expected' => new PartialTreeNode([
+                'name' => new ExcludedTreeNode(),
+                'age' => new ExcludedTreeNode(),
+                'posts' => new PartialTreeNode([
+                    'name' => new ExcludedTreeNode(),
+                    'tags' => new AllTreeNode(),
+                ]),
+                'identities' => new PartialTreeNode([
+                    'auth0' => new PartialTreeNode([
+                        'name' => new ExcludedTreeNode(),
+                        'email' => new ExcludedTreeNode(),
+                    ]),
+                ]),
+                'books' => new AllTreeNode(),
+            ]),
         ];
     }
 }

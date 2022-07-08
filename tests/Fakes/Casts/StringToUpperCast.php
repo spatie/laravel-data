@@ -7,7 +7,7 @@ use Spatie\LaravelData\Support\DataProperty;
 
 class StringToUpperCast implements Cast
 {
-    public function cast(DataProperty $property, mixed $value): string
+    public function cast(DataProperty $property, mixed $value, array $context): string
     {
         return strtoupper($value);
     }

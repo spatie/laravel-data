@@ -1,6 +1,6 @@
 ---
 title: Validation attributes
-weight: 7
+weight: 10
 ---
 
 It is possible to validate the request before a data object is constructed. This can be done by adding validation attributes to the properties of a data object like this:
@@ -20,11 +20,11 @@ class SongData extends Data
 
 ## Creating your validation attribute
 
-A validation attribute is a class that extends `ValidationAttribute` and returns an array of validation rules when the `getRules` method is called:
+A validation attribute is a class that extends `ValidationRule` and returns an array of validation rules when the `getRules` method is called:
 
 ```php
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class CustomRule extends ValidationAttribute
+class CustomRule extends ValidationRule
 {
     public function getRules(): array
     {
@@ -792,6 +792,15 @@ public string $value;
 
 ```php
 #[Size(10)]
+public string $value; 
+```
+
+### Sometimes
+
+[Docs](https://laravel.com/docs/8.x/validation#validating-when-present)
+
+```php
+#[Sometimes]
 public string $value; 
 ```
 

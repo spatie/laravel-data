@@ -5,10 +5,15 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class StringType extends ValidationAttribute
+class StringType extends StringValidationAttribute
 {
-    public function getRules(): array
+    public static function keyword(): string
     {
-        return ['string'];
+        return 'string';
+    }
+
+    public function parameters(): array
+    {
+        return [];
     }
 }

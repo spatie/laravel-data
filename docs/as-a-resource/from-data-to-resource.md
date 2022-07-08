@@ -6,7 +6,8 @@ weight: 1
 A data object will automatically be transformed to a JSON response when returned in a controller:
 
 ```php
-class SongController{
+class SongController
+{
     public function show(Song $model)
     {
         return SongData::from($model);
@@ -117,6 +118,59 @@ SongData::empty([
     'name' => 'Title of the song here',
     'artist' => 'An artist'
 ]);
+```
+
+## Mapping property names
+
+Sometimes you might want to change the name of a property, with attributes this is possible:
+
+```php
+class ContractData extends Data
+{
+    public function __construct(
+        public string $name,
+        #[MapOutputName('record_company')]
+        public string $recordCompany,
+    ) {
+    }
+}
+```
+
+Now our JSON looks like this:
+
+```json
+{
+    "name": "Rick Astley",
+    "record_company": "RCA Records"
+}
+``` 
+
+Changing all camelCased property names in a data object to snake_case can be done as such:
+
+```php
+#[MapOutputName(SnakeCaseMapper::class)]
+class ContractData extends Data
+{
+    public function __construct(
+        public string $name,
+        public string $recordCompany,
+    ) {
+    }
+}
+```
+
+You can also use the `MapName` attribute when you want to combine input and output property name mapping:
+
+```php
+#[MapName(SnakeCaseMapper::class)]
+class ContractData extends Data
+{
+    public function __construct(
+        public string $name,
+        public string $recordCompany,
+    ) {
+    }
+}
 ```
 
 ## Using collections
@@ -249,7 +303,7 @@ class AlbumData extends Data
 {
     public function __construct(
         public string $title,
-        /** @var SongData[] */
+        #[DataCollectionOf(SongData::class)]
         public DataCollection $songs,
     ) {
     }

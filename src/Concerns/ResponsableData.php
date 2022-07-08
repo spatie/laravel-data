@@ -3,7 +3,9 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Http\JsonResponse;
-use Spatie\LaravelData\Support\TransformationType;
+use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
+use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
+use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 trait ResponsableData
 {
@@ -14,24 +16,34 @@ trait ResponsableData
      */
     public function toResponse($request)
     {
-        if ($request->has('include')) {
-            $this->include(...explode(',', $request->get('include')));
+        if ($this instanceof IncludeableDataContract) {
+            $partialTrees = resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request);
+
+            $this->withPartialTrees($partialTrees);
         }
 
-        if ($request->has('exclude')) {
-            $this->exclude(...explode(',', $request->get('exclude')));
-        }
-
-        return new JsonResponse($this->transform(TransformationType::request()));
+        return new JsonResponse($this->transform(
+            wrapExecutionType: WrapExecutionType::Enabled,
+        ));
     }
 
-    public function allowedRequestIncludes(): ?array
+    public static function allowedRequestIncludes(): ?array
     {
-        return null;
+        return [];
     }
 
-    public function allowedRequestExcludes(): ?array
+    public static function allowedRequestExcludes(): ?array
     {
-        return null;
+        return [];
+    }
+
+    public static function allowedRequestOnly(): ?array
+    {
+        return [];
+    }
+
+    public static function allowedRequestExcept(): ?array
+    {
+        return [];
     }
 }

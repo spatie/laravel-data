@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Email extends ValidationAttribute
+class Email extends StringValidationAttribute
 {
     public const RfcValidation = 'rfc';
     public const NoRfcWarningsValidation = 'strict';
@@ -16,16 +16,21 @@ class Email extends ValidationAttribute
     public const SpoofCheckValidation = 'spoof';
     public const FilterEmailValidation = 'filter';
 
-    private array $modes;
+    protected array $modes;
 
     public function __construct(array | string ...$modes)
     {
         $this->modes = Arr::flatten($modes);
     }
 
-    public function getRules(): array
+    public static function keyword(): string
     {
-        $modes = collect($this->modes)
+        return 'email';
+    }
+
+    public function parameters(): array
+    {
+        return collect($this->modes)
             ->whenEmpty(fn (Collection $modes) => $modes->add(self::RfcValidation))
             ->filter(fn (string $mode) => in_array($mode, [
                 self::RfcValidation,
@@ -35,8 +40,6 @@ class Email extends ValidationAttribute
                 self::FilterEmailValidation,
             ]))
             ->whenEmpty(fn () => throw CannotBuildValidationRule::create("Email validation rule needs at least one valid mode."))
-            ->implode(',');
-
-        return ["email:{$modes}"];
+            ->all();
     }
 }

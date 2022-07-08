@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Tests\Attributes\Validation;
 use Carbon\CarbonImmutable;
 use DateTimeZone;
 use Generator;
-use Spatie\LaravelData\Attributes\Validation\Rule;
+use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
 use Spatie\LaravelData\Tests\TestCase;
 
@@ -14,9 +14,9 @@ class ValidationAttributeTest extends TestCase
     /** @test */
     public function it_can_get_a_string_representation_of_rules()
     {
-        $rule = new Rule('string', 'uuid', 'required');
+        $rule = new StringType();
 
-        $this->assertEquals('string|uuid|required', (string) $rule);
+        $this->assertEquals('string', (string) $rule);
     }
 
     /**
@@ -34,6 +34,16 @@ class ValidationAttributeTest extends TestCase
             public function getRules(): array
             {
                 return [];
+            }
+
+            public static function create(string ...$parameters): static
+            {
+                return new self();
+            }
+
+            public static function keyword(): string
+            {
+                return '';
             }
         };
 
