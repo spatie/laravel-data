@@ -1435,6 +1435,76 @@ class DataTest extends TestCase
     }
 
     /** @test */
+    public function it_can_filter_nested_array_properties_inside_the_data_class()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                public ?int $id = null,
+                public ?string $name = null,
+                public ?array $more = null
+            ) {
+            }
+
+            protected function exclusions(): array
+            {
+                return [
+                    'id' => true,
+                    'more.twitter_verified' => true,
+                ];
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+            'more' => [
+                'last_name' => 'Otwell',
+            ],
+        ], $data::from([
+            'id' => 1,
+            'name' => 'Taylor',
+            'more' => [
+                'last_name' => 'Otwell',
+                'twitter_verified' => false,
+            ],
+        ])->toArray());
+    }
+
+    /** @test */
+    public function it_can_filter_nested_data_properties_inside_the_data_class()
+    {
+        $more = new class ('Otwell', false) extends Data {
+            public function __construct(
+                public string $last_name,
+                public bool $twitter_verified,
+            ) {
+            }
+        };
+
+        $data = new class ('Taylor', $more) extends Data {
+            public function __construct(
+                public string $name,
+                public Data $more,
+            ) {
+            }
+
+            protected function exclusions(): array
+            {
+                return [
+                    'id' => true,
+                    'more.twitter_verified' => true,
+                ];
+            }
+        };
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+            'more' => [
+                'last_name' => 'Otwell',
+            ],
+        ], $data->toArray());
+    }
+
+    /** @test */
     public function it_can_conditionally_include_properties()
     {
         $data = new class () extends Data {
