@@ -9,7 +9,7 @@ use Illuminate\Validation\Rules\Password as BasePassword;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Password extends ValidationAttribute
 {
-    private BasePassword $rule;
+    protected BasePassword $rule;
 
     public function __construct(
         int $min = 12,

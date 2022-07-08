@@ -20,7 +20,7 @@ class AuthorizedDataPipe implements DataPipe
         return $properties;
     }
 
-    private function ensureRequestIsAuthorized(string $class): void
+    protected function ensureRequestIsAuthorized(string $class): void
     {
         /** @psalm-suppress UndefinedMethod */
         if (method_exists($class, 'authorize') && $class::authorize() === false) {

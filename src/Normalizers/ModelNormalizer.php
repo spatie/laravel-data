@@ -34,7 +34,7 @@ class ModelNormalizer implements Normalizer
         return $properties;
     }
 
-    private function isDateCast(string $cast): bool
+    protected function isDateCast(string $cast): bool
     {
         return in_array($cast, [
             'date',

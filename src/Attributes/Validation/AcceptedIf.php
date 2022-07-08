@@ -7,7 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class AcceptedIf extends StringValidationAttribute
 {
-    public function __construct(private string $field, private string|bool|int|float $value)
+    public function __construct(protected string $field, protected string|bool|int|float $value)
     {
     }
 

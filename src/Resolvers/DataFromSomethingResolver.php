@@ -45,7 +45,7 @@ class DataFromSomethingResolver
         return $this->dataFromArrayResolver->execute($class, $properties);
     }
 
-    private function createFromCustomCreationMethod(string $class, array $payloads): ?BaseData
+    protected function createFromCustomCreationMethod(string $class, array $payloads): ?BaseData
     {
         /** @var Collection<\Spatie\LaravelData\Support\DataMethod> $customCreationMethods */
         $customCreationMethods = $this->dataConfig

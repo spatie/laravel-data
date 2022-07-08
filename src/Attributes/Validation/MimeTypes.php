@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class MimeTypes extends StringValidationAttribute
 {
-    private array $mimeTypes;
+    protected array $mimeTypes;
 
     public function __construct(string | array ...$mimeTypes)
     {

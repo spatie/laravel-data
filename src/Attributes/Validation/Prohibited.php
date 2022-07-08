@@ -8,7 +8,7 @@ use Illuminate\Validation\Rules\ProhibitedIf;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Prohibited extends ValidationAttribute
 {
-    public function __construct(private ?ProhibitedIf $rule = null)
+    public function __construct(protected ?ProhibitedIf $rule = null)
     {
     }
 

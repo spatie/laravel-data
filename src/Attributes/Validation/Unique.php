@@ -10,7 +10,7 @@ use Illuminate\Validation\Rules\Unique as BaseUnique;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Unique extends ValidationAttribute
 {
-    private BaseUnique $rule;
+    protected BaseUnique $rule;
 
     public function __construct(
         ?string $table = null,

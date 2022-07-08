@@ -9,7 +9,7 @@ use Illuminate\Validation\Rules\NotIn as BaseNotIn;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class NotIn extends ValidationAttribute
 {
-    private BaseNotIn $rule;
+    protected BaseNotIn $rule;
 
     public function __construct(array|string|BaseNotIn ...$values)
     {

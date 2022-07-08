@@ -8,7 +8,7 @@ use Illuminate\Validation\Rules\Enum as EnumRule;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Enum extends ValidationAttribute
 {
-    private EnumRule $enum;
+    protected EnumRule $enum;
 
     public function __construct(string|EnumRule $enum)
     {

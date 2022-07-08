@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class StartsWith extends StringValidationAttribute
 {
-    private string|array $values;
+    protected string|array $values;
 
     public function __construct(string | array ...$values)
     {

@@ -29,7 +29,7 @@ class CursorPaginatedDataCollection implements DataCollectable
     use BaseDataCollectable;
 
     /** @var CursorPaginator<TValue> */
-    private CursorPaginator $items;
+    protected CursorPaginator $items;
 
     /**
      * @param class-string<TValue> $dataClass

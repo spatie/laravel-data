@@ -10,7 +10,7 @@ use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 
 abstract class Lazy
 {
-    private ?bool $defaultIncluded = null;
+    protected ?bool $defaultIncluded = null;
 
     public static function create(Closure $value): DefaultLazy
     {

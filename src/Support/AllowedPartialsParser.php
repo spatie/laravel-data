@@ -11,7 +11,7 @@ use Spatie\LaravelData\Support\TreeNodes\TreeNode;
 
 class AllowedPartialsParser
 {
-    public function __construct(private DataConfig $dataConfig)
+    public function __construct(protected DataConfig $dataConfig)
     {
     }
 

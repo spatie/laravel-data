@@ -8,8 +8,8 @@ use Spatie\LaravelData\Lazy;
 class ConditionalLazy extends Lazy
 {
     protected function __construct(
-        private Closure $condition,
-        private Closure $value,
+        protected Closure $condition,
+        protected Closure $value,
     ) {
     }
 

@@ -10,7 +10,7 @@ use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 class AttributesRuleInferrer implements RuleInferrer
 {
-    public function __construct(private RulesMapper $ruleAttributesResolver)
+    public function __construct(protected RulesMapper $ruleAttributesResolver)
     {
     }
 

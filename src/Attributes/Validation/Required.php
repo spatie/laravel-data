@@ -9,7 +9,7 @@ use Spatie\LaravelData\Support\Validation\RequiringRule;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Required extends ValidationAttribute implements RequiringRule
 {
-    public function __construct(private ?RequiredIf $rule = null)
+    public function __construct(protected ?RequiredIf $rule = null)
     {
     }
 

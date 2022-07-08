@@ -9,7 +9,7 @@ use Spatie\LaravelData\Support\Validation\RequiringRule;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredWithAll extends StringValidationAttribute implements RequiringRule
 {
-    private string|array $fields;
+    protected string|array $fields;
 
     public function __construct(
         array | string ...$fields,

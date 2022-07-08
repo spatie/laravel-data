@@ -8,7 +8,7 @@ use DateTimeInterface;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class After extends StringValidationAttribute
 {
-    public function __construct(private string|DateTimeInterface $date)
+    public function __construct(protected string|DateTimeInterface $date)
     {
     }
 

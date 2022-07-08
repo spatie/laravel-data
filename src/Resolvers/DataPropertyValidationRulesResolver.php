@@ -28,7 +28,7 @@ class DataPropertyValidationRulesResolver
         return collect([$propertyName => $this->getRulesForProperty($property, $nullable)]);
     }
 
-    private function getNestedRules(
+    protected function getNestedRules(
         DataProperty $property,
         string $propertyName,
         array $payload,
@@ -61,7 +61,7 @@ class DataPropertyValidationRulesResolver
             ->prepend([$toplevelRule, 'array'], $propertyName);
     }
 
-    private function getRulesForProperty(DataProperty $property, bool $nullable): array
+    protected function getRulesForProperty(DataProperty $property, bool $nullable): array
     {
         $rules = new RulesCollection();
 
@@ -76,7 +76,7 @@ class DataPropertyValidationRulesResolver
         return $rules->normalize();
     }
 
-    private function isNestedDataNullable(bool $nullable, DataProperty $property): bool
+    protected function isNestedDataNullable(bool $nullable, DataProperty $property): bool
     {
         if ($nullable) {
             return true;

@@ -10,7 +10,7 @@ use Illuminate\Validation\Rules\Exists as BaseExists;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Exists extends ValidationAttribute
 {
-    private BaseExists $rule;
+    protected BaseExists $rule;
 
     public function __construct(
         ?string $table = null,

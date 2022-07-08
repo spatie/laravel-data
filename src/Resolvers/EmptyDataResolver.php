@@ -30,7 +30,7 @@ class EmptyDataResolver
         }, []);
     }
 
-    private function getValueForProperty(DataProperty $property): mixed
+    protected function getValueForProperty(DataProperty $property): mixed
     {
         if ($property->type->isMixed) {
             return null;

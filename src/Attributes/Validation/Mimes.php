@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Mimes extends StringValidationAttribute
 {
-    private array $mimes;
+    protected array $mimes;
 
     public function __construct(string | array ...$mimes)
     {

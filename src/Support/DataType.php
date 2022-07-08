@@ -208,7 +208,7 @@ class DataType implements Countable
         return null;
     }
 
-    private function resolveBaseTypes(string $type): array
+    protected function resolveBaseTypes(string $type): array
     {
         if (! class_exists($type)) {
             return [];
@@ -220,7 +220,7 @@ class DataType implements Countable
         ]);
     }
 
-    private function resolveDataCollectableClass(
+    protected function resolveDataCollectableClass(
         ReflectionProperty|ReflectionParameter $reflection,
     ): ?string {
         $attributes = $reflection->getAttributes(DataCollectionOf::class);
@@ -245,7 +245,7 @@ class DataType implements Countable
         return $class;
     }
 
-    private function resolveDataCollectableType(
+    protected function resolveDataCollectableType(
         ReflectionNamedType $reflection,
     ): ?DataCollectableType {
         $className = $reflection->getName();

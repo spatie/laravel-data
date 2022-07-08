@@ -24,7 +24,7 @@ use TypeError;
 
 class DataTransformer
 {
-    private DataConfig $config;
+    protected DataConfig $config;
 
     public static function create(
         bool $transformValues,
@@ -234,7 +234,7 @@ class DataTransformer
         return $value;
     }
 
-    private function resolveTransformerForValue(
+    protected function resolveTransformerForValue(
         DataProperty $property,
         mixed $value,
     ): ?Transformer {

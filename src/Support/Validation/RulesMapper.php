@@ -29,7 +29,7 @@ use Throwable;
 
 class RulesMapper
 {
-    public function __construct(private RuleFactory $ruleFactory)
+    public function __construct(protected RuleFactory $ruleFactory)
     {
     }
 
@@ -56,7 +56,7 @@ class RulesMapper
         return Arr::flatten($rules);
     }
 
-    private function resolveStringRule(string $rule): mixed
+    protected function resolveStringRule(string $rule): mixed
     {
         if (! str_contains($rule, '|')) {
             try {

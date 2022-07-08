@@ -9,7 +9,7 @@ use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Dimensions extends ValidationAttribute
 {
-    private BaseDimensions $rule;
+    protected BaseDimensions $rule;
 
     public function __construct(
         ?int $minWidth = null,

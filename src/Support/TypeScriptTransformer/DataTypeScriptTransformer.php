@@ -103,12 +103,12 @@ class DataTypeScriptTransformer extends DtoTransformer
         return $collectionType;
     }
 
-    private function defaultCollectionType(string $class): Type
+    protected function defaultCollectionType(string $class): Type
     {
         return new Array_(new Object_(new Fqsen("\\{$class}")));
     }
 
-    private function paginatedCollectionType(string $class): Type
+    protected function paginatedCollectionType(string $class): Type
     {
         return new StructType([
             'data' => $this->defaultCollectionType($class),
@@ -134,7 +134,7 @@ class DataTypeScriptTransformer extends DtoTransformer
         ]);
     }
 
-    private function cursorPaginatedCollectionType(string $class): Type
+    protected function cursorPaginatedCollectionType(string $class): Type
     {
         return new StructType([
             'data' => $this->defaultCollectionType($class),

@@ -7,7 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Regex extends StringValidationAttribute
 {
-    public function __construct(private string $pattern)
+    public function __construct(protected string $pattern)
     {
     }
 

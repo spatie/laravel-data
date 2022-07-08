@@ -9,10 +9,10 @@ use Spatie\LaravelData\Support\Validation\RequiringRule;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredIf extends StringValidationAttribute implements RequiringRule
 {
-    private string|array $values;
+    protected string|array $values;
 
     public function __construct(
-        private string $field,
+        protected string $field,
         array | string ...$values
     ) {
         $this->values = Arr::flatten($values);

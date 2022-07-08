@@ -11,7 +11,7 @@ class Distinct extends StringValidationAttribute
     public const Strict = 'strict';
     public const IgnoreCase = 'ignore_case';
 
-    public function __construct(private ?string $mode = null)
+    public function __construct(protected ?string $mode = null)
     {
     }
 

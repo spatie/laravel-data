@@ -7,7 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Size extends StringValidationAttribute
 {
-    public function __construct(private int $size)
+    public function __construct(protected int $size)
     {
     }
 

@@ -20,9 +20,9 @@ use TypeError;
 class PartialsTreeFromRequestResolver
 {
     public function __construct(
-        private DataConfig $dataConfig,
-        private PartialsParser $partialsParser,
-        private AllowedPartialsParser $allowedPartialsParser,
+        protected DataConfig $dataConfig,
+        protected PartialsParser $partialsParser,
+        protected AllowedPartialsParser $allowedPartialsParser,
     ) {
     }
 

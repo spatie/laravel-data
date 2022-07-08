@@ -8,7 +8,7 @@ use Illuminate\Validation\Rules\ExcludeIf;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Exclude extends ValidationAttribute
 {
-    public function __construct(private ?ExcludeIf $rule = null)
+    public function __construct(protected ?ExcludeIf $rule = null)
     {
     }
 

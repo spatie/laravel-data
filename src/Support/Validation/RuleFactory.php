@@ -98,7 +98,7 @@ class RuleFactory
         return $ruleClass::create(...$parameters);
     }
 
-    private function resolveParameters(string $rule): array
+    protected function resolveParameters(string $rule): array
     {
         if (! str_contains($rule, ':')) {
             return [];
@@ -117,7 +117,7 @@ class RuleFactory
         )->all();
     }
 
-    private function mapping(): array
+    protected function mapping(): array
     {
         return [
             Accepted::keyword() => Accepted::class,

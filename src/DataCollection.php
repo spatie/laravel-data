@@ -34,7 +34,7 @@ class DataCollection implements DataCollectable, ArrayAccess
     use EnumerableMethods;
 
     /** @var Enumerable<TKey, TValue> */
-    private Enumerable $items;
+    protected Enumerable $items;
 
     /**
      * @param class-string<TValue> $dataClass

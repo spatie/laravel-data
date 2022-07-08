@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Mappers;
 
 class ProvidedNameMapper implements NameMapper
 {
-    public function __construct(private string|int $name)
+    public function __construct(protected string|int $name)
     {
     }
 

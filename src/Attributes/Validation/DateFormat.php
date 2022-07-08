@@ -7,7 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class DateFormat extends StringValidationAttribute
 {
-    public function __construct(private string $format)
+    public function __construct(protected string $format)
     {
     }
 

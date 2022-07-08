@@ -49,7 +49,7 @@ class DataFromArrayResolver
         return $data;
     }
 
-    private function createData(
+    protected function createData(
         DataClass $dataClass,
         Collection $parameters,
     ) {

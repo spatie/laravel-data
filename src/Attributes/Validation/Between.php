@@ -7,7 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Between extends StringValidationAttribute
 {
-    public function __construct(private int | float $min, private int | float $max)
+    public function __construct(protected int | float $min, protected int | float $max)
     {
     }
 

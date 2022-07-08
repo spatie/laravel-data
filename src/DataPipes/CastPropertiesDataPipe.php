@@ -37,7 +37,7 @@ class CastPropertiesDataPipe implements DataPipe
         return $properties;
     }
 
-    private function cast(
+    protected function cast(
         DataProperty $property,
         mixed $value,
         array $castContext,
@@ -63,7 +63,7 @@ class CastPropertiesDataPipe implements DataPipe
         return $value;
     }
 
-    private function shouldBeCasted(DataProperty $property, mixed $value): bool
+    protected function shouldBeCasted(DataProperty $property, mixed $value): bool
     {
         return gettype($value) === 'object'
             ? ! $property->type->acceptsValue($value)

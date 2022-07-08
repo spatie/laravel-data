@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Prohibits extends StringValidationAttribute
 {
-    private string|array $fields;
+    protected string|array $fields;
 
     public function __construct(array | string ...$fields)
     {

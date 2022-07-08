@@ -16,7 +16,7 @@ class NameMappersResolver
         return new self($ignoredMappers);
     }
 
-    public function __construct(private array $ignoredMappers = [])
+    public function __construct(protected array $ignoredMappers = [])
     {
     }
 
@@ -29,7 +29,7 @@ class NameMappersResolver
         ];
     }
 
-    private function resolveInputNameMapper(
+    protected function resolveInputNameMapper(
         Collection $attributes
     ): ?NameMapper {
         /** @var \Spatie\LaravelData\Attributes\MapInputName|\Spatie\LaravelData\Attributes\MapName|null $mapper */
@@ -43,7 +43,7 @@ class NameMappersResolver
         return null;
     }
 
-    private function resolveOutputNameMapper(
+    protected function resolveOutputNameMapper(
         Collection $attributes
     ): ?NameMapper {
         /** @var \Spatie\LaravelData\Attributes\MapOutputName|\Spatie\LaravelData\Attributes\MapName|null $mapper */
@@ -57,7 +57,7 @@ class NameMappersResolver
         return null;
     }
 
-    private function resolveMapper(string|int $value): ?NameMapper
+    protected function resolveMapper(string|int $value): ?NameMapper
     {
         $mapper = $this->resolveMapperClass($value);
 
@@ -70,7 +70,7 @@ class NameMappersResolver
         return $mapper;
     }
 
-    private function resolveMapperClass(int|string $value): NameMapper
+    protected function resolveMapperClass(int|string $value): NameMapper
     {
         if (is_int($value)) {
             return new ProvidedNameMapper($value);

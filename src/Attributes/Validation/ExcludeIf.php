@@ -7,7 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ExcludeIf extends StringValidationAttribute
 {
-    public function __construct(private string $field, private string|int|float|bool $value)
+    public function __construct(protected string $field, protected string|int|float|bool $value)
     {
     }
 

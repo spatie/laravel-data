@@ -9,9 +9,9 @@ use Spatie\LaravelData\Lazy;
 class RelationalLazy extends Lazy
 {
     protected function __construct(
-        private string $relation,
-        private Model $model,
-        private Closure $value,
+        protected string $relation,
+        protected Model $model,
+        protected Closure $value,
     ) {
     }
 

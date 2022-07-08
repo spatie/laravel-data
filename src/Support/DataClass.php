@@ -67,7 +67,7 @@ class DataClass
         );
     }
 
-    private static function resolveMethods(
+    protected static function resolveMethods(
         ReflectionClass $reflectionClass,
     ): Collection {
         return collect($reflectionClass->getMethods())
@@ -77,7 +77,7 @@ class DataClass
             );
     }
 
-    private static function resolveProperties(
+    protected static function resolveProperties(
         ReflectionClass $class,
         ?ReflectionMethod $constructorMethod,
         array $mappers,
@@ -98,7 +98,7 @@ class DataClass
             ]);
     }
 
-    private static function resolveDefaultValues(
+    protected static function resolveDefaultValues(
         ReflectionClass $class,
         ?ReflectionMethod $constructorMethod,
     ): array {

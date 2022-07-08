@@ -28,7 +28,7 @@ class PaginatedDataCollection implements DataCollectable
     use TransformableData;
     use BaseDataCollectable;
 
-    private Paginator $items;
+    protected Paginator $items;
 
     /**
      * @param class-string<TValue> $dataClass

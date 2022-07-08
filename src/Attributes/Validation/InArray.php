@@ -7,7 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class InArray extends StringValidationAttribute
 {
-    public function __construct(private string $field)
+    public function __construct(protected string $field)
     {
     }
 

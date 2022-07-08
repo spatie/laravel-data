@@ -10,15 +10,15 @@ use Spatie\LaravelData\Support\DataConfig;
 
 class DataPipeline
 {
-    private array $normalizers = [];
+    protected array $normalizers = [];
 
-    private array $pipes = [];
+    protected array $pipes = [];
 
-    private mixed $value;
+    protected mixed $value;
 
-    private string $classString;
+    protected string $classString;
 
-    public function __construct(private DataConfig $dataConfig)
+    public function __construct(protected DataConfig $dataConfig)
     {
     }
 

@@ -7,7 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Max extends StringValidationAttribute
 {
-    public function __construct(private int $value)
+    public function __construct(protected int $value)
     {
     }
 

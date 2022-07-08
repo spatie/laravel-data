@@ -9,7 +9,7 @@ use Illuminate\Validation\Rules\In as BaseIn;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class In extends ValidationAttribute
 {
-    private BaseIn $rule;
+    protected BaseIn $rule;
 
     public function __construct(array|string|BaseIn ...$values)
     {

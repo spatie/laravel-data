@@ -7,7 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class CurrentPassword extends StringValidationAttribute
 {
-    public function __construct(private ?string $guard = null)
+    public function __construct(protected ?string $guard = null)
     {
     }
 
