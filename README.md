@@ -58,7 +58,7 @@ We highly appreciate you sending us a postcard from your hometown, mentioning wh
 
 ## Documentation
 
-You will find full documentation on the dedicated [documentation](https://spatie.be/docs/laravel-data/v1/introduction) site.
+You will find full documentation on the dedicated [documentation](https://spatie.be/docs/laravel-data/v2/introduction) site.
 
 ## Testing
 
