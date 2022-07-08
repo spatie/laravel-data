@@ -2,9 +2,7 @@
 
 namespace Spatie\LaravelData\Support;
 
-use Illuminate\Support\Str;
 use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
-use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\TreeNode;
@@ -18,8 +16,7 @@ class AllowedPartialsParser
     public function execute(
         string $type,
         DataClass $dataClass
-    ): TreeNode
-    {
+    ): TreeNode {
         $allowed = $dataClass->name::{$type}();
 
         if ($allowed === ['*'] || $allowed === null) {
