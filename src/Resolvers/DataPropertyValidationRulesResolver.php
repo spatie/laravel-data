@@ -25,7 +25,7 @@ class DataPropertyValidationRulesResolver
         return collect([$property->name() => $this->getRulesForProperty($property, $nullable)]);
     }
 
-    private function getNestedRules(DataProperty $property, array $payload = [], bool $nullable): Collection
+    private function getNestedRules(DataProperty $property, array $payload = [], bool $nullable = false): Collection
     {
         $prefix = match (true) {
             $property->isData() => "{$property->name()}.",
