@@ -80,11 +80,25 @@ trait IncludeableData
         return $this;
     }
 
+    protected function exclusions(): array
+    {
+        return [];
+    }
+
+    protected function processExclusions(): void
+    {
+        foreach ($this->exclusions() as $key => $condition) {
+            $this->exceptWhen($key, $condition);
+        }
+    }
+
     public function getPartialTrees(): PartialTrees
     {
         if ($this->partialTrees) {
             return $this->partialTrees;
         }
+
+        $this->processExclusions();
 
         return new PartialTrees(
             (new PartialsParser())->execute($this->includes),

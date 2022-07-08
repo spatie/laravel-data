@@ -1405,6 +1405,36 @@ class DataTest extends TestCase
     }
 
     /** @test */
+    public function it_can_filter_properties_inside_the_data_class()
+    {
+        $data = new class () extends Data {
+            public function __construct(
+                public ?int $id = null,
+                public ?string $first_name = null,
+                public ?string $last_name = null,
+            ) {
+            }
+
+            protected function exclusions(): array
+            {
+                return [
+                    'id' => true,
+                    'first_name' => false,
+                    'last_name' => fn () => true,
+                ];
+            }
+        };
+
+        $this->assertEquals([
+            'first_name' => 'Taylor',
+        ], $data::from([
+            'id' => 1,
+            'first_name' => 'Taylor',
+            'last_name' => 'Otwell',
+        ])->toArray());
+    }
+
+    /** @test */
     public function it_can_conditionally_include_properties()
     {
         $data = new class () extends Data {
