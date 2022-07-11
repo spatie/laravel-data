@@ -26,16 +26,16 @@ class PartialsTreeFromRequestResolver
         Request $request,
     ): PartialTrees {
         $requestedIncludesTree = $this->partialsParser->execute(
-            $request->has('include') ? explode(',', $request->get('include')) : []
+            $request->has('include') ? $this->arrayFromRequest($request, 'includes') : []
         );
         $requestedExcludesTree = $this->partialsParser->execute(
-            $request->has('exclude') ? explode(',', $request->get('exclude')) : []
+            $request->has('exclude') ? $this->arrayFromRequest($request, 'exclude') : []
         );
         $requestedOnlyTree = $this->partialsParser->execute(
-            $request->has('only') ? explode(',', $request->get('only')) : []
+            $request->has('only') ? $this->arrayFromRequest($request, 'only') : []
         );
         $requestedExceptTree = $this->partialsParser->execute(
-            $request->has('except') ? explode(',', $request->get('except')) : []
+            $request->has('except') ? $this->arrayFromRequest($request, 'except') : []
         );
 
         $dataClass = match (true) {
@@ -57,5 +57,12 @@ class PartialsTreeFromRequestResolver
             $partialTrees->only->merge($requestedOnlyTree->intersect($allowedRequestOnlyTree)),
             $partialTrees->except->merge($requestedExceptTree->intersect($allowedRequestExceptTree))
         );
+    }
+
+    private function arrayFromRequest(Request $request, string $key): array
+    {
+        $value = $request->get($key);
+
+        return is_array($value) ? $value : explode(',', $value);
     }
 }
