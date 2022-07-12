@@ -75,9 +75,11 @@ class DataType implements Countable
 
             $this->isNullable = $type->allowsNull();
             $this->isMixed = $type->getName() === 'mixed';
-            $this->acceptedTypes = $this->isMixed ? [] : [
-                $type->getName() => $this->resolveBaseTypes($type->getName()),
-            ];
+            $this->acceptedTypes = $this->isMixed
+                ? []
+                : [
+                    $type->getName() => $this->resolveBaseTypes($type->getName()),
+                ];
             $this->isLazy = false;
             $this->isOptional = false;
             $this->isDataObject = is_a($type->getName(), BaseData::class, true);
@@ -93,7 +95,7 @@ class DataType implements Countable
             return;
         }
 
-        if (! ($type instanceof ReflectionUnionType || $type instanceof ReflectionIntersectionType)) {
+        if (!($type instanceof ReflectionUnionType || $type instanceof ReflectionIntersectionType)) {
             throw new TypeError('Invalid reflection type');
         }
 
@@ -106,7 +108,10 @@ class DataType implements Countable
         $dataCollectableType = null;
 
         foreach ($type->getTypes() as $namedType) {
-            if (! in_array($namedType, ['null', Lazy::class, Optional::class])) {
+            if ($namedType->getName() !== 'null'
+                && !is_a($namedType->getName(), Lazy::class, true)
+                && !is_a($namedType->getName(), Optional::class, true)
+            ) {
                 $acceptedTypes[$namedType->getName()] = $this->resolveBaseTypes($namedType->getName());
             }
 
@@ -210,7 +215,7 @@ class DataType implements Countable
 
     protected function resolveBaseTypes(string $type): array
     {
-        if (! class_exists($type)) {
+        if (!class_exists($type)) {
             return [];
         }
 
@@ -225,7 +230,7 @@ class DataType implements Countable
     ): ?string {
         $attributes = $reflection->getAttributes(DataCollectionOf::class);
 
-        if (! empty($attributes)) {
+        if (!empty($attributes)) {
             return $attributes[0]->getArguments()[0];
         }
 
