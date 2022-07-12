@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\Validation\In;
@@ -34,6 +35,7 @@ use Spatie\LaravelData\Normalizers\ArrayNormalizer;
 use Spatie\LaravelData\Normalizers\ModelNormalizer;
 use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\Lazy\InertiaLazy;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
@@ -331,6 +333,29 @@ class DataTest extends TestCase
         $data = DefaultLazyData::from('Freek');
 
         $this->assertEquals([], $data->exclude('name')->toArray());
+    }
+
+
+    /** @test */
+    public function it_always_transforms_lazy_inertia_data_to_inertia_lazy_props()
+    {
+        $blueprint = new class () extends Data {
+            public function __construct(
+                public string|InertiaLazy|null $name = null
+            ) {
+            }
+
+            public static function create(string $name): static
+            {
+                return new self(
+                    Lazy::inertia(fn () => $name)
+                );
+            }
+        };
+
+        $data = $blueprint::create('Freek');
+
+        $this->assertInstanceOf(LazyProp::class, $data->toArray()['name']);
     }
 
     /** @test */
