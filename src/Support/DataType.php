@@ -95,7 +95,7 @@ class DataType implements Countable
             return;
         }
 
-        if (!($type instanceof ReflectionUnionType || $type instanceof ReflectionIntersectionType)) {
+        if (! ($type instanceof ReflectionUnionType || $type instanceof ReflectionIntersectionType)) {
             throw new TypeError('Invalid reflection type');
         }
 
@@ -109,8 +109,8 @@ class DataType implements Countable
 
         foreach ($type->getTypes() as $namedType) {
             if ($namedType->getName() !== 'null'
-                && !is_a($namedType->getName(), Lazy::class, true)
-                && !is_a($namedType->getName(), Optional::class, true)
+                && ! is_a($namedType->getName(), Lazy::class, true)
+                && ! is_a($namedType->getName(), Optional::class, true)
             ) {
                 $acceptedTypes[$namedType->getName()] = $this->resolveBaseTypes($namedType->getName());
             }
@@ -215,7 +215,7 @@ class DataType implements Countable
 
     protected function resolveBaseTypes(string $type): array
     {
-        if (!class_exists($type)) {
+        if (! class_exists($type)) {
             return [];
         }
 
@@ -230,7 +230,7 @@ class DataType implements Countable
     ): ?string {
         $attributes = $reflection->getAttributes(DataCollectionOf::class);
 
-        if (!empty($attributes)) {
+        if (! empty($attributes)) {
             return $attributes[0]->getArguments()[0];
         }
 
