@@ -2,9 +2,7 @@
 
 namespace Spatie\LaravelData\Tests\Resolvers;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rules\Enum as EnumRule;
-use Illuminate\Validation\Rules\Exists;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapName;

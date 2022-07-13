@@ -25,8 +25,8 @@ class DataClassValidationRulesResolver
 
         return $this->dataConfig->getDataClass($class)
             ->properties
-            ->reject(fn(DataProperty $property) => array_key_exists($property->name, $overWrittenRules) || ! $property->validate)
-            ->mapWithKeys(fn(DataProperty $property) => $resolver->execute($property, $payload, $nullable)->all())
+            ->reject(fn (DataProperty $property) => array_key_exists($property->name, $overWrittenRules) || ! $property->validate)
+            ->mapWithKeys(fn (DataProperty $property) => $resolver->execute($property, $payload, $nullable)->all())
             ->merge($overWrittenRules);
     }
 
@@ -42,8 +42,8 @@ class DataClassValidationRulesResolver
 
         foreach ($overWrittenRules as $property => $rules) {
             $overWrittenRules[$property] = collect(Arr::wrap($rules))
-                ->map(fn(mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
-                ->map(fn(mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules() : $rule)
+                ->map(fn (mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
+                ->map(fn (mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules() : $rule)
                 ->flatten()
                 ->all();
         }

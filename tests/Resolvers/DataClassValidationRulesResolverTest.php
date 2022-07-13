@@ -4,8 +4,6 @@ namespace Spatie\LaravelData\Tests\Resolvers;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rules\Exists as ExistsAlias;
-use Illuminate\Validation\Rules\Exists as ExistsAlias1;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Exists;
@@ -124,7 +122,7 @@ class DataClassValidationRulesResolverTest extends TestCase
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn() => $requestMock);
+        $this->app->bind(Request::class, fn () => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
@@ -171,14 +169,14 @@ class DataClassValidationRulesResolverTest extends TestCase
             {
                 return [
                     'property' => [
-                        new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
+                        new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
                     ],
                 ];
             }
         };
 
         $this->assertEquals([
-            'property' => [(new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin)],
+            'property' => [(new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin)],
         ], $this->resolver->execute($data::class)->all());
     }
 }
