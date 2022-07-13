@@ -116,7 +116,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::new('name')->lazy()->withType('string')
         )->create();
 
-        $data = new $dataClass(Lazy::create(fn() => 'test'));
+        $data = new $dataClass(Lazy::create(fn () => 'test'));
 
         $this->assertEquals([], $data->toArray());
 
@@ -152,8 +152,8 @@ class DataTest extends TestCase
         )->create();
 
         $data = new $dataClass(
-            Lazy::create(fn() => LazyData::from('Hello')),
-            Lazy::create(fn() => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
+            Lazy::create(fn () => LazyData::from('Hello')),
+            Lazy::create(fn () => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
         );
 
         $this->assertEquals([], (clone $data)->toArray());
@@ -196,7 +196,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::dataCollection('songs', MultiLazyData::class)->lazy()
         )->create();
 
-        $collection = Lazy::create(fn() => MultiLazyData::collection([
+        $collection = Lazy::create(fn () => MultiLazyData::collection([
             DummyDto::rick(),
             DummyDto::bon(),
         ]));
@@ -251,7 +251,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
+                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
                 );
             }
         };
@@ -277,7 +277,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
+                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
                 );
             }
         };
@@ -597,7 +597,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn() => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'),) extends Data {
+        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
             public function __construct(
                 public SimpleData $data,
                 #[DataCollectionOf(SimpleData::class)]
@@ -656,7 +656,7 @@ class DataTest extends TestCase
 
         $transformed = $data->additional([
             'company' => 'Spatie',
-            'alt_name' => fn(Data $data) => "{$data->name} from Spatie",
+            'alt_name' => fn (Data $data) => "{$data->name} from Spatie",
         ])->toArray();
 
         $this->assertEquals([
@@ -986,7 +986,7 @@ class DataTest extends TestCase
                 #[WithTransformer(ConfidentialDataTransformer::class)]
                 public Data $nestedData,
                 #[WithTransformer(ConfidentialDataCollectionTransformer::class),
-                    DataCollectionOf(SimpleData::class)]
+                DataCollectionOf(SimpleData::class)]
                 public DataCollection $nestedDataCollection,
             ) {
             }
@@ -1182,7 +1182,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_will_not_include_lazy_optional_values_when_transforming()
     {
-        $data = new class ('Hello World', Lazy::create(fn() => Optional::make())) extends Data {
+        $data = new class ('Hello World', Lazy::create(fn () => Optional::make())) extends Data {
             public function __construct(
                 public string $string,
                 public string|Optional|Lazy $lazy_optional_string,
@@ -1237,7 +1237,7 @@ class DataTest extends TestCase
                 #[DataCollectionOf(SimpleDataWithMappedProperty::class)]
                 public DataCollection $nested_collection,
                 #[MapOutputName('nested_other_collection'),
-                    DataCollectionOf(SimpleDataWithMappedProperty::class)]
+                DataCollectionOf(SimpleDataWithMappedProperty::class)]
                 public DataCollection $nested_renamed_collection,
             ) {
             }
@@ -1440,7 +1440,7 @@ class DataTest extends TestCase
 
         $this->assertEquals([
             'name' => 'Never gonna give you up',
-        ], MultiLazyData::from(DummyDto::rick())->includeWhen('name', fn() => true)->toArray());
+        ], MultiLazyData::from(DummyDto::rick())->includeWhen('name', fn () => true)->toArray());
     }
 
     /** @test */
@@ -1459,7 +1459,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_conditionally_include_nested()
     {
-        $dataClass = new class() extends Data {
+        $dataClass = new class () extends Data {
             public Lazy|NestedLazyData $nested;
         };
 
@@ -1472,7 +1472,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_conditionally_include_using_class_defaults_nested()
     {
-        $dataClass = new class() extends Data {
+        $dataClass = new class () extends Data {
             public function __construct(
                 protected bool|null $includeLazy = null,
                 protected bool|null $includeNested = null,
@@ -1494,8 +1494,8 @@ class DataTest extends TestCase
                 return new self(
                     $includeLazy,
                     $includeNested,
-                    Lazy::create(fn() => 'Hello World'),
-                    Lazy::create(fn() => NestedLazyData::fromString('Hello World'))
+                    Lazy::create(fn () => 'Hello World'),
+                    Lazy::create(fn () => NestedLazyData::fromString('Hello World'))
                 );
             }
         };
@@ -1531,8 +1531,8 @@ class DataTest extends TestCase
     public function it_can_conditionally_exclude()
     {
         $data = new MultiLazyData(
-            Lazy::create(fn() => 'Rick Astley')->defaultIncluded(),
-            Lazy::create(fn() => 'Never gonna give you up')->defaultIncluded(),
+            Lazy::create(fn () => 'Rick Astley')->defaultIncluded(),
+            Lazy::create(fn () => 'Never gonna give you up')->defaultIncluded(),
             1989
         );
 
@@ -1544,7 +1544,7 @@ class DataTest extends TestCase
         $this->assertEquals([
             'artist' => 'Rick Astley',
             'year' => 1989,
-        ], (clone $data)->exceptWhen('name', fn() => true)->toArray());
+        ], (clone $data)->exceptWhen('name', fn () => true)->toArray());
     }
 
     /** @test */
@@ -1620,7 +1620,7 @@ class DataTest extends TestCase
         ], $data::from([
             'id' => 1,
             'name' => 'Taylor',
-        ])->exceptWhen('id', fn(Data $data) => $data->name === 'Taylor')->toArray());
+        ])->exceptWhen('id', fn (Data $data) => $data->name === 'Taylor')->toArray());
 
         $this->assertEquals([
             'id' => 1,
@@ -1628,7 +1628,7 @@ class DataTest extends TestCase
         ], $data::from([
             'id' => 1,
             'name' => 'Freek',
-        ])->exceptWhen('id', fn(Data $data) => $data->name === 'Taylor')->toArray());
+        ])->exceptWhen('id', fn (Data $data) => $data->name === 'Taylor')->toArray());
     }
 
     /** @test */

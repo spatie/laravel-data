@@ -44,7 +44,7 @@ class CastPropertiesDataPipe implements DataPipe
     ): mixed {
         $shouldCast = $this->shouldBeCasted($property, $value);
 
-        if($shouldCast === false){
+        if ($shouldCast === false) {
             return $value;
         }
 

@@ -3,11 +3,6 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Closure;
-use Spatie\LaravelData\Contracts\DataCollectable;
-use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
-use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Support\PartialDefinition;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\PartialTrees;
 
@@ -125,7 +120,7 @@ trait IncludeableData
             return $this->partialTrees;
         }
 
-        $filter = fn(bool|null|Closure $condition, string $definition) => match (true) {
+        $filter = fn (bool|null|Closure $condition, string $definition) => match (true) {
             is_bool($condition) => $condition,
             $condition === null => false,
             is_callable($condition) => $condition($this),

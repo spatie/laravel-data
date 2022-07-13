@@ -22,6 +22,6 @@ class ClassConditionalIncludedData extends Data
 
     public static function fromBool(bool $include): self
     {
-        return new self($include, Lazy::create(fn() => 'Hello World'));
+        return new self($include, Lazy::create(fn () => 'Hello World'));
     }
 }
