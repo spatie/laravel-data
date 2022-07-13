@@ -2,8 +2,11 @@
 
 namespace Spatie\LaravelData\Tests\Resolvers;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Numeric;
 use Spatie\LaravelData\Attributes\Validation\StringType;
@@ -52,7 +55,7 @@ class DataClassValidationRulesResolverTest extends TestCase
 
         $this->assertEquals([
             'name' => [new Nullable(), new StringType()],
-            'age' => [new Numeric(),  new Nullable()],
+            'age' => [new Numeric(), new Nullable()],
         ], $this->resolver->execute($data::class, nullable: true)->all());
     }
 
@@ -154,5 +157,26 @@ class DataClassValidationRulesResolverTest extends TestCase
         $this->assertEquals([
             'name' => ['required'],
         ], $this->resolver->execute($data::class, ['name' => 'foo'])->all());
+    }
+
+    /** @test */
+    public function it_will_transform_overwritten_data_rules_into_plain_laravel_rules()
+    {
+        $data = new class () extends Data {
+            public int $property;
+
+            public static function rules(): array
+            {
+                return [
+                    'property' => [
+                        new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
+                    ],
+                ];
+            }
+        };
+
+        $this->assertEquals([
+            'property' => [(new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin)],
+        ], $this->resolver->execute($data::class)->all());
     }
 }

@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\DefaultLazy;
+use Spatie\LaravelData\Support\Lazy\InertiaLazy;
 use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 
 abstract class Lazy
@@ -25,6 +26,11 @@ abstract class Lazy
     public static function whenLoaded(string $relation, Model $model, Closure $value): RelationalLazy
     {
         return new RelationalLazy($relation, $model, $value);
+    }
+
+    public static function inertia(Closure $value): InertiaLazy
+    {
+        return new InertiaLazy($value);
     }
 
     abstract public function resolve(): mixed;

@@ -75,9 +75,11 @@ class DataType implements Countable
 
             $this->isNullable = $type->allowsNull();
             $this->isMixed = $type->getName() === 'mixed';
-            $this->acceptedTypes = $this->isMixed ? [] : [
-                $type->getName() => $this->resolveBaseTypes($type->getName()),
-            ];
+            $this->acceptedTypes = $this->isMixed
+                ? []
+                : [
+                    $type->getName() => $this->resolveBaseTypes($type->getName()),
+                ];
             $this->isLazy = false;
             $this->isOptional = false;
             $this->isDataObject = is_a($type->getName(), BaseData::class, true);
@@ -106,7 +108,10 @@ class DataType implements Countable
         $dataCollectableType = null;
 
         foreach ($type->getTypes() as $namedType) {
-            if (! in_array($namedType, ['null', Lazy::class, Optional::class])) {
+            if ($namedType->getName() !== 'null'
+                && ! is_a($namedType->getName(), Lazy::class, true)
+                && ! is_a($namedType->getName(), Optional::class, true)
+            ) {
                 $acceptedTypes[$namedType->getName()] = $this->resolveBaseTypes($namedType->getName());
             }
 

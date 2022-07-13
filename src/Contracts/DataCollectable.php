@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Contracts;
 
 use Countable;
+use Illuminate\Contracts\Support\Responsable;
 use IteratorAggregate;
 
 /**
@@ -11,6 +12,6 @@ use IteratorAggregate;
  *
  * @extends   \IteratorAggregate<TKey, TValue>
  */
-interface DataCollectable extends BaseDataCollectable, ResponsableData, TransformableData, IncludeableData, WrappableData, IteratorAggregate, Countable
+interface DataCollectable extends Responsable, BaseDataCollectable, ResponsableData, TransformableData, IncludeableData, WrappableData, IteratorAggregate, Countable
 {
 }

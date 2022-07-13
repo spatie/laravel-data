@@ -187,30 +187,30 @@ class DataPropertyValidationRulesResolverTest extends TestCase
     /** @test */
     public function it_will_never_add_extra_require_rules_when_not_needed()
     {
-//        $rules = $this->resolveRules(new class () {
-//            public ?string $property;
-//        });
-//
-//        $this->assertEquals([
-//            'property' => ['string', new Nullable()],
-//        ], $rules);
-//
-//        $rules = $this->resolveRules(new class () {
-//            public bool $property;
-//        });
-//
-//        $this->assertEquals([
-//            'property' => ['boolean'],
-//        ], $rules);
-//
-//        $rules = $this->resolveRules(new class () {
-//            #[RequiredWith('other')]
-//            public string $property;
-//        });
-//
-//        $this->assertEquals([
-//            'property' => ['string', 'required_with:other'],
-//        ], $rules);
+        $rules = $this->resolveRules(new class () {
+            public ?string $property;
+        });
+
+        $this->assertEquals([
+            'property' => ['string', new Nullable()],
+        ], $rules);
+
+        $rules = $this->resolveRules(new class () {
+            public bool $property;
+        });
+
+        $this->assertEquals([
+            'property' => ['boolean'],
+        ], $rules);
+
+        $rules = $this->resolveRules(new class () {
+            #[RequiredWith('other')]
+            public string $property;
+        });
+
+        $this->assertEquals([
+            'property' => ['string', 'required_with:other'],
+        ], $rules);
 
         $rules = $this->resolveRules(new class () {
             #[Rule('required_with:other')]
