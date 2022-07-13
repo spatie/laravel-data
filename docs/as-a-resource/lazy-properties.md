@@ -220,7 +220,7 @@ AlbumData::from(Album::first())->onlyWhen('songs', fn(AlbumData $data) => count(
 AlbumData::from(Album::first())->except('songs', fn(AlbumData $data) => count($data->songs) > 0);
 ```
 
-In some cases you may want to define an `include` on a class level:
+In some cases you may want to define an `include` on a class level by implementing a method:
 
 ```php
 class AlbumData extends Data
