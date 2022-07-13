@@ -6,10 +6,12 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use ReflectionClass;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
@@ -153,6 +155,26 @@ class DataTypeScriptTransformerTest extends TestCase
 
         $transformer = new DataTypeScriptTransformer($config);
 
+        $reflection = new ReflectionClass($data);
+
+        $this->assertTrue($transformer->canTransform($reflection));
+        $this->assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
+    }
+
+    /** @test */
+    public function it_outputs_types_with_properties_using_their_mapped_name()
+    {
+        $config = TypeScriptTransformerConfig::create();
+
+        $data = new class ('Good job Ruben') extends Data {
+            public function __construct(
+                #[MapOutputName(SnakeCaseMapper::class)]
+                public string $someCamelCaseProperty,
+            ) {
+            }
+        };
+
+        $transformer = new DataTypeScriptTransformer($config);
         $reflection = new ReflectionClass($data);
 
         $this->assertTrue($transformer->canTransform($reflection));
