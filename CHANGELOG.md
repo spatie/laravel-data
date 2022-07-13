@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.1 - 2022-07-13
+
+- Add class defined partials (#164)
+- Use mapped property names in TypeScript (#154)
+- Add make:data command (#157)
+- Better support for overwritten rules
+- Add support for Lazy inertia props (#163)
+- Add support for array query parameters as partials (#162)
+
 ## 2.0.0 - 2022-07-08
 
 Version 2 of laravel-data is a complete overhaul, we've almost completely rewritten the package.
