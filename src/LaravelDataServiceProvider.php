@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData;
 
+use Spatie\LaravelData\Commands\DataMakeCommand;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelPackageTools\Package;
@@ -13,6 +14,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('laravel-data')
+            ->hasCommand(DataMakeCommand::class)
             ->hasConfigFile();
     }
 
