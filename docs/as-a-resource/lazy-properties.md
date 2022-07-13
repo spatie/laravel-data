@@ -272,6 +272,18 @@ https://spatie.be/my-account?include=favorite_song
 }
 ```
 
+We can also include multiple properties by separating them with a comma:
+
+```
+https://spatie.be/my-account?include=favorite_song,favorite_movie
+```
+
+Or by using a group input:
+
+```
+https://spatie.be/my-account?include[]=favorite_song&include[]=favorite_movie
+```
+
 Including properties works for data objects and data collections.
 
 ### Allowing includes by query string
