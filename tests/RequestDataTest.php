@@ -126,7 +126,7 @@ class RequestDataTest extends TestCase
     /** @test */
     public function it_can_change_the_validator()
     {
-        RequestData::$validatorClosure = fn(Validator $validator) => $validator->setRules([]);
+        RequestData::$validatorClosure = fn (Validator $validator) => $validator->setRules([]);
 
         $this->performRequest('Hello world')
             ->assertOk()
