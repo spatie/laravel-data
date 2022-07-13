@@ -126,7 +126,7 @@ class RequestDataTest extends TestCase
     /** @test */
     public function it_can_change_the_validator()
     {
-        RequestData::$validatorClosure = fn (Validator $validator) => $validator->setRules([]);
+        RequestData::$validatorClosure = fn(Validator $validator) => $validator->setRules([]);
 
         $this->performRequest('Hello world')
             ->assertOk()
@@ -222,13 +222,13 @@ class RequestDataTest extends TestCase
         DataBlueprintFactory::new('ValidationSkippeableDataFromRequest')
             ->withProperty(
                 DataPropertyBlueprintFactory::new('first_name')
-                ->withType('string')
+                    ->withType('string')
             )
             ->withProperty(
                 DataPropertyBlueprintFactory::new('last_name')
-                ->withAttribute(WithoutValidation::class)
-                ->withAttribute(Max::class, [2])
-                ->withType('string')
+                    ->withAttribute(WithoutValidation::class)
+                    ->withAttribute(Max::class, [2])
+                    ->withType('string')
             )
             ->create();
 
@@ -249,8 +249,8 @@ class RequestDataTest extends TestCase
         DataBlueprintFactory::new('OverrideableDataFromRequest')
             ->withProperty(
                 DataPropertyBlueprintFactory::new('name')
-                ->withAttribute(WithoutValidation::class)
-                ->withType('string')
+                    ->withAttribute(WithoutValidation::class)
+                    ->withType('string')
             )
             ->withMethod(
                 DataMagicMethodFactory::new('fromRequest')
@@ -299,6 +299,38 @@ class RequestDataTest extends TestCase
         ])
             ->assertOk()
             ->assertJson(['name' => 'Rick Astley']);
+    }
+
+    /** @test */
+    public function it_can_wrap_data()
+    {
+        Route::post('/example-route', function () {
+            return SimpleData::from(request()->input('string'))->wrap('data');
+        });
+
+        $this->performRequest('Hello World')
+            ->assertOk()
+            ->assertJson(['data' => ['string' => 'Hello World']]);
+    }
+
+    /** @test */
+    public function it_can_wrap_data_collections()
+    {
+        Route::post('/example-route', function () {
+            return SimpleData::collection([
+                request()->input('string'),
+                strtoupper(request()->input('string')),
+            ])->wrap('data');
+        });
+
+        $this->performRequest('Hello World')
+            ->assertOk()
+            ->assertJson([
+                'data' => [
+                    ['string' => 'Hello World'],
+                    ['string' => 'HELLO WORLD'],
+                ],
+            ]);
     }
 
     private function performRequest(string $string): TestResponse
