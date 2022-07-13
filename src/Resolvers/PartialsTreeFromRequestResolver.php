@@ -26,7 +26,7 @@ class PartialsTreeFromRequestResolver
         Request $request,
     ): PartialTrees {
         $requestedIncludesTree = $this->partialsParser->execute(
-            $request->has('include') ? $this->arrayFromRequest($request, 'includes') : []
+            $request->has('include') ? $this->arrayFromRequest($request, 'include') : []
         );
         $requestedExcludesTree = $this->partialsParser->execute(
             $request->has('exclude') ? $this->arrayFromRequest($request, 'exclude') : []

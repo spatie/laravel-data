@@ -207,4 +207,44 @@ class PartialsTreeFromRequestResolverTest extends TestCase
             'name' => 'Never gonna give you up',
         ], $data);
     }
+
+    /**
+     * @test
+     * @dataProvider requestInputProvider
+     */
+    public function it_handles_parsing_includes_from_request(array $input, array $expected)
+    {
+        $dataclass = new class (
+            Lazy::create(fn () => 'Rick Astley'),
+            Lazy::create(fn () => 'Never gonna give you up'),
+            Lazy::create(fn () => 1986),
+        ) extends MultiLazyData {
+            public static function allowedRequestIncludes(): ?array
+            {
+                return ['*'];
+            }
+        };
+
+        $request = request()->merge($input);
+
+        $data = $dataclass->toResponse($request)->getData(assoc: true);
+
+        $this->assertEquals(
+            array_keys($data),
+            $expected,
+        );
+    }
+
+    protected function requestInputProvider()
+    {
+        yield 'input as array' => [
+            'input' => ['include' => ['artist', 'name']],
+            'expected' => ['artist', 'name'],
+        ];
+
+        yield 'input as comma separated' => [
+            'input' => ['include' => 'artist,name'],
+            'expected' => ['artist', 'name'],
+        ];
+    }
 }
