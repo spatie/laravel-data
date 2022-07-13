@@ -20,8 +20,7 @@ class PartialClassConditionalData extends Data
         array $excludeDefinitions = [],
         array $onlyDefinitions = [],
         array $exceptDefinitions = []
-    )
-    {
+    ) {
         static::$includeDefinitions = $includeDefinitions;
         static::$excludeDefinitions = $excludeDefinitions;
         static::$onlyDefinitions = $onlyDefinitions;
@@ -69,7 +68,7 @@ class PartialClassConditionalData extends Data
         return new self(
             $enabled,
             Lazy::create(fn () => 'Hello World'),
-            Lazy::create(fn() => SimpleData::from('Hello World'))
+            Lazy::create(fn () => SimpleData::from('Hello World'))
         );
     }
 
@@ -78,7 +77,7 @@ class PartialClassConditionalData extends Data
         return new self(
             $enabled,
             Lazy::create(fn () => 'Hello World')->defaultIncluded(),
-            Lazy::create(fn() => SimpleData::from('Hello World'))->defaultIncluded()
+            Lazy::create(fn () => SimpleData::from('Hello World'))->defaultIncluded()
         );
     }
 }
