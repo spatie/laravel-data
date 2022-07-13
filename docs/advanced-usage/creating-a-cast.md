@@ -1,6 +1,6 @@
 ---
 title: Creating a cast
-weight: 6
+weight: 7
 ---
 
 Casts take simple values and cast them into complex types. For example, `16-05-1994T00:00:00+00` could be cast into a `Carbon` object with the same date.

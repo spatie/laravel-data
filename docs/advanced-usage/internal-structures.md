@@ -1,6 +1,6 @@
 ---
 title: Internal structures
-weight: 9
+weight: 10
 ---
 
 This package has some internal structures which are used to analyze data objects and their properties. They can be helpful when writing casts, transformers or rule inferrers.
