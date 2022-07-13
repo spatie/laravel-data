@@ -44,6 +44,7 @@ use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
+use Spatie\LaravelData\Tests\Fakes\ClassConditionalIncludedData;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\DefaultOptionalData;
@@ -62,6 +63,7 @@ use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\MultiNestedData;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
+use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
 use Spatie\LaravelData\Tests\Fakes\OnlyData;
 use Spatie\LaravelData\Tests\Fakes\ReadonlyData;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
@@ -114,7 +116,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::new('name')->lazy()->withType('string')
         )->create();
 
-        $data = new $dataClass(Lazy::create(fn () => 'test'));
+        $data = new $dataClass(Lazy::create(fn() => 'test'));
 
         $this->assertEquals([], $data->toArray());
 
@@ -150,8 +152,8 @@ class DataTest extends TestCase
         )->create();
 
         $data = new $dataClass(
-            Lazy::create(fn () => LazyData::from('Hello')),
-            Lazy::create(fn () => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
+            Lazy::create(fn() => LazyData::from('Hello')),
+            Lazy::create(fn() => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
         );
 
         $this->assertEquals([], (clone $data)->toArray());
@@ -194,7 +196,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::dataCollection('songs', MultiLazyData::class)->lazy()
         )->create();
 
-        $collection = Lazy::create(fn () => MultiLazyData::collection([
+        $collection = Lazy::create(fn() => MultiLazyData::collection([
             DummyDto::rick(),
             DummyDto::bon(),
         ]));
@@ -249,7 +251,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
                 );
             }
         };
@@ -275,7 +277,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
                 );
             }
         };
@@ -595,7 +597,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
+        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn() => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'),) extends Data {
             public function __construct(
                 public SimpleData $data,
                 #[DataCollectionOf(SimpleData::class)]
@@ -654,7 +656,7 @@ class DataTest extends TestCase
 
         $transformed = $data->additional([
             'company' => 'Spatie',
-            'alt_name' => fn (Data $data) => "{$data->name} from Spatie",
+            'alt_name' => fn(Data $data) => "{$data->name} from Spatie",
         ])->toArray();
 
         $this->assertEquals([
@@ -984,7 +986,7 @@ class DataTest extends TestCase
                 #[WithTransformer(ConfidentialDataTransformer::class)]
                 public Data $nestedData,
                 #[WithTransformer(ConfidentialDataCollectionTransformer::class),
-                DataCollectionOf(SimpleData::class)]
+                    DataCollectionOf(SimpleData::class)]
                 public DataCollection $nestedDataCollection,
             ) {
             }
@@ -1180,7 +1182,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_will_not_include_lazy_optional_values_when_transforming()
     {
-        $data = new class ('Hello World', Lazy::create(fn () => Optional::make())) extends Data {
+        $data = new class ('Hello World', Lazy::create(fn() => Optional::make())) extends Data {
             public function __construct(
                 public string $string,
                 public string|Optional|Lazy $lazy_optional_string,
@@ -1235,7 +1237,7 @@ class DataTest extends TestCase
                 #[DataCollectionOf(SimpleDataWithMappedProperty::class)]
                 public DataCollection $nested_collection,
                 #[MapOutputName('nested_other_collection'),
-                DataCollectionOf(SimpleDataWithMappedProperty::class)]
+                    DataCollectionOf(SimpleDataWithMappedProperty::class)]
                 public DataCollection $nested_renamed_collection,
             ) {
             }
@@ -1404,8 +1406,8 @@ class DataTest extends TestCase
                     ->through(AuthorizedDataPipe::class)
                     ->through(
                         self::$validateAllTypes
-                        ? ValidatePropertiesDataPipe::allTypes()
-                        : ValidatePropertiesDataPipe::onlyRequests()
+                            ? ValidatePropertiesDataPipe::allTypes()
+                            : ValidatePropertiesDataPipe::onlyRequests()
                     )
                     ->through(MapPropertiesDataPipe::class)
                     ->through(DefaultValuesDataPipe::class)
@@ -1430,7 +1432,123 @@ class DataTest extends TestCase
     }
 
     /** @test */
-    public function it_can_conditionally_include_properties()
+    public function it_can_conditionally_include()
+    {
+        $this->assertEquals([
+            'artist' => 'Rick Astley',
+        ], MultiLazyData::from(DummyDto::rick())->includeWhen('artist', true)->toArray());
+
+        $this->assertEquals([
+            'name' => 'Never gonna give you up',
+        ], MultiLazyData::from(DummyDto::rick())->includeWhen('name', fn() => true)->toArray());
+    }
+
+    /** @test */
+    public function it_can_conditionally_include_using_class_defaults()
+    {
+        $this->assertEmpty(
+            ClassConditionalIncludedData::from(include: false)->toArray(),
+        );
+
+        $this->assertEquals(
+            ['string' => 'Hello World'],
+            ClassConditionalIncludedData::from(include: true)->toArray(),
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_include_nested()
+    {
+        $dataClass = new class() extends Data {
+            public Lazy|NestedLazyData $nested;
+        };
+
+        $this->assertEquals(
+            ['nested' => ['simple' => ['string' => 'Hello World']]],
+            $dataClass::from(['nested' => NestedLazyData::from('Hello World')])->includeWhen('nested.simple', true)->toArray()
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_include_using_class_defaults_nested()
+    {
+        $dataClass = new class() extends Data {
+            public function __construct(
+                protected bool|null $includeLazy = null,
+                protected bool|null $includeNested = null,
+                public Lazy|string|null $lazy = null,
+                public Lazy|NestedLazyData|null $nested = null
+            ) {
+            }
+
+            public function includes(): array
+            {
+                return [
+                    'lazy' => $this->includeLazy,
+                    'nested.simple' => $this->includeNested,
+                ];
+            }
+
+            public static function fromBools(bool $includeLazy, bool $includeNested): static
+            {
+                return new self(
+                    $includeLazy,
+                    $includeNested,
+                    Lazy::create(fn() => 'Hello World'),
+                    Lazy::create(fn() => NestedLazyData::fromString('Hello World'))
+                );
+            }
+        };
+
+        $this->assertEmpty(
+            $dataClass::from(includeLazy: false, includeNested: false)->toArray()
+        );
+
+        $this->assertEquals(
+            [
+                'lazy' => 'Hello World',
+            ],
+            $dataClass::from(includeLazy: true, includeNested: false)->toArray()
+        );
+
+        $this->assertEquals(
+            [
+                'nested' => ['simple' => ['string' => 'Hello World']],
+            ],
+            $dataClass::from(includeLazy: false, includeNested: true)->toArray()
+        );
+
+        $this->assertEquals(
+            [
+                'lazy' => 'Hello World',
+                'nested' => ['simple' => ['string' => 'Hello World']],
+            ],
+            $dataClass::from(includeLazy: true, includeNested: true)->toArray()
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_exclude()
+    {
+        $data = new MultiLazyData(
+            Lazy::create(fn() => 'Rick Astley')->defaultIncluded(),
+            Lazy::create(fn() => 'Never gonna give you up')->defaultIncluded(),
+            1989
+        );
+
+        $this->assertEquals([
+            'name' => 'Never gonna give you up',
+            'year' => 1989,
+        ], (clone $data)->exceptWhen('artist', true)->toArray());
+
+        $this->assertEquals([
+            'artist' => 'Rick Astley',
+            'year' => 1989,
+        ], (clone $data)->exceptWhen('name', fn() => true)->toArray());
+    }
+
+    /** @test */
+    public function it_can_conditionally_define_only()
     {
         $data = new class () extends Data {
             public function __construct(
@@ -1449,7 +1567,7 @@ class DataTest extends TestCase
     }
 
     /** @test */
-    public function exclusions_have_priority_over_inclusions()
+    public function only_has_precedence_over_except()
     {
         $data = new class () extends Data {
             public function __construct(
@@ -1468,7 +1586,7 @@ class DataTest extends TestCase
     }
 
     /** @test */
-    public function it_can_conditionally_exclude_properties()
+    public function it_can_conditionally_define_excepts_properties()
     {
         $data = new class () extends Data {
             public function __construct(
@@ -1487,7 +1605,7 @@ class DataTest extends TestCase
     }
 
     /** @test */
-    public function it_can_conditionally_exclude_properties_with_a_callback()
+    public function it_can_conditionally_define_excepts_properties_with_a_callback()
     {
         $data = new class () extends Data {
             public function __construct(
@@ -1502,7 +1620,7 @@ class DataTest extends TestCase
         ], $data::from([
             'id' => 1,
             'name' => 'Taylor',
-        ])->exceptWhen('id', fn (Data $data) => $data->name === 'Taylor')->toArray());
+        ])->exceptWhen('id', fn(Data $data) => $data->name === 'Taylor')->toArray());
 
         $this->assertEquals([
             'id' => 1,
@@ -1510,30 +1628,11 @@ class DataTest extends TestCase
         ], $data::from([
             'id' => 1,
             'name' => 'Freek',
-        ])->exceptWhen('id', fn (Data $data) => $data->name === 'Taylor')->toArray());
+        ])->exceptWhen('id', fn(Data $data) => $data->name === 'Taylor')->toArray());
     }
 
     /** @test */
-    public function it_can_exclude_properties_at_runtime()
-    {
-        $data = new class () extends Data {
-            public function __construct(
-                public ?int $id = null,
-                public ?string $name = null,
-            ) {
-            }
-        };
-
-        $this->assertEquals([
-            'name' => 'Taylor',
-        ], $data::from([
-            'id' => 1,
-            'name' => 'Taylor',
-        ])->except('id')->toArray());
-    }
-
-    /** @test */
-    public function it_can_include_nested_array_properties()
+    public function it_can_define_only_for_array_properties()
     {
         $data = new class () extends Data {
             public function __construct(
@@ -1560,7 +1659,7 @@ class DataTest extends TestCase
     }
 
     /** @test */
-    public function it_can_exclude_nested_array_properties()
+    public function it_can_define_except_for_nested_array_properties()
     {
         $data = new class () extends Data {
             public function __construct(
@@ -1587,7 +1686,7 @@ class DataTest extends TestCase
     }
 
     /** @test */
-    public function it_can_include_nested_data_properties()
+    public function it_can_define_only_for_nested_data_properties()
     {
         $more = new class ('Otwell', false) extends Data {
             public function __construct(
@@ -1614,7 +1713,7 @@ class DataTest extends TestCase
     }
 
     /** @test */
-    public function it_can_exclude_nested_data_properties()
+    public function it_can_define_except_for_nested_data_properties()
     {
         $more = new class ('Otwell', false) extends Data {
             public function __construct(
@@ -1638,6 +1737,33 @@ class DataTest extends TestCase
                 'last_name' => 'Otwell',
             ],
         ], $data->except('id', 'more.twitter_verified')->toArray());
+    }
+
+    /** @test */
+    public function it_can_define_partials_inside_the_data_class()
+    {
+        $data = new class () extends Data {
+            protected array $except = [
+                'id' => true,
+                'first_name' => false,
+                'last_name' => true,
+            ];
+
+            public function __construct(
+                public ?int $id = null,
+                public ?string $first_name = null,
+                public ?string $last_name = null,
+            ) {
+            }
+        };
+
+        $this->assertEquals([
+            'first_name' => 'Taylor',
+        ], $data::from([
+            'id' => 1,
+            'first_name' => 'Taylor',
+            'last_name' => 'Otwell',
+        ])->toArray());
     }
 
     /** @test */

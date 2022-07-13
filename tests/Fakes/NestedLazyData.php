@@ -11,4 +11,9 @@ class NestedLazyData extends Data
         public SimpleData|Lazy $simple
     ) {
     }
+
+    public static function fromString(string $string): static
+    {
+        return new self(Lazy::create(fn() => SimpleData::from($string)));
+    }
 }

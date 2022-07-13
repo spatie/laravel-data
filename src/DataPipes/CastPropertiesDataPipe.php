@@ -44,11 +44,15 @@ class CastPropertiesDataPipe implements DataPipe
     ): mixed {
         $shouldCast = $this->shouldBeCasted($property, $value);
 
-        if ($shouldCast && $cast = $property->cast) {
+        if($shouldCast === false){
+            return $value;
+        }
+
+        if ($cast = $property->cast) {
             return $cast->cast($property, $value, $castContext);
         }
 
-        if ($shouldCast && $cast = $this->dataConfig->findGlobalCastForProperty($property)) {
+        if ($cast = $this->dataConfig->findGlobalCastForProperty($property)) {
             return $cast->cast($property, $value, $castContext);
         }
 

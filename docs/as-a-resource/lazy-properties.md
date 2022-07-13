@@ -20,10 +20,6 @@ class AlbumData extends Data
 This will always output a collection of songs, which can become quite large. With lazy properties, we can include properties when we want to:
 
 ```php
-use Spatie\LaravelData\Data;
-use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Lazy;
-
 class AlbumData extends Data
 {
     public function __construct(
@@ -72,8 +68,6 @@ Properties will only be included when the `include` method is called on the data
 It is also possible to nest these includes. For example, let's update the `SongData` class and make all of its properties lazy:
 
 ```php
-use Spatie\LaravelData\Lazy;
-
 class SongData extends Data
 {
     public function __construct(
@@ -206,11 +200,13 @@ AlbumData::from(Album::first())->except('songs.{name, artist}');
 
 Only and except always take precedence over include and exclude, which means that when a property is hidden by `only` or `except` it is impossible to show it again using `include`.
 
-### Specific `only` and `except`
+### Conditionally
 
-It is possible to add an `only` or `exclude` if a certain condition is met:
+It is possible to add an `include`, `exclude`, `only` or `except` if a certain condition is met:
 
 ```php
+AlbumData::from(Album::first())->includeWhen('songs', auth()->user()->isAdmin);
+AlbumData::from(Album::first())->excludeWhen('songs', auth()->user()->isAdmin);
 AlbumData::from(Album::first())->onlyWhen('songs', auth()->user()->isAdmin);
 AlbumData::from(Album::first())->except('songs', auth()->user()->isAdmin);
 ```
@@ -218,9 +214,59 @@ AlbumData::from(Album::first())->except('songs', auth()->user()->isAdmin);
 You can also use the values of the data object in such condition:
 
 ```php
+AlbumData::from(Album::first())->includeWhen('songs', fn(AlbumData $data) => count($data->songs) > 0);
+AlbumData::from(Album::first())->excludeWhen('songs', fn(AlbumData $data) => count($data->songs) > 0);
 AlbumData::from(Album::first())->onlyWhen('songs', fn(AlbumData $data) => count($data->songs) > 0);
 AlbumData::from(Album::first())->except('songs', fn(AlbumData $data) => count($data->songs) > 0);
 ```
+
+In some cases you may want to define an `include` on a class level:
+
+```php
+class AlbumData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[DataCollectionOf(SongData::class)]
+        public Lazy|DataCollection $songs,
+    ) {
+    }
+    
+    public function includes(): array
+    {
+        return [
+            'songs' => count($this->songs) > 0,
+        ];
+    }
+}
+```
+
+It is even possible to include nested properties:
+
+```php
+class AlbumData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[DataCollectionOf(SongData::class)]
+        public Lazy|DataCollection $songs,
+    ) {
+    }
+    
+    public function includes(): array
+    {
+        return [
+            'songs.title' => count($this->songs) > 0,
+        ];
+    }
+}
+```
+
+You can define exclude, except and only partials on a data class:
+
+- You can define **excludes** in a `excludes` method
+- You can define **except** in a `excepts` method
+- You can define **only** in a `onlys` method
 
 ## Using query strings
 
