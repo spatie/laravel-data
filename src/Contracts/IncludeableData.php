@@ -17,6 +17,10 @@ interface IncludeableData
 
     public function except(string ...$except): object;
 
+    public function includeWhen(string $include, bool|Closure $condition): object;
+
+    public function excludeWhen(string $exclude, bool|Closure $condition): object;
+
     public function onlyWhen(string $only, bool|Closure $condition): object;
 
     public function exceptWhen(string $except, bool|Closure $condition): object;
