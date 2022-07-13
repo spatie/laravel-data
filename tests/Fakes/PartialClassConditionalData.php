@@ -34,22 +34,22 @@ class PartialClassConditionalData extends Data
     ) {
     }
 
-    protected function includes(): array
+    protected function includeProperties(): array
     {
         return self::$includeDefinitions;
     }
 
-    protected function excludes(): array
+    protected function excludeProperties(): array
     {
         return self::$excludeDefinitions;
     }
 
-    protected function excepts(): array
+    protected function exceptProperties(): array
     {
         return self::$exceptDefinitions;
     }
 
-    protected function onlys(): array
+    protected function onlyProperties(): array
     {
         return self::$onlyDefinitions;
     }

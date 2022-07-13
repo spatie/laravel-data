@@ -93,22 +93,22 @@ trait IncludeableData
         return $this;
     }
 
-    protected function includes(): array
+    protected function includeProperties(): array
     {
         return [];
     }
 
-    protected function excludes(): array
+    protected function excludeProperties(): array
     {
         return [];
     }
 
-    protected function onlys(): array
+    protected function onlyProperties(): array
     {
         return [];
     }
 
-    protected function excepts(): array
+    protected function exceptProperties(): array
     {
         return [];
     }
@@ -125,10 +125,10 @@ trait IncludeableData
             is_callable($condition) => $condition($this),
         };
 
-        $includes = collect($this->includes)->merge($this->includes())->filter($filter)->keys()->all();
-        $excludes = collect($this->excludes)->merge($this->excludes())->filter($filter)->keys()->all();
-        $only = collect($this->only)->merge($this->onlys())->filter($filter)->keys()->all();
-        $except = collect($this->except)->merge($this->excepts())->filter($filter)->keys()->all();
+        $includes = collect($this->includes)->merge($this->includeProperties())->filter($filter)->keys()->all();
+        $excludes = collect($this->excludes)->merge($this->excludeProperties())->filter($filter)->keys()->all();
+        $only = collect($this->only)->merge($this->onlyProperties())->filter($filter)->keys()->all();
+        $except = collect($this->except)->merge($this->exceptProperties())->filter($filter)->keys()->all();
 
         return new PartialTrees(
             (new PartialsParser())->execute($includes),

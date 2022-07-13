@@ -220,7 +220,7 @@ AlbumData::from(Album::first())->onlyWhen('songs', fn(AlbumData $data) => count(
 AlbumData::from(Album::first())->except('songs', fn(AlbumData $data) => count($data->songs) > 0);
 ```
 
-In some cases you may want to define an `include` on a class level by implementing a method:
+In some cases you may want to define an include on a class level by implementing a method:
 
 ```php
 class AlbumData extends Data
@@ -232,7 +232,7 @@ class AlbumData extends Data
     ) {
     }
     
-    public function includes(): array
+    public function includeProperties(): array
     {
         return [
             'songs' => count($this->songs) > 0,
@@ -253,7 +253,7 @@ class AlbumData extends Data
     ) {
     }
     
-    public function includes(): array
+    public function includeProperties(): array
     {
         return [
             'songs.title' => count($this->songs) > 0,
@@ -264,9 +264,9 @@ class AlbumData extends Data
 
 You can define exclude, except and only partials on a data class:
 
-- You can define **excludes** in a `excludes` method
-- You can define **except** in a `excepts` method
-- You can define **only** in a `onlys` method
+- You can define **excludes** in a `excludeProperties` method
+- You can define **except** in a `exceptProperties` method
+- You can define **only** in a `onlyProperties` method
 
 ## Using query strings
 
