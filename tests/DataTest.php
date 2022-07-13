@@ -44,7 +44,7 @@ use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
-use Spatie\LaravelData\Tests\Fakes\ClassConditionalIncludedData;
+use Spatie\LaravelData\Tests\Fakes\PartialClassConditionalData;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\DefaultOptionalData;
@@ -116,7 +116,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::new('name')->lazy()->withType('string')
         )->create();
 
-        $data = new $dataClass(Lazy::create(fn () => 'test'));
+        $data = new $dataClass(Lazy::create(fn() => 'test'));
 
         $this->assertEquals([], $data->toArray());
 
@@ -152,8 +152,8 @@ class DataTest extends TestCase
         )->create();
 
         $data = new $dataClass(
-            Lazy::create(fn () => LazyData::from('Hello')),
-            Lazy::create(fn () => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
+            Lazy::create(fn() => LazyData::from('Hello')),
+            Lazy::create(fn() => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
         );
 
         $this->assertEquals([], (clone $data)->toArray());
@@ -196,7 +196,7 @@ class DataTest extends TestCase
             DataPropertyBlueprintFactory::dataCollection('songs', MultiLazyData::class)->lazy()
         )->create();
 
-        $collection = Lazy::create(fn () => MultiLazyData::collection([
+        $collection = Lazy::create(fn() => MultiLazyData::collection([
             DummyDto::rick(),
             DummyDto::bon(),
         ]));
@@ -251,7 +251,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
                 );
             }
         };
@@ -277,7 +277,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::when(fn () => $name === 'Ruben', fn () => $name)
+                    Lazy::when(fn() => $name === 'Ruben', fn() => $name)
                 );
             }
         };
@@ -350,7 +350,7 @@ class DataTest extends TestCase
             public static function create(string $name): static
             {
                 return new self(
-                    Lazy::inertia(fn () => $name)
+                    Lazy::inertia(fn() => $name)
                 );
             }
         };
@@ -597,7 +597,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
+        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn() => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'),) extends Data {
             public function __construct(
                 public SimpleData $data,
                 #[DataCollectionOf(SimpleData::class)]
@@ -656,7 +656,7 @@ class DataTest extends TestCase
 
         $transformed = $data->additional([
             'company' => 'Spatie',
-            'alt_name' => fn (Data $data) => "{$data->name} from Spatie",
+            'alt_name' => fn(Data $data) => "{$data->name} from Spatie",
         ])->toArray();
 
         $this->assertEquals([
@@ -986,7 +986,7 @@ class DataTest extends TestCase
                 #[WithTransformer(ConfidentialDataTransformer::class)]
                 public Data $nestedData,
                 #[WithTransformer(ConfidentialDataCollectionTransformer::class),
-                DataCollectionOf(SimpleData::class)]
+                    DataCollectionOf(SimpleData::class)]
                 public DataCollection $nestedDataCollection,
             ) {
             }
@@ -1182,7 +1182,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_will_not_include_lazy_optional_values_when_transforming()
     {
-        $data = new class ('Hello World', Lazy::create(fn () => Optional::make())) extends Data {
+        $data = new class ('Hello World', Lazy::create(fn() => Optional::make())) extends Data {
             public function __construct(
                 public string $string,
                 public string|Optional|Lazy $lazy_optional_string,
@@ -1237,7 +1237,7 @@ class DataTest extends TestCase
                 #[DataCollectionOf(SimpleDataWithMappedProperty::class)]
                 public DataCollection $nested_collection,
                 #[MapOutputName('nested_other_collection'),
-                DataCollectionOf(SimpleDataWithMappedProperty::class)]
+                    DataCollectionOf(SimpleDataWithMappedProperty::class)]
                 public DataCollection $nested_renamed_collection,
             ) {
             }
@@ -1434,96 +1434,90 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_conditionally_include()
     {
+        $this->assertEmpty(MultiLazyData::from(DummyDto::rick())->includeWhen('artist', false)->toArray());
+
         $this->assertEquals([
             'artist' => 'Rick Astley',
-        ], MultiLazyData::from(DummyDto::rick())->includeWhen('artist', true)->toArray());
+        ], MultiLazyData::from(DummyDto::rick())
+            ->includeWhen('artist', true)
+            ->toArray()
+        );
 
         $this->assertEquals([
             'name' => 'Never gonna give you up',
-        ], MultiLazyData::from(DummyDto::rick())->includeWhen('name', fn () => true)->toArray());
-    }
-
-    /** @test */
-    public function it_can_conditionally_include_using_class_defaults()
-    {
-        $this->assertEmpty(
-            ClassConditionalIncludedData::from(include: false)->toArray(),
-        );
-
-        $this->assertEquals(
-            ['string' => 'Hello World'],
-            ClassConditionalIncludedData::from(include: true)->toArray(),
+        ], MultiLazyData::from(DummyDto::rick())
+            ->includeWhen('name', fn(MultiLazyData $data) => $data->artist->resolve() === 'Rick Astley')
+            ->toArray()
         );
     }
 
     /** @test */
     public function it_can_conditionally_include_nested()
     {
-        $dataClass = new class () extends Data {
-            public Lazy|NestedLazyData $nested;
+        $data = new class () extends Data {
+            public NestedLazyData $nested;
         };
+
+        $data->nested = NestedLazyData::from('Hello World');
+
+        $this->assertEquals(
+            ['nested' => []],
+            $data->toArray()
+        );
 
         $this->assertEquals(
             ['nested' => ['simple' => ['string' => 'Hello World']]],
-            $dataClass::from(['nested' => NestedLazyData::from('Hello World')])->includeWhen('nested.simple', true)->toArray()
+            $data->includeWhen('nested.simple', true)->toArray()
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_include_using_class_defaults()
+    {
+        PartialClassConditionalData::setDefinitions(includeDefinitions: [
+            'string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        ]);
+
+        $this->assertEquals(
+            ['enabled' => false],
+            PartialClassConditionalData::createLazy(enabled: false)->toArray()
+        );
+
+        $this->assertEquals(
+            ['enabled' => true, 'string' => 'Hello World'],
+            PartialClassConditionalData::createLazy(enabled: true)->toArray(),
         );
     }
 
     /** @test */
     public function it_can_conditionally_include_using_class_defaults_nested()
     {
-        $dataClass = new class () extends Data {
-            public function __construct(
-                protected bool|null $includeLazy = null,
-                protected bool|null $includeNested = null,
-                public Lazy|string|null $lazy = null,
-                public Lazy|NestedLazyData|null $nested = null
-            ) {
-            }
+        PartialClassConditionalData::setDefinitions(includeDefinitions: [
+            'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        ]);
 
-            public function includes(): array
-            {
-                return [
-                    'lazy' => $this->includeLazy,
-                    'nested.simple' => $this->includeNested,
-                ];
-            }
+        $this->assertEquals(
+            ['enabled' => true, 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::createLazy(enabled: true)->toArray(),
+        );
+    }
 
-            public static function fromBools(bool $includeLazy, bool $includeNested): static
-            {
-                return new self(
-                    $includeLazy,
-                    $includeNested,
-                    Lazy::create(fn () => 'Hello World'),
-                    Lazy::create(fn () => NestedLazyData::fromString('Hello World'))
-                );
-            }
-        };
+    /** @test */
+    public function it_can_conditionally_include_using_class_defaults_multiple()
+    {
+        PartialClassConditionalData::setDefinitions(includeDefinitions: [
+            'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+            'string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        ]);
 
-        $this->assertEmpty(
-            $dataClass::from(includeLazy: false, includeNested: false)->toArray()
+        $this->assertEquals(
+            ['enabled' => false],
+            PartialClassConditionalData::createLazy(enabled: false)->toArray(),
         );
 
         $this->assertEquals(
-            [
-                'lazy' => 'Hello World',
-            ],
-            $dataClass::from(includeLazy: true, includeNested: false)->toArray()
-        );
-
-        $this->assertEquals(
-            [
-                'nested' => ['simple' => ['string' => 'Hello World']],
-            ],
-            $dataClass::from(includeLazy: false, includeNested: true)->toArray()
-        );
-
-        $this->assertEquals(
-            [
-                'lazy' => 'Hello World',
-                'nested' => ['simple' => ['string' => 'Hello World']],
-            ],
-            $dataClass::from(includeLazy: true, includeNested: true)->toArray()
+            ['enabled' => true, 'string' => 'Hello World', 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::createLazy(enabled: true)->toArray(),
         );
     }
 
@@ -1531,10 +1525,16 @@ class DataTest extends TestCase
     public function it_can_conditionally_exclude()
     {
         $data = new MultiLazyData(
-            Lazy::create(fn () => 'Rick Astley')->defaultIncluded(),
-            Lazy::create(fn () => 'Never gonna give you up')->defaultIncluded(),
+            Lazy::create(fn() => 'Rick Astley')->defaultIncluded(),
+            Lazy::create(fn() => 'Never gonna give you up')->defaultIncluded(),
             1989
         );
+
+        $this->assertEquals([
+            'artist' => 'Rick Astley',
+            'name' => 'Never gonna give you up',
+            'year' => 1989,
+        ], (clone $data)->exceptWhen('artist', false)->toArray());
 
         $this->assertEquals([
             'name' => 'Never gonna give you up',
@@ -1544,226 +1544,330 @@ class DataTest extends TestCase
         $this->assertEquals([
             'artist' => 'Rick Astley',
             'year' => 1989,
-        ], (clone $data)->exceptWhen('name', fn () => true)->toArray());
+        ], (clone $data)
+            ->exceptWhen('name', fn(MultiLazyData $data) => $data->artist->resolve() === 'Rick Astley')
+            ->toArray()
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_exclude_nested()
+    {
+        $data = new class () extends Data {
+            public NestedLazyData $nested;
+        };
+
+        $data->nested = new NestedLazyData(Lazy::create(fn() => SimpleData::from('Hello World'))->defaultIncluded());
+
+        $this->assertEquals(
+            ['nested' => ['simple' => ['string' => 'Hello World']]],
+            $data->toArray()
+        );
+
+        $this->assertEquals(
+            ['nested' => []],
+            $data->exceptWhen('nested.simple', true)->toArray()
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_exclude_using_class_defaults()
+    {
+        PartialClassConditionalData::setDefinitions(excludeDefinitions: [
+            'string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        ]);
+
+        $this->assertEquals(
+            ['enabled' => false, 'string' => 'Hello World', 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::createDefaultIncluded(enabled: false)->toArray()
+        );
+
+        $this->assertEquals(
+            ['enabled' => true, 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::createDefaultIncluded(enabled: true)->toArray(),
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_exclude_using_class_defaults_nested()
+    {
+        PartialClassConditionalData::setDefinitions(excludeDefinitions: [
+            'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        ]);
+
+        $this->assertEquals(
+            ['enabled' => false, 'string' => 'Hello World', 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::createDefaultIncluded(enabled: false)->toArray()
+        );
+
+        $this->assertEquals(
+            ['enabled' => true, 'string' => 'Hello World'],
+            PartialClassConditionalData::createDefaultIncluded(enabled: true)->toArray(),
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_exclude_using_multiple_class_defaults()
+    {
+        PartialClassConditionalData::setDefinitions(excludeDefinitions: [
+            'string' => fn(PartialClassConditionalData $data) => $data->enabled,
+            'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        ]);
+
+        $this->assertEquals(
+            ['enabled' => false, 'string' => 'Hello World', 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::createDefaultIncluded(enabled: false)->toArray()
+        );
+
+        $this->assertEquals(
+            ['enabled' => true],
+            PartialClassConditionalData::createDefaultIncluded(enabled: true)->toArray(),
+        );
     }
 
     /** @test */
     public function it_can_conditionally_define_only()
     {
-        $data = new class () extends Data {
-            public function __construct(
-                public ?int $id = null,
-                public ?string $name = null,
-            ) {
-            }
-        };
+        $data = new MultiData('Hello', 'World');
 
         $this->assertEquals([
-            'name' => 'Taylor',
-        ], $data::from([
-            'id' => 1,
-            'name' => 'Taylor',
-        ])->onlyWhen('id', false)->onlyWhen('name', true)->toArray());
+            'first' => 'Hello',
+        ], (clone $data)->onlyWhen('first', true)->toArray());
+
+        $this->assertEquals([
+            'first' => 'Hello',
+            'second' => 'World',
+        ], (clone $data)->onlyWhen('first', false)->toArray());
+
+        $this->assertEquals([
+            'second' => 'World',
+        ], (clone $data)
+            ->onlyWhen('second', fn(MultiData $data) => $data->second === 'World')
+            ->toArray()
+        );
+
+        $this->assertEquals([
+            'first' => 'Hello',
+            'second' => 'World',
+        ], (clone $data)
+            ->onlyWhen('first', fn(MultiData $data) => $data->first === 'Hello')
+            ->onlyWhen('second', fn(MultiData $data) => $data->second === 'World')
+            ->toArray());
+    }
+
+    /** @test */
+    public function it_can_conditionally_define_only_nested()
+    {
+        $data = new class () extends Data {
+            public MultiData $nested;
+        };
+
+        $data->nested = new MultiData('Hello', 'World');
+
+        $this->assertEquals(
+            ['nested' => ['first' => 'Hello']],
+            (clone $data)->onlyWhen('nested.first', true)->toArray()
+        );
+
+        $this->assertEquals(
+            ['nested' => ['first' => 'Hello', 'second' => 'World']],
+            (clone $data)->onlyWhen('nested.{first, second}', true)->toArray()
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_define_only_using_class_defaults()
+    {
+        PartialClassConditionalData::setDefinitions(onlyDefinitions: [
+            'string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        ]);
+
+        $this->assertEquals(
+            ['enabled' => false, 'string' => 'Hello World', 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::create(enabled: false)->toArray()
+        );
+
+        $this->assertEquals(
+            ['string' => 'Hello World'],
+            PartialClassConditionalData::create(enabled: true)->toArray(),
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_define_only_using_class_defaults_nested()
+    {
+        PartialClassConditionalData::setDefinitions(onlyDefinitions: [
+            'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        ]);
+
+        $this->assertEquals(
+            ['enabled' => false, 'string' => 'Hello World', 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::create(enabled: false)->toArray()
+        );
+
+        $this->assertEquals(
+            ['nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::create(enabled: true)->toArray(),
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_define_only_using_multiple_class_defaults()
+    {
+        PartialClassConditionalData::setDefinitions(onlyDefinitions: [
+            'string' => fn(PartialClassConditionalData $data) => $data->enabled,
+            'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        ]);
+
+        $this->assertEquals(
+            ['enabled' => false, 'string' => 'Hello World', 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::create(enabled: false)->toArray()
+        );
+
+        $this->assertEquals(
+            ['string' => 'Hello World', 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::create(enabled: true)->toArray(),
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_define_except()
+    {
+        $data = new MultiData('Hello', 'World');
+
+        $this->assertEquals([
+            'second' => 'World',
+        ], (clone $data)->exceptWhen('first', true)->toArray());
+
+        $this->assertEquals([
+            'first' => 'Hello',
+            'second' => 'World',
+        ], (clone $data)->exceptWhen('first', false)->toArray());
+
+        $this->assertEquals([
+            'first' => 'Hello',
+        ], (clone $data)
+            ->exceptWhen('second', fn(MultiData $data) => $data->second === 'World')
+            ->toArray());
+
+        $this->assertEmpty((clone $data)
+            ->exceptWhen('first', fn(MultiData $data) => $data->first === 'Hello')
+            ->exceptWhen('second', fn(MultiData $data) => $data->second === 'World')
+            ->toArray()
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_define_except_nested()
+    {
+        $data = new class () extends Data {
+            public MultiData $nested;
+        };
+
+        $data->nested = new MultiData('Hello', 'World');
+
+        $this->assertEquals(
+            ['nested' => ['second' => 'World']],
+            (clone $data)->exceptWhen('nested.first', true)->toArray()
+        );
+
+        $this->assertEquals(
+            ['nested' => []],
+            (clone $data)->exceptWhen('nested.{first, second}', true)->toArray()
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_define_except_using_class_defaults()
+    {
+        PartialClassConditionalData::setDefinitions(exceptDefinitions: [
+            'string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        ]);
+
+        $this->assertEquals(
+            ['enabled' => false, 'string' => 'Hello World', 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::create(enabled: false)->toArray()
+        );
+
+        $this->assertEquals(
+            ['enabled' => true, 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::create(enabled: true)->toArray(),
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_define_except_using_class_defaults_nested()
+    {
+        PartialClassConditionalData::setDefinitions(exceptDefinitions: [
+            'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        ]);
+
+        $this->assertEquals(
+            ['enabled' => false, 'string' => 'Hello World', 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::create(enabled: false)->toArray()
+        );
+
+        $this->assertEquals(
+            ['enabled' => true, 'string' => 'Hello World', 'nested' => []],
+            PartialClassConditionalData::create(enabled: true)->toArray(),
+        );
+    }
+
+    /** @test */
+    public function it_can_conditionally_define_except_using_multiple_class_defaults()
+    {
+        PartialClassConditionalData::setDefinitions(exceptDefinitions: [
+            'string' => fn(PartialClassConditionalData $data) => $data->enabled,
+            'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        ]);
+
+        $this->assertEquals(
+            ['enabled' => false, 'string' => 'Hello World', 'nested' => ['string' => 'Hello World']],
+            PartialClassConditionalData::create(enabled: false)->toArray()
+        );
+
+        $this->assertEquals(
+            ['enabled' => true, 'nested' => []],
+            PartialClassConditionalData::create(enabled: true)->toArray(),
+        );
     }
 
     /** @test */
     public function only_has_precedence_over_except()
     {
-        $data = new class () extends Data {
-            public function __construct(
-                public ?int $id = null,
-                public ?string $name = null,
-            ) {
-            }
-        };
+        $data = new MultiData('Hello', 'World');
 
-        $this->assertEquals([
-            'id' => 1,
-        ], $data::from([
-            'id' => 1,
-            'name' => 'Taylor',
-        ])->onlyWhen('name', true)->exceptWhen('name', true)->toArray());
+        $this->assertEquals(
+            ['second' => 'World'],
+            (clone $data)->onlyWhen('first', true)->exceptWhen('first', true)->toArray()
+        );
+
+        $this->assertEquals(
+            ['second' => 'World'],
+            (clone $data)->exceptWhen('first', true)->onlyWhen('first', true)->toArray()
+        );
     }
 
     /** @test */
-    public function it_can_conditionally_define_excepts_properties()
+    public function it_can_perform_only_and_except_on_array_properties()
     {
-        $data = new class () extends Data {
+        $data = new class ('Hello World', ['string' => 'Hello World', 'int' => 42]) extends Data {
             public function __construct(
-                public ?int $id = null,
-                public ?string $name = null,
+                public string $string,
+                public array $array
             ) {
             }
         };
 
-        $this->assertEquals([
-            'name' => 'Taylor',
-        ], $data::from([
-            'id' => 1,
-            'name' => 'Taylor',
-        ])->exceptWhen('id', true)->exceptWhen('name', false)->toArray());
-    }
+        $this->assertEquals(
+            ['string' => 'Hello World', 'array' => ['int' => 42]],
+            (clone $data)->only('string', 'array.int')->toArray()
+        );
 
-    /** @test */
-    public function it_can_conditionally_define_excepts_properties_with_a_callback()
-    {
-        $data = new class () extends Data {
-            public function __construct(
-                public ?int $id = null,
-                public ?string $name = null,
-            ) {
-            }
-        };
-
-        $this->assertEquals([
-            'name' => 'Taylor',
-        ], $data::from([
-            'id' => 1,
-            'name' => 'Taylor',
-        ])->exceptWhen('id', fn (Data $data) => $data->name === 'Taylor')->toArray());
-
-        $this->assertEquals([
-            'id' => 1,
-            'name' => 'Freek',
-        ], $data::from([
-            'id' => 1,
-            'name' => 'Freek',
-        ])->exceptWhen('id', fn (Data $data) => $data->name === 'Taylor')->toArray());
-    }
-
-    /** @test */
-    public function it_can_define_only_for_array_properties()
-    {
-        $data = new class () extends Data {
-            public function __construct(
-                public ?int $id = null,
-                public ?string $name = null,
-                public ?array $more = null
-            ) {
-            }
-        };
-
-        $this->assertEquals([
-            'id' => 1,
-            'more' => [
-                'twitter_verified' => false,
-            ],
-        ], $data::from([
-            'id' => 1,
-            'name' => 'Taylor',
-            'more' => [
-                'last_name' => 'Otwell',
-                'twitter_verified' => false,
-            ],
-        ])->only('id', 'more.twitter_verified')->toArray());
-    }
-
-    /** @test */
-    public function it_can_define_except_for_nested_array_properties()
-    {
-        $data = new class () extends Data {
-            public function __construct(
-                public ?int $id = null,
-                public ?string $name = null,
-                public ?array $more = null
-            ) {
-            }
-        };
-
-        $this->assertEquals([
-            'name' => 'Taylor',
-            'more' => [
-                'last_name' => 'Otwell',
-            ],
-        ], $data::from([
-            'id' => 1,
-            'name' => 'Taylor',
-            'more' => [
-                'last_name' => 'Otwell',
-                'twitter_verified' => false,
-            ],
-        ])->except('id', 'more.twitter_verified')->toArray());
-    }
-
-    /** @test */
-    public function it_can_define_only_for_nested_data_properties()
-    {
-        $more = new class ('Otwell', false) extends Data {
-            public function __construct(
-                public string $last_name,
-                public bool $twitter_verified,
-            ) {
-            }
-        };
-
-        $data = new class ('Taylor', $more) extends Data {
-            public function __construct(
-                public string $name,
-                public Data $more,
-            ) {
-            }
-        };
-
-        $this->assertEquals([
-            'name' => 'Taylor',
-            'more' => [
-                'last_name' => 'Otwell',
-            ],
-        ], $data->only('name', 'more.last_name')->toArray());
-    }
-
-    /** @test */
-    public function it_can_define_except_for_nested_data_properties()
-    {
-        $more = new class ('Otwell', false) extends Data {
-            public function __construct(
-                public string $last_name,
-                public bool $twitter_verified,
-            ) {
-            }
-        };
-
-        $data = new class ('Taylor', $more) extends Data {
-            public function __construct(
-                public string $name,
-                public Data $more,
-            ) {
-            }
-        };
-
-        $this->assertEquals([
-            'name' => 'Taylor',
-            'more' => [
-                'last_name' => 'Otwell',
-            ],
-        ], $data->except('id', 'more.twitter_verified')->toArray());
-    }
-
-    /** @test */
-    public function it_can_define_partials_inside_the_data_class()
-    {
-        $data = new class () extends Data {
-            protected array $except = [
-                'id' => true,
-                'first_name' => false,
-                'last_name' => true,
-            ];
-
-            public function __construct(
-                public ?int $id = null,
-                public ?string $first_name = null,
-                public ?string $last_name = null,
-            ) {
-            }
-        };
-
-        $this->assertEquals([
-            'first_name' => 'Taylor',
-        ], $data::from([
-            'id' => 1,
-            'first_name' => 'Taylor',
-            'last_name' => 'Otwell',
-        ])->toArray());
+        $this->assertEquals(
+            ['array' => ['string' => 'Hello World']],
+            (clone $data)->except('string', 'array.int')->toArray()
+        );
     }
 
     /** @test */
