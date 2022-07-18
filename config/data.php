@@ -46,4 +46,13 @@ return [
      * `null` if you want to disable wrapping.
      */
     'wrap' => null,
+
+
+    /*
+     * Paths where data objects can be found, will be used for caching reflection
+     * information for the data objects.
+     */
+    'data_paths' => [
+        app_path()
+    ]
 ];

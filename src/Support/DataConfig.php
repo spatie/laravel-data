@@ -20,10 +20,13 @@ class DataConfig
     /** @var \Spatie\LaravelData\RuleInferrers\RuleInferrer[] */
     protected array $ruleInferrers;
 
+    /** @var array<string> */
+    protected array $dataPaths;
+
     public function __construct(array $config)
     {
         $this->ruleInferrers = array_map(
-            fn (string $ruleInferrerClass) => app($ruleInferrerClass),
+            fn(string $ruleInferrerClass) => app($ruleInferrerClass),
             $config['rule_inferrers'] ?? []
         );
 
@@ -34,6 +37,8 @@ class DataConfig
         foreach ($config['casts'] ?? [] as $castable => $cast) {
             $this->casts[ltrim($castable, ' \\')] = app($cast);
         }
+
+        $this->dataPaths = $config['data_paths'] ?? [];
     }
 
     public function getDataClass(string $class): DataClass
@@ -77,8 +82,26 @@ class DataConfig
         return null;
     }
 
+    public function intializeCachedDataClasses(
+        DataClass ...$classes,
+    ): void {
+        foreach ($classes as $class) {
+            $this->dataClasses[$class->name] = $class;
+        }
+    }
+
     public function getRuleInferrers(): array
     {
         return $this->ruleInferrers;
+    }
+
+    public function getDataPaths(): array
+    {
+        return $this->dataPaths;
+    }
+
+    public function getDataClasses(): array
+    {
+        return $this->dataClasses;
     }
 }
