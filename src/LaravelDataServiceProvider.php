@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData;
 
-use Illuminate\Support\Collection;
 use Spatie\LaravelAutoDiscoverer\Discover;
 use Spatie\LaravelData\Commands\DataMakeCommand;
 use Spatie\LaravelData\Contracts\BaseData;
@@ -33,7 +32,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
             ->within(...app(DataConfig::class)->getDataPaths())
             ->extending(DataObject::class)
             ->returnReflection()
-            ->get(fn(array $classes) => app(DataCacheManager::class)->initialize($classes));
+            ->get(fn (array $classes) => app(DataCacheManager::class)->initialize($classes));
 
         /** @psalm-suppress UndefinedInterfaceMethod */
         $this->app->beforeResolving(BaseData::class, function ($class, $parameters, $app) {
