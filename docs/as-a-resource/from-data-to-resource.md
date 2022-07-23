@@ -277,7 +277,7 @@ class UserData extends Data
         return new self(
             $user->title,
             $user->email,
-            SongData::create($user->favorite_song)
+            SongData::from($user->favorite_song)
         );
     }
 }
