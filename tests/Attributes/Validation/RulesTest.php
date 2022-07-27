@@ -1047,18 +1047,11 @@ class RulesTest extends TestCase
             }
         };
 
-        $invokableLaravelRule = new class () implements InvokableRule {
-            public function __invoke($attribute, $value, $fail)
-            {
-            }
-        };
-
         $rule = new Rule(
             'test',
             ['a', 'b', 'c'],
             'x|y',
             $laravelRule,
-            $invokableLaravelRule,
             new Required()
         );
 
@@ -1071,6 +1064,43 @@ class RulesTest extends TestCase
                 'x',
                 'y',
                 $laravelRule,
+                'required',
+            ],
+            $rule->getRules()
+        );
+    }
+
+    /** @test */
+    public function it_can_use_the_rule_rule_with_invokable_rules()
+    {
+        $this->onlyPHP81();
+
+        if (version_compare($this->app->version(), '9.18', '<')) {
+            $this->markTestIncomplete('Invokable rules are only available in Laravel 9.18.');
+        }
+
+        $invokableLaravelRule = new class () implements InvokableRule {
+            public function __invoke($attribute, $value, $fail)
+            {
+            }
+        };
+
+        $rule = new Rule(
+            'test',
+            ['a', 'b', 'c'],
+            'x|y',
+            $invokableLaravelRule,
+            new Required()
+        );
+
+        $this->assertEquals(
+            [
+                'test',
+                'a',
+                'b',
+                'c',
+                'x',
+                'y',
                 $invokableLaravelRule,
                 'required',
             ],
