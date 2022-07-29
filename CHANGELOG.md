@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.3 - 2022-07-29
+
+- Add support for invokable rules (#179)
+
 ## 2.0.2 - 2022-07-29
 
 - more consistent use of transform through codebase for transforming collections and data
