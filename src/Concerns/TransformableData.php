@@ -18,12 +18,12 @@ trait TransformableData
 
     public function toJson($options = 0): string
     {
-        return json_encode($this->toArray(), $options);
+        return json_encode($this->transform(), $options);
     }
 
     public function jsonSerialize(): array
     {
-        return $this->toArray();
+        return $this->transform();
     }
 
     public static function castUsing(array $arguments)
