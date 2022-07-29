@@ -119,7 +119,7 @@ class UserData extends Data
     {
         return new self(
             $user->title,
-            Lazy::create(fn() => SongData::create($user->favorite_song))
+            Lazy::create(fn() => SongData::from($user->favorite_song))
         );
     }
 }
