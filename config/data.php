@@ -53,6 +53,6 @@ return [
      * information for the data objects.
      */
     'data_paths' => [
-        app_path()
+
     ]
 ];
