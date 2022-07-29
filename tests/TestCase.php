@@ -55,7 +55,7 @@ class TestCase extends Orchestra
     public function onlyPHP81()
     {
         if (version_compare(phpversion(), '8.1', '<')) {
-            $this->markTestIncomplete('No enum support in PHP 8.1');
+            $this->markTestIncomplete('This test is only supported in PHP versions > PHP 8.1');
         }
     }
 }

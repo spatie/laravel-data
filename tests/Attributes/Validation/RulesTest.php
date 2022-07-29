@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Tests\Attributes\Validation;
 
 use Carbon\Carbon;
 use Generator;
+use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Validation\Rules\Enum as EnumRule;
@@ -1063,6 +1064,44 @@ class RulesTest extends TestCase
                 'x',
                 'y',
                 $laravelRule,
+                'required',
+            ],
+            $rule->getRules()
+        );
+    }
+
+    /** @test */
+    public function it_can_use_the_rule_rule_with_invokable_rules()
+    {
+        $this->onlyPHP81();
+
+        if (version_compare($this->app->version(), '9.18', '<')) {
+            $this->markTestIncomplete('Invokable rules are only available in Laravel 9.18.');
+        }
+
+        $invokableLaravelRule = new class () implements InvokableRule {
+            public function __invoke($attribute, $value, $fail)
+            {
+            }
+        };
+
+        $rule = new Rule(
+            'test',
+            ['a', 'b', 'c'],
+            'x|y',
+            $invokableLaravelRule,
+            new Required()
+        );
+
+        $this->assertEquals(
+            [
+                'test',
+                'a',
+                'b',
+                'c',
+                'x',
+                'y',
+                $invokableLaravelRule,
                 'required',
             ],
             $rule->getRules()
