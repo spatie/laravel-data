@@ -1,0 +1,26 @@
+{
+    "$schema": "https://laravel-ide.com/schema/laravel-ide-v2.json",
+    "completions": [
+        {
+            "complete": "classFields",
+            "options": {
+                "fieldsFilter": {
+                    "fetch": "own",
+                    "modifier": ["public"]
+                }
+            },
+            "condition": [
+                {
+                    "methodNames": ["from", "optional"],
+                    "classFqn": ["\\Spatie\\LaravelData\\Concerns\\BaseData"],
+                    "place": "arrayKey"
+                },
+                {
+                    "methodNames": ["collection"],
+                    "classFqn": ["\\Spatie\\LaravelData\\Concerns\\BaseData"],
+                    "place": "arrayInArrayKey"
+                }
+            ]
+        }
+    ]
+}
