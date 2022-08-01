@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.4 - 2022-08-01
+
+- Add IDE completion support (#182)
+
 ## 2.0.3 - 2022-07-29
 
 - Add support for invokable rules (#179)
