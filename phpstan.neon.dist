@@ -6,6 +6,7 @@ parameters:
     paths:
         - src
         - config
+        - types
     tmpDir: build/phpstan
     reportUnmatchedIgnoredErrors: true
     checkOctaneCompatibility: true
