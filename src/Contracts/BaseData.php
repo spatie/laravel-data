@@ -30,7 +30,7 @@ interface BaseData
     /**
      * @param \Illuminate\Support\Enumerable|array|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|\Spatie\LaravelData\DataCollection $items
      *
-     * @return \Spatie\LaravelData\DataCollection|\Spatie\LaravelData\CursorPaginatedDataCollection|\Spatie\LaravelData\PaginatedDataCollection
+     * @return ($items is \Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Pagination\CursorPaginator ? \Spatie\LaravelData\CursorPaginatedDataCollection : ($items is \Illuminate\Pagination\Paginator|\Illuminate\Pagination\AbstractPaginator ? \Spatie\LaravelData\PaginatedDataCollection : \Spatie\LaravelData\DataCollection))
      */
     public static function collection(Enumerable|array|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator|DataCollection $items): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection;
 
