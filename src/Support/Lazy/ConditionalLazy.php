@@ -20,6 +20,6 @@ class ConditionalLazy extends Lazy
 
     public function shouldBeIncluded(): bool
     {
-        return ($this->condition)();
+        return (bool) ($this->condition)();
     }
 }
