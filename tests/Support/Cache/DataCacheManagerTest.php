@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Tests\Support\Cache;
 
 use ReflectionClass;
 use Spatie\LaravelAutoDiscoverer\Discover;
-use Spatie\LaravelAutoDiscoverer\ValueObjects\DiscoverProfile;
 use Spatie\LaravelAutoDiscoverer\ValueObjects\DiscoverProfileConfig;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
