@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.5 - 2022-08-10
+
+- Fix validation rules not being used for data collections and objects
+
 ## 2.0.4 - 2022-08-01
 
 - Add IDE completion support (#182)
