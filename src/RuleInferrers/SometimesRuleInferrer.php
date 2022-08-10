@@ -10,7 +10,7 @@ class SometimesRuleInferrer implements RuleInferrer
 {
     public function handle(DataProperty $property, RulesCollection $rules): RulesCollection
     {
-        if ($property->type->isOptional) {
+        if ($property->type->isOptional && ! $rules->hasType(Sometimes::class)) {
             $rules->add(new Sometimes());
         }
 

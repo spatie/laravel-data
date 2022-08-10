@@ -6,11 +6,13 @@ use Illuminate\Validation\Rules\Enum as EnumRule;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapName;
+use Spatie\LaravelData\Attributes\Validation\Bail;
 use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
 use Spatie\LaravelData\Attributes\Validation\Rule;
+use Spatie\LaravelData\Attributes\Validation\Size;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Optional;
@@ -135,13 +137,31 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             'property' => ['nullable', 'array'],
             'property.string' => ['nullable', 'string'],
         ], $rules);
+
+        $rules = $this->resolveRules(new class () {
+            public Optional|SimpleData $property;
+        });
+
+        $this->assertEquals([
+            'property' => ['sometimes', 'array'],
+            'property.string' => ['nullable', 'string'],
+        ], $rules);
+
+        $rules = $this->resolveRules(new class () {
+            public null|Optional|SimpleData $property;
+        });
+
+        $this->assertEquals([
+            'property' => ['nullable', 'sometimes', 'array'],
+            'property.string' => ['nullable', 'string'],
+        ], $rules);
     }
 
     /** @test */
     public function it_will_take_rules_from_nested_data_collections()
     {
         $rules = $this->resolveRules(new class () {
-            /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */
+            #[DataCollectionOf(SimpleData::class)]
             public DataCollection $property;
         });
 
@@ -151,7 +171,7 @@ class DataPropertyValidationRulesResolverTest extends TestCase
         ], $rules);
 
         $rules = $this->resolveRules(new class () {
-            /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[]|null */
+            #[DataCollectionOf(SimpleData::class)]
             public ?DataCollection $property;
         });
 
@@ -159,10 +179,30 @@ class DataPropertyValidationRulesResolverTest extends TestCase
             'property' => ['nullable', 'array'],
             'property.*.string' => ['string', 'required'],
         ], $rules);
+
+        $rules = $this->resolveRules(new class () {
+            #[DataCollectionOf(SimpleData::class)]
+            public Optional|DataCollection $property;
+        });
+
+        $this->assertEquals([
+            'property' => ['sometimes', 'array'],
+            'property.*.string' => ['string', 'required'],
+        ], $rules);
+
+        $rules = $this->resolveRules(new class () {
+            #[DataCollectionOf(SimpleData::class)]
+            public null|Optional|DataCollection $property;
+        });
+
+        $this->assertEquals([
+            'property' => ['nullable','sometimes', 'array'],
+            'property.*.string' => ['string', 'required'],
+        ], $rules);
     }
 
     /** @test */
-    public function it_can_nest_validation_rules_event_further()
+    public function it_can_nest_validation_rules_even_further()
     {
         $rules = $this->resolveRules(new class () {
             public NestedData $property;
@@ -304,8 +344,33 @@ class DataPropertyValidationRulesResolverTest extends TestCase
         };
 
         $this->assertEquals([
-            'property' => ['nullable', 'array'],
+            'property' => ['sometimes', 'array'],
             'property.string' => ['nullable', 'string'],
+        ], $this->resolveRules($data));
+    }
+
+    /** @test */
+    public function it_will_apply_rule_inferrers_rules_on_data_collections_and_data_objects()
+    {
+        $data = new class () extends Data {
+            #[Bail]
+            public SimpleData $property;
+        };
+
+        $this->assertEquals([
+            'property' => ['required', 'array', 'bail'],
+            'property.string' => ['string', 'required'],
+        ], $this->resolveRules($data));
+
+        $data = new class () extends Data {
+            #[DataCollectionOf(SimpleData::class)]
+            #[Size(10)]
+            public DataCollection $property;
+        };
+
+        $this->assertEquals([
+            'property' => ['present', 'array', 'size:10'],
+            'property.*.string' => ['string', 'required'],
         ], $this->resolveRules($data));
     }
 

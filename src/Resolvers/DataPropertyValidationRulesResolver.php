@@ -3,7 +3,16 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
+use Spatie\LaravelData\Attributes\Validation\Present;
+use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\Sometimes;
+use Spatie\LaravelData\RuleInferrers\AttributesRuleInferrer;
+use Spatie\LaravelData\RuleInferrers\BuiltInTypesRuleInferrer;
+use Spatie\LaravelData\RuleInferrers\NullableRuleInferrer;
+use Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer;
+use Spatie\LaravelData\RuleInferrers\RuleInferrer;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\RulesCollection;
@@ -40,14 +49,32 @@ class DataPropertyValidationRulesResolver
             default => throw new TypeError()
         };
 
-        $isNullable = $nullable || $property->type->isNullable || $property->type->isOptional;
+        $isNullable = $nullable || $property->type->isNullable;
+        $isOptional = $property->type->isOptional;
 
-        $toplevelRule = match (true) {
-            $isNullable => 'nullable',
-            $property->type->isDataObject => "required",
-            $property->type->isDataCollectable => "present",
-            default => throw new TypeError()
-        };
+        $toplevelRules = RulesCollection::create();
+
+        if($isNullable){
+            $toplevelRules->add(new Nullable());
+        }
+
+        if($isOptional){
+            $toplevelRules->add(New Sometimes());
+        }
+
+        if(! $isNullable && ! $isOptional && $property->type->isDataObject){
+            $toplevelRules->add(new Required());
+        }
+
+        if(! $isNullable && ! $isOptional&&  $property->type->isDataCollectable){
+            $toplevelRules->add(new Present());
+        }
+
+        $toplevelRules->add(ArrayType::create());
+
+        foreach ($this->dataConfig->getRuleInferrers() as $inferrer){
+            $inferrer->handle($property, $toplevelRules);
+        }
 
         return $this->dataValidationRulesResolver
             ->execute(
@@ -55,10 +82,10 @@ class DataPropertyValidationRulesResolver
                 $payload,
                 $this->isNestedDataNullable($nullable, $property)
             )
-            ->mapWithKeys(fn (array $rules, string $name) => [
+            ->mapWithKeys(fn(array $rules, string $name) => [
                 "{$prefix}{$name}" => $rules,
             ])
-            ->prepend([$toplevelRule, 'array'], $propertyName);
+            ->prepend($toplevelRules->normalize(), $propertyName);
     }
 
     protected function getRulesForProperty(DataProperty $property, bool $nullable): array

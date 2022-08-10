@@ -10,7 +10,7 @@ class NullableRuleInferrer implements RuleInferrer
 {
     public function handle(DataProperty $property, RulesCollection $rules): RulesCollection
     {
-        if ($property->type->isNullable) {
+        if ($property->type->isNullable && ! $rules->hasType(Nullable::class)) {
             $rules->add(new Nullable());
         }
 

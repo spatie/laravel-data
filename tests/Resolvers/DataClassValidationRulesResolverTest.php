@@ -54,8 +54,8 @@ class DataClassValidationRulesResolverTest extends TestCase
         };
 
         $this->assertEquals([
-            'name' => [new Nullable(), new StringType()],
-            'age' => [new Numeric(), new Nullable()],
+            'name' => ['nullable', 'string'],
+            'age' => ['nullable', 'numeric'],
         ], $this->resolver->execute($data::class, nullable: true)->all());
     }
 
