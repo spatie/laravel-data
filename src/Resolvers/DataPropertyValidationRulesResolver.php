@@ -8,11 +8,6 @@ use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\Sometimes;
-use Spatie\LaravelData\RuleInferrers\AttributesRuleInferrer;
-use Spatie\LaravelData\RuleInferrers\BuiltInTypesRuleInferrer;
-use Spatie\LaravelData\RuleInferrers\NullableRuleInferrer;
-use Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer;
-use Spatie\LaravelData\RuleInferrers\RuleInferrer;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\RulesCollection;
@@ -54,25 +49,25 @@ class DataPropertyValidationRulesResolver
 
         $toplevelRules = RulesCollection::create();
 
-        if($isNullable){
+        if ($isNullable) {
             $toplevelRules->add(new Nullable());
         }
 
-        if($isOptional){
-            $toplevelRules->add(New Sometimes());
+        if ($isOptional) {
+            $toplevelRules->add(new Sometimes());
         }
 
-        if(! $isNullable && ! $isOptional && $property->type->isDataObject){
+        if (! $isNullable && ! $isOptional && $property->type->isDataObject) {
             $toplevelRules->add(new Required());
         }
 
-        if(! $isNullable && ! $isOptional&&  $property->type->isDataCollectable){
+        if (! $isNullable && ! $isOptional && $property->type->isDataCollectable) {
             $toplevelRules->add(new Present());
         }
 
         $toplevelRules->add(ArrayType::create());
 
-        foreach ($this->dataConfig->getRuleInferrers() as $inferrer){
+        foreach ($this->dataConfig->getRuleInferrers() as $inferrer) {
             $inferrer->handle($property, $toplevelRules);
         }
 
@@ -82,7 +77,7 @@ class DataPropertyValidationRulesResolver
                 $payload,
                 $this->isNestedDataNullable($nullable, $property)
             )
-            ->mapWithKeys(fn(array $rules, string $name) => [
+            ->mapWithKeys(fn (array $rules, string $name) => [
                 "{$prefix}{$name}" => $rules,
             ])
             ->prepend($toplevelRules->normalize(), $propertyName);
