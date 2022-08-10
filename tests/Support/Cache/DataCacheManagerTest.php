@@ -4,7 +4,8 @@ namespace Spatie\LaravelData\Tests\Support\Cache;
 
 use ReflectionClass;
 use Spatie\LaravelAutoDiscoverer\Discover;
-use Spatie\LaravelAutoDiscoverer\DiscoverProfile;
+use Spatie\LaravelAutoDiscoverer\ValueObjects\DiscoverProfile;
+use Spatie\LaravelAutoDiscoverer\ValueObjects\DiscoverProfileConfig;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -15,11 +16,12 @@ class DataCacheManagerTest extends TestCase
     /** @test */
     public function it_can_cache_classes()
     {
-        Discover::update('laravel-data', function (DiscoverProfile $profile) {
+        Discover::update('laravel-data', function (DiscoverProfileConfig $profile) {
             $profile
-                ->directories(__DIR__ . '/../../Fakes/')
                 ->basePath(__DIR__ . '/../../Fakes')
                 ->rootNamespace('Spatie\LaravelData\Tests\Fakes');
+
+            $profile->directories = [__DIR__ . '/../../Fakes/'];
         });
 
         Discover::run();

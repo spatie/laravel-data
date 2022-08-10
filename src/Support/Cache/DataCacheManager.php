@@ -16,11 +16,11 @@ class DataCacheManager
     ) {
     }
 
-    public function initialize(array $classes)
+    public function initialize(Collection $classes)
     {
         /** @var Collection<string> $cachedClasses */
         /** @var Collection<ReflectionClass|string> $uncachedClasses */
-        [$cachedClasses, $uncachedClasses] = collect($classes)
+        [$cachedClasses, $uncachedClasses] = $classes
             ->partition(fn (ReflectionClass|string $class) => $this->hasClass($class));
 
         $cachedClasses
