@@ -59,5 +59,5 @@ The `handle` method has several arguments:
 - **properties** the key-value properties which will be used to construct the data object
 
 When using a magic creation methods, the pipeline is not being used (since you manually overwrite how a data object is
-constructed). Only when you pass in a request object a minimal version of the pipeline is ued to authorize and validate
+constructed). Only when you pass in a request object a minimal version of the pipeline is used to authorize and validate
 the request.
