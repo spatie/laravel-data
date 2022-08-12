@@ -17,19 +17,25 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
+use Spatie\Snapshots\Driver;
+use Spatie\Snapshots\MatchesSnapshots;
 use Spatie\TypeScriptTransformer\TypeScriptTransformerConfig;
 
 class DataTypeScriptTransformerTest extends TestCase
 {
+    use MatchesSnapshots {
+        assertMatchesSnapshot as baseAssertMatchesSnapshot;
+    }
+
     /** @test */
     public function it_can_covert_a_data_object_to_typescript()
     {
         $config = TypeScriptTransformerConfig::create();
 
-        $data = new class (null, Optional::create(), 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn () => 'Lazy'), SimpleData::from('Simple data'), SimpleData::collection([]), SimpleData::collection([]), SimpleData::collection([])) extends Data {
+        $data = new class (null, Optional::create(), 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn() => 'Lazy'), SimpleData::from('Simple data'), SimpleData::collection([]), SimpleData::collection([]), SimpleData::collection([])) extends Data {
             public function __construct(
                 public null|int $nullable,
-                public Optional | int $undefineable,
+                public Optional|int $undefineable,
                 public int $int,
                 public bool $bool,
                 public string $string,
@@ -179,5 +185,10 @@ class DataTypeScriptTransformerTest extends TestCase
 
         $this->assertTrue($transformer->canTransform($reflection));
         $this->assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
+    }
+
+    public function assertMatchesSnapshot($actual, Driver $driver = null): void
+    {
+        $this->baseAssertMatchesSnapshot(str_replace('\r\n', '\n', $actual), $driver);
     }
 }
