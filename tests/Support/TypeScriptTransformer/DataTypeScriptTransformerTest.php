@@ -189,6 +189,6 @@ class DataTypeScriptTransformerTest extends TestCase
 
     public function assertMatchesSnapshot($actual, Driver $driver = null): void
     {
-        $this->baseAssertMatchesSnapshot(str_replace('\r\n', '\n', $actual), $driver);
+        $this->baseAssertMatchesSnapshot(str_replace('\\r\\n', '\\n', $actual), $driver);
     }
 }
