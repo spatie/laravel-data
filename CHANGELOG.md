@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.6 - 2022-08-12
+
+- Add cast lazy condition result to bool (#186)
+- Add conditional return types for collections (#184)
+- Fix windows tests
+
 ## 2.0.5 - 2022-08-10
 
 - Fix validation rules not being used for data collections and objects
