@@ -10,7 +10,7 @@ eloquent model to create a data object like this:
 SongData::from(Song::findOrFail($id));
 ```
 
-A `Normalizer` will take a payload like a model and transforms it into an array so it can be used in the pipeline (see further).
+A `Normalizer` will take a payload like a model and will transform it into an array so it can be used in the pipeline (see further).
 
 By default, there are four normalizers for each data object:
 
@@ -19,7 +19,7 @@ By default, there are four normalizers for each data object:
 - **ObjectNormalizer** will cast `stdObject`'s
 - **ArrayNormalizer** will cast arrays
 
-Normalizers are defined in the data object `normalizers` method and can be overwritten on an individual data object:
+Normalizers can be globally configured in `config/data.php`, and can be configured on a specific data object by overriding the `normalizers` method.
 
 ```php
 class SongData extends Data
@@ -41,7 +41,7 @@ class SongData extends Data
 }
 ```
 
-A normalizer implements the `Normalizer` interface and should return an array representation of the payload or null if it cannot normalize the payload:
+A normalizer implements the `Normalizer` interface and should return an array representation of the payload, or null if it cannot normalize the payload:
 
 ```php
 class ArraybleNormalizer implements Normalizer
@@ -58,5 +58,3 @@ class ArraybleNormalizer implements Normalizer
 ```
 
 Normalizers are executed the order as they are defined in the `normalize` method. The first normalizer not returning null will be used to normalize the payload. Magical creation methods always have precedence on normalizers.
-
-
