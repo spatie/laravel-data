@@ -15,7 +15,7 @@ use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
-use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
+use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
 use Spatie\LaravelData\Normalizers\ArrayNormalizer;
 use Spatie\LaravelData\Normalizers\ModelNormalizer;
 use Spatie\LaravelData\Normalizers\ObjectNormalizer;
@@ -60,7 +60,7 @@ trait BaseData
     {
         return [
             ModelNormalizer::class,
-            ArraybleNormalizer::class,
+            ArrayableNormalizer::class,
             ObjectNormalizer::class,
             ArrayNormalizer::class,
         ];
