@@ -318,4 +318,52 @@ class DataFromSomethingResolverTest extends TestCase
 
         $this->fail('We should not end up here');
     }
+
+    /** @test */
+    public function it_can_create_data_without_custom_creation_methods()
+    {
+        $data = new class ('', '') extends Data {
+            public function __construct(
+                public ?string $id,
+                public string $name,
+            ) {
+            }
+
+            public static function fromArray(array $payload)
+            {
+                return new self(
+                    id: $payload['hash_id'] ?? null,
+                    name: $payload['name'],
+                );
+            }
+        };
+
+        $this->assertEquals(new $data(null, 'Taylor'), $data::throughPipeline(['hash_id' => 1, 'name' => 'Taylor']));
+        $this->assertEquals(new $data(1, 'Taylor'), $data::from(['hash_id' => 1, 'name' => 'Taylor']));
+    }
+
+    /** @test */
+    public function it_can_call_pipeline_method_in_custom_creation_method()
+    {
+        $data = new class ('', '') extends Data {
+            public function __construct(
+                public readonly string $id,
+                public readonly string $string
+            ) {
+            }
+
+            public static function fromDummyModel(DummyModel $model)
+            {
+                return self::from([
+                    ...self::throughPipeline($model)->toArray(),
+                    'id' => 'abc123',
+                ]);
+            }
+        };
+
+        $this->assertEquals(new $data('abc123', 'owo'), $data::from(new DummyModel([
+            'id' => 1,
+            'string' => 'owo',
+        ])));
+    }
 }

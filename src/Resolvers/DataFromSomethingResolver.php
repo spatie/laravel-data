@@ -27,6 +27,11 @@ class DataFromSomethingResolver
             return $data;
         }
 
+        return $this->executeThroughPipeline($class, ...$payloads);
+    }
+
+    public function executeThroughPipeline(string $class, mixed ...$payloads): BaseData
+    {
         $properties = array_reduce(
             $payloads,
             function (Collection $carry, mixed $payload) use ($class) {
