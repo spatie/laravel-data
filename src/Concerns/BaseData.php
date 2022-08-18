@@ -15,10 +15,6 @@ use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
-use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
-use Spatie\LaravelData\Normalizers\ArrayNormalizer;
-use Spatie\LaravelData\Normalizers\ModelNormalizer;
-use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
@@ -58,12 +54,7 @@ trait BaseData
 
     public static function normalizers(): array
     {
-        return [
-            ModelNormalizer::class,
-            ArrayableNormalizer::class,
-            ObjectNormalizer::class,
-            ArrayNormalizer::class,
-        ];
+        return config('data.normalizers');
     }
 
     public static function pipeline(): DataPipeline
