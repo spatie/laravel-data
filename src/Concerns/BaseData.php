@@ -52,6 +52,14 @@ trait BaseData
         );
     }
 
+    public static function throughPipeline(mixed ...$payloads): static
+    {
+        return app(DataFromSomethingResolver::class)->executeThroughPipeline(
+            static::class,
+            ...$payloads
+        );
+    }
+
     public static function normalizers(): array
     {
         return config('data.normalizers');
