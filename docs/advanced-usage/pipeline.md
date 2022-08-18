@@ -60,4 +60,4 @@ The `handle` method has several arguments:
 
 When using a magic creation methods, the pipeline is not being used (since you manually overwrite how a data object is
 constructed). Only when you pass in a request object a minimal version of the pipeline is used to authorize and validate
-the request. If you need to ignore the custom creation methods, you can call `throughPipeline` on the data object.
+the request.

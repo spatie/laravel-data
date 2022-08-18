@@ -52,9 +52,9 @@ trait BaseData
         );
     }
 
-    public static function throughPipeline(mixed ...$payloads): static
+    public static function withoutMagicalCreationFrom(mixed ...$payloads): static
     {
-        return app(DataFromSomethingResolver::class)->executeThroughPipeline(
+        return app(DataFromSomethingResolver::class)->withoutMagicalCreation()->execute(
             static::class,
             ...$payloads
         );

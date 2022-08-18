@@ -61,7 +61,7 @@ parameters:
 			path: src/Data.php
 
 		-
-			message: "#^Method Spatie\\\\LaravelData\\\\Data\\:\\:throughPipeline\\(\\) should return static\\(Spatie\\\\LaravelData\\\\Data\\) but returns Spatie\\\\LaravelData\\\\Contracts\\\\BaseData\\.$#"
+			message: "#^Method Spatie\\\\LaravelData\\\\Data\\:\\:withoutMagicalCreationFrom\\(\\) should return static\\(Spatie\\\\LaravelData\\\\Data\\) but returns Spatie\\\\LaravelData\\\\Contracts\\\\BaseData\\.$#"
 			count: 1
 			path: src/Data.php
 

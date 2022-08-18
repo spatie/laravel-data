@@ -18,7 +18,15 @@ class DataFromSomethingResolver
     public function __construct(
         protected DataConfig $dataConfig,
         protected DataFromArrayResolver $dataFromArrayResolver,
+        protected bool $withoutMagicalCreation = false,
     ) {
+    }
+
+    public function withoutMagicalCreation(bool $withoutMagicalCreation = true): self
+    {
+        $this->withoutMagicalCreation = $withoutMagicalCreation;
+
+        return $this;
     }
 
     public function execute(string $class, mixed ...$payloads): BaseData
@@ -27,11 +35,6 @@ class DataFromSomethingResolver
             return $data;
         }
 
-        return $this->executeThroughPipeline($class, ...$payloads);
-    }
-
-    public function executeThroughPipeline(string $class, mixed ...$payloads): BaseData
-    {
         $properties = array_reduce(
             $payloads,
             function (Collection $carry, mixed $payload) use ($class) {
@@ -52,11 +55,15 @@ class DataFromSomethingResolver
 
     protected function createFromCustomCreationMethod(string $class, array $payloads): ?BaseData
     {
+        if ($this->withoutMagicalCreation) {
+            return null;
+        }
+
         /** @var Collection<\Spatie\LaravelData\Support\DataMethod> $customCreationMethods */
         $customCreationMethods = $this->dataConfig
             ->getDataClass($class)
             ->methods
-            ->filter(fn (DataMethod $method) => $method->isCustomCreationMethod);
+            ->filter(fn(DataMethod $method) => $method->isCustomCreationMethod);
 
         $methodName = null;
 

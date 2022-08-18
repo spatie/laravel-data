@@ -220,6 +220,14 @@ SongData::optional(null); // returns null
 Underneath the optional method will call the `from` method when a value is given, so you can still magically create data
 objects. When a null value is given, it will return null.
 
+## Creation without magic methods
+
+You can ignore the magical creation methods when creating a data object as such:
+
+```php
+SongData::withoutMagicalCreationFrom($song);
+```
+
 ## Quickly getting data from Models, Requests, ...
 
 By adding the `WithData` trait to a Model, Request or any class that can be magically be converted to a data object,

@@ -28,6 +28,11 @@ interface BaseData
     public static function from(mixed ...$payloads): object;
 
     /**
+     * @return TValue
+     */
+    public static function withoutMagicalCreationFrom(mixed ...$payloads): object;
+
+    /**
      * @param \Illuminate\Support\Enumerable|array|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|\Spatie\LaravelData\DataCollection $items
      *
      * @return ($items is \Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Pagination\CursorPaginator ? \Spatie\LaravelData\CursorPaginatedDataCollection : ($items is \Illuminate\Pagination\Paginator|\Illuminate\Pagination\AbstractPaginator ? \Spatie\LaravelData\PaginatedDataCollection : \Spatie\LaravelData\DataCollection))
