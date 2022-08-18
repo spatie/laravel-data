@@ -33,8 +33,6 @@ class DataCollectionTest extends TestCase
 
         $collection = SimpleData::collection($paginator);
 
-        dd($collection);
-
         $this->assertInstanceOf(PaginatedDataCollection::class, $collection);
         $this->assertMatchesJsonSnapshot($collection->toArray());
     }
