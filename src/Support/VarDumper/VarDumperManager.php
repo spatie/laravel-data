@@ -6,8 +6,6 @@ use ReflectionMethod;
 use ReflectionProperty;
 use Spatie\LaravelData\Contracts\DataCollectable;
 use Spatie\LaravelData\Contracts\DataObject;
-use Spatie\LaravelData\Data;
-use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -32,7 +30,7 @@ class VarDumperManager
 
         $cloner->addCasters([
             DataObject::class => [DataVarDumperCaster::class, 'castDataObject'],
-            DataCollectable::class => [DataVarDumperCaster::class, 'castDataCollectable']
+            DataCollectable::class => [DataVarDumperCaster::class, 'castDataCollectable'],
         ]);
     }
 }
