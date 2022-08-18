@@ -39,4 +39,6 @@ interface BaseData
     public static function pipeline(): DataPipeline;
 
     public static function empty(array $extra = []): array;
+
+    public static function createByContainerInjection(): bool;
 }

@@ -95,6 +95,11 @@ trait BaseData
         return app(EmptyDataResolver::class)->execute(static::class, $extra);
     }
 
+    public static function createByContainerInjection(): bool
+    {
+        return true;
+    }
+
     public function transform(
         bool $transformValues = true,
         WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,

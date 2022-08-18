@@ -31,6 +31,10 @@ class LaravelDataServiceProvider extends PackageServiceProvider
                 return;
             }
 
+            if($class::createByContainerInjection() === false){
+                return;
+            }
+
             $app->bind(
                 $class,
                 fn ($container) => $class::from($container['request'])
