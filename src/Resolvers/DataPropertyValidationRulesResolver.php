@@ -18,8 +18,10 @@ class DataPropertyValidationRulesResolver
 
     public function execute(DataProperty $property, array $payload = [], bool $nullable = false): Collection
     {
-        if ($property->isData() || $property->isDataCollection()) {
-            return $this->getNestedRules($property, $payload, $nullable);
+         if ($property->isData() || $property->isDataCollection()){
+            $current = collect([$property->name() => $this->getRulesForProperty($property, $nullable)]);
+            $nested = $this->getNestedRules($property, $payload, $nullable);
+            return $nested->mergeRecursive($current);
         }
 
         return collect([$property->name() => $this->getRulesForProperty($property, $nullable)]);
