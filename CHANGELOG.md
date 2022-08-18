@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.7 - 2022-08-18
+
+- Add var dumper caster (#195)
+- Allow direct pipeline call (#193)
+- Rename ArrayableNormalizer (#191)
+- Make normalizers configurable (#190)
+
 ## 2.0.6 - 2022-08-12
 
 - Add cast lazy condition result to bool (#186)
