@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.8 - 2022-08-18
+
+- use AbstractCloner instead of reflection (#196)
+
 ## 2.0.7 - 2022-08-18
 
 - Add var dumper caster (#195)
