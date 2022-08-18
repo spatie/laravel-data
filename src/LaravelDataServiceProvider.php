@@ -31,7 +31,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
                 return;
             }
 
-            if($class::createByContainerInjection() === false){
+            if ($class::createByContainerInjection() === false) {
                 return;
             }
 
