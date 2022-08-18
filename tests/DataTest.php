@@ -30,7 +30,7 @@ use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
+use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
 use Spatie\LaravelData\Normalizers\ArrayNormalizer;
 use Spatie\LaravelData\Normalizers\ModelNormalizer;
 use Spatie\LaravelData\Normalizers\ObjectNormalizer;
@@ -1400,7 +1400,7 @@ class DataTest extends TestCase
                 return DataPipeline::create()
                     ->into(static::class)
                     ->normalizer(ModelNormalizer::class)
-                    ->normalizer(ArraybleNormalizer::class)
+                    ->normalizer(ArrayableNormalizer::class)
                     ->normalizer(ObjectNormalizer::class)
                     ->normalizer(ArrayNormalizer::class)
                     ->through(AuthorizedDataPipe::class)

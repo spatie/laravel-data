@@ -9,7 +9,7 @@ use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
-use Spatie\LaravelData\Normalizers\ArraybleNormalizer;
+use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
 
@@ -70,7 +70,7 @@ class DataFromSomethingResolver
         foreach ($payloads as $payload) {
             if ($payload instanceof Request) {
                 DataPipeline::create()
-                    ->normalizer(ArraybleNormalizer::class)
+                    ->normalizer(ArrayableNormalizer::class)
                     ->into($class)
                     ->through(AuthorizedDataPipe::class)
                     ->through(MapPropertiesDataPipe::class)
