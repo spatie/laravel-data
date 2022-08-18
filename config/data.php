@@ -46,4 +46,12 @@ return [
      * `null` if you want to disable wrapping.
      */
     'wrap' => null,
+
+    /**
+     * Adds a specific caster to the Symphony VarDumper component which hides
+     * some properties from data objects and collections when being dumped
+     * by `dump` or `dd`. Can be 'enabled', 'disabled' or 'development'
+     * which will only enable the caster locally.
+     */
+    'var_dumper_caster_mode' => 'development',
 ];
