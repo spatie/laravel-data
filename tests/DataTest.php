@@ -644,6 +644,37 @@ class DataTest extends TestCase
             'alt_name' => 'Freek from Spatie',
         ], $data->toArray());
     }
+    /** @test */
+    public function it_can_get_the_data_object_without_transforming_properties_names()
+    {
+        $data = new class ('Freek') extends Data {
+            public function __construct(
+                #[MapOutputName('snake_name')]
+                public string $camelName
+            ) {
+            }
+        };
+        $this->assertEquals([
+            'camelName' => 'Freek',
+        ], $data->all());
+    }
+
+    /** @test */
+    public function it_can_get_the_data_object_with_transforming_properties_names()
+    {
+        $data = new class ('Freek', 'Hello World') extends Data {
+            public function __construct(
+                #[MapOutputName('snake_name')]
+                public string $camelName,
+                public string $helloCamelName
+            ) {
+            }
+        };
+        $this->assertEquals([
+            'snake_name' => 'Freek',
+            'helloCamelName' => 'Hello World',
+        ], $data->toArray());
+    }
 
     /** @test */
     public function it_can_append_data_via_method_call()

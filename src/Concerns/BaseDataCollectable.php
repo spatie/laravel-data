@@ -21,6 +21,7 @@ trait BaseDataCollectable
     {
         return new ArrayIterator($this->transform(
             transformValues: false,
+            transformNames: false,
         ));
     }
 
@@ -34,11 +35,13 @@ trait BaseDataCollectable
      */
     public function transform(
         bool $transformValues = true,
+        bool $transformNames = true,
         WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
     ): array {
         $transformer = new DataCollectableTransformer(
             $this->dataClass,
             $transformValues,
+            $transformNames,
             $wrapExecutionType,
             $this->getPartialTrees(),
             $this->items,
