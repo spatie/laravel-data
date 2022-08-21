@@ -646,7 +646,7 @@ class DataTest extends TestCase
         ], $data->toArray());
     }
     /** @test */
-    public function it_can_get_the_data_object_without_transforming_properties_names()
+    public function it_can_get_the_data_object_without_mapping_properties_names()
     {
         $data = new class ('Freek') extends Data {
             public function __construct(
@@ -661,7 +661,7 @@ class DataTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_the_data_object_with_transforming_properties_names()
+    public function it_can_get_the_data_object_with_mapping_properties_names()
     {
         $data = new class ('Freek', 'Hello World') extends Data {
             public function __construct(

@@ -28,15 +28,15 @@ class DataTransformer
 
     public static function create(
         bool $transformValues,
-        bool $transformNames,
+        bool $mappingNames,
         WrapExecutionType $wrapExecutionType
     ): self {
-        return new self($transformValues, $transformNames, $wrapExecutionType);
+        return new self($transformValues, $mappingNames, $wrapExecutionType);
     }
 
     public function __construct(
         protected bool $transformValues,
-        protected bool $transformNames,
+        protected bool $mappingNames,
         protected WrapExecutionType $wrapExecutionType,
     ) {
         $this->config = app(DataConfig::class);
@@ -86,7 +86,7 @@ class DataTransformer
                     return $payload;
                 }
 
-                if ($this->transformNames && $property->outputMappedName) {
+                if ($this->mappingNames && $property->outputMappedName) {
                     $name = $property->outputMappedName;
                 }
 
@@ -229,8 +229,8 @@ class DataTransformer
             default => throw new TypeError('Invalid wrap execution type')
         };
 
-        if ($value instanceof TransformableData && ($this->transformValues || $this->transformNames)) {
-            return $value->transform($this->transformValues, $this->transformNames, $wrapExecutionType);
+        if ($value instanceof TransformableData && ($this->transformValues || $this->mappingNames)) {
+            return $value->transform($this->transformValues, $this->mappingNames, $wrapExecutionType);
         }
 
         return $value;

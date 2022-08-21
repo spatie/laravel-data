@@ -37,13 +37,13 @@ trait BaseDataCollectable
      */
     public function transform(
         bool $transformValues = true,
-        bool $transformNames = true,
+        bool $mappingNames = true,
         WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
     ): array {
         $transformer = new DataCollectableTransformer(
             $this->dataClass,
             $transformValues,
-            $transformNames,
+            $mappingNames,
             $wrapExecutionType,
             $this->getPartialTrees(),
             $this->items,
