@@ -19,7 +19,7 @@ class DataCollectableTransformer
     public function __construct(
         protected string $dataClass,
         protected bool $transformValues,
-        protected bool $mappingNames,
+        protected bool $mapPropertyNames,
         protected WrapExecutionType $wrapExecutionType,
         protected PartialTrees $trees,
         protected Enumerable|CursorPaginator|Paginator $items,
@@ -49,7 +49,7 @@ class DataCollectableTransformer
                 $this->transformValues,
                 fn (Enumerable $collection) => $collection->map(fn (TransformableData $data) => $data->transform(
                     $this->transformValues,
-                    $this->mappingNames,
+                    $this->mapPropertyNames,
                     $this->wrapExecutionType->shouldExecute()
                         ? WrapExecutionType::TemporarilyDisabled
                         : $this->wrapExecutionType

@@ -8,7 +8,7 @@ trait TransformableData
 {
     public function all(): array
     {
-        return $this->transform(transformValues: false, mappingNames: false);
+        return $this->transform(transformValues: false, mapPropertyNames: false);
     }
 
     public function toArray(): array
