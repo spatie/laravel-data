@@ -48,7 +48,7 @@ class DataObject extends Data{
 
 First, you must install the spatie/laravel-typescript-transformer into your project.
 
-```php
+```bash
 composer require spatie/laravel-typescript-transformer
 ```
 
