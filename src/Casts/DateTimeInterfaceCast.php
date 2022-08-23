@@ -37,7 +37,7 @@ class DateTimeInterfaceCast implements Cast
             throw CannotCastDate::create($formats->toArray(), $type, $value);
         }
 
-        if ($this->setTimeZone && ($datetime instanceof DateTime || $datetime instanceof DateTimeImmutable)) {
+        if ($this->setTimeZone) {
             return $datetime->setTimezone(new DateTimeZone($this->setTimeZone));
         }
 

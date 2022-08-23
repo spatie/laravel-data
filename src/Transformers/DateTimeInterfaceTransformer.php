@@ -21,8 +21,7 @@ class DateTimeInterfaceTransformer implements Transformer
         [$format] = Arr::wrap($this->format ?? config('data.date_format'));
 
         /** @var \DateTimeInterface $value */
-
-        if ($this->setTimeZone && ($value instanceof DateTime || $value instanceof DateTimeImmutable)) {
+        if ($this->setTimeZone) {
             $value = (clone $value)->setTimezone(new DateTimeZone($this->setTimeZone));
         }
 

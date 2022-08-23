@@ -56,6 +56,11 @@ parameters:
 			path: src/Attributes/Validation/ValidationAttribute.php
 
 		-
+			message: "#^Call to an undefined method DateTimeInterface\\:\\:setTimezone\\(\\)\\.$#"
+			count: 1
+			path: src/Casts/DateTimeInterfaceCast.php
+
+		-
 			message: "#^Method Spatie\\\\LaravelData\\\\Data\\:\\:from\\(\\) should return static\\(Spatie\\\\LaravelData\\\\Data\\) but returns Spatie\\\\LaravelData\\\\Contracts\\\\BaseData\\.$#"
 			count: 1
 			path: src/Data.php
@@ -129,3 +134,8 @@ parameters:
 			message: "#^Match arm comparison between true and false is always false\\.$#"
 			count: 1
 			path: src/Support/Validation/RulesMapper.php
+
+		-
+			message: "#^Call to an undefined method DateTimeInterface\\:\\:setTimezone\\(\\)\\.$#"
+			count: 1
+			path: src/Transformers/DateTimeInterfaceTransformer.php
