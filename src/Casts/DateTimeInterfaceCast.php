@@ -30,8 +30,8 @@ class DateTimeInterfaceCast implements Cast
 
         /** @var DateTimeInterface|null $datetime */
         $datetime = $formats
-            ->map(fn(string $format) => rescue(fn() => $type::createFromFormat($format, $value), report: false))
-            ->first(fn($value) => (bool) $value);
+            ->map(fn (string $format) => rescue(fn () => $type::createFromFormat($format, $value), report: false))
+            ->first(fn ($value) => (bool) $value);
 
         if (! $datetime) {
             throw CannotCastDate::create($formats->toArray(), $type, $value);
