@@ -2,8 +2,6 @@
 
 namespace Spatie\LaravelData\Casts;
 
-use DateTime;
-use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use Spatie\LaravelData\Exceptions\CannotCastDate;

@@ -2,8 +2,6 @@
 
 namespace Spatie\LaravelData\Transformers;
 
-use DateTime;
-use DateTimeImmutable;
 use DateTimeZone;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\DataProperty;
