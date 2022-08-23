@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.9 - 2022-08-23
+
+- Add support for timezone manipulation in casts and transformers (#200)
+
 ## 2.0.8 - 2022-08-18
 
 - use AbstractCloner instead of reflection (#196)
