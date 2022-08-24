@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Normalizers;
 
-use Illuminate\Support\Str;
 use JsonException;
 
 class JsonNormalizer implements Normalizer

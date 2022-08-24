@@ -3,8 +3,6 @@
 namespace Spatie\LaravelData\Tests\Normalizers;
 
 use Spatie\LaravelData\Exceptions\CannotCreateData;
-use Spatie\LaravelData\Normalizers\JsonNormalizer;
-use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\TestCase;
 
