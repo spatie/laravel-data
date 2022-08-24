@@ -43,6 +43,12 @@ You can create a data object from such a model like this:
 SongData::from(Song::firstOrFail($id));
 ```
 
+Data can also be created from JSON strings:
+
+```php
+SongData::from('{"name" : "Never Gonna Give You Up","artist" : "Rick Astley"}');
+```
+
 The package will find the required properties within the model and use them to construct the data object.
 
 Although the PHP 8.0 constructor properties look great in data objects, it is perfectly valid to use regular properties without a constructor like so:

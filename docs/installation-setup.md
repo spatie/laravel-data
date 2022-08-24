@@ -58,13 +58,26 @@ return [
         Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer::class,
     ],
 
+    /**
+     * Normalizers return an array representation of the payload, or null if
+     * it cannot normalize the payload. The normalizers below are used for
+     * every data object, unless overridden in a specific data object class.
+     */
+    'normalizers' => [
+         Spatie\LaravelData\Normalizers\ModelNormalizer::class,
+         Spatie\LaravelData\Normalizers\ArrayableNormalizer::class,
+         Spatie\LaravelData\Normalizers\ObjectNormalizer::class,
+         Spatie\LaravelData\Normalizers\ArrayNormalizer::class,
+         Spatie\LaravelData\Normalizers\JsonNormalizer::class,
+    ],
+
     /*
      * Data objects can be wrapped into a key like 'data' when used as a resource,
      * this key can be set globally here for all data objects. You can pass in
      * `null` if you want to disable wrapping.
      */
     'wrap' => null,
-    
+
     /**
      * Adds a specific caster to the Symphony VarDumper component which hides
      * some properties from data objects and collections when being dumped
