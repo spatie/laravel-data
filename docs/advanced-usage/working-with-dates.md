@@ -56,3 +56,18 @@ Now when casting a date, a valid format will be searched. When none can be found
 
 When a transformers hasn't explicitly stated it's format, the first format within the array is used.
 
+## Changing time zones
+
+When casting a date you may want to set an alternative timezone this can be achieved as such:
+
+```php
+#[WithCast(DateTimeInterfaceCast::class, setTimeZone: 'Europe/Brussels')]
+public DateTime $date
+```
+
+You can also change the timezone of a property which is getting transformed:
+
+```php
+#[WithTransformer(DateTimeInterfaceTransformer::class, setTimeZone: 'Europe/Brussels')]
+public DateTime $date
+```

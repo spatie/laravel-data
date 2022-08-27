@@ -4,8 +4,10 @@ namespace Spatie\LaravelData\Tests\Casts;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Carbon\CarbonTimeZone;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeZone;
 use Exception;
 use ReflectionProperty;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
@@ -80,6 +82,42 @@ class DateTimeInterfaceCastTest extends TestCase
         $this->assertEquals(
             Uncastable::create(),
             $caster->cast(DataProperty::create(new ReflectionProperty($class, 'int')), '1994-05-16 12:20:00', [])
+        );
+    }
+
+    /** @test */
+    public function it_can_set_an_alternative_timezone()
+    {
+        $caster = new DateTimeInterfaceCast('d-m-Y H:i:s', setTimeZone: 'Europe/Brussels');
+
+        $class = new class () {
+            public Carbon $carbon;
+
+            public CarbonImmutable $carbonImmutable;
+
+            public DateTime $dateTime;
+
+            public DateTimeImmutable $dateTimeImmutable;
+        };
+
+        $this->assertEquals(
+            CarbonTimeZone::create('Europe/Brussels'),
+            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'carbon')), '19-05-1994 00:00:00', [])->getTimezone()
+        );
+
+        $this->assertEquals(
+            CarbonTimeZone::create('Europe/Brussels'),
+            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')), '19-05-1994 00:00:00', [])->getTimezone()
+        );
+
+        $this->assertEquals(
+            new DateTimeZone('Europe/Brussels'),
+            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'dateTime')), '19-05-1994 00:00:00', [])->getTimezone()
+        );
+
+        $this->assertEquals(
+            new DateTimeZone('Europe/Brussels'),
+            $caster->cast(DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')), '19-05-1994 00:00:00', [])->getTimezone()
         );
     }
 }
