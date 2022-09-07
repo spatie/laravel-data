@@ -23,8 +23,6 @@ class DataClassValidationRulesResolver
 
         $overWrittenRules = $this->resolveOverwrittenRules($class, $payload);
 
-        ray($overWrittenRules);
-
         return $this->dataConfig->getDataClass($class)
             ->properties
             ->reject(fn (DataProperty $property) => ! $property->validate)
