@@ -43,13 +43,14 @@ return [
     /**
      * Normalizers return an array representation of the payload, or null if
      * it cannot normalize the payload. The normalizers below are used for
-     * every data object, unless overriden in a specific data object class.
+     * every data object, unless overridden in a specific data object class.
      */
     'normalizers' => [
          Spatie\LaravelData\Normalizers\ModelNormalizer::class,
          Spatie\LaravelData\Normalizers\ArrayableNormalizer::class,
          Spatie\LaravelData\Normalizers\ObjectNormalizer::class,
          Spatie\LaravelData\Normalizers\ArrayNormalizer::class,
+         Spatie\LaravelData\Normalizers\JsonNormalizer::class,
     ],
 
     /*

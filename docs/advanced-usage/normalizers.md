@@ -18,6 +18,7 @@ By default, there are four normalizers for each data object:
 - **ArraybleNormalizer** will cast `Arrayable`'s
 - **ObjectNormalizer** will cast `stdObject`'s
 - **ArrayNormalizer** will cast arrays
+- **JsonNormalizer** will cast json strings
 
 Normalizers can be globally configured in `config/data.php`, and can be configured on a specific data object by overriding the `normalizers` method.
 
@@ -36,6 +37,7 @@ class SongData extends Data
             ArraybleNormalizer::class,
             ObjectNormalizer::class,
             ArrayNormalizer::class,
+            JsonNormalizer::class,
         ];
     }
 }
