@@ -97,14 +97,14 @@ class DataClassValidationRulesResolverTest extends TestCase
     /** @test */
     public function it_can_overwrite_rules_for_the_base_collection_object_which_will_not_affect_the_collected_data_object_rules()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             #[DataCollectionOf(SimpleData::class)]
             public DataCollection $collection;
 
             public static function rules(): array
             {
                 return [
-                    'collection' => ['array', 'required']
+                    'collection' => ['array', 'required'],
                 ];
             }
         };
@@ -116,7 +116,7 @@ class DataClassValidationRulesResolverTest extends TestCase
                     ['invalid' => 'B'],
                 ],
             ]);
-        }catch (ValidationException $exception){
+        } catch (ValidationException $exception) {
             $this->assertArrayHasKey('collection.1.string', $exception->errors());
 
             return;
@@ -151,7 +151,7 @@ class DataClassValidationRulesResolverTest extends TestCase
     {
         $requestMock = $this->mock(Request::class);
         $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn() => $requestMock);
+        $this->app->bind(Request::class, fn () => $requestMock);
 
         $data = new class () extends Data {
             public string $name;
@@ -198,14 +198,14 @@ class DataClassValidationRulesResolverTest extends TestCase
             {
                 return [
                     'property' => [
-                        new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
+                        new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
                     ],
                 ];
             }
         };
 
         $this->assertEquals([
-            'property' => [(new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin)],
+            'property' => [(new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin)],
         ], $this->resolver->execute($data::class)->all());
     }
 }
