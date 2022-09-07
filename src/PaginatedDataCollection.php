@@ -27,6 +27,8 @@ class PaginatedDataCollection implements DataCollectable
     use IncludeableData;
     use WrappableData;
     use TransformableData;
+
+    /** @use \Spatie\LaravelData\Concerns\BaseDataCollectable<TKey, TValue> */
     use BaseDataCollectable;
 
     protected Paginator $items;
