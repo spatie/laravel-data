@@ -21,9 +21,10 @@ trait BaseDataCollectable
     /**  @return \ArrayIterator<TKey, TValue> */
     public function getIterator(): ArrayIterator
     {
-        return new ArrayIterator($this->transform(
-            transformValues: false,
-        ));
+        /** @var array<TValue> $data */
+        $data = $this->transform(transformValues: false);
+
+        return new ArrayIterator($data);
     }
 
     public function count(): int

@@ -23,7 +23,6 @@ use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
  *
  * @implements \ArrayAccess<TKey, TValue>
  * @implements  DataCollectable<TKey, TValue>
- * @uses BaseDataCollectable<TKey, TValue>
  */
 class DataCollection implements DataCollectable, ArrayAccess
 {
