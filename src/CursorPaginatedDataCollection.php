@@ -19,6 +19,7 @@ use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
  * @template TValue
  *
  * @implements  DataCollectable<TKey, TValue>
+ * @uses BaseDataCollectable<TKey, TValue>
  */
 class CursorPaginatedDataCollection implements DataCollectable
 {

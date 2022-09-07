@@ -8,15 +8,17 @@ use Spatie\LaravelData\Transformers\DataCollectableTransformer;
 
 /**
  * @template TKey of array-key
+ * @template TValue
  */
 trait BaseDataCollectable
 {
+    /** @return class-string<TValue> */
     public function getDataClass(): string
     {
         return $this->dataClass;
     }
 
-    /**  @return \ArrayIterator<TKey, array> */
+    /**  @return \ArrayIterator<TKey, TValue> */
     public function getIterator(): ArrayIterator
     {
         return new ArrayIterator($this->transform(
@@ -30,7 +32,7 @@ trait BaseDataCollectable
     }
 
     /**
-     * @return array<array>
+     * @return array<array|TValue>
      */
     public function transform(
         bool $transformValues = true,
