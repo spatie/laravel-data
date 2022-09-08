@@ -2403,4 +2403,17 @@ class DataTest extends TestCase
 
         SimpleData::from([]);
     }
+
+    /** @test */
+    public function it_can_inherit_properties_from_a_base_class()
+    {
+        $dataClass = new class ('') extends SimpleData {
+            public int $int;
+        };
+
+        $data = $dataClass::from(['string' => 'Hi', 'int' => 42]);
+
+        $this->assertEquals('Hi', $data->string);
+        $this->assertEquals(42, $data->int);
+    }
 }

@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Tests\Resolvers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
+use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\WithoutValidation;
@@ -91,6 +92,37 @@ class DataClassValidationRulesResolverTest extends TestCase
             'collection' => ['array', 'present'],
             'collection.*.string' => ['string', 'required', 'min:10', 'max:100'],
         ], $this->resolver->execute($data::class)->all());
+    }
+
+    /** @test */
+    public function it_can_overwrite_rules_for_the_base_collection_object_which_will_not_affect_the_collected_data_object_rules()
+    {
+        $dataClass = new class () extends Data {
+            #[DataCollectionOf(SimpleData::class)]
+            public DataCollection $collection;
+
+            public static function rules(): array
+            {
+                return [
+                    'collection' => ['array', 'required'],
+                ];
+            }
+        };
+
+        try {
+            $dataClass::validate([
+                'collection' => [
+                    ['string' => 'A'],
+                    ['invalid' => 'B'],
+                ],
+            ]);
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('collection.1.string', $exception->errors());
+
+            return;
+        }
+
+        $this->fail('We should not end up here');
     }
 
     /** @test */

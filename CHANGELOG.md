@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.10 - 2022-09-07
+
+- Add support for a JsonSerializer
+- Fix generic iterator definition for data collections
+- Fix validation of DataCollection objects not working as expected
+
 ## 2.0.9 - 2022-08-23
 
 - Add support for timezone manipulation in casts and transformers (#200)

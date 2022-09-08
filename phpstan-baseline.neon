@@ -71,7 +71,7 @@ parameters:
 			path: src/Data.php
 
 		-
-			message: "#^PHPDoc tag @return with type Spatie\\\\LaravelData\\\\DataCollection\\<int, mixed\\> is not subtype of native type static\\(Spatie\\\\LaravelData\\\\DataCollection\\<TKey of \\(int\\|string\\), TValue\\>\\)\\.$#"
+			message: "#^PHPDoc tag @return with type Spatie\\\\LaravelData\\\\DataCollection\\<int, TValue\\> is not subtype of native type static\\(Spatie\\\\LaravelData\\\\DataCollection\\<TKey of \\(int\\|string\\), TValue\\>\\)\\.$#"
 			count: 1
 			path: src/DataCollection.php
 
