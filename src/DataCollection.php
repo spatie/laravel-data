@@ -26,14 +26,11 @@ use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
  */
 class DataCollection implements DataCollectable, ArrayAccess
 {
-    /** @use \Spatie\LaravelData\Concerns\BaseDataCollectable<TKey, TValue> */
     use BaseDataCollectable;
     use ResponsableData;
     use IncludeableData;
     use WrappableData;
     use TransformableData;
-
-    /** @use \Spatie\LaravelData\Concerns\EnumerableMethods<TKey, TValue> */
     use EnumerableMethods;
 
     /** @var Enumerable<TKey, TValue> */

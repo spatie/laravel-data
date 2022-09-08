@@ -26,8 +26,6 @@ class CursorPaginatedDataCollection implements DataCollectable
     use IncludeableData;
     use WrappableData;
     use TransformableData;
-
-    /** @use \Spatie\LaravelData\Concerns\BaseDataCollectable<TKey, TValue> */
     use BaseDataCollectable;
 
     /** @var CursorPaginator<TValue> */
