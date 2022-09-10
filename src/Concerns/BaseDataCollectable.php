@@ -37,8 +37,8 @@ trait BaseDataCollectable
      */
     public function transform(
         bool $transformValues = true,
-        bool $mapPropertyNames = true,
         WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
+        bool $mapPropertyNames = true,
     ): array {
         $transformer = new DataCollectableTransformer(
             $this->dataClass,
