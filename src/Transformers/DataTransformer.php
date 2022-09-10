@@ -27,16 +27,16 @@ class DataTransformer
 
     public static function create(
         bool $transformValues,
+        WrapExecutionType $wrapExecutionType,
         bool $mapPropertyNames,
-        WrapExecutionType $wrapExecutionType
     ): self {
-        return new self($transformValues, $mapPropertyNames, $wrapExecutionType);
+        return new self($transformValues, $wrapExecutionType, $mapPropertyNames);
     }
 
     public function __construct(
         protected bool $transformValues,
-        protected bool $mapPropertyNames,
         protected WrapExecutionType $wrapExecutionType,
+        protected bool $mapPropertyNames,
     ) {
         $this->config = app(DataConfig::class);
     }
@@ -71,7 +71,7 @@ class DataTransformer
             ->reduce(function (array $payload, DataProperty $property) use ($data, $trees) {
                 $name = $property->name;
 
-                if (! $this->shouldIncludeProperty($name, $data->{$name}, $trees)) {
+                if (!$this->shouldIncludeProperty($name, $data->{$name}, $trees)) {
                     return $payload;
                 }
 
@@ -108,7 +108,7 @@ class DataTransformer
             return false;
         }
 
-        if (! $value instanceof Lazy) {
+        if (!$value instanceof Lazy) {
             return true;
         }
 
@@ -210,7 +210,7 @@ class DataTransformer
             return $transformer->transform($property, $value);
         }
 
-        if (! $value instanceof BaseData && ! $value instanceof BaseDataCollectable) {
+        if (!$value instanceof BaseData && !$value instanceof BaseDataCollectable) {
             return $value;
         }
 
@@ -221,8 +221,8 @@ class DataTransformer
         if ($value instanceof TransformableData && $this->shouldTransformData()) {
             return $value->transform(
                 $this->transformValues,
+                $this->wrapExecutionType->selectedBy($value),
                 $this->mapPropertyNames,
-                $this->wrapExecutionType->selectedBy($value)
             );
         }
 

@@ -22,7 +22,7 @@ trait BaseDataCollectable
     public function getIterator(): ArrayIterator
     {
         /** @var array<TValue> $data */
-        $data = $this->transform(transformValues: false,mapPropertyNames: false);
+        $data = $this->transform(transformValues: false, mapPropertyNames: false);
 
         return new ArrayIterator($data);
     }
@@ -37,8 +37,8 @@ trait BaseDataCollectable
      */
     public function transform(
         bool $transformValues = true,
-        bool $mapPropertyNames = true,
         WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
+        bool $mapPropertyNames = true,
     ): array {
         $transformer = new DataCollectableTransformer(
             $this->dataClass,

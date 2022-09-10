@@ -49,10 +49,10 @@ class DataCollectableTransformer
                 $this->transformValues,
                 fn (Enumerable $collection) => $collection->map(fn (TransformableData $data) => $data->transform(
                     $this->transformValues,
-                    $this->mapPropertyNames,
                     $this->wrapExecutionType->shouldExecute()
                         ? WrapExecutionType::TemporarilyDisabled
-                        : $this->wrapExecutionType
+                        : $this->wrapExecutionType,
+                    $this->mapPropertyNames,
                 ))
             )
             ->all();
