@@ -60,6 +60,10 @@ return [
      */
     'wrap' => null,
 
+ /*
+ */
+    'lock_mapping' => true,
+
     /**
      * Adds a specific caster to the Symphony VarDumper component which hides
      * some properties from data objects and collections when being dumped

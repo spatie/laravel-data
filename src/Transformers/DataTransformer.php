@@ -20,7 +20,6 @@ use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
-use TypeError;
 
 class DataTransformer
 {
@@ -219,18 +218,12 @@ class DataTransformer
             $value->withPartialTrees($trees);
         }
 
-        $wrapExecutionType = match (true) {
-            $value instanceof BaseData && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
-            $value instanceof BaseData && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
-            $value instanceof BaseData && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled,
-            $value instanceof BaseDataCollectable && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::Enabled,
-            $value instanceof BaseDataCollectable && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
-            $value instanceof BaseDataCollectable && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled,
-            default => throw new TypeError('Invalid wrap execution type')
-        };
-
-        if ($value instanceof TransformableData && ($this->transformValues || $this->mapPropertyNames)) {
-            return $value->transform($this->transformValues, $this->mapPropertyNames, $wrapExecutionType);
+        if ($this->shouldTransformData($value instanceof TransformableData)) {
+            return $value->transform(
+                $this->transformValues,
+                $this->mapPropertyNames,
+                $this->wrapExecutionType->selectedBy($value)
+            );
         }
 
         return $value;
@@ -254,5 +247,12 @@ class DataTransformer
         }
 
         return $transformer;
+    }
+
+    private function shouldTransformData(bool $isTransformableData): bool
+    {
+        return $isTransformableData
+            && ($this->transformValues ||
+                ($this->mapPropertyNames && config('data.lock_mapping')));
     }
 }
