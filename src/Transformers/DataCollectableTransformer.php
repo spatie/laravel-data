@@ -19,8 +19,8 @@ class DataCollectableTransformer
     public function __construct(
         protected string $dataClass,
         protected bool $transformValues,
-        protected bool $mapPropertyNames,
         protected WrapExecutionType $wrapExecutionType,
+        protected bool $mapPropertyNames,
         protected PartialTrees $trees,
         protected Enumerable|CursorPaginator|Paginator $items,
         protected Wrap $wrap,

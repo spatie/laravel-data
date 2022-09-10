@@ -43,8 +43,8 @@ trait BaseDataCollectable
         $transformer = new DataCollectableTransformer(
             $this->dataClass,
             $transformValues,
-            $mapPropertyNames,
             $wrapExecutionType,
+            $mapPropertyNames,
             $this->getPartialTrees(),
             $this->items,
             $this->getWrap(),
