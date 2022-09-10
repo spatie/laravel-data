@@ -218,7 +218,7 @@ class DataTransformer
             $value->withPartialTrees($trees);
         }
 
-        if ($this->shouldTransformData($value instanceof TransformableData)) {
+        if ($value instanceof TransformableData && $this->shouldTransformData()) {
             return $value->transform(
                 $this->transformValues,
                 $this->mapPropertyNames,
@@ -233,7 +233,7 @@ class DataTransformer
         DataProperty $property,
         mixed $value,
     ): ?Transformer {
-        if (! $this->transformValues) {
+        if (!$this->transformValues) {
             return null;
         }
 
@@ -249,10 +249,9 @@ class DataTransformer
         return $transformer;
     }
 
-    private function shouldTransformData(bool $isTransformableData): bool
+    private function shouldTransformData(): bool
     {
-        return $isTransformableData
-            && ($this->transformValues ||
-                ($this->mapPropertyNames && config('data.lock_mapping')));
+        return $this->transformValues ||
+            ($this->mapPropertyNames && config('data.lock_mapping'));
     }
 }
