@@ -22,7 +22,7 @@ trait BaseDataCollectable
     public function getIterator(): ArrayIterator
     {
         /** @var array<TValue> $data */
-        $data = $this->transform(transformValues: false, mapPropertyNames: false);
+        $data = $this->transform(transformValues: false);
 
         return new ArrayIterator($data);
     }
