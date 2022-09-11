@@ -72,7 +72,7 @@ The package will look through these global transformers and tries to find a suit
 
 ## Getting a data object without transforming
 
-It is possible to get an array representation of a data object without transforming the properties. This means `Carbon` objects won't be transformed into strings. And also, nested data objects, `DataCollection`s won't be transformed into arrays and the names of the properties won't be change by `MapOutputName` . You can do this by calling the `all` method on a data object like this:
+It is possible to get an array representation of a data object without transforming the properties. This means `Carbon` objects won't be transformed into strings. And also, nested data objects and `DataCollection`s won't be transformed into arrays. You can do this by calling the `all` method on a data object like this:
 
 ```php
 ArtistData::from($artist)->all();
