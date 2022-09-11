@@ -46,11 +46,11 @@ return [
      * every data object, unless overridden in a specific data object class.
      */
     'normalizers' => [
-         Spatie\LaravelData\Normalizers\ModelNormalizer::class,
-         Spatie\LaravelData\Normalizers\ArrayableNormalizer::class,
-         Spatie\LaravelData\Normalizers\ObjectNormalizer::class,
-         Spatie\LaravelData\Normalizers\ArrayNormalizer::class,
-         Spatie\LaravelData\Normalizers\JsonNormalizer::class,
+        Spatie\LaravelData\Normalizers\ModelNormalizer::class,
+        Spatie\LaravelData\Normalizers\ArrayableNormalizer::class,
+        Spatie\LaravelData\Normalizers\ObjectNormalizer::class,
+        Spatie\LaravelData\Normalizers\ArrayNormalizer::class,
+        Spatie\LaravelData\Normalizers\JsonNormalizer::class,
     ],
 
     /*
@@ -59,10 +59,6 @@ return [
      * `null` if you want to disable wrapping.
      */
     'wrap' => null,
-
- /*
- */
-    'lock_mapping' => true,
 
     /**
      * Adds a specific caster to the Symphony VarDumper component which hides
