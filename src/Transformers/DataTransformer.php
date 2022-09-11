@@ -71,7 +71,7 @@ class DataTransformer
             ->reduce(function (array $payload, DataProperty $property) use ($data, $trees) {
                 $name = $property->name;
 
-                if (!$this->shouldIncludeProperty($name, $data->{$name}, $trees)) {
+                if (! $this->shouldIncludeProperty($name, $data->{$name}, $trees)) {
                     return $payload;
                 }
 
@@ -108,7 +108,7 @@ class DataTransformer
             return false;
         }
 
-        if (!$value instanceof Lazy) {
+        if (! $value instanceof Lazy) {
             return true;
         }
 
@@ -210,7 +210,7 @@ class DataTransformer
             return $transformer->transform($property, $value);
         }
 
-        if (!$value instanceof BaseData && !$value instanceof BaseDataCollectable) {
+        if (! $value instanceof BaseData && ! $value instanceof BaseDataCollectable) {
             return $value;
         }
 
@@ -218,7 +218,7 @@ class DataTransformer
             $value->withPartialTrees($trees);
         }
 
-        if ($value instanceof TransformableData && $this->shouldTransformData()) {
+        if ($value instanceof TransformableData && $this->transformValues) {
             return $value->transform(
                 $this->transformValues,
                 $this->wrapExecutionType->selectedBy($value),
@@ -233,7 +233,7 @@ class DataTransformer
         DataProperty $property,
         mixed $value,
     ): ?Transformer {
-        if (!$this->transformValues) {
+        if (! $this->transformValues) {
             return null;
         }
 
@@ -247,11 +247,5 @@ class DataTransformer
         }
 
         return $transformer;
-    }
-
-    private function shouldTransformData(): bool
-    {
-        return $this->transformValues ||
-            ($this->mapPropertyNames && config('data.lock_mapping'));
     }
 }
