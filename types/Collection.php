@@ -6,20 +6,15 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
-use Spatie\LaravelData\CursorPaginatedDataCollection;
-use function PHPStan\dumpType;
 use function PHPStan\Testing\assertType;
 
-use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 // Regular collections
 $collection = SimpleData::collection(['A', 'B']);
-assertType(DataCollection::class, $collection);
+assertType('Spatie\LaravelData\DataCollection<(int|string), Spatie\LaravelData\Tests\Fakes\SimpleData>', $collection);
 $collection = SimpleData::collection(collect(['A', 'B']));
-assertType(DataCollection::class, $collection);
-
+assertType('Spatie\LaravelData\DataCollection<(int|string), Spatie\LaravelData\Tests\Fakes\SimpleData>', $collection);
 
 // PaginatedDataCollection
 $items = Collection::times(100, fn (int $index) => "Item {$index}");
@@ -32,7 +27,7 @@ $paginator = new LengthAwarePaginator(
 
 $collection = SimpleData::collection($paginator);
 
-assertType(PaginatedDataCollection::class, $collection);
+assertType('Spatie\LaravelData\PaginatedDataCollection<(int|string), Spatie\LaravelData\Tests\Fakes\SimpleData>', $collection);
 
 // CursorPaginatedDataCollection
 $items = Collection::times(100, fn (int $index) => "Item {$index}");
@@ -44,4 +39,4 @@ $paginator = new CursorPaginator(
 
 $collection = SimpleData::collection($paginator);
 
-assertType(CursorPaginatedDataCollection::class, $collection);
+assertType('Spatie\LaravelData\CursorPaginatedDataCollection<(int|string), Spatie\LaravelData\Tests\Fakes\SimpleData>', $collection);
