@@ -45,6 +45,10 @@ Why would you be using this package?
 
 Let's dive right into it!
 
+## Are you a visual learner?
+
+In this talk, given at Laracon, you'll see [an introduction to Laravel Data](https://www.youtube.com/watch?v=f4QShF42c6E&t=29110s).
+
 ## We have badges!
 
 <section class="article_badges">
