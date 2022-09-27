@@ -10,5 +10,6 @@ class SimpleDataWithExplicitValidationRuleAttributeData extends Data
     public function __construct(
         #[Email]
         public string $email,
-    ) {}
+    ) {
+    }
 }
