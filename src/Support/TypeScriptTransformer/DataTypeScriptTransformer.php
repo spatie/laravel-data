@@ -120,10 +120,10 @@ class DataTypeScriptTransformer extends DtoTransformer
             ])),
             'meta' => new StructType([
                 'current_page' => new Integer(),
-                'first_page_url' => new Nullable(new String_()),
+                'first_page_url' => new String_(),
                 'from' => new Nullable(new Integer()),
                 'last_page' => new Integer(),
-                'last_page_url' => new Nullable(new String_()),
+                'last_page_url' => new String_(),
                 'next_page_url' => new Nullable(new String_()),
                 'path' => new String_(),
                 'per_page' => new Integer(),
