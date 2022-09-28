@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.11 - 2022-09-28
+
+- Use generics with Data::collection (#213)
+- Improve pattern matching in DataCollectionAnnotationReader (#214)
+- Fix TypeScript Transformer paginated collections, first and last page url are never null (#215)
+
 ## 2.0.10 - 2022-09-07
 
 - Add support for a JsonSerializer
