@@ -13,29 +13,20 @@ use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\PaginatedDataCollection;
 
 /**
- * @template TValue of object
+ * @template TValue
  */
 interface BaseData
 {
-    /**
-     * @return TValue|null
-     */
-    public static function optional(mixed ...$payloads): ?object;
+    public static function optional(mixed ...$payloads): ?static;
+
+    public static function from(mixed ...$payloads): static;
+
+    public static function withoutMagicalCreationFrom(mixed ...$payloads): static;
 
     /**
-     * @return TValue
-     */
-    public static function from(mixed ...$payloads): object;
-
-    /**
-     * @return TValue
-     */
-    public static function withoutMagicalCreationFrom(mixed ...$payloads): object;
-
-    /**
-     * @param \Illuminate\Support\Enumerable|array|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|\Spatie\LaravelData\DataCollection $items
+     * @param \Illuminate\Support\Enumerable<array-key, TValue>|TValue[]|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|\Spatie\LaravelData\DataCollection<array-key, TValue> $items
      *
-     * @return ($items is \Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Pagination\CursorPaginator ? \Spatie\LaravelData\CursorPaginatedDataCollection : ($items is \Illuminate\Pagination\Paginator|\Illuminate\Pagination\AbstractPaginator ? \Spatie\LaravelData\PaginatedDataCollection : \Spatie\LaravelData\DataCollection))
+     * @return ($items is \Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Pagination\CursorPaginator ? \Spatie\LaravelData\CursorPaginatedDataCollection<array-key, static> : ($items is \Illuminate\Pagination\Paginator|\Illuminate\Pagination\AbstractPaginator ? \Spatie\LaravelData\PaginatedDataCollection<array-key, static> : \Spatie\LaravelData\DataCollection<array-key, static>))
      */
     public static function collection(Enumerable|array|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator|DataCollection $items): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection;
 
