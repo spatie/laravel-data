@@ -48,6 +48,10 @@ Why would you be using this package?
 - You need to write a lot less of validation rules because they are obvious through PHP's type system
 - You get TypeScript versions of the data objects for free
 
+## Are you a visual learner?
+
+In this talk, given at Laracon, you'll see [an introduction to Laravel Data](https://www.youtube.com/watch?v=f4QShF42c6E&t=29110s).
+
 ## Support us
 
 [<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-data.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-data)
