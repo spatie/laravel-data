@@ -271,25 +271,6 @@ class DataTypeTest extends TestCase
     }
 
     /** @test */
-    public function it_can_deduce_a_data_collection_from_annotation()
-    {
-        $type = $this->resolveDataType(new class () {
-            /** @var DataCollection<array-key, \Spatie\LaravelData\Tests\Fakes\SimpleData> */
-            public DataCollection $property;
-        });
-
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertTrue($type->isDataCollectable);
-        $this->assertEquals(DataCollectableType::Default, $type->dataCollectableType);
-        $this->assertEquals(SimpleData::class, $type->dataClass);
-        $this->assertEquals([DataCollection::class], array_keys($type->acceptedTypes));
-    }
-
-    /** @test */
     public function it_can_deduce_a_data_collection_union_type()
     {
         $type = $this->resolveDataType(new class () {

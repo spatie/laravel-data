@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support;
 
-use Illuminate\Support\Str;
 use phpDocumentor\Reflection\FqsenResolver;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use ReflectionProperty;
@@ -19,13 +18,13 @@ class DataCollectionAnnotationReader
             return null;
         }
 
-        $fqsenPattern = '[\\\\a-z0-9_]+';
-        $keyPattern = 'int|string|\(int\|string\)|array-key';
+        preg_match(
+            '/\??(?<array>[\\\\A-Za-z0-9]*)\[\]|([\\\\A-Za-z0-9?]*)<(?<collection>[\\\\A-Za-z0-9]*)>/',
+            $comment,
+            $matches,
+        );
 
-        $array = fn () => Str::of($comment)->match("/{$fqsenPattern}\[\]/i")->toString();
-        $collection = fn () => Str::of($comment)->match("/{$fqsenPattern}<(?:{$keyPattern},\s*)({$fqsenPattern})>/i")->toString();
-
-        $class = $collection() ?: $array() ?: null;
+        $class = $matches['collection'] ?? $matches['array'] ?? null;
 
         if ($class === null) {
             return null;
