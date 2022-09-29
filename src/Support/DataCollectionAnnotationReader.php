@@ -22,8 +22,8 @@ class DataCollectionAnnotationReader
         $fqsenPattern = '[\\\\a-z0-9_]+';
         $keyPattern = '(?:int|string|\(int\|string\)|array-key)';
 
-        $array = fn () => Str::of($comment)->match("/({$fqsenPattern})\[\]/i")->toString();
-        $collection = fn () => Str::of($comment)->match("/{$fqsenPattern}<(?:{$keyPattern},\s*)?({$fqsenPattern})>/i")->toString();
+        $array = fn () => (string) Str::of($comment)->match("/({$fqsenPattern})\[\]/i");
+        $collection = fn () => (string) Str::of($comment)->match("/{$fqsenPattern}<(?:{$keyPattern},\s*)?({$fqsenPattern})>/i");
 
         $class = $collection() ?: $array() ?: null;
 
