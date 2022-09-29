@@ -225,52 +225,6 @@ class PostData extends Data
 
 There's still much more you can do with validating data objects. Read more about it [here](/docs/laravel-data/v2/as-a-data-transfer-object/request-to-data-object#validating-a-request).
 
-## Retrieving validation rules
-Sometimes you just want to use the validation rules defined by your data object before using it.
-
-If we take our previous example object `PostData` we can do just that by calling the nifty method `getValidationRules` to retrieve all the rules defined by the data object.
-In this example the rules have been inferred by the argument types and validation attributes used but this method will also work with rules defined by a static `rules` method on the data object.
-
-```php
-dd(PostData::getValidationRules());
-[
-  "title" => [
-    0 => "string"
-    1 => "max:200"
-    2 => "required"
-  ],
-  "content" => [
-    0 => "string"
-    1 => "required"
-  ],
-  "status" => [
-    0 => "string"
-    1 => "in:'draft','published','archived'"
-    2 => "required"
-  ],
-  "published_at" => [
-    0 => "date"
-    1 => "nullable"
-  ],
-]
-```
-
-In case you do not need every rule defined by the object you can also define a selection of rules to retrieve by providing the names of the fields you want the validation rules for.
-
-```php
-dd(PostData::getValidationRules('title', 'content'));
-[
-  "title" => [
-    0 => "string"
-    1 => "max:200"
-    2 => "required"
-  ],
-  "content" => [
-    0 => "string"
-    1 => "required"
-  ],
-]
-```
 ## Working with Eloquent models
 
 In our application, we have a `Post` Eloquent model:

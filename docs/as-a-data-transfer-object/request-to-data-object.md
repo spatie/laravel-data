@@ -532,3 +532,43 @@ It is possible to return a data object when the payload is valid when calling:
 ```php
 SongData::validateAndCreate(['title' => 'Never gonna give you up', 'artist' => 'Rick Astley']); 
 ```
+
+## Retrieving validation rules for a data object
+
+You can retrieve the validation rules a data object will generate as such:
+
+```php
+AlbumData::getValidationRules();
+```
+
+This will produce the following array with rules:
+
+```php
+[
+    'title' => ['required', 'string'],
+    'songs' => ['required', 'array'],
+    'songs.*.title' => ['required', 'string'],
+    'songs.*.artist' => ['required', 'string'],
+]
+```
+
+You can also select specific fields as such:
+
+```php
+AlbumData::getValidationRules(['title']);
+```
+
+Which will provide you the following rules:
+
+```php
+[
+    'title' => ['required', 'string'],
+]
+```
+
+When you're having rules depending on a specific payload, you can provide the payload:
+
+```php
+AlbumData::getValidationRules(payload: $payload);
+```
+

@@ -53,16 +53,16 @@ trait ValidateableData
         return;
     }
 
-    public static function getValidationRules(string ...$fields): array
-    {
-        $rules = app(DataValidatorResolver::class)
-            ->execute(static::class, [])
-            ->getRules();
+    public static function getValidationRules(
+        array $fields = [],
+        array $payload = []
+    ): array {
+        $rules = app(DataValidatorResolver::class)->execute(static::class, $payload)->getRules();
 
         if (count($fields) === 0) {
             return $rules;
         }
 
-        return array_filter($rules, fn (string $key): bool => in_array($key, $fields, true), ARRAY_FILTER_USE_KEY);
+        return array_filter($rules, fn(string $key): bool => in_array($key, $fields, true), ARRAY_FILTER_USE_KEY);
     }
 }

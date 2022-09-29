@@ -68,8 +68,10 @@ use Spatie\LaravelData\Tests\Fakes\PartialClassConditionalData;
 use Spatie\LaravelData\Tests\Fakes\ReadonlyData;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithWrap;
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataCollectionTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataTransformer;
@@ -2384,5 +2386,30 @@ class DataTest extends TestCase
 
         $this->assertEquals('Hi', $data->string);
         $this->assertEquals(42, $data->int);
+    }
+
+    /** @test */
+    public function it_can_get_the_validation_rules_for_a_data_object(): void
+    {
+        $this->assertSame([
+            'first' => ['string', 'required'],
+            'second' => ['string', 'required'],
+        ], MultiData::getValidationRules());
+    }
+
+    /** @test */
+    public function it_can_get_the_validation_rules_for_a_data_object_using_attributes(): void
+    {
+        $this->assertSame([
+            'email' => ['string', 'email:rfc', 'required'],
+        ], SimpleDataWithExplicitValidationRuleAttributeData::getValidationRules());
+    }
+
+    /** @test */
+    public function it_can_get_the_validation_rules_for_a_data_object_for_specific_fields(): void
+    {
+        $this->assertSame([
+            'first' => ['string', 'required'],
+        ], MultiData::getValidationRules(fields: ['first']));
     }
 }
