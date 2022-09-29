@@ -15,13 +15,13 @@ class ValidateableDataTest extends TestCase
         $this->assertSame([
             'first' => ['string', 'required'],
             'second' => ['string', 'required'],
-        ], MultiData::getRules());
+        ], MultiData::getValidationRules());
     }
 
     /** @test */
     public function it_will_detect_validation_rules_when_set_via_the_static_rules_method(): void
     {
-        $this->assertSame(SimpleDataWithOverwrittenRules::rules(), SimpleDataWithOverwrittenRules::getRules());
+        $this->assertSame(SimpleDataWithOverwrittenRules::rules(), SimpleDataWithOverwrittenRules::getValidationRules());
     }
 
     /** @test */
@@ -29,7 +29,7 @@ class ValidateableDataTest extends TestCase
     {
         $this->assertSame([
             'email' => ['string', 'email:rfc', 'required'],
-        ], SimpleDataWithExplicitValidationRuleAttributeData::getRules());
+        ], SimpleDataWithExplicitValidationRuleAttributeData::getValidationRules());
     }
 
     /** @test */
@@ -37,6 +37,6 @@ class ValidateableDataTest extends TestCase
     {
         $this->assertSame([
             'first' => ['string', 'required'],
-        ], MultiData::getRules('first'));
+        ], MultiData::getValidationRules('first'));
     }
 }

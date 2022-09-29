@@ -53,7 +53,7 @@ trait ValidateableData
         return;
     }
 
-    public static function getRules(string ...$fields): array
+    public static function getValidationRules(string ...$fields): array
     {
         $rules = app(DataValidatorResolver::class)
             ->execute(static::class, [])
