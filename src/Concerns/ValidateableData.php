@@ -63,6 +63,6 @@ trait ValidateableData
             return $rules;
         }
 
-        return array_filter($rules, fn(string $key): bool => in_array($key, $fields, true), ARRAY_FILTER_USE_KEY);
+        return array_filter($rules, fn (string $key): bool => in_array($key, $fields, true), ARRAY_FILTER_USE_KEY);
     }
 }

@@ -71,7 +71,6 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithWrap;
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataCollectionTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataTransformer;
