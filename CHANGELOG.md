@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.12 - 2022-09-29
+
+- Improve pattern matching in DataCollectionAnnotationReader (#214)
+- Add ability to retrieve rules for a data object (#221)
+
 ## 2.0.11 - 2022-09-28
 
 - Use generics with Data::collection (#213)
