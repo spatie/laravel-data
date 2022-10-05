@@ -42,6 +42,7 @@ use Spatie\LaravelData\Attributes\Validation\EndsWith;
 use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\ExcludeIf;
 use Spatie\LaravelData\Attributes\Validation\ExcludeUnless;
+use Spatie\LaravelData\Attributes\Validation\ExcludeWithout;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\File;
 use Spatie\LaravelData\Attributes\Validation\Filled;
@@ -252,6 +253,12 @@ class RulesTest extends TestCase
         yield $this->fixature(
             attribute: new ExcludeUnless('field', 42),
             expected: 'exclude_unless:field,42',
+        );
+
+        yield $this->fixature(
+            attribute: new ExcludeWithout('field'),
+            expected: 'exclude_without:field',
+            expectCreatedAttribute: new ExcludeWithout('field')
         );
 
         yield $this->fixature(
