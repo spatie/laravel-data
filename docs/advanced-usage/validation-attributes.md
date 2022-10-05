@@ -37,7 +37,7 @@ class CustomRule extends ValidationRule
 
 ### Accepted
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-accepted)
+[Docs](https://laravel.com/docs/9.x/validation#rule-accepted)
 
 ```php
 #[Accepted]
@@ -46,7 +46,7 @@ public bool $value;
 
 ### AcceptedIf
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-accepted-if)
+[Docs](https://laravel.com/docs/9.x/validation#rule-accepted-if)
 
 ```php
 #[AcceptedIf('other_field', 'equals_this')]
@@ -55,7 +55,7 @@ public bool $value;
 
 ### ActiveUrl
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-active-url)
+[Docs](https://laravel.com/docs/9.x/validation#rule-active-url)
 
 ```php
 #[ActiveUrl]
@@ -64,7 +64,7 @@ public string $value;
 
 ### After
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-after)
+[Docs](https://laravel.com/docs/9.x/validation#rule-after)
 
 ```php
 #[After('other_field')]
@@ -79,7 +79,7 @@ public Carbon $value;
 
 ### AfterOrEqual
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-after-or-equal)
+[Docs](https://laravel.com/docs/9.x/validation#rule-after-or-equal)
 
 ```php
 #[AfterOrEqual('other_field')]
@@ -94,7 +94,7 @@ public Carbon $value;
 
 ### Alpha
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-alpha)
+[Docs](https://laravel.com/docs/9.x/validation#rule-alpha)
 
 ```php
 #[Alpha]
@@ -103,7 +103,7 @@ public string $value;
 
 ### AlphaDash
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-alpha-dash)
+[Docs](https://laravel.com/docs/9.x/validation#rule-alpha-dash)
 
 ```php
 #[AlphaDash]
@@ -112,7 +112,7 @@ public string $value;
 
 ### AlphaNumeric
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-alpha-num)
+[Docs](https://laravel.com/docs/9.x/validation#rule-alpha-num)
 
 ```php
 #[AlphaNumeric]
@@ -121,7 +121,7 @@ public string $value;
 
 ### ArrayType
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-array)
+[Docs](https://laravel.com/docs/9.x/validation#rule-array)
 
 ```php
 #[ArrayType]
@@ -136,7 +136,7 @@ public array $value;
 
 ### Bail
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-bail)
+[Docs](https://laravel.com/docs/9.x/validation#rule-bail)
 
 ```php
 #[Bail]
@@ -145,7 +145,7 @@ public string $value;
 
 ### Before
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-before)
+[Docs](https://laravel.com/docs/9.x/validation#rule-before)
 
 ```php
 #[Before('other_field')]
@@ -160,7 +160,7 @@ public Carbon $value;
 
 ### BeforeOrEqual
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-before-or-equal)
+[Docs](https://laravel.com/docs/9.x/validation#rule-before-or-equal)
 
 ```php
 #[BeforeOrEqual('other_field')]
@@ -175,7 +175,7 @@ public Carbon $value;
 
 ### Between
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-between)
+[Docs](https://laravel.com/docs/9.x/validation#rule-between)
 
 ```php
 #[Between(3.14, 42)]
@@ -184,7 +184,7 @@ public int $value;
 
 ### BooleanType
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-boolean)
+[Docs](https://laravel.com/docs/9.x/validation#rule-boolean)
 
 ```php
 #[BooleanType]
@@ -193,7 +193,7 @@ public bool $value;
 
 ### Confirmed
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-confirmed)
+[Docs](https://laravel.com/docs/9.x/validation#rule-confirmed)
 
 ```php
 #[Confirmed]
@@ -202,7 +202,7 @@ public string $value;
 
 ### CurrentPassword
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-current-password)
+[Docs](https://laravel.com/docs/9.x/validation#rule-current-password)
 
 ```php
 #[CurrentPassword]
@@ -214,7 +214,7 @@ public string $value;
 
 ### Date
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-date)
+[Docs](https://laravel.com/docs/9.x/validation#rule-date)
 
 ```php
 #[Date]
@@ -223,7 +223,7 @@ public Carbon $value;
 
 ### DateEquals
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-date-equals)
+[Docs](https://laravel.com/docs/9.x/validation#rule-date-equals)
 
 ```php
 #[DateEquals('tomorrow')]
@@ -235,7 +235,7 @@ public Carbon $value;
 
 ### DateFormat
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-date-format)
+[Docs](https://laravel.com/docs/9.x/validation#rule-date-format)
 
 ```php
 #[DateFormat('d-m-Y')]
@@ -244,7 +244,7 @@ public Carbon $value;
 
 ### Different
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-different)
+[Docs](https://laravel.com/docs/9.x/validation#rule-different)
 
 ```php
 #[Different('other_field')]
@@ -253,7 +253,7 @@ public string $value;
 
 ### Digits
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-digits)
+[Docs](https://laravel.com/docs/9.x/validation#rule-digits)
 
 ```php
 #[Digits(10)]
@@ -262,7 +262,7 @@ public int $value;
 
 ### DigitsBetween
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-digits-between)
+[Docs](https://laravel.com/docs/9.x/validation#rule-digits-between)
 
 ```php
 #[DigitsBetween(2, 10)]
@@ -271,7 +271,7 @@ public int $value;
 
 ### Dimensions
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-dimensions)
+[Docs](https://laravel.com/docs/9.x/validation#rule-dimensions)
 
 ```php
 #[Dimensions(ratio: 1.5)]
@@ -283,7 +283,7 @@ public UploadedFile $value;
 
 ### Distinct
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-distinct)
+[Docs](https://laravel.com/docs/9.x/validation#rule-distinct)
 
 ```php
 #[Distinct]
@@ -298,7 +298,7 @@ public string $value;
 
 ### Email
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-email)
+[Docs](https://laravel.com/docs/9.x/validation#rule-email)
 
 ```php
 #[Email]
@@ -316,7 +316,7 @@ public string $value;
 
 ### EndsWith
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-ends-with)
+[Docs](https://laravel.com/docs/9.x/validation#rule-ends-with)
 
 ```php
 #[EndsWith('a')]
@@ -331,7 +331,7 @@ public string $value;
 
 ### Enum
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-enum)
+[Docs](https://laravel.com/docs/9.x/validation#rule-enum)
 
 ```php
 #[Enum(ChannelType::class)]
@@ -340,7 +340,7 @@ public string $value;
 
 ### ExcludeIf
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-exclude-if)
+[Docs](https://laravel.com/docs/9.x/validation#rule-exclude-if)
 
 ```php
 #[ExcludeIf('other_field', 'has_value')]
@@ -349,16 +349,25 @@ public string $value;
 
 ### ExcludeUnless
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-exclude-unless)
+[Docs](https://laravel.com/docs/9.x/validation#rule-exclude-unless)
 
 ```php
 #[ExcludeUnless('other_field', 'has_value')]
 public string $value;
 ```
 
+### ExcludeWithout
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-exclude-without)
+
+```php
+#[ExcludeWithout('other_field')]
+public string $value;
+```
+
 ### Exists
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-exists)
+[Docs](https://laravel.com/docs/9.x/validation#rule-exists)
 
 ```php
 #[Exists('users')]
@@ -376,7 +385,7 @@ public string $value;
 
 ### File
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-file)
+[Docs](https://laravel.com/docs/9.x/validation#rule-file)
 
 ```php
 #[File]
@@ -385,7 +394,7 @@ public UploadedFile $value;
 
 ### Filled
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-filled)
+[Docs](https://laravel.com/docs/9.x/validation#rule-filled)
 
 ```php
 #[Filled]
@@ -394,7 +403,7 @@ public string $value;
 
 ### GreaterThan
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-gt)
+[Docs](https://laravel.com/docs/9.x/validation#rule-gt)
 
 ```php
 #[GreaterThan('other_field')]
@@ -403,7 +412,7 @@ public int $value;
 
 ### GreaterThanOrEqualTo
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-gte)
+[Docs](https://laravel.com/docs/9.x/validation#rule-gte)
 
 ```php
 #[GreaterThanOrEqualTo('other_field')]
@@ -412,7 +421,7 @@ public int $value;
 
 ### Image
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-image)
+[Docs](https://laravel.com/docs/9.x/validation#rule-image)
 
 ```php
 #[Image]
@@ -421,7 +430,7 @@ public UploadedFile $value;
 
 ### In
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-in)
+[Docs](https://laravel.com/docs/9.x/validation#rule-in)
 
 ```php
 #[In([1, 2, 3, 'a', 'b'])]
@@ -433,7 +442,7 @@ public mixed $value;
 
 ### InArray
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-in-array)
+[Docs](https://laravel.com/docs/9.x/validation#rule-in-array)
 
 ```php
 #[InArray('other_field')]
@@ -442,7 +451,7 @@ public string $value;
 
 ### IntegerType
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-integer)
+[Docs](https://laravel.com/docs/9.x/validation#rule-integer)
 
 ```php
 #[IntegerType]
@@ -451,7 +460,7 @@ public int $value;
 
 ### IP
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-ip)
+[Docs](https://laravel.com/docs/9.x/validation#rule-ip)
 
 ```php
 #[IP]
@@ -460,7 +469,7 @@ public string $value;
 
 ### IPv4
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-ipv4)
+[Docs](https://laravel.com/docs/9.x/validation#rule-ipv4)
 
 ```php
 #[IPv4]
@@ -469,7 +478,7 @@ public string $value;
 
 ### IPv6
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-ipv6)
+[Docs](https://laravel.com/docs/9.x/validation#rule-ipv6)
 
 ```php
 #[IPv6]
@@ -478,7 +487,7 @@ public string $value;
 
 ### Json
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-json)
+[Docs](https://laravel.com/docs/9.x/validation#rule-json)
 
 ```php
 #[Json]
@@ -487,7 +496,7 @@ public string $value;
 
 ### LessThan
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-lt)
+[Docs](https://laravel.com/docs/9.x/validation#rule-lt)
 
 ```php
 #[LessThan('other_field')]
@@ -496,7 +505,7 @@ public int $value;
 
 ### LessThanOrEqualTo
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-lte)
+[Docs](https://laravel.com/docs/9.x/validation#rule-lte)
 
 ```php
 #[LessThanOrEqualTo('other_field')]
@@ -505,7 +514,7 @@ public int $value;
 
 ### Max
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-max)
+[Docs](https://laravel.com/docs/9.x/validation#rule-max)
 
 ```php
 #[Max(20)]
@@ -514,7 +523,7 @@ public int $value;
 
 ### MimeTypes
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-mimetypes)
+[Docs](https://laravel.com/docs/9.x/validation#rule-mimetypes)
 
 ```php
 #[MimeTypes('video/quicktime')]
@@ -529,7 +538,7 @@ public UploadedFile $value;
 
 ### Mimes
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-mimes)
+[Docs](https://laravel.com/docs/9.x/validation#rule-mimes)
 
 ```php
 #[Mimes('jpg')]
@@ -544,7 +553,7 @@ public UploadedFile $value;
 
 ### Min
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-min)
+[Docs](https://laravel.com/docs/9.x/validation#rule-min)
 
 ```php
 #[Min(20)]
@@ -553,7 +562,7 @@ public int $value;
 
 ### MultipleOf
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-multiple-of)
+[Docs](https://laravel.com/docs/9.x/validation#rule-multiple-of)
 
 ```php
 #[MultipleOf(3)]
@@ -562,7 +571,7 @@ public int $value;
 
 ### NotIn
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-not-in)
+[Docs](https://laravel.com/docs/9.x/validation#rule-not-in)
 
 ```php
 #[NotIn([1, 2, 3, 'a', 'b'])]
@@ -574,7 +583,7 @@ public mixed $value;
 
 ### NotRegex
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-not-regex)
+[Docs](https://laravel.com/docs/9.x/validation#rule-not-regex)
 
 ```php
 #[NotRegex('/^.+$/i')]
@@ -583,7 +592,7 @@ public string $value;
 
 ### Nullable
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-nullable)
+[Docs](https://laravel.com/docs/9.x/validation#rule-nullable)
 
 ```php
 #[Nullable]
@@ -592,7 +601,7 @@ public ?string $value;
 
 ### Numeric
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-numeric)
+[Docs](https://laravel.com/docs/9.x/validation#rule-numeric)
 
 ```php
 #[Numeric]
@@ -601,7 +610,7 @@ public ?string $value;
 
 ### Password
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-password)
+[Docs](https://laravel.com/docs/9.x/validation#rule-password)
 
 ```php
 #[Password(min: 12, letters: true, mixedCase: true, numbers: false, symbols: false, uncompromised: true, uncompromisedThreshold: 0)]
@@ -610,7 +619,7 @@ public string $value;
 
 ### Present
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-present)
+[Docs](https://laravel.com/docs/9.x/validation#rule-present)
 
 ```php
 #[Present]
@@ -619,7 +628,7 @@ public string $value;
 
 ### Prohibited
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-prohibited)
+[Docs](https://laravel.com/docs/9.x/validation#rule-prohibited)
 
 ```php
 #[Prohibited]
@@ -628,7 +637,7 @@ public ?string $value;
 
 ### ProhibitedIf
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-prohibited-if)
+[Docs](https://laravel.com/docs/9.x/validation#rule-prohibited-if)
 
 ```php
 #[ProhibitedIf('other_field', 'has_value')]
@@ -640,7 +649,7 @@ public ?string $value;
 
 ### ProhibitedUnless
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-prohibited-unless)
+[Docs](https://laravel.com/docs/9.x/validation#rule-prohibited-unless)
 
 ```php
 #[ProhibitedUnless('other_field', 'has_value')]
@@ -652,7 +661,7 @@ public ?string $value;
 
 ### Prohibits
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-prohibits)
+[Docs](https://laravel.com/docs/9.x/validation#rule-prohibits)
 
 ```php
 #[Prohibits('other_field')]
@@ -667,7 +676,7 @@ public ?string $value;
 
 ### Regex
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-regex)
+[Docs](https://laravel.com/docs/9.x/validation#rule-regex)
 
 ```php
 #[Regex('/^.+$/i')]
@@ -676,7 +685,7 @@ public string $value;
 
 ### Required
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-required)
+[Docs](https://laravel.com/docs/9.x/validation#rule-required)
 
 ```php
 #[Required]
@@ -685,7 +694,7 @@ public string $value;
 
 ### RequiredIf
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-required-if)
+[Docs](https://laravel.com/docs/9.x/validation#rule-required-if)
 
 ```php
 #[RequiredIf('other_field', 'value')]
@@ -697,7 +706,7 @@ public ?string $value;
 
 ### RequiredUnless
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-required-unless)
+[Docs](https://laravel.com/docs/9.x/validation#rule-required-unless)
 
 ```php
 #[RequiredUnless('other_field', 'value')]
@@ -709,7 +718,7 @@ public ?string $value;
 
 ### RequiredWith
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-required-with)
+[Docs](https://laravel.com/docs/9.x/validation#rule-required-with)
 
 ```php
 #[RequiredWith('other_field')]
@@ -724,7 +733,7 @@ public ?string $value;
 
 ### RequiredWithAll
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-required-with-all)
+[Docs](https://laravel.com/docs/9.x/validation#rule-required-with-all)
 
 ```php
 #[RequiredWithAll('other_field')]
@@ -739,7 +748,7 @@ public ?string $value;
 
 ### RequiredWithout
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-required-without)
+[Docs](https://laravel.com/docs/9.x/validation#rule-required-without)
 
 ```php
 #[RequiredWithout('other_field')]
@@ -754,7 +763,7 @@ public ?string $value;
 
 ### RequiredWithoutAll
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-required-without-all)
+[Docs](https://laravel.com/docs/9.x/validation#rule-required-without-all)
 
 ```php
 #[RequiredWithoutAll('other_field')]
@@ -779,7 +788,7 @@ public string $value;
 
 ### Same
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-same)
+[Docs](https://laravel.com/docs/9.x/validation#rule-same)
 
 ```php
 #[Same('other_field')]
@@ -788,7 +797,7 @@ public string $value;
 
 ### Size
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-size)
+[Docs](https://laravel.com/docs/9.x/validation#rule-size)
 
 ```php
 #[Size(10)]
@@ -797,7 +806,7 @@ public string $value;
 
 ### Sometimes
 
-[Docs](https://laravel.com/docs/8.x/validation#validating-when-present)
+[Docs](https://laravel.com/docs/9.x/validation#validating-when-present)
 
 ```php
 #[Sometimes]
@@ -806,7 +815,7 @@ public string $value;
 
 ### StartsWith
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-starts-with)
+[Docs](https://laravel.com/docs/9.x/validation#rule-starts-with)
 
 ```php
 #[StartsWith('a')]
@@ -821,7 +830,7 @@ public string $value;
 
 ### StringType
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-string)
+[Docs](https://laravel.com/docs/9.x/validation#rule-string)
 
 ```php
 #[StringType()]
@@ -830,7 +839,7 @@ public string $value;
 
 ### TimeZone
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-timezone)
+[Docs](https://laravel.com/docs/9.x/validation#rule-timezone)
 
 ```php
 #[TimeZone()]
@@ -839,7 +848,7 @@ public string $value;
 
 ### Unique
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-unqiue)
+[Docs](https://laravel.com/docs/9.x/validation#rule-unqiue)
 
 ```php
 #[Unique('users')]
@@ -863,7 +872,7 @@ public string $value;
 
 ### Url
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-url)
+[Docs](https://laravel.com/docs/9.x/validation#rule-url)
 
 ```php
 #[Url]
@@ -872,7 +881,7 @@ public string $value;
 
 ### Uuid
 
-[Docs](https://laravel.com/docs/8.x/validation#rule-uuid)
+[Docs](https://laravel.com/docs/9.x/validation#rule-uuid)
 
 ```php
 #[Uuid]
