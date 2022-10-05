@@ -20,6 +20,7 @@ use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
+use TypeError;
 
 class DataTransformer
 {
@@ -218,12 +219,18 @@ class DataTransformer
             $value->withPartialTrees($trees);
         }
 
+        $wrapExecutionType = match (true) {
+            $value instanceof BaseData && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
+            $value instanceof BaseData && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
+            $value instanceof BaseData && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled,
+            $value instanceof BaseDataCollectable && $this->wrapExecutionType === WrapExecutionType::Enabled => WrapExecutionType::Enabled,
+            $value instanceof BaseDataCollectable && $this->wrapExecutionType === WrapExecutionType::Disabled => WrapExecutionType::Disabled,
+            $value instanceof BaseDataCollectable && $this->wrapExecutionType === WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled,
+            default => throw new TypeError('Invalid wrap execution type')
+        };
+
         if ($value instanceof TransformableData && $this->transformValues) {
-            return $value->transform(
-                $this->transformValues,
-                $this->wrapExecutionType->selectedBy($value),
-                $this->mapPropertyNames,
-            );
+            return $value->transform($this->transformValues, $wrapExecutionType, $this->mapPropertyNames,);
         }
 
         return $value;
