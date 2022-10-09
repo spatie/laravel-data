@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Concerns;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use Spatie\LaravelData\Resolvers\DataClassValidationRulesResolver;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
 
 /**
@@ -18,7 +19,7 @@ use Spatie\LaravelData\Resolvers\DataValidatorResolver;
  */
 trait ValidateableData
 {
-    public static function validate(Arrayable|array $payload): Arrayable|array
+    public static function validate(Arrayable | array $payload): Arrayable | array
     {
         $validator = app(DataValidatorResolver::class)->execute(static::class, $payload);
 
@@ -43,7 +44,7 @@ trait ValidateableData
         return $validator->validated();
     }
 
-    public static function validateAndCreate(Arrayable|array $payload): static
+    public static function validateAndCreate(Arrayable | array $payload): static
     {
         return static::from(static::validate($payload));
     }
@@ -57,7 +58,9 @@ trait ValidateableData
         array $fields = [],
         array $payload = []
     ): array {
-        $rules = app(DataValidatorResolver::class)->execute(static::class, $payload)->getRules();
+        $rules = app(DataClassValidationRulesResolver::class)
+            ->execute(static::class, $payload)
+            ->toArray();
 
         if (count($fields) === 0) {
             return $rules;

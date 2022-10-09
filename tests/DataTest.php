@@ -40,6 +40,7 @@ use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
+use Spatie\LaravelData\Tests\Fakes\AttributeRulesWithStaticFunctionRulesData;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
@@ -2410,5 +2411,15 @@ class DataTest extends TestCase
         $this->assertSame([
             'first' => ['string', 'required'],
         ], MultiData::getValidationRules(fields: ['first']));
+    }
+
+
+    /** @test */
+    public function it_can_add_wildcard_rules_for_arrays()
+    {
+        $this->assertEquals([
+            'emails' => ['array', 'min:1', 'max:5', 'required'],
+            'emails.*' => ['email'],
+        ], AttributeRulesWithStaticFunctionRulesData::getValidationRules());
     }
 }
