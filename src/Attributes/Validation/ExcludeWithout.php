@@ -3,10 +3,9 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
-use Spatie\LaravelData\Support\Validation\RequiringRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class ExcludeWithout extends StringValidationAttribute implements RequiringRule
+class ExcludeWithout extends StringValidationAttribute
 {
     public function __construct(protected string $field)
     {
