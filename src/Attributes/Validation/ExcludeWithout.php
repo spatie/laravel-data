@@ -3,9 +3,10 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\RequiringRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class ExcludeWithout extends StringValidationAttribute
+class ExcludeWithout extends StringValidationAttribute implements RequiringRule
 {
     public function __construct(protected string $field)
     {
@@ -19,7 +20,7 @@ class ExcludeWithout extends StringValidationAttribute
     public function parameters(): array
     {
         return [
-            $this->field,
+            $this->normalizeValue($this->field),
         ];
     }
 }

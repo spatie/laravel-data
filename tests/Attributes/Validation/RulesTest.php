@@ -258,7 +258,6 @@ class RulesTest extends TestCase
         yield $this->fixature(
             attribute: new ExcludeWithout('field'),
             expected: 'exclude_without:field',
-            expectCreatedAttribute: new ExcludeWithout('field')
         );
 
         yield $this->fixature(
