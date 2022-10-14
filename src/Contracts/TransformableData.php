@@ -21,6 +21,7 @@ interface TransformableData extends JsonSerializable, Jsonable, Arrayable, Eloqu
     public function transform(
         bool $transformValues = true,
         WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
+        bool $mapPropertyNames = true,
     ): array;
 
     public static function castUsing(array $arguments);

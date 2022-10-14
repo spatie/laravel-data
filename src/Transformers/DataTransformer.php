@@ -28,14 +28,16 @@ class DataTransformer
 
     public static function create(
         bool $transformValues,
-        WrapExecutionType $wrapExecutionType
+        WrapExecutionType $wrapExecutionType,
+        bool $mapPropertyNames,
     ): self {
-        return new self($transformValues, $wrapExecutionType);
+        return new self($transformValues, $wrapExecutionType, $mapPropertyNames);
     }
 
     public function __construct(
         protected bool $transformValues,
         protected WrapExecutionType $wrapExecutionType,
+        protected bool $mapPropertyNames,
     ) {
         $this->config = app(DataConfig::class);
     }
@@ -84,7 +86,7 @@ class DataTransformer
                     return $payload;
                 }
 
-                if ($property->outputMappedName) {
+                if ($this->mapPropertyNames && $property->outputMappedName) {
                     $name = $property->outputMappedName;
                 }
 
@@ -228,7 +230,7 @@ class DataTransformer
         };
 
         if ($value instanceof TransformableData && $this->transformValues) {
-            return $value->transform($this->transformValues, $wrapExecutionType);
+            return $value->transform($this->transformValues, $wrapExecutionType, $this->mapPropertyNames,);
         }
 
         return $value;

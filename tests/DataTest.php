@@ -38,6 +38,7 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Lazy\InertiaLazy;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
+use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
@@ -598,7 +599,7 @@ class DataTest extends TestCase
     /** @test */
     public function it_can_get_the_data_object_without_transforming()
     {
-        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'),]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
+        $data = new class ($dataObject = new SimpleData('Test'), $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B'), ]), Lazy::create(fn () => new SimpleData('Lazy')), 'Test', $transformable = new DateTime('16 may 1994'), ) extends Data {
             public function __construct(
                 public SimpleData $data,
                 #[DataCollectionOf(SimpleData::class)]
@@ -643,6 +644,81 @@ class DataTest extends TestCase
         $this->assertEquals([
             'name' => 'Freek',
             'alt_name' => 'Freek from Spatie',
+        ], $data->toArray());
+    }
+    /** @test */
+    public function it_can_get_the_data_object_without_mapping_properties_names()
+    {
+        $data = new class ('Freek') extends Data {
+            public function __construct(
+                #[MapOutputName('snake_name')]
+                public string $camelName
+            ) {
+            }
+        };
+        $this->assertEquals([
+            'camelName' => 'Freek',
+        ], $data->transform(true, WrapExecutionType::Disabled, false));
+    }
+
+    /** @test */
+    public function it_can_get_the_data_object_without_mapping()
+    {
+        $data = new class ('Freek') extends Data {
+            public function __construct(
+                #[MapOutputName('snake_name')]
+                public string $camelName
+            ) {
+            }
+        };
+        $this->assertEquals([
+            'camelName' => 'Freek',
+        ], $data->transform(true, WrapExecutionType::Disabled, false));
+    }
+
+    /** @test */
+    public function it_can_get_the_data_object_with_mapping_properties_by_default()
+    {
+        $data = new class ('Freek') extends Data {
+            public function __construct(
+                #[MapOutputName('snake_name')]
+                public string $camelName
+            ) {
+            }
+        };
+        $this->assertEquals([
+            'snake_name' => 'Freek',
+        ], $data->transform());
+    }
+    /** @test */
+    public function it_can_get_the_data_object_with_mapping_properties_without_transform_data()
+    {
+        $data = new class ('Freek') extends Data {
+            public function __construct(
+                #[MapOutputName('snake_name')]
+                public string $camelName
+            ) {
+            }
+        };
+        $this->assertEquals([
+            'snake_name' => 'Freek',
+        ], $data->transform(transformValues:false, mapPropertyNames: true));
+    }
+
+    /** @test */
+    public function it_can_get_the_data_object_with_mapping_properties_names()
+    {
+        $data = new class ('Freek', 'Hello World') extends Data {
+            public function __construct(
+                #[MapOutputName('snake_name')]
+                public string $camelName,
+                public string $helloCamelName
+            ) {
+            }
+        };
+        $this->assertEquals([
+            'snake_name' => 'Freek',
+            'helloCamelName' => 'Hello World',
         ], $data->toArray());
     }
 

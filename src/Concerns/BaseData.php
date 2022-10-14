@@ -97,7 +97,8 @@ trait BaseData
     public function transform(
         bool $transformValues = true,
         WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
+        bool $mapPropertyNames = true,
     ): array {
-        return DataTransformer::create($transformValues, $wrapExecutionType)->transform($this);
+        return DataTransformer::create($transformValues, $wrapExecutionType, $mapPropertyNames)->transform($this);
     }
 }
