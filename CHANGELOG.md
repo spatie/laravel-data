@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.13 - 2022-10-14
+
+- fix first and last page url are never null (#215)
+- add ability to statically retrieve a data models rules (#221)
+- improved pattern matching in DataCollectionAnnotationReader (#225)
+- add ExcludeWithout attribute rule (#230)
+- improve getValidationRules to also retrieve wildcard rules (#231)
+- return property with or without mapping the name (#199)
+
 ## 2.0.12 - 2022-09-29
 
 - Improve pattern matching in DataCollectionAnnotationReader (#214)
