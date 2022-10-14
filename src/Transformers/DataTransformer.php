@@ -230,7 +230,7 @@ class DataTransformer
         };
 
         if ($value instanceof TransformableData && $this->transformValues) {
-            return $value->transform($this->transformValues, $wrapExecutionType, $this->mapPropertyNames,);
+            return $value->transform($this->transformValues, $wrapExecutionType, $this->mapPropertyNames, );
         }
 
         return $value;
