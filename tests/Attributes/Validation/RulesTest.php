@@ -42,6 +42,7 @@ use Spatie\LaravelData\Attributes\Validation\EndsWith;
 use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\ExcludeIf;
 use Spatie\LaravelData\Attributes\Validation\ExcludeUnless;
+use Spatie\LaravelData\Attributes\Validation\ExcludeWithout;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\File;
 use Spatie\LaravelData\Attributes\Validation\Filled;
@@ -255,6 +256,11 @@ class RulesTest extends TestCase
         );
 
         yield $this->fixature(
+            attribute: new ExcludeWithout('field'),
+            expected: 'exclude_without:field',
+        );
+
+        yield $this->fixature(
             attribute: new File(),
             expected: 'file',
         );
@@ -437,8 +443,8 @@ class RulesTest extends TestCase
         );
 
         yield $this->fixature(
-            attribute: new After(Carbon::yesterday()),
-            expected: 'after:2020-05-15T00:00:00+00:00',
+            attribute: new After('2020-05-15 00:00:00'),
+            expected: 'after:2020-05-15 00:00:00',
         );
     }
 
@@ -450,8 +456,8 @@ class RulesTest extends TestCase
         );
 
         yield $this->fixature(
-            attribute: new AfterOrEqual(Carbon::yesterday()),
-            expected: 'after_or_equal:2020-05-15T00:00:00+00:00',
+            attribute: new AfterOrEqual('2020-05-15 00:00:00'),
+            expected: 'after_or_equal:2020-05-15 00:00:00',
         );
     }
 
@@ -486,8 +492,8 @@ class RulesTest extends TestCase
         );
 
         yield $this->fixature(
-            attribute: new Before(Carbon::yesterday()),
-            expected: 'before:2020-05-15T00:00:00+00:00',
+            attribute: new Before('2020-05-15 00:00:00'),
+            expected: 'before:2020-05-15 00:00:00',
         );
     }
 
@@ -499,8 +505,8 @@ class RulesTest extends TestCase
         );
 
         yield $this->fixature(
-            attribute: new BeforeOrEqual(Carbon::yesterday()),
-            expected: 'before_or_equal:2020-05-15T00:00:00+00:00',
+            attribute: new BeforeOrEqual('2020-05-15 00:00:00'),
+            expected: 'before_or_equal:2020-05-15 00:00:00',
         );
     }
 
@@ -543,8 +549,8 @@ class RulesTest extends TestCase
         );
 
         yield $this->fixature(
-            attribute: new DateEquals(Carbon::yesterday()),
-            expected: 'date_equals:2020-05-15T00:00:00+00:00',
+            attribute: new DateEquals('2020-05-15 00:00:00'),
+            expected: 'date_equals:2020-05-15 00:00:00',
         );
     }
 

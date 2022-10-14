@@ -32,6 +32,7 @@ use Spatie\LaravelData\Attributes\Validation\EndsWith;
 use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\ExcludeIf;
 use Spatie\LaravelData\Attributes\Validation\ExcludeUnless;
+use Spatie\LaravelData\Attributes\Validation\ExcludeWithout;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\File;
 use Spatie\LaravelData\Attributes\Validation\Filled;
@@ -149,6 +150,7 @@ class RuleFactory
             Enum::keyword() => Enum::class,
             ExcludeIf::keyword() => ExcludeIf::class,
             ExcludeUnless::keyword() => ExcludeUnless::class,
+            ExcludeWithout::keyword() => ExcludeWithout::class,
             Exists::keyword() => Exists::class,
             File::keyword() => File::class,
             Filled::keyword() => Filled::class,
