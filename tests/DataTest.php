@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
@@ -2488,7 +2489,6 @@ class DataTest extends TestCase
             'first' => ['string', 'required'],
         ], MultiData::getValidationRules(fields: ['first']));
     }
-
 
     /** @test */
     public function it_can_add_wildcard_rules_for_arrays()
