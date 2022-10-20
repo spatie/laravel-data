@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests;
 
 use Illuminate\Validation\Rules\Enum;
-use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
@@ -12,10 +11,8 @@ use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Mappers\CamelCaseMapper;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
-use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
@@ -30,7 +27,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_validate_a_string()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public string $property;
         };
 
@@ -44,7 +41,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_validate_a_float()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public float $property;
         };
 
@@ -58,7 +55,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_validate_an_integer()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public int $property;
         };
 
@@ -72,7 +69,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_validate_an_array()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public array $property;
         };
 
@@ -87,7 +84,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_validate_a_bool()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public bool $property;
         };
 
@@ -101,7 +98,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_validate_a_nullable_type()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public ?array $property;
         };
 
@@ -117,7 +114,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_validate_a_property_with_custom_rules()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public ?array $property;
 
             public static function rules(): array
@@ -137,7 +134,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_validate_a_property_with_custom_rules_as_string()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public ?array $property;
 
             public static function rules(): array
@@ -157,13 +154,13 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_validate_a_property_with_custom_rules_as_object()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public ?array $property;
 
             public static function rules(): array
             {
                 return [
-                    'property' =>  [new ArrayType(), new Min(5)],
+                    'property' => [new ArrayType(), new Min(5)],
                 ];
             }
         };
@@ -177,7 +174,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_validate_a_property_with_attributes()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             #[Min(5)]
             public ?array $property;
         };
@@ -191,7 +188,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_validate_an_optional_attribute()
     {
-        DataValidationAsserter::for(new class extends Data {
+        DataValidationAsserter::for(new class () extends Data {
             public array|Optional $property;
         })
             ->assertOk([])
@@ -201,7 +198,7 @@ class ValidationTest extends TestCase
                 'property' => ['sometimes', 'array'],
             ]);
 
-        DataValidationAsserter::for(new class extends Data {
+        DataValidationAsserter::for(new class () extends Data {
             public array|Optional|null $property;
         })
             ->assertOk([])
@@ -211,7 +208,7 @@ class ValidationTest extends TestCase
                 'property' => ['sometimes', 'array', 'nullable'],
             ]);
 
-        DataValidationAsserter::for(new class extends Data {
+        DataValidationAsserter::for(new class () extends Data {
             #[Max(10)]
             public array|Optional $property;
         })
@@ -226,7 +223,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_validate_a_native_enum()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public DummyBackedEnum $property;
         };
 
@@ -240,7 +237,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_will_use_name_mapping_within_validation()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             #[MapInputName('some_property')]
             public string $property;
         };
@@ -255,7 +252,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_disable_validation()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             #[WithoutValidation]
             public string $property;
 
@@ -274,7 +271,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_write_custom_rules_based_upon_payloads()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public bool $strict;
 
             public string $property;
@@ -332,7 +329,7 @@ class ValidationTest extends TestCase
             }
         PHP);
 
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public \NestedClassA $nested;
         };
 
@@ -356,7 +353,7 @@ class ValidationTest extends TestCase
             }
         PHP);
 
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public ?\NestedClassB $nested;
         };
 
@@ -384,7 +381,7 @@ class ValidationTest extends TestCase
             }
         PHP);
 
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public \NestedClassC|Optional $nested;
         };
 
@@ -409,7 +406,7 @@ class ValidationTest extends TestCase
             }
         PHP);
 
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             #[Min(100)]
             public \NestedClassD|Optional $nested;
         };
@@ -424,7 +421,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_will_use_name_mapping_with_nested_objects()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             #[MapInputName('some_nested')]
             public SimpleData $nested;
         };
@@ -461,7 +458,7 @@ class ValidationTest extends TestCase
             }
         PHP);
 
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public \NestedClassF $nested;
         };
 
@@ -506,7 +503,7 @@ class ValidationTest extends TestCase
             }
         PHP);
 
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             public \NestedClassG $nested;
         };
 
@@ -533,7 +530,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_will_validate_a_collection()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             #[DataCollectionOf(SimpleData::class)]
             public DataCollection $collection;
         };
@@ -562,7 +559,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_will_validate_a_nullable_collection()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             #[DataCollectionOf(SimpleData::class)]
             public ?DataCollection $collection;
         };
@@ -591,7 +588,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_will_validate_an_optional_collection()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             #[DataCollectionOf(SimpleData::class)]
             public Optional|DataCollection $collection;
         };
@@ -620,7 +617,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_overwrite_collection_class_rules()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             #[DataCollectionOf(SimpleData::class)]
             public DataCollection $collection;
 
@@ -643,7 +640,7 @@ class ValidationTest extends TestCase
     /** @test */
     public function it_can_add_collection_class_rules_using_attributes()
     {
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             #[DataCollectionOf(SimpleDataWithExplicitValidationRuleAttributeData::class)]
             #[Min(10)]
             public DataCollection $collection;
@@ -674,7 +671,7 @@ class ValidationTest extends TestCase
             }
         PHP);
 
-        $dataClass = new class extends Data {
+        $dataClass = new class () extends Data {
             #[DataCollectionOf(\CollectionClassA::class)]
             public DataCollection $collection;
         };
@@ -688,5 +685,3 @@ class ValidationTest extends TestCase
             ->assertOk(['collection' => [['nested' => ['string' => 'Hello World']]]]);
     }
 }
-
-

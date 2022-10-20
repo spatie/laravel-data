@@ -58,12 +58,12 @@ class DataValidationAsserter
         array $payload = []
     ): self {
         $inferredRules = collect($this->dataClass::getValidationRules(payload: $payload))
-            ->map(fn(array $rules) => array_values(Arr::sort($rules)))
+            ->map(fn (array $rules) => array_values(Arr::sort($rules)))
             ->sortKeys()
             ->all();
 
         $rules = collect($rules)
-            ->map(fn(array $rules) => array_values(Arr::sort($rules)))
+            ->map(fn (array $rules) => array_values(Arr::sort($rules)))
             ->sortKeys()
             ->all();
 
