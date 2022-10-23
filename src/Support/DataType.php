@@ -168,6 +168,7 @@ class DataType implements Countable
         $type = match ($type) {
             'integer' => 'int',
             'boolean' => 'bool',
+            'double' => 'float',
             'object' => $value::class,
             default => $type,
         };
