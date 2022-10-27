@@ -1,13 +1,9 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Support\EloquentCasts;
-
+use function Pest\Laravel\assertDatabaseHas;
 use Illuminate\Support\Facades\DB;
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\TestCase;
-
-use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(function () {
     DummyModelWithCasts::migrate();
