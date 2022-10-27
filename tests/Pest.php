@@ -11,7 +11,7 @@
 |
 */
 
-// uses(Tests\TestCase::class)->in('Feature');
+uses(Spatie\LaravelData\Tests\TestCase::class)->in('.');
 
 /*
 |--------------------------------------------------------------------------

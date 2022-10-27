@@ -33,6 +33,7 @@
         "phpunit/phpunit": "^9.3",
         "spatie/invade": "^1.0",
         "spatie/laravel-typescript-transformer": "^2.0",
+        "spatie/pest-plugin-snapshots": "^1.1",
         "spatie/phpunit-snapshot-assertions": "^4.2",
         "spatie/test-time": "^1.2"
     },
