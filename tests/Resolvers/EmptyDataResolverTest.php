@@ -1,7 +1,5 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Resolvers;
-
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
@@ -10,233 +8,202 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
-use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\TestCase;
 
-class EmptyDataResolverTest extends TestCase
-{
-    /** @test */
-    public function it_will_return_null_if_the_property_has_no_type()
+it('will return null if the property has no type', function () {
+    assertEmptyPropertyValue(null, new class()
     {
-        $this->assertEmptyPropertyValue(null, new class () {
-            public $property;
-        });
-    }
+        public $property;
+    });
+});
 
-    /** @test */
-    public function it_will_return_null_if_the_property_has_a_basic_type()
+it('will return null if the property has a basic type', function () {
+    assertEmptyPropertyValue(null, new class()
     {
-        $this->assertEmptyPropertyValue(null, new class () {
-            public int $property;
-        });
+        public int $property;
+    });
 
-        $this->assertEmptyPropertyValue(null, new class () {
-            public bool $property;
-        });
-
-        $this->assertEmptyPropertyValue(null, new class () {
-            public float $property;
-        });
-
-        $this->assertEmptyPropertyValue(null, new class () {
-            public string $property;
-        });
-
-        $this->assertEmptyPropertyValue(null, new class () {
-            public mixed $property;
-        });
-    }
-
-    /** @test */
-    public function it_will_return_an_array_for_collection_types()
+    assertEmptyPropertyValue(null, new class()
     {
-        $this->assertEmptyPropertyValue([], new class () {
-            public array $property;
-        });
+        public bool $property;
+    });
 
-        $this->assertEmptyPropertyValue([], new class () {
-            public Collection $property;
-        });
-
-        $this->assertEmptyPropertyValue([], new class () {
-            public EloquentCollection $property;
-        });
-
-        $this->assertEmptyPropertyValue([], new class () {
-            #[DataCollectionOf(SimpleData::class)]
-            public DataCollection $property;
-        });
-    }
-
-    /** @test */
-    public function it_will_further_transform_resources()
+    assertEmptyPropertyValue(null, new class()
     {
-        $this->assertEmptyPropertyValue(['string' => null], new class () {
-            public SimpleData $property;
-        });
-    }
+        public float $property;
+    });
 
-    /** @test */
-    public function it_will_return_the_base_type_for_lazy_types()
+    assertEmptyPropertyValue(null, new class()
     {
-//        $this->assertEmptyPropertyValue(null, new class() {
-//            public Lazy | string $property;
-//        });
+        public string $property;
+    });
 
-        $this->assertEmptyPropertyValue([], new class () {
-            public Lazy|array $property;
-        });
-
-        $this->assertEmptyPropertyValue(['string' => null], new class () {
-            public Lazy|SimpleData $property;
-        });
-    }
-
-    /** @test */
-    public function it_will_return_the_base_type_for_lazy_types_that_can_be_null()
+    assertEmptyPropertyValue(null, new class()
     {
-        $this->assertEmptyPropertyValue(null, new class () {
-            public Lazy|string|null $property;
-        });
+        public mixed $property;
+    });
+});
 
-        $this->assertEmptyPropertyValue([], new class () {
-            public Lazy|array|null $property;
-        });
-
-        $this->assertEmptyPropertyValue(['string' => null], new class () {
-            public Lazy|SimpleData|null $property;
-        });
-    }
-
-    public function it_will_return_the_base_type_for_lazy_types_that_can_be_optional()
+it('will return an array for collection types', function () {
+    assertEmptyPropertyValue([], new class()
     {
-        $this->assertEmptyPropertyValue(null, new class () {
-            public Lazy|string|Optional $property;
-        });
+        public array $property;
+    });
 
-        $this->assertEmptyPropertyValue([], new class () {
-            public Lazy|array|Optional $property;
-        });
-
-        $this->assertEmptyPropertyValue(['string' => null], new class () {
-            public Lazy|SimpleData|Optional $property;
-        });
-    }
-
-    /** @test */
-    public function it_will_return_the_base_type_for_undefinable_types()
+    assertEmptyPropertyValue([], new class()
     {
-        $this->assertEmptyPropertyValue(null, new class () {
-            public Optional|string $property;
-        });
+        public Collection $property;
+    });
 
-        $this->assertEmptyPropertyValue([], new class () {
-            public Optional|array $property;
-        });
-
-        $this->assertEmptyPropertyValue(['string' => null], new class () {
-            public Optional|SimpleData $property;
-        });
-    }
-
-    /** @test */
-    public function it_cannot_have_multiple_types()
+    assertEmptyPropertyValue([], new class()
     {
-        $this->expectException(DataPropertyCanOnlyHaveOneType::class);
+        public EloquentCollection $property;
+    });
 
-        $this->assertEmptyPropertyValue(null, new class () {
-            public int|string $property;
-        });
-    }
-
-    /** @test */
-    public function it_cannot_have_multiple_types_with_a_lazy()
+    assertEmptyPropertyValue([], new class()
     {
-        $this->expectException(DataPropertyCanOnlyHaveOneType::class);
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection $property;
+    });
+});
 
-        $this->assertEmptyPropertyValue(null, new class () {
-            public int|string|Lazy $property;
-        });
-    }
-
-    /** @test */
-    public function it_cannot_have_multiple_types_with_a_nullable_lazy()
+it('will further transform resources', function () {
+    assertEmptyPropertyValue(['string' => null], new class()
     {
-        $this->expectException(DataPropertyCanOnlyHaveOneType::class);
+        public SimpleData $property;
+    });
+});
 
-        $this->assertEmptyPropertyValue(null, new class () {
-            public int|string|Lazy|null $property;
-        });
-    }
+it('will return the base type for lazy types', function () {
+    //        $this->assertEmptyPropertyValue(null, new class() {
+    //            public Lazy | string $property;
+    //        });
 
-    /** @test */
-    public function it_cannot_have_multiple_types_with_a_optional()
+    assertEmptyPropertyValue([], new class()
     {
-        $this->expectException(DataPropertyCanOnlyHaveOneType::class);
+        public Lazy|array $property;
+    });
 
-        $this->assertEmptyPropertyValue(null, new class () {
-            public int|string|Optional $property;
-        });
-    }
-
-    /** @test */
-    public function it_cannot_have_multiple_types_with_a_nullable_optional()
+    assertEmptyPropertyValue(['string' => null], new class()
     {
-        $this->expectException(DataPropertyCanOnlyHaveOneType::class);
+        public Lazy|SimpleData $property;
+    });
+});
 
-        $this->assertEmptyPropertyValue(null, new class () {
-            public int|string|Optional|null $property;
-        });
-    }
-
-    /** @test */
-    public function it_can_overwrite_empty_properties()
+it('will return the base type for lazy types that can be null', function () {
+    assertEmptyPropertyValue(null, new class()
     {
-        $this->assertEmptyPropertyValue('Hello', new class () {
-            public string $property;
-        }, ['property' => 'Hello']);
-    }
+        public Lazy|string|null $property;
+    });
 
-    /** @test */
-    public function it_can_use_the_property_default_value()
+    assertEmptyPropertyValue([], new class()
     {
-        $this->assertEmptyPropertyValue('Hello', new class () {
-            public string $property = 'Hello';
-        });
-    }
+        public Lazy|array|null $property;
+    });
 
-    /** @test */
-    public function it_can_use_the_constructor_property_default_value()
+    assertEmptyPropertyValue(['string' => null], new class()
     {
-        $this->assertEmptyPropertyValue('Hello', new class () {
-            public function __construct(
-                public string $property = 'Hello',
-            ) {
-            }
-        });
-    }
+        public Lazy|SimpleData|null $property;
+    });
+});
 
-    /** @test */
-    public function it_has_support_for_mapping_property_names()
+it('will return the base type for lazy types that can be optional', function () {
+    assertEmptyPropertyValue(null, new class()
     {
-        $this->assertEmptyPropertyValue(null, new class () {
-            #[MapOutputName('other_property')]
-            public string $property;
-        }, propertyName: 'other_property');
-    }
+        public Lazy|string|Optional $property;
+    });
 
-    private function assertEmptyPropertyValue(
-        mixed $expected,
-        object $class,
-        array $extra = [],
-        string $propertyName = 'property',
-    ) {
-        $resolver = app(EmptyDataResolver::class);
+    assertEmptyPropertyValue([], new class()
+    {
+        public Lazy|array|Optional $property;
+    });
 
-        $empty = $resolver->execute($class::class, $extra);
+    assertEmptyPropertyValue(['string' => null], new class()
+    {
+        public Lazy|SimpleData|Optional $property;
+    });
+});
 
-        $this->assertArrayHasKey($propertyName, $empty);
-        $this->assertEquals($expected, $empty[$propertyName]);
-    }
-}
+it('will return the base type for undefinable types', function () {
+    assertEmptyPropertyValue(null, new class()
+    {
+        public Optional|string $property;
+    });
+
+    assertEmptyPropertyValue([], new class()
+    {
+        public Optional|array $property;
+    });
+
+    assertEmptyPropertyValue(['string' => null], new class()
+    {
+        public Optional|SimpleData $property;
+    });
+});
+
+it('cannot have multiple types', function () {
+    assertEmptyPropertyValue(null, new class()
+    {
+        public int|string $property;
+    });
+})->throws(DataPropertyCanOnlyHaveOneType::class);
+
+it('cannot have multiple types with a lazy', function () {
+    assertEmptyPropertyValue(null, new class()
+    {
+        public int|string|Lazy $property;
+    });
+})->throws(DataPropertyCanOnlyHaveOneType::class);
+
+it('cannot have multiple types with a nullable lazy', function () {
+    assertEmptyPropertyValue(null, new class()
+    {
+        public int|string|Lazy|null $property;
+    });
+})->throws(DataPropertyCanOnlyHaveOneType::class);
+
+it('cannot have multiple types with an optional', function () {
+    assertEmptyPropertyValue(null, new class()
+    {
+        public int|string|Optional $property;
+    });
+})->throws(DataPropertyCanOnlyHaveOneType::class);
+
+it('cannot have multiple types with a nullable optional', function () {
+    assertEmptyPropertyValue(null, new class()
+    {
+        public int|string|Optional|null $property;
+    });
+})->throws(DataPropertyCanOnlyHaveOneType::class);
+
+it('can overwrite empty properties', function () {
+    assertEmptyPropertyValue('Hello', new class()
+    {
+        public string $property;
+    }, ['property' => 'Hello']);
+});
+
+it('can use the property default value', function () {
+    assertEmptyPropertyValue('Hello', new class()
+    {
+        public string $property = 'Hello';
+    });
+});
+
+it('can use the constructor property default value', function () {
+    assertEmptyPropertyValue('Hello', new class()
+    {
+        public function __construct(
+            public string $property = 'Hello',
+        ) {
+        }
+    });
+});
+
+it('has support for mapping property names', function () {
+    assertEmptyPropertyValue(null, new class()
+    {
+        #[MapOutputName('other_property')]
+        public string $property;
+    }, propertyName: 'other_property');
+});

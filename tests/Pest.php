@@ -4,6 +4,7 @@ use function Pest\Laravel\postJson;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Illuminate\Testing\TestResponse;
 use Spatie\LaravelData\Resolvers\DataPropertyValidationRulesResolver;
+use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 use Spatie\LaravelData\Support\DataProperty;
 
 /*
@@ -48,4 +49,18 @@ function resolveRules(object $class): array
     $property = DataProperty::create($reflectionProperty);
 
     return app(DataPropertyValidationRulesResolver::class)->execute($property)->toArray();
+}
+
+function assertEmptyPropertyValue(
+    mixed $expected,
+    object $class,
+    array $extra = [],
+    string $propertyName = 'property',
+) {
+    $resolver = app(EmptyDataResolver::class);
+
+    $empty = $resolver->execute($class::class, $extra);
+
+    expect($empty)->toHaveKey($propertyName)
+        ->and($empty[$propertyName])->toEqual($expected);
 }
