@@ -1,5 +1,9 @@
 <?php
 
+use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
+use Spatie\LaravelData\Tests\Fakes\FakeEnum;
+use Spatie\LaravelData\Tests\Fakes\NestedData;
+use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Illuminate\Validation\Rules\Enum as EnumRule;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapName;
@@ -13,12 +17,6 @@ use Spatie\LaravelData\Attributes\Validation\Size;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Optional;
-
-use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
-use Spatie\LaravelData\Tests\Fakes\FakeEnum;
-use Spatie\LaravelData\Tests\Fakes\NestedData;
-use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\TestCase;
 
 it('will add a required or nullable rule based upon the property nullability', function () {
     $rules = resolveRules(new class()
