@@ -1,28 +1,19 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\DataPipes;
-
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
-use Spatie\LaravelData\Tests\TestCase;
 
-class DefaultValuesDataPipeTest extends TestCase
-{
-    /** @test */
-    public function it_can_create_a_data_object_with_defaults_empty()
+it('can create a data object with defaults empty', function () {
+    $dataClass = new class('', '', '') extends Data
     {
-        $dataClass = new class ('', '', '') extends Data {
-            public function __construct(
-                public ?string $string,
-                public Optional|string $optionalString,
-                public string $stringWithDefault = 'Hi',
-            ) {
-            }
-        };
+        public function __construct(
+            public ?string $string,
+            public Optional|string $optionalString,
+            public string $stringWithDefault = 'Hi',
+        ) {
+        }
+    };
 
-        $this->assertEquals(
-            new $dataClass(null, new Optional(), 'Hi'),
-            $dataClass::from([])
-        );
-    }
-}
+    expect(new $dataClass(null, new Optional(), 'Hi'))
+        ->toEqual($dataClass::from([]));
+});
