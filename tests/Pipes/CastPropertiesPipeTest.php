@@ -1,8 +1,6 @@
 <?php
 
 use Carbon\CarbonImmutable;
-use DateTime;
-use DateTimeImmutable;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\Lazy;
