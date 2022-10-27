@@ -1,90 +1,74 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Attributes\Validation;
-
 use Carbon\CarbonImmutable;
 use DateTimeZone;
-use Generator;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
-use Spatie\LaravelData\Tests\TestCase;
 
-class ValidationAttributeTest extends TestCase
-{
-    /** @test */
-    public function it_can_get_a_string_representation_of_rules()
+it('can get a string representation of rules', function () {
+    $rule = new StringType();
+
+    expect((string) $rule)->toEqual('string');
+});
+
+it('can normalize values', function ($input, $output) {
+    $normalizer = new class() extends ValidationAttribute
     {
-        $rule = new StringType();
+        public function execute(mixed $value): mixed
+        {
+            return $this->normalizeValue($value);
+        }
 
-        $this->assertEquals('string', (string) $rule);
-    }
+        public function getRules(): array
+        {
+            return [];
+        }
 
-    /**
-     * @test
-     * @dataProvider valuesDataProvider
-     */
-    public function it_can_normalize_values(mixed $input, mixed $output)
-    {
-        $normalizer = new class () extends ValidationAttribute {
-            public function execute(mixed $value): mixed
-            {
-                return $this->normalizeValue($value);
-            }
+        public static function create(string ...$parameters): static
+        {
+            return new self();
+        }
 
-            public function getRules(): array
-            {
-                return [];
-            }
+        public static function keyword(): string
+        {
+            return '';
+        }
+    };
 
-            public static function create(string ...$parameters): static
-            {
-                return new self();
-            }
+    expect($normalizer->execute($input))->toEqual($output);
+})->with(function () {
+    yield [
+        'input' => 'Hello world',
+        'output' => 'Hello world',
+    ];
 
-            public static function keyword(): string
-            {
-                return '';
-            }
-        };
+    yield [
+        'input' => 42,
+        'output' => '42',
+    ];
 
-        $this->assertEquals($output, $normalizer->execute($input));
-    }
+    yield [
+        'input' => 3.14,
+        'output' => '3.14',
+    ];
 
-    public function valuesDataProvider(): Generator
-    {
-        yield [
-            'input' => 'Hello world',
-            'output' => 'Hello world',
-        ];
+    yield [
+        'input' => true,
+        'output' => 'true',
+    ];
 
-        yield [
-            'input' => 42,
-            'output' => '42',
-        ];
+    yield [
+        'input' => false,
+        'output' => 'false',
+    ];
 
-        yield [
-            'input' => 3.14,
-            'output' => '3.14',
-        ];
+    yield [
+        'input' => ['a', 'b', 'c'],
+        'output' => 'a,b,c',
+    ];
 
-        yield [
-            'input' => true,
-            'output' => 'true',
-        ];
-
-        yield [
-            'input' => false,
-            'output' => 'false',
-        ];
-
-        yield [
-            'input' => ['a', 'b', 'c'],
-            'output' => 'a,b,c',
-        ];
-
-        yield [
-            'input' => CarbonImmutable::create(2020, 05, 16, 0, 0, 0, new DateTimeZone('Europe/Brussels')),
-            'output' => '2020-05-16T00:00:00+02:00',
-        ];
-    }
-}
+    yield [
+        'input' => CarbonImmutable::create(2020, 05, 16, 0, 0, 0, new DateTimeZone('Europe/Brussels')),
+        'output' => '2020-05-16T00:00:00+02:00',
+    ];
+});
