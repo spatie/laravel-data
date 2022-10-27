@@ -17,6 +17,16 @@ use Spatie\LaravelData\Attributes\Validation\Size;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\DataProperty;
+
+function resolveRules(object $class): array
+{
+    $reflectionProperty = new ReflectionProperty($class, 'property');
+
+    $property = DataProperty::create($reflectionProperty);
+
+    return app(DataPropertyValidationRulesResolver::class)->execute($property)->toArray();
+}
 
 it('will add a required or nullable rule based upon the property nullability', function () {
     $rules = resolveRules(new class()

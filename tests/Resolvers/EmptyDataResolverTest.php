@@ -10,6 +10,20 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
+function assertEmptyPropertyValue(
+    mixed $expected,
+    object $class,
+    array $extra = [],
+    string $propertyName = 'property',
+) {
+    $resolver = app(EmptyDataResolver::class);
+
+    $empty = $resolver->execute($class::class, $extra);
+
+    expect($empty)->toHaveKey($propertyName)
+        ->and($empty[$propertyName])->toEqual($expected);
+}
+
 it('will return null if the property has no type', function () {
     assertEmptyPropertyValue(null, new class()
     {

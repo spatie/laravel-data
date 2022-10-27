@@ -17,6 +17,14 @@ use Spatie\LaravelData\Tests\Factories\DataMagicMethodFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Illuminate\Testing\TestResponse;
+
+function performRequest(string $string): TestResponse
+{
+    return postJson('/example-route', [
+        'string' => $string,
+    ]);
+}
 
 beforeEach(function () {
     handleExceptions([
