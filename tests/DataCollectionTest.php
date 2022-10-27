@@ -1,9 +1,5 @@
 <?php
 
-namespace Spatie\LaravelData\Tests;
-
-use Closure;
-use Generator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;

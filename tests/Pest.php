@@ -3,6 +3,8 @@
 use function Pest\Laravel\postJson;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Illuminate\Testing\TestResponse;
+use Spatie\LaravelData\Resolvers\DataPropertyValidationRulesResolver;
+use Spatie\LaravelData\Support\DataProperty;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,4 +39,13 @@ function rulesFixture(
         'expectedCreatedAttribute' => $expectCreatedAttribute ?? $attribute,
         'exception' => $exception,
     ];
+}
+
+function resolveRules(object $class): array
+{
+    $reflectionProperty = new ReflectionProperty($class, 'property');
+
+    $property = DataProperty::create($reflectionProperty);
+
+    return app(DataPropertyValidationRulesResolver::class)->execute($property)->toArray();
 }

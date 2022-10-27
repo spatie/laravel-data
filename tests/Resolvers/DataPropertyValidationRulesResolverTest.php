@@ -1,9 +1,6 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Resolvers;
-
 use Illuminate\Validation\Rules\Enum as EnumRule;
-use ReflectionProperty;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\Validation\Bail;
@@ -16,370 +13,365 @@ use Spatie\LaravelData\Attributes\Validation\Size;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Optional;
-use Spatie\LaravelData\Resolvers\DataPropertyValidationRulesResolver;
-use Spatie\LaravelData\Support\DataProperty;
+
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 
-class DataPropertyValidationRulesResolverTest extends TestCase
-{
-    /** @test */
-    public function it_will_add_a_required_or_nullable_rule_based_upon_the_property_nullability()
+it('will add a required or nullable rule based upon the property nullability', function () {
+    $rules = resolveRules(new class()
     {
-        $rules = $this->resolveRules(new class () {
-            public int $property;
-        });
+        public int $property;
+    });
 
-        $this->assertEquals([
-            'property' => ['numeric', 'required'],
-        ], $rules);
+    expect($rules)->toMatchArray([
+        'property' => ['numeric', 'required'],
+    ]);
 
-        $rules = $this->resolveRules(new class () {
-            public ?int $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['numeric', 'nullable'],
-        ], $rules);
-    }
-
-    /** @test */
-    public function it_will_add_basic_rules_for_certain_types()
+    $rules = resolveRules(new class()
     {
-        $rules = $this->resolveRules(new class () {
-            public string $property;
-        });
+        public ?int $property;
+    });
 
-        $this->assertEquals([
-            'property' => ['string', 'required'],
-        ], $rules);
+    expect($rules)->toMatchArray([
+        'property' => ['numeric', 'nullable'],
+    ]);
+});
 
-        $rules = $this->resolveRules(new class () {
-            public int $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['numeric', 'required'],
-        ], $rules);
-
-        $rules = $this->resolveRules(new class () {
-            public bool $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['boolean'],
-        ], $rules);
-
-        $rules = $this->resolveRules(new class () {
-            public float $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['numeric', 'required'],
-        ], $rules);
-
-        $rules = $this->resolveRules(new class () {
-            public array $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['array', 'required'],
-        ], $rules);
-    }
-
-    /** @test */
-    public function it_will_add_rules_for_enums()
+it('will add basic rules for certain types', function () {
+    $rules = resolveRules(new class()
     {
-        $this->onlyPHP81();
+        public string $property;
+    });
 
-        $rules = $this->resolveRules(new class () {
-            public FakeEnum $property;
-        });
+    expect($rules)->toMatchArray([
+        'property' => ['string', 'required'],
+    ]);
 
-        $this->assertEquals([
-            'property' => [new EnumRule(FakeEnum::class), 'required'],
-        ], $rules);
-    }
-
-    /** @test */
-    public function it_will_take_validation_attributes_into_account()
+    $rules = resolveRules(new class()
     {
-        $rules = $this->resolveRules(new class () {
-            #[Max(10)]
-            public string $property;
-        });
+        public int $property;
+    });
 
-        $this->assertEquals([
-            'property' => ['string', 'max:10', 'required'],
-        ], $rules);
-    }
+    expect($rules)->toMatchArray([
+        'property' => ['numeric', 'required'],
+    ]);
 
-    /** @test */
-    public function it_will_take_rules_from_nested_data_objects()
+    $rules = resolveRules(new class()
     {
-        $rules = $this->resolveRules(new class () {
-            public SimpleData $property;
-        });
+        public bool $property;
+    });
 
-        $this->assertEquals([
-            'property' => ['required', 'array'],
-            'property.string' => ['string', 'required'],
-        ], $rules);
+    expect($rules)->toMatchArray([
+        'property' => ['boolean'],
+    ]);
 
-        $rules = $this->resolveRules(new class () {
-            public ?SimpleData $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['nullable', 'array'],
-            'property.string' => ['nullable', 'string'],
-        ], $rules);
-
-        $rules = $this->resolveRules(new class () {
-            public Optional|SimpleData $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['sometimes', 'array'],
-            'property.string' => ['nullable', 'string'],
-        ], $rules);
-
-        $rules = $this->resolveRules(new class () {
-            public null|Optional|SimpleData $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['nullable', 'sometimes', 'array'],
-            'property.string' => ['nullable', 'string'],
-        ], $rules);
-    }
-
-    /** @test */
-    public function it_will_take_rules_from_nested_data_collections()
+    $rules = resolveRules(new class()
     {
-        $rules = $this->resolveRules(new class () {
-            #[DataCollectionOf(SimpleData::class)]
-            public DataCollection $property;
-        });
+        public float $property;
+    });
 
-        $this->assertEquals([
-            'property' => ['present', 'array'],
-            'property.*.string' => ['string', 'required'],
-        ], $rules);
+    expect($rules)->toMatchArray([
+        'property' => ['numeric', 'required'],
+    ]);
 
-        $rules = $this->resolveRules(new class () {
-            #[DataCollectionOf(SimpleData::class)]
-            public ?DataCollection $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['nullable', 'array'],
-            'property.*.string' => ['string', 'required'],
-        ], $rules);
-
-        $rules = $this->resolveRules(new class () {
-            #[DataCollectionOf(SimpleData::class)]
-            public Optional|DataCollection $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['sometimes', 'array'],
-            'property.*.string' => ['string', 'required'],
-        ], $rules);
-
-        $rules = $this->resolveRules(new class () {
-            #[DataCollectionOf(SimpleData::class)]
-            public null|Optional|DataCollection $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['nullable','sometimes', 'array'],
-            'property.*.string' => ['string', 'required'],
-        ], $rules);
-    }
-
-    /** @test */
-    public function it_can_nest_validation_rules_even_further()
+    $rules = resolveRules(new class()
     {
-        $rules = $this->resolveRules(new class () {
-            public NestedData $property;
-        });
+        public array $property;
+    });
 
-        $this->assertEquals([
-            'property' => ['required', 'array'],
-            'property.simple' => ['required', 'array'],
-            'property.simple.string' => ['string', 'required'],
-        ], $rules);
+    expect($rules)->toMatchArray([
+        'property' => ['array', 'required'],
+    ]);
+});
 
-        $rules = $this->resolveRules(new class () {
-            public ?SimpleData $property;
-        });
+it('will add rules for enums', function () {
+    $this->onlyPHP81();
 
-        $this->assertEquals([
-            'property' => ['nullable', 'array'],
-            'property.string' => ['nullable', 'string'],
-        ], $rules);
-    }
-
-    /** @test */
-    public function it_will_never_add_extra_require_rules_when_not_needed()
+    $rules = resolveRules(new class()
     {
-        $rules = $this->resolveRules(new class () {
-            public ?string $property;
-        });
+        public FakeEnum $property;
+    });
 
-        $this->assertEquals([
-            'property' => ['string', new Nullable()],
-        ], $rules);
+    expect($rules)->toMatchArray([
+        'property' => [new EnumRule(FakeEnum::class), 'required'],
+    ]);
+});
 
-        $rules = $this->resolveRules(new class () {
-            public bool $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['boolean'],
-        ], $rules);
-
-        $rules = $this->resolveRules(new class () {
-            #[RequiredWith('other')]
-            public string $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['string', 'required_with:other'],
-        ], $rules);
-
-        $rules = $this->resolveRules(new class () {
-            #[Rule('required_with:other')]
-            public string $property;
-        });
-
-        $this->assertEquals([
-            'property' => ['string', 'required_with:other'],
-        ], $rules);
-    }
-
-    /** @test */
-    public function it_will_work_with_non_string_rules()
+it('will take validation attributes into account', function () {
+    $rules = resolveRules(new class()
     {
-        $rules = $this->resolveRules(new class () {
-            #[Enum(FakeEnum::class)]
-            public string $property;
-        });
+        #[Max(10)]
+        public string $property;
+    });
 
-        $this->assertEquals([
-            'property' => ['string', new EnumRule(FakeEnum::class), 'required'],
-        ], $rules);
-    }
+    expect($rules)->toMatchArray([
+        'property' => ['string', 'max:10', 'required'],
+    ]);
+});
 
-    /** @test */
-    public function it_will_take_mapped_properties_into_account()
+it('will take rules from nested data objects', function () {
+    $rules = resolveRules(new class()
     {
-        $rules = $this->resolveRules(new class () {
-            #[MapName('other')]
-            public int $property;
-        });
+        public SimpleData $property;
+    });
 
-        $this->assertEquals([
-            'other' => ['numeric', 'required'],
-        ], $rules);
+    expect($rules)->toMatchArray([
+        'property' => ['required', 'array'],
+        'property.string' => ['string', 'required'],
+    ]);
 
-        $rules = $this->resolveRules(new class () {
-            #[MapName('other')]
-            public SimpleData $property;
-        });
-
-        $this->assertEquals([
-            'other' => ['required', 'array'],
-            'other.string' => ['string', 'required'],
-        ], $rules);
-
-        $rules = $this->resolveRules(new class () {
-            #[DataCollectionOf(SimpleData::class), MapName('other')]
-            public DataCollection $property;
-        });
-
-        $this->assertEquals([
-            'other' => ['present', 'array'],
-            'other.*.string' => ['string', 'required'],
-        ], $rules);
-
-
-        $rules = $this->resolveRules(new class () {
-            #[MapName('other')]
-            public DataWithMapper $property;
-        });
-
-        $this->assertEquals([
-            'other' => ['required', 'array'],
-            'other.cased_property' => ['string', 'required'],
-            'other.data_cased_property' => ['required', 'array'],
-            'other.data_cased_property.string' => ['string', 'required'],
-            'other.data_collection_cased_property' => ['present', 'array'],
-            'other.data_collection_cased_property.*.string' => ['string', 'required'],
-        ], $rules);
-    }
-
-    /** @test */
-    public function it_will_nullify_nested_nullable_data_objects()
+    $rules = resolveRules(new class()
     {
-        $data = new class () extends Data {
-            public ?SimpleData $property;
-        };
+        public ?SimpleData $property;
+    });
 
-        $this->assertEquals([
-            'property' => ['nullable', 'array'],
-            'property.string' => ['nullable', 'string'],
-        ], $this->resolveRules($data));
-    }
+    expect($rules)->toMatchArray([
+        'property' => ['nullable', 'array'],
+        'property.string' => ['nullable', 'string'],
+    ]);
 
-    /** @test */
-    public function it_will_nullify_optional_nested_data_objects()
+    $rules = resolveRules(new class()
     {
-        $data = new class () extends Data {
-            public Optional|SimpleData $property;
-        };
+        public Optional|SimpleData $property;
+    });
 
-        $this->assertEquals([
-            'property' => ['sometimes', 'array'],
-            'property.string' => ['nullable', 'string'],
-        ], $this->resolveRules($data));
-    }
+    expect($rules)->toMatchArray([
+        'property' => ['sometimes', 'array'],
+        'property.string' => ['nullable', 'string'],
+    ]);
 
-    /** @test */
-    public function it_will_apply_rule_inferrers_rules_on_data_collections_and_data_objects()
+    $rules = resolveRules(new class()
     {
-        $data = new class () extends Data {
+        public null|Optional|SimpleData $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'property' => ['nullable', 'sometimes', 'array'],
+        'property.string' => ['nullable', 'string'],
+    ]);
+});
+
+it('will take rules from nested data collections', function () {
+    $rules = resolveRules(new class()
+    {
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'property' => ['present', 'array'],
+        'property.*.string' => ['string', 'required'],
+    ]);
+
+    $rules = resolveRules(new class()
+    {
+        #[DataCollectionOf(SimpleData::class)]
+        public ?DataCollection $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'property' => ['nullable', 'array'],
+        'property.*.string' => ['string', 'required'],
+    ]);
+
+    $rules = resolveRules(new class()
+    {
+        #[DataCollectionOf(SimpleData::class)]
+        public Optional|DataCollection $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'property' => ['sometimes', 'array'],
+        'property.*.string' => ['string', 'required'],
+    ]);
+
+    $rules = resolveRules(new class()
+    {
+        #[DataCollectionOf(SimpleData::class)]
+        public null|Optional|DataCollection $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'property' => ['nullable', 'sometimes', 'array'],
+        'property.*.string' => ['string', 'required'],
+    ]);
+});
+
+it('can nest validation rules even further', function () {
+    $rules = resolveRules(new class()
+    {
+        public NestedData $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'property' => ['required', 'array'],
+        'property.simple' => ['required', 'array'],
+        'property.simple.string' => ['string', 'required'],
+    ]);
+
+    $rules = resolveRules(new class()
+    {
+        public ?SimpleData $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'property' => ['nullable', 'array'],
+        'property.string' => ['nullable', 'string'],
+    ]);
+});
+
+it('will never add extra require rules when not needed', function () {
+    $rules = resolveRules(new class()
+    {
+        public ?string $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'property' => ['string', new Nullable()],
+    ]);
+
+    $rules = resolveRules(new class()
+    {
+        public bool $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'property' => ['boolean'],
+    ]);
+
+    $rules = resolveRules(new class()
+    {
+        #[RequiredWith('other')]
+        public string $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'property' => ['string', 'required_with:other'],
+    ]);
+
+    $rules = resolveRules(new class()
+    {
+        #[Rule('required_with:other')]
+        public string $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'property' => ['string', 'required_with:other'],
+    ]);
+});
+
+it('will work with non-string rules', function () {
+    $rules = resolveRules(new class()
+    {
+        #[Enum(FakeEnum::class)]
+        public string $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'property' => ['string', new EnumRule(FakeEnum::class), 'required'],
+    ]);
+});
+
+it('will take mapped properties into account', function () {
+    $rules = resolveRules(new class()
+    {
+        #[MapName('other')]
+        public int $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'other' => ['numeric', 'required'],
+    ]);
+
+    $rules = resolveRules(new class()
+    {
+        #[MapName('other')]
+        public SimpleData $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'other' => ['required', 'array'],
+        'other.string' => ['string', 'required'],
+    ]);
+
+    $rules = resolveRules(new class()
+    {
+        #[DataCollectionOf(SimpleData::class), MapName('other')]
+        public DataCollection $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'other' => ['present', 'array'],
+        'other.*.string' => ['string', 'required'],
+    ]);
+
+    $rules = resolveRules(new class()
+    {
+        #[MapName('other')]
+        public DataWithMapper $property;
+    });
+
+    expect($rules)->toMatchArray([
+        'other' => ['required', 'array'],
+        'other.cased_property' => ['string', 'required'],
+        'other.data_cased_property' => ['required', 'array'],
+        'other.data_cased_property.string' => ['string', 'required'],
+        'other.data_collection_cased_property' => ['present', 'array'],
+        'other.data_collection_cased_property.*.string' => ['string', 'required'],
+    ]);
+});
+
+it('will nullify nested nullable data objects', function () {
+    $data = new class() extends Data
+    {
+        public ?SimpleData $property;
+    };
+
+    expect(resolveRules($data))->toMatchArray([
+        'property' => ['nullable', 'array'],
+        'property.string' => ['nullable', 'string'],
+    ]);
+});
+
+it('will nullify optional nested data objects', function () {
+    $data = new class() extends Data
+    {
+        public Optional|SimpleData $property;
+    };
+
+    expect(resolveRules($data))->toEqual([
+        'property' => ['sometimes', 'array'],
+        'property.string' => ['nullable', 'string'],
+    ]);
+});
+
+it(
+    'will apply rule inferrers on data collections and data objects',
+    function () {
+        $data = new class() extends Data
+        {
             #[Bail]
             public SimpleData $property;
         };
 
-        $this->assertEquals([
+        expect(resolveRules($data))->toMatchArray([
             'property' => ['required', 'array', 'bail'],
             'property.string' => ['string', 'required'],
-        ], $this->resolveRules($data));
+        ]);
 
-        $data = new class () extends Data {
+        $data = new class() extends Data
+        {
             #[DataCollectionOf(SimpleData::class)]
             #[Size(10)]
             public DataCollection $property;
         };
 
-        $this->assertEquals([
+        expect(resolveRules($data))->toMatchArray([
             'property' => ['present', 'array', 'size:10'],
             'property.*.string' => ['string', 'required'],
-        ], $this->resolveRules($data));
+        ]);
     }
-
-    private function resolveRules(object $class): array
-    {
-        $reflectionProperty = new ReflectionProperty($class, 'property');
-
-        $property = DataProperty::create($reflectionProperty);
-
-        return app(DataPropertyValidationRulesResolver::class)->execute($property)->toArray();
-    }
-}
+);
