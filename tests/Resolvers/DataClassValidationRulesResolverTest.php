@@ -1,5 +1,7 @@
 <?php
 
+
+use function Pest\Laravel\mock;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
@@ -12,8 +14,6 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Resolvers\DataClassValidationRulesResolver;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
-
-use function Pest\Laravel\mock;
 
 beforeEach(function () {
     $this->resolver = app(DataClassValidationRulesResolver::class);
