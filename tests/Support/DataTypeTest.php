@@ -1,19 +1,10 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Support;
-
-use BackedEnum;
-use DateTime;
-use DateTimeImmutable;
-use DateTimeInterface;
-use Generator;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
-use JsonSerializable;
-use ReflectionProperty;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\BaseData;
@@ -38,826 +29,807 @@ use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
-use Spatie\LaravelData\Tests\TestCase;
-use UnitEnum;
 
-class DataTypeTest extends TestCase
+function resolveDataType(object $class, string $property = 'property'): DataType
 {
-    /** @test */
-    public function it_can_deduce_a_type_without_definition()
+    return DataType::create(new ReflectionProperty($class, $property));
+}
+
+it('can deduce a type without definition', function () {
+    $type = resolveDataType(new class()
     {
-        $type = $this->resolveDataType(new class () {
-            public $property;
-        });
+        public $property;
+    });
 
-        $this->assertTrue($type->isNullable);
-        $this->assertTrue($type->isMixed);
-        $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollectable);
-        $this->assertNull($type->dataClass);
-        $this->assertEmpty($type->acceptedTypes);
-    }
+    expect($type)
+        ->isNullable->toBeTrue()
+        ->isMixed->toBeTrue()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeFalse()
+        ->dataClass->toBeNull()
+        ->acceptedTypes->toBeEmpty();
+});
 
-    /** @test */
-    public function it_can_deduce_a_type_with_definition()
+it('can deduce a type with definition', function () {
+    $type = resolveDataType(new class()
     {
-        $type = $this->resolveDataType(new class () {
-            public string $property;
-        });
+        public string $property;
+    });
 
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollectable);
-        $this->assertNull($type->dataClass);
-        $this->assertEquals(['string'], array_keys($type->acceptedTypes));
-    }
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeFalse()
+        ->dataClass->toBeNull()
+        ->acceptedTypes->toHaveKeys(['string']);
+});
 
-    /** @test */
-    public function it_can_deduce_a_nullable_type_with_definition()
+it('can deduce a nullable type with definition', function () {
+    $type = resolveDataType(new class()
     {
-        $type = $this->resolveDataType(new class () {
-            public ?string $property;
-        });
+        public ?string $property;
+    });
 
-        $this->assertTrue($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollectable);
-        $this->assertNull($type->dataClass);
-        $this->assertEquals(['string'], array_keys($type->acceptedTypes));
-    }
+    expect($type)
+        ->isNullable->toBeTrue()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeFalse()
+        ->dataClass->toBeNull()
+        ->acceptedTypes->toHaveKeys(['string']);
+});
 
-    /** @test */
-    public function it_can_deduce_a_union_type_definition()
+it('can deduce a union type definition', function () {
+    $type = resolveDataType(new class()
     {
-        $type = $this->resolveDataType(new class () {
-            public string|int $property;
-        });
+        public string|int $property;
+    });
 
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollectable);
-        $this->assertNull($type->dataCollectableType);
-        $this->assertNull($type->dataClass);
-        $this->assertEquals(['string', 'int'], array_keys($type->acceptedTypes));
-    }
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeFalse()
+        ->dataCollectableType->toBeNull()
+        ->dataClass->toBeNull()
+        ->acceptedTypes->toHaveKeys(['string', 'int']);
+});
 
-    /** @test */
-    public function it_can_deduce_a_nullable_union_type_definition()
+it('can deduce a nullable union type definition', function () {
+    $type = resolveDataType(new class()
     {
-        $type = $this->resolveDataType(new class () {
-            public string|int|null $property;
-        });
+        public string|int|null $property;
+    });
 
-        $this->assertTrue($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollectable);
-        $this->assertNull($type->dataCollectableType);
-        $this->assertNull($type->dataClass);
-        $this->assertEquals(['string', 'int'], array_keys($type->acceptedTypes));
-    }
+    expect($type)
+        ->isNullable->toBeTrue()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeFalse()
+        ->dataCollectableType->toBeNull()
+        ->dataClass->toBeNull()
+        ->acceptedTypes->toHaveKeys(['string', 'int']);
+});
 
-    /** @test */
-    public function it_can_deduce_an_intersection_type_definition()
+it('can deduce an intersection type definition', function () {
+    $type = resolveDataType(new class()
     {
-        $type = $this->resolveDataType(new class () {
-            public DateTime & DateTimeImmutable $property;
-        });
+        public DateTime & DateTimeImmutable $property;
+    });
 
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollectable);
-        $this->assertNull($type->dataCollectableType);
-        $this->assertNull($type->dataClass);
-        $this->assertEquals([
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeFalse()
+        ->dataCollectableType->toBeNull()
+        ->dataClass->toBeNull()
+        ->acceptedTypes->toHaveKeys([
             DateTime::class,
             DateTimeImmutable::class,
-        ], array_keys($type->acceptedTypes));
-    }
+        ]);
+});
 
-    /** @test */
-    public function it_can_deduce_a_mixed_type()
+it('can deduce a mixed type', function () {
+    $type = resolveDataType(new class()
     {
-        $type = $this->resolveDataType(new class () {
+        public mixed $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeTrue()
+        ->isMixed->toBeTrue()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeFalse()
+        ->dataCollectableType->toBeNull()
+        ->dataClass->toBeNull()
+        ->acceptedTypes->toHaveKeys([]);
+});
+
+it('can deduce a lazy type', function () {
+    $type = resolveDataType(new class()
+    {
+        public string|Lazy $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeTrue()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeFalse()
+        ->dataCollectableType->toBeNull()
+        ->dataClass->toBeNull()
+        ->acceptedTypes->toHaveKeys(['string']);
+});
+
+it('can deduce an optional type', function () {
+    $type = resolveDataType(new class()
+    {
+        public string|Optional $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeTrue()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeFalse()
+        ->dataCollectableType->toBeNull()
+        ->dataClass->toBeNull()
+        ->acceptedTypes->toHaveKeys(['string']);
+});
+
+test('a type cannot be optional alone', function () {
+    resolveDataType(new class()
+    {
+        public Optional $property;
+    });
+})->throws(InvalidDataType::class);
+
+it('can deduce a data type', function () {
+    $type = resolveDataType(new class()
+    {
+        public SimpleData $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeTrue()
+        ->isDataCollectable->toBeFalse()
+        ->dataCollectableType->toBeNull()
+        ->dataClass->toEqual(SimpleData::class)
+        ->acceptedTypes->toHaveKeys([SimpleData::class]);
+});
+
+it('can deduce a data union type', function () {
+    $type = resolveDataType(new class()
+    {
+        public SimpleData|Lazy $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeTrue()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeTrue()
+        ->isDataCollectable->toBeFalse()
+        ->dataCollectableType->toBeNull()
+        ->dataClass->toEqual(SimpleData::class)
+        ->acceptedTypes->toHaveKeys([SimpleData::class]);
+});
+
+it('can deduce a data collection type', function () {
+    $type = resolveDataType(new class()
+    {
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeTrue()
+        ->dataCollectableType->toEqual(DataCollectableType::Default)
+        ->dataClass->toEqual(SimpleData::class)
+        ->acceptedTypes->toHaveKeys([DataCollection::class]);
+});
+
+it('can deduce a data collection union type', function () {
+    $type = resolveDataType(new class()
+    {
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection|Lazy $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeTrue()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeTrue()
+        ->dataCollectableType->toEqual(DataCollectableType::Default)
+        ->dataClass->toEqual(SimpleData::class)
+        ->acceptedTypes->toHaveKeys([DataCollection::class]);
+});
+
+it('can deduce a paginated data collection type', function () {
+    $type = resolveDataType(new class()
+    {
+        #[DataCollectionOf(SimpleData::class)]
+        public PaginatedDataCollection $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeTrue()
+        ->dataCollectableType->toEqual(DataCollectableType::Paginated)
+        ->dataClass->toEqual(SimpleData::class)
+        ->acceptedTypes->toHaveKeys([PaginatedDataCollection::class]);
+});
+
+it('can deduce a paginated data collection union type', function () {
+    $type = resolveDataType(new class()
+    {
+        #[DataCollectionOf(SimpleData::class)]
+        public PaginatedDataCollection|Lazy $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeTrue()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeTrue()
+        ->dataCollectableType->toEqual(DataCollectableType::Paginated)
+        ->dataClass->toEqual(SimpleData::class)
+        ->acceptedTypes->toHaveKeys([PaginatedDataCollection::class]);
+});
+
+it('can deduce a cursor paginated data collection type', function () {
+    $type = resolveDataType(new class()
+    {
+        #[DataCollectionOf(SimpleData::class)]
+        public CursorPaginatedDataCollection $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeTrue()
+        ->dataCollectableType->toEqual(DataCollectableType::CursorPaginated)
+        ->dataClass->toEqual(SimpleData::class)
+        ->acceptedTypes->toHaveKeys([CursorPaginatedDataCollection::class]);
+});
+
+it('can deduce a cursor paginated data collection union type', function () {
+    $type = resolveDataType(new class()
+    {
+        #[DataCollectionOf(SimpleData::class)]
+        public CursorPaginatedDataCollection|Lazy $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeTrue()
+        ->isOptional->toBeFalse()
+        ->isDataObject->toBeFalse()
+        ->isDataCollectable->toBeTrue()
+        ->dataCollectableType->toEqual(DataCollectableType::CursorPaginated)
+        ->dataClass->toEqual(SimpleData::class)
+        ->acceptedTypes->toHaveKeys([CursorPaginatedDataCollection::class]);
+});
+
+it('cannot have multiple data types', function () {
+    resolveDataType(new class()
+    {
+        public SimpleData|ComplicatedData $property;
+    });
+})->throws(InvalidDataType::class);
+
+it('cannot combine a data object and another type', function () {
+    resolveDataType(new class()
+    {
+        public SimpleData|int $property;
+    });
+})->throws(InvalidDataType::class);
+
+it('cannot combine a data collection and another type', function () {
+    resolveDataType(new class()
+    {
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection|int $property;
+    });
+})->throws(InvalidDataType::class);
+
+it(
+    'will resolve the base types for accepted types',
+    function (object $class, array $expected) {
+        expect(resolveDataType($class))
+            ->acceptedTypes->toEqualCanonicalizing($expected);
+    }
+)->with(function () {
+    yield [
+        'class' => new class()
+        {
+            public $property;
+        },
+        'expected' => [],
+    ];
+
+    yield [
+        'class' => new class()
+        {
             public mixed $property;
-        });
+        },
+        'expected' => [],
+    ];
 
-        $this->assertTrue($type->isNullable);
-        $this->assertTrue($type->isMixed);
-        $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollectable);
-        $this->assertNull($type->dataCollectableType);
-        $this->assertNull($type->dataClass);
-        $this->assertEquals([], $type->acceptedTypes);
-    }
+    yield [
+        'class' => new class()
+        {
+            public string $property;
+        },
+        'expected' => ['string' => []],
+    ];
 
-    /** @test */
-    public function it_can_deduce_a_lazy_type()
-    {
-        $type = $this->resolveDataType(new class () {
-            public string|Lazy $property;
-        });
+    yield [
+        'class' => new class()
+        {
+            public string|int|bool|float|array $property;
+        },
+        'expected' => [
+            'string' => [],
+            'int' => [],
+            'bool' => [],
+            'float' => [],
+            'array' => [],
+        ],
+    ];
 
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertTrue($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollectable);
-        $this->assertNull($type->dataCollectableType);
-        $this->assertNull($type->dataClass);
-        $this->assertEquals(['string'], array_keys($type->acceptedTypes));
-    }
-
-    /** @test */
-    public function it_can_deduce_an_optional_type()
-    {
-        $type = $this->resolveDataType(new class () {
-            public string|Optional $property;
-        });
-
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertFalse($type->isLazy);
-        $this->assertTrue($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertFalse($type->isDataCollectable);
-        $this->assertNull($type->dataCollectableType);
-        $this->assertNull($type->dataClass);
-        $this->assertEquals(['string'], array_keys($type->acceptedTypes));
-    }
-
-    /** @test */
-    public function a_type_cannot_be_optional_alone()
-    {
-        $this->expectException(InvalidDataType::class);
-
-        $this->resolveDataType(new class () {
-            public Optional $property;
-        });
-    }
-
-    /** @test */
-    public function it_can_deduce_a_data_type()
-    {
-        $type = $this->resolveDataType(new class () {
+    yield [
+        'class' => new class()
+        {
             public SimpleData $property;
-        });
-
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertTrue($type->isDataObject);
-        $this->assertFalse($type->isDataCollectable);
-        $this->assertNull($type->dataCollectableType);
-        $this->assertEquals(SimpleData::class, $type->dataClass);
-        $this->assertEquals([SimpleData::class], array_keys($type->acceptedTypes));
-    }
-
-    /** @test */
-    public function it_can_deduce_a_data_union_type()
-    {
-        $type = $this->resolveDataType(new class () {
-            public SimpleData|Lazy $property;
-        });
-
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertTrue($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertTrue($type->isDataObject);
-        $this->assertFalse($type->isDataCollectable);
-        $this->assertNull($type->dataCollectableType);
-        $this->assertEquals(SimpleData::class, $type->dataClass);
-        $this->assertEquals([SimpleData::class], array_keys($type->acceptedTypes));
-    }
-
-    /** @test */
-    public function it_can_deduce_a_data_collection_type()
-    {
-        $type = $this->resolveDataType(new class () {
-            #[DataCollectionOf(SimpleData::class)]
-            public DataCollection $property;
-        });
-
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertTrue($type->isDataCollectable);
-        $this->assertEquals(DataCollectableType::Default, $type->dataCollectableType);
-        $this->assertEquals(SimpleData::class, $type->dataClass);
-        $this->assertEquals([DataCollection::class], array_keys($type->acceptedTypes));
-    }
-
-    /** @test */
-    public function it_can_deduce_a_data_collection_union_type()
-    {
-        $type = $this->resolveDataType(new class () {
-            #[DataCollectionOf(SimpleData::class)]
-            public DataCollection|Lazy $property;
-        });
-
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertTrue($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertTrue($type->isDataCollectable);
-        $this->assertEquals(DataCollectableType::Default, $type->dataCollectableType);
-        $this->assertEquals(SimpleData::class, $type->dataClass);
-        $this->assertEquals([DataCollection::class], array_keys($type->acceptedTypes));
-    }
-
-    /** @test */
-    public function it_can_deduce_a_paginated_data_collection_type()
-    {
-        $type = $this->resolveDataType(new class () {
-            #[DataCollectionOf(SimpleData::class)]
-            public PaginatedDataCollection $property;
-        });
-
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertTrue($type->isDataCollectable);
-        $this->assertEquals(DataCollectableType::Paginated, $type->dataCollectableType);
-        $this->assertEquals(SimpleData::class, $type->dataClass);
-        $this->assertEquals([PaginatedDataCollection::class], array_keys($type->acceptedTypes));
-    }
-
-    /** @test */
-    public function it_can_deduce_a_paginated_data_collection_union_type()
-    {
-        $type = $this->resolveDataType(new class () {
-            #[DataCollectionOf(SimpleData::class)]
-            public PaginatedDataCollection|Lazy $property;
-        });
-
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertTrue($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertTrue($type->isDataCollectable);
-        $this->assertEquals(DataCollectableType::Paginated, $type->dataCollectableType);
-        $this->assertEquals(SimpleData::class, $type->dataClass);
-        $this->assertEquals([PaginatedDataCollection::class], array_keys($type->acceptedTypes));
-    }
-
-    /** @test */
-    public function it_can_deduce_a_cursor_paginated_data_collection_type()
-    {
-        $type = $this->resolveDataType(new class () {
-            #[DataCollectionOf(SimpleData::class)]
-            public CursorPaginatedDataCollection $property;
-        });
-
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertFalse($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertTrue($type->isDataCollectable);
-        $this->assertEquals(DataCollectableType::CursorPaginated, $type->dataCollectableType);
-        $this->assertEquals(SimpleData::class, $type->dataClass);
-        $this->assertEquals([CursorPaginatedDataCollection::class], array_keys($type->acceptedTypes));
-    }
-
-    /** @test */
-    public function it_can_deduce_a_cursor_paginated_data_collection_union_type()
-    {
-        $type = $this->resolveDataType(new class () {
-            #[DataCollectionOf(SimpleData::class)]
-            public CursorPaginatedDataCollection|Lazy $property;
-        });
-
-        $this->assertFalse($type->isNullable);
-        $this->assertFalse($type->isMixed);
-        $this->assertTrue($type->isLazy);
-        $this->assertFalse($type->isOptional);
-        $this->assertFalse($type->isDataObject);
-        $this->assertTrue($type->isDataCollectable);
-        $this->assertEquals(DataCollectableType::CursorPaginated, $type->dataCollectableType);
-        $this->assertEquals(SimpleData::class, $type->dataClass);
-        $this->assertEquals([CursorPaginatedDataCollection::class], array_keys($type->acceptedTypes));
-    }
-
-    /** @test */
-    public function it_cannot_have_multiple_data_types()
-    {
-        $this->expectException(InvalidDataType::class);
-
-        $this->resolveDataType(new class () {
-            public SimpleData|ComplicatedData $property;
-        });
-    }
-
-    /** @test */
-    public function it_cannot_combine_a_data_object_and_another_type()
-    {
-        $this->expectException(InvalidDataType::class);
-
-        $this->resolveDataType(new class () {
-            public SimpleData|int $property;
-        });
-    }
-
-
-    /** @test */
-    public function it_cannot_combine_a_data_collection_and_another_type()
-    {
-        $this->expectException(InvalidDataType::class);
-
-        $this->resolveDataType(new class () {
-            #[DataCollectionOf(SimpleData::class)]
-            public DataCollection|int $property;
-        });
-    }
-
-    /**
-     * @test
-     * @dataProvider acceptedBaseTypesDataProvider
-     */
-    public function it_will_resolve_the_base_types_for_accepted_types(
-        object $class,
-        array $expected,
-    ) {
-        $this->assertEqualsCanonicalizing($expected, $this->resolveDataType($class)->acceptedTypes);
-    }
-
-    public function acceptedBaseTypesDataProvider(): Generator
-    {
-        yield [
-            'class' => new class () {
-                public $property;
-            },
-            'expected' => [],
-        ];
-
-        yield [
-            'class' => new class () {
-                public mixed $property;
-            },
-            'expected' => [],
-        ];
-
-        yield [
-            'class' => new class () {
-                public string $property;
-            },
-            'expected' => ['string' => []],
-        ];
-
-        yield [
-            'class' => new class () {
-                public string|int|bool|float|array $property;
-            },
-            'expected' => [
-                'string' => [],
-                'int' => [],
-                'bool' => [],
-                'float' => [],
-                'array' => [],
+        },
+        'expected' => [
+            SimpleData::class => [
+                Data::class,
+                JsonSerializable::class,
+                Castable::class,
+                Jsonable::class,
+                Responsable::class,
+                Arrayable::class,
+                DataObject::class,
+                AppendableData::class,
+                BaseData::class,
+                IncludeableData::class,
+                ResponsableData::class,
+                TransformableData::class,
+                ValidateableData::class,
+                WrappableData::class,
             ],
-        ];
+        ],
+    ];
 
-        yield [
-            'class' => new class () {
-                public SimpleData $property;
-            },
-            'expected' => [
-                SimpleData::class => [
-                    Data::class,
-                    JsonSerializable::class,
-                    Castable::class,
-                    Jsonable::class,
-                    Responsable::class,
-                    Arrayable::class,
-                    DataObject::class,
-                    AppendableData::class,
-                    BaseData::class,
-                    IncludeableData::class,
-                    ResponsableData::class,
-                    TransformableData::class,
-                    ValidateableData::class,
-                    WrappableData::class,
-                ],
+    yield [
+        'class' => new class()
+        {
+            public DummyBackedEnum $property;
+        },
+        'expected' => [
+            DummyBackedEnum::class => [
+                UnitEnum::class,
+                BackedEnum::class,
             ],
-        ];
+        ],
+    ];
+});
 
-        yield [
-            'class' => new class () {
-                public DummyBackedEnum $property;
-            },
-            'expected' => [
-                DummyBackedEnum::class => [
-                    UnitEnum::class,
-                    BackedEnum::class,
-                ],
-            ],
-        ];
+it(
+    'can check if a data type accepts a type',
+    function (object $class, string $type, bool $accepts) {
+        expect(resolveDataType($class))->acceptsType($type)->toEqual($accepts);
     }
+)->with(function () {
+    // Base types
 
-    /**
-     * @test
-     * @dataProvider acceptTypeDataProvider
-     */
-    public function it_can_check_if_a_data_type_accepts_a_type(
-        object $class,
-        string $type,
-        bool $accepts
-    ) {
-        $this->assertEquals($accepts, $this->resolveDataType($class)->acceptsType($type));
+    yield [
+        'class' => new class()
+        {
+            public $property;
+        },
+        'type' => 'string',
+        'accepts' => true,
+    ];
+
+    yield [
+        'class' => new class()
+        {
+            public mixed $property;
+        },
+        'type' => 'string',
+        'accepts' => true,
+    ];
+
+    yield [
+        'class' => new class()
+        {
+            public string $property;
+        },
+        'type' => 'string',
+        'accepts' => true,
+    ];
+
+    yield [
+        'class' => new class()
+        {
+            public bool $property;
+        },
+        'type' => 'bool',
+        'accepts' => true,
+    ];
+
+    yield [
+        'class' => new class()
+        {
+            public int $property;
+        },
+        'type' => 'int',
+        'accepts' => true,
+    ];
+
+    yield [
+        'class' => new class()
+        {
+            public float $property;
+        },
+        'type' => 'float',
+        'accepts' => true,
+    ];
+
+    yield [
+        'class' => new class()
+        {
+            public array $property;
+        },
+        'type' => 'array',
+        'accepts' => true,
+    ];
+
+    yield [
+        'class' => new class()
+        {
+            public string $property;
+        },
+        'type' => 'array',
+        'accepts' => false,
+    ];
+
+    // Objects
+
+    yield [
+        'class' => new class()
+        {
+            public SimpleData $property;
+        },
+        'type' => SimpleData::class,
+        'accepts' => true,
+    ];
+
+    yield [
+        'class' => new class()
+        {
+            public SimpleData $property;
+        },
+        'type' => ComplicatedData::class,
+        'accepts' => false,
+    ];
+
+    // Objects with inheritance
+
+    yield 'simple inheritance' => [
+        'class' => new class()
+        {
+            public Data $property;
+        },
+        'type' => SimpleData::class,
+        'accepts' => true,
+    ];
+
+    yield 'reversed inheritance' => [
+        'class' => new class()
+        {
+            public SimpleData $property;
+        },
+        'type' => Data::class,
+        'accepts' => false,
+    ];
+
+    yield 'false inheritance' => [
+        'class' => new class()
+        {
+            public Model $property;
+        },
+        'type' => SimpleData::class,
+        'accepts' => false,
+    ];
+
+    // Objects with interfaces
+
+    yield 'simple interface implementation' => [
+        'class' => new class()
+        {
+            public DateTimeInterface $property;
+        },
+        'type' => DateTime::class,
+        'accepts' => true,
+    ];
+
+    yield 'reversed interface implementation' => [
+        'class' => new class()
+        {
+            public DateTime $property;
+        },
+        'type' => DateTimeInterface::class,
+        'accepts' => false,
+    ];
+
+    yield 'false interface implementation' => [
+        'class' => new class()
+        {
+            public Model $property;
+        },
+        'type' => DateTime::class,
+        'accepts' => false,
+    ];
+
+    // Enums
+
+    yield [
+        'class' => new class()
+        {
+            public DummyBackedEnum $property;
+        },
+        'type' => DummyBackedEnum::class,
+        'accepts' => true,
+    ];
+});
+
+it(
+    'can check if a data type accepts a value',
+    function (object $class, mixed $value, bool $accepts) {
+        expect(resolveDataType($class))->acceptsValue($value)->toEqual($accepts);
     }
+)->with(function () {
+    yield [
+        'class' => new class()
+        {
+            public ?string $property;
+        },
+        'value' => null,
+        'accepts' => true,
+    ];
 
-    public function acceptTypeDataProvider(): Generator
-    {
-        // Base types
+    yield [
+        'class' => new class()
+        {
+            public string $property;
+        },
+        'value' => 'Hello',
+        'accepts' => true,
+    ];
 
-        yield [
-            'class' => new class () {
-                public $property;
-            },
-            'type' => 'string',
-            'accepts' => true,
-        ];
+    yield [
+        'class' => new class()
+        {
+            public string $property;
+        },
+        'value' => 3.14,
+        'accepts' => false,
+    ];
 
-        yield [
-            'class' => new class () {
-                public mixed $property;
-            },
-            'type' => 'string',
-            'accepts' => true,
-        ];
+    yield [
+        'class' => new class()
+        {
+            public mixed $property;
+        },
+        'value' => 3.14,
+        'accepts' => true,
+    ];
 
-        yield [
-            'class' => new class () {
-                public string $property;
-            },
-            'type' => 'string',
-            'accepts' => true,
-        ];
+    yield [
+        'class' => new class()
+        {
+            public Data $property;
+        },
+        'value' => new SimpleData('Hello'),
+        'accepts' => true,
+    ];
 
-        yield [
-            'class' => new class () {
-                public bool $property;
-            },
-            'type' => 'bool',
-            'accepts' => true,
-        ];
+    yield [
+        'class' => new class()
+        {
+            public SimpleData $property;
+        },
+        'value' => new SimpleData('Hello'),
+        'accepts' => true,
+    ];
 
-        yield [
-            'class' => new class () {
-                public int $property;
-            },
-            'type' => 'int',
-            'accepts' => true,
-        ];
+    yield [
+        'class' => new class()
+        {
+            public SimpleData $property;
+        },
+        'value' => new SimpleDataWithMappedProperty('Hello'),
+        'accepts' => false,
+    ];
 
-        yield [
-            'class' => new class () {
-                public float $property;
-            },
-            'type' => 'float',
-            'accepts' => true,
-        ];
+    yield [
+        'class' => new class()
+        {
+            public DummyBackedEnum $property;
+        },
+        'value' => DummyBackedEnum::FOO,
+        'accepts' => true,
+    ];
+});
 
-        yield [
-            'class' => new class () {
-                public array $property;
-            },
-            'type' => 'array',
-            'accepts' => true,
-        ];
-
-        yield [
-            'class' => new class () {
-                public string $property;
-            },
-            'type' => 'array',
-            'accepts' => false,
-        ];
-
-        // Objects
-
-        yield [
-            'class' => new class () {
-                public SimpleData $property;
-            },
-            'type' => SimpleData::class,
-            'accepts' => true,
-        ];
-
-        yield [
-            'class' => new class () {
-                public SimpleData $property;
-            },
-            'type' => ComplicatedData::class,
-            'accepts' => false,
-        ];
-
-        // Objects with inheritance
-
-        yield 'simple inheritance' => [
-            'class' => new class () {
-                public Data $property;
-            },
-            'type' => SimpleData::class,
-            'accepts' => true,
-        ];
-
-        yield 'reversed inheritance' => [
-            'class' => new class () {
-                public SimpleData $property;
-            },
-            'type' => Data::class,
-            'accepts' => false,
-        ];
-
-        yield 'false inheritance' => [
-            'class' => new class () {
-                public Model $property;
-            },
-            'type' => SimpleData::class,
-            'accepts' => false,
-        ];
-
-        // Objects with interfaces
-
-        yield 'simple interface implementation' => [
-            'class' => new class () {
-                public DateTimeInterface $property;
-            },
-            'type' => DateTime::class,
-            'accepts' => true,
-        ];
-
-        yield 'reversed interface implementation' => [
-            'class' => new class () {
-                public DateTime $property;
-            },
-            'type' => DateTimeInterface::class,
-            'accepts' => false,
-        ];
-
-        yield 'false interface implementation' => [
-            'class' => new class () {
-                public Model $property;
-            },
-            'type' => DateTime::class,
-            'accepts' => false,
-        ];
-
-        // Enums
-
-        yield [
-            'class' => new class () {
-                public DummyBackedEnum $property;
-            },
-            'type' => DummyBackedEnum::class,
-            'accepts' => true,
-        ];
+it(
+    'can find accepted type for a base type',
+    function (object $class, string $type, ?string $expectedType) {
+        expect(resolveDataType($class))
+            ->findAcceptedTypeForBaseType($type)->toEqual($expectedType);
     }
+)->with(function () {
+    yield [
+        'class' => new class()
+        {
+            public SimpleData $property;
+        },
+        'type' => SimpleData::class,
+        'expectedType' => SimpleData::class,
+    ];
 
-    /**
-     * @test
-     * @dataProvider acceptValueDataProvider
-     */
-    public function it_can_check_if_a_data_type_accepts_a_value(
-        object $class,
-        mixed $value,
-        bool $accepts
-    ) {
-        $this->assertEquals($accepts, $this->resolveDataType($class)->acceptsValue($value));
-    }
+    yield [
+        'class' => new class()
+        {
+            public SimpleData $property;
+        },
+        'type' => Data::class,
+        'expectedType' => SimpleData::class,
+    ];
 
-    public function acceptValueDataProvider(): Generator
-    {
-        yield [
-            'class' => new class () {
-                public ?string $property;
-            },
-            'value' => null,
-            'accepts' => true,
-        ];
+    yield [
+        'class' => new class()
+        {
+            public DummyBackedEnum $property;
+        },
+        'type' => BackedEnum::class,
+        'expectedType' => DummyBackedEnum::class,
+    ];
 
-        yield [
-            'class' => new class () {
-                public string $property;
-            },
-            'value' => 'Hello',
-            'accepts' => true,
-        ];
+    yield [
+        'class' => new class()
+        {
+            public SimpleData $property;
+        },
+        'type' => DataCollection::class,
+        'expectedType' => null,
+    ];
+});
 
-        yield [
-            'class' => new class () {
-                public string $property;
-            },
-            'value' => 3.14,
-            'accepts' => false,
-        ];
-
-        yield [
-            'class' => new class () {
-                public mixed $property;
-            },
-            'value' => 3.14,
-            'accepts' => true,
-        ];
-
-        yield [
-            'class' => new class () {
-                public Data $property;
-            },
-            'value' => new SimpleData('Hello'),
-            'accepts' => true,
-        ];
-
-        yield [
-            'class' => new class () {
-                public SimpleData $property;
-            },
-            'value' => new SimpleData('Hello'),
-            'accepts' => true,
-        ];
-
-        yield [
-            'class' => new class () {
-                public SimpleData $property;
-            },
-            'value' => new SimpleDataWithMappedProperty('Hello'),
-            'accepts' => false,
-        ];
-
-        yield [
-            'class' => new class () {
-                public DummyBackedEnum $property;
-            },
-            'value' => DummyBackedEnum::FOO,
-            'accepts' => true,
-        ];
-    }
-
-    /**
-     * @test
-     * @dataProvider acceptedTypeForBaseTypesDataProvider
-     */
-    public function it_can_find_an_accepted_type_for_a_base_type(
-        object $class,
-        string $type,
-        ?string $expectedType
-    ) {
-        $this->assertEquals($expectedType, $this->resolveDataType($class)->findAcceptedTypeForBaseType($type));
-    }
-
-    public function acceptedTypeForBaseTypesDataProvider(): Generator
-    {
-        yield [
-            'class' => new class () {
-                public SimpleData $property;
-            },
-            'type' => SimpleData::class,
-            'expectedType' => SimpleData::class,
-        ];
-
-        yield [
-            'class' => new class () {
-                public SimpleData $property;
-            },
-            'type' => Data::class,
-            'expectedType' => SimpleData::class,
-        ];
-
-        yield [
-            'class' => new class () {
-                public DummyBackedEnum $property;
-            },
-            'type' => BackedEnum::class,
-            'expectedType' => DummyBackedEnum::class,
-        ];
-
-        yield [
-            'class' => new class () {
-                public SimpleData $property;
-            },
-            'type' => DataCollection::class,
-            'expectedType' => null,
-        ];
-    }
-
-    /**
-     * @test
-     * @dataProvider correctAnnotationsDataProvider
-     */
-    public function it_can_get_the_data_class_for_a_data_collection_by_annotation(
-        string $property,
-        ?string $expected
-    ) {
+it(
+    'can get the data class for a data collection by annotation',
+    function (string $property, ?string $expected) {
         $dataType = DataType::create(new ReflectionProperty(CollectionAnnotationsData::class, $property));
 
-        $this->assertEquals($expected, $dataType->dataClass);
+        expect($dataType->dataClass)->toEqual($expected);
     }
+)->with(function () {
+    yield [
+        'property' => 'propertyA',
+        'expected' => SimpleData::class,
+    ];
 
-    public function correctAnnotationsDataProvider(): Generator
-    {
-        yield [
-            'property' => 'propertyA',
-            'expected' => SimpleData::class,
-        ];
+    yield [
+        'property' => 'propertyB',
+        'expected' => SimpleData::class,
+    ];
 
-        yield [
-            'property' => 'propertyB',
-            'expected' => SimpleData::class,
-        ];
+    yield [
+        'property' => 'propertyC',
+        'expected' => SimpleData::class,
+    ];
 
-        yield [
-            'property' => 'propertyC',
-            'expected' => SimpleData::class,
-        ];
+    yield [
+        'property' => 'propertyD',
+        'expected' => SimpleData::class,
+    ];
 
-        yield [
-            'property' => 'propertyD',
-            'expected' => SimpleData::class,
-        ];
+    yield [
+        'property' => 'propertyE',
+        'expected' => SimpleData::class,
+    ];
 
-        yield [
-            'property' => 'propertyE',
-            'expected' => SimpleData::class,
-        ];
+    yield [
+        'property' => 'propertyF',
+        'expected' => SimpleData::class,
+    ];
 
-        yield [
-            'property' => 'propertyF',
-            'expected' => SimpleData::class,
-        ];
+    yield [
+        'property' => 'propertyG',
+        'expected' => SimpleData::class,
+    ];
 
-        yield [
-            'property' => 'propertyG',
-            'expected' => SimpleData::class,
-        ];
+    yield [
+        'property' => 'propertyH',
+        'expected' => SimpleData::class,
+    ];
 
-        yield [
-            'property' => 'propertyH',
-            'expected' => SimpleData::class,
-        ];
+    yield [
+        'property' => 'propertyI',
+        'expected' => SimpleData::class,
+    ];
 
-        yield [
-            'property' => 'propertyI',
-            'expected' => SimpleData::class,
-        ];
+    yield [
+        'property' => 'propertyJ',
+        'expected' => SimpleData::class,
+    ];
 
-        yield [
-            'property' => 'propertyJ',
-            'expected' => SimpleData::class,
-        ];
+    yield [
+        'property' => 'propertyK',
+        'expected' => SimpleData::class,
+    ];
 
-        yield [
-            'property' => 'propertyK',
-            'expected' => SimpleData::class,
-        ];
+    yield [
+        'property' => 'propertyL',
+        'expected' => SimpleData::class,
+    ];
+});
 
-        yield [
-            'property' => 'propertyL',
-            'expected' => SimpleData::class,
-        ];
-    }
-
-    /**
-     * @test
-     * @dataProvider invalidAnnotationsDataProvider
-     */
-    public function it_cannot_get_the_data_class_for_invalid_annotations(
-        string $property,
-    ) {
-        $this->expectException(CannotFindDataClass::class);
-
-        DataType::create(new ReflectionProperty(CollectionAnnotationsData::class, $property));
-    }
-
-    public function invalidAnnotationsDataProvider(): Generator
-    {
+it('cannot get the data class for invalid annotations')
+    ->tap(
+        fn (string $property) => DataType::create(
+            new ReflectionProperty(CollectionAnnotationsData::class, $property)
+        )
+    )
+    ->throws(CannotFindDataClass::class)
+    ->with(function () {
         yield [
             'property' => 'propertyM',
         ];
@@ -869,10 +841,4 @@ class DataTypeTest extends TestCase
         yield [
             'property' => 'propertyO',
         ];
-    }
-
-    private function resolveDataType(object $class, string $property = 'property'): DataType
-    {
-        return DataType::create(new ReflectionProperty($class, $property));
-    }
-}
+    });
