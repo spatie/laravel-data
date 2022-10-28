@@ -1,123 +1,139 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Transformers;
-
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use DateTime;
-use DateTimeImmutable;
-use ReflectionProperty;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Tests\TestCase;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
-class DateTimeInterfaceTransformerTest extends TestCase
-{
-    /** @test */
-    public function it_can_transform_dates()
+it('can transform dates', function () {
+    $transformer = new DateTimeInterfaceTransformer();
+
+    $class = new class()
     {
-        $transformer = new DateTimeInterfaceTransformer();
+        public Carbon $carbon;
 
-        $class = new class () {
-            public Carbon $carbon;
+        public CarbonImmutable $carbonImmutable;
 
-            public CarbonImmutable $carbonImmutable;
+        public DateTime $dateTime;
 
-            public DateTime $dateTime;
+        public DateTimeImmutable $dateTimeImmutable;
+    };
 
-            public DateTimeImmutable $dateTimeImmutable;
-        };
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'carbon')),
+            new Carbon('19-05-1994 00:00:00')
+        )
+    )->toEqual('1994-05-19T00:00:00+00:00');
 
-        $this->assertEquals(
-            '1994-05-19T00:00:00+00:00',
-            $transformer->transform(DataProperty::create(new ReflectionProperty($class, 'carbon')), new Carbon('19-05-1994 00:00:00'))
-        );
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')),
+            new CarbonImmutable('19-05-1994 00:00:00')
+        )
+    )->toEqual('1994-05-19T00:00:00+00:00');
 
-        $this->assertEquals(
-            '1994-05-19T00:00:00+00:00',
-            $transformer->transform(DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')), new CarbonImmutable('19-05-1994 00:00:00'))
-        );
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'dateTime')),
+            new DateTime('19-05-1994 00:00:00')
+        )
+    )->toEqual('1994-05-19T00:00:00+00:00');
 
-        $this->assertEquals(
-            '1994-05-19T00:00:00+00:00',
-            $transformer->transform(DataProperty::create(new ReflectionProperty($class, 'dateTime')), new DateTime('19-05-1994 00:00:00'))
-        );
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')),
+            new DateTimeImmutable('19-05-1994 00:00:00')
+        )
+    )->toEqual('1994-05-19T00:00:00+00:00');
+});
 
-        $this->assertEquals(
-            '1994-05-19T00:00:00+00:00',
-            $transformer->transform(DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')), new DateTimeImmutable('19-05-1994 00:00:00'))
-        );
-    }
+it('can transform dates with an alternative format', function () {
+    $transformer = new DateTimeInterfaceTransformer(format: 'd-m-Y');
 
-    /** @test */
-    public function it_can_transform_dates_with_an_alternative_format()
+    $class = new class()
     {
-        $transformer = new DateTimeInterfaceTransformer(format: 'd-m-Y');
+        public Carbon $carbon;
 
-        $class = new class () {
-            public Carbon $carbon;
+        public CarbonImmutable $carbonImmutable;
 
-            public CarbonImmutable $carbonImmutable;
+        public DateTime $dateTime;
 
-            public DateTime $dateTime;
+        public DateTimeImmutable $dateTimeImmutable;
+    };
 
-            public DateTimeImmutable $dateTimeImmutable;
-        };
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'carbon')),
+            new Carbon('19-05-1994 00:00:00'),
+            []
+        )
+    )->toEqual('19-05-1994');
 
-        $this->assertEquals(
-            '19-05-1994',
-            $transformer->transform(DataProperty::create(new ReflectionProperty($class, 'carbon')), new Carbon('19-05-1994 00:00:00'), [])
-        );
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')),
+            new CarbonImmutable('19-05-1994 00:00:00'),
+            []
+        )
+    )->toEqual('19-05-1994');
 
-        $this->assertEquals(
-            '19-05-1994',
-            $transformer->transform(DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')), new CarbonImmutable('19-05-1994 00:00:00'), [])
-        );
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'dateTime')),
+            new DateTime('19-05-1994 00:00:00'),
+            []
+        )
+    )->toEqual('19-05-1994');
 
-        $this->assertEquals(
-            '19-05-1994',
-            $transformer->transform(DataProperty::create(new ReflectionProperty($class, 'dateTime')), new DateTime('19-05-1994 00:00:00'), [])
-        );
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')),
+            new DateTimeImmutable('19-05-1994 00:00:00'),
+            []
+        )
+    )->toEqual('19-05-1994');
+});
 
-        $this->assertEquals(
-            '19-05-1994',
-            $transformer->transform(DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')), new DateTimeImmutable('19-05-1994 00:00:00'), [])
-        );
-    }
+it('can change the timezone', function () {
+    $transformer = new DateTimeInterfaceTransformer(setTimeZone: 'Europe/Brussels');
 
-    /** @test */
-    public function it_can_change_the_timezone()
+    $class = new class()
     {
-        $transformer = new DateTimeInterfaceTransformer(setTimeZone: 'Europe/Brussels');
+        public Carbon $carbon;
 
-        $class = new class () {
-            public Carbon $carbon;
+        public CarbonImmutable $carbonImmutable;
 
-            public CarbonImmutable $carbonImmutable;
+        public DateTime $dateTime;
 
-            public DateTime $dateTime;
+        public DateTimeImmutable $dateTimeImmutable;
+    };
 
-            public DateTimeImmutable $dateTimeImmutable;
-        };
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'carbon')),
+            new Carbon('19-05-1994 00:00:00')
+        )
+    )->toEqual('1994-05-19T02:00:00+02:00');
 
-        $this->assertEquals(
-            '1994-05-19T02:00:00+02:00',
-            $transformer->transform(DataProperty::create(new ReflectionProperty($class, 'carbon')), new Carbon('19-05-1994 00:00:00'))
-        );
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')),
+            new CarbonImmutable('19-05-1994 00:00:00')
+        )
+    )->toEqual('1994-05-19T02:00:00+02:00');
 
-        $this->assertEquals(
-            '1994-05-19T02:00:00+02:00',
-            $transformer->transform(DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')), new CarbonImmutable('19-05-1994 00:00:00'))
-        );
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'dateTime')),
+            new DateTime('19-05-1994 00:00:00')
+        )
+    )->toEqual('1994-05-19T02:00:00+02:00');
 
-        $this->assertEquals(
-            '1994-05-19T02:00:00+02:00',
-            $transformer->transform(DataProperty::create(new ReflectionProperty($class, 'dateTime')), new DateTime('19-05-1994 00:00:00'))
-        );
-
-        $this->assertEquals(
-            '1994-05-19T02:00:00+02:00',
-            $transformer->transform(DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')), new DateTimeImmutable('19-05-1994 00:00:00'))
-        );
-    }
-}
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')),
+            new DateTimeImmutable('19-05-1994 00:00:00')
+        )
+    )->toEqual('1994-05-19T02:00:00+02:00');
+});
