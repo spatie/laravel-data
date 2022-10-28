@@ -10,98 +10,50 @@ use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Support\Validation\RulesMapper;
-use Spatie\LaravelData\Tests\TestCase;
 
-class RulesMapperTest extends TestCase
-{
-    private RulesMapper $mapper;
+beforeEach(function () {
+    $this->mapper = resolve(RulesMapper::class);
+});
 
-    public function setUp(): void
+it('can map string rules')
+    ->expect(fn () => $this->mapper->execute(['required']))
+    ->toEqual([new Required()]);
+
+it('can map string rules with arguments')
+    ->expect(fn () => $this->mapper->execute(['exists:users']))
+    ->toEqual([new Exists(rule: new BaseExists('users'))]);
+
+it('can map string rules with key-value arguments')
+    ->expect(fn () => $this->mapper->execute(['dimensions:min_width=100,min_height=200']))
+    ->toEqual([new Dimensions(minWidth: 100, minHeight: 200)]);
+
+it('can map multiple rules')
+    ->expect(fn () => $this->mapper->execute(['required', 'min:0']))
+    ->toEqual([new Required(), new Min(0)]);
+
+it('can map multiple concatenated rules')
+    ->expect(fn () => $this->mapper->execute(['required|min:0']))
+    ->toEqual([new Required(), new Min(0)]);
+
+it('can map faulty rules')
+    ->expect(fn () => $this->mapper->execute(['min:']))
+    ->toEqual([new Rule('min:')]);
+
+it('can map Laravel rule objects')
+    ->expect(fn () => $this->mapper->execute([new BaseExists('users')]))
+    ->toEqual([new Exists('users')]);
+
+it('can map a custom Laravel rule objects', function () {
+    $rule = new class() implements CustomRuleContract
     {
-        parent::setUp();
+        public function passes($attribute, $value)
+        {
+        }
 
-        $this->mapper = resolve(RulesMapper::class);
-    }
+        public function message()
+        {
+        }
+    };
 
-    /** @test */
-    public function it_can_map_string_rules()
-    {
-        $this->assertEquals(
-            [new Required()],
-            $this->mapper->execute(['required'])
-        );
-    }
-
-    /** @test */
-    public function it_can_map_string_rules_with_arguments()
-    {
-        $this->assertEquals(
-            [new Exists(rule: new BaseExists('users'))],
-            $this->mapper->execute(['exists:users'])
-        );
-    }
-
-    /** @test */
-    public function it_can_map_string_rules_with_key_value_arguments()
-    {
-        $this->assertEquals(
-            [new Dimensions(minWidth: 100, minHeight: 200)],
-            $this->mapper->execute(['dimensions:min_width=100,min_height=200'])
-        );
-    }
-
-    /** @test */
-    public function it_can_map_multiple_rules()
-    {
-        $this->assertEquals(
-            [new Required(), new Min(0)],
-            $this->mapper->execute(['required', 'min:0'])
-        );
-    }
-
-    /** @test */
-    public function it_can_map_multiple_concatenated_rules()
-    {
-        $this->assertEquals(
-            [new Required(), new Min(0)],
-            $this->mapper->execute(['required|min:0'])
-        );
-    }
-
-    /** @test */
-    public function it_can_map_faulty_rules()
-    {
-        $this->assertEquals(
-            [new Rule('min:')],
-            $this->mapper->execute(['min:'])
-        );
-    }
-
-    /** @test */
-    public function it_can_map_laravel_rule_objects()
-    {
-        $this->assertEquals(
-            [new Exists('users')],
-            $this->mapper->execute([new BaseExists('users')])
-        );
-    }
-
-    /** @test */
-    public function it_can_map_custom_laravel_rule_objects()
-    {
-        $rule = new class () implements CustomRuleContract {
-            public function passes($attribute, $value)
-            {
-            }
-
-            public function message()
-            {
-            }
-        };
-
-        $this->assertEquals(
-            [new Rule($rule)],
-            $this->mapper->execute([$rule])
-        );
-    }
-}
+    expect($this->mapper->execute([$rule]))->toEqual([new Rule($rule)]);
+});
