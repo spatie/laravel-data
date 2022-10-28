@@ -1,0 +1,14 @@
+{
+nullable: number | null;
+undefineable?: number;
+int: number;
+bool: boolean;
+string: string;
+float: number;
+array: Array<string>;
+lazy?: string;
+simpleData: {%Spatie\LaravelData\Tests\Fakes\SimpleData%};
+dataCollection: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
+dataCollectionAlternative: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
+dataCollectionWithAttribute: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
+}
