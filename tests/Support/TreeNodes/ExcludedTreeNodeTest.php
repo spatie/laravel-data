@@ -8,67 +8,42 @@ use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
 use Spatie\LaravelData\Tests\TestCase;
 
-class ExcludedTreeNodeTest extends TestCase
-{
-    /** @test */
-    public function it_can_merge_a_node()
-    {
-        $node = new ExcludedTreeNode();
+it('can merge a node', function () {
+    $node = new ExcludedTreeNode();
 
-        $this->assertEquals(
-            new AllTreeNode(),
-            $node->merge(new AllTreeNode())
-        );
+    expect($node->merge(new AllTreeNode()))
+        ->toEqual(new AllTreeNode());
 
-        $this->assertEquals(
-            $node,
-            $node->merge(new ExcludedTreeNode())
-        );
+    expect($node->merge(new ExcludedTreeNode()))
+        ->toEqual($node);
 
-        $this->assertEquals(
-            new DisabledTreeNode(),
-            $node->merge(new DisabledTreeNode())
-        );
+    expect($node->merge(new DisabledTreeNode()))
+        ->toEqual(new DisabledTreeNode());
 
-        $this->assertEquals(
-            new PartialTreeNode(),
-            $node->merge(new PartialTreeNode())
-        );
+    expect($node->merge(new PartialTreeNode()))
+        ->toEqual(new PartialTreeNode());
 
-        $this->assertEquals(
-            new PartialTreeNode(['nested' => new ExcludedTreeNode()]),
-            $node->merge(new PartialTreeNode(['nested' => new ExcludedTreeNode()]))
-        );
-    }
+    expect(
+        $node->merge(new PartialTreeNode(['nested' => new ExcludedTreeNode()]))
+    )
+        ->toEqual(new PartialTreeNode(['nested' => new ExcludedTreeNode()]));
+});
 
-    /** @test */
-    public function it_can_intersect_a_node()
-    {
-        $node = new ExcludedTreeNode();
+it('can intersect a node', function () {
+    $node = new ExcludedTreeNode();
 
-        $this->assertEquals(
-            $node,
-            $node->intersect(new AllTreeNode())
-        );
+    expect($node->intersect(new AllTreeNode()))
+        ->toEqual($node);
 
-        $this->assertEquals(
-            $node,
-            $node->intersect(new ExcludedTreeNode())
-        );
+    expect($node->intersect(new ExcludedTreeNode()))
+        ->toEqual($node);
 
-        $this->assertEquals(
-            $node,
-            $node->intersect(new DisabledTreeNode())
-        );
+    expect($node->intersect(new DisabledTreeNode()))
+        ->toEqual($node);
 
-        $this->assertEquals(
-            $node,
-            $node->intersect(new PartialTreeNode())
-        );
+    expect($node->intersect(new PartialTreeNode()))
+        ->toEqual($node);
 
-        $this->assertEquals(
-            $node,
-            $node->intersect(new PartialTreeNode(['nested' => new ExcludedTreeNode()]))
-        );
-    }
-}
+    expect($node->intersect(new PartialTreeNode(['nested' => new ExcludedTreeNode()])))
+        ->toEqual($node);
+});
