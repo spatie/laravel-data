@@ -12,147 +12,140 @@ use Spatie\LaravelData\Tests\Fakes\DataWithMultipleArgumentCreationMethod;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestCase;
 
-class DataMethodTest extends TestCase
-{
-    /** @test */
-    public function it_can_create_a_data_method_from_a_constructor()
+it('can create a data method from a constructor', function () {
+    $class = new class() extends Data
     {
-        $class = new class () extends Data {
-            public function __construct(
-                public string $promotedProperty = 'hello',
-                string $property = 'hello',
-            ) {
-            }
-        };
+        public function __construct(
+            public string $promotedProperty = 'hello',
+            string $property = 'hello',
+        ) {
+        }
+    };
 
-        $method = DataMethod::createConstructor(
-            new ReflectionMethod($class, '__construct'),
-            collect(['promotedProperty' => DataProperty::create(new ReflectionProperty($class, 'promotedProperty'))])
-        );
+    $method = DataMethod::createConstructor(
+        new ReflectionMethod($class, '__construct'),
+        collect(['promotedProperty' => DataProperty::create(new ReflectionProperty($class, 'promotedProperty'))])
+    );
 
-        $this->assertEquals('__construct', $method->name);
-        $this->assertCount(2, $method->parameters);
-        $this->assertInstanceOf(DataProperty::class, $method->parameters[0]);
-        $this->assertInstanceOf(DataParameter::class, $method->parameters[1]);
-        $this->assertTrue($method->isPublic);
-        $this->assertFalse($method->isStatic);
-        $this->assertFalse($method->isCustomCreationMethod);
-    }
+    expect($method)
+        ->name->toEqual('__construct')
+        ->parameters->toHaveCount(2)
+        ->isPublic->toBeTrue()
+        ->isStatic->toBeFalse()
+        ->isCustomCreationMethod->toBeFalse()
+        ->and($method->parameters[0])->toBeInstanceOf(DataProperty::class)
+        ->and($method->parameters[1])->toBeInstanceOf(DataParameter::class);
+});
 
-    /** @test */
-    public function it_can_create_a_data_method_from_a_magic_method()
+it('can create a data method from a magic method', function () {
+    $class = new class() extends Data
     {
-        $class = new class () extends Data {
-            public static function fromString(
-                string $property,
-            ) {
-            }
-        };
+        public static function fromString(
+            string $property,
+        ) {
+        }
+    };
 
-        $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
+    $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
 
-        $this->assertEquals('fromString', $method->name);
-        $this->assertCount(1, $method->parameters);
-        $this->assertInstanceOf(DataParameter::class, $method->parameters[0]);
-        $this->assertTrue($method->isPublic);
-        $this->assertTrue($method->isStatic);
-        $this->assertTrue($method->isCustomCreationMethod);
-    }
+    expect($method)
+        ->name->toEqual('fromString')
+        ->parameters->toHaveCount(1)
+        ->isPublic->toBeTrue()
+        ->isStatic->toBeTrue()
+        ->isCustomCreationMethod->toBeTrue()
+        ->and($method->parameters[0])->toBeInstanceOf(DataParameter::class);
+});
 
-    /** @test */
-    public function it_correctly_accepts_single_values_as_magic_creation_method()
+it('correctly accepts single values as magic creation method', function () {
+    $class = new class() extends Data
     {
-        $class = new class () extends Data {
-            public static function fromString(
-                string $property,
-            ) {
-            }
-        };
+        public static function fromString(
+            string $property,
+        ) {
+        }
+    };
 
-        $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
+    $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
 
-        $this->assertTrue($method->accepts('Hello'));
-        $this->assertFalse($method->accepts(3.14));
-    }
+    expect($method)
+        ->accepts('Hello')->toBeTrue()
+        ->accepts(3.14)->toBeFalse();
+});
 
-    /** @test */
-    public function it_correctly_accepts_single_inherited_values_as_magic_creation_method()
+it('correctly accepts single inherited values as magic creation method', function () {
+    $class = new class() extends Data
     {
-        $class = new class () extends Data {
-            public static function fromString(
-                Data $property,
-            ) {
-            }
-        };
+        public static function fromString(
+            Data $property,
+        ) {
+        }
+    };
 
-        $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
+    $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
 
-        $this->assertTrue($method->accepts(new SimpleData('Hello')));
-    }
+    expect($method->accepts(new SimpleData('Hello')))->toBeTrue();
+});
 
-    /** @test */
-    public function it_correctly_accepts_multiple_values_as_magic_creation_method()
-    {
-        $method = DataMethod::create(new ReflectionMethod(DataWithMultipleArgumentCreationMethod::class, 'fromMultiple'));
+it('correctly accepts multiple values as magic creation method', function () {
+    $method = DataMethod::create(new ReflectionMethod(DataWithMultipleArgumentCreationMethod::class, 'fromMultiple'));
 
-        $this->assertTrue($method->accepts('Hello', 42));
-        $this->assertTrue($method->accepts(...[
+    expect($method)
+        ->accepts('Hello', 42)->toBeTrue()
+        ->accepts(...[
             'number' => 42,
             'string' => 'hello',
-        ]));
+        ])->toBeTrue()
+        ->accepts(42, 'Hello')->toBeFalse();
+});
 
-        $this->assertFalse($method->accepts(42, 'Hello'));
-    }
-
-    /** @test */
-    public function it_correctly_accepts_mixed_values_as_magic_creation_method()
+it('correctly accepts mixed values as magic creation method', function () {
+    $class = new class() extends Data
     {
-        $class = new class () extends Data {
-            public static function fromString(
-                mixed $property,
-            ) {
-            }
-        };
+        public static function fromString(
+            mixed $property,
+        ) {
+        }
+    };
 
-        $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
+    $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
 
-        $this->assertTrue($method->accepts(new SimpleData('Hello')));
-        $this->assertTrue($method->accepts(null));
-    }
+    expect($method)
+        ->accepts(new SimpleData('Hello'))->toBeTrue()
+        ->accepts(null)->toBeTrue();
+});
 
-    /** @test */
-    public function it_correctly_accepts_values_with_defaults_as_magic_creation_method()
+it('correctly accepts values with defaults as magic creation method', function () {
+    $class = new class() extends Data
     {
-        $class = new class () extends Data {
-            public static function fromString(
-                string $property = 'Hello',
-            ) {
-            }
-        };
+        public static function fromString(
+            string $property = 'Hello',
+        ) {
+        }
+    };
 
-        $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
+    $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
 
-        $this->assertTrue($method->accepts('Hello'));
-        $this->assertTrue($method->accepts());
-    }
+    expect($method)
+        ->accepts('Hello')->toBeTrue()
+        ->accepts()->toBeTrue();
+});
 
-    /** @test */
-    public function it_needs_a_correct_amount_of_parameters_as_magic_creation_method()
+it('needs a correct amount of parameters as magic creation method', function () {
+    $class = new class() extends Data
     {
-        $class = new class () extends Data {
-            public static function fromString(
-                string $property,
-                string $propertyWithDefault = 'Hello',
-            ) {
-            }
-        };
+        public static function fromString(
+            string $property,
+            string $propertyWithDefault = 'Hello',
+        ) {
+        }
+    };
 
-        $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
+    $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
 
-        $this->assertTrue($method->accepts('Hello'));
-        $this->assertTrue($method->accepts('Hello', 'World'));
-
-        $this->assertFalse($method->accepts());
-        $this->assertFalse($method->accepts('Hello', 'World', 'Nope'));
-    }
-}
+    expect($method)
+        ->accepts('Hello')->toBeTrue()
+        ->accepts('Hello', 'World')->toBeTrue()
+        ->accepts()->toBeFalse()
+        ->accepts('Hello', 'World', 'Nope')->toBeFalse();
+});
