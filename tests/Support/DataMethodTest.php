@@ -1,7 +1,5 @@
 <?php
 
-use ReflectionMethod;
-use ReflectionProperty;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Support\DataParameter;
