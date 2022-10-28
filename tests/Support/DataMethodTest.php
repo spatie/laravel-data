@@ -1,7 +1,5 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Support;
-
 use ReflectionMethod;
 use ReflectionProperty;
 use Spatie\LaravelData\Data;
@@ -10,7 +8,6 @@ use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Fakes\DataWithMultipleArgumentCreationMethod;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\TestCase;
 
 it('can create a data method from a constructor', function () {
     $class = new class() extends Data
