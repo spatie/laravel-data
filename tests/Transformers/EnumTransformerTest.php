@@ -1,29 +1,23 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Transformers;
-
-use ReflectionProperty;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
-use Spatie\LaravelData\Tests\TestCase;
 use Spatie\LaravelData\Transformers\EnumTransformer;
 
-class EnumTransformerTest extends TestCase
-{
-    /** @test */
-    public function it_can_transform_enums()
+it('can transform enums', function () {
+    $this->onlyPHP81();
+
+    $transformer = new EnumTransformer();
+
+    $class = new class()
     {
-        $this->onlyPHP81();
+        public DummyBackedEnum $enum = DummyBackedEnum::FOO;
+    };
 
-        $transformer = new EnumTransformer();
-
-        $class = new class () {
-            public DummyBackedEnum $enum = DummyBackedEnum::FOO;
-        };
-
-        $this->assertEquals(
-            DummyBackedEnum::FOO->value,
-            $transformer->transform(DataProperty::create(new ReflectionProperty($class, 'enum')), $class->enum)
-        );
-    }
-}
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'enum')),
+            $class->enum
+        )
+    )->toEqual(DummyBackedEnum::FOO->value);
+});
