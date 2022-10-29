@@ -1,10 +1,7 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Resolvers;
-
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
-use Spatie\LaravelData\Tests\TestCase;
 
 beforeEach(function () {
     $this->resolver = app(DataValidatorResolver::class);

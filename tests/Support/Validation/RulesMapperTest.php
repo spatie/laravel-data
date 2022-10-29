@@ -1,7 +1,5 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Support\Validation;
-
 use Illuminate\Contracts\Validation\Rule as CustomRuleContract;
 use Illuminate\Validation\Rules\Exists as BaseExists;
 use Spatie\LaravelData\Attributes\Validation\Dimensions;

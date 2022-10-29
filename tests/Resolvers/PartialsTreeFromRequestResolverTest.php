@@ -1,8 +1,5 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Resolvers;
-
-use Generator;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -15,7 +12,6 @@ use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\TreeNode;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
-use Spatie\LaravelData\Tests\TestCase;
 
 beforeEach(function () {
     $this->resolver = resolve(PartialsTreeFromRequestResolver::class);

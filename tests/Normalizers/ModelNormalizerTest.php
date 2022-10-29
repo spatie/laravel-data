@@ -1,7 +1,5 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Normalizers;
-
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +8,6 @@ use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\FakeModelData;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
-use Spatie\LaravelData\Tests\TestCase;
 
 it('can get a data object from model', function () {
     $model = FakeModel::factory()->create();

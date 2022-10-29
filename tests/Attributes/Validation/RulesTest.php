@@ -1,7 +1,5 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Attributes\Validation;
-
 use Carbon\Carbon;
 use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
