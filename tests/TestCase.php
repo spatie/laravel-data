@@ -40,11 +40,4 @@ class TestCase extends Orchestra
     {
         $this->loadMigrationsFrom(__DIR__ . '/Migrations');
     }
-
-    public function assertValidationAttributeRules(
-        array $expected,
-        ValidationRule $attribute
-    ) {
-        $this->assertEquals($expected, $attribute->getRules());
-    }
 }
