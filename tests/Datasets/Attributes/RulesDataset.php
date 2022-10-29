@@ -271,7 +271,6 @@ dataset('attributes', function () {
         expected: 'ipv6',
     );
 
-
     yield fixature(
         attribute: new Json(),
         expected: 'json',

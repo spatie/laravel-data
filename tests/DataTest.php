@@ -1,11 +1,8 @@
 <?php
 
-namespace Spatie\LaravelData\Tests;
-
+use function PHPUnit\Framework\assertFalse;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use DateTime;
-use Generator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
@@ -82,8 +79,7 @@ use Spatie\LaravelData\Tests\Fakes\UlarData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\WithData;
 
-use function PHPUnit\Framework\assertEquals;
-use function PHPUnit\Framework\assertFalse;
+
 
 it('can create a resource', function () {
     $dataClass = DataBlueprintFactory::new()->withProperty(
@@ -1449,7 +1445,9 @@ it('can validate non-requests payloads', function () {
 })->throws(ValidationException::class);
 
 it('can conditionally include', function () {
-    $this->assertEmpty(MultiLazyData::from(DummyDto::rick())->includeWhen('artist', false)->toArray());
+    expect(
+        MultiLazyData::from(DummyDto::rick())->includeWhen('artist', false)->toArray()
+    )->toBeEmpty();
 
     expect(
         MultiLazyData::from(DummyDto::rick())

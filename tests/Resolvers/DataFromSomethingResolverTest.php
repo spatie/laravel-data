@@ -294,7 +294,7 @@ it('can resolve payload dependency for rules', function () {
     try {
         $data::validate(['payment_method' => 'paypal']);
     } catch (ValidationException $exception) {
-        $this->assertArrayHasKey('paypal_email', $exception->validator->failed());
+        expect($exception->validator->failed())->toHaveKey('paypal_email');
 
         return;
     }

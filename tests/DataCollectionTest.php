@@ -458,9 +458,7 @@ it(
 
         $changedCollection = $collection->{$operation}(...$arguments);
 
-        $this->assertEquals(
-            $expected,
-            $changedCollection->toArray(),
-        );
+        expect($changedCollection->toArray())
+            ->toEqual($expected);
     }
 )->with('collection-operations');

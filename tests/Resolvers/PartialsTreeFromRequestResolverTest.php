@@ -59,10 +59,7 @@ it('will correctly reduce a tree based upon allowed includes', function (
 
     $trees = $this->resolver->execute($data, $request);
 
-    $this->assertEquals(
-        $expectedIncludes,
-        $trees->lazyIncluded
-    );
+    expect($trees->lazyIncluded)->toEqual($expectedIncludes);
 })->with(function () {
     yield 'disallowed property inclusion' => [
         'lazyDataAllowedIncludes' => [],
@@ -184,10 +181,10 @@ it('can combine request and manual includes', function () {
         'include' => 'artist',
     ]))->getData(true);
 
-    $this->assertEquals([
+    expect($data)->toMatchArray([
         'artist' => 'Rick Astley',
         'name' => 'Never gonna give you up',
-    ], $data);
+    ]);
 });
 
 it('handles parsing includes from request', function (array $input, array $expected) {
@@ -207,10 +204,7 @@ it('handles parsing includes from request', function (array $input, array $expec
 
     $data = $dataclass->toResponse($request)->getData(assoc: true);
 
-    $this->assertEquals(
-        array_keys($data),
-        $expected,
-    );
+    expect($data)->toHaveKeys($expected);
 })->with(function () {
     yield 'input as array' => [
         'input' => ['include' => ['artist', 'name']],
