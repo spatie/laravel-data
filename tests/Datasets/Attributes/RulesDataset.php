@@ -87,7 +87,7 @@ use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 
-function fixture(
+function fixature(
     ValidationRule $attribute,
     object|string|array $expected,
     object|string|null $expectCreatedAttribute = null,
@@ -102,494 +102,540 @@ function fixture(
 }
 
 dataset('attributes', function () {
-    yield fixture(
+    yield from acceptedIfAttributesDataProvider();
+    yield from afterAttributesDataProvider();
+    yield from afterOrEqualAttributesDataProvider();
+    yield from arrayTypeAttributesDataProvider();
+    yield from beforeAttributesDataProvider();
+    yield from beforeOrEqualAttributesDataProvider();
+    yield from betweenAttributesDataProvider();
+    yield from currentPasswordAttributesDataProvider();
+    yield from dateEqualsAttributesDataProvider();
+    yield from dimensionsAttributesDataProvider();
+    yield from distinctAttributesDataProvider();
+    yield from emailAttributesDataProvider();
+    yield from endsWithAttributesDataProvider();
+    yield from existsAttributesDataProvider();
+    yield from inAttributesDataProvider();
+    yield from mimesAttributesDataProvider();
+    yield from mimeTypesAttributesDataProvider();
+    yield from notInAttributesDataProvider();
+    yield from passwordAttributesDataProvider();
+    yield from prohibitedIfAttributesDataProvider();
+    yield from prohibitedUnlessAttributesDataProvider();
+    yield from prohibitsAttributesDataProvider();
+    yield from requiredIfAttributesDataProvider();
+    yield from requiredUnlessAttributesDataProvider();
+    yield from requiredWithAttributesDataProvider();
+    yield from requiredWithAllAttributesDataProvider();
+    yield from requiredWithoutAttributesDataProvider();
+    yield from requiredWithoutAllAttributesDataProvider();
+    yield from startsWithAttributesDataProvider();
+    yield from uniqueAttributesDataProvider();
+
+    yield fixature(
         attribute: new Accepted(),
         expected: 'accepted',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new ActiveUrl(),
         expected: 'active_url',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Alpha(),
         expected: 'alpha',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new AlphaDash(),
         expected: 'alpha_dash',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new AlphaNumeric(),
         expected: 'alpha_num',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Bail(),
         expected: 'bail',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new BooleanType(),
         expected: 'boolean',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Confirmed(),
         expected: 'confirmed',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Date(),
         expected: 'date',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new DateFormat('Y-m-d'),
         expected: 'date_format:Y-m-d',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Different('field'),
         expected: 'different:field',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Digits(10),
         expected: 'digits:10',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new DigitsBetween(5, 10),
         expected: 'digits_between:5,10',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Enum('enum_class'),
         expected: new EnumRule('enum_class'),
         expectCreatedAttribute: new Enum(new EnumRule('enum_class'))
     );
 
-    yield fixture(
+
+    yield fixature(
         attribute: new ExcludeIf('field', true),
         expected: 'exclude_if:field,true',
         expectCreatedAttribute: new ExcludeIf('field', true)
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new ExcludeUnless('field', 42),
         expected: 'exclude_unless:field,42',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new ExcludeWithout('field'),
         expected: 'exclude_without:field',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new File(),
         expected: 'file',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Filled(),
         expected: 'filled',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new GreaterThan('field'),
         expected: 'gt:field',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new GreaterThanOrEqualTo('field'),
         expected: 'gte:field',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Image(),
         expected: 'image',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new InArray('field'),
         expected: 'in_array:field',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new IntegerType(),
         expected: 'integer',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new IP(),
         expected: 'ip',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new IPv4(),
         expected: 'ipv4',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new IPv6(),
         expected: 'ipv6',
     );
 
 
-    yield fixture(
+    yield fixature(
         attribute: new Json(),
         expected: 'json',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new LessThan('field'),
         expected: 'lt:field',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new LessThanOrEqualTo('field'),
         expected: 'lte:field',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Max(10),
         expected: 'max:10',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Min(10),
         expected: 'min:10',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new MultipleOf(10),
         expected: 'multiple_of:10',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new NotRegex('/^.+$/i'),
         expected: 'not_regex:/^.+$/i',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Nullable(),
         expected: 'nullable',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Numeric(),
         expected: 'numeric',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Present(),
         expected: 'present',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Prohibited(),
         expected: 'prohibited',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Regex('/^.+$/i'),
         expected: 'regex:/^.+$/i',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Required(),
         expected: 'required',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Same('field'),
         expected: 'same:field',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Size(10),
         expected: 'size:10',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new StringType(),
         expected: 'string',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Timezone(),
         expected: 'timezone',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Url(),
         expected: 'url',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Uuid(),
         expected: 'uuid',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Sometimes(),
         expected: 'sometimes',
     );
+});
 
-    // Accepted if attributes
-
-    yield fixture(
+function acceptedIfAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new AcceptedIf('value', 'string'),
         expected: 'accepted_if:value,string',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new AcceptedIf('value', true),
         expected: 'accepted_if:value,true',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new AcceptedIf('value', 42),
         expected: 'accepted_if:value,42',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new AcceptedIf('value', 3.14),
         expected: 'accepted_if:value,3.14',
     );
+}
 
-    // After Attributes
-
-    yield fixture(
+function afterAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new After('some_field'),
         expected: 'after:some_field',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new After('2020-05-15 00:00:00'),
         expected: 'after:2020-05-15 00:00:00',
     );
+}
 
-    // After or equal attributes
-
-    yield fixture(
+function afterOrEqualAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new AfterOrEqual('some_field'),
         expected: 'after_or_equal:some_field',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new AfterOrEqual('2020-05-15 00:00:00'),
         expected: 'after_or_equal:2020-05-15 00:00:00',
     );
+}
 
-    // Array type attributes
-
-    yield fixture(
+function arrayTypeAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new ArrayType(),
         expected: 'array',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new ArrayType(['a', 'b', 'c']),
         expected: 'array:a,b,c',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new ArrayType('a', 'b', 'c'),
         expected: 'array:a,b,c',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new ArrayType('a', ['b', 'c']),
         expected: 'array:a,b,c',
     );
+}
 
-    // Before attributes
-
-    yield fixture(
+function beforeAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new Before('some_field'),
         expected: 'before:some_field',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Before('2020-05-15 00:00:00'),
         expected: 'before:2020-05-15 00:00:00',
     );
+}
 
-    // Before or equal attributes
-
-    yield fixture(
+function beforeOrEqualAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new BeforeOrEqual('some_field'),
         expected: 'before_or_equal:some_field',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new BeforeOrEqual('2020-05-15 00:00:00'),
         expected: 'before_or_equal:2020-05-15 00:00:00',
     );
+}
 
-    // Between attributes
-
-    yield fixture(
+function betweenAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new Between(-42, 42),
         expected: 'between:-42,42',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Between(-3.14, 3.14),
         expected: 'between:-3.14,3.14',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Between(-3.14, 42),
         expected: 'between:-3.14,42',
     );
+}
 
-    // Current password attributes
-
-    yield fixture(
+function currentPasswordAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new CurrentPassword(),
         expected: 'current_password',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new CurrentPassword('api'),
         expected: 'current_password:api',
     );
+}
 
-    // Date equals attributes
-
-    yield fixture(
+function dateEqualsAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new DateEquals('tomorrow'),
         expected: 'date_equals:tomorrow',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new DateEquals('2020-05-15 00:00:00'),
         expected: 'date_equals:2020-05-15 00:00:00',
     );
+}
 
-    // Dimenstions attributes
-
-    yield fixture(
+function dimensionsAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new Dimensions(minWidth: 15, minHeight: 10, maxWidth: 150, maxHeight: 100, ratio: 1),
         expected: 'dimensions:min_width=15,min_height=10,max_width=150,max_height=100,ratio=1',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Dimensions(maxWidth: 150, maxHeight: 100),
         expected: 'dimensions:max_width=150,max_height=100',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Dimensions(ratio: 1.5),
         expected: 'dimensions:ratio=1.5',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Dimensions(ratio: '3/4'),
         expected: 'dimensions:ratio=3/4',
     );
 
-    //        yield fixture(
-    //            attribute: new Dimensions(),
-    //            expected: '',
-    //            exception: CannotBuildValidationRule::class,
-    //        );
+    //    yield fixature(
+    //      attribute: new Dimensions(),
+    //      expected: '',
+    //      exception: CannotBuildValidationRule::class,
+    //    );
+}
 
-    // Distinct attributes
-
-    yield fixture(
+function distinctAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new Distinct(),
         expected: 'distinct',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Distinct(Distinct::Strict),
         expected: 'distinct:strict',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Distinct(Distinct::IgnoreCase),
         expected: 'distinct:ignore_case',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Distinct('fake'),
         expected: '',
         exception: CannotBuildValidationRule::class
     );
+}
 
-    // Email attributes
-
-    yield fixture(
+function emailAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new Email(),
         expected: 'email:rfc',
         expectCreatedAttribute: new Email(Email::RfcValidation),
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Email(Email::RfcValidation),
         expected: 'email:rfc',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Email([Email::RfcValidation, Email::NoRfcWarningsValidation]),
         expected: 'email:rfc,strict',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Email([Email::RfcValidation, Email::NoRfcWarningsValidation, Email::DnsCheckValidation, Email::SpoofCheckValidation, Email::FilterEmailValidation]),
         expected: 'email:rfc,strict,dns,spoof,filter',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Email(Email::RfcValidation, Email::NoRfcWarningsValidation),
         expected: 'email:rfc,strict',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Email(['fake']),
         expected: '',
         exception: CannotBuildValidationRule::class,
     );
+}
 
-    // Ends with attributes
-
-    yield fixture(
+function endsWithAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new EndsWith('x'),
         expected: 'ends_with:x',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new EndsWith(['x', 'y']),
         expected: 'ends_with:x,y',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new EndsWith('x', 'y'),
         expected: 'ends_with:x,y',
     );
+}
 
-    // Exists attributes
-
-    yield fixture(
+function existsAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new Exists('users'),
         expected: new BaseExists('users'),
         expectCreatedAttribute: new Exists(rule: new BaseExists('users'))
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Exists('users', 'email'),
         expected: new BaseExists('users', 'email'),
         expectCreatedAttribute: new Exists(rule: new BaseExists('users', 'email'))
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Exists('users', 'email', connection: 'tenant'),
         expected: new BaseExists('tenant.users', 'email'),
         expectCreatedAttribute: new Exists(rule: new BaseExists('tenant.users', 'email'))
@@ -597,337 +643,336 @@ dataset('attributes', function () {
 
     $closure = fn (Builder $builder) => $builder;
 
-    yield fixture(
+    yield fixature(
         attribute: new Exists('users', 'email', where: $closure),
         expected: (new BaseExists('users', 'email'))->where($closure),
         expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'email'))->where($closure))
     );
+}
 
-    // In attributes
-
-    yield fixture(
+function inAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new In('key'),
         expected: new BaseIn(['key']),
         expectCreatedAttribute: new In(new BaseIn(['key']))
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new In(['key', 'other']),
         expected: new BaseIn(['key', 'other']),
         expectCreatedAttribute: new In(new BaseIn(['key', 'other']))
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new In('key', 'other'),
         expected: new BaseIn(['key', 'other']),
         expectCreatedAttribute: new In(new BaseIn(['key', 'other']))
     );
+}
 
-    // Mime attributes
-
-    yield fixture(
+function mimesAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new MimeTypes('video/quicktime'),
         expected: 'mimestypes:video/quicktime',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new MimeTypes(['video/quicktime', 'video/avi']),
         expected: 'mimestypes:video/quicktime,video/avi',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new MimeTypes('video/quicktime', 'video/avi'),
         expected: 'mimestypes:video/quicktime,video/avi',
     );
+}
 
-    // Mime types attributes
-
-    yield fixture(
+function mimeTypesAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new Mimes('jpg'),
         expected: 'mimes:jpg',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Mimes(['jpg', 'png']),
         expected: 'mimes:jpg,png',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Mimes('jpg', 'png'),
         expected: 'mimes:jpg,png',
     );
+}
 
-    // Not in attributes
-
-    yield fixture(
+function notInAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new NotIn('key'),
         expected: new BaseNotIn(['key']),
         expectCreatedAttribute: new NotIn(new BaseNotIn(['key']))
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new NotIn(['key', 'other']),
         expected: new BaseNotIn(['key', 'other']),
         expectCreatedAttribute: new NotIn(new BaseNotIn(['key', 'other']))
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new NotIn('key', 'other'),
         expected: new BaseNotIn(['key', 'other']),
         expectCreatedAttribute: new NotIn(new BaseNotIn(['key', 'other']))
     );
+}
 
-    // Password attributes
-
-    yield fixture(
+function passwordAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new Password(),
         expected: new BasePassword(12),
         expectCreatedAttribute: new Password(rule: new BasePassword(12)),
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Password(min: 20),
         expected: new BasePassword(20),
         expectCreatedAttribute: new Password(rule: new BasePassword(20)),
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Password(letters: true, mixedCase: true, numbers: true, uncompromised: true, uncompromisedThreshold: 12),
         expected: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12),
         expectCreatedAttribute: new Password(rule: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12),),
     );
+}
 
-    // Prohibited if attributes
-
-    yield fixture(
+function prohibitedIfAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new ProhibitedIf('field', 'key'),
         expected: 'prohibited_if:field,key',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new ProhibitedIf('field', ['key', 'other']),
         expected: 'prohibited_if:field,key,other',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new ProhibitedIf('field', 'key', 'other'),
         expected: 'prohibited_if:field,key,other',
     );
+}
 
-    // Prohibited unless attributes
-
-    yield fixture(
+function prohibitedUnlessAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new ProhibitedUnless('field', 'key'),
         expected: 'prohibited_unless:field,key',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new ProhibitedUnless('field', ['key', 'other']),
         expected: 'prohibited_unless:field,key,other',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new ProhibitedUnless('field', 'key', 'other'),
         expected: 'prohibited_unless:field,key,other',
     );
+}
 
-    // Prohibited attributes
-
-    yield fixture(
+function prohibitsAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new Prohibits('key'),
         expected: 'prohibits:key',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Prohibits(['key', 'other']),
         expected: 'prohibits:key,other',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Prohibits('key', 'other'),
         expected: 'prohibits:key,other',
     );
+}
 
-    // Required if attributes
-
-    yield fixture(
+function requiredIfAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new RequiredIf('field'),
         expected: 'required_if:field',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new RequiredIf('field', 'key'),
         expected: 'required_if:field,key',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new RequiredIf('field', ['key', 'other']),
         expected: 'required_if:field,key,other',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new RequiredIf('field', 'key', 'other'),
         expected: 'required_if:field,key,other',
     );
+}
 
-    // Required unless attributes
-
-    yield fixture(
+function requiredUnlessAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new RequiredUnless('field', 'key'),
         expected: 'required_unless:field,key',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new RequiredUnless('field', ['key', 'other']),
         expected: 'required_unless:field,key,other',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new RequiredUnless('field', 'key', 'other'),
         expected: 'required_unless:field,key,other',
     );
+}
 
-    // Required with attributes
-
-    yield fixture(
+function requiredWithAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new RequiredWith('key'),
         expected: 'required_with:key',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new RequiredWith(['key', 'other']),
         expected: 'required_with:key,other',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new RequiredWith('key', 'other'),
         expected: 'required_with:key,other',
     );
+}
 
-    // Required with all attributes
-
-    yield fixture(
+function requiredWithAllAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new RequiredWithAll('key'),
         expected: 'required_with_all:key',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new RequiredWithAll(['key', 'other']),
         expected: 'required_with_all:key,other',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new RequiredWithAll('key', 'other'),
         expected: 'required_with_all:key,other',
     );
+}
 
-    // Required with all attributes
-
-    yield fixture(
-        attribute: new RequiredWithAll('key'),
-        expected: 'required_with_all:key',
-    );
-
-    yield fixture(
-        attribute: new RequiredWithAll(['key', 'other']),
-        expected: 'required_with_all:key,other',
-    );
-
-    yield fixture(
-        attribute: new RequiredWithAll('key', 'other'),
-        expected: 'required_with_all:key,other',
-    );
-
-    // Required without attributes
-
-    yield fixture(
+function requiredWithoutAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new RequiredWithout('key'),
         expected: 'required_without:key',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new RequiredWithout(['key', 'other']),
         expected: 'required_without:key,other',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new RequiredWithout('key', 'other'),
         expected: 'required_without:key,other',
     );
+}
 
-    // Required without all attributes
-
-    yield fixture(
+function requiredWithoutAllAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new RequiredWithoutAll('key'),
         expected: 'required_without_all:key',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new RequiredWithoutAll(['key', 'other']),
         expected: 'required_without_all:key,other',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new RequiredWithoutAll('key', 'other'),
         expected: 'required_without_all:key,other',
     );
+}
 
-    // Starts with attributes
-
-    yield fixture(
+function startsWithAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new StartsWith('x'),
         expected: 'starts_with:x',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new StartsWith(['x', 'y']),
         expected: 'starts_with:x,y',
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new StartsWith('x', 'y'),
         expected: 'starts_with:x,y',
     );
+}
 
-    // Unique attributes
-
-    yield fixture(
+function uniqueAttributesDataProvider(): Generator
+{
+    yield fixature(
         attribute: new Unique('users'),
         expected: new BaseUnique('users'),
         expectCreatedAttribute: new Unique(rule: new BaseUnique('users'))
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Unique('users', 'email'),
         expected: new BaseUnique('users', 'email'),
         expectCreatedAttribute: new Unique(rule: new BaseUnique('users', 'email'))
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Unique('users', 'email', connection: 'tenant'),
         expected: new BaseUnique('tenant.users', 'email'),
         expectCreatedAttribute: new Unique(rule: new BaseUnique('tenant.users', 'email'))
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Unique('users', 'email', withoutTrashed: true),
         expected: (new BaseUnique('users', 'email'))->withoutTrashed(),
         expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->withoutTrashed())
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Unique('users', 'email', withoutTrashed: true, deletedAtColumn: 'deleted_when'),
         expected: (new BaseUnique('users', 'email'))->withoutTrashed('deleted_when'),
         expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->withoutTrashed('deleted_when'))
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Unique('users', 'email', ignore: 5),
         expected: (new BaseUnique('users', 'email'))->ignore(5),
         expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->ignore(5))
     );
 
-    yield fixture(
+    yield fixature(
         attribute: new Unique('users', 'email', ignore: 5, ignoreColumn: 'uuid'),
         expected: (new BaseUnique('users', 'email'))->ignore(5, 'uuid'),
         expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->ignore(5, 'uuid'))
@@ -935,9 +980,9 @@ dataset('attributes', function () {
 
     $closure = fn (Builder $builder) => $builder;
 
-    yield fixture(
+    yield fixature(
         attribute: new Unique('users', 'email', where: $closure),
         expected: (new BaseUnique('users', 'email'))->where($closure),
         expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->where($closure))
     );
-});
+}
