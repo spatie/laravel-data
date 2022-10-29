@@ -13,7 +13,6 @@ use Spatie\Snapshots\MatchesSnapshots;
 
 class TestCase extends Orchestra
 {
-    use MatchesSnapshots;
     use RefreshDatabase;
 
     protected function setUp(): void
