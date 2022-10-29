@@ -41,11 +41,6 @@ class TestCase extends Orchestra
         $this->loadMigrationsFrom(__DIR__ . '/Migrations');
     }
 
-    public function faker(): Generator
-    {
-        return FakerFactory::create();
-    }
-
     public function assertValidationAttributeRules(
         array $expected,
         ValidationRule $attribute
