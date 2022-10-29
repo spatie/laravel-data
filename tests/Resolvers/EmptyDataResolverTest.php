@@ -8,6 +8,7 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 function assertEmptyPropertyValue(

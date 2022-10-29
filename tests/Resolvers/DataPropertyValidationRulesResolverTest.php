@@ -17,6 +17,7 @@ use Spatie\LaravelData\Attributes\Validation\Size;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Resolvers\DataPropertyValidationRulesResolver;
 use Spatie\LaravelData\Support\DataProperty;
 
 function resolveRules(object $class): array
