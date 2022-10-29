@@ -52,11 +52,4 @@ class TestCase extends Orchestra
     ) {
         $this->assertEquals($expected, $attribute->getRules());
     }
-
-    public function onlyPHP81()
-    {
-        if (version_compare(phpversion(), '8.1', '<')) {
-            $this->markTestIncomplete('This test is only supported in PHP versions > PHP 8.1');
-        }
-    }
 }

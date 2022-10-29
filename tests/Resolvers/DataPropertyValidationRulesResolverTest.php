@@ -97,7 +97,7 @@ it('will add basic rules for certain types', function () {
 });
 
 it('will add rules for enums', function () {
-    $this->onlyPHP81();
+    onlyPHP81();
 
     $rules = resolveRules(new class()
     {

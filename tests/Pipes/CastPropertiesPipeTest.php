@@ -179,7 +179,7 @@ it('allows casting', function () {
 });
 
 it('allows casting of enums', function () {
-    $this->onlyPHP81();
+    onlyPHP81();
 
     $data = EnumData::from([
         'enum' => 'foo',

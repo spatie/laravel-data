@@ -7,7 +7,7 @@ use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyUnitEnum;
 
 beforeEach(function () {
-    $this->onlyPHP81();
+    onlyPHP81();
 
     $this->caster = new EnumCast();
 });

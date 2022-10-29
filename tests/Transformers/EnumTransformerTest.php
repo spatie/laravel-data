@@ -5,7 +5,7 @@ use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Transformers\EnumTransformer;
 
 it('can transform enums', function () {
-    $this->onlyPHP81();
+    onlyPHP81();
 
     $transformer = new EnumTransformer();
 

@@ -76,7 +76,7 @@ it('can use the Rule rule', function () {
 });
 
 it('can use the Rule rule with invokable rules', function () {
-    $this->onlyPHP81();
+    onlyPHP81();
 
     if (version_compare($this->app->version(), '9.18', '<')) {
         $this->markTestIncomplete('Invokable rules are only available in Laravel 9.18.');

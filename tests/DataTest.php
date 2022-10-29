@@ -919,7 +919,7 @@ it('always validates requests when passed to the from method', function () {
 });
 
 it('has support fro readonly properties', function () {
-    $this->onlyPHP81();
+    onlyPHP81();
 
     $data = ReadonlyData::from(['string' => 'Hello world']);
 
@@ -928,7 +928,7 @@ it('has support fro readonly properties', function () {
 });
 
 it('has support for intersection types', function () {
-    $this->onlyPHP81();
+    onlyPHP81();
 
     $collection = collect(['a', 'b', 'c']);
 
