@@ -10,8 +10,7 @@ use Spatie\LaravelData\Support\DataProperty;
 it('can cast date times', function () {
     $caster = new DateTimeInterfaceCast('d-m-Y H:i:s');
 
-    $class = new class()
-    {
+    $class = new class () {
         public Carbon $carbon;
 
         public CarbonImmutable $carbonImmutable;
@@ -57,8 +56,7 @@ it('can cast date times', function () {
 it('fails when it cannot cast a date into the correct format', function () {
     $caster = new DateTimeInterfaceCast('d-m-Y H:i:s');
 
-    $class = new class()
-    {
+    $class = new class () {
         public DateTime $carbon;
     };
 
@@ -74,8 +72,7 @@ it('fails when it cannot cast a date into the correct format', function () {
 it('fails with other types', function () {
     $caster = new DateTimeInterfaceCast('d-m-Y');
 
-    $class = new class()
-    {
+    $class = new class () {
         public int $int;
     };
 
@@ -91,8 +88,7 @@ it('fails with other types', function () {
 it('can set an alternative timezone', function () {
     $caster = new DateTimeInterfaceCast('d-m-Y H:i:s', setTimeZone: 'Europe/Brussels');
 
-    $class = new class()
-    {
+    $class = new class () {
         public Carbon $carbon;
 
         public CarbonImmutable $carbonImmutable;

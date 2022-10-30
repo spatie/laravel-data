@@ -13,8 +13,7 @@ beforeEach(function () {
 });
 
 it('can cast enum', function () {
-    $class = new class()
-    {
+    $class = new class () {
         public DummyBackedEnum $enum;
     };
 
@@ -28,8 +27,7 @@ it('can cast enum', function () {
 });
 
 it('fails when it cannot cast an enum from value', function () {
-    $class = new class()
-    {
+    $class = new class () {
         public DummyBackedEnum $enum;
     };
 
@@ -39,8 +37,7 @@ it('fails when it cannot cast an enum from value', function () {
 })->throws(Exception::class);
 
 it('fails when casting an unit enum', function () {
-    $class = new class()
-    {
+    $class = new class () {
         public DummyUnitEnum $enum;
     };
 
@@ -50,8 +47,7 @@ it('fails when casting an unit enum', function () {
 });
 
 it('fails with other types', function () {
-    $class = new class()
-    {
+    $class = new class () {
         public int $int;
     };
 

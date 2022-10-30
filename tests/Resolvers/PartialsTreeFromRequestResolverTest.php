@@ -25,12 +25,11 @@ it('will correctly reduce a tree based upon allowed includes', function (
 ) {
     LazyData::$allowedIncludes = $lazyDataAllowedIncludes;
 
-    $data = new class(
+    $data = new class (
         'Hello',
         LazyData::from('Hello'),
         LazyData::collection(['Hello', 'World'])
-    ) extends Data
-    {
+    ) extends Data {
         public static ?array $allowedIncludes;
 
         public function __construct(
@@ -165,12 +164,11 @@ it('will correctly reduce a tree based upon allowed includes', function (
 });
 
 it('can combine request and manual includes', function () {
-    $dataclass = new class(
+    $dataclass = new class (
         Lazy::create(fn () => 'Rick Astley'),
         Lazy::create(fn () => 'Never gonna give you up'),
         Lazy::create(fn () => 1986),
-    ) extends MultiLazyData
-    {
+    ) extends MultiLazyData {
         public static function allowedRequestIncludes(): ?array
         {
             return null;
@@ -188,12 +186,11 @@ it('can combine request and manual includes', function () {
 });
 
 it('handles parsing includes from request', function (array $input, array $expected) {
-    $dataclass = new class(
+    $dataclass = new class (
         Lazy::create(fn () => 'Rick Astley'),
         Lazy::create(fn () => 'Never gonna give you up'),
         Lazy::create(fn () => 1986),
-    ) extends MultiLazyData
-    {
+    ) extends MultiLazyData {
         public static function allowedRequestIncludes(): ?array
         {
             return ['*'];

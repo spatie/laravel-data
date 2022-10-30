@@ -23,8 +23,7 @@ function resolveHelper(
 }
 
 it('can get the cast attribute with arguments', function () {
-    $helper = resolveHelper(new class()
-    {
+    $helper = resolveHelper(new class () {
         #[WithCast(DateTimeInterfaceCast::class, 'd-m-y')]
         public SimpleData $property;
     });
@@ -33,8 +32,7 @@ it('can get the cast attribute with arguments', function () {
 });
 
 it('can get the transformer attribute', function () {
-    $helper = resolveHelper(new class()
-    {
+    $helper = resolveHelper(new class () {
         #[WithTransformer(DateTimeInterfaceTransformer::class)]
         public SimpleData $property;
     });
@@ -43,8 +41,7 @@ it('can get the transformer attribute', function () {
 });
 
 it('can get the transformer attribute with arguments', function () {
-    $helper = resolveHelper(new class()
-    {
+    $helper = resolveHelper(new class () {
         #[WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-y')]
         public SimpleData $property;
     });
@@ -53,8 +50,7 @@ it('can get the transformer attribute with arguments', function () {
 });
 
 it('can get the mapped input name', function () {
-    $helper = resolveHelper(new class()
-    {
+    $helper = resolveHelper(new class () {
         #[MapInputName('other')]
         public SimpleData $property;
     });
@@ -63,8 +59,7 @@ it('can get the mapped input name', function () {
 });
 
 it('can get the mapped output name', function () {
-    $helper = resolveHelper(new class()
-    {
+    $helper = resolveHelper(new class () {
         #[MapOutputName('other')]
         public SimpleData $property;
     });
@@ -73,8 +68,7 @@ it('can get the mapped output name', function () {
 });
 
 it('can get all attributes', function () {
-    $helper = resolveHelper(new class()
-    {
+    $helper = resolveHelper(new class () {
         #[MapInputName('other')]
         #[WithTransformer(DateTimeInterfaceTransformer::class)]
         #[WithCast(DateTimeInterfaceCast::class)]
@@ -86,15 +80,13 @@ it('can get all attributes', function () {
 });
 
 it('can get the default value', function () {
-    $helper = resolveHelper(new class()
-    {
+    $helper = resolveHelper(new class () {
         public string $property;
     });
 
     expect($helper->hasDefaultValue)->toBeFalse();
 
-    $helper = resolveHelper(new class()
-    {
+    $helper = resolveHelper(new class () {
         public string $property = 'hello';
     });
 
@@ -104,8 +96,7 @@ it('can get the default value', function () {
 });
 
 it('can check if the property is promoted', function () {
-    $helper = resolveHelper(new class('')
-    {
+    $helper = resolveHelper(new class ('') {
         public function __construct(
             public string $property,
         ) {
@@ -114,8 +105,7 @@ it('can check if the property is promoted', function () {
 
     expect($helper->isPromoted)->toBeTrue();
 
-    $helper = resolveHelper(new class()
-    {
+    $helper = resolveHelper(new class () {
         public string $property;
     });
 
@@ -124,15 +114,13 @@ it('can check if the property is promoted', function () {
 
 it('can check if a property should be validated', function () {
     expect(
-        resolveHelper(new class()
-        {
+        resolveHelper(new class () {
             public string $property;
         })->validate
     )->toBeTrue();
 
     expect(
-        resolveHelper(new class()
-        {
+        resolveHelper(new class () {
             #[WithoutValidation]
             public string $property;
         })->validate

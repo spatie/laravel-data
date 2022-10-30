@@ -42,8 +42,7 @@ it('can map Laravel rule objects')
     ->toEqual([new Exists('users')]);
 
 it('can map a custom Laravel rule objects', function () {
-    $rule = new class() implements CustomRuleContract
-    {
+    $rule = new class () implements CustomRuleContract {
         public function passes($attribute, $value)
         {
         }

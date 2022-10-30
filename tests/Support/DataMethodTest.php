@@ -8,8 +8,7 @@ use Spatie\LaravelData\Tests\Fakes\DataWithMultipleArgumentCreationMethod;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 it('can create a data method from a constructor', function () {
-    $class = new class() extends Data
-    {
+    $class = new class () extends Data {
         public function __construct(
             public string $promotedProperty = 'hello',
             string $property = 'hello',
@@ -33,8 +32,7 @@ it('can create a data method from a constructor', function () {
 });
 
 it('can create a data method from a magic method', function () {
-    $class = new class() extends Data
-    {
+    $class = new class () extends Data {
         public static function fromString(
             string $property,
         ) {
@@ -53,8 +51,7 @@ it('can create a data method from a magic method', function () {
 });
 
 it('correctly accepts single values as magic creation method', function () {
-    $class = new class() extends Data
-    {
+    $class = new class () extends Data {
         public static function fromString(
             string $property,
         ) {
@@ -69,8 +66,7 @@ it('correctly accepts single values as magic creation method', function () {
 });
 
 it('correctly accepts single inherited values as magic creation method', function () {
-    $class = new class() extends Data
-    {
+    $class = new class () extends Data {
         public static function fromString(
             Data $property,
         ) {
@@ -95,8 +91,7 @@ it('correctly accepts multiple values as magic creation method', function () {
 });
 
 it('correctly accepts mixed values as magic creation method', function () {
-    $class = new class() extends Data
-    {
+    $class = new class () extends Data {
         public static function fromString(
             mixed $property,
         ) {
@@ -111,8 +106,7 @@ it('correctly accepts mixed values as magic creation method', function () {
 });
 
 it('correctly accepts values with defaults as magic creation method', function () {
-    $class = new class() extends Data
-    {
+    $class = new class () extends Data {
         public static function fromString(
             string $property = 'Hello',
         ) {
@@ -127,8 +121,7 @@ it('correctly accepts values with defaults as magic creation method', function (
 });
 
 it('needs a correct amount of parameters as magic creation method', function () {
-    $class = new class() extends Data
-    {
+    $class = new class () extends Data {
         public static function fromString(
             string $property,
             string $propertyWithDefault = 'Hello',

@@ -1,11 +1,13 @@
 <?php
 
 
-use function Pest\Laravel\mock;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\ValidationException;
+
+use function Pest\Laravel\mock;
+
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\WithoutValidation;
@@ -20,8 +22,7 @@ beforeEach(function () {
 });
 
 it('will resolve rules for a data object', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public string $name;
 
         public ?int $age;
@@ -35,8 +36,7 @@ it('will resolve rules for a data object', function () {
 });
 
 it('will make properties nullable if required', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public string $name;
 
         public ?int $age;
@@ -51,8 +51,7 @@ it('will make properties nullable if required', function () {
 });
 
 it('will merge overwritten rules on the data object', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public string $name;
 
         public static function rules(): array
@@ -71,8 +70,7 @@ it('will merge overwritten rules on the data object', function () {
 });
 
 it('will merge overwritten rules on nested data objects', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public SimpleDataWithOverwrittenRules $nested;
 
         /** @var DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules> */
@@ -92,8 +90,7 @@ it('will merge overwritten rules on nested data objects', function () {
 it(
     'can overwrite fules for the base collection object which will not affect the collected data object rules',
     function () {
-        $dataClass = new class() extends Data
-        {
+        $dataClass = new class () extends Data {
             #[DataCollectionOf(SimpleData::class)]
             public DataCollection $collection;
 
@@ -123,8 +120,7 @@ it(
 );
 
 it('can skip certain properties from being validated', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         #[WithoutValidation]
         public string $skip_string;
 
@@ -149,8 +145,7 @@ it('can resolve dependencies when calling rules', function () {
     $requestMock->expects('input')->andReturns('value');
     $this->app->bind(Request::class, fn () => $requestMock);
 
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public string $name;
 
         public static function rules(Request $request): array
@@ -169,8 +164,7 @@ it('can resolve dependencies when calling rules', function () {
 });
 
 it('can resolve payload when calling rules', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public string $name;
 
         public static function rules(array $payload): array
@@ -189,8 +183,7 @@ it('can resolve payload when calling rules', function () {
 });
 
 it('will transform overwritten data rules into plain Laravel rules', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public int $property;
 
         public static function rules(): array
@@ -207,7 +200,7 @@ it('will transform overwritten data rules into plain Laravel rules', function ()
         $this->resolver->execute($data::class)->all()
     )->toMatchArray([
         'property' => [
-            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin)
+            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
         ],
     ]);
 });

@@ -10,8 +10,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 
 it('can map using string', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName('something')]
         public string $mapped;
     };
@@ -24,8 +23,7 @@ it('can map using string', function () {
 });
 
 it('can map in nested objects using strings', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName('nested.something')]
         public string $mapped;
     };
@@ -38,8 +36,7 @@ it('can map in nested objects using strings', function () {
 });
 
 it('replaces properties when a mapped alternative exists', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName('something')]
         public string $mapped;
     };
@@ -53,8 +50,7 @@ it('replaces properties when a mapped alternative exists', function () {
 });
 
 it('skips properties it cannot find ', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName('something')]
         public string $mapped;
     };
@@ -67,8 +63,7 @@ it('skips properties it cannot find ', function () {
 });
 
 it('can use integers to map properties', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName(1)]
         public string $mapped;
     };
@@ -82,8 +77,7 @@ it('can use integers to map properties', function () {
 });
 
 it('can use integers to map properties in nested data', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName('1.0')]
         public string $mapped;
     };
@@ -97,8 +91,7 @@ it('can use integers to map properties in nested data', function () {
 });
 
 it('can combine integers and strings to map properties', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName('lines.1')]
         public string $mapped;
     };
@@ -114,8 +107,7 @@ it('can combine integers and strings to map properties', function () {
 });
 
 it('can use a dedicated mapper', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName(SnakeCaseMapper::class)]
         public string $mappedLine;
     };
@@ -128,8 +120,7 @@ it('can use a dedicated mapper', function () {
 });
 
 it('can map properties into data objects', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName('something')]
         public SimpleData $mapped;
     };
@@ -146,8 +137,7 @@ it('can map properties into data objects', function () {
 });
 
 it('can map properties into data objects which map properties again', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName('something')]
         public SimpleDataWithMappedProperty $mapped;
     };
@@ -166,8 +156,7 @@ it('can map properties into data objects which map properties again', function (
 });
 
 it('can map properties into data collections', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName('something'), DataCollectionOf(SimpleData::class)]
         public DataCollection $mapped;
     };
@@ -190,8 +179,7 @@ it('can map properties into data collections', function () {
 });
 
 it('can map properties into data collections which map properties again', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName('something'), DataCollectionOf(SimpleDataWithMappedProperty::class)]
         public DataCollection $mapped;
     };

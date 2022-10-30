@@ -368,8 +368,7 @@ test('a collection can be transformed to JSON', function () {
 });
 
 it('will cast data object into the data collection objects', function () {
-    $dataClass = new class('') extends Data
-    {
+    $dataClass = new class ('') extends Data {
         public function __construct(public string $otherString)
         {
         }
@@ -414,13 +413,12 @@ it('can use magical creation methods to create a collection', function () {
     expect($collection->toCollection()->all())
         ->toMatchArray([
             SimpleData::from('A'),
-            SimpleData::from('B')
+            SimpleData::from('B'),
         ]);
 });
 
 it('can return a custom data collection when collecting data', function () {
-    $class = new class('') extends Data
-    {
+    $class = new class ('') extends Data {
         protected static string $collectionClass = CustomDataCollection::class;
 
         public function __construct(public string $string)
@@ -437,8 +435,7 @@ it('can return a custom data collection when collecting data', function () {
 });
 
 it('can return a custom paginated data collection when collecting data', function () {
-    $class = new class('') extends Data
-    {
+    $class = new class ('') extends Data {
         protected static string $paginatedCollectionClass = CustomPaginatedDataCollection::class;
 
         public function __construct(public string $string)

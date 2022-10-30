@@ -20,8 +20,7 @@ beforeEach(function () {
 });
 
 it('can get an input and output mapper', function () {
-    $attributes = getAttributes(new class()
-    {
+    $attributes = getAttributes(new class () {
         #[MapInputName('input'), MapOutputName('output')]
         public $property;
     });
@@ -33,8 +32,7 @@ it('can get an input and output mapper', function () {
 });
 
 it('can have no mappers', function () {
-    $attributes = getAttributes(new class()
-    {
+    $attributes = getAttributes(new class () {
         public $property;
     });
 
@@ -45,8 +43,7 @@ it('can have no mappers', function () {
 });
 
 it('can have a single map attribute', function () {
-    $attributes = getAttributes(new class()
-    {
+    $attributes = getAttributes(new class () {
         #[MapName('input', 'output')]
         public $property;
     });
@@ -58,8 +55,7 @@ it('can have a single map attribute', function () {
 });
 
 it('can overwrite a general map attribute', function () {
-    $attributes = getAttributes(new class()
-    {
+    $attributes = getAttributes(new class () {
         #[MapName('input', 'output'), MapInputName('input_overwritten')]
         public $property;
     });
@@ -71,8 +67,7 @@ it('can overwrite a general map attribute', function () {
 });
 
 it('can map an int', function () {
-    $attributes = getAttributes(new class()
-    {
+    $attributes = getAttributes(new class () {
         #[MapName(0, 3)]
         public $property;
     });
@@ -84,8 +79,7 @@ it('can map an int', function () {
 });
 
 it('can map a string', function () {
-    $attributes = getAttributes(new class()
-    {
+    $attributes = getAttributes(new class () {
         #[MapName('hello', 'world')]
         public $property;
     });
@@ -97,8 +91,7 @@ it('can map a string', function () {
 });
 
 it('can map a mapper class', function () {
-    $attributes = getAttributes(new class()
-    {
+    $attributes = getAttributes(new class () {
         #[MapName(CamelCaseMapper::class, SnakeCaseMapper::class)]
         public $property;
     });
@@ -110,8 +103,7 @@ it('can map a mapper class', function () {
 });
 
 it('can ignore certain mapper types', function () {
-    $attributes = getAttributes(new class()
-    {
+    $attributes = getAttributes(new class () {
         #[MapInputName('input'), MapOutputName(CamelCaseMapper::class)]
         public $property;
     });

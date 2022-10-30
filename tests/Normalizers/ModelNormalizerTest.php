@@ -45,8 +45,7 @@ it('can get a data object with nesting from model and relations', function () {
 });
 
 it('can get a data object from model with dates', function () {
-    $fakeModelClass = new class() extends Model
-    {
+    $fakeModelClass = new class () extends Model {
         protected $casts = [
             'date' => 'date',
             'datetime' => 'datetime',
@@ -83,6 +82,6 @@ it('can get a data object from model with dates', function () {
         $data->immutable_date->eq(Carbon::create(2020, 05, 16, 00, 00, 00)),
         $data->immutable_datetime->eq(Carbon::create(2020, 05, 16, 12, 00, 00)),
         $data->created_at->eq(Carbon::create(2020, 05, 16, 12, 00, 00)),
-        $data->updated_at->eq(Carbon::create(2020, 05, 16, 12, 00, 00))
+        $data->updated_at->eq(Carbon::create(2020, 05, 16, 12, 00, 00)),
     ])->each->toBeTrue();
 });

@@ -14,7 +14,7 @@ it('can add rules', function () {
         ->add(new Prohibited(), new Min(0));
 
     expect($collection->all())->toMatchArray([
-        new Required(), new Prohibited(), new Min(0)
+        new Required(), new Prohibited(), new Min(0),
     ]);
 });
 

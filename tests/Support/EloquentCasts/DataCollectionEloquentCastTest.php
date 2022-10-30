@@ -1,7 +1,9 @@
 <?php
 
-use function Pest\Laravel\assertDatabaseHas;
 use Illuminate\Support\Facades\DB;
+
+use function Pest\Laravel\assertDatabaseHas;
+
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 

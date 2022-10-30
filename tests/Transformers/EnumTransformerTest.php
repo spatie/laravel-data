@@ -9,8 +9,7 @@ it('can transform enums', function () {
 
     $transformer = new EnumTransformer();
 
-    $class = new class()
-    {
+    $class = new class () {
         public DummyBackedEnum $enum = DummyBackedEnum::FOO;
     };
 

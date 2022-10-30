@@ -1,43 +1,43 @@
 <?php
 
-use Spatie\LaravelData\Attributes\Validation\AcceptedIf;
-use Spatie\LaravelData\Attributes\Validation\After;
-use Spatie\LaravelData\Attributes\Validation\AfterOrEqual;
-use Spatie\LaravelData\Attributes\Validation\ArrayType;
-use Spatie\LaravelData\Attributes\Validation\Before;
-use Spatie\LaravelData\Attributes\Validation\BeforeOrEqual;
-use Spatie\LaravelData\Attributes\Validation\Between;
-use Spatie\LaravelData\Attributes\Validation\CurrentPassword;
-use Spatie\LaravelData\Attributes\Validation\DateEquals;
-use Spatie\LaravelData\Attributes\Validation\Dimensions;
-use Spatie\LaravelData\Attributes\Validation\Distinct;
-use Spatie\LaravelData\Attributes\Validation\Email;
-use Spatie\LaravelData\Attributes\Validation\EndsWith;
-use Spatie\LaravelData\Attributes\Validation\Exists;
-use Illuminate\Validation\Rules\Exists as BaseExists;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Validation\Rules\Enum as EnumRule;
+use Illuminate\Validation\Rules\Exists as BaseExists;
 use Illuminate\Validation\Rules\In as BaseIn;
 use Illuminate\Validation\Rules\NotIn as BaseNotIn;
 use Illuminate\Validation\Rules\Password as BasePassword;
 use Illuminate\Validation\Rules\Unique as BaseUnique;
 use Spatie\LaravelData\Attributes\Validation\Accepted;
+use Spatie\LaravelData\Attributes\Validation\AcceptedIf;
 use Spatie\LaravelData\Attributes\Validation\ActiveUrl;
+use Spatie\LaravelData\Attributes\Validation\After;
+use Spatie\LaravelData\Attributes\Validation\AfterOrEqual;
 use Spatie\LaravelData\Attributes\Validation\Alpha;
 use Spatie\LaravelData\Attributes\Validation\AlphaDash;
 use Spatie\LaravelData\Attributes\Validation\AlphaNumeric;
+use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Bail;
+use Spatie\LaravelData\Attributes\Validation\Before;
+use Spatie\LaravelData\Attributes\Validation\BeforeOrEqual;
+use Spatie\LaravelData\Attributes\Validation\Between;
 use Spatie\LaravelData\Attributes\Validation\BooleanType;
 use Spatie\LaravelData\Attributes\Validation\Confirmed;
+use Spatie\LaravelData\Attributes\Validation\CurrentPassword;
 use Spatie\LaravelData\Attributes\Validation\Date;
+use Spatie\LaravelData\Attributes\Validation\DateEquals;
 use Spatie\LaravelData\Attributes\Validation\DateFormat;
 use Spatie\LaravelData\Attributes\Validation\Different;
 use Spatie\LaravelData\Attributes\Validation\Digits;
 use Spatie\LaravelData\Attributes\Validation\DigitsBetween;
+use Spatie\LaravelData\Attributes\Validation\Dimensions;
+use Spatie\LaravelData\Attributes\Validation\Distinct;
+use Spatie\LaravelData\Attributes\Validation\Email;
+use Spatie\LaravelData\Attributes\Validation\EndsWith;
 use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\ExcludeIf;
 use Spatie\LaravelData\Attributes\Validation\ExcludeUnless;
 use Spatie\LaravelData\Attributes\Validation\ExcludeWithout;
+use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\File;
 use Spatie\LaravelData\Attributes\Validation\Filled;
 use Spatie\LaravelData\Attributes\Validation\GreaterThan;
@@ -744,7 +744,7 @@ function passwordAttributesDataProvider(): Generator
     yield fixature(
         attribute: new Password(letters: true, mixedCase: true, numbers: true, uncompromised: true, uncompromisedThreshold: 12),
         expected: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12),
-        expectCreatedAttribute: new Password(rule: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12),),
+        expectCreatedAttribute: new Password(rule: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12), ),
     );
 }
 

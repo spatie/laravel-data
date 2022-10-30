@@ -14,7 +14,7 @@ it('can merge a node', function () {
         ->toEqual($node->merge(new PartialTreeNode()))
         ->toEqual($node->merge(new PartialTreeNode()))
         ->toEqual($node->merge(new PartialTreeNode([
-            'nested' => new ExcludedTreeNode()
+            'nested' => new ExcludedTreeNode(),
         ])));
 });
 

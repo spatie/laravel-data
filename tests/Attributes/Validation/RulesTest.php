@@ -44,8 +44,7 @@ it('creates the correct attributes', function (
 })->with('attributes');
 
 it('can use the Rule rule', function () {
-    $laravelRule = new class() implements RuleContract
-    {
+    $laravelRule = new class () implements RuleContract {
         public function passes($attribute, $value)
         {
         }
@@ -82,8 +81,7 @@ it('can use the Rule rule with invokable rules', function () {
         $this->markTestIncomplete('Invokable rules are only available in Laravel 9.18.');
     }
 
-    $invokableLaravelRule = new class() implements InvokableRule
-    {
+    $invokableLaravelRule = new class () implements InvokableRule {
         public function __invoke($attribute, $value, $fail)
         {
         }

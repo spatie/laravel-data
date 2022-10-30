@@ -1,14 +1,17 @@
 <?php
 
-use function Pest\Laravel\handleExceptions;
-use function Pest\Laravel\postJson;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+
+use function Pest\Laravel\handleExceptions;
+use function Pest\Laravel\postJson;
+
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Optional;
@@ -17,7 +20,6 @@ use Spatie\LaravelData\Tests\Factories\DataMagicMethodFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Illuminate\Testing\TestResponse;
 
 function performRequest(string $string): TestResponse
 {
@@ -53,7 +55,7 @@ it('can fail validation', function () {
             'string' => __(
                 'validation.max.string',
                 ['attribute' => 'string', 'max' => 10]
-            )
+            ),
         ]);
 });
 
@@ -63,7 +65,7 @@ it('can overwrite validation rules', function () {
     performRequest('Accepted string longer then 10 characters from attribute on data object')
         ->assertOk()
         ->assertJson([
-            'given' => 'Accepted string longer then 10 characters from attribute on data object'
+            'given' => 'Accepted string longer then 10 characters from attribute on data object',
         ]);
 });
 

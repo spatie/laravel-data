@@ -36,8 +36,7 @@ function resolveDataType(object $class, string $property = 'property'): DataType
 }
 
 it('can deduce a type without definition', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         public $property;
     });
 
@@ -53,8 +52,7 @@ it('can deduce a type without definition', function () {
 });
 
 it('can deduce a type with definition', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         public string $property;
     });
 
@@ -70,8 +68,7 @@ it('can deduce a type with definition', function () {
 });
 
 it('can deduce a nullable type with definition', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         public ?string $property;
     });
 
@@ -87,8 +84,7 @@ it('can deduce a nullable type with definition', function () {
 });
 
 it('can deduce a union type definition', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         public string|int $property;
     });
 
@@ -105,8 +101,7 @@ it('can deduce a union type definition', function () {
 });
 
 it('can deduce a nullable union type definition', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         public string|int|null $property;
     });
 
@@ -123,8 +118,7 @@ it('can deduce a nullable union type definition', function () {
 });
 
 it('can deduce an intersection type definition', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         public DateTime & DateTimeImmutable $property;
     });
 
@@ -144,8 +138,7 @@ it('can deduce an intersection type definition', function () {
 });
 
 it('can deduce a mixed type', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         public mixed $property;
     });
 
@@ -162,8 +155,7 @@ it('can deduce a mixed type', function () {
 });
 
 it('can deduce a lazy type', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         public string|Lazy $property;
     });
 
@@ -180,8 +172,7 @@ it('can deduce a lazy type', function () {
 });
 
 it('can deduce an optional type', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         public string|Optional $property;
     });
 
@@ -198,15 +189,13 @@ it('can deduce an optional type', function () {
 });
 
 test('a type cannot be optional alone', function () {
-    resolveDataType(new class()
-    {
+    resolveDataType(new class () {
         public Optional $property;
     });
 })->throws(InvalidDataType::class);
 
 it('can deduce a data type', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         public SimpleData $property;
     });
 
@@ -223,8 +212,7 @@ it('can deduce a data type', function () {
 });
 
 it('can deduce a data union type', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         public SimpleData|Lazy $property;
     });
 
@@ -241,8 +229,7 @@ it('can deduce a data union type', function () {
 });
 
 it('can deduce a data collection type', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public DataCollection $property;
     });
@@ -260,8 +247,7 @@ it('can deduce a data collection type', function () {
 });
 
 it('can deduce a data collection union type', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public DataCollection|Lazy $property;
     });
@@ -279,8 +265,7 @@ it('can deduce a data collection union type', function () {
 });
 
 it('can deduce a paginated data collection type', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public PaginatedDataCollection $property;
     });
@@ -298,8 +283,7 @@ it('can deduce a paginated data collection type', function () {
 });
 
 it('can deduce a paginated data collection union type', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public PaginatedDataCollection|Lazy $property;
     });
@@ -317,8 +301,7 @@ it('can deduce a paginated data collection union type', function () {
 });
 
 it('can deduce a cursor paginated data collection type', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public CursorPaginatedDataCollection $property;
     });
@@ -336,8 +319,7 @@ it('can deduce a cursor paginated data collection type', function () {
 });
 
 it('can deduce a cursor paginated data collection union type', function () {
-    $type = resolveDataType(new class()
-    {
+    $type = resolveDataType(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public CursorPaginatedDataCollection|Lazy $property;
     });
@@ -355,22 +337,19 @@ it('can deduce a cursor paginated data collection union type', function () {
 });
 
 it('cannot have multiple data types', function () {
-    resolveDataType(new class()
-    {
+    resolveDataType(new class () {
         public SimpleData|ComplicatedData $property;
     });
 })->throws(InvalidDataType::class);
 
 it('cannot combine a data object and another type', function () {
-    resolveDataType(new class()
-    {
+    resolveDataType(new class () {
         public SimpleData|int $property;
     });
 })->throws(InvalidDataType::class);
 
 it('cannot combine a data collection and another type', function () {
-    resolveDataType(new class()
-    {
+    resolveDataType(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public DataCollection|int $property;
     });
@@ -384,32 +363,28 @@ it(
     }
 )->with(function () {
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public $property;
         },
         'expected' => [],
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public mixed $property;
         },
         'expected' => [],
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public string $property;
         },
         'expected' => ['string' => []],
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public string|int|bool|float|array $property;
         },
         'expected' => [
@@ -422,8 +397,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public SimpleData $property;
         },
         'expected' => [
@@ -447,8 +421,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public DummyBackedEnum $property;
         },
         'expected' => [
@@ -469,8 +442,7 @@ it(
     // Base types
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public $property;
         },
         'type' => 'string',
@@ -478,8 +450,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public mixed $property;
         },
         'type' => 'string',
@@ -487,8 +458,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public string $property;
         },
         'type' => 'string',
@@ -496,8 +466,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public bool $property;
         },
         'type' => 'bool',
@@ -505,8 +474,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public int $property;
         },
         'type' => 'int',
@@ -514,8 +482,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public float $property;
         },
         'type' => 'float',
@@ -523,8 +490,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public array $property;
         },
         'type' => 'array',
@@ -532,8 +498,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public string $property;
         },
         'type' => 'array',
@@ -543,8 +508,7 @@ it(
     // Objects
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public SimpleData $property;
         },
         'type' => SimpleData::class,
@@ -552,8 +516,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public SimpleData $property;
         },
         'type' => ComplicatedData::class,
@@ -563,8 +526,7 @@ it(
     // Objects with inheritance
 
     yield 'simple inheritance' => [
-        'class' => new class()
-        {
+        'class' => new class () {
             public Data $property;
         },
         'type' => SimpleData::class,
@@ -572,8 +534,7 @@ it(
     ];
 
     yield 'reversed inheritance' => [
-        'class' => new class()
-        {
+        'class' => new class () {
             public SimpleData $property;
         },
         'type' => Data::class,
@@ -581,8 +542,7 @@ it(
     ];
 
     yield 'false inheritance' => [
-        'class' => new class()
-        {
+        'class' => new class () {
             public Model $property;
         },
         'type' => SimpleData::class,
@@ -592,8 +552,7 @@ it(
     // Objects with interfaces
 
     yield 'simple interface implementation' => [
-        'class' => new class()
-        {
+        'class' => new class () {
             public DateTimeInterface $property;
         },
         'type' => DateTime::class,
@@ -601,8 +560,7 @@ it(
     ];
 
     yield 'reversed interface implementation' => [
-        'class' => new class()
-        {
+        'class' => new class () {
             public DateTime $property;
         },
         'type' => DateTimeInterface::class,
@@ -610,8 +568,7 @@ it(
     ];
 
     yield 'false interface implementation' => [
-        'class' => new class()
-        {
+        'class' => new class () {
             public Model $property;
         },
         'type' => DateTime::class,
@@ -621,8 +578,7 @@ it(
     // Enums
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public DummyBackedEnum $property;
         },
         'type' => DummyBackedEnum::class,
@@ -637,8 +593,7 @@ it(
     }
 )->with(function () {
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public ?string $property;
         },
         'value' => null,
@@ -646,8 +601,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public string $property;
         },
         'value' => 'Hello',
@@ -655,8 +609,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public string $property;
         },
         'value' => 3.14,
@@ -664,8 +617,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public mixed $property;
         },
         'value' => 3.14,
@@ -673,8 +625,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public Data $property;
         },
         'value' => new SimpleData('Hello'),
@@ -682,8 +633,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public SimpleData $property;
         },
         'value' => new SimpleData('Hello'),
@@ -691,8 +641,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public SimpleData $property;
         },
         'value' => new SimpleDataWithMappedProperty('Hello'),
@@ -700,8 +649,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public DummyBackedEnum $property;
         },
         'value' => DummyBackedEnum::FOO,
@@ -717,8 +665,7 @@ it(
     }
 )->with(function () {
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public SimpleData $property;
         },
         'type' => SimpleData::class,
@@ -726,8 +673,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public SimpleData $property;
         },
         'type' => Data::class,
@@ -735,8 +681,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public DummyBackedEnum $property;
         },
         'type' => BackedEnum::class,
@@ -744,8 +689,7 @@ it(
     ];
 
     yield [
-        'class' => new class()
-        {
+        'class' => new class () {
             public SimpleData $property;
         },
         'type' => DataCollection::class,

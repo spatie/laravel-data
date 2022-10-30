@@ -19,8 +19,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttribute
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
 
 it('can validate a string', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public string $property;
     };
 
@@ -32,8 +31,7 @@ it('can validate a string', function () {
 });
 
 it('can validate a float', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public float $property;
     };
 
@@ -45,8 +43,7 @@ it('can validate a float', function () {
 });
 
 it('can validate an integer', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public int $property;
     };
 
@@ -58,8 +55,7 @@ it('can validate an integer', function () {
 });
 
 it('can validate an array', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public array $property;
     };
 
@@ -71,8 +67,7 @@ it('can validate an array', function () {
 });
 
 it('can validate a bool', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public bool $property;
     };
 
@@ -84,8 +79,7 @@ it('can validate a bool', function () {
 });
 
 it('can validate a nullable type', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public ?array $property;
     };
 
@@ -99,8 +93,7 @@ it('can validate a nullable type', function () {
 });
 
 it('can validated a property with custom rules', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public ?array $property;
 
         public static function rules(): array
@@ -118,8 +111,7 @@ it('can validated a property with custom rules', function () {
 });
 
 it('can validate a property with custom rules as string', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public ?array $property;
 
         public static function rules(): array
@@ -137,8 +129,7 @@ it('can validate a property with custom rules as string', function () {
 });
 
 it('can validate a property with custom rules as object', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public ?array $property;
 
         public static function rules(): array
@@ -156,8 +147,7 @@ it('can validate a property with custom rules as object', function () {
 });
 
 it('can validate a property with attributes', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[Min(5)]
         public ?array $property;
     };
@@ -169,8 +159,7 @@ it('can validate a property with attributes', function () {
 });
 
 it('can validate an optional attribute', function () {
-    DataValidationAsserter::for(new class() extends Data
-    {
+    DataValidationAsserter::for(new class () extends Data {
         public array|Optional $property;
     })
         ->assertOk([])
@@ -180,8 +169,7 @@ it('can validate an optional attribute', function () {
             'property' => ['sometimes', 'array'],
         ]);
 
-    DataValidationAsserter::for(new class() extends Data
-    {
+    DataValidationAsserter::for(new class () extends Data {
         public array|Optional|null $property;
     })
         ->assertOk([])
@@ -191,8 +179,7 @@ it('can validate an optional attribute', function () {
             'property' => ['sometimes', 'array', 'nullable'],
         ]);
 
-    DataValidationAsserter::for(new class() extends Data
-    {
+    DataValidationAsserter::for(new class () extends Data {
         #[Max(10)]
         public array|Optional $property;
     })
@@ -205,8 +192,7 @@ it('can validate an optional attribute', function () {
 });
 
 it('can validate a native enum', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public DummyBackedEnum $property;
     };
 
@@ -218,8 +204,7 @@ it('can validate a native enum', function () {
 });
 
 it('will use name mapping within validation', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName('some_property')]
         public string $property;
     };
@@ -232,8 +217,7 @@ it('will use name mapping within validation', function () {
 });
 
 it('can disable validation', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[WithoutValidation]
         public string $property;
 
@@ -250,8 +234,7 @@ it('can disable validation', function () {
 });
 
 it('can write custom rules based upon payloads', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public bool $strict;
 
         public string $property;
@@ -303,8 +286,7 @@ it('can validate nested data', function () {
             }
         PHP);
 
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public \NestedClassA $nested;
     };
 
@@ -326,8 +308,7 @@ it('can validate nested nullable data', function () {
             }
         PHP);
 
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public ?\NestedClassB $nested;
     };
 
@@ -350,8 +331,7 @@ it('can validate nested optional data', function () {
             }
         PHP);
 
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public \NestedClassC|Optional $nested;
     };
 
@@ -374,8 +354,7 @@ it('can add additional rules to nested data', function () {
             }
         PHP);
 
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[Min(100)]
         public \NestedClassD|Optional $nested;
     };
@@ -388,8 +367,7 @@ it('can add additional rules to nested data', function () {
 });
 
 it('will use name mapping with nested objects', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[MapInputName('some_nested')]
         public SimpleData $nested;
     };
@@ -422,8 +400,7 @@ it('can use nested payloads in nested data', function () {
             }
         PHP);
 
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public \NestedClassF $nested;
     };
 
@@ -451,7 +428,6 @@ it('can use nested payloads in nested data', function () {
 })->skip('Implementation required');
 
 test('rules in nested data are rewritten according to their fields', function () {
-
     // Should we do the same with the `rules` method?
     // Also implement for collections
     eval(<<<'PHP'
@@ -465,8 +441,7 @@ test('rules in nested data are rewritten according to their fields', function ()
             }
         PHP);
 
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public \NestedClassG $nested;
     };
 
@@ -487,8 +462,7 @@ test('rules in nested data are rewritten according to their fields', function ()
 })->skip('Feature to add');
 
 it('will validate a collection', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[DataCollectionOf(SimpleData::class)]
         public DataCollection $collection;
     };
@@ -515,8 +489,7 @@ it('will validate a collection', function () {
 });
 
 it('will validate a nullable collection', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[DataCollectionOf(SimpleData::class)]
         public ?DataCollection $collection;
     };
@@ -543,8 +516,7 @@ it('will validate a nullable collection', function () {
 });
 
 it('will validate an optional collection', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[DataCollectionOf(SimpleData::class)]
         public Optional|DataCollection $collection;
     };
@@ -571,8 +543,7 @@ it('will validate an optional collection', function () {
 });
 
 it('can overwrite collection class rules', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[DataCollectionOf(SimpleData::class)]
         public DataCollection $collection;
 
@@ -593,8 +564,7 @@ it('can overwrite collection class rules', function () {
 });
 
 it('can add collection class rules using attributes', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[DataCollectionOf(SimpleDataWithExplicitValidationRuleAttributeData::class)]
         #[Min(10)]
         public DataCollection $collection;
@@ -623,8 +593,7 @@ it('can nest data in collections', function () {
             }
         PHP);
 
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         #[DataCollectionOf(\CollectionClassA::class)]
         public DataCollection $collection;
     };

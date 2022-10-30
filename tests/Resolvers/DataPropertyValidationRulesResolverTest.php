@@ -1,9 +1,5 @@
 <?php
 
-use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
-use Spatie\LaravelData\Tests\Fakes\FakeEnum;
-use Spatie\LaravelData\Tests\Fakes\NestedData;
-use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Illuminate\Validation\Rules\Enum as EnumRule;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapName;
@@ -19,6 +15,10 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Resolvers\DataPropertyValidationRulesResolver;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
+use Spatie\LaravelData\Tests\Fakes\FakeEnum;
+use Spatie\LaravelData\Tests\Fakes\NestedData;
+use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 function resolveRules(object $class): array
 {
@@ -30,8 +30,7 @@ function resolveRules(object $class): array
 }
 
 it('will add a required or nullable rule based upon the property nullability', function () {
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public int $property;
     });
 
@@ -39,8 +38,7 @@ it('will add a required or nullable rule based upon the property nullability', f
         'property' => ['numeric', 'required'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public ?int $property;
     });
 
@@ -50,8 +48,7 @@ it('will add a required or nullable rule based upon the property nullability', f
 });
 
 it('will add basic rules for certain types', function () {
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public string $property;
     });
 
@@ -59,8 +56,7 @@ it('will add basic rules for certain types', function () {
         'property' => ['string', 'required'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public int $property;
     });
 
@@ -68,8 +64,7 @@ it('will add basic rules for certain types', function () {
         'property' => ['numeric', 'required'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public bool $property;
     });
 
@@ -77,8 +72,7 @@ it('will add basic rules for certain types', function () {
         'property' => ['boolean'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public float $property;
     });
 
@@ -86,8 +80,7 @@ it('will add basic rules for certain types', function () {
         'property' => ['numeric', 'required'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public array $property;
     });
 
@@ -99,8 +92,7 @@ it('will add basic rules for certain types', function () {
 it('will add rules for enums', function () {
     onlyPHP81();
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public FakeEnum $property;
     });
 
@@ -110,8 +102,7 @@ it('will add rules for enums', function () {
 });
 
 it('will take validation attributes into account', function () {
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         #[Max(10)]
         public string $property;
     });
@@ -122,8 +113,7 @@ it('will take validation attributes into account', function () {
 });
 
 it('will take rules from nested data objects', function () {
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public SimpleData $property;
     });
 
@@ -132,8 +122,7 @@ it('will take rules from nested data objects', function () {
         'property.string' => ['string', 'required'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public ?SimpleData $property;
     });
 
@@ -142,8 +131,7 @@ it('will take rules from nested data objects', function () {
         'property.string' => ['nullable', 'string'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public Optional|SimpleData $property;
     });
 
@@ -152,8 +140,7 @@ it('will take rules from nested data objects', function () {
         'property.string' => ['nullable', 'string'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public null|Optional|SimpleData $property;
     });
 
@@ -164,8 +151,7 @@ it('will take rules from nested data objects', function () {
 });
 
 it('will take rules from nested data collections', function () {
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public DataCollection $property;
     });
@@ -175,8 +161,7 @@ it('will take rules from nested data collections', function () {
         'property.*.string' => ['string', 'required'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public ?DataCollection $property;
     });
@@ -186,8 +171,7 @@ it('will take rules from nested data collections', function () {
         'property.*.string' => ['string', 'required'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public Optional|DataCollection $property;
     });
@@ -197,8 +181,7 @@ it('will take rules from nested data collections', function () {
         'property.*.string' => ['string', 'required'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public null|Optional|DataCollection $property;
     });
@@ -210,8 +193,7 @@ it('will take rules from nested data collections', function () {
 });
 
 it('can nest validation rules even further', function () {
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public NestedData $property;
     });
 
@@ -221,8 +203,7 @@ it('can nest validation rules even further', function () {
         'property.simple.string' => ['string', 'required'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public ?SimpleData $property;
     });
 
@@ -233,8 +214,7 @@ it('can nest validation rules even further', function () {
 });
 
 it('will never add extra require rules when not needed', function () {
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public ?string $property;
     });
 
@@ -242,8 +222,7 @@ it('will never add extra require rules when not needed', function () {
         'property' => ['string', new Nullable()],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         public bool $property;
     });
 
@@ -251,8 +230,7 @@ it('will never add extra require rules when not needed', function () {
         'property' => ['boolean'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         #[RequiredWith('other')]
         public string $property;
     });
@@ -261,8 +239,7 @@ it('will never add extra require rules when not needed', function () {
         'property' => ['string', 'required_with:other'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         #[Rule('required_with:other')]
         public string $property;
     });
@@ -273,8 +250,7 @@ it('will never add extra require rules when not needed', function () {
 });
 
 it('will work with non-string rules', function () {
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         #[Enum(FakeEnum::class)]
         public string $property;
     });
@@ -285,8 +261,7 @@ it('will work with non-string rules', function () {
 });
 
 it('will take mapped properties into account', function () {
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         #[MapName('other')]
         public int $property;
     });
@@ -295,8 +270,7 @@ it('will take mapped properties into account', function () {
         'other' => ['numeric', 'required'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         #[MapName('other')]
         public SimpleData $property;
     });
@@ -306,8 +280,7 @@ it('will take mapped properties into account', function () {
         'other.string' => ['string', 'required'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class), MapName('other')]
         public DataCollection $property;
     });
@@ -317,8 +290,7 @@ it('will take mapped properties into account', function () {
         'other.*.string' => ['string', 'required'],
     ]);
 
-    $rules = resolveRules(new class()
-    {
+    $rules = resolveRules(new class () {
         #[MapName('other')]
         public DataWithMapper $property;
     });
@@ -334,8 +306,7 @@ it('will take mapped properties into account', function () {
 });
 
 it('will nullify nested nullable data objects', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public ?SimpleData $property;
     };
 
@@ -346,8 +317,7 @@ it('will nullify nested nullable data objects', function () {
 });
 
 it('will nullify optional nested data objects', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public Optional|SimpleData $property;
     };
 
@@ -360,8 +330,7 @@ it('will nullify optional nested data objects', function () {
 it(
     'will apply rule inferrers on data collections and data objects',
     function () {
-        $data = new class() extends Data
-        {
+        $data = new class () extends Data {
             #[Bail]
             public SimpleData $property;
         };
@@ -371,8 +340,7 @@ it(
             'property.string' => ['string', 'required'],
         ]);
 
-        $data = new class() extends Data
-        {
+        $data = new class () extends Data {
             #[DataCollectionOf(SimpleData::class)]
             #[Size(10)]
             public DataCollection $property;

@@ -13,11 +13,13 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer;
 use Spatie\LaravelData\Support\DataClass;
-use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\RulesCollection;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
-function getProperty(object $class): DataProperty
+/**
+ * @return \Spatie\LaravelData\Support\DataProperty;
+ */
+function getProperty(object $class)
 {
     $dataClass = DataClass::create(new ReflectionClass($class));
 
@@ -126,7 +128,7 @@ it('has support for rules that cannot be converted to string', function () {
     );
 
     expect($rules->normalize())->toEqualCanonicalizing([
-        'required', new BaseEnum('SomeClass')
+        'required', new BaseEnum('SomeClass'),
     ]);
 });
 

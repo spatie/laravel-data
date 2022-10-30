@@ -5,8 +5,7 @@ use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataType;
 
 it('can create a data parameter', function () {
-    $class = new class('', '', '') extends Data
-    {
+    $class = new class ('', '', '') extends Data {
         public function __construct(
             string $nonPromoted,
             public $withoutType,

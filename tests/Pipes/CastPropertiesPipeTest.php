@@ -191,8 +191,7 @@ it('allows casting of enums', function () {
 });
 
 it('can manually set values in the constructor', function () {
-    $dataClass = new class('', '') extends Data
-    {
+    $dataClass = new class ('', '') extends Data {
         public string $member;
 
         public string $other_member;

@@ -8,8 +8,7 @@ use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 it('can transform dates', function () {
     $transformer = new DateTimeInterfaceTransformer();
 
-    $class = new class()
-    {
+    $class = new class () {
         public Carbon $carbon;
 
         public CarbonImmutable $carbonImmutable;
@@ -51,8 +50,7 @@ it('can transform dates', function () {
 it('can transform dates with an alternative format', function () {
     $transformer = new DateTimeInterfaceTransformer(format: 'd-m-Y');
 
-    $class = new class()
-    {
+    $class = new class () {
         public Carbon $carbon;
 
         public CarbonImmutable $carbonImmutable;
@@ -98,8 +96,7 @@ it('can transform dates with an alternative format', function () {
 it('can change the timezone', function () {
     $transformer = new DateTimeInterfaceTransformer(setTimeZone: 'Europe/Brussels');
 
-    $class = new class()
-    {
+    $class = new class () {
         public Carbon $carbon;
 
         public CarbonImmutable $carbonImmutable;
