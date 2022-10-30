@@ -31,8 +31,7 @@ beforeEach(function () {
 });
 
 it("won't add a required rule when a property is non-nullable", function () {
-    $dataProperty = getProperty(new class() extends Data
-    {
+    $dataProperty = getProperty(new class () extends Data {
         public string $string;
     });
 
@@ -42,8 +41,7 @@ it("won't add a required rule when a property is non-nullable", function () {
 });
 
 it("won't add a required rule when a property is nullable", function () {
-    $dataProperty = getProperty(new class() extends Data
-    {
+    $dataProperty = getProperty(new class () extends Data {
         public ?string $string;
     });
 
@@ -53,8 +51,7 @@ it("won't add a required rule when a property is nullable", function () {
 });
 
 it("won't add a required rule when a property already contains a required rule", function () {
-    $dataProperty = getProperty(new class() extends Data
-    {
+    $dataProperty = getProperty(new class () extends Data {
         public string $string;
     });
 
@@ -67,8 +64,7 @@ it("won't add a required rule when a property already contains a required rule",
 });
 
 it("won't add a required rule when a property already contains a required object rule ", function () {
-    $dataProperty = getProperty(new class() extends Data
-    {
+    $dataProperty = getProperty(new class () extends Data {
         public string $string;
     });
 
@@ -83,8 +79,7 @@ it("won't add a required rule when a property already contains a required object
 it(
     "won't add a required rule when a property already contains a boolean rule",
     function () {
-        $dataProperty = getProperty(new class() extends Data
-        {
+        $dataProperty = getProperty(new class () extends Data {
             public string $string;
         });
 
@@ -100,8 +95,7 @@ it(
 it(
     "won't add a required rule when a property already contains a nullable rule",
     function () {
-        $dataProperty = getProperty(new class() extends Data
-        {
+        $dataProperty = getProperty(new class () extends Data {
             public string $string;
         });
 
@@ -115,8 +109,7 @@ it(
 );
 
 it('has support for rules that cannot be converted to string', function () {
-    $dataProperty = getProperty(new class() extends Data
-    {
+    $dataProperty = getProperty(new class () extends Data {
         public string $string;
     });
 
@@ -133,8 +126,7 @@ it('has support for rules that cannot be converted to string', function () {
 });
 
 it("won't add required to a data collection since it is already present", function () {
-    $dataProperty = getProperty(new class() extends Data
-    {
+    $dataProperty = getProperty(new class () extends Data {
         #[DataCollectionOf(SimpleData::class)]
         public DataCollection $collection;
     });
@@ -148,8 +140,7 @@ it("won't add required to a data collection since it is already present", functi
 });
 
 it("won't add required rules to undefinable properties", function () {
-    $dataProperty = getProperty(new class() extends Data
-    {
+    $dataProperty = getProperty(new class () extends Data {
         public string|Optional $string;
     });
 

@@ -242,8 +242,7 @@ it('can include specific nested data', function () {
 });
 
 it('can have a conditional lazy data', function () {
-    $blueprint = new class() extends Data
-    {
+    $blueprint = new class () extends Data {
         public function __construct(
             public string|Lazy|null $name = null
         ) {
@@ -267,8 +266,7 @@ it('can have a conditional lazy data', function () {
 });
 
 it('cannot have conditional lazy data manually loaded', function () {
-    $blueprint = new class() extends Data
-    {
+    $blueprint = new class () extends Data {
         public function __construct(
             public string|Lazy|null $name = null
         ) {
@@ -314,8 +312,7 @@ it('can include data based upon relations loaded when they are null', function (
 });
 
 it('can have default included lazy data', function () {
-    $data = new class('Freek') extends Data
-    {
+    $data = new class ('Freek') extends Data {
         public function __construct(public string|Lazy $name)
         {
         }
@@ -331,8 +328,7 @@ it('can exclude default lazy data', function () {
 });
 
 it('always transforms lazy inertia data to inertia lazy props', function () {
-    $blueprint = new class() extends Data
-    {
+    $blueprint = new class () extends Data {
         public function __construct(
             public string|InertiaLazy|null $name = null
         ) {
@@ -381,8 +377,7 @@ it('can overwrite properties in an empty version of a data object', function () 
 it('will use transformers to convert specific types', function () {
     $date = new DateTime('16 may 1994');
 
-    $data = new class($date) extends Data
-    {
+    $data = new class ($date) extends Data {
         public function __construct(public DateTime $date)
         {
         }
@@ -394,8 +389,7 @@ it('will use transformers to convert specific types', function () {
 it('can manually specific a transformer', function () {
     $date = new DateTime('16 may 1994');
 
-    $data = new class($date) extends Data
-    {
+    $data = new class ($date) extends Data {
         public function __construct(
             #[WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-Y')]
             public $date
@@ -407,8 +401,7 @@ it('can manually specific a transformer', function () {
 });
 
 test('a transformer will never handle a null value', function () {
-    $data = new class(null) extends Data
-    {
+    $data = new class (null) extends Data {
         public function __construct(
             #[WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-Y')]
             public $date
@@ -571,14 +564,13 @@ it('can disabled except data dynamically from the request', function () {
 });
 
 it('can get the data object without transforming', function () {
-    $data = new class(
+    $data = new class (
         $dataObject = new SimpleData('Test'),
         $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B')]),
         Lazy::create(fn () => new SimpleData('Lazy')),
         'Test',
         $transformable = new DateTime('16 may 1994')
-    ) extends Data
-    {
+    ) extends Data {
         public function __construct(
             public SimpleData $data,
             #[DataCollectionOf(SimpleData::class)]
@@ -607,8 +599,7 @@ it('can get the data object without transforming', function () {
 });
 
 it('can append data via method overwriting', function () {
-    $data = new class('Freek') extends Data
-    {
+    $data = new class ('Freek') extends Data {
         public function __construct(public string $name)
         {
         }
@@ -626,8 +617,7 @@ it('can append data via method overwriting', function () {
 });
 
 it('can get the data object without mapping properties names', function () {
-    $data = new class('Freek') extends Data
-    {
+    $data = new class ('Freek') extends Data {
         public function __construct(
             #[MapOutputName('snake_name')]
             public string $camelName
@@ -641,8 +631,7 @@ it('can get the data object without mapping properties names', function () {
 });
 
 it('can get the data object without mapping', function () {
-    $data = new class('Freek') extends Data
-    {
+    $data = new class ('Freek') extends Data {
         public function __construct(
             #[MapOutputName('snake_name')]
             public string $camelName
@@ -657,8 +646,7 @@ it('can get the data object without mapping', function () {
 });
 
 it('can get the data object with mapping properties by default', function () {
-    $data = new class('Freek') extends Data
-    {
+    $data = new class ('Freek') extends Data {
         public function __construct(
             #[MapOutputName('snake_name')]
             public string $camelName
@@ -671,8 +659,7 @@ it('can get the data object with mapping properties by default', function () {
 });
 
 it('can get the data object with mapping properties without transform data', function () {
-    $data = new class('Freek') extends Data
-    {
+    $data = new class ('Freek') extends Data {
         public function __construct(
             #[MapOutputName('snake_name')]
             public string $camelName
@@ -690,8 +677,7 @@ it('can get the data object with mapping properties without transform data', fun
 });
 
 it('can get the data object with mapping properties names', function () {
-    $data = new class('Freek', 'Hello World') extends Data
-    {
+    $data = new class ('Freek', 'Hello World') extends Data {
         public function __construct(
             #[MapOutputName('snake_name')]
             public string $camelName,
@@ -707,8 +693,7 @@ it('can get the data object with mapping properties names', function () {
 });
 
 it('can append data via method call', function () {
-    $data = new class('Freek') extends Data
-    {
+    $data = new class ('Freek') extends Data {
         public function __construct(public string $name)
         {
         }
@@ -794,8 +779,7 @@ it('can create a data object from a model', function () {
         'nullable_date' => null,
     ]);
 
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public string $string;
 
         public bool $boolean;
@@ -822,8 +806,7 @@ it('can create a data object from a stdClass object', function () {
         'nullable_date' => null,
     ];
 
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public string $string;
 
         public bool $boolean;
@@ -843,8 +826,7 @@ it('can create a data object from a stdClass object', function () {
 });
 
 it('can add the WithData trait to a request', function () {
-    $formRequest = new class() extends FormRequest
-    {
+    $formRequest = new class () extends FormRequest {
         use WithData;
 
         public string $dataClass = SimpleData::class;
@@ -860,8 +842,7 @@ it('can add the WithData trait to a request', function () {
 });
 
 it('can add the WithData trait to a model', function () {
-    $model = new class() extends Model
-    {
+    $model = new class () extends Model {
         use WithData;
 
         protected string $dataClass = SimpleData::class;
@@ -877,8 +858,7 @@ it('can add the WithData trait to a model', function () {
 });
 
 it('can define the WithData trait data class by method', function () {
-    $arrayable = new class() implements Arrayable
-    {
+    $arrayable = new class () implements Arrayable {
         use WithData;
 
         public function toArray()
@@ -944,8 +924,7 @@ it('can transform to JSON', function () {
 it(
     'can construct a data object with both constructor promoted and default properties',
     function () {
-        $dataClass = new class('') extends Data
-        {
+        $dataClass = new class ('') extends Data {
             public string $property;
 
             public function __construct(
@@ -994,8 +973,7 @@ it('can construct a data object with default values and overwrite them', functio
 });
 
 it('can use a custom transformer', function () {
-    $nestedData = new class(42, 'Hello World') extends Data
-    {
+    $nestedData = new class (42, 'Hello World') extends Data {
         public function __construct(
             public int $integer,
             public string $string,
@@ -1008,8 +986,7 @@ it('can use a custom transformer', function () {
         ['integer' => '69', 'string' => 'Laravel after hours'],
     ]);
 
-    $dataWithDefaultTransformers = new class($nestedData, $nestedDataCollection) extends Data
-    {
+    $dataWithDefaultTransformers = new class ($nestedData, $nestedDataCollection) extends Data {
         public function __construct(
             public Data $nestedData,
             #[DataCollectionOf(SimpleData::class)]
@@ -1018,14 +995,13 @@ it('can use a custom transformer', function () {
         }
     };
 
-    $dataWithSpecificTransformers = new class($nestedData, $nestedDataCollection) extends Data
-    {
+    $dataWithSpecificTransformers = new class ($nestedData, $nestedDataCollection) extends Data {
         public function __construct(
             #[WithTransformer(ConfidentialDataTransformer::class)]
             public Data $nestedData,
             #[
                 WithTransformer(ConfidentialDataCollectionTransformer::class),
-                DataCollectionOf(SimpleData::class)
+            DataCollectionOf(SimpleData::class)
             ]
             public DataCollection $nestedDataCollection,
         ) {
@@ -1052,8 +1028,7 @@ it('can use a custom transformer', function () {
 });
 
 it('can transform built it types with custom transformers', function () {
-    $data = new class('Hello World', 'Hello World') extends Data
-    {
+    $data = new class ('Hello World', 'Hello World') extends Data {
         public function __construct(
             public string $without_transformer,
             #[WithTransformer(StringToUpperTransformer::class)]
@@ -1069,8 +1044,7 @@ it('can transform built it types with custom transformers', function () {
 });
 
 it('can cast data object and collections using a custom cast', function () {
-    $dataWithDefaultCastsClass = new class(new SimpleData(''), SimpleData::collection([])) extends Data
-    {
+    $dataWithDefaultCastsClass = new class (new SimpleData(''), SimpleData::collection([])) extends Data {
         public function __construct(
             public SimpleData $nestedData,
             #[DataCollectionOf(SimpleData::class)]
@@ -1079,8 +1053,7 @@ it('can cast data object and collections using a custom cast', function () {
         }
     };
 
-    $dataWithCustomCastsClass = new class(new SimpleData(''), SimpleData::collection([])) extends Data
-    {
+    $dataWithCustomCastsClass = new class (new SimpleData(''), SimpleData::collection([])) extends Data {
         public function __construct(
             #[WithCast(ConfidentialDataCast::class)]
             public SimpleData $nestedData,
@@ -1113,8 +1086,7 @@ it('can cast data object and collections using a custom cast', function () {
 });
 
 it('can cast built-in types with custom casts', function () {
-    $dataClass = new class('', '') extends Data
-    {
+    $dataClass = new class ('', '') extends Data {
         public function __construct(
             public string $without_cast,
             #[WithCast(StringToUpperCast::class)]
@@ -1134,8 +1106,7 @@ it('can cast built-in types with custom casts', function () {
 });
 
 it('continues value assignment after a false boolean', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public bool $false;
 
         public bool $true;
@@ -1160,8 +1131,7 @@ it('continues value assignment after a false boolean', function () {
 });
 
 it('can create an partial data object', function () {
-    $dataClass = new class('', Optional::create(), Optional::create()) extends Data
-    {
+    $dataClass = new class ('', Optional::create(), Optional::create()) extends Data {
         public function __construct(
             public string $string,
             public string|Optional $undefinable_string,
@@ -1193,8 +1163,7 @@ it('can create an partial data object', function () {
 });
 
 it('can transform a partial object', function () {
-    $dataClass = new class('', Optional::create(), Optional::create()) extends Data
-    {
+    $dataClass = new class ('', Optional::create(), Optional::create()) extends Data {
         public function __construct(
             public string $string,
             public string|Optional $undefinable_string,
@@ -1226,8 +1195,7 @@ it('can transform a partial object', function () {
 });
 
 it('will not include lazy optional values when transforming', function () {
-    $data = new class('Hello World', Lazy::create(fn () => Optional::make())) extends Data
-    {
+    $data = new class ('Hello World', Lazy::create(fn () => Optional::make())) extends Data {
         public function __construct(
             public string $string,
             public string|Optional|Lazy $lazy_optional_string,
@@ -1266,8 +1234,7 @@ it('can map transformed property names', function () {
         ['description' => 'up'],
     ]);
 
-    $dataClass = new class('hello', $data, $data, $dataCollection, $dataCollection) extends Data
-    {
+    $dataClass = new class ('hello', $data, $data, $dataCollection, $dataCollection) extends Data {
         public function __construct(
             #[MapOutputName('property')]
             public string $string,
@@ -1278,7 +1245,7 @@ it('can map transformed property names', function () {
             public DataCollection $nested_collection,
             #[
                 MapOutputName('nested_other_collection'),
-                DataCollectionOf(SimpleDataWithMappedProperty::class)
+            DataCollectionOf(SimpleDataWithMappedProperty::class)
             ]
             public DataCollection $nested_renamed_collection,
         ) {
@@ -1333,8 +1300,7 @@ it('can map transformed properties from a complete class', function () {
 });
 
 it('can use context in casts based upon the properties of the data object', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public SimpleData $nested;
 
         public string $string;
@@ -1367,8 +1333,7 @@ it('will transform native enums', function () {
 });
 
 it('can magically create a data object', function () {
-    $dataClass = new class('', '') extends Data
-    {
+    $dataClass = new class ('', '') extends Data {
         public function __construct(
             public mixed $propertyA,
             public mixed $propertyB,
@@ -1404,8 +1369,7 @@ it('can magically create a data object', function () {
 });
 
 it('can validate non-requests payloads', function () {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public static bool $validateAllTypes = false;
 
         #[In('Hello World')]
@@ -1436,7 +1400,8 @@ it('can validate non-requests payloads', function () {
     ]);
 
     expect($data)->toBeInstanceOf(Data::class)
-        ->string->toEqual('nowp');;
+        ->string->toEqual('nowp');
+        ;
 
     $dataClass::$validateAllTypes = true;
 
@@ -1470,8 +1435,7 @@ it('can conditionally include', function () {
 });
 
 it('can conditionally include nested', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public NestedLazyData $nested;
     };
 
@@ -1560,8 +1524,7 @@ it('can conditionally exclude', function () {
 });
 
 it('can conditionally exclude nested', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public NestedLazyData $nested;
     };
 
@@ -1674,8 +1637,7 @@ it('can conditionally define only', function () {
 });
 
 it('can conditionally define only nested', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public MultiData $nested;
     };
 
@@ -1789,8 +1751,7 @@ it('can conditionally define except', function () {
 });
 
 it('can conditionally define except nested', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public MultiData $nested;
     };
 
@@ -1885,8 +1846,7 @@ test('only has precedence over except', function () {
 });
 
 it('can perform only and except on array properties', function () {
-    $data = new class('Hello World', ['string' => 'Hello World', 'int' => 42]) extends Data
-    {
+    $data = new class ('Hello World', ['string' => 'Hello World', 'int' => 42]) extends Data {
         public function __construct(
             public string $string,
             public array $array
@@ -2017,8 +1977,7 @@ it('can set a default wrap on a data object', function () {
 });
 
 it('wraps additional data', function () {
-    $dataClass = new class('Hello World') extends Data
-    {
+    $dataClass = new class ('Hello World') extends Data {
         public function __construct(
             public string $string
         ) {
@@ -2104,8 +2063,7 @@ it('only wraps responses', function () {
 });
 
 it('can use only when transforming', function (array $directive, array $expectedOnly) {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public string $first;
 
         public string $second;
@@ -2136,8 +2094,7 @@ it('can use except when transforming', function (
     array $expectedOnly,
     array $expectedExcept
 ) {
-    $dataClass = new class() extends Data
-    {
+    $dataClass = new class () extends Data {
         public string $first;
 
         public string $second;
@@ -2163,8 +2120,7 @@ it('can use except when transforming', function (
 })->with('only-inclusion');
 
 it('can use a trait', function () {
-    $data = new class('') implements DataObject
-    {
+    $data = new class ('') implements DataObject {
         use DataTrait;
 
         public function __construct(public string $string)
@@ -2183,8 +2139,7 @@ it('can use a trait', function () {
 });
 
 it('supports conversion from multiple date formats', function () {
-    $data = new class() extends Data
-    {
+    $data = new class () extends Data {
         public function __construct(
             #[WithCast(DateTimeInterfaceCast::class, ['Y-m-d\TH:i:sP', 'Y-m-d H:i:s'])]
             public ?DateTime $date = null
@@ -2206,8 +2161,7 @@ it(
 )->throws(CannotCreateData::class, 'the constructor requires 1 parameters');
 
 it('can inherit properties from a base class', function () {
-    $dataClass = new class('') extends SimpleData
-    {
+    $dataClass = new class ('') extends SimpleData {
         public int $int;
     };
 

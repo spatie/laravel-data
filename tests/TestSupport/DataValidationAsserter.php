@@ -4,9 +4,10 @@ namespace Spatie\LaravelData\Tests\TestSupport;
 
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
-use Spatie\LaravelData\Data;
 
 use function PHPUnit\Framework\assertTrue;
+
+use Spatie\LaravelData\Data;
 
 /**
  * @property class-string<Data::class> $dataClass
