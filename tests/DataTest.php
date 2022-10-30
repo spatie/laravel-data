@@ -2159,7 +2159,7 @@ it('can use except when transforming', function (
     ]);
 
     expect($data->except(...$directive)->toArray())
-        ->toMatchArray($expectedExcept);
+        ->toEqual($expectedExcept);
 })->with('only-inclusion');
 
 it('can use a trait', function () {
