@@ -75,18 +75,18 @@ class DataCollectionTest extends TestCase
     }
     
     /** @test */
-    public function a_can_see_if_collection_contains()
+    public function it_can_see_if_collection_contains()
     {
         $collection = SimpleData::collection(['A', 'B']);
-        $contains = $collection->contains(fn (SimpleData $data) => $data->string === 'A')
-        $this->assertTrue($filtered);
+        $contains = $collection->contains(fn (SimpleData $data) => $data->string === 'A');
+        $this->assertTrue($contains);
         
-        $doesNotContain = $collection->contains(fn (SimpleData $data) => $data->string === 'C')
-        $this->assertFalse($filtered);
+        $doesNotContain = $collection->contains(fn (SimpleData $data) => $data->string === 'C');
+        $this->assertFalse($doesNotContain);
     }
 
     /** @test */
-    public function a_collection_can_be_filtered()
+    public function it_collection_can_be_filtered()
     {
         $collection = SimpleData::collection(['A', 'B']);
 
