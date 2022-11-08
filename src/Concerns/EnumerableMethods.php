@@ -45,7 +45,7 @@ trait EnumerableMethods
      * @param  mixed  $value
      * @return bool
      */
-    public function contains($key, $operator = null, $value = null)
+    public function contains($key, $operator = null, $value = null): bool
     {
         if (func_num_args() === 1) {
             if (! is_string($key) && is_callable($key)) {
