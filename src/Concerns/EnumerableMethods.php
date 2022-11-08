@@ -36,6 +36,29 @@ trait EnumerableMethods
     {
         return $this->through($map);
     }
+    
+    /**
+     * Determine if an item exists in the collection.
+     *
+     * @param  (callable(TValue, TKey): bool)|TValue|string  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function contains($key, $operator = null, $value = null)
+    {
+        if (func_num_args() === 1) {
+            if (! is_string($key) && is_callable($key)) {
+                $placeholder = new \stdClass;
+
+                return $this->first($key, $placeholder) !== $placeholder;
+            }
+
+            return in_array($key, $this->items);
+        }
+
+        return $this->contains($this->operatorForWhere(...func_get_args()));
+    }
 
     /**
      * @param callable(TValue): bool $filter
