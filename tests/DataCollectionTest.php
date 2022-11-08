@@ -86,7 +86,7 @@ class DataCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_collection_can_be_filtered()
+    public function a_collection_can_be_filtered()
     {
         $collection = SimpleData::collection(['A', 'B']);
 
