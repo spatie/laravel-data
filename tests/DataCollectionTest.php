@@ -73,6 +73,17 @@ class DataCollectionTest extends TestCase
 
         $this->assertEquals($collectionB->toArray(), $collectionA->toArray());
     }
+    
+    /** @test */
+    public function a_can_see_if_collection_contains()
+    {
+        $collection = SimpleData::collection(['A', 'B']);
+        $contains = $collection->contains(fn (SimpleData $data) => $data->string === 'A')
+        $this->assertTrue($filtered);
+        
+        $doesNotContain = $collection->contains(fn (SimpleData $data) => $data->string === 'C')
+        $this->assertFalse($filtered);
+    }
 
     /** @test */
     public function a_collection_can_be_filtered()
