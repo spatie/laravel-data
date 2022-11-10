@@ -674,17 +674,17 @@ function mimesAttributes(): Generator
 {
     yield fixature(
         attribute: new MimeTypes('video/quicktime'),
-        expected: 'mimestypes:video/quicktime',
+        expected: 'mimetypes:video/quicktime',
     );
 
     yield fixature(
         attribute: new MimeTypes(['video/quicktime', 'video/avi']),
-        expected: 'mimestypes:video/quicktime,video/avi',
+        expected: 'mimetypes:video/quicktime,video/avi',
     );
 
     yield fixature(
         attribute: new MimeTypes('video/quicktime', 'video/avi'),
-        expected: 'mimestypes:video/quicktime,video/avi',
+        expected: 'mimetypes:video/quicktime,video/avi',
     );
 }
 
