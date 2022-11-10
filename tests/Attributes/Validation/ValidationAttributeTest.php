@@ -12,8 +12,7 @@ it('can get a string representation of rules', function () {
 });
 
 it('can normalize values', function ($input, $output) {
-    $normalizer = new class() extends ValidationAttribute
-    {
+    $normalizer = new class () extends ValidationAttribute {
         public function execute(mixed $value): mixed
         {
             return $this->normalizeValue($value);
