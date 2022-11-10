@@ -86,6 +86,7 @@ use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
+use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 
 function fixature(
     ValidationRule $attribute,
@@ -393,6 +394,12 @@ function acceptedIfAttributes(): Generator
         attribute: new AcceptedIf('value', 3.14),
         expected: 'accepted_if:value,3.14',
     );
+
+    yield fixature(
+        attribute: new AcceptedIf('value', DummyBackedEnum::FOO),
+        expected: 'accepted_if:value,foo',
+        expectCreatedAttribute: new AcceptedIf('value', 'foo')
+    );
 }
 
 function afterAttributes(): Generator
@@ -498,6 +505,12 @@ function currentPasswordAttributes(): Generator
     yield fixature(
         attribute: new CurrentPassword('api'),
         expected: 'current_password:api',
+    );
+
+    yield fixature(
+        attribute: new CurrentPassword(DummyBackedEnum::FOO),
+        expected: 'current_password:foo',
+        expectCreatedAttribute: new CurrentPassword(DummyBackedEnum::FOO->value)
     );
 }
 
@@ -647,6 +660,18 @@ function existsAttributes(): Generator
         expected: (new BaseExists('users', 'email'))->where($closure),
         expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'email'))->where($closure))
     );
+
+    yield fixature(
+        attribute: new Exists('users', 'email', withoutTrashed: true),
+        expected: (new BaseExists('users', 'email'))->withoutTrashed(),
+        expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'email'))->withoutTrashed())
+    );
+
+    yield fixature(
+        attribute: new Exists('users', 'email', withoutTrashed: true, deletedAtColumn: 'deleted_when'),
+        expected: (new BaseExists('users', 'email'))->withoutTrashed('deleted_when'),
+        expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'email'))->withoutTrashed('deleted_when'))
+    );
 }
 
 function inAttributes(): Generator
@@ -744,7 +769,7 @@ function passwordAttributes(): Generator
     yield fixature(
         attribute: new Password(letters: true, mixedCase: true, numbers: true, uncompromised: true, uncompromisedThreshold: 12),
         expected: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12),
-        expectCreatedAttribute: new Password(rule: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12), ),
+        expectCreatedAttribute: new Password(rule: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12),),
     );
 }
 
@@ -753,6 +778,12 @@ function prohibitedIfAttributes(): Generator
     yield fixature(
         attribute: new ProhibitedIf('field', 'key'),
         expected: 'prohibited_if:field,key',
+    );
+
+    yield fixature(
+        attribute: new ProhibitedIf('field', DummyBackedEnum::FOO),
+        expected: 'prohibited_if:field,foo',
+        expectCreatedAttribute: new ProhibitedIf('field', DummyBackedEnum::FOO->value),
     );
 
     yield fixature(
@@ -771,6 +802,12 @@ function prohibitedUnlessAttributes(): Generator
     yield fixature(
         attribute: new ProhibitedUnless('field', 'key'),
         expected: 'prohibited_unless:field,key',
+    );
+
+    yield fixature(
+        attribute: new ProhibitedUnless('field', DummyBackedEnum::FOO),
+        expected: 'prohibited_unless:field,foo',
+        expectCreatedAttribute: new ProhibitedUnless('field', DummyBackedEnum::FOO->value),
     );
 
     yield fixature(
@@ -815,6 +852,12 @@ function requiredIfAttributes(): Generator
     );
 
     yield fixature(
+        attribute: new RequiredIf('field', DummyBackedEnum::FOO),
+        expected: 'required_if:field,foo',
+        expectCreatedAttribute: new RequiredIf('field', DummyBackedEnum::FOO->value),
+    );
+
+    yield fixature(
         attribute: new RequiredIf('field', ['key', 'other']),
         expected: 'required_if:field,key,other',
     );
@@ -830,6 +873,12 @@ function requiredUnlessAttributes(): Generator
     yield fixature(
         attribute: new RequiredUnless('field', 'key'),
         expected: 'required_unless:field,key',
+    );
+
+    yield fixature(
+        attribute: new RequiredUnless('field', DummyBackedEnum::FOO),
+        expected: 'required_unless:field,foo',
+        expectCreatedAttribute: new RequiredUnless('field', DummyBackedEnum::FOO->value),
     );
 
     yield fixature(

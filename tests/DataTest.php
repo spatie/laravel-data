@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Inertia\LazyProp;
 
@@ -2273,5 +2274,36 @@ it('can have a circular dependency', function () {
                 'ular' => null,
             ],
         ],
+    ]);
+});
+
+it('can restructure payload', function () {
+    $class = new class() extends Data
+    {
+        public function __construct(
+            public string|null $name = null,
+            public string|null $address = null,
+        ) {
+        }
+
+        public static function prepareForPipeline(Collection $properties): Collection
+        {
+            $properties->put('address', $properties->only(['line_1', 'city', 'state', 'zipcode'])->join(','));
+
+            return $properties;
+        }
+    };
+
+    $instance = $class::from([
+        'name' => 'Freek',
+        'line_1' => '123 Sesame St',
+        'city' => 'New York',
+        'state' => 'NJ',
+        'zipcode' => '10010',
+    ]);
+
+    expect($instance->toArray())->toMatchArray([
+        'name' => 'Freek',
+        'address' => '123 Sesame St,New York,NJ,10010'
     ]);
 });
