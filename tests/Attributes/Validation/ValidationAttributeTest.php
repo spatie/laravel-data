@@ -7,6 +7,7 @@ use DateTimeZone;
 use Generator;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
+use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\TestCase;
 
 class ValidationAttributeTest extends TestCase
@@ -85,6 +86,16 @@ class ValidationAttributeTest extends TestCase
         yield [
             'input' => CarbonImmutable::create(2020, 05, 16, 0, 0, 0, new DateTimeZone('Europe/Brussels')),
             'output' => '2020-05-16T00:00:00+02:00',
+        ];
+
+        yield [
+            'input' => DummyBackedEnum::FOO,
+            'output' => 'foo',
+        ];
+
+        yield [
+            'input' => [DummyBackedEnum::FOO, DummyBackedEnum::BOO],
+            'output' => 'foo,boo',
         ];
     }
 }

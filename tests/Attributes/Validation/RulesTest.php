@@ -94,6 +94,7 @@ use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 use Spatie\LaravelData\Support\Validation\RulesMapper;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
+use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\TestCase;
 use Spatie\TestTime\TestTime;
 
@@ -242,7 +243,6 @@ class RulesTest extends TestCase
             expected: new EnumRule('enum_class'),
             expectCreatedAttribute: new Enum(new EnumRule('enum_class'))
         );
-
 
         yield $this->fixature(
             attribute: new ExcludeIf('field', true),
@@ -433,6 +433,12 @@ class RulesTest extends TestCase
             attribute: new AcceptedIf('value', 3.14),
             expected: 'accepted_if:value,3.14',
         );
+
+        yield $this->fixature(
+            attribute: new AcceptedIf('value', DummyBackedEnum::FOO),
+            expected: 'accepted_if:value,foo',
+            expectCreatedAttribute: new AcceptedIf('value', 'foo')
+        );
     }
 
     public function afterAttributesDataProvider(): Generator
@@ -538,6 +544,12 @@ class RulesTest extends TestCase
         yield $this->fixature(
             attribute: new CurrentPassword('api'),
             expected: 'current_password:api',
+        );
+
+        yield $this->fixature(
+            attribute: new CurrentPassword(DummyBackedEnum::FOO),
+            expected: 'current_password:foo',
+            expectCreatedAttribute: new CurrentPassword(DummyBackedEnum::FOO->value)
         );
     }
 
@@ -796,6 +808,12 @@ class RulesTest extends TestCase
         );
 
         yield $this->fixature(
+            attribute: new ProhibitedIf('field', DummyBackedEnum::FOO),
+            expected: 'prohibited_if:field,foo',
+            expectCreatedAttribute: new ProhibitedIf('field', DummyBackedEnum::FOO->value),
+        );
+
+        yield $this->fixature(
             attribute: new ProhibitedIf('field', ['key', 'other']),
             expected: 'prohibited_if:field,key,other',
         );
@@ -811,6 +829,12 @@ class RulesTest extends TestCase
         yield $this->fixature(
             attribute: new ProhibitedUnless('field', 'key'),
             expected: 'prohibited_unless:field,key',
+        );
+
+        yield $this->fixature(
+            attribute: new ProhibitedUnless('field', DummyBackedEnum::FOO),
+            expected: 'prohibited_unless:field,foo',
+            expectCreatedAttribute: new ProhibitedUnless('field', DummyBackedEnum::FOO->value),
         );
 
         yield $this->fixature(
@@ -855,6 +879,12 @@ class RulesTest extends TestCase
         );
 
         yield $this->fixature(
+            attribute: new RequiredIf('field', DummyBackedEnum::FOO),
+            expected: 'required_if:field,foo',
+            expectCreatedAttribute: new RequiredIf('field', DummyBackedEnum::FOO->value),
+        );
+
+        yield $this->fixature(
             attribute: new RequiredIf('field', ['key', 'other']),
             expected: 'required_if:field,key,other',
         );
@@ -870,6 +900,12 @@ class RulesTest extends TestCase
         yield $this->fixature(
             attribute: new RequiredUnless('field', 'key'),
             expected: 'required_unless:field,key',
+        );
+
+        yield $this->fixature(
+            attribute: new RequiredUnless('field', DummyBackedEnum::FOO),
+            expected: 'required_unless:field,foo',
+            expectCreatedAttribute: new RequiredUnless('field', DummyBackedEnum::FOO->value),
         );
 
         yield $this->fixature(

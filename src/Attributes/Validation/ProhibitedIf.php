@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use BackedEnum;
 use Illuminate\Support\Arr;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -12,7 +13,7 @@ class ProhibitedIf extends StringValidationAttribute
 
     public function __construct(
         protected string $field,
-        array | string ...$values
+        array | string | BackedEnum ...$values
     ) {
         $this->values = Arr::flatten($values);
     }
