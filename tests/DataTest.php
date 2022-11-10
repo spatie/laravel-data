@@ -2543,7 +2543,8 @@ class DataTest extends TestCase
             public function __construct(
                 public string|null $name = null,
                 public string|null $address = null,
-            ) {}
+            ) {
+            }
 
             public static function prepareForPipeline(Collection $properties): Collection
             {
