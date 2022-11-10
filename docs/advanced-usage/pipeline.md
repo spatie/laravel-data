@@ -61,3 +61,42 @@ The `handle` method has several arguments:
 When using a magic creation methods, the pipeline is not being used (since you manually overwrite how a data object is
 constructed). Only when you pass in a request object a minimal version of the pipeline is used to authorize and validate
 the request.
+
+## Preparing data for the pipeline
+
+Sometimes you need to make some changes to the payload after it has been normalized, but before they are sent into the data pipeline. You can do this using the `prepareForPipeline` method as follows: 
+
+```php
+class SongMetadata
+{
+    public function __construct(
+        public string $releaseYear,
+        public string $producer,
+    ) {}
+}
+
+class Song extends Data
+{
+    public function __construct(
+        public string $title,
+        public SongMetadata $metadata,
+    ) {}
+    
+    public static function prepareForPipeline(Collection $properties) : Collection
+    {
+        $properties->put('metadata', $properties->only(['release_year', 'producer']));
+        
+        return $properties;
+    }
+}
+```
+
+Now it is possible to create a data object as follows:
+
+```php
+$song = Song::from([
+    'title' => 'Never gonna give you up',
+    'release_year' => '1987',
+    'producer' => 'Stock Aitken Waterman',
+]);
+```

@@ -7,6 +7,7 @@ trait DataTrait
     use ResponsableData;
     use IncludeableData;
     use AppendableData;
+    use PrepareableData;
     use ValidateableData;
     use WrappableData;
     use TransformableData;

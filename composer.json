@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": "^8.1",
-        "illuminate/contracts": "^8.71|^9.18",
+        "illuminate/contracts": "^8.83|^9.30",
         "phpdocumentor/type-resolver": "^1.5",
         "spatie/laravel-package-tools": "^1.9.0"
     },
@@ -36,7 +36,8 @@
         "spatie/laravel-typescript-transformer": "^2.0",
         "spatie/pest-plugin-snapshots": "^1.1",
         "spatie/phpunit-snapshot-assertions": "^4.2",
-        "spatie/test-time": "^1.2"
+        "spatie/test-time": "^1.2",
+        "nesbot/carbon" : "^2.63"
     },
     "autoload": {
         "psr-4": {

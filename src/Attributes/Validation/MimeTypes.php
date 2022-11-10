@@ -17,7 +17,7 @@ class MimeTypes extends StringValidationAttribute
 
     public static function keyword(): string
     {
-        return 'mimestypes';
+        return 'mimetypes';
     }
 
     public function parameters(): array

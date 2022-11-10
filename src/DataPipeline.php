@@ -87,6 +87,8 @@ class DataPipeline
 
         $class = $this->dataConfig->getDataClass($this->classString);
 
+        $properties = ($class->name)::prepareForPipeline($properties);
+
         foreach ($pipes as $pipe) {
             $piped = $pipe->handle($this->value, $class, $properties);
 

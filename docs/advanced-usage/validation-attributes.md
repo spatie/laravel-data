@@ -381,6 +381,9 @@ public string $value;
 
 #[Exists('users', 'email', connection: 'tenant')]
 public string $value;
+
+#[Exists('users', 'email', withoutTrashed: true)]
+public string $value;
 ```
 
 ### File
