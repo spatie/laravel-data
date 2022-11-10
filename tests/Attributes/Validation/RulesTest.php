@@ -692,6 +692,18 @@ class RulesTest extends TestCase
             expectCreatedAttribute: new Exists(rule: new BaseExists('tenant.users', 'email'))
         );
 
+        yield $this->fixature(
+            attribute: new Exists('users', 'email', withoutTrashed: true),
+            expected: (new BaseExists('users', 'email'))->withoutTrashed(),
+            expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'email'))->withoutTrashed())
+        );
+
+        yield $this->fixature(
+            attribute: new Exists('users', 'email', withoutTrashed: true, deletedAtColumn: 'deleted_when'),
+            expected: (new BaseExists('users', 'email'))->withoutTrashed('deleted_when'),
+            expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'email'))->withoutTrashed('deleted_when'))
+        );
+
         $closure = fn (Builder $builder) => $builder;
 
         yield $this->fixature(

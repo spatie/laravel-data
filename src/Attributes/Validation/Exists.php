@@ -16,6 +16,8 @@ class Exists extends ValidationAttribute
         ?string $table = null,
         ?string $column = 'NULL',
         ?string $connection = null,
+        bool $withoutTrashed = false,
+        string $deletedAtColumn = 'deleted_at',
         ?Closure $where = null,
         ?BaseExists $rule = null,
     ) {
@@ -27,6 +29,10 @@ class Exists extends ValidationAttribute
             $connection ? "{$connection}.{$table}" : $table,
             $column
         );
+
+        if ($withoutTrashed) {
+            $rule->withoutTrashed($deletedAtColumn);
+        }
 
         if ($where) {
             $rule->where($where);
