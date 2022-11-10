@@ -4,8 +4,9 @@
 # Powerful data objects for Laravel
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-data.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-data)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/spatie/laravel-data/run-tests?label=tests)](https://github.com/spatie/laravel-data/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/spatie/laravel-data/Check%20&%20fix%20styling?label=code%20style)](https://github.com/spatie/laravel-data/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
+[![Tests](https://github.com/spatie/laravel-data/actions/workflows/run-tests.yml/badge.svg)](https://github.com/spatie/laravel-data/actions/workflows/run-tests.yml)
+[![PHPStan](https://github.com/spatie/laravel-data/actions/workflows/phpstan.yml/badge.svg)](https://github.com/spatie/laravel-data/actions/workflows/phpstan.yml)
+[![Check & fix styling](https://github.com/spatie/laravel-data/actions/workflows/php-cs-fixer.yml/badge.svg)](https://github.com/spatie/laravel-data/actions/workflows/php-cs-fixer.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-data.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-data)
 
 This package enables the creation of rich data objects which can be used in various ways. Using this package you only need to describe your data once:
