@@ -7,7 +7,6 @@ use Carbon\Carbon;
 use DateTimeInterface;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Stringable;
-use UnitEnum;
 
 abstract class ValidationAttribute extends ValidationRule implements Stringable
 {
@@ -41,7 +40,7 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
         }
 
         if (is_array($mixed)) {
-            return implode(',', array_map(fn(mixed $mixed) => $this->normalizeValue($mixed), $mixed));
+            return implode(',', array_map(fn (mixed $mixed) => $this->normalizeValue($mixed), $mixed));
         }
 
         if ($mixed instanceof DateTimeInterface) {
