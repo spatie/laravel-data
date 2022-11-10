@@ -227,51 +227,6 @@ This list can be extended using extra normalizers, find more about it [here](htt
 When a data object cannot be created using magical methods or the default methods, a `CannotCreateDataFromValue`
 exception will be thrown.
 
-## Preparing Data
-
-Sometimes you may need to handle situations where the *structure* of the data needs to be normalized. 
-
-In these cases, you may use the static `prepareForPipeline` method on your data object. This method allows you to modify your properties after the payload has been normalized, but before they are sent into the data pipeline (i.e.: before being casted, mapped, and so forth).
-
-A typical example would be breaking a flat structure (such as an imported csv) into a nested structure:
-
-```php
-class SongMetadata
-{
-    public function __construct(
-        public string $releaseYear,
-        public string $producer,
-    ) {}
-}
-
-class Song extends Data
-{
-    public function __construct(
-        public string $title,
-        public SongMetadata $metadata,
-    ) {}
-    
-    public static function prepareForPipeline(Collection $properties) : Collection
-    {
-        $properties->put('metadata', $properties->only(['release_year', 'producer']));
-        
-        return $properties;
-    }
-}
-```
-
-This flat incoming data will be converted into the nested structure we just codified:
-
-```php
-$song = Song::from([
-    'title' => 'Never gonna give you up',
-    'release_year' => '1987',
-    'producer' => 'Stock Aitken Waterman',
-]);
-
-$song->toArray(); // ['title' => '...', 'songMetadata' => ['release_year' => '...', 'producer' => '...']]
-```
-
 ## Optional creation
 
 It is impossible to return `null` from a data object's `from` method since we always expect a data object when
@@ -291,6 +246,10 @@ You can ignore the magical creation methods when creating a data object as such:
 ```php
 SongData::withoutMagicalCreationFrom($song);
 ```
+
+## Advanced creation
+
+Internally this package is using a pipeline to create a data object from something. This pipeline exists of steps which transform properties into a correct structure and it can be completely customized. You can read more about it [here](/docs/laravel-data/v2/advanced-usage/pipeline).
 
 ## Quickly getting data from Models, Requests, ...
 
