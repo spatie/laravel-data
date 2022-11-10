@@ -738,17 +738,17 @@ class RulesTest extends TestCase
     {
         yield $this->fixature(
             attribute: new MimeTypes('video/quicktime'),
-            expected: 'mimestypes:video/quicktime',
+            expected: 'mimetypes:video/quicktime',
         );
 
         yield $this->fixature(
             attribute: new MimeTypes(['video/quicktime', 'video/avi']),
-            expected: 'mimestypes:video/quicktime,video/avi',
+            expected: 'mimetypes:video/quicktime,video/avi',
         );
 
         yield $this->fixature(
             attribute: new MimeTypes('video/quicktime', 'video/avi'),
-            expected: 'mimestypes:video/quicktime,video/avi',
+            expected: 'mimetypes:video/quicktime,video/avi',
         );
     }
 
