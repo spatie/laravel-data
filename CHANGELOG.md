@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.14 - 2022-11-10
+
+- accept 'float' as data type (#237)
+- fix typo in mime type validation rule(#243)
+- add support for enums in validation attributes
+- add support for withoutTrashed to exists validation attribute (#248)
+- add PHP 8.2 testing in GH actions
+- add ability to modify properties before the data pipeline (#247)
+
 ## 2.0.13 - 2022-10-14
 
 - fix first and last page url are never null (#215)
