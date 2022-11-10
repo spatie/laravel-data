@@ -102,36 +102,36 @@ function fixature(
 }
 
 dataset('attributes', function () {
-    yield from acceptedIfAttributesDataProvider();
-    yield from afterAttributesDataProvider();
-    yield from afterOrEqualAttributesDataProvider();
-    yield from arrayTypeAttributesDataProvider();
-    yield from beforeAttributesDataProvider();
-    yield from beforeOrEqualAttributesDataProvider();
-    yield from betweenAttributesDataProvider();
-    yield from currentPasswordAttributesDataProvider();
-    yield from dateEqualsAttributesDataProvider();
-    yield from dimensionsAttributesDataProvider();
-    yield from distinctAttributesDataProvider();
-    yield from emailAttributesDataProvider();
-    yield from endsWithAttributesDataProvider();
-    yield from existsAttributesDataProvider();
-    yield from inAttributesDataProvider();
-    yield from mimesAttributesDataProvider();
-    yield from mimeTypesAttributesDataProvider();
-    yield from notInAttributesDataProvider();
-    yield from passwordAttributesDataProvider();
-    yield from prohibitedIfAttributesDataProvider();
-    yield from prohibitedUnlessAttributesDataProvider();
-    yield from prohibitsAttributesDataProvider();
-    yield from requiredIfAttributesDataProvider();
-    yield from requiredUnlessAttributesDataProvider();
-    yield from requiredWithAttributesDataProvider();
-    yield from requiredWithAllAttributesDataProvider();
-    yield from requiredWithoutAttributesDataProvider();
-    yield from requiredWithoutAllAttributesDataProvider();
-    yield from startsWithAttributesDataProvider();
-    yield from uniqueAttributesDataProvider();
+    yield from acceptedIfAttributes();
+    yield from afterAttributes();
+    yield from afterOrEqualAttributes();
+    yield from arrayTypeAttributes();
+    yield from beforeAttributes();
+    yield from beforeOrEqualAttributes();
+    yield from betweenAttributes();
+    yield from currentPasswordAttributes();
+    yield from dateEqualsAttributes();
+    yield from dimensionsAttributes();
+    yield from distinctAttributes();
+    yield from emailAttributes();
+    yield from endsWithAttributes();
+    yield from existsAttributes();
+    yield from inAttributes();
+    yield from mimesAttributes();
+    yield from mimeTypesAttributes();
+    yield from notInAttributes();
+    yield from passwordAttributes();
+    yield from prohibitedIfAttributes();
+    yield from prohibitedUnlessAttributes();
+    yield from prohibitsAttributes();
+    yield from requiredIfAttributes();
+    yield from requiredUnlessAttributes();
+    yield from requiredWithAttributes();
+    yield from requiredWithAllAttributes();
+    yield from requiredWithoutAttributes();
+    yield from requiredWithoutAllAttributes();
+    yield from startsWithAttributes();
+    yield from uniqueAttributes();
 
     yield fixature(
         attribute: new Accepted(),
@@ -372,7 +372,7 @@ dataset('attributes', function () {
     );
 });
 
-function acceptedIfAttributesDataProvider(): Generator
+function acceptedIfAttributes(): Generator
 {
     yield fixature(
         attribute: new AcceptedIf('value', 'string'),
@@ -395,7 +395,7 @@ function acceptedIfAttributesDataProvider(): Generator
     );
 }
 
-function afterAttributesDataProvider(): Generator
+function afterAttributes(): Generator
 {
     yield fixature(
         attribute: new After('some_field'),
@@ -408,7 +408,7 @@ function afterAttributesDataProvider(): Generator
     );
 }
 
-function afterOrEqualAttributesDataProvider(): Generator
+function afterOrEqualAttributes(): Generator
 {
     yield fixature(
         attribute: new AfterOrEqual('some_field'),
@@ -421,7 +421,7 @@ function afterOrEqualAttributesDataProvider(): Generator
     );
 }
 
-function arrayTypeAttributesDataProvider(): Generator
+function arrayTypeAttributes(): Generator
 {
     yield fixature(
         attribute: new ArrayType(),
@@ -444,7 +444,7 @@ function arrayTypeAttributesDataProvider(): Generator
     );
 }
 
-function beforeAttributesDataProvider(): Generator
+function beforeAttributes(): Generator
 {
     yield fixature(
         attribute: new Before('some_field'),
@@ -457,7 +457,7 @@ function beforeAttributesDataProvider(): Generator
     );
 }
 
-function beforeOrEqualAttributesDataProvider(): Generator
+function beforeOrEqualAttributes(): Generator
 {
     yield fixature(
         attribute: new BeforeOrEqual('some_field'),
@@ -470,7 +470,7 @@ function beforeOrEqualAttributesDataProvider(): Generator
     );
 }
 
-function betweenAttributesDataProvider(): Generator
+function betweenAttributes(): Generator
 {
     yield fixature(
         attribute: new Between(-42, 42),
@@ -488,7 +488,7 @@ function betweenAttributesDataProvider(): Generator
     );
 }
 
-function currentPasswordAttributesDataProvider(): Generator
+function currentPasswordAttributes(): Generator
 {
     yield fixature(
         attribute: new CurrentPassword(),
@@ -501,7 +501,7 @@ function currentPasswordAttributesDataProvider(): Generator
     );
 }
 
-function dateEqualsAttributesDataProvider(): Generator
+function dateEqualsAttributes(): Generator
 {
     yield fixature(
         attribute: new DateEquals('tomorrow'),
@@ -514,7 +514,7 @@ function dateEqualsAttributesDataProvider(): Generator
     );
 }
 
-function dimensionsAttributesDataProvider(): Generator
+function dimensionsAttributes(): Generator
 {
     yield fixature(
         attribute: new Dimensions(minWidth: 15, minHeight: 10, maxWidth: 150, maxHeight: 100, ratio: 1),
@@ -543,7 +543,7 @@ function dimensionsAttributesDataProvider(): Generator
     //    );
 }
 
-function distinctAttributesDataProvider(): Generator
+function distinctAttributes(): Generator
 {
     yield fixature(
         attribute: new Distinct(),
@@ -567,7 +567,7 @@ function distinctAttributesDataProvider(): Generator
     );
 }
 
-function emailAttributesDataProvider(): Generator
+function emailAttributes(): Generator
 {
     yield fixature(
         attribute: new Email(),
@@ -602,7 +602,7 @@ function emailAttributesDataProvider(): Generator
     );
 }
 
-function endsWithAttributesDataProvider(): Generator
+function endsWithAttributes(): Generator
 {
     yield fixature(
         attribute: new EndsWith('x'),
@@ -620,7 +620,7 @@ function endsWithAttributesDataProvider(): Generator
     );
 }
 
-function existsAttributesDataProvider(): Generator
+function existsAttributes(): Generator
 {
     yield fixature(
         attribute: new Exists('users'),
@@ -649,7 +649,7 @@ function existsAttributesDataProvider(): Generator
     );
 }
 
-function inAttributesDataProvider(): Generator
+function inAttributes(): Generator
 {
     yield fixature(
         attribute: new In('key'),
@@ -670,7 +670,7 @@ function inAttributesDataProvider(): Generator
     );
 }
 
-function mimesAttributesDataProvider(): Generator
+function mimesAttributes(): Generator
 {
     yield fixature(
         attribute: new MimeTypes('video/quicktime'),
@@ -688,7 +688,7 @@ function mimesAttributesDataProvider(): Generator
     );
 }
 
-function mimeTypesAttributesDataProvider(): Generator
+function mimeTypesAttributes(): Generator
 {
     yield fixature(
         attribute: new Mimes('jpg'),
@@ -706,7 +706,7 @@ function mimeTypesAttributesDataProvider(): Generator
     );
 }
 
-function notInAttributesDataProvider(): Generator
+function notInAttributes(): Generator
 {
     yield fixature(
         attribute: new NotIn('key'),
@@ -727,7 +727,7 @@ function notInAttributesDataProvider(): Generator
     );
 }
 
-function passwordAttributesDataProvider(): Generator
+function passwordAttributes(): Generator
 {
     yield fixature(
         attribute: new Password(),
@@ -748,7 +748,7 @@ function passwordAttributesDataProvider(): Generator
     );
 }
 
-function prohibitedIfAttributesDataProvider(): Generator
+function prohibitedIfAttributes(): Generator
 {
     yield fixature(
         attribute: new ProhibitedIf('field', 'key'),
@@ -766,7 +766,7 @@ function prohibitedIfAttributesDataProvider(): Generator
     );
 }
 
-function prohibitedUnlessAttributesDataProvider(): Generator
+function prohibitedUnlessAttributes(): Generator
 {
     yield fixature(
         attribute: new ProhibitedUnless('field', 'key'),
@@ -784,7 +784,7 @@ function prohibitedUnlessAttributesDataProvider(): Generator
     );
 }
 
-function prohibitsAttributesDataProvider(): Generator
+function prohibitsAttributes(): Generator
 {
     yield fixature(
         attribute: new Prohibits('key'),
@@ -802,7 +802,7 @@ function prohibitsAttributesDataProvider(): Generator
     );
 }
 
-function requiredIfAttributesDataProvider(): Generator
+function requiredIfAttributes(): Generator
 {
     yield fixature(
         attribute: new RequiredIf('field'),
@@ -825,7 +825,7 @@ function requiredIfAttributesDataProvider(): Generator
     );
 }
 
-function requiredUnlessAttributesDataProvider(): Generator
+function requiredUnlessAttributes(): Generator
 {
     yield fixature(
         attribute: new RequiredUnless('field', 'key'),
@@ -843,7 +843,7 @@ function requiredUnlessAttributesDataProvider(): Generator
     );
 }
 
-function requiredWithAttributesDataProvider(): Generator
+function requiredWithAttributes(): Generator
 {
     yield fixature(
         attribute: new RequiredWith('key'),
@@ -861,7 +861,7 @@ function requiredWithAttributesDataProvider(): Generator
     );
 }
 
-function requiredWithAllAttributesDataProvider(): Generator
+function requiredWithAllAttributes(): Generator
 {
     yield fixature(
         attribute: new RequiredWithAll('key'),
@@ -879,7 +879,7 @@ function requiredWithAllAttributesDataProvider(): Generator
     );
 }
 
-function requiredWithoutAttributesDataProvider(): Generator
+function requiredWithoutAttributes(): Generator
 {
     yield fixature(
         attribute: new RequiredWithout('key'),
@@ -897,7 +897,7 @@ function requiredWithoutAttributesDataProvider(): Generator
     );
 }
 
-function requiredWithoutAllAttributesDataProvider(): Generator
+function requiredWithoutAllAttributes(): Generator
 {
     yield fixature(
         attribute: new RequiredWithoutAll('key'),
@@ -915,7 +915,7 @@ function requiredWithoutAllAttributesDataProvider(): Generator
     );
 }
 
-function startsWithAttributesDataProvider(): Generator
+function startsWithAttributes(): Generator
 {
     yield fixature(
         attribute: new StartsWith('x'),
@@ -933,7 +933,7 @@ function startsWithAttributesDataProvider(): Generator
     );
 }
 
-function uniqueAttributesDataProvider(): Generator
+function uniqueAttributes(): Generator
 {
     yield fixature(
         attribute: new Unique('users'),
