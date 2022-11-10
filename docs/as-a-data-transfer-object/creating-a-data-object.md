@@ -247,6 +247,10 @@ You can ignore the magical creation methods when creating a data object as such:
 SongData::withoutMagicalCreationFrom($song);
 ```
 
+## Advanced creation
+
+Internally this package is using a pipeline to create a data object from something. This pipeline exists of steps which transform properties into a correct structure and it can be completely customized. You can read more about it [here](/docs/laravel-data/v2/advanced-usage/pipeline).
+
 ## Quickly getting data from Models, Requests, ...
 
 By adding the `WithData` trait to a Model, Request or any class that can be magically be converted to a data object,

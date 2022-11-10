@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
@@ -2533,5 +2534,33 @@ class DataTest extends TestCase
             ],
             $data->toArray()
         );
+    }
+
+    /** @test */
+    public function it_can_restructure_payload()
+    {
+        $class = new class () extends Data {
+            public function __construct(
+                public string|null $name = null,
+                public string|null $address = null,
+            ) {}
+
+            public static function prepareForPipeline(Collection $properties): Collection
+            {
+                $properties->put('address', $properties->only(['line_1','city','state','zipcode'])->join(','));
+
+                return $properties;
+            }
+        };
+
+        $instance = $class::from([
+            'name' => 'Freek',
+            'line_1' => '123 Sesame St',
+            'city' => 'New York',
+            'state' => 'NJ',
+            'zipcode' => '10010',
+        ]);
+
+        $this->assertEquals(['name' => 'Freek', 'address' => '123 Sesame St,New York,NJ,10010'], $instance->toArray());
     }
 }
