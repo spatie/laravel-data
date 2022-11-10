@@ -3,11 +3,12 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class CurrentPassword extends StringValidationAttribute
 {
-    public function __construct(protected ?string $guard = null)
+    public function __construct(protected null|string|DummyBackedEnum $guard = null)
     {
     }
 
@@ -20,6 +21,6 @@ class CurrentPassword extends StringValidationAttribute
     {
         return $this->guard === null
             ? []
-            : [$this->guard];
+            : [self::normalizeValue($this->guard)];
     }
 }

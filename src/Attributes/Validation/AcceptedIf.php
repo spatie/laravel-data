@@ -3,11 +3,12 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use BackedEnum;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class AcceptedIf extends StringValidationAttribute
 {
-    public function __construct(protected string $field, protected string|bool|int|float $value)
+    public function __construct(protected string $field, protected string|bool|int|float|BackedEnum $value)
     {
     }
 
@@ -18,15 +19,9 @@ class AcceptedIf extends StringValidationAttribute
 
     public function parameters(): array
     {
-        $value = $this->value;
-
-        if (is_bool($value)) {
-            $value = $value ? 'true' : 'false';
-        }
-
         return [
             $this->field,
-            $value,
+            self::normalizeValue($this->value),
         ];
     }
 

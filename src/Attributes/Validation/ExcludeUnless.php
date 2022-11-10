@@ -3,11 +3,12 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use BackedEnum;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ExcludeUnless extends StringValidationAttribute
 {
-    public function __construct(protected string $field, protected string | bool | int | float $value)
+    public function __construct(protected string $field, protected string | bool | int | float | BackedEnum $value)
     {
     }
 

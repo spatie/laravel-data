@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use BackedEnum;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
 
@@ -13,7 +14,7 @@ class RequiredIf extends StringValidationAttribute implements RequiringRule
 
     public function __construct(
         protected string $field,
-        array | string ...$values
+        array | string | BackedEnum ...$values
     ) {
         $this->values = Arr::flatten($values);
     }
