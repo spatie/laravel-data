@@ -744,7 +744,7 @@ function passwordAttributes(): Generator
     yield fixature(
         attribute: new Password(letters: true, mixedCase: true, numbers: true, uncompromised: true, uncompromisedThreshold: 12),
         expected: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12),
-        expectCreatedAttribute: new Password(rule: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12),),
+        expectCreatedAttribute: new Password(rule: (new BasePassword(12))->letters()->mixedCase()->numbers()->uncompromised(12), ),
     );
 }
 

@@ -47,7 +47,6 @@ it('can use the Rule rule', function () {
     $laravelRule = new class () implements RuleContract {
         public function passes($attribute, $value)
         {
-
         }
 
         public function message()
