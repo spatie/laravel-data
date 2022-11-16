@@ -1,101 +1,82 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Support\EloquentCasts;
-
 use Illuminate\Support\Facades\DB;
+
+use function Pest\Laravel\assertDatabaseHas;
+
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\TestCase;
 
-class DataCollectionEloquentCastTest extends TestCase
-{
-    public function setUp(): void
-    {
-        parent::setUp();
+beforeEach(function () {
+    DummyModelWithCasts::migrate();
+});
 
-        DummyModelWithCasts::migrate();
-    }
+it('can save a data collection', function () {
+    DummyModelWithCasts::create([
+        'data_collection' => SimpleData::collection([
+            new SimpleData('Hello'),
+            new SimpleData('World'),
+        ]),
+    ]);
 
-    /** @test */
-    public function it_can_save_a_data_collection()
-    {
-        DummyModelWithCasts::create([
-            'data_collection' => SimpleData::collection([
-                new SimpleData('Hello'),
-                new SimpleData('World'),
-            ]),
-        ]);
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data_collection' => json_encode([
+            ['string' => 'Hello'],
+            ['string' => 'World'],
+        ]),
+    ]);
+});
 
-        $this->assertDatabaseHas(DummyModelWithCasts::class, [
-            'data_collection' => json_encode([
-                ['string' => 'Hello'],
-                ['string' => 'World'],
-            ]),
-        ]);
-    }
+it('can save a data object as an array', function () {
+    DummyModelWithCasts::create([
+        'data_collection' => [
+            ['string' => 'Hello'],
+            ['string' => 'World'],
+        ],
+    ]);
 
-    /** @test */
-    public function it_can_save_a_data_object_as_an_array()
-    {
-        DummyModelWithCasts::create([
-            'data_collection' => [
-                ['string' => 'Hello'],
-                ['string' => 'World'],
-            ],
-        ]);
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data_collection' => json_encode([
+            ['string' => 'Hello'],
+            ['string' => 'World'],
+        ]),
+    ]);
+});
 
-        $this->assertDatabaseHas(DummyModelWithCasts::class, [
-            'data_collection' => json_encode([
-                ['string' => 'Hello'],
-                ['string' => 'World'],
-            ]),
-        ]);
-    }
+it('can load a data object', function () {
+    DB::table('dummy_model_with_casts')->insert([
+        'data_collection' => json_encode([
+            ['string' => 'Hello'],
+            ['string' => 'World'],
+        ]),
+    ]);
 
-    /** @test */
-    public function it_can_load_a_data_object()
-    {
-        DB::table('dummy_model_with_casts')->insert([
-            'data_collection' => json_encode([
-                ['string' => 'Hello'],
-                ['string' => 'World'],
-            ]),
-        ]);
+    /** @var \Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts $model */
+    $model = DummyModelWithCasts::first();
 
-        /** @var \Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts $model */
-        $model = DummyModelWithCasts::first();
+    expect($model->data_collection)->toEqual(SimpleData::collection([
+        new SimpleData('Hello'),
+        new SimpleData('World'),
+    ]));
+});
 
-        $this->assertEquals(
-            SimpleData::collection([
-                new SimpleData('Hello'),
-                new SimpleData('World'),
-            ]),
-            $model->data_collection
-        );
-    }
+it('can save a null as a value', function () {
+    DummyModelWithCasts::create([
+        'data_collection' => null,
+    ]);
 
-    /** @test */
-    public function it_can_save_a_null_as_a_value()
-    {
-        DummyModelWithCasts::create([
-            'data_collection' => null,
-        ]);
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data_collection' => null,
+    ]);
+});
 
-        $this->assertDatabaseHas(DummyModelWithCasts::class, [
-            'data_collection' => null,
-        ]);
-    }
+it('can load null as a value', function () {
+    DB::table('dummy_model_with_casts')->insert([
+        'data_collection' => null,
+    ]);
 
-    /** @test */
-    public function it_can_load_null_as_a_value()
-    {
-        DB::table('dummy_model_with_casts')->insert([
-            'data_collection' => null,
-        ]);
+    /** @var \Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts $model */
+    $model = DummyModelWithCasts::first();
 
-        /** @var \Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts $model */
-        $model = DummyModelWithCasts::first();
-
-        $this->assertNull($model->data_collection);
-    }
-}
+    expect($model->data_collection)->toBeNull();
+});

@@ -1,344 +1,320 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Resolvers;
-
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+
+use function Pest\Laravel\handleExceptions;
+use function Pest\Laravel\mock;
+use function Pest\Laravel\postJson;
+
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Tests\Fakes\DataWithMultipleArgumentCreationMethod;
+
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
-use Spatie\LaravelData\Tests\TestCase;
 
-class DataFromSomethingResolverTest extends TestCase
-{
-    public function setUp(): void
-    {
-        parent::setUp();
+beforeEach(function () {
+    handleExceptions([ValidationException::class]);
+});
 
-        $this->handleExceptions([
-            ValidationException::class,
+it('can create data from a custom method', function () {
+    $data = new class ('') extends Data {
+        public function __construct(public string $string)
+        {
+        }
+
+        public static function fromString(string $string): static
+        {
+            return new self($string);
+        }
+
+        public static function fromDto(DummyDto $dto)
+        {
+            return new self($dto->artist);
+        }
+
+        public static function fromArray(array $payload)
+        {
+            return new self($payload['string']);
+        }
+    };
+
+    expect($data::from('Hello World'))->toEqual(new $data('Hello World'))
+        ->and($data::from(DummyDto::rick()))->toEqual(new $data('Rick Astley'))
+        ->and($data::from(DummyDto::rick()))->toEqual(new $data('Rick Astley'))
+        ->and($data::from(['string' => 'Hello World']))->toEqual(new $data('Hello World'))
+        ->and($data::from(DummyModelWithCasts::make(['string' => 'Hello World'])))->toEqual(new $data('Hello World'));
+});
+
+it('can create data from a custom method with an interface parameter', function () {
+    $data = new class ('') extends Data {
+        public function __construct(public string $string)
+        {
+        }
+
+        public static function fromInterface(Arrayable $arrayable)
+        {
+            return new self($arrayable->toArray()['string']);
+        }
+    };
+
+    $interfaceable = new class () implements Arrayable {
+        public function toArray()
+        {
+            return [
+                'string' => 'Rick Astley',
+            ];
+        }
+    };
+
+    expect($data::from($interfaceable))->toEqual(new $data('Rick Astley'));
+});
+
+it('can create data from a custom method with an inherit parameter', function () {
+    $data = new class ('') extends Data {
+        public function __construct(public string $string)
+        {
+        }
+
+        public static function fromModel(Model $model)
+        {
+            return new self($model->string);
+        }
+    };
+
+    $inherited = new DummyModel(['string' => 'Rick Astley']);
+
+    expect($data::from($inherited))->toEqual(new $data('Rick Astley'));
+});
+
+it('can resolve validation dependencies for messages', function () {
+    $requestMock = mock(Request::class);
+    $requestMock->expects('input')->andReturns('value');
+    $this->app->bind(Request::class, fn () => $requestMock);
+
+    $data = new class () extends Data {
+        public string $name;
+
+        public static function rules()
+        {
+            return [
+                'name' => ['required'],
+            ];
+        }
+
+        public static function messages(Request $request): array
+        {
+            return [
+                'name.required' => $request->input('key') === 'value' ? 'Name is required' : 'Bad',
+            ];
+        }
+    };
+
+    try {
+        $data::validate(['name' => '']);
+    } catch (ValidationException $exception) {
+        expect($exception->errors())->toMatchArray([
+            "name" => [
+                "Name is required",
+            ],
         ]);
+
+        return;
     }
 
-    /** @test */
-    public function it_can_create_data_from_a_custom_method()
-    {
-        $data = new class ('') extends Data {
-            public function __construct(public string $string)
-            {
-            }
+    $this->fail('We should not end up here');
+});
 
-            public static function fromString(string $string): static
-            {
-                return new self($string);
-            }
+it('can resolve validation dependencies for attributes ', function () {
+    $requestMock = mock(Request::class);
+    $requestMock->expects('input')->andReturns('value');
+    $this->app->bind(Request::class, fn () => $requestMock);
 
-            public static function fromDto(DummyDto $dto)
-            {
-                return new self($dto->artist);
-            }
+    $data = new class () extends Data {
+        public string $name;
 
-            public static function fromArray(array $payload)
-            {
-                return new self($payload['string']);
-            }
-        };
-
-        $this->assertEquals(new $data('Hello World'), $data::from('Hello World'));
-        $this->assertEquals(new $data('Rick Astley'), $data::from(DummyDto::rick()));
-        $this->assertEquals(new $data('Hello World'), $data::from(['string' => 'Hello World']));
-        $this->assertEquals(new $data('Hello World'), $data::from(DummyModelWithCasts::make(['string' => 'Hello World'])));
-    }
-
-    /** @test */
-    public function it_can_create_data_from_a_custom_method_with_an_interface_parameter()
-    {
-        $data = new class ('') extends Data {
-            public function __construct(public string $string)
-            {
-            }
-
-            public static function fromInterface(Arrayable $arrayable)
-            {
-                return new self($arrayable->toArray()['string']);
-            }
-        };
-
-        $interfaceable = new class () implements Arrayable {
-            public function toArray()
-            {
-                return [
-                    'string' => 'Rick Astley',
-                ];
-            }
-        };
-
-        $this->assertEquals(new $data('Rick Astley'), $data::from($interfaceable));
-    }
-
-    /** @test */
-    public function it_can_create_data_from_a_custom_method_with_an_inherited_parameter()
-    {
-        $data = new class ('') extends Data {
-            public function __construct(public string $string)
-            {
-            }
-
-            public static function fromModel(Model $model)
-            {
-                return new self($model->string);
-            }
-        };
-
-        $inherited = new DummyModel(['string' => 'Rick Astley']);
-
-        $this->assertEquals(new $data('Rick Astley'), $data::from($inherited));
-    }
-
-    /** @test */
-    public function it_can_resolve_validation_dependencies_for_messages()
-    {
-        $requestMock = $this->mock(Request::class);
-        $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
-
-        $data = new class () extends Data {
-            public string $name;
-
-            public static function rules()
-            {
-                return [
-                    'name' => ['required'],
-                ];
-            }
-
-            public static function messages(Request $request): array
-            {
-                return [
-                    'name.required' => $request->input('key') === 'value' ? 'Name is required' : 'Bad',
-                ];
-            }
-        };
-
-        try {
-            $data::validate(['name' => '']);
-        } catch (ValidationException $exception) {
-            $this->assertEquals([
-                "name" => [
-                    "Name is required",
-                ],
-            ], $exception->errors());
-
-            return;
+        public static function rules()
+        {
+            return [
+                'name' => ['required'],
+            ];
         }
 
-        $this->fail('We should not end up here');
+        public static function attributes(Request $request): array
+        {
+            return [
+                'name' => $request->input('key') === 'value' ? 'Another name' : 'Bad',
+            ];
+        }
+    };
+
+    try {
+        $data::validate(['name' => '']);
+    } catch (ValidationException $exception) {
+        expect($exception->errors())->toMatchArray([
+            "name" => [
+                "The Another name field is required.",
+            ],
+        ]);
+
+        return;
     }
 
-    /** @test */
-    public function it_can_resolve_validation_dependencies_for_attributes()
-    {
-        $requestMock = $this->mock(Request::class);
-        $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+    $this->fail('We should not end up here');
+});
 
-        $data = new class () extends Data {
-            public string $name;
+it('can resolve validation dependencies for redirect url', function () {
+    $requestMock = mock(Request::class);
+    $requestMock->expects('input')->andReturns('value');
+    $this->app->bind(Request::class, fn () => $requestMock);
 
-            public static function rules()
-            {
-                return [
-                    'name' => ['required'],
-                ];
-            }
+    $data = new class () extends Data {
+        public string $name;
 
-            public static function attributes(Request $request): array
-            {
-                return [
-                    'name' => $request->input('key') === 'value' ? 'Another name' : 'Bad',
-                ];
-            }
-        };
-
-        try {
-            $data::validate(['name' => '']);
-        } catch (ValidationException $exception) {
-            $this->assertEquals([
-                "name" => [
-                    "The Another name field is required.",
-                ],
-            ], $exception->errors());
-
-            return;
+        public static function rules()
+        {
+            return [
+                'name' => ['required'],
+            ];
         }
 
-        $this->fail('We should not end up here');
+        public static function redirect(Request $request): string
+        {
+            return $request->input('key') === 'value' ? 'Another name' : 'Bad';
+        }
+    };
+
+    try {
+        $data::validate(['name' => '']);
+    } catch (ValidationException $exception) {
+        expect($exception->redirectTo)->toBe('Another name');
+
+        return;
     }
 
-    /** @test */
-    public function it_can_resolve_validation_dependencies_for_redirect_url()
-    {
-        $requestMock = $this->mock(Request::class);
-        $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+    $this->fail('We should not end up here');
+});
 
-        $data = new class () extends Data {
-            public string $name;
+it('can resolve validation dependencies for error bag', function () {
+    $requestMock = mock(Request::class);
+    $requestMock->expects('input')->andReturns('value');
+    $this->app->bind(Request::class, fn () => $requestMock);
 
-            public static function rules()
-            {
-                return [
-                    'name' => ['required'],
-                ];
-            }
+    $data = new class () extends Data {
+        public string $name;
 
-            public static function redirect(Request $request): string
-            {
-                return $request->input('key') === 'value' ? 'Another name' : 'Bad';
-            }
-        };
-
-        try {
-            $data::validate(['name' => '']);
-        } catch (ValidationException $exception) {
-            $this->assertEquals('Another name', $exception->redirectTo);
-
-            return;
+        public static function rules()
+        {
+            return [
+                'name' => ['required'],
+            ];
         }
 
-        $this->fail('We should not end up here');
+        public static function errorBag(Request $request): string
+        {
+            return $request->input('key') === 'value' ? 'Another name' : 'Bad';
+        }
+    };
+
+    try {
+        $data::validate(['name' => '']);
+    } catch (ValidationException $exception) {
+        expect($exception->errorBag)->toBe('Another name');
+
+        return;
     }
 
-    /** @test */
-    public function it_can_resolve_validation_dependencies_for_error_bag()
-    {
-        $requestMock = $this->mock(Request::class);
-        $requestMock->expects('input')->andReturns('value');
-        $this->app->bind(Request::class, fn () => $requestMock);
+    $this->fail('We should not end up here');
+});
 
-        $data = new class () extends Data {
-            public string $name;
+it('can create data from a custom method with multiple parameters', function () {
+    expect(DataWithMultipleArgumentCreationMethod::from('Rick Astley', 42))
+        ->toEqual(new DataWithMultipleArgumentCreationMethod('Rick Astley_42'));
+});
 
-            public static function rules()
-            {
-                return [
-                    'name' => ['required'],
-                ];
-            }
-
-            public static function errorBag(Request $request): string
-            {
-                return $request->input('key') === 'value' ? 'Another name' : 'Bad';
-            }
-        };
-
-        try {
-            $data::validate(['name' => '']);
-        } catch (ValidationException $exception) {
-            $this->assertEquals('Another name', $exception->errorBag);
-
-            return;
+it('will validate a request when given as a parameter to a custom creation method', function () {
+    $data = new class ('', 0) extends Data {
+        public function __construct(
+            public string $string,
+        ) {
         }
 
-        $this->fail('We should not end up here');
+        public static function fromRequest(Request $request)
+        {
+            return new self($request->input('string'));
+        }
+    };
+
+    Route::post('/', fn (Request $request) => $data::from($request));
+
+    postJson('/', [])->assertJsonValidationErrorFor('string');
+
+    postJson('/', [
+        'string' => 'Rick Astley',
+    ])->assertJson([
+        'string' => 'Rick Astley',
+    ])->assertOk();
+});
+
+it('can resolve payload dependency for rules', function () {
+    $data = new class () extends Data {
+        public string $payment_method;
+
+        public string|Optional $paypal_email;
+
+        public static function rules(array $payload)
+        {
+            return [
+                'payment_method' => ['required'],
+                'paypal_email' => Rule::requiredIf($payload['payment_method'] === 'paypal'),
+            ];
+        }
+    };
+
+    $result = $data::validateAndCreate(['payment_method' => 'credit_card']);
+
+    expect($result->toArray())->toMatchArray([
+        'payment_method' => 'credit_card',
+    ]);
+
+    try {
+        $data::validate(['payment_method' => 'paypal']);
+    } catch (ValidationException $exception) {
+        expect($exception->validator->failed())->toHaveKey('paypal_email');
+
+        return;
     }
 
-    /** @test */
-    public function it_can_create_data_from_a_custom_method_with_multiple_parameters()
-    {
-        $this->assertEquals(
-            new DataWithMultipleArgumentCreationMethod('Rick Astley_42'),
-            DataWithMultipleArgumentCreationMethod::from('Rick Astley', 42)
-        );
-    }
+    $this->fail('We should not end up here');
+});
 
-    /** @test */
-    public function it_will_validate_a_request_when_given_as_a_parameter_to_a_custom_creation_method()
-    {
-        $data = new class ('', 0) extends Data {
-            public function __construct(
-                public string $string,
-            ) {
-            }
-
-            public static function fromRequest(Request $request)
-            {
-                return new self($request->input('string'));
-            }
-        };
-
-        Route::post('/', fn (Request $request) => $data::from($request));
-
-        $this->postJson('/', [])->assertJsonValidationErrorFor('string');
-
-        $this->postJson('/', [
-            'string' => 'Rick Astley',
-        ])->assertJson([
-            'string' => 'Rick Astley',
-        ])->assertOk();
-    }
-
-    /** @test */
-    public function it_can_resolve_payload_dependency_for_rules()
-    {
-        $data = new class () extends Data {
-            public string $payment_method;
-
-            public string|Optional $paypal_email;
-
-            public static function rules(array $payload)
-            {
-                return [
-                    'payment_method' => ['required'],
-                    'paypal_email' => Rule::requiredIf($payload['payment_method'] === 'paypal'),
-                ];
-            }
-        };
-
-        $result = $data::validateAndCreate(['payment_method' => 'credit_card']);
-
-        $this->assertEquals([
-            'payment_method' => 'credit_card',
-        ], $result->toArray());
-
-        try {
-            $data::validate(['payment_method' => 'paypal']);
-        } catch (ValidationException $exception) {
-            $this->assertArrayHasKey('paypal_email', $exception->validator->failed());
-
-            return;
+it('can create data without custom creation methods', function () {
+    $data = new class ('', '') extends Data {
+        public function __construct(
+            public ?string $id,
+            public string $name,
+        ) {
         }
 
-        $this->fail('We should not end up here');
-    }
+        public static function fromArray(array $payload)
+        {
+            return new self(
+                id: $payload['hash_id'] ?? null,
+                name: $payload['name'],
+            );
+        }
+    };
 
-    /** @test */
-    public function it_can_create_data_without_custom_creation_methods()
-    {
-        $data = new class ('', '') extends Data {
-            public function __construct(
-                public ?string $id,
-                public string $name,
-            ) {
-            }
+    expect(
+        $data::withoutMagicalCreationFrom(['hash_id' => 1, 'name' => 'Taylor'])
+    )->toEqual(new $data(null, 'Taylor'));
 
-            public static function fromArray(array $payload)
-            {
-                return new self(
-                    id: $payload['hash_id'] ?? null,
-                    name: $payload['name'],
-                );
-            }
-        };
-
-        $this->assertEquals(new $data(null, 'Taylor'), $data::withoutMagicalCreationFrom(['hash_id' => 1, 'name' => 'Taylor']));
-        $this->assertEquals(new $data(1, 'Taylor'), $data::from(['hash_id' => 1, 'name' => 'Taylor']));
-    }
-}
+    expect($data::from(['hash_id' => 1, 'name' => 'Taylor']))
+        ->toEqual(new $data(1, 'Taylor'));
+});

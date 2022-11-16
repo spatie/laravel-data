@@ -1,0 +1,9 @@
+{
+collection: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<any>;meta:{path:string;per_page:number;next_cursor:string | null;next_cursor_url:string | null;prev_cursor:string | null;prev_cursor_url:string | null;};};
+collectionWithNull: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<any>;meta:{path:string;per_page:number;next_cursor:string | null;next_cursor_url:string | null;prev_cursor:string | null;prev_cursor_url:string | null;};} | null;
+collectionWithNullable: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<any>;meta:{path:string;per_page:number;next_cursor:string | null;next_cursor_url:string | null;prev_cursor:string | null;prev_cursor_url:string | null;};} | null;
+optionalCollection?: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<any>;meta:{path:string;per_page:number;next_cursor:string | null;next_cursor_url:string | null;prev_cursor:string | null;prev_cursor_url:string | null;};};
+optionalCollectionWithNullable?: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<any>;meta:{path:string;per_page:number;next_cursor:string | null;next_cursor_url:string | null;prev_cursor:string | null;prev_cursor_url:string | null;};} | null;
+lazyCollection?: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<any>;meta:{path:string;per_page:number;next_cursor:string | null;next_cursor_url:string | null;prev_cursor:string | null;prev_cursor_url:string | null;};};
+lazyCollectionWithNullable?: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<any>;meta:{path:string;per_page:number;next_cursor:string | null;next_cursor_url:string | null;prev_cursor:string | null;prev_cursor_url:string | null;};} | null;
+}

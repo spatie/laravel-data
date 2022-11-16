@@ -18,430 +18,372 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
 
-class ValidationTest extends TestCase
-{
-    /**
-     * Simple properties
-     */
+it('can validate a string', function () {
+    $dataClass = new class () extends Data {
+        public string $property;
+    };
 
-    /** @test */
-    public function it_can_validate_a_string()
-    {
-        $dataClass = new class () extends Data {
-            public string $property;
-        };
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['property' => 'Hello World'])
+        ->assertRules([
+            'property' => ['string', 'required'],
+        ]);
+});
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk(['property' => 'Hello World'])
-            ->assertRules([
-                'property' => ['string', 'required'],
-            ]);
-    }
+it('can validate a float', function () {
+    $dataClass = new class () extends Data {
+        public float $property;
+    };
 
-    /** @test */
-    public function it_can_validate_a_float()
-    {
-        $dataClass = new class () extends Data {
-            public float $property;
-        };
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['property' => 10.0])
+        ->assertRules([
+            'property' => ['numeric', 'required'],
+        ]);
+});
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk(['property' => 10.0])
-            ->assertRules([
-                'property' => ['numeric', 'required'],
-            ]);
-    }
+it('can validate an integer', function () {
+    $dataClass = new class () extends Data {
+        public int $property;
+    };
 
-    /** @test */
-    public function it_can_validate_an_integer()
-    {
-        $dataClass = new class () extends Data {
-            public int $property;
-        };
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['property' => 10.0])
+        ->assertRules([
+            'property' => ['numeric', 'required'],
+        ]);
+});
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk(['property' => 10.0])
-            ->assertRules([
-                'property' => ['numeric', 'required'],
-            ]);
-    }
+it('can validate an array', function () {
+    $dataClass = new class () extends Data {
+        public array $property;
+    };
 
-    /** @test */
-    public function it_can_validate_an_array()
-    {
-        $dataClass = new class () extends Data {
-            public array $property;
-        };
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['property' => ['Hello World']])
+        ->assertRules([
+            'property' => ['array', 'required'],
+        ]);
+});
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk(['property' => ['Hello World']])
-            ->assertRules([
-                'property' => ['array', 'required'],
-            ]);
-    }
+it('can validate a bool', function () {
+    $dataClass = new class () extends Data {
+        public bool $property;
+    };
 
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['property' => true])
+        ->assertRules([
+            'property' => ['boolean'],
+        ]);
+});
 
-    /** @test */
-    public function it_can_validate_a_bool()
-    {
-        $dataClass = new class () extends Data {
-            public bool $property;
-        };
+it('can validate a nullable type', function () {
+    $dataClass = new class () extends Data {
+        public ?array $property;
+    };
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk(['property' => true])
-            ->assertRules([
-                'property' => ['boolean'],
-            ]);
-    }
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['property' => ['Hello World']])
+        ->assertOk(['property' => null])
+        ->assertOk([])
+        ->assertRules([
+            'property' => ['array', 'nullable'],
+        ]);
+});
 
-    /** @test */
-    public function it_can_validate_a_nullable_type()
-    {
-        $dataClass = new class () extends Data {
-            public ?array $property;
-        };
+it('can validated a property with custom rules', function () {
+    $dataClass = new class () extends Data {
+        public ?array $property;
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk(['property' => ['Hello World']])
-            ->assertOk(['property' => null])
-            ->assertOk([])
-            ->assertRules([
-                'property' => ['array', 'nullable'],
-            ]);
-    }
-
-    /** @test */
-    public function it_can_validate_a_property_with_custom_rules()
-    {
-        $dataClass = new class () extends Data {
-            public ?array $property;
-
-            public static function rules(): array
-            {
-                return [
-                    'property' => ['array', 'min:5'],
-                ];
-            }
-        };
-
-        DataValidationAsserter::for($dataClass)
-            ->assertRules([
+        public static function rules(): array
+        {
+            return [
                 'property' => ['array', 'min:5'],
-            ]);
-    }
+            ];
+        }
+    };
 
-    /** @test */
-    public function it_can_validate_a_property_with_custom_rules_as_string()
-    {
-        $dataClass = new class () extends Data {
-            public ?array $property;
+    DataValidationAsserter::for($dataClass)
+        ->assertRules([
+            'property' => ['array', 'min:5'],
+        ]);
+});
 
-            public static function rules(): array
-            {
+it('can validate a property with custom rules as string', function () {
+    $dataClass = new class () extends Data {
+        public ?array $property;
+
+        public static function rules(): array
+        {
+            return [
+                'property' => 'array|min:5',
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertRules([
+            'property' => ['array', 'min:5'],
+        ]);
+});
+
+it('can validate a property with custom rules as object', function () {
+    $dataClass = new class () extends Data {
+        public ?array $property;
+
+        public static function rules(): array
+        {
+            return [
+                'property' => [new ArrayType(), new Min(5)],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertRules([
+            'property' => ['array', 'min:5'],
+        ]);
+});
+
+it('can validate a property with attributes', function () {
+    $dataClass = new class () extends Data {
+        #[Min(5)]
+        public ?array $property;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertRules([
+            'property' => ['array', 'min:5', 'nullable'],
+        ]);
+});
+
+it('can validate an optional attribute', function () {
+    DataValidationAsserter::for(new class () extends Data {
+        public array|Optional $property;
+    })
+        ->assertOk([])
+        ->assertOk(['property' => []])
+        ->assertErrors(['property' => null])
+        ->assertRules([
+            'property' => ['sometimes', 'array'],
+        ]);
+
+    DataValidationAsserter::for(new class () extends Data {
+        public array|Optional|null $property;
+    })
+        ->assertOk([])
+        ->assertOk(['property' => []])
+        ->assertOk(['property' => null])
+        ->assertRules([
+            'property' => ['sometimes', 'array', 'nullable'],
+        ]);
+
+    DataValidationAsserter::for(new class () extends Data {
+        #[Max(10)]
+        public array|Optional $property;
+    })
+        ->assertOk([])
+        ->assertOk(['property' => []])
+        ->assertErrors(['property' => null])
+        ->assertRules([
+            'property' => ['sometimes', 'array', 'max:10'],
+        ]);
+});
+
+it('can validate a native enum', function () {
+    $dataClass = new class () extends Data {
+        public DummyBackedEnum $property;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['property' => 'foo'])
+        ->assertRules([
+            'property' => [new Enum(DummyBackedEnum::class), 'required'],
+        ]);
+});
+
+it('will use name mapping within validation', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName('some_property')]
+        public string $property;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['some_property' => 'foo'])
+        ->assertRules([
+            'some_property' => ['string', 'required'],
+        ]);
+});
+
+it('can disable validation', function () {
+    $dataClass = new class () extends Data {
+        #[WithoutValidation]
+        public string $property;
+
+        #[DataCollectionOf(SimpleData::class), WithoutValidation]
+        public DataCollection $collection;
+
+        #[WithoutValidation]
+        public SimpleData $data;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([])
+        ->assertRules([]);
+});
+
+it('can write custom rules based upon payloads', function () {
+    $dataClass = new class () extends Data {
+        public bool $strict;
+
+        public string $property;
+
+        #[MapInputName(SnakeCaseMapper::class)]
+        public string $mappedProperty;
+
+        public static function rules(array $payload): array
+        {
+            if ($payload['strict'] === true) {
                 return [
-                    'property' => 'array|min:5',
-                ];
-            }
-        };
-
-        DataValidationAsserter::for($dataClass)
-            ->assertRules([
-                'property' => ['array', 'min:5'],
-            ]);
-    }
-
-    /** @test */
-    public function it_can_validate_a_property_with_custom_rules_as_object()
-    {
-        $dataClass = new class () extends Data {
-            public ?array $property;
-
-            public static function rules(): array
-            {
-                return [
-                    'property' => [new ArrayType(), new Min(5)],
-                ];
-            }
-        };
-
-        DataValidationAsserter::for($dataClass)
-            ->assertRules([
-                'property' => ['array', 'min:5'],
-            ]);
-    }
-
-    /** @test */
-    public function it_can_validate_a_property_with_attributes()
-    {
-        $dataClass = new class () extends Data {
-            #[Min(5)]
-            public ?array $property;
-        };
-
-        DataValidationAsserter::for($dataClass)
-            ->assertRules([
-                'property' => ['array', 'min:5', 'nullable'],
-            ]);
-    }
-
-    /** @test */
-    public function it_can_validate_an_optional_attribute()
-    {
-        DataValidationAsserter::for(new class () extends Data {
-            public array|Optional $property;
-        })
-            ->assertOk([])
-            ->assertOk(['property' => []])
-            ->assertErrors(['property' => null])
-            ->assertRules([
-                'property' => ['sometimes', 'array'],
-            ]);
-
-        DataValidationAsserter::for(new class () extends Data {
-            public array|Optional|null $property;
-        })
-            ->assertOk([])
-            ->assertOk(['property' => []])
-            ->assertOk(['property' => null])
-            ->assertRules([
-                'property' => ['sometimes', 'array', 'nullable'],
-            ]);
-
-        DataValidationAsserter::for(new class () extends Data {
-            #[Max(10)]
-            public array|Optional $property;
-        })
-            ->assertOk([])
-            ->assertOk(['property' => []])
-            ->assertErrors(['property' => null])
-            ->assertRules([
-                'property' => ['sometimes', 'array', 'max:10'],
-            ]);
-    }
-
-    /** @test */
-    public function it_can_validate_a_native_enum()
-    {
-        $dataClass = new class () extends Data {
-            public DummyBackedEnum $property;
-        };
-
-        DataValidationAsserter::for($dataClass)
-            ->assertOk(['property' => 'foo'])
-            ->assertRules([
-                'property' => [new Enum(DummyBackedEnum::class), 'required'],
-            ]);
-    }
-
-    /** @test */
-    public function it_will_use_name_mapping_within_validation()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName('some_property')]
-            public string $property;
-        };
-
-        DataValidationAsserter::for($dataClass)
-            ->assertOk(['some_property' => 'foo'])
-            ->assertRules([
-                'some_property' => ['string', 'required'],
-            ]);
-    }
-
-    /** @test */
-    public function it_can_disable_validation()
-    {
-        $dataClass = new class () extends Data {
-            #[WithoutValidation]
-            public string $property;
-
-            #[DataCollectionOf(SimpleData::class), WithoutValidation]
-            public DataCollection $collection;
-
-            #[WithoutValidation]
-            public SimpleData $data;
-        };
-
-        DataValidationAsserter::for($dataClass)
-            ->assertOk([])
-            ->assertRules([]);
-    }
-
-    /** @test */
-    public function it_can_write_custom_rules_based_upon_payloads()
-    {
-        $dataClass = new class () extends Data {
-            public bool $strict;
-
-            public string $property;
-
-            #[MapInputName(SnakeCaseMapper::class)]
-            public string $mappedProperty;
-
-            public static function rules(array $payload): array
-            {
-                if ($payload['strict'] === true) {
-                    return [
-                        'property' => ['in:strict'],
-                        'mapped_property' => ['in:strict'],
-                    ];
-                }
-
-                return [];
-            }
-        };
-
-        DataValidationAsserter::for($dataClass)
-            ->assertRules(
-                rules: [
-                    'strict' => ['boolean'],
                     'property' => ['in:strict'],
                     'mapped_property' => ['in:strict'],
-                ],
-                payload: [
-                    'strict' => true,
-                ]
-            )
-            ->assertRules(
-                rules: [
-                    'strict' => ['boolean'],
-                    'property' => ['string', 'required'],
-                    'mapped_property' => ['string', 'required'],
-                ],
-                payload: [
-                    'strict' => false,
-                ]
-            );
-    }
+                ];
+            }
 
-    /**
-     * Nested data
-     */
+            return [];
+        }
+    };
 
-    /** @test */
-    public function it_can_validate_nested_data()
-    {
-        eval(<<<'PHP'
+    DataValidationAsserter::for($dataClass)
+        ->assertRules(
+            rules: [
+                'strict' => ['boolean'],
+                'property' => ['in:strict'],
+                'mapped_property' => ['in:strict'],
+            ],
+            payload: [
+                'strict' => true,
+            ]
+        )
+        ->assertRules(
+            rules: [
+                'strict' => ['boolean'],
+                'property' => ['string', 'required'],
+                'mapped_property' => ['string', 'required'],
+            ],
+            payload: [
+                'strict' => false,
+            ]
+        );
+});
+
+it('can validate nested data', function () {
+    eval(<<<'PHP'
             use Spatie\LaravelData\Data;
             class NestedClassA extends Data {
                 public string $name;
             }
         PHP);
 
-        $dataClass = new class () extends Data {
-            public \NestedClassA $nested;
-        };
+    $dataClass = new class () extends Data {
+        public \NestedClassA $nested;
+    };
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk(['nested' => ['name' => 'Hello World']])
-            ->assertErrors(['nested' => []])
-            ->assertErrors(['nested' => null])
-            ->assertRules([
-                'nested' => ['required', 'array'],
-                'nested.name' => ['string', 'required'],
-            ]);
-    }
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['nested' => ['name' => 'Hello World']])
+        ->assertErrors(['nested' => []])
+        ->assertErrors(['nested' => null])
+        ->assertRules([
+            'nested' => ['required', 'array'],
+            'nested.name' => ['string', 'required'],
+        ]);
+});
 
-    /** @test */
-    public function it_can_validate_nested_nullable_data()
-    {
-        eval(<<<'PHP'
+it('can validate nested nullable data', function () {
+    eval(<<<'PHP'
             use Spatie\LaravelData\Data;
             class NestedClassB extends Data {
                 public string $name;
             }
         PHP);
 
-        $dataClass = new class () extends Data {
-            public ?\NestedClassB $nested;
-        };
+    $dataClass = new class () extends Data {
+        public ?\NestedClassB $nested;
+    };
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk(['nested' => ['name' => 'Hello World']])
-            ->assertOk(['nested' => ['name' => null]])
-            ->assertOk(['nested' => null])
-            ->assertOk(['nested' => []])
-            ->assertRules([
-                'nested' => ['nullable', 'array'],
-                'nested.name' => ['nullable', 'string'],
-            ]);
-    }
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['nested' => ['name' => 'Hello World']])
+        ->assertOk(['nested' => ['name' => null]])
+        ->assertOk(['nested' => null])
+        ->assertOk(['nested' => []])
+        ->assertRules([
+            'nested' => ['nullable', 'array'],
+            'nested.name' => ['nullable', 'string'],
+        ]);
+});
 
-
-    /** @test */
-    public function it_can_validate_nested_optional_data()
-    {
-        $this->markTestIncomplete('Failures');
-
-        eval(<<<'PHP'
+it('can validate nested optional data', function () {
+    eval(<<<'PHP'
             use Spatie\LaravelData\Data;
             class NestedClassC extends Data {
                 public string $name;
             }
         PHP);
 
-        $dataClass = new class () extends Data {
-            public \NestedClassC|Optional $nested;
-        };
+    $dataClass = new class () extends Data {
+        public \NestedClassC|Optional $nested;
+    };
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk(['nested' => ['name' => 'Hello World']])
-            ->assertOk(['nested' => null])
-            ->assertErrors(['nested' => ['name' => null]])
-            ->assertErrors(['nested' => []])
-            ->assertRules([
-                'nested' => ['sometimes', 'array'],
-                'nested.name' => ['nullable', 'string'],
-            ]);
-    }
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['nested' => ['name' => 'Hello World']])
+        ->assertOk(['nested' => null])
+        ->assertErrors(['nested' => ['name' => null]])
+        ->assertErrors(['nested' => []])
+        ->assertRules([
+            'nested' => ['sometimes', 'array'],
+            'nested.name' => ['nullable', 'string'],
+        ]);
+})->skip('Failures');
 
-    /** @test */
-    public function it_can_add_additional_rules_to_nested_data()
-    {
-        eval(<<<'PHP'
+it('can add additional rules to nested data', function () {
+    eval(<<<'PHP'
             use Spatie\LaravelData\Attributes\Validation\In;use Spatie\LaravelData\Data;
             class NestedClassD extends Data {
                 public string $name;
             }
         PHP);
 
-        $dataClass = new class () extends Data {
-            #[Min(100)]
-            public \NestedClassD|Optional $nested;
-        };
+    $dataClass = new class () extends Data {
+        #[Min(100)]
+        public \NestedClassD|Optional $nested;
+    };
 
-        DataValidationAsserter::for($dataClass)
-            ->assertRules([
-                'nested' => ['sometimes', 'array', 'min:100'],
-                'nested.name' => ['nullable', 'string'],
-            ]);
-    }
+    DataValidationAsserter::for($dataClass)
+        ->assertRules([
+            'nested' => ['sometimes', 'array', 'min:100'],
+            'nested.name' => ['nullable', 'string'],
+        ]);
+});
 
-    /** @test */
-    public function it_will_use_name_mapping_with_nested_objects()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName('some_nested')]
-            public SimpleData $nested;
-        };
+it('will use name mapping with nested objects', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName('some_nested')]
+        public SimpleData $nested;
+    };
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk(['some_nested' => ['string' => 'Hello World']])
-            ->assertRules([
-                'some_nested' => ['required', 'array'],
-                'some_nested.string' => ['string', 'required'],
-            ]);
-    }
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['some_nested' => ['string' => 'Hello World']])
+        ->assertRules([
+            'some_nested' => ['required', 'array'],
+            'some_nested.string' => ['string', 'required'],
+        ]);
+});
 
-    /** @test */
-    public function it_can_use_nested_payloads_in_nested_data()
-    {
-        $this->markTestIncomplete('Implementation required');
+it('can use nested payloads in nested data', function () {
+    // Also implement for collections -> complicated we would have to create rules for each individual payload
 
-        // Also implement for collections -> complicated we would have to create rules for each individual payload
-
-        eval(<<<'PHP'
+    eval(<<<'PHP'
             use Spatie\LaravelData\Attributes\Validation\In;use Spatie\LaravelData\Data;
             class NestedClassF extends Data {
                 public bool $strict;
@@ -458,41 +400,37 @@ class ValidationTest extends TestCase
             }
         PHP);
 
-        $dataClass = new class () extends Data {
-            public \NestedClassF $nested;
-        };
+    $dataClass = new class () extends Data {
+        public \NestedClassF $nested;
+    };
 
-        DataValidationAsserter::for($dataClass)
-            ->assertRules(
-                rules: [
-                    'some_nested' => ['required', 'array'],
-                    'some_nested.strict' => ['boolean'],
-                    'some_nested.string' => ['in:strict'],
-                ],
-                payload: [
-                    'some_nested.strict' => true,
-                ]
-            )
-            ->assertRules(
-                rules: [
-                    'some_nested' => ['required', 'array'],
-                    'some_nested.strict' => ['boolean'],
-                    'some_nested.string' => ['required', 'string'],
-                ],
-                payload: [
-                    'some_nested.strict' => false,
-                ]
-            );
-    }
+    DataValidationAsserter::for($dataClass)
+        ->assertRules(
+            rules: [
+                'some_nested' => ['required', 'array'],
+                'some_nested.strict' => ['boolean'],
+                'some_nested.string' => ['in:strict'],
+            ],
+            payload: [
+                'some_nested.strict' => true,
+            ]
+        )
+        ->assertRules(
+            rules: [
+                'some_nested' => ['required', 'array'],
+                'some_nested.strict' => ['boolean'],
+                'some_nested.string' => ['required', 'string'],
+            ],
+            payload: [
+                'some_nested.strict' => false,
+            ]
+        );
+})->skip('Implementation required');
 
-    /** @test */
-    public function rules_in_nested_data_are_rewritten_according_to_their_fields()
-    {
-        $this->markTestIncomplete('Feature to add');
-
-        // Should we do the same with the `rules` method?
-        // Also implement for collections
-        eval(<<<'PHP'
+test('rules in nested data are rewritten according to their fields', function () {
+    // Should we do the same with the `rules` method?
+    // Also implement for collections
+    eval(<<<'PHP'
             use Spatie\LaravelData\Attributes\Validation\In;
             use Spatie\LaravelData\Attributes\Validation\RequiredIf;use Spatie\LaravelData\Attributes\Validation\RequiredWith;use Spatie\LaravelData\Data;
             class NestedClassG extends Data {
@@ -503,164 +441,148 @@ class ValidationTest extends TestCase
             }
         PHP);
 
-        $dataClass = new class () extends Data {
-            public \NestedClassG $nested;
-        };
+    $dataClass = new class () extends Data {
+        public \NestedClassG $nested;
+    };
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk([
-                'nested' => ['alsoAString' => '0'],
-            ])
-            ->assertErrors([
-                'nested' => ['alsoAString' => '1'],
-            ]) // Fails when we prefix the rule with nested.
-            ->assertRules(
-                rules: [
-                    'nested' => ['required', 'array'],
-                    'nested.alsoAString' => ['boolean'],
-                    'nested.string' => ['required_if:alsoAString,1', 'string'],
-                ]
-            );
-    }
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'nested' => ['alsoAString' => '0'],
+        ])
+        ->assertErrors([
+            'nested' => ['alsoAString' => '1'],
+        ]) // Fails when we prefix the rule with nested.
+        ->assertRules(
+            rules: [
+                'nested' => ['required', 'array'],
+                'nested.alsoAString' => ['boolean'],
+                'nested.string' => ['required_if:alsoAString,1', 'string'],
+            ]
+        );
+})->skip('Feature to add');
 
-    /**
-     * Collections
-     */
+it('will validate a collection', function () {
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection $collection;
+    };
 
-    /** @test */
-    public function it_will_validate_a_collection()
-    {
-        $dataClass = new class () extends Data {
-            #[DataCollectionOf(SimpleData::class)]
-            public DataCollection $collection;
-        };
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'collection' => [
+                ['string' => 'Never Gonna'],
+                ['string' => 'Give You Up'],
+            ],
+        ])
+        ->assertOk(['collection' => []])
+        ->assertErrors(['collection' => null])
+        ->assertErrors([])
+        ->assertErrors([
+            'collection' => [
+                ['other_string' => 'Hello World'],
+            ],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array'],
+            'collection.*.string' => ['string', 'required'],
+        ]);
+});
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk([
-                'collection' => [
-                    ['string' => 'Never Gonna'],
-                    ['string' => 'Give You Up'],
-                ],
-            ])
-            ->assertOk(['collection' => []])
-            ->assertErrors(['collection' => null])
-            ->assertErrors([])
-            ->assertErrors([
-                'collection' => [
-                    ['other_string' => 'Hello World'],
-                ],
-            ])
-            ->assertRules([
-                'collection' => ['present', 'array'],
-                'collection.*.string' => ['string', 'required'],
-            ]);
-    }
+it('will validate a nullable collection', function () {
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(SimpleData::class)]
+        public ?DataCollection $collection;
+    };
 
-    /** @test */
-    public function it_will_validate_a_nullable_collection()
-    {
-        $dataClass = new class () extends Data {
-            #[DataCollectionOf(SimpleData::class)]
-            public ?DataCollection $collection;
-        };
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'collection' => [
+                ['string' => 'Never Gonna'],
+                ['string' => 'Give You Up'],
+            ],
+        ])
+        ->assertOk(['collection' => []])
+        ->assertOk(['collection' => null])
+        ->assertOk([])
+        ->assertErrors([
+            'collection' => [
+                ['other_string' => 'Hello World'],
+            ],
+        ])
+        ->assertRules([
+            'collection' => ['nullable', 'array'],
+            'collection.*.string' => ['string', 'required'],
+        ]);
+});
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk([
-                'collection' => [
-                    ['string' => 'Never Gonna'],
-                    ['string' => 'Give You Up'],
-                ],
-            ])
-            ->assertOk(['collection' => []])
-            ->assertOk(['collection' => null])
-            ->assertOk([])
-            ->assertErrors([
-                'collection' => [
-                    ['other_string' => 'Hello World'],
-                ],
-            ])
-            ->assertRules([
-                'collection' => ['nullable', 'array'],
-                'collection.*.string' => ['string', 'required'],
-            ]);
-    }
+it('will validate an optional collection', function () {
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(SimpleData::class)]
+        public Optional|DataCollection $collection;
+    };
 
-    /** @test */
-    public function it_will_validate_an_optional_collection()
-    {
-        $dataClass = new class () extends Data {
-            #[DataCollectionOf(SimpleData::class)]
-            public Optional|DataCollection $collection;
-        };
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'collection' => [
+                ['string' => 'Never Gonna'],
+                ['string' => 'Give You Up'],
+            ],
+        ])
+        ->assertOk(['collection' => []])
+        ->assertOk([])
+        ->assertErrors(['collection' => null])
+        ->assertErrors([
+            'collection' => [
+                ['other_string' => 'Hello World'],
+            ],
+        ])
+        ->assertRules([
+            'collection' => ['sometimes', 'array'],
+            'collection.*.string' => ['string', 'required'],
+        ]);
+});
 
-        DataValidationAsserter::for($dataClass)
-            ->assertOk([
-                'collection' => [
-                    ['string' => 'Never Gonna'],
-                    ['string' => 'Give You Up'],
-                ],
-            ])
-            ->assertOk(['collection' => []])
-            ->assertOk([])
-            ->assertErrors(['collection' => null])
-            ->assertErrors([
-                'collection' => [
-                    ['other_string' => 'Hello World'],
-                ],
-            ])
-            ->assertRules([
-                'collection' => ['sometimes', 'array'],
-                'collection.*.string' => ['string', 'required'],
-            ]);
-    }
+it('can overwrite collection class rules', function () {
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection $collection;
 
-    /** @test */
-    public function it_can_overwrite_collection_class_rules()
-    {
-        $dataClass = new class () extends Data {
-            #[DataCollectionOf(SimpleData::class)]
-            public DataCollection $collection;
-
-            public static function rules(): array
-            {
-                return [
-                    'collection' => ['array', 'min:1', 'max:5'],
-                    'collection.*.string' => ['required', 'string', 'min:100'],
-                ];
-            }
-        };
-
-        DataValidationAsserter::for($dataClass)
-            ->assertRules([
+        public static function rules(): array
+        {
+            return [
                 'collection' => ['array', 'min:1', 'max:5'],
                 'collection.*.string' => ['required', 'string', 'min:100'],
-            ]);
-    }
+            ];
+        }
+    };
 
-    /** @test */
-    public function it_can_add_collection_class_rules_using_attributes()
-    {
-        $dataClass = new class () extends Data {
-            #[DataCollectionOf(SimpleDataWithExplicitValidationRuleAttributeData::class)]
-            #[Min(10)]
-            public DataCollection $collection;
-        };
+    DataValidationAsserter::for($dataClass)
+        ->assertRules([
+            'collection' => ['array', 'min:1', 'max:5'],
+            'collection.*.string' => ['required', 'string', 'min:100'],
+        ]);
+});
 
-        DataValidationAsserter::for($dataClass)
-            ->assertRules([
-                'collection' => ['present', 'array', 'min:10'],
-                'collection.*.email' => ['string', 'required', 'email:rfc'],
-            ]);
-    }
+it('can add collection class rules using attributes', function () {
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(SimpleDataWithExplicitValidationRuleAttributeData::class)]
+        #[Min(10)]
+        public DataCollection $collection;
+    };
 
-    /**
-     * Complex Examples
-     */
+    DataValidationAsserter::for($dataClass)
+        ->assertRules([
+            'collection' => ['present', 'array', 'min:10'],
+            'collection.*.email' => ['string', 'required', 'email:rfc'],
+        ]);
+});
 
-    /** @test */
-    public function it_can_nest_data_in_collections()
-    {
-        eval(<<<'PHP'
+/**
+ * Complex Examples
+ */
+
+it('can nest data in collections', function () {
+    eval(<<<'PHP'
             use Spatie\LaravelData\Data;
             class NestedClassE extends Data {
                 public string $string;
@@ -671,17 +593,16 @@ class ValidationTest extends TestCase
             }
         PHP);
 
-        $dataClass = new class () extends Data {
-            #[DataCollectionOf(\CollectionClassA::class)]
-            public DataCollection $collection;
-        };
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(\CollectionClassA::class)]
+        public DataCollection $collection;
+    };
 
-        DataValidationAsserter::for($dataClass)
-            ->assertRules([
-                'collection' => ['present', 'array'],
-                'collection.*.nested' => ['required', 'array'],
-                'collection.*.nested.string' => ['required', 'string'],
-            ])
-            ->assertOk(['collection' => [['nested' => ['string' => 'Hello World']]]]);
-    }
-}
+    DataValidationAsserter::for($dataClass)
+        ->assertRules([
+            'collection' => ['present', 'array'],
+            'collection.*.nested' => ['required', 'array'],
+            'collection.*.nested.string' => ['required', 'string'],
+        ])
+        ->assertOk(['collection' => [['nested' => ['string' => 'Hello World']]]]);
+});

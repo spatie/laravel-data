@@ -2,21 +2,16 @@
 
 namespace Spatie\LaravelData\Tests;
 
-use Faker\Factory as FakerFactory;
-use Faker\Generator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\LaravelData\LaravelDataServiceProvider;
-use Spatie\LaravelData\Support\Validation\ValidationRule;
-use Spatie\Snapshots\MatchesSnapshots;
 
 class TestCase extends Orchestra
 {
-    use MatchesSnapshots;
     use RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,24 +34,5 @@ class TestCase extends Orchestra
     protected function defineDatabaseMigrations()
     {
         $this->loadMigrationsFrom(__DIR__ . '/Migrations');
-    }
-
-    public function faker(): Generator
-    {
-        return FakerFactory::create();
-    }
-
-    public function assertValidationAttributeRules(
-        array $expected,
-        ValidationRule $attribute
-    ) {
-        $this->assertEquals($expected, $attribute->getRules());
-    }
-
-    public function onlyPHP81()
-    {
-        if (version_compare(phpversion(), '8.1', '<')) {
-            $this->markTestIncomplete('This test is only supported in PHP versions > PHP 8.1');
-        }
     }
 }

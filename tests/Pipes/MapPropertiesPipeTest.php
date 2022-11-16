@@ -1,7 +1,5 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Pipes;
-
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
@@ -10,245 +8,215 @@ use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
-use Spatie\LaravelData\Tests\TestCase;
 
-class MapPropertiesPipeTest extends TestCase
-{
-    /** @test */
-    public function it_can_map_using_string()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName('something')]
-            public string $mapped;
-        };
+it('can map using string', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName('something')]
+        public string $mapped;
+    };
 
-        $data = $dataClass::from([
-            'something' => 'We are the knights who say, ni!',
-        ]);
+    $data = $dataClass::from([
+        'something' => 'We are the knights who say, ni!',
+    ]);
 
-        $this->assertEquals('We are the knights who say, ni!', $data->mapped);
-    }
+    expect($data->mapped)->toEqual('We are the knights who say, ni!');
+});
 
-    /** @test */
-    public function it_can_map_in_nested_objects_using_strings()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName('nested.something')]
-            public string $mapped;
-        };
+it('can map in nested objects using strings', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName('nested.something')]
+        public string $mapped;
+    };
 
-        $data = $dataClass::from([
-            'nested' => ['something' => 'We are the knights who say, ni!'],
-        ]);
+    $data = $dataClass::from([
+        'nested' => ['something' => 'We are the knights who say, ni!'],
+    ]);
 
-        $this->assertEquals('We are the knights who say, ni!', $data->mapped);
-    }
+    expect($data->mapped)->toEqual('We are the knights who say, ni!');
+});
 
-    /** @test */
-    public function it_replaces_properties_when_a_mapped_alternative_exists()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName('something')]
-            public string $mapped;
-        };
+it('replaces properties when a mapped alternative exists', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName('something')]
+        public string $mapped;
+    };
 
-        $data = $dataClass::from([
-            'mapped' => 'We are the knights who say, ni!',
-            'something' => 'Bring us a, shrubbery!',
-        ]);
+    $data = $dataClass::from([
+        'mapped' => 'We are the knights who say, ni!',
+        'something' => 'Bring us a, shrubbery!',
+    ]);
 
-        $this->assertEquals('Bring us a, shrubbery!', $data->mapped);
-    }
+    expect($data->mapped)->toEqual('Bring us a, shrubbery!');
+});
 
-    /** @test */
-    public function it_skips_properties_it_cannot_find()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName('something')]
-            public string $mapped;
-        };
+it('skips properties it cannot find ', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName('something')]
+        public string $mapped;
+    };
 
-        $data = $dataClass::from([
-            'mapped' => 'We are the knights who say, ni!',
-        ]);
+    $data = $dataClass::from([
+        'mapped' => 'We are the knights who say, ni!',
+    ]);
 
-        $this->assertEquals('We are the knights who say, ni!', $data->mapped);
-    }
+    expect($data->mapped)->toEqual('We are the knights who say, ni!');
+});
 
-    /** @test */
-    public function it_can_use_integers_to_map_properties()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName(1)]
-            public string $mapped;
-        };
+it('can use integers to map properties', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName(1)]
+        public string $mapped;
+    };
 
-        $data = $dataClass::from([
+    $data = $dataClass::from([
+        'We are the knights who say, ni!',
+        'Bring us a, shrubbery!',
+    ]);
+
+    expect($data->mapped)->toEqual('Bring us a, shrubbery!');
+});
+
+it('can use integers to map properties in nested data', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName('1.0')]
+        public string $mapped;
+    };
+
+    $data = $dataClass::from([
+        ['We are the knights who say, ni!'],
+        ['Bring us a, shrubbery!'],
+    ]);
+
+    expect($data->mapped)->toEqual('Bring us a, shrubbery!');
+});
+
+it('can combine integers and strings to map properties', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName('lines.1')]
+        public string $mapped;
+    };
+
+    $data = $dataClass::from([
+        'lines' => [
             'We are the knights who say, ni!',
             'Bring us a, shrubbery!',
-        ]);
+        ],
+    ]);
 
-        $this->assertEquals('Bring us a, shrubbery!', $data->mapped);
-    }
+    expect($data->mapped)->toEqual('Bring us a, shrubbery!');
+});
 
-    /** @test */
-    public function it_can_use_integers_to_map_properties_in_nested_data()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName('1.0')]
-            public string $mapped;
-        };
+it('can use a dedicated mapper', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName(SnakeCaseMapper::class)]
+        public string $mappedLine;
+    };
 
-        $data = $dataClass::from([
-            ['We are the knights who say, ni!'],
-            ['Bring us a, shrubbery!'],
-        ]);
+    $data = $dataClass::from([
+        'mapped_line' => 'We are the knights who say, ni!',
+    ]);
 
-        $this->assertEquals('Bring us a, shrubbery!', $data->mapped);
-    }
+    expect($data->mappedLine)->toEqual('We are the knights who say, ni!');
+});
 
-    /** @test */
-    public function it_can_combine_integers_and_strings_to_map_properties()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName('lines.1')]
-            public string $mapped;
-        };
+it('can map properties into data objects', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName('something')]
+        public SimpleData $mapped;
+    };
 
-        $data = $dataClass::from([
-            'lines' => [
-                'We are the knights who say, ni!',
-                'Bring us a, shrubbery!',
-            ],
-        ]);
+    $value = collect([
+        'something' => 'We are the knights who say, ni!',
+    ]);
 
-        $this->assertEquals('Bring us a, shrubbery!', $data->mapped);
-    }
+    $data = $dataClass::from($value);
 
-    /** @test */
-    public function it_can_use_a_dedicated_mapper()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName(SnakeCaseMapper::class)]
-            public string $mappedLine;
-        };
+    expect($data->mapped)->toEqual(
+        SimpleData::from('We are the knights who say, ni!')
+    );
+});
 
-        $data = $dataClass::from([
-            'mapped_line' => 'We are the knights who say, ni!',
-        ]);
+it('can map properties into data objects which map properties again', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName('something')]
+        public SimpleDataWithMappedProperty $mapped;
+    };
 
-        $this->assertEquals('We are the knights who say, ni!', $data->mappedLine);
-    }
+    $value = collect([
+        'something' => [
+            'description' => 'We are the knights who say, ni!',
+        ],
+    ]);
 
-    /** @test */
-    public function it_can_map_properties_into_data_objects()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName('something')]
-            public SimpleData $mapped;
-        };
+    $data = $dataClass::from($value);
 
-        $value = collect([
-            'something' => 'We are the knights who say, ni!',
-        ]);
+    expect($data->mapped)->toEqual(
+        new SimpleDataWithMappedProperty('We are the knights who say, ni!')
+    );
+});
 
-        $data = $dataClass::from($value);
+it('can map properties into data collections', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName('something'), DataCollectionOf(SimpleData::class)]
+        public DataCollection $mapped;
+    };
 
-        $this->assertEquals(SimpleData::from('We are the knights who say, ni!'), $data->mapped);
-    }
+    $value = collect([
+        'something' => [
+            'We are the knights who say, ni!',
+            'Bring us a, shrubbery!',
+        ],
+    ]);
 
-    /** @test */
-    public function it_can_map_properties_into_data_objects_which_map_properties_again()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName('something')]
-            public SimpleDataWithMappedProperty $mapped;
-        };
+    $data = $dataClass::from($value);
 
-        $value = collect([
-            'something' => [
-                'description' => 'We are the knights who say, ni!',
-            ],
-        ]);
+    expect($data->mapped)->toEqual(
+        SimpleData::collection([
+            'We are the knights who say, ni!',
+            'Bring us a, shrubbery!',
+        ])
+    );
+});
 
-        $data = $dataClass::from($value);
+it('can map properties into data collections which map properties again', function () {
+    $dataClass = new class () extends Data {
+        #[MapInputName('something'), DataCollectionOf(SimpleDataWithMappedProperty::class)]
+        public DataCollection $mapped;
+    };
 
-        $this->assertEquals(
-            new SimpleDataWithMappedProperty('We are the knights who say, ni!'),
-            $data->mapped
-        );
-    }
+    $value = collect([
+        'something' => [
+            ['description' => 'We are the knights who say, ni!'],
+            ['description' => 'Bring us a, shrubbery!'],
+        ],
+    ]);
 
-    /** @test */
-    public function it_can_map_properties_into_data_collections()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName('something'), DataCollectionOf(SimpleData::class)]
-            public DataCollection $mapped;
-        };
+    $data = $dataClass::from($value);
 
-        $value = collect([
-            'something' => [
-                'We are the knights who say, ni!',
-                'Bring us a, shrubbery!',
-            ],
-        ]);
+    expect($data->mapped)->toEqual(
+        SimpleDataWithMappedProperty::collection([
+            ['description' => 'We are the knights who say, ni!'],
+            ['description' => 'Bring us a, shrubbery!'],
+        ])
+    );
+});
 
-        $data = $dataClass::from($value);
+it('can map properties from a complete class', function () {
+    $data = DataWithMapper::from([
+        'cased_property' => 'We are the knights who say, ni!',
+        'data_cased_property' =>
+        ['string' => 'Bring us a, shrubbery!'],
+        'data_collection_cased_property' => [
+            ['string' => 'One that looks nice!'],
+            ['string' => 'But not too expensive!'],
+        ],
+    ]);
 
-        $this->assertEquals(
-            SimpleData::collection([
-                'We are the knights who say, ni!',
-                'Bring us a, shrubbery!',
-            ]),
-            $data->mapped
-        );
-    }
-
-    /** @test */
-    public function it_can_map_properties_into_data_collections_wich_map_properties_again()
-    {
-        $dataClass = new class () extends Data {
-            #[MapInputName('something'), DataCollectionOf(SimpleDataWithMappedProperty::class)]
-            public DataCollection $mapped;
-        };
-
-        $value = collect([
-            'something' => [
-                ['description' => 'We are the knights who say, ni!'],
-                ['description' => 'Bring us a, shrubbery!'],
-            ],
-        ]);
-
-        $data = $dataClass::from($value);
-
-        $this->assertEquals(
-            SimpleDataWithMappedProperty::collection([
-                ['description' => 'We are the knights who say, ni!'],
-                ['description' => 'Bring us a, shrubbery!'],
-            ]),
-            $data->mapped
-        );
-    }
-
-    /** @test */
-    public function it_can_map_properties_from_a_complete_class()
-    {
-        $data = DataWithMapper::from([
-            'cased_property' => 'We are the knights who say, ni!',
-            'data_cased_property' =>
-                ['string' => 'Bring us a, shrubbery!'],
-            'data_collection_cased_property' => [
-                ['string' => 'One that looks nice!'],
-                ['string' => 'But not too expensive!'],
-            ],
-        ]);
-
-        $this->assertEquals('We are the knights who say, ni!', $data->casedProperty);
-        $this->assertEquals(SimpleData::from('Bring us a, shrubbery!'), $data->dataCasedProperty);
-        $this->assertEquals(SimpleData::collection([
+    expect($data)
+        ->casedProperty->toEqual('We are the knights who say, ni!')
+        ->dataCasedProperty->toEqual(SimpleData::from('Bring us a, shrubbery!'))
+        ->dataCollectionCasedProperty->toEqual(SimpleData::collection([
             'One that looks nice!',
             'But not too expensive!',
-        ]), $data->dataCollectionCasedProperty);
-    }
-}
+        ]));
+});

@@ -4,7 +4,9 @@ namespace Spatie\LaravelData\Tests\TestSupport;
 
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
-use PHPUnit\Framework\Assert;
+
+use function PHPUnit\Framework\assertTrue;
+
 use Spatie\LaravelData\Data;
 
 /**
@@ -32,7 +34,7 @@ class DataValidationAsserter
     {
         $this->dataClass::validate($payload);
 
-        Assert::assertTrue(true);
+        expect(true)->toBeTrue();
 
         return $this;
     }
@@ -43,12 +45,12 @@ class DataValidationAsserter
         try {
             $this->dataClass::validate($payload);
         } catch (ValidationException $exception) {
-            Assert::assertTrue(true);
+            expect(true)->toBeTrue();
 
             return $this;
         }
 
-        Assert::assertTrue(false, 'No validation errors');
+        assertTrue(false, 'No validation errors');
 
         return $this;
     }
@@ -67,7 +69,7 @@ class DataValidationAsserter
             ->sortKeys()
             ->all();
 
-        Assert::assertEquals($rules, $inferredRules);
+        expect($inferredRules)->toEqual($rules);
 
         return $this;
     }

@@ -1,9 +1,6 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\RuleInferrers;
-
 use Illuminate\Validation\Rules\Enum as BaseEnum;
-use ReflectionClass;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\BooleanType;
@@ -16,77 +13,73 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer;
 use Spatie\LaravelData\Support\DataClass;
-use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\RulesCollection;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\TestCase;
 
-class RequiredRuleInferrerTest extends TestCase
+/**
+ * @return \Spatie\LaravelData\Support\DataProperty;
+ */
+function getProperty(object $class)
 {
-    private RequiredRuleInferrer $inferrer;
+    $dataClass = DataClass::create(new ReflectionClass($class));
 
-    public function setUp(): void
-    {
-        parent::setUp();
+    return $dataClass->properties->first();
+}
 
-        $this->inferrer = new RequiredRuleInferrer();
-    }
+beforeEach(function () {
+    $this->inferrer = new RequiredRuleInferrer();
+});
 
-    /** @test */
-    public function it_wont_add_a_required_rule_when_a_property_is_non_nullable()
-    {
-        $dataProperty = $this->getProperty(new class () extends Data {
-            public string $string;
-        });
+it("won't add a required rule when a property is non-nullable", function () {
+    $dataProperty = getProperty(new class () extends Data {
+        public string $string;
+    });
 
-        $rules = $this->inferrer->handle($dataProperty, new RulesCollection());
+    $rules = $this->inferrer->handle($dataProperty, new RulesCollection());
 
-        $this->assertEqualsCanonicalizing([new Required()], $rules->all());
-    }
+    expect($rules->all())->toEqualCanonicalizing([new Required()]);
+});
 
-    /** @test */
-    public function it_wont_add_a_required_rule_when_a_property_is_nullable()
-    {
-        $dataProperty = $this->getProperty(new class () extends Data {
-            public ?string $string;
-        });
+it("won't add a required rule when a property is nullable", function () {
+    $dataProperty = getProperty(new class () extends Data {
+        public ?string $string;
+    });
 
-        $rules = $this->inferrer->handle($dataProperty, new RulesCollection());
+    $rules = $this->inferrer->handle($dataProperty, new RulesCollection());
 
-        $this->assertEqualsCanonicalizing([], $rules->all());
-    }
+    expect($rules->all())->toEqualCanonicalizing([]);
+});
 
-    /** @test */
-    public function it_wont_add_a_required_rule_when_a_property_already_contains_a_required_rule()
-    {
-        $dataProperty = $this->getProperty(new class () extends Data {
-            public string $string;
-        });
+it("won't add a required rule when a property already contains a required rule", function () {
+    $dataProperty = getProperty(new class () extends Data {
+        public string $string;
+    });
 
-        $rules = $this->inferrer->handle($dataProperty, RulesCollection::create()->add(new RequiredIf('bla')));
+    $rules = $this->inferrer->handle(
+        $dataProperty,
+        RulesCollection::create()->add(new RequiredIf('bla'))
+    );
 
-        $this->assertEqualsCanonicalizing(['required_if:bla'], $rules->all());
-    }
+    expect($rules->all())->toEqualCanonicalizing(['required_if:bla']);
+});
 
-    /** @test */
-    public function it_wont_add_a_required_rule_when_a_property_already_contains_a_required_object_rule()
-    {
-        $dataProperty = $this->getProperty(new class () extends Data {
-            public string $string;
-        });
+it("won't add a required rule when a property already contains a required object rule ", function () {
+    $dataProperty = getProperty(new class () extends Data {
+        public string $string;
+    });
 
-        $rules = $this->inferrer->handle(
-            $dataProperty,
-            RulesCollection::create()->add(Required::create())
-        );
+    $rules = $this->inferrer->handle(
+        $dataProperty,
+        RulesCollection::create()->add(Required::create())
+    );
 
-        $this->assertEqualsCanonicalizing(['required'], $rules->normalize());
-    }
+    expect($rules->normalize())->toEqualCanonicalizing(['required']);
+});
 
-    /** @test */
-    public function it_wont_add_a_required_rule_when_a_property_already_contains_a_boolean_rule()
-    {
-        $dataProperty = $this->getProperty(new class () extends Data {
+it(
+    "won't add a required rule when a property already contains a boolean rule",
+    function () {
+        $dataProperty = getProperty(new class () extends Data {
             public string $string;
         });
 
@@ -95,13 +88,14 @@ class RequiredRuleInferrerTest extends TestCase
             RulesCollection::create()->add(BooleanType::create())
         );
 
-        $this->assertEqualsCanonicalizing([new BooleanType()], $rules->normalize());
+        expect($rules->normalize())->toEqualCanonicalizing([new BooleanType()]);
     }
+);
 
-    /** @test */
-    public function it_wont_add_a_required_rule_when_a_property_already_contains_a_nullable_rule()
-    {
-        $dataProperty = $this->getProperty(new class () extends Data {
+it(
+    "won't add a required rule when a property already contains a nullable rule",
+    function () {
+        $dataProperty = getProperty(new class () extends Data {
             public string $string;
         });
 
@@ -110,55 +104,47 @@ class RequiredRuleInferrerTest extends TestCase
             RulesCollection::create()->add(Nullable::create())
         );
 
-        $this->assertEqualsCanonicalizing([new Nullable()], $rules->normalize());
+        expect($rules->normalize())->toEqualCanonicalizing([new Nullable()]);
     }
+);
 
-    /** @test */
-    public function it_has_support_for_rules_that_cannot_be_converted_to_string()
-    {
-        $dataProperty = $this->getProperty(new class () extends Data {
-            public string $string;
-        });
+it('has support for rules that cannot be converted to string', function () {
+    $dataProperty = getProperty(new class () extends Data {
+        public string $string;
+    });
 
-        $rules = $this->inferrer->handle(
-            $dataProperty,
-            RulesCollection::create()->add(new \Spatie\LaravelData\Attributes\Validation\Enum(new BaseEnum('SomeClass')))
-        );
+    $rules = $this->inferrer->handle(
+        $dataProperty,
+        RulesCollection::create()->add(
+            new \Spatie\LaravelData\Attributes\Validation\Enum(new BaseEnum('SomeClass'))
+        )
+    );
 
-        $this->assertEqualsCanonicalizing(['required', new BaseEnum('SomeClass')], $rules->normalize());
-    }
+    expect($rules->normalize())->toEqualCanonicalizing([
+        'required', new BaseEnum('SomeClass'),
+    ]);
+});
 
-    /** @test */
-    public function it_wont_add_required_to_a_data_collection_since_it_is_already_present()
-    {
-        $dataProperty = $this->getProperty(new class () extends Data {
-            #[DataCollectionOf(SimpleData::class)]
-            public DataCollection $collection;
-        });
+it("won't add required to a data collection since it is already present", function () {
+    $dataProperty = getProperty(new class () extends Data {
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection $collection;
+    });
 
-        $rules = $this->inferrer->handle(
-            $dataProperty,
-            RulesCollection::create()->add(new Present(), new ArrayType())
-        );
+    $rules = $this->inferrer->handle(
+        $dataProperty,
+        RulesCollection::create()->add(new Present(), new ArrayType())
+    );
 
-        $this->assertEqualsCanonicalizing(['present', 'array'], $rules->normalize());
-    }
+    expect($rules->normalize())->toEqualCanonicalizing(['present', 'array']);
+});
 
-    public function it_wont_add_required_rules_to_undefinable_properties()
-    {
-        $dataProperty = $this->getProperty(new class () extends Data {
-            public string|Optional $string;
-        });
+it("won't add required rules to undefinable properties", function () {
+    $dataProperty = getProperty(new class () extends Data {
+        public string|Optional $string;
+    });
 
-        $rules = $this->inferrer->handle($dataProperty, []);
+    $rules = $this->inferrer->handle($dataProperty, []);
 
-        $this->assertEqualsCanonicalizing([], $rules);
-    }
-
-    private function getProperty(object $class): DataProperty
-    {
-        $dataClass = DataClass::create(new ReflectionClass($class));
-
-        return $dataClass->properties->first();
-    }
-}
+    expect($rules)->toEqualCanonicalizing([]);
+})->throws(TypeError::class);
