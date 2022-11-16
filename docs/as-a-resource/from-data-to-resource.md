@@ -145,7 +145,7 @@ Now our JSON looks like this:
 }
 ``` 
 
-Changing all camelCased property names in a data object to snake_case can be done as such:
+Changing all property names in a data object to snake_case as output data can be done as such:
 
 ```php
 #[MapOutputName(SnakeCaseMapper::class)]

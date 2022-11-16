@@ -83,7 +83,7 @@ Creating the data object can now be done as such:
 SongData::from(['name' => 'Rick Astley', 'record_company' => 'RCA Records']);
 ```
 
-Changing all camelCased property names in a data object to snake_case can be done as such:
+Changing all property names in a data object to snake_case in the data the object is created from can be done as such:
 
 ```php
 #[MapInputName(SnakeCaseMapper::class)]
@@ -109,19 +109,6 @@ class ContractData extends Data
     ) {
     }
 }
-```
-## Getting a data object without mapping property names
-
-Sometimes you want to send an object into an internal process without changing the name of the properties. This way you can use one object without making calls to model-queries for every signal process, you can do that with the `transform` function. Although transforming is different from mapping, the `transform` function is very fixable and can be useful for scenarios like that, for example:
-
-```php
-// enable mapping  - default behaiver
-$songData->transform(transformValues: true, mapPropertyNames:true);
-//  result: ['name' => 'Rick', record_company => 'RCA' ], 
-
-// disable mapping
-$songData->transform(transformValues: true, mapPropertyNames:false );
-//  result: ['name' => 'Rick', recordCompany => 'RCA' ],
 ```
 
 ## Magical creation

@@ -77,3 +77,19 @@ It is possible to get an array representation of a data object without transform
 ```php
 ArtistData::from($artist)->all();
 ```
+
+## Getting a data object (on steroids)
+
+Internally the package uses the `transform` method for operations like `toArray`, `all`, `toJson` and so on. This method is highly configurable:
+
+```php
+ArtistData::from($artist)->transform(
+    bool $transformValues = true,
+    WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
+    bool $mapPropertyNames = true,
+);
+```
+
+- **$transformValues** when enabled transformers will be used to transform properties, also data objects and collections will be transformed
+- **$wrapExecutionType** allows you to set if wrapping is `Enabled` or `Disabled`
+- **$mapPropertyNames** uses defined mappers to rename properties when enabled

@@ -6,7 +6,7 @@ enum WrapExecutionType
 {
     case Disabled;
     case Enabled;
-    case TemporarilyDisabled;
+    case TemporarilyDisabled; // Internal
 
     public function shouldExecute(): bool
     {
