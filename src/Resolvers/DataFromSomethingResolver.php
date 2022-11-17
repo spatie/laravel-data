@@ -19,12 +19,20 @@ class DataFromSomethingResolver
         protected DataConfig $dataConfig,
         protected DataFromArrayResolver $dataFromArrayResolver,
         protected bool $withoutMagicalCreation = false,
+        protected array $ignoredMagicalMethods = [],
     ) {
     }
 
     public function withoutMagicalCreation(bool $withoutMagicalCreation = true): self
     {
         $this->withoutMagicalCreation = $withoutMagicalCreation;
+
+        return $this;
+    }
+
+    public function ignoreMagicalMethods(string ...$methods): self
+    {
+        array_push($this->ignoredMagicalMethods, ...$methods);
 
         return $this;
     }
@@ -63,7 +71,9 @@ class DataFromSomethingResolver
         $customCreationMethods = $this->dataConfig
             ->getDataClass($class)
             ->methods
-            ->filter(fn (DataMethod $method) => $method->isCustomCreationMethod);
+            ->filter(fn(DataMethod $method) => $method->isCustomCreationMethod
+                && ! in_array($method->name, $this->ignoredMagicalMethods)
+            );
 
         $methodName = null;
 

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
+use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use function Pest\Laravel\handleExceptions;
 use function Pest\Laravel\mock;
 use function Pest\Laravel\postJson;
@@ -96,7 +97,7 @@ it('can create data from a custom method with an inherit parameter', function ()
 it('can resolve validation dependencies for messages', function () {
     $requestMock = mock(Request::class);
     $requestMock->expects('input')->andReturns('value');
-    $this->app->bind(Request::class, fn () => $requestMock);
+    $this->app->bind(Request::class, fn() => $requestMock);
 
     $data = new class () extends Data {
         public string $name;
@@ -134,7 +135,7 @@ it('can resolve validation dependencies for messages', function () {
 it('can resolve validation dependencies for attributes ', function () {
     $requestMock = mock(Request::class);
     $requestMock->expects('input')->andReturns('value');
-    $this->app->bind(Request::class, fn () => $requestMock);
+    $this->app->bind(Request::class, fn() => $requestMock);
 
     $data = new class () extends Data {
         public string $name;
@@ -172,7 +173,7 @@ it('can resolve validation dependencies for attributes ', function () {
 it('can resolve validation dependencies for redirect url', function () {
     $requestMock = mock(Request::class);
     $requestMock->expects('input')->andReturns('value');
-    $this->app->bind(Request::class, fn () => $requestMock);
+    $this->app->bind(Request::class, fn() => $requestMock);
 
     $data = new class () extends Data {
         public string $name;
@@ -204,7 +205,7 @@ it('can resolve validation dependencies for redirect url', function () {
 it('can resolve validation dependencies for error bag', function () {
     $requestMock = mock(Request::class);
     $requestMock->expects('input')->andReturns('value');
-    $this->app->bind(Request::class, fn () => $requestMock);
+    $this->app->bind(Request::class, fn() => $requestMock);
 
     $data = new class () extends Data {
         public string $name;
@@ -251,7 +252,7 @@ it('will validate a request when given as a parameter to a custom creation metho
         }
     };
 
-    Route::post('/', fn (Request $request) => $data::from($request));
+    Route::post('/', fn(Request $request) => $data::from($request));
 
     postJson('/', [])->assertJsonValidationErrorFor('string');
 
@@ -317,4 +318,31 @@ it('can create data without custom creation methods', function () {
 
     expect($data::from(['hash_id' => 1, 'name' => 'Taylor']))
         ->toEqual(new $data(1, 'Taylor'));
+});
+
+it('can create data ignoring certain magical methods', function () {
+    class DummyA extends Data
+    {
+        public function __construct(
+            public ?string $id,
+            public string $name,
+        ) {
+        }
+
+        public static function fromArray(array $payload)
+        {
+            return new self(
+                id: $payload['hash_id'] ?? null,
+                name: $payload['name'],
+            );
+        }
+    }
+
+    expect(
+        app(DataFromSomethingResolver::class)->ignoreMagicalMethods('fromArray')->execute(DummyA::class, ['hash_id' => 1, 'name' => 'Taylor'])
+    )->toEqual(new DummyA(null, 'Taylor'));
+
+    expect(
+        app(DataFromSomethingResolver::class)->execute(DummyA::class, ['hash_id' => 1, 'name' => 'Taylor'])
+    )->toEqual(new DummyA(1, 'Taylor'));
 });

@@ -1,6 +1,6 @@
 ---
 title: Creating a rule inferrer
-weight: 9
+weight: 10
 ---
 
 Rule inferrers will try to infer validation rules for properties within a data object.
