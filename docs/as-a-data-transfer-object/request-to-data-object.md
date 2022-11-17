@@ -572,3 +572,35 @@ When you're having rules depending on a specific payload, you can provide the pa
 AlbumData::getValidationRules(payload: $payload);
 ```
 
+## Validation and nesting or collecting the same class
+
+Be aware that it is impossible to nest or collect the same class and then create validation rules. The following examples will cause an infinite loop because the rules will be generated each time again and again until your memory runs dry:
+
+```php
+class Genre extends Data {
+  public function __construct(
+    public int $id,
+    public string $name,
+    public ?Genre $sub_genre
+  ) {}
+}
+```
+
+```php
+class Genre extends Data {
+  public function __construct(
+    public int $id,
+    public string $name,
+    #[DataCollectionOf(Genre::class)]
+    public DataCollection $sub_genre
+  ) {}
+}
+```
+
+You can still use this package with these kinds of data objects. Magic creation methods, transforming, and all other functionalities of this package will still work.
+
+But using this data object to generate validation rules is impossible. Notice that the package also generates validation rules when injecting a data object in a controller. The best solution in such a case is manually defining validation rules and using a magical creation method to create the data objects like this:
+
+```php
+Genre::from(request()->all());
+```
