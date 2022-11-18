@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.16 - 2022-11-18
+
+- add support for optional properties in TypeScript transformer (#153)
+
 ## 2.0.15 - 2022-11-17
 
 - refactor test suite to Pest (#239)
