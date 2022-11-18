@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Support\TypeScriptTransformer;
 
+use Attribute;
 use phpDocumentor\Reflection\Fqsen;
 use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\Types\Array_;
@@ -18,6 +19,7 @@ use Spatie\LaravelData\Enums\DataCollectableType;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelTypeScriptTransformer\Transformers\DtoTransformer;
+use Spatie\TypeScriptTransformer\Attributes\Optional as TypeScriptOptional;
 use Spatie\TypeScriptTransformer\Structures\MissingSymbolsCollection;
 use Spatie\TypeScriptTransformer\TypeProcessors\DtoCollectionTypeProcessor;
 use Spatie\TypeScriptTransformer\TypeProcessors\ReplaceDefaultsTypeProcessor;
@@ -49,9 +51,13 @@ class DataTypeScriptTransformer extends DtoTransformer
     ): string {
         $dataClass = app(DataConfig::class)->getDataClass($class->getName());
 
+        $isOptional = $dataClass->attributes->contains(
+            fn(object $attribute) => $attribute instanceof TypeScriptOptional
+        );
+
         return array_reduce(
             $this->resolveProperties($class),
-            function (string $carry, ReflectionProperty $property) use ($dataClass, $missingSymbols) {
+            function (string $carry, ReflectionProperty $property) use ($isOptional, $dataClass, $missingSymbols) {
                 /** @var \Spatie\LaravelData\Support\DataProperty $dataProperty */
                 $dataProperty = $dataClass->properties[$property->getName()];
 
@@ -61,15 +67,22 @@ class DataTypeScriptTransformer extends DtoTransformer
                     return $carry;
                 }
 
+                $isOptional = $isOptional
+                    || $dataProperty->attributes->contains(
+                        fn(object $attribute) => $attribute instanceof TypeScriptOptional
+                    )
+                    || $dataProperty->type->isLazy
+                    || $dataProperty->type->isOptional;
+
                 $transformed = $this->typeToTypeScript(
                     $type,
                     $missingSymbols,
-                    $property->getDeclaringClass()->getName()
+                    $property->getDeclaringClass()->getName(),
                 );
 
                 $propertyName = $dataProperty->outputMappedName ?? $dataProperty->name;
 
-                return $dataProperty->type->isLazy || $dataProperty->type->isOptional
+                return $isOptional
                     ? "{$carry}{$propertyName}?: {$transformed};" . PHP_EOL
                     : "{$carry}{$propertyName}: {$transformed};" . PHP_EOL;
             },

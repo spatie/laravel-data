@@ -6,6 +6,9 @@ use Illuminate\Support\Collection;
 use ReflectionMethod;
 use ReflectionParameter;
 
+/**
+ * @property Collection<DataParameter> $parameters
+ */
 class DataMethod
 {
     public function __construct(
