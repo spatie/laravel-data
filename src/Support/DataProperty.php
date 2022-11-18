@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Support;
 
+use Attribute;
 use Illuminate\Support\Collection;
 use ReflectionAttribute;
 use ReflectionProperty;
@@ -13,6 +14,9 @@ use Spatie\LaravelData\Mappers\NameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Transformers\Transformer;
 
+/**
+ * @property Collection<string, object> $attributes
+ */
 class DataProperty
 {
     public function __construct(

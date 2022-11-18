@@ -13,12 +13,9 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\TestCase;
-
 use function Spatie\Snapshots\assertMatchesSnapshot as baseAssertMatchesSnapshot;
-
 use Spatie\Snapshots\Driver;
-use Spatie\Snapshots\MatchesSnapshots;
+use Spatie\TypeScriptTransformer\Attributes\Optional as TypeScriptOptional;
 use Spatie\TypeScriptTransformer\TypeScriptTransformerConfig;
 
 function assertMatchesSnapshot($actual, Driver $driver = null): void
@@ -29,7 +26,7 @@ function assertMatchesSnapshot($actual, Driver $driver = null): void
 it('can convert a data object to Typescript', function () {
     $config = TypeScriptTransformerConfig::create();
 
-    $data = new class (null, Optional::create(), 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn () => 'Lazy'), SimpleData::from('Simple data'), SimpleData::collection([]), SimpleData::collection([]), SimpleData::collection([])) extends Data {
+    $data = new class (null, Optional::create(), 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn() => 'Lazy'), SimpleData::from('Simple data'), SimpleData::collection([]), SimpleData::collection([]), SimpleData::collection([])) extends Data {
         public function __construct(
             public null|int $nullable,
             public Optional|int $undefineable,
@@ -176,9 +173,55 @@ it('outputs types with properties using their mapped name', function () {
     assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
 });
 
-class DataTypeScriptTransformerTest extends TestCase
-{
-    use MatchesSnapshots {
-        assertMatchesSnapshot as baseAssertMatchesSnapshot;
-    }
-}
+it('it respects a TypeScript property optional attribute', function () {
+    $config = TypeScriptTransformerConfig::create();
+
+    $data = new class (10, 'Ruben') extends Data {
+        public function __construct(
+            #[TypeScriptOptional]
+            public int $id,
+            public string $name,
+        ) {
+        }
+    };
+
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass($data);
+
+    $this->assertTrue($transformer->canTransform($reflection));
+    $this->assertEquals(<<<TXT
+        {
+        id?: number;
+        name: string;
+        }
+        TXT, $transformer->transform($reflection, 'DataObject')->transformed
+    );
+});
+
+it('it respects a TypeScript class optional attribute', function () {
+    $config = TypeScriptTransformerConfig::create();
+
+    #[TypeScriptOptional]
+    class DummyTypeScriptOptionalClass extends Data {
+        public function __construct(
+            public int $id,
+            public string $name,
+        ) {
+        }
+    };
+
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass(DummyTypeScriptOptionalClass::class);
+
+    $this->assertTrue($transformer->canTransform($reflection));
+    $this->assertEquals(<<<TXT
+        {
+        id?: number;
+        name?: string;
+        }
+        TXT, $transformer->transform($reflection, 'DataObject')->transformed
+    );
+});
+
+
+

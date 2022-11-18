@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Support;
 
+use Attribute;
 use Illuminate\Support\Collection;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -18,14 +19,17 @@ use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 
+/**
+ * @property  class-string<DataObject> $name
+ * @property  Collection<string, DataProperty> $properties
+ * @property  Collection<string, DataMethod> $methods
+ * @property  Collection<string, object> $attributes
+ */
 class DataClass
 {
     public function __construct(
-        /** @var class-string<DataObject> */
         public readonly string $name,
-        /** @var Collection<string, \Spatie\LaravelData\Support\DataProperty> */
         public readonly Collection $properties,
-        /** @var Collection<string, \Spatie\LaravelData\Support\DataMethod> */
         public readonly Collection $methods,
         public readonly ?DataMethod $constructorMethod,
         public readonly bool $appendable,
@@ -34,10 +38,11 @@ class DataClass
         public readonly bool $transformable,
         public readonly bool $validateable,
         public readonly bool $wrappable,
+        public readonly Collection $attributes,
     ) {
     }
 
-    public static function create(ReflectionClass $class)
+    public static function create(ReflectionClass $class): self
     {
         $attributes = collect($class->getAttributes())->map(
             fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
@@ -64,6 +69,7 @@ class DataClass
             transformable: $class->implementsInterface(TransformableData::class),
             validateable: $class->implementsInterface(ValidateableData::class),
             wrappable: $class->implementsInterface(WrappableData::class),
+            attributes:  $attributes,
         );
     }
 
