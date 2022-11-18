@@ -7,13 +7,14 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
-use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use function Pest\Laravel\handleExceptions;
 use function Pest\Laravel\mock;
 use function Pest\Laravel\postJson;
 
 use Spatie\LaravelData\Data;
+
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Tests\Fakes\DataWithMultipleArgumentCreationMethod;
 
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
@@ -97,7 +98,7 @@ it('can create data from a custom method with an inherit parameter', function ()
 it('can resolve validation dependencies for messages', function () {
     $requestMock = mock(Request::class);
     $requestMock->expects('input')->andReturns('value');
-    $this->app->bind(Request::class, fn() => $requestMock);
+    $this->app->bind(Request::class, fn () => $requestMock);
 
     $data = new class () extends Data {
         public string $name;
@@ -135,7 +136,7 @@ it('can resolve validation dependencies for messages', function () {
 it('can resolve validation dependencies for attributes ', function () {
     $requestMock = mock(Request::class);
     $requestMock->expects('input')->andReturns('value');
-    $this->app->bind(Request::class, fn() => $requestMock);
+    $this->app->bind(Request::class, fn () => $requestMock);
 
     $data = new class () extends Data {
         public string $name;
@@ -173,7 +174,7 @@ it('can resolve validation dependencies for attributes ', function () {
 it('can resolve validation dependencies for redirect url', function () {
     $requestMock = mock(Request::class);
     $requestMock->expects('input')->andReturns('value');
-    $this->app->bind(Request::class, fn() => $requestMock);
+    $this->app->bind(Request::class, fn () => $requestMock);
 
     $data = new class () extends Data {
         public string $name;
@@ -205,7 +206,7 @@ it('can resolve validation dependencies for redirect url', function () {
 it('can resolve validation dependencies for error bag', function () {
     $requestMock = mock(Request::class);
     $requestMock->expects('input')->andReturns('value');
-    $this->app->bind(Request::class, fn() => $requestMock);
+    $this->app->bind(Request::class, fn () => $requestMock);
 
     $data = new class () extends Data {
         public string $name;
@@ -252,7 +253,7 @@ it('will validate a request when given as a parameter to a custom creation metho
         }
     };
 
-    Route::post('/', fn(Request $request) => $data::from($request));
+    Route::post('/', fn (Request $request) => $data::from($request));
 
     postJson('/', [])->assertJsonValidationErrorFor('string');
 

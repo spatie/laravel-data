@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.0.15 - 2022-11-17
+
+- refactor test suite to Pest (#239)
+- update the docs
+- add a `StudlyMapper`
+- add better support for Livewire
+
 ## 2.0.14 - 2022-11-10
 
 - accept 'float' as data type (#237)
