@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support;
 
-use Attribute;
 use Illuminate\Support\Collection;
 use ReflectionAttribute;
 use ReflectionClass;

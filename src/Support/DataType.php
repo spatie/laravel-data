@@ -18,7 +18,6 @@ use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
-use Spatie\TypeScriptTransformer\Attributes\Optional as OptionalAttribute;
 use TypeError;
 
 class DataType implements Countable

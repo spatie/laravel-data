@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support\TypeScriptTransformer;
 
-use Attribute;
 use phpDocumentor\Reflection\Fqsen;
 use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\Types\Array_;
@@ -52,7 +51,7 @@ class DataTypeScriptTransformer extends DtoTransformer
         $dataClass = app(DataConfig::class)->getDataClass($class->getName());
 
         $isOptional = $dataClass->attributes->contains(
-            fn(object $attribute) => $attribute instanceof TypeScriptOptional
+            fn (object $attribute) => $attribute instanceof TypeScriptOptional
         );
 
         return array_reduce(
@@ -69,7 +68,7 @@ class DataTypeScriptTransformer extends DtoTransformer
 
                 $isOptional = $isOptional
                     || $dataProperty->attributes->contains(
-                        fn(object $attribute) => $attribute instanceof TypeScriptOptional
+                        fn (object $attribute) => $attribute instanceof TypeScriptOptional
                     )
                     || $dataProperty->type->isLazy
                     || $dataProperty->type->isOptional;
