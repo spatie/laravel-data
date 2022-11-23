@@ -20,13 +20,13 @@ use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
-function resolveRules(object $class): array
+function resolveRules(object $class, array $payload = []): array
 {
     $reflectionProperty = new ReflectionProperty($class, 'property');
 
     $property = DataProperty::create($reflectionProperty);
 
-    return app(DataPropertyValidationRulesResolver::class)->execute($property)->toArray();
+    return app(DataPropertyValidationRulesResolver::class)->execute($property, $payload)->toArray();
 }
 
 it('will add a required or nullable rule based upon the property nullability', function () {
@@ -154,41 +154,49 @@ it('will take rules from nested data collections', function () {
     $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public DataCollection $property;
-    });
+    }, [
+        'property' => [[]],
+    ]);
 
     expect($rules)->toMatchArray([
         'property' => ['present', 'array'],
-        'property.*.string' => ['string', 'required'],
+        'property.0.string' => ['string', 'required'],
     ]);
 
     $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public ?DataCollection $property;
-    });
+    }, [
+        'property' => [[]],
+    ]);
 
     expect($rules)->toMatchArray([
         'property' => ['nullable', 'array'],
-        'property.*.string' => ['string', 'required'],
+        'property.0.string' => ['string', 'required'],
     ]);
 
     $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public Optional|DataCollection $property;
-    });
+    }, [
+        'property' => [[]],
+    ]);
 
     expect($rules)->toMatchArray([
         'property' => ['sometimes', 'array'],
-        'property.*.string' => ['string', 'required'],
+        'property.0.string' => ['string', 'required'],
     ]);
 
     $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public null|Optional|DataCollection $property;
-    });
+    }, [
+        'property' => [[]],
+    ]);
 
     expect($rules)->toMatchArray([
         'property' => ['nullable', 'sometimes', 'array'],
-        'property.*.string' => ['string', 'required'],
+        'property.0.string' => ['string', 'required'],
     ]);
 });
 
@@ -283,17 +291,23 @@ it('will take mapped properties into account', function () {
     $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class), MapName('other')]
         public DataCollection $property;
-    });
+    }, [
+        'other' => [[]],
+    ]);
 
     expect($rules)->toMatchArray([
         'other' => ['present', 'array'],
-        'other.*.string' => ['string', 'required'],
+        'other.0.string' => ['string', 'required'],
     ]);
 
     $rules = resolveRules(new class () {
         #[MapName('other')]
         public DataWithMapper $property;
-    });
+    }, [
+        'other' => [
+            'data_collection_cased_property' => [[]],
+        ],
+    ]);
 
     expect($rules)->toMatchArray([
         'other' => ['required', 'array'],
@@ -301,7 +315,7 @@ it('will take mapped properties into account', function () {
         'other.data_cased_property' => ['required', 'array'],
         'other.data_cased_property.string' => ['string', 'required'],
         'other.data_collection_cased_property' => ['present', 'array'],
-        'other.data_collection_cased_property.*.string' => ['string', 'required'],
+        'other.data_collection_cased_property.0.string' => ['string', 'required'],
     ]);
 });
 
@@ -346,9 +360,9 @@ it(
             public DataCollection $property;
         };
 
-        expect(resolveRules($data))->toMatchArray([
+        expect(resolveRules($data, ['property' => [[]]]))->toMatchArray([
             'property' => ['present', 'array', 'size:10'],
-            'property.*.string' => ['string', 'required'],
+            'property.0.string' => ['string', 'required'],
         ]);
     }
 );

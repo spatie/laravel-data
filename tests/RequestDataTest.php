@@ -197,7 +197,7 @@ it('can nest collections of data', function () {
         ],
     ])
         ->assertStatus(422)
-        ->assertJsonValidationErrors(['simple_collection.1.string' => 'The simple_collection.1.string must be a string.']);
+        ->assertJsonValidationErrors(['simple_collection.1.string' => 'The simple collection.1.string must be a string.']);
 });
 
 it('can check for authorization', function () {

@@ -78,12 +78,12 @@ it('will merge overwritten rules on nested data objects', function () {
     };
 
     expect(
-        $this->resolver->execute($data::class)->all()
+        $this->resolver->execute($data::class, ['collection' => [[]]])->all()
     )->toEqualCanonicalizing([
         'nested' => ['array', 'required'],
         'nested.string' => ['string', 'required', 'min:10', 'max:100'],
         'collection' => ['array', 'present'],
-        'collection.*.string' => ['string', 'required', 'min:10', 'max:100'],
+        'collection.0.string' => ['string', 'required', 'min:10', 'max:100'],
     ]);
 });
 

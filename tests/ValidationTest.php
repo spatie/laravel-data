@@ -348,7 +348,8 @@ it('can validate nested optional data', function () {
 
 it('can add additional rules to nested data', function () {
     eval(<<<'PHP'
-            use Spatie\LaravelData\Attributes\Validation\In;use Spatie\LaravelData\Data;
+            use Spatie\LaravelData\Attributes\Validation\In;
+            use Spatie\LaravelData\Data;
             class NestedClassD extends Data {
                 public string $name;
             }
@@ -384,7 +385,8 @@ it('can use nested payloads in nested data', function () {
     // Also implement for collections -> complicated we would have to create rules for each individual payload
 
     eval(<<<'PHP'
-            use Spatie\LaravelData\Attributes\Validation\In;use Spatie\LaravelData\Data;
+            use Spatie\LaravelData\Attributes\Validation\In;
+            use Spatie\LaravelData\Data;
             class NestedClassF extends Data {
                 public bool $strict;
 
@@ -432,7 +434,9 @@ test('rules in nested data are rewritten according to their fields', function ()
     // Also implement for collections
     eval(<<<'PHP'
             use Spatie\LaravelData\Attributes\Validation\In;
-            use Spatie\LaravelData\Attributes\Validation\RequiredIf;use Spatie\LaravelData\Attributes\Validation\RequiredWith;use Spatie\LaravelData\Data;
+            use Spatie\LaravelData\Attributes\Validation\RequiredIf;
+            use Spatie\LaravelData\Attributes\Validation\RequiredWith;
+            use Spatie\LaravelData\Data;
             class NestedClassG extends Data {
                 public bool $alsoAString;
 
@@ -484,7 +488,9 @@ it('will validate a collection', function () {
         ])
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.*.string' => ['string', 'required'],
+            'collection.0.string' => ['string', 'required'],
+        ], [
+            'collection' => [[]],
         ]);
 });
 
@@ -511,7 +517,9 @@ it('will validate a nullable collection', function () {
         ])
         ->assertRules([
             'collection' => ['nullable', 'array'],
-            'collection.*.string' => ['string', 'required'],
+            'collection.0.string' => ['string', 'required'],
+        ], [
+            'collection' => [[]],
         ]);
 });
 
@@ -538,7 +546,9 @@ it('will validate an optional collection', function () {
         ])
         ->assertRules([
             'collection' => ['sometimes', 'array'],
-            'collection.*.string' => ['string', 'required'],
+            'collection.0.string' => ['string', 'required'],
+        ], [
+            'collection' => [[]],
         ]);
 });
 
@@ -573,7 +583,9 @@ it('can add collection class rules using attributes', function () {
     DataValidationAsserter::for($dataClass)
         ->assertRules([
             'collection' => ['present', 'array', 'min:10'],
-            'collection.*.email' => ['string', 'required', 'email:rfc'],
+            'collection.0.email' => ['string', 'required', 'email:rfc'],
+        ], [
+            'collection' => [[]],
         ]);
 });
 
@@ -598,11 +610,99 @@ it('can nest data in collections', function () {
         public DataCollection $collection;
     };
 
+    $payload = ['collection' => [['nested' => ['string' => 'Hello World']]]];
     DataValidationAsserter::for($dataClass)
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.*.nested' => ['required', 'array'],
-            'collection.*.nested.string' => ['required', 'string'],
-        ])
-        ->assertOk(['collection' => [['nested' => ['string' => 'Hello World']]]]);
+            'collection.0.nested' => ['required', 'array'],
+            'collection.0.nested.string' => ['required', 'string'],
+        ], $payload)
+        ->assertOk($payload);
+});
+
+it('can nest data with relative payload', function () {
+    eval(<<<'PHP'
+        use Spatie\LaravelData\Data;
+        class NestedClassH extends Data {
+            public string $string;
+            #[\Spatie\LaravelData\Attributes\Validation\Required]
+            public bool $isEmail;
+
+            public static function rules(array $payload): array
+            {
+                if ($payload['isEmail'] ?? false) {
+                    return [
+                        'string' => ['required', 'string', 'email'],
+                    ];
+                }
+                return [];
+            }
+        }
+
+        class CollectionClassH extends Data {
+            public \NestedClassH $nested;
+        }
+    PHP);
+
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(\CollectionClassH::class)]
+        public DataCollection $collection;
+    };
+
+    $payload = ['collection' => [
+        ['nested' => ['string' => 'Hello World', 'isEmail' => false]],
+        ['nested' => ['string' => 'hello@world.test', 'isEmail' => true]],
+    ]];
+
+    DataValidationAsserter::for($dataClass)
+        ->assertRules([
+            'collection' => ['present', 'array'],
+            'collection.0.nested' => ['required', 'array'],
+            'collection.0.nested.string' => ['required', 'string'],
+            'collection.0.nested.isEmail' => ['required', 'boolean'],
+            'collection.1.nested' => ['required', 'array'],
+            'collection.1.nested.string' => ['required', 'string', 'email'],
+            'collection.1.nested.isEmail' => ['required', 'boolean'],
+        ], $payload)
+        ->assertOk($payload);
+});
+
+it('can nest data in collections with relative payload', function () {
+    eval(<<<'PHP'
+        use Spatie\LaravelData\Data;
+        class NestedClassI extends Data {
+            public string $string;
+            #[\Spatie\LaravelData\Attributes\Validation\Required]
+            public bool $isEmail;
+
+            public static function rules(array $payload): array
+            {
+                if ($payload['isEmail'] ?? false) {
+                    return [
+                        'string' => ['required', 'string', 'email'],
+                    ];
+                }
+                return [];
+            }
+        }
+    PHP);
+
+    $dataClass = new class () extends Data {
+        public \NestedClassI $nested;
+    };
+
+    $payload = [
+        'nested' => [
+            'string' => 'Hello World',
+            'isEmail' => true
+        ]
+    ];
+
+    DataValidationAsserter::for($dataClass)
+        ->assertRules([
+            'nested' => ['required', 'array'],
+            'nested.string' => ['required', 'string', 'email'],
+            'nested.isEmail' => ['required', 'boolean'],
+        ], $payload)
+        ->assertErrors($payload);
 });

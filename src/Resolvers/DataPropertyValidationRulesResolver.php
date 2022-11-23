@@ -38,11 +38,9 @@ class DataPropertyValidationRulesResolver
         array $payload,
         bool $nullable
     ): Collection {
-        $prefix = match (true) {
-            $property->type->isDataObject => "{$propertyName}.",
-            $property->type->isDataCollectable => "{$propertyName}.*.",
-            default => throw new TypeError()
-        };
+        if (! $property->type->isDataObject && ! $property->type->isDataCollectable) {
+            throw new TypeError();
+        }
 
         $isNullable = $nullable || $property->type->isNullable;
         $isOptional = $property->type->isOptional;
@@ -71,14 +69,30 @@ class DataPropertyValidationRulesResolver
             $inferrer->handle($property, $toplevelRules);
         }
 
+        if ($property->type->isDataCollectable) {
+            return collect($payload[$propertyName] ?? [])
+                ->flatMap(function ($item, $key) use ($nullable, $property, $propertyName) {
+                    return $this->dataValidationRulesResolver
+                        ->execute(
+                            $property->type->dataClass,
+                            $item,
+                            $this->isNestedDataNullable($nullable, $property)
+                        )
+                        ->mapWithKeys(fn (array $rules, string $name) => [
+                            "{$propertyName}.{$key}.{$name}" => $rules,
+                        ]);
+                })
+                ->prepend($toplevelRules->normalize(), $propertyName);
+        }
+
         return $this->dataValidationRulesResolver
             ->execute(
                 $property->type->dataClass,
-                $payload,
+                $payload[$propertyName] ?? [],
                 $this->isNestedDataNullable($nullable, $property)
             )
             ->mapWithKeys(fn (array $rules, string $name) => [
-                "{$prefix}{$name}" => $rules,
+                "{$propertyName}.{$name}" => $rules,
             ])
             ->prepend($toplevelRules->normalize(), $propertyName);
     }
