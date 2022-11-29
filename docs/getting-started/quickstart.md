@@ -99,7 +99,7 @@ That's because the status property expects a `PostStatus` enum object, but it ge
 ```php
 class PostStatusCast implements Cast
 {
-    public function cast(DataProperty $property, mixed $value): PostStatus
+    public function cast(DataProperty $property, mixed $value, array $context): PostStatus
     {
         return PostStatus::from($value);
     }
