@@ -40,7 +40,10 @@ class DataFromArrayResolver
         $dataClass
             ->properties
             ->filter(
-                fn (DataProperty $property) => ! $property->isPromoted && $properties->has($property->name)
+                fn (DataProperty $property) =>
+                    ! $property->isPromoted &&
+                    ! $property->isReadonly &&
+                    $properties->has($property->name)
             )
             ->each(function (DataProperty $property) use ($properties, $data) {
                 $data->{$property->name} = $properties->get($property->name);

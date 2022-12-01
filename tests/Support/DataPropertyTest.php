@@ -7,8 +7,10 @@ use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
@@ -126,3 +128,74 @@ it('can check if a property should be validated', function () {
         })->validate
     )->toBeFalse();
 });
+
+it('wont throw an error if non existing attribute is used on a data class property', function () {
+    expect(NonExistingPropertyAttributeData::from(['property' => 'hello'])->property)->toEqual('hello')
+        ->and(PhpStormAttributeData::from(['property' => 'hello'])->property)->toEqual('hello')
+        ->and(PhpStormAttributeData::from('{"property": "hello"}')->property)->toEqual('hello')
+        ->and(PhpStormAttributeData::from((object) ['property' => 'hello'])->property)->toEqual('hello')
+        ->and(ModelWithPhpStormAttributePropertyData::from((new DummyModel)->fill(['id' => 1]))->id)->toEqual(1)
+        ->and(ModelWithPromotedPhpStormAttributePropertyData::from((new DummyModel)->fill(['id' => 1]))->id)->toEqual(1);
+});
+
+class NonExistingPropertyAttributeData extends Data
+{
+    #[\Foo\Bar]
+    public readonly string $property;
+
+    public function __construct(string $property)
+    {
+        $this->property = $property;
+    }
+}
+
+class PhpStormAttributeData extends Data
+{
+    #[\JetBrains\PhpStorm\Immutable]
+    public readonly string $property;
+
+    public function __construct(string $property)
+    {
+        $this->property = $property;
+    }
+}
+
+class PromotedPhpStormAttributeData extends Data
+{
+    public function __construct(
+        #[\JetBrains\PhpStorm\Immutable]
+        public readonly string $property)
+    {
+        //
+    }
+}
+
+class ModelWithPhpStormAttributePropertyData extends Data
+{
+    #[\JetBrains\PhpStorm\Immutable]
+    public int $id;
+
+    public function __construct(int $id)
+    {
+        $this->id = $id;
+    }
+
+    public static function fromDummyModel(DummyModel $model)
+    {
+        return new self($model->id);
+    }
+}
+
+class ModelWithPromotedPhpStormAttributePropertyData extends Data
+{
+    public function __construct(
+        #[\JetBrains\PhpStorm\Immutable]
+        public int $id
+    ) {
+    }
+
+    public static function fromDummyModel(DummyModel $model)
+    {
+        return new self($model->id);
+    }
+}
