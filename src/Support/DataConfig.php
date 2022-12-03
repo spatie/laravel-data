@@ -37,7 +37,7 @@ class DataConfig
             $this->casts[ltrim($castable, ' \\')] = app($cast);
         }
 
-        $this->relativeRuleGeneration = $config['relative_rule_generation'];
+        $this->relativeRuleGeneration = $config['relative_rule_generation'] ?? false;
     }
 
     public function getDataClass(string $class): DataClass

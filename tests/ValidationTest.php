@@ -611,7 +611,7 @@ it('can nest data in collections', function () {
         ->assertOk(['collection' => [['nested' => ['string' => 'Hello World']]]]);
 });
 
-it('can nest data with payload using relative rule generation', function () {
+it('can nest data in collections using relative rule generation', function () {
     eval(<<<'PHP'
         use Spatie\LaravelData\Data;
         class NestedClassH extends Data {
@@ -660,7 +660,7 @@ it('can nest data with payload using relative rule generation', function () {
         ->assertOk($payload);
 });
 
-it('can nest data in collections using relative rule generation', function () {
+it('can nest data using relative rule generation', function () {
     eval(<<<'PHP'
         use Spatie\LaravelData\Data;
         class NestedClassI extends Data {

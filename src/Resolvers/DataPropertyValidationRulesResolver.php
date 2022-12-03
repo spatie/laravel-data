@@ -38,10 +38,6 @@ class DataPropertyValidationRulesResolver
         array $payload,
         bool $nullable
     ): Collection {
-        if (! $property->type->isDataObject && ! $property->type->isDataCollectable) {
-            throw new TypeError();
-        }
-
         $isNullable = $nullable || $property->type->isNullable;
         $isOptional = $property->type->isOptional;
 
@@ -77,6 +73,7 @@ class DataPropertyValidationRulesResolver
         $prefix = match (true) {
             $property->type->isDataObject || $relativeRuleGeneration => "{$propertyName}.",
             $property->type->isDataCollectable => "{$propertyName}.*.",
+            default => throw new TypeError(),
         };
 
         if ($relativeRuleGeneration && $property->type->isDataCollectable) {
