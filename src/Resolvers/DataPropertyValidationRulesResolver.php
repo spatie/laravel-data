@@ -69,27 +69,19 @@ class DataPropertyValidationRulesResolver
             $inferrer->handle($property, $toplevelRules);
         }
 
-        if (! $this->dataConfig->usesRelativeRuleGeneration()) {
-            $prefix = match (true) {
-                $property->type->isDataObject => "{$propertyName}",
-                $property->type->isDataCollectable => "{$propertyName}.*",
-            };
-
-            return $this->dataValidationRulesResolver
-                ->execute(
-                    $property->type->dataClass,
-                    $payload,
-                    $this->isNestedDataNullable($nullable, $property)
-                )
-                ->mapWithKeys(fn (array $rules, string $name) => [
-                    "{$prefix}.{$name}" => $rules,
-                ])
-                ->prepend($toplevelRules->normalize(), $propertyName);
+        $relativeRuleGeneration = $this->dataConfig->usesRelativeRuleGeneration();
+        if ($relativeRuleGeneration) {
+            $payload = $payload[$propertyName] ?? [];
         }
 
-        if ($property->type->isDataCollectable) {
-            return collect($payload[$propertyName] ?? [])
-                ->flatMap(function ($item, $key) use ($nullable, $property, $propertyName) {
+        $prefix = match (true) {
+            $property->type->isDataObject || $relativeRuleGeneration => "{$propertyName}.",
+            $property->type->isDataCollectable => "{$propertyName}.*.",
+        };
+
+        if ($relativeRuleGeneration && $property->type->isDataCollectable) {
+            return collect($payload)
+                ->flatMap(function ($item, $key) use ($prefix, $nullable, $property) {
                     return $this->dataValidationRulesResolver
                         ->execute(
                             $property->type->dataClass,
@@ -97,7 +89,7 @@ class DataPropertyValidationRulesResolver
                             $this->isNestedDataNullable($nullable, $property)
                         )
                         ->mapWithKeys(fn (array $rules, string $name) => [
-                            "{$propertyName}.{$key}.{$name}" => $rules,
+                            "{$prefix}{$key}.{$name}" => $rules,
                         ]);
                 })
                 ->prepend($toplevelRules->normalize(), $propertyName);
@@ -106,11 +98,11 @@ class DataPropertyValidationRulesResolver
         return $this->dataValidationRulesResolver
             ->execute(
                 $property->type->dataClass,
-                $payload[$propertyName] ?? [],
+                $payload,
                 $this->isNestedDataNullable($nullable, $property)
             )
             ->mapWithKeys(fn (array $rules, string $name) => [
-                "{$propertyName}.{$name}" => $rules,
+                "{$prefix}{$name}" => $rules,
             ])
             ->prepend($toplevelRules->normalize(), $propertyName);
     }
