@@ -488,7 +488,7 @@ it('will validate a collection', function () {
         ])
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.0.string' => ['string', 'required'],
+            'collection.*.string' => ['string', 'required'],
         ], [
             'collection' => [[]],
         ]);
@@ -517,7 +517,7 @@ it('will validate a nullable collection', function () {
         ])
         ->assertRules([
             'collection' => ['nullable', 'array'],
-            'collection.0.string' => ['string', 'required'],
+            'collection.*.string' => ['string', 'required'],
         ], [
             'collection' => [[]],
         ]);
@@ -546,7 +546,7 @@ it('will validate an optional collection', function () {
         ])
         ->assertRules([
             'collection' => ['sometimes', 'array'],
-            'collection.0.string' => ['string', 'required'],
+            'collection.*.string' => ['string', 'required'],
         ], [
             'collection' => [[]],
         ]);
@@ -583,7 +583,7 @@ it('can add collection class rules using attributes', function () {
     DataValidationAsserter::for($dataClass)
         ->assertRules([
             'collection' => ['present', 'array', 'min:10'],
-            'collection.0.email' => ['string', 'required', 'email:rfc'],
+            'collection.*.email' => ['string', 'required', 'email:rfc'],
         ], [
             'collection' => [[]],
         ]);
@@ -614,13 +614,13 @@ it('can nest data in collections', function () {
     DataValidationAsserter::for($dataClass)
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.0.nested' => ['required', 'array'],
-            'collection.0.nested.string' => ['required', 'string'],
+            'collection.*.nested' => ['required', 'array'],
+            'collection.*.nested.string' => ['required', 'string'],
         ], $payload)
         ->assertOk($payload);
 });
 
-it('can nest data with relative payload', function () {
+it('can nest data with payload using relative rule generation', function () {
     eval(<<<'PHP'
         use Spatie\LaravelData\Data;
         class NestedClassH extends Data {
@@ -643,6 +643,8 @@ it('can nest data with relative payload', function () {
             public \NestedClassH $nested;
         }
     PHP);
+
+    config()->set('data.relative_rule_generation', true);
 
     $dataClass = new class () extends Data {
         #[DataCollectionOf(\CollectionClassH::class)]
@@ -667,7 +669,7 @@ it('can nest data with relative payload', function () {
         ->assertOk($payload);
 });
 
-it('can nest data in collections with relative payload', function () {
+it('can nest data in collections using relative rule generation', function () {
     eval(<<<'PHP'
         use Spatie\LaravelData\Data;
         class NestedClassI extends Data {
@@ -686,6 +688,8 @@ it('can nest data in collections with relative payload', function () {
             }
         }
     PHP);
+
+    config()->set('data.relative_rule_generation', true);
 
     $dataClass = new class () extends Data {
         public \NestedClassI $nested;

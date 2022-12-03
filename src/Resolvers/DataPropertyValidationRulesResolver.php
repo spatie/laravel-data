@@ -69,6 +69,24 @@ class DataPropertyValidationRulesResolver
             $inferrer->handle($property, $toplevelRules);
         }
 
+        if (! $this->dataConfig->usesRelativeRuleGeneration()) {
+            $prefix = match (true) {
+                $property->type->isDataObject => "{$propertyName}",
+                $property->type->isDataCollectable => "{$propertyName}.*",
+            };
+
+            return $this->dataValidationRulesResolver
+                ->execute(
+                    $property->type->dataClass,
+                    $payload,
+                    $this->isNestedDataNullable($nullable, $property)
+                )
+                ->mapWithKeys(fn (array $rules, string $name) => [
+                    "{$prefix}.{$name}" => $rules,
+                ])
+                ->prepend($toplevelRules->normalize(), $propertyName);
+        }
+
         if ($property->type->isDataCollectable) {
             return collect($payload[$propertyName] ?? [])
                 ->flatMap(function ($item, $key) use ($nullable, $property, $propertyName) {

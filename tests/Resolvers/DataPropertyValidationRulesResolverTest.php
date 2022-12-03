@@ -160,7 +160,7 @@ it('will take rules from nested data collections', function () {
 
     expect($rules)->toMatchArray([
         'property' => ['present', 'array'],
-        'property.0.string' => ['string', 'required'],
+        'property.*.string' => ['string', 'required'],
     ]);
 
     $rules = resolveRules(new class () {
@@ -172,7 +172,7 @@ it('will take rules from nested data collections', function () {
 
     expect($rules)->toMatchArray([
         'property' => ['nullable', 'array'],
-        'property.0.string' => ['string', 'required'],
+        'property.*.string' => ['string', 'required'],
     ]);
 
     $rules = resolveRules(new class () {
@@ -184,7 +184,7 @@ it('will take rules from nested data collections', function () {
 
     expect($rules)->toMatchArray([
         'property' => ['sometimes', 'array'],
-        'property.0.string' => ['string', 'required'],
+        'property.*.string' => ['string', 'required'],
     ]);
 
     $rules = resolveRules(new class () {
@@ -196,7 +196,7 @@ it('will take rules from nested data collections', function () {
 
     expect($rules)->toMatchArray([
         'property' => ['nullable', 'sometimes', 'array'],
-        'property.0.string' => ['string', 'required'],
+        'property.*.string' => ['string', 'required'],
     ]);
 });
 
@@ -297,7 +297,7 @@ it('will take mapped properties into account', function () {
 
     expect($rules)->toMatchArray([
         'other' => ['present', 'array'],
-        'other.0.string' => ['string', 'required'],
+        'other.*.string' => ['string', 'required'],
     ]);
 
     $rules = resolveRules(new class () {
@@ -315,7 +315,7 @@ it('will take mapped properties into account', function () {
         'other.data_cased_property' => ['required', 'array'],
         'other.data_cased_property.string' => ['string', 'required'],
         'other.data_collection_cased_property' => ['present', 'array'],
-        'other.data_collection_cased_property.0.string' => ['string', 'required'],
+        'other.data_collection_cased_property.*.string' => ['string', 'required'],
     ]);
 });
 
@@ -362,7 +362,7 @@ it(
 
         expect(resolveRules($data, ['property' => [[]]]))->toMatchArray([
             'property' => ['present', 'array', 'size:10'],
-            'property.0.string' => ['string', 'required'],
+            'property.*.string' => ['string', 'required'],
         ]);
     }
 );

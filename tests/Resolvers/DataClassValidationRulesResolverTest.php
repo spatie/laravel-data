@@ -88,7 +88,7 @@ it('will merge overwritten rules on nested data objects', function () {
 });
 
 it(
-    'can overwrite fules for the base collection object which will not affect the collected data object rules',
+    'can overwrite rules for the base collection object which will not affect the collected data object rules',
     function () {
         $dataClass = new class () extends Data {
             #[DataCollectionOf(SimpleData::class)]

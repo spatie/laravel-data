@@ -61,6 +61,16 @@ return [
     'wrap' => null,
 
     /**
+     * Rules can be generated using data from the root request level or relative to
+     * each data object. When relative rule generation is selected collections of data
+     * objects will be iterated over and rules generated for each item.
+     * This allows for more dynamic validation, but has the downside of duplicate
+     * rule generation.
+     * For example, items.0.string, items.1.string etc. instead of, items.*.string
+     */
+    'relative_rule_generation' => false,
+
+    /**
      * Adds a specific caster to the Symphony VarDumper component which hides
      * some properties from data objects and collections when being dumped
      * by `dump` or `dd`. Can be 'enabled', 'disabled' or 'development'
