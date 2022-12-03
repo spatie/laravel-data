@@ -154,9 +154,7 @@ it('will take rules from nested data collections', function () {
     $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public DataCollection $property;
-    }, [
-        'property' => [[]],
-    ]);
+    });
 
     expect($rules)->toMatchArray([
         'property' => ['present', 'array'],
@@ -166,9 +164,7 @@ it('will take rules from nested data collections', function () {
     $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public ?DataCollection $property;
-    }, [
-        'property' => [[]],
-    ]);
+    });
 
     expect($rules)->toMatchArray([
         'property' => ['nullable', 'array'],
@@ -178,9 +174,7 @@ it('will take rules from nested data collections', function () {
     $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public Optional|DataCollection $property;
-    }, [
-        'property' => [[]],
-    ]);
+    });
 
     expect($rules)->toMatchArray([
         'property' => ['sometimes', 'array'],
@@ -190,9 +184,7 @@ it('will take rules from nested data collections', function () {
     $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class)]
         public null|Optional|DataCollection $property;
-    }, [
-        'property' => [[]],
-    ]);
+    });
 
     expect($rules)->toMatchArray([
         'property' => ['nullable', 'sometimes', 'array'],
@@ -291,9 +283,7 @@ it('will take mapped properties into account', function () {
     $rules = resolveRules(new class () {
         #[DataCollectionOf(SimpleData::class), MapName('other')]
         public DataCollection $property;
-    }, [
-        'other' => [[]],
-    ]);
+    });
 
     expect($rules)->toMatchArray([
         'other' => ['present', 'array'],
@@ -303,11 +293,7 @@ it('will take mapped properties into account', function () {
     $rules = resolveRules(new class () {
         #[MapName('other')]
         public DataWithMapper $property;
-    }, [
-        'other' => [
-            'data_collection_cased_property' => [[]],
-        ],
-    ]);
+    });
 
     expect($rules)->toMatchArray([
         'other' => ['required', 'array'],
@@ -360,7 +346,7 @@ it(
             public DataCollection $property;
         };
 
-        expect(resolveRules($data, ['property' => [[]]]))->toMatchArray([
+        expect(resolveRules($data))->toMatchArray([
             'property' => ['present', 'array', 'size:10'],
             'property.*.string' => ['string', 'required'],
         ]);

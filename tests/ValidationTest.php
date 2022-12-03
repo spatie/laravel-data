@@ -489,8 +489,6 @@ it('will validate a collection', function () {
         ->assertRules([
             'collection' => ['present', 'array'],
             'collection.*.string' => ['string', 'required'],
-        ], [
-            'collection' => [[]],
         ]);
 });
 
@@ -518,8 +516,6 @@ it('will validate a nullable collection', function () {
         ->assertRules([
             'collection' => ['nullable', 'array'],
             'collection.*.string' => ['string', 'required'],
-        ], [
-            'collection' => [[]],
         ]);
 });
 
@@ -547,8 +543,6 @@ it('will validate an optional collection', function () {
         ->assertRules([
             'collection' => ['sometimes', 'array'],
             'collection.*.string' => ['string', 'required'],
-        ], [
-            'collection' => [[]],
         ]);
 });
 
@@ -584,8 +578,6 @@ it('can add collection class rules using attributes', function () {
         ->assertRules([
             'collection' => ['present', 'array', 'min:10'],
             'collection.*.email' => ['string', 'required', 'email:rfc'],
-        ], [
-            'collection' => [[]],
         ]);
 });
 
@@ -610,14 +602,13 @@ it('can nest data in collections', function () {
         public DataCollection $collection;
     };
 
-    $payload = ['collection' => [['nested' => ['string' => 'Hello World']]]];
     DataValidationAsserter::for($dataClass)
         ->assertRules([
             'collection' => ['present', 'array'],
             'collection.*.nested' => ['required', 'array'],
             'collection.*.nested.string' => ['required', 'string'],
-        ], $payload)
-        ->assertOk($payload);
+        ])
+        ->assertOk(['collection' => [['nested' => ['string' => 'Hello World']]]]);
 });
 
 it('can nest data with payload using relative rule generation', function () {
