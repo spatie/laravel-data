@@ -382,28 +382,27 @@ it('will use name mapping with nested objects', function () {
 });
 
 it('can use nested payloads in nested data', function () {
-    // Also implement for collections -> complicated we would have to create rules for each individual payload
-
     eval(<<<'PHP'
             use Spatie\LaravelData\Attributes\Validation\In;
             use Spatie\LaravelData\Data;
             class NestedClassF extends Data {
                 public bool $strict;
 
-                public string $string;
+                public string $name;
 
-                public static function rules(array $payload) : array{
-                    // Maybe introduce parameter as $nestedPayload?
-
-                    if($payload['strict']){
+                public static function rules(array $payload): array{
+                    if($payload['strict'] ?? false) {
                         return ['name' => ['in:strict']];
                     }
+                    return [];
                 }
             }
         PHP);
 
+    config()->set('data.relative_rule_generation', true);
+
     $dataClass = new class () extends Data {
-        public \NestedClassF $nested;
+        public \NestedClassF $some_nested;
     };
 
     DataValidationAsserter::for($dataClass)
@@ -411,23 +410,27 @@ it('can use nested payloads in nested data', function () {
             rules: [
                 'some_nested' => ['required', 'array'],
                 'some_nested.strict' => ['boolean'],
-                'some_nested.string' => ['in:strict'],
+                'some_nested.name' => ['in:strict'],
             ],
             payload: [
-                'some_nested.strict' => true,
+                'some_nested' => [
+                    'strict' => true,
+                ],
             ]
         )
         ->assertRules(
             rules: [
                 'some_nested' => ['required', 'array'],
                 'some_nested.strict' => ['boolean'],
-                'some_nested.string' => ['required', 'string'],
+                'some_nested.name' => ['required', 'string'],
             ],
             payload: [
-                'some_nested.strict' => false,
+                'some_nested' => [
+                    'strict' => false,
+                ],
             ]
         );
-})->skip('Implementation required');
+});
 
 test('rules in nested data are rewritten according to their fields', function () {
     // Should we do the same with the `rules` method?
