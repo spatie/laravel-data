@@ -92,12 +92,9 @@ class DataFromSomethingResolver
 
         foreach ($payloads as $payload) {
             if ($payload instanceof Request) {
-                DataPipeline::create()
+                $class::pipeline()
                     ->normalizer(ArrayableNormalizer::class)
                     ->into($class)
-                    ->through(AuthorizedDataPipe::class)
-                    ->through(MapPropertiesDataPipe::class)
-                    ->through(ValidatePropertiesDataPipe::class)
                     ->using($payload)
                     ->execute();
             }
