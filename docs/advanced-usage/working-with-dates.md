@@ -56,6 +56,15 @@ Now when casting a date, a valid format will be searched. When none can be found
 
 When a transformers hasn't explicitly stated it's format, the first format within the array is used.
 
+## Casting dates in a different time zone
+
+Sometimes a date can be in a different timezone than the timezone you application uses. For example, if you application uses `Europe/Brussels` but your date is in `UTC`:
+
+```php
+#[WithCast(DateTimeInterfaceCast::class, timeZone: 'UTC')]
+public DateTime $date
+```
+
 ## Changing time zones
 
 When casting a date you may want to set an alternative timezone this can be achieved as such:
