@@ -12,7 +12,8 @@ class DateTimeInterfaceCast implements Cast
     public function __construct(
         protected null|string|array $format = null,
         protected ?string $type = null,
-        protected ?string $setTimeZone = null
+        protected ?string $setTimeZone = null,
+        protected ?string $timeZone = null
     ) {
     }
 
@@ -28,7 +29,11 @@ class DateTimeInterfaceCast implements Cast
 
         /** @var DateTimeInterface|null $datetime */
         $datetime = $formats
-            ->map(fn (string $format) => rescue(fn () => $type::createFromFormat($format, $value), report: false))
+            ->map(fn (string $format) => rescue(fn () => $type::createFromFormat(
+                $format,
+                $value,
+                isset($this->timeZone) ? new DateTimeZone($this->timeZone) : null
+            ), report: false))
             ->first(fn ($value) => (bool) $value);
 
         if (! $datetime) {
