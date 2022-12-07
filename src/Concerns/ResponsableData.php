@@ -3,6 +3,8 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
@@ -22,9 +24,17 @@ trait ResponsableData
             $this->withPartialTrees($partialTrees);
         }
 
-        return new JsonResponse($this->transform(
-            wrapExecutionType: WrapExecutionType::Enabled,
-        ));
+        return new JsonResponse(
+            data: $this->transform(
+                wrapExecutionType: WrapExecutionType::Enabled,
+            ),
+            status: $this->calculateResponseStatus($request)
+        );
+    }
+
+    protected function calculateResponseStatus(Request $request): int {
+        return $request->isMethod('POST') &&
+               config('data.json_response_201_on_post_requests') ? Response::HTTP_CREATED : Response::HTTP_OK;
     }
 
     public static function allowedRequestIncludes(): ?array
@@ -46,4 +56,6 @@ trait ResponsableData
     {
         return [];
     }
+
+
 }

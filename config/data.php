@@ -67,4 +67,10 @@ return [
      * which will only enable the caster locally.
      */
     'var_dumper_caster_mode' => 'development',
+
+    /**
+     * When enabled, Laravel Data will return a JsonResponse with status 201 in stead of the
+     * default status code 200 when the toResponse() method is called in a request with method 'post'
+     */
+    'json_response_201_on_post_requests' => false
 ];
