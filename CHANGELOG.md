@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.1.0 - 2022-12-07
+
+- Stop using custom pipeline when creating data magically from requests
+- set timezones in datetime casts (#287 )
+
 ## 2.0.16 - 2022-11-18
 
 - add support for optional properties in TypeScript transformer (#153)
