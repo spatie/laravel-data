@@ -24,8 +24,6 @@ The JSON then will look like this:
 }
 ```
 
-
-
 You can manually transform a data object to JSON:
 
 ```php
