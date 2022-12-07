@@ -58,12 +58,14 @@ When a transformers hasn't explicitly stated it's format, the first format withi
 
 ## Casting dates in a different time zone
 
-Sometimes a date can be in a different timezone than the timezone you application uses. For example, if you application uses `Europe/Brussels` but your date is in `UTC`:
+Sometimes a date can be in a different timezone than the timezone you application uses. For example, if your application uses `Europe/Brussels` but your date is in `UTC`:
 
 ```php
 #[WithCast(DateTimeInterfaceCast::class, timeZone: 'UTC')]
 public DateTime $date
 ```
+
+The date will be created with the `UTC` timezone but will be the same as in the `Europe/Brussels` timezone.
 
 ## Changing time zones
 
@@ -73,6 +75,8 @@ When casting a date you may want to set an alternative timezone this can be achi
 #[WithCast(DateTimeInterfaceCast::class, setTimeZone: 'Europe/Brussels')]
 public DateTime $date
 ```
+
+In this case the time will be transformed, if our original time was in `UTC` then one or two hours (depending on summer time) will be added.
 
 You can also change the timezone of a property which is getting transformed:
 
