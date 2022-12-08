@@ -3,8 +3,11 @@
 namespace Spatie\LaravelData\Tests\TestSupport;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Validation\NestedRules;
 use Illuminate\Validation\ValidationException;
 
+use Illuminate\Validation\ValidationRuleParser;
 use Spatie\LaravelData\Support\Validation\NestedRulesWithAdditional;
 use function PHPUnit\Framework\assertTrue;
 
@@ -66,17 +69,18 @@ class DataValidationAsserter
         array $payload = []
     ): self {
         $inferredRules = collect($this->dataClass::getValidationRules(payload: $payload))
-            ->map(function (array|NestedRulesWithAdditional $rules) {
-                // Replace class with class name
-                if ($rules instanceof NestedRulesWithAdditional) {
-                    return [
-                        NestedRulesWithAdditional::class => collect($rules->additionalRules)
-                            ->map(fn (array $rules) => array_values(Arr::sort($rules)))
-                            ->sortKeys()
-                            ->all(),
-                    ];
+            ->mapWithKeys(function (array|NestedRules $rules, string $key) use ($payload) {
+                // Get the rules generated from the nested rules
+                if ($rules instanceof NestedRules) {
+                    $parser = new ValidationRuleParser($payload);
+                    $result = $parser->explode([$key => $rules]);
+
+                    return collect($result->rules)
+                        ->map(fn ($rules) => array_values(Arr::sort($rules)))
+                        ->sortKeys()
+                        ->all();
                 }
-                return array_values(Arr::sort($rules));
+                return [$key => array_values(Arr::sort($rules))];
             })
             ->sortKeys()
             ->all();
