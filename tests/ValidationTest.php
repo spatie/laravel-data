@@ -13,6 +13,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\Validation\NestedRulesWithAdditional;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
@@ -385,12 +386,13 @@ it('can use nested payloads in nested data', function () {
     eval(<<<'PHP'
             use Spatie\LaravelData\Attributes\Validation\In;
             use Spatie\LaravelData\Data;
-            class NestedClassF extends Data {
+
+            class NestedClassF extends Data implements \Spatie\LaravelData\Contracts\RelativeRuleData {
                 public bool $strict;
 
                 public string $name;
 
-                public static function rules(array $payload): array{
+                public static function rules(array $payload, ?string $path): array {
                     if($payload['strict'] ?? false) {
                         return ['name' => ['in:strict']];
                     }
@@ -398,8 +400,6 @@ it('can use nested payloads in nested data', function () {
                 }
             }
         PHP);
-
-    config()->set('data.relative_rule_generation', true);
 
     $dataClass = new class () extends Data {
         public \NestedClassF $some_nested;
@@ -617,12 +617,12 @@ it('can nest data in collections', function () {
 it('can nest data in collections using relative rule generation', function () {
     eval(<<<'PHP'
         use Spatie\LaravelData\Data;
-        class NestedClassH extends Data {
+        class NestedClassH extends Data implements \Spatie\LaravelData\Contracts\RelativeRuleData {
             public string $string;
             #[\Spatie\LaravelData\Attributes\Validation\Required]
             public bool $isEmail;
 
-            public static function rules(array $payload): array
+            public static function rules(array $payload, ?string $path): array
             {
                 if ($payload['isEmail'] ?? false) {
                     return [
@@ -638,8 +638,6 @@ it('can nest data in collections using relative rule generation', function () {
         }
     PHP);
 
-    config()->set('data.relative_rule_generation', true);
-
     $dataClass = new class () extends Data {
         #[DataCollectionOf(\CollectionClassH::class)]
         public DataCollection $collection;
@@ -653,25 +651,42 @@ it('can nest data in collections using relative rule generation', function () {
     DataValidationAsserter::for($dataClass)
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.0.nested' => ['required', 'array'],
-            'collection.0.nested.string' => ['required', 'string'],
-            'collection.0.nested.isEmail' => ['required', 'boolean'],
-            'collection.1.nested' => ['required', 'array'],
-            'collection.1.nested.string' => ['required', 'string', 'email'],
-            'collection.1.nested.isEmail' => ['required', 'boolean'],
+            'collection.*.nested' => [
+                NestedRulesWithAdditional::class => [
+                    'collection.*.nested' => [
+                        'required',
+                        'array',
+                    ],
+                ],
+            ],
+            'collection.*.nested.string' => ['required', 'string'],
+            'collection.*.nested.isEmail' => ['required', 'boolean'],
         ], $payload)
-        ->assertOk($payload);
+        ->assertOk([
+            'collection' => [
+                ['nested' => ['string' => 'Hello World', 'isEmail' => false]],
+                ['nested' => ['string' => 'hello@world.test', 'isEmail' => true]],
+            ]
+        ])
+        ->assertErrors([
+            'collection' => [
+                ['nested' => ['string' => 'Hello World', 'isEmail' => false]],
+                ['nested' => ['string' => 'Invalid Email', 'isEmail' => true]],
+            ]
+        ], [
+            'collection.1.nested.string' => ['The collection.1.nested.string must be a valid email address.'],
+        ]);
 });
 
 it('can nest data using relative rule generation', function () {
     eval(<<<'PHP'
         use Spatie\LaravelData\Data;
-        class NestedClassI extends Data {
+        class NestedClassI extends Data implements \Spatie\LaravelData\Contracts\RelativeRuleData {
             public string $string;
             #[\Spatie\LaravelData\Attributes\Validation\Required]
             public bool $isEmail;
 
-            public static function rules(array $payload): array
+            public static function rules(array $payload, ?string $path): array
             {
                 if ($payload['isEmail'] ?? false) {
                     return [
@@ -682,8 +697,6 @@ it('can nest data using relative rule generation', function () {
             }
         }
     PHP);
-
-    config()->set('data.relative_rule_generation', true);
 
     $dataClass = new class () extends Data {
         public \NestedClassI $nested;

@@ -83,7 +83,7 @@ it('will merge overwritten rules on nested data objects', function () {
         'nested' => ['array', 'required'],
         'nested.string' => ['string', 'required', 'min:10', 'max:100'],
         'collection' => ['array', 'present'],
-        'collection.0.string' => ['string', 'required', 'min:10', 'max:100'],
+        'collection.*.string' => ['string', 'required', 'min:10', 'max:100'],
     ]);
 });
 

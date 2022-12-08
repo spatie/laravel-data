@@ -20,8 +20,6 @@ class DataConfig
     /** @var \Spatie\LaravelData\RuleInferrers\RuleInferrer[] */
     protected array $ruleInferrers;
 
-    protected bool $relativeRuleGeneration;
-
     public function __construct(array $config)
     {
         $this->ruleInferrers = array_map(
@@ -36,8 +34,6 @@ class DataConfig
         foreach ($config['casts'] ?? [] as $castable => $cast) {
             $this->casts[ltrim($castable, ' \\')] = app($cast);
         }
-
-        $this->relativeRuleGeneration = $config['relative_rule_generation'] ?? false;
     }
 
     public function getDataClass(string $class): DataClass
@@ -84,10 +80,5 @@ class DataConfig
     public function getRuleInferrers(): array
     {
         return $this->ruleInferrers;
-    }
-
-    public function usesRelativeRuleGeneration(): bool
-    {
-        return $this->relativeRuleGeneration;
     }
 }

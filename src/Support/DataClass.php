@@ -11,6 +11,7 @@ use ReflectionProperty;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Contracts\IncludeableData;
+use Spatie\LaravelData\Contracts\RelativeRuleData;
 use Spatie\LaravelData\Contracts\ResponsableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\ValidateableData;
@@ -38,6 +39,7 @@ class DataClass
         public readonly bool $validateable,
         public readonly bool $wrappable,
         public readonly Collection $attributes,
+        public readonly bool $relativeRuleGeneration,
     ) {
     }
 
@@ -69,6 +71,7 @@ class DataClass
             validateable: $class->implementsInterface(ValidateableData::class),
             wrappable: $class->implementsInterface(WrappableData::class),
             attributes:  $attributes,
+            relativeRuleGeneration: $class->implementsInterface(RelativeRuleData::class),
         );
     }
 
