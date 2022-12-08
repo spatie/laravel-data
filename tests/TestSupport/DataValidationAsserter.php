@@ -86,17 +86,7 @@ class DataValidationAsserter
             ->all();
 
         $rules = collect($rules)
-            ->map(function (array $rules) {
-                if (Arr::has($rules, NestedRulesWithAdditional::class)) {
-                    return [
-                        NestedRulesWithAdditional::class => collect($rules[NestedRulesWithAdditional::class])
-                            ->map(fn (array $rules) => array_values(Arr::sort($rules)))
-                            ->sortKeys()
-                            ->all(),
-                    ];
-                }
-                return array_values(Arr::sort($rules));
-            })
+            ->map(fn (array $rules) => array_values(Arr::sort($rules)))
             ->sortKeys()
             ->all();
 
