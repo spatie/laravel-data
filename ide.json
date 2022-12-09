@@ -19,6 +19,17 @@
                     "methodNames": ["collection"],
                     "classFqn": ["\\Spatie\\LaravelData\\Concerns\\BaseData"],
                     "place": "arrayInArrayKey"
+                },
+                {
+                    "methodNames": ["include", "exclude", "only", "except"],
+                    "classFqn": ["\\Spatie\\LaravelData\\Concerns\\IncludeableData"],
+                    "place": "parameter"
+                },
+                {
+                    "methodNames": ["includeWhen", "excludeWhen", "onlyWhen", "exceptWhen"],
+                    "classFqn": ["\\Spatie\\LaravelData\\Concerns\\IncludeableData"],
+                    "place": "parameter",
+                    "parameters": [1]
                 }
             ]
         }
