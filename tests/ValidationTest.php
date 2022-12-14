@@ -11,6 +11,7 @@ use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Exceptions\CannotBuildRelativeRules;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Validation\NestedRulesWithAdditional;
@@ -430,7 +431,7 @@ it('can use nested payloads in nested data', function () {
                 ],
             ]
         );
-});
+})->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 test('rules in nested data are rewritten according to their fields', function () {
     // Should we do the same with the `rules` method?
@@ -659,7 +660,7 @@ it('can nest data in collections using relative rule generation', function () {
             'collection.0.string' => ['The collection.0.string must be a valid email address.'],
             'collection.2.string' => ['The collection.2.string must be a valid email address.'],
         ]);
-});
+})->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 it('can nest data in classes inside collections using relative rule generation', function () {
     eval(<<<'PHP'
@@ -718,7 +719,7 @@ it('can nest data in classes inside collections using relative rule generation',
             'collection.0.nested.string' => ['The collection.0.nested.string must be a valid email address.'],
             'collection.2.nested.string' => ['The collection.2.nested.string must be a valid email address.'],
         ]);
-});
+})->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 it('can nest data in deep collections using relative rule generation', function () {
     eval(<<<'PHP'
@@ -847,7 +848,7 @@ it('can nest data in deep collections using relative rule generation', function 
             'collection.0.items.0.deepString' => ['The collection.0.items.0.deepString must be a valid email address.'],
             'collection.1.items.0.deepString' => ['The collection.1.items.0.deepString must be a valid email address.'],
         ]);
-});
+})->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 it('can nest data using relative rule generation', function () {
     eval(<<<'PHP'
@@ -887,4 +888,4 @@ it('can nest data using relative rule generation', function () {
             'nested.isEmail' => ['required', 'boolean'],
         ], $payload)
         ->assertErrors($payload);
-});
+})->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);

@@ -6,6 +6,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use RuntimeException;
+use Spatie\LaravelData\Exceptions\CannotBuildRelativeRules;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
@@ -46,6 +48,10 @@ class DataClassValidationRulesResolver
 
         // Make the payload relative to the data class
         if ($class->relativeRuleGeneration && $payloadPath) {
+            if (CannotBuildRelativeRules::shouldThrow()) {
+                throw CannotBuildRelativeRules::create();
+            }
+
             // If the path contains a wildcard use nested rule generation
             if (Str::contains($payloadPath, '*')) {
                 return [

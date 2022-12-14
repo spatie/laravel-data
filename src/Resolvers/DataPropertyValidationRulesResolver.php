@@ -88,7 +88,7 @@ class DataPropertyValidationRulesResolver
         if ($rules->has($payloadPropertyPath)) {
             $resolvedTopLevelRules = $rules->pull($payloadPropertyPath);
 
-            // Add the top level rules to the nest rules class
+            // Add the top level rules to the nested rules class
             if ($resolvedTopLevelRules instanceof NestedRules) {
                 $topLevelRulesNormalised = NestedRulesWithAdditional::fromNestedRules($resolvedTopLevelRules, [$payloadPropertyPath => $topLevelRulesNormalised]);
             }
