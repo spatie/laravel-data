@@ -2,7 +2,7 @@
 
 namespace Spatie\LaravelData\Contracts;
 
-interface RelativeRuleData
+interface RelativeRuleGenerationData
 {
 
 }

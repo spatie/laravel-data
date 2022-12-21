@@ -10,7 +10,7 @@ use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\WithoutValidation;
-use Spatie\LaravelData\Contracts\RelativeRuleData;
+use Spatie\LaravelData\Contracts\RelativeRuleGenerationData;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotBuildRelativeRules;
@@ -373,7 +373,7 @@ it('will use name mapping with nested objects', function () {
 });
 
 it('can use nested payloads in nested data', function () {
-    class NestedClassF extends Data implements RelativeRuleData
+    class NestedClassF extends Data implements RelativeRuleGenerationData
     {
         public bool $strict;
 
@@ -599,7 +599,7 @@ it('can nest data in collections', function () {
 
 it('can nest data in collections using relative rule generation', function () {
 
-    class NestedClassH extends Data implements RelativeRuleData
+    class NestedClassH extends Data implements RelativeRuleGenerationData
     {
         public string $string;
 
@@ -643,7 +643,7 @@ it('can nest data in collections using relative rule generation', function () {
 })->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 it('can nest data in classes inside collections using relative rule generation', function () {
-    class NestedClassJ extends Data implements RelativeRuleData {
+    class NestedClassJ extends Data implements RelativeRuleGenerationData {
         public string $string;
         #[Required]
         public bool $isEmail;
@@ -697,7 +697,7 @@ it('can nest data in classes inside collections using relative rule generation',
 })->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 it('can nest data in deep collections using relative rule generation', function () {
-    class NestedClassL extends Data implements RelativeRuleData {
+    class NestedClassL extends Data implements RelativeRuleGenerationData {
         public string $deepString;
         #[Required]
         public bool $deepIsEmail;
@@ -710,7 +710,7 @@ it('can nest data in deep collections using relative rule generation', function 
         }
     }
 
-    class NestedClassM extends Data implements RelativeRuleData {
+    class NestedClassM extends Data implements RelativeRuleGenerationData {
         public string $string;
         #[Required]
         public bool $isEmail;
@@ -820,7 +820,7 @@ it('can nest data in deep collections using relative rule generation', function 
 it('can nest data using relative rule generation', function () {
     eval(<<<'PHP'
         use Spatie\LaravelData\Data;
-        class NestedClassI extends Data implements \Spatie\LaravelData\Contracts\RelativeRuleData {
+        class NestedClassI extends Data implements \Spatie\LaravelData\Contracts\RelativeRuleGenerationData {
             public string $string;
             #[\Spatie\LaravelData\Attributes\Validation\Required]
             public bool $isEmail;
