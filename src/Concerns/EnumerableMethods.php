@@ -123,6 +123,6 @@ trait EnumerableMethods
      */
     public function sole(callable|string|null $key = null, mixed $operator = null, mixed $value = null)
     {
-        return $this->items->sole($key, $operator, $value);
+        return $this->items->sole(...func_get_args());
     }
 }
