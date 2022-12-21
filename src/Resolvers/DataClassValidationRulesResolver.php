@@ -5,13 +5,13 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Validation\NestedRules;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\RulesMapper;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
-use Illuminate\Validation\NestedRules;
 
 class DataClassValidationRulesResolver
 {
@@ -33,8 +33,8 @@ class DataClassValidationRulesResolver
 
         return $class
             ->properties
-            ->reject(fn(DataProperty $property) => ! $property->validate)
-            ->mapWithKeys(fn(DataProperty $property) => $resolver->execute($property, $payload, $nullable, $payloadPath)->all())
+            ->reject(fn (DataProperty $property) => ! $property->validate)
+            ->mapWithKeys(fn (DataProperty $property) => $resolver->execute($property, $payload, $nullable, $payloadPath)->all())
             ->merge($this->resolveOverwrittenRules($class, $payload, $payloadPath));
     }
 
@@ -54,7 +54,7 @@ class DataClassValidationRulesResolver
         if (Str::contains($payloadPath, '*') && class_exists(NestedRules::class)) {
             return [
                 $payloadPath => Rule::forEach(
-                    fn(mixed $value, string $relativePath) => $value === null
+                    fn (mixed $value, string $relativePath) => $value === null
                         ? []
                         : $this->buildOverwrittenRules($class, $payload, $value, $relativePath, false)
                 ),
@@ -90,15 +90,15 @@ class DataClassValidationRulesResolver
 
         return collect($overwrittenRules)
             ->map(
-                fn(mixed $rules) => collect(Arr::wrap($rules))
-                    ->map(fn(mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
-                    ->map(fn(mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules() : $rule)
+                fn (mixed $rules) => collect(Arr::wrap($rules))
+                    ->map(fn (mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
+                    ->map(fn (mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules() : $rule)
                     ->flatten()
                     ->all()
             )
             ->when(
                 $payloadPath && $prefixWithPayloadPath,
-                fn(Collection $collection) => $collection->keyBy(fn(mixed $rules, string $key) => "{$payloadPath}.{$key}")
+                fn (Collection $collection) => $collection->keyBy(fn (mixed $rules, string $key) => "{$payloadPath}.{$key}")
             )
             ->all();
     }
