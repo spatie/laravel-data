@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
@@ -31,6 +32,7 @@ class DataClass
         public readonly Collection $properties,
         public readonly Collection $methods,
         public readonly ?DataMethod $constructorMethod,
+        public readonly bool $isReadonly,
         public readonly bool $appendable,
         public readonly bool $includeable,
         public readonly bool $responsable,
@@ -43,9 +45,9 @@ class DataClass
 
     public static function create(ReflectionClass $class): self
     {
-        $attributes = collect($class->getAttributes())->map(
-            fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
-        );
+        $attributes = collect($class->getAttributes())
+            ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
+            ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
 
         $methods = collect($class->getMethods());
 
@@ -62,6 +64,7 @@ class DataClass
             properties: $properties,
             methods: self::resolveMethods($class),
             constructorMethod: DataMethod::createConstructor($constructor, $properties),
+            isReadonly: method_exists($class, 'isReadOnly') && $class->isReadOnly(),
             appendable: $class->implementsInterface(AppendableData::class),
             includeable: $class->implementsInterface(IncludeableData::class),
             responsable: $class->implementsInterface(ResponsableData::class),

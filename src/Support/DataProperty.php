@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use ReflectionAttribute;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\WithCast;
@@ -24,6 +25,7 @@ class DataProperty
         public readonly DataType $type,
         public readonly bool $validate,
         public readonly bool $isPromoted,
+        public readonly bool $isReadonly,
         public readonly bool $hasDefaultValue,
         public readonly mixed $defaultValue,
         public readonly ?Cast $cast,
@@ -41,9 +43,9 @@ class DataProperty
         ?NameMapper $classInputNameMapper = null,
         ?NameMapper $classOutputNameMapper = null,
     ): self {
-        $attributes = collect($property->getAttributes())->map(
-            fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance()
-        );
+        $attributes = collect($property->getAttributes())
+            ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
+            ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
 
         $mappers = NameMappersResolver::create()->execute($attributes);
 
@@ -65,6 +67,7 @@ class DataProperty
             type: DataType::create($property),
             validate: ! $attributes->contains(fn (object $attribute) => $attribute instanceof WithoutValidation),
             isPromoted: $property->isPromoted(),
+            isReadonly: $property->isReadOnly(),
             hasDefaultValue: $property->isPromoted() ? $hasDefaultValue : $property->hasDefaultValue(),
             defaultValue: $property->isPromoted() ? $defaultValue : $property->getDefaultValue(),
             cast: $attributes->first(fn (object $attribute) => $attribute instanceof WithCast)?->get(),
