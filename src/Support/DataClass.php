@@ -11,7 +11,6 @@ use ReflectionProperty;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Contracts\IncludeableData;
-use Spatie\LaravelData\Contracts\RelativeRuleGenerationData;
 use Spatie\LaravelData\Contracts\ResponsableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\ValidateableData;

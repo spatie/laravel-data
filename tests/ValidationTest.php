@@ -11,7 +11,6 @@ use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\WithoutValidation;
-use Spatie\LaravelData\Contracts\RelativeRuleGenerationData;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotBuildRelativeRules;
@@ -870,7 +869,7 @@ it('can nest data using relative rule generation', function () {
             'nested.isEmail' => ['required', 'boolean'],
         ], $payload)
         ->assertErrors($payload);
-})->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
+})->throwsIf(fn () => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 it('will merge overwritten rules on inherited data objects', function () {
     $data = new class () extends Data {

@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Validation\NestedRules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\ValidationRuleParser;
+
 use function PHPUnit\Framework\assertTrue;
 
 use Spatie\LaravelData\Data;
@@ -73,7 +74,7 @@ class DataValidationAsserter
                     $result = $parser->explode([$key => $rules]);
 
                     return collect($result->rules)
-                        ->map(fn($rules) => array_values(Arr::sort($rules)))
+                        ->map(fn ($rules) => array_values(Arr::sort($rules)))
                         ->sortKeys()
                         ->all();
                 }
@@ -84,7 +85,7 @@ class DataValidationAsserter
             ->all();
 
         $rules = collect($rules)
-            ->map(fn(array $rules) => array_values(Arr::sort($rules)))
+            ->map(fn (array $rules) => array_values(Arr::sort($rules)))
             ->sortKeys()
             ->all();
 

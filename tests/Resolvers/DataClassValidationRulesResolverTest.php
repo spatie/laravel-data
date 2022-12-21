@@ -15,7 +15,6 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Resolvers\DataClassValidationRulesResolver;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 
 beforeEach(function () {
     $this->resolver = app(DataClassValidationRulesResolver::class);
