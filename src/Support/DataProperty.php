@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use ReflectionAttribute;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\WithCast;

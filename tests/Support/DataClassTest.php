@@ -61,7 +61,7 @@ it('wont throw an error if a non existing attribute is used on a data class', fu
         ->and(NonExistingAttributeData::from(['property' => 'hello'])->property)->toEqual('hello')
         ->and(PhpStormClassAttributeData::from((object)['property' => 'hello'])->property)->toEqual('hello')
         ->and(PhpStormClassAttributeData::from('{"property": "hello"}')->property)->toEqual('hello')
-        ->and(ModelWithPhpStormAttributeData::from((new DummyModel)->fill(['id' => 1]))->id)->toEqual(1);
+        ->and(ModelWithPhpStormAttributeData::from((new DummyModel())->fill(['id' => 1]))->id)->toEqual(1);
 });
 
 #[\JetBrains\PhpStorm\Immutable]

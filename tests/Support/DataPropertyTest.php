@@ -134,8 +134,8 @@ it('wont throw an error if non existing attribute is used on a data class proper
         ->and(PhpStormAttributeData::from(['property' => 'hello'])->property)->toEqual('hello')
         ->and(PhpStormAttributeData::from('{"property": "hello"}')->property)->toEqual('hello')
         ->and(PhpStormAttributeData::from((object) ['property' => 'hello'])->property)->toEqual('hello')
-        ->and(ModelWithPhpStormAttributePropertyData::from((new DummyModel)->fill(['id' => 1]))->id)->toEqual(1)
-        ->and(ModelWithPromotedPhpStormAttributePropertyData::from((new DummyModel)->fill(['id' => 1]))->id)->toEqual(1);
+        ->and(ModelWithPhpStormAttributePropertyData::from((new DummyModel())->fill(['id' => 1]))->id)->toEqual(1)
+        ->and(ModelWithPromotedPhpStormAttributePropertyData::from((new DummyModel())->fill(['id' => 1]))->id)->toEqual(1);
 });
 
 class NonExistingPropertyAttributeData extends Data
@@ -164,7 +164,8 @@ class PromotedPhpStormAttributeData extends Data
 {
     public function __construct(
         #[\JetBrains\PhpStorm\Immutable]
-        public readonly string $property)
+        public readonly string $property
+    )
     {
         //
     }
