@@ -3,12 +3,11 @@
 namespace Spatie\LaravelData\Tests\TestSupport;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Validation\NestedRules;
 use Illuminate\Validation\ValidationException;
 
 use Illuminate\Validation\ValidationRuleParser;
-use Spatie\LaravelData\Support\Validation\NestedRulesWithAdditional;
+
 use function PHPUnit\Framework\assertTrue;
 
 use Spatie\LaravelData\Data;
@@ -80,6 +79,7 @@ class DataValidationAsserter
                         ->sortKeys()
                         ->all();
                 }
+
                 return [$key => array_values(Arr::sort($rules))];
             })
             ->sortKeys()

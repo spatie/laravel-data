@@ -16,7 +16,6 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotBuildRelativeRules;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
-use Spatie\LaravelData\Support\Validation\NestedRulesWithAdditional;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
@@ -283,7 +282,8 @@ it('can write custom rules based upon payloads', function () {
 });
 
 it('can validate nested data', function () {
-    class NestedClassA extends Data {
+    class NestedClassA extends Data
+    {
         public string $name;
     }
 
@@ -302,7 +302,8 @@ it('can validate nested data', function () {
 });
 
 it('can validate nested nullable data', function () {
-    class NestedClassB extends Data {
+    class NestedClassB extends Data
+    {
         public string $name;
     }
 
@@ -322,7 +323,8 @@ it('can validate nested nullable data', function () {
 });
 
 it('can validate nested optional data', function () {
-    class NestedClassC extends Data {
+    class NestedClassC extends Data
+    {
         public string $name;
     }
 
@@ -342,7 +344,8 @@ it('can validate nested optional data', function () {
 })->skip('Failures');
 
 it('can add additional rules to nested data', function () {
-    class NestedClassD extends Data {
+    class NestedClassD extends Data
+    {
         public string $name;
     }
 
@@ -379,10 +382,12 @@ it('can use nested payloads in nested data', function () {
 
         public string $name;
 
-        public static function rules(array $payload, ?string $path): array {
-            if($payload['strict'] ?? false) {
+        public static function rules(array $payload, ?string $path): array
+        {
+            if ($payload['strict'] ?? false) {
                 return ['name' => ['in:strict']];
             }
+
             return [];
         }
     }
@@ -416,7 +421,7 @@ it('can use nested payloads in nested data', function () {
                 ],
             ]
         );
-})->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
+})->throwsIf(fn () => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 test('rules in nested data are rewritten according to their fields', function () {
     // Should we do the same with the `rules` method?
@@ -575,11 +580,13 @@ it('can add collection class rules using attributes', function () {
  */
 
 it('can nest data in collections', function () {
-    class NestedClassE extends Data {
+    class NestedClassE extends Data
+    {
         public string $string;
     }
 
-    class CollectionClassA extends Data {
+    class CollectionClassA extends Data
+    {
         public NestedClassE $nested;
     }
 
@@ -598,7 +605,6 @@ it('can nest data in collections', function () {
 });
 
 it('can nest data in collections using relative rule generation', function () {
-
     class NestedClassH extends Data implements RelativeRuleGenerationData
     {
         public string $string;
@@ -640,10 +646,11 @@ it('can nest data in collections using relative rule generation', function () {
             'collection.0.string' => ['The collection.0.string must be a valid email address.'],
             'collection.2.string' => ['The collection.2.string must be a valid email address.'],
         ]);
-})->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
+})->throwsIf(fn () => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 it('can nest data in classes inside collections using relative rule generation', function () {
-    class NestedClassJ extends Data implements RelativeRuleGenerationData {
+    class NestedClassJ extends Data implements RelativeRuleGenerationData
+    {
         public string $string;
         #[Required]
         public bool $isEmail;
@@ -656,7 +663,8 @@ it('can nest data in classes inside collections using relative rule generation',
         }
     }
 
-    class CollectionClassK extends Data {
+    class CollectionClassK extends Data
+    {
         public NestedClassJ $nested;
     }
 
@@ -694,10 +702,11 @@ it('can nest data in classes inside collections using relative rule generation',
             'collection.0.nested.string' => ['The collection.0.nested.string must be a valid email address.'],
             'collection.2.nested.string' => ['The collection.2.nested.string must be a valid email address.'],
         ]);
-})->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
+})->throwsIf(fn () => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 it('can nest data in deep collections using relative rule generation', function () {
-    class NestedClassL extends Data implements RelativeRuleGenerationData {
+    class NestedClassL extends Data implements RelativeRuleGenerationData
+    {
         public string $deepString;
         #[Required]
         public bool $deepIsEmail;
@@ -710,7 +719,8 @@ it('can nest data in deep collections using relative rule generation', function 
         }
     }
 
-    class NestedClassM extends Data implements RelativeRuleGenerationData {
+    class NestedClassM extends Data implements RelativeRuleGenerationData
+    {
         public string $string;
         #[Required]
         public bool $isEmail;
@@ -718,7 +728,7 @@ it('can nest data in deep collections using relative rule generation', function 
         #[DataCollectionOf(NestedClassL::class), Required]
         public DataCollection $items;
 
-        public static function rules(array $payload , ?string $path): array
+        public static function rules(array $payload, ?string $path): array
         {
             return $payload['isEmail'] ?? false
                 ? ['string' => ['required', 'string', 'email']]
@@ -815,7 +825,7 @@ it('can nest data in deep collections using relative rule generation', function 
             'collection.0.items.0.deepString' => ['The collection.0.items.0.deepString must be a valid email address.'],
             'collection.1.items.0.deepString' => ['The collection.1.items.0.deepString must be a valid email address.'],
         ]);
-})->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
+})->throwsIf(fn () => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 it('can nest data using relative rule generation', function () {
     eval(<<<'PHP'
@@ -855,4 +865,4 @@ it('can nest data using relative rule generation', function () {
             'nested.isEmail' => ['required', 'boolean'],
         ], $payload)
         ->assertErrors($payload);
-})->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
+})->throwsIf(fn () => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);

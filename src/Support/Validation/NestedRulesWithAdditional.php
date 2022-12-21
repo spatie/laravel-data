@@ -31,8 +31,9 @@ class NestedRulesWithAdditional extends NestedRules
         $result = parent::compile($attribute, $value, $data);
         $result->rules = [
             ...$result->rules,
-            ...$this->additionalRules
+            ...$this->additionalRules,
         ];
+
         return $result;
     }
 }
