@@ -165,8 +165,7 @@ class PromotedPhpStormAttributeData extends Data
     public function __construct(
         #[\JetBrains\PhpStorm\Immutable]
         public readonly string $property
-    )
-    {
+    ) {
         //
     }
 }
