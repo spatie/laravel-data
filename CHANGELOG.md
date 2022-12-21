@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.2.0 - 2022-12-21
+
+- Add generic return type for DataCollection::toCollection (#290)
+- Improve ide.json completion (#294)
+- Pass in payload relative to the data object when generating rules (#264)
+- ignore phpstorm attributes when instantiating and add readonly property (#281)
+
 ## 2.1.0 - 2022-12-07
 
 - Stop using custom pipeline when creating data magically from requests
