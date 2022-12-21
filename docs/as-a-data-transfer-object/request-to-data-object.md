@@ -233,7 +233,7 @@ The rules will be:
 
 Make sure the name of the parameter is `$relativePayload` in the `rules` method, otherwise no payload will be injected.
 
-As you can see we're using the `NestedRules` rule recently introduced with Laravel. This feature will not work if you're not using Laravel 9!
+As you can see we're using the `NestedRules` [rule](https://laravel.com/docs/9.x/validation#accessing-nested-array-data) recently introduced with Laravel. This feature will not work if you're not using Laravel 9!
 
 ## Mapping a request onto a data object
 
