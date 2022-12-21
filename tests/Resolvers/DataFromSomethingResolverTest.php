@@ -261,7 +261,7 @@ it('will validate a request when given as a parameter to a custom creation metho
         'string' => 'Rick Astley',
     ])->assertJson([
         'string' => 'Rick Astley',
-    ])->assertOk();
+    ])->assertCreated();
 });
 
 it('can resolve payload dependency for rules', function () {

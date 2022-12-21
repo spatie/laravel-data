@@ -307,7 +307,7 @@ it('can wrap data', function () {
     });
 
     performRequest('Hello World')
-        ->assertOk()
+        ->assertCreated()
         ->assertJson(['data' => ['string' => 'Hello World']]);
 });
 
@@ -320,7 +320,7 @@ it('can wrap data collections', function () {
     });
 
     performRequest('Hello World')
-        ->assertOk()
+        ->assertCreated()
         ->assertJson([
             'data' => [
                 ['string' => 'Hello World'],
