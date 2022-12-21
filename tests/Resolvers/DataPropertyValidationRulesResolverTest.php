@@ -20,13 +20,13 @@ use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
-function resolveRules(object $class): array
+function resolveRules(object $class, array $payload = []): array
 {
     $reflectionProperty = new ReflectionProperty($class, 'property');
 
     $property = DataProperty::create($reflectionProperty);
 
-    return app(DataPropertyValidationRulesResolver::class)->execute($property)->toArray();
+    return app(DataPropertyValidationRulesResolver::class)->execute($property, $payload)->toArray();
 }
 
 it('will add a required or nullable rule based upon the property nullability', function () {

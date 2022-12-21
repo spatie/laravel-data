@@ -3,7 +3,9 @@
 namespace Spatie\LaravelData\Tests\TestSupport;
 
 use Illuminate\Support\Arr;
+use Illuminate\Validation\NestedRules;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\ValidationRuleParser;
 
 use function PHPUnit\Framework\assertTrue;
 
@@ -40,12 +42,17 @@ class DataValidationAsserter
     }
 
     public function assertErrors(
-        array $payload
+        array $payload,
+        ?array $errors = null
     ): self {
         try {
             $this->dataClass::validate($payload);
         } catch (ValidationException $exception) {
             expect(true)->toBeTrue();
+
+            if ($errors) {
+                expect($exception->errors())->toBe($errors);
+            }
 
             return $this;
         }
@@ -60,7 +67,20 @@ class DataValidationAsserter
         array $payload = []
     ): self {
         $inferredRules = collect($this->dataClass::getValidationRules(payload: $payload))
-            ->map(fn (array $rules) => array_values(Arr::sort($rules)))
+            ->mapWithKeys(function (array|NestedRules $rules, string $key) use ($payload) {
+                if ($rules instanceof NestedRules) {
+                    $parser = new ValidationRuleParser($payload);
+
+                    $result = $parser->explode([$key => $rules]);
+
+                    return collect($result->rules)
+                        ->map(fn ($rules) => array_values(Arr::sort($rules)))
+                        ->sortKeys()
+                        ->all();
+                }
+
+                return [$key => array_values(Arr::sort($rules))];
+            })
             ->sortKeys()
             ->all();
 

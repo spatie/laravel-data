@@ -459,3 +459,21 @@ it(
             ->toEqual($expected);
     }
 )->with('collection-operations');
+
+it('can return a sole data object', function () {
+    $collection = SimpleData::collection(['A', 'B']);
+
+    $filtered = $collection->sole('string', '=', 'A');
+
+    expect('A')
+        ->toEqual($filtered->string);
+});
+
+it('can return a sole data object without specifying an operator', function () {
+    $collection = SimpleData::collection(['A', 'B']);
+
+    $filtered = $collection->sole('string', 'A');
+
+    expect('A')
+        ->toEqual($filtered->string);
+});

@@ -15,7 +15,6 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Resolvers\DataClassValidationRulesResolver;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 
 beforeEach(function () {
     $this->resolver = app(DataClassValidationRulesResolver::class);
@@ -69,26 +68,8 @@ it('will merge overwritten rules on the data object', function () {
     ]);
 });
 
-it('will merge overwritten rules on nested data objects', function () {
-    $data = new class () extends Data {
-        public SimpleDataWithOverwrittenRules $nested;
-
-        /** @var DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules> */
-        public DataCollection $collection;
-    };
-
-    expect(
-        $this->resolver->execute($data::class)->all()
-    )->toEqualCanonicalizing([
-        'nested' => ['array', 'required'],
-        'nested.string' => ['string', 'required', 'min:10', 'max:100'],
-        'collection' => ['array', 'present'],
-        'collection.*.string' => ['string', 'required', 'min:10', 'max:100'],
-    ]);
-});
-
 it(
-    'can overwrite fules for the base collection object which will not affect the collected data object rules',
+    'can overwrite rules for the base collection object which will not affect the collected data object rules',
     function () {
         $dataClass = new class () extends Data {
             #[DataCollectionOf(SimpleData::class)]

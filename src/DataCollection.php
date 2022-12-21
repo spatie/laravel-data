@@ -68,6 +68,9 @@ class DataCollection implements DataCollectable, ArrayAccess
         return $this->items->all();
     }
 
+    /**
+     * @return Enumerable<TKey, TValue>
+     */
     public function toCollection(): Enumerable
     {
         return $this->items;
