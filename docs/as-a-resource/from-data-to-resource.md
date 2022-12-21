@@ -405,3 +405,7 @@ Now each transformed data object contains an `endpoints` key with all the endpoi
     }
 }
 ```
+ ## Response status code
+
+When a resource is being returned from a controller, the status code of the response will automatically be set to `201 CREATED` when Laravel data detectes that the request's method is `POST`.  In all other cases, `200 OK` will be returned.
+

@@ -67,4 +67,5 @@ return [
      * which will only enable the caster locally.
      */
     'var_dumper_caster_mode' => 'development',
+
 ];
