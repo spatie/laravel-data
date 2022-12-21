@@ -8,7 +8,6 @@ use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
-use Illuminate\Support\Facades\Config;
 
 use function Pest\Laravel\handleExceptions;
 use function Pest\Laravel\postJson;
@@ -21,7 +20,6 @@ use Spatie\LaravelData\Tests\Factories\DataMagicMethodFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use function PHPUnit\Framework\assertEquals;
 
 function performRequest(string $string): TestResponse
 {
@@ -50,7 +48,7 @@ it('can pass validation', function () {
         ->assertJson(['given' => 'Hello']);
 });
 
-it('can returns a 201 response code for POST requests', function() {
+it('can returns a 201 response code for POST requests', function () {
     Route::post('/example-route', function () {
         return new SimpleData(request()->input('string'));
     });
@@ -58,7 +56,6 @@ it('can returns a 201 response code for POST requests', function() {
     performRequest('Hello')
         ->assertCreated()
         ->assertJson(['string' => 'Hello']);
-
 });
 
 it('can fail validation', function () {

@@ -32,7 +32,8 @@ trait ResponsableData
         );
     }
 
-    protected function calculateResponseStatus(Request $request): int {
+    protected function calculateResponseStatus(Request $request): int
+    {
         return $request->isMethod(Request::METHOD_POST) ? Response::HTTP_CREATED : Response::HTTP_OK;
     }
 
@@ -55,6 +56,4 @@ trait ResponsableData
     {
         return [];
     }
-
-
 }
