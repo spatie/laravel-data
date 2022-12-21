@@ -405,14 +405,7 @@ Now each transformed data object contains an `endpoints` key with all the endpoi
     }
 }
 ```
- ## Modifying the JSON Response status code
+ ## Response status code
 
-By default, Laravel Data will return a `200 OK` status code.
-When refactoring an existing implementation using Eloquent's API resources, you may however be used to your controllers returning a `201 CREATED` status code when you created a new model.
+When a resource is being returned from a controller, the status code of the response will automatically be set to `201 CREATED` when Laravel data detectes that the request's method is `POST`.  In all other cases, `200 OK` will be returned.
 
-Laravel determines whether it needs to return a `201 CREATED` in stead of the `200 OK` response code based on the Model's method `wasRecentlyCreated`.  Since Data objects do not have access to the model it was created for, we can not perform the same check in Laravel Data.
-However, you can instruct Laravel Data to always create a JSON Reponse with status code `201 CREATED` when it detects that the request's method is `POST` using the following setting in your `data.pho` config file:
-
-```php
-    'json_response_201_on_post_requests' => false
-```

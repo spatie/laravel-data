@@ -33,8 +33,7 @@ trait ResponsableData
     }
 
     protected function calculateResponseStatus(Request $request): int {
-        return $request->isMethod('POST') &&
-               config('data.json_response_201_on_post_requests') ? Response::HTTP_CREATED : Response::HTTP_OK;
+        return $request->isMethod(Request::METHOD_POST) ? Response::HTTP_CREATED : Response::HTTP_OK;
     }
 
     public static function allowedRequestIncludes(): ?array

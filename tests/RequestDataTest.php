@@ -50,22 +50,15 @@ it('can pass validation', function () {
         ->assertJson(['given' => 'Hello']);
 });
 
-it('can return 201 response on a post request when globally enabled', function() {
+it('can returns a 201 response code for POST requests', function() {
     Route::post('/example-route', function () {
         return new SimpleData(request()->input('string'));
     });
-
-    Config::set('data.json_response_201_on_post_requests', true);
 
     performRequest('Hello')
         ->assertCreated()
         ->assertJson(['string' => 'Hello']);
 
-    Config::set('data.json_response_201_on_post_requests', false);
-
-    performRequest('Hello')
-        ->assertOk()
-        ->assertJson(['string' => 'Hello']);
 });
 
 it('can fail validation', function () {
