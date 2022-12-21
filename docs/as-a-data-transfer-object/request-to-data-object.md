@@ -170,11 +170,70 @@ class SongData extends Data
     {
         return [
             'title' => ['required'],
-            'artist' => Rule::requiredIf($payload['title'] !== 'Rick Astley'),
+            'artist' => Rule::requiredIf($payload['title'] !== 'Never Gonna Give You Up'),
         ];
     }
 }
 ```
+
+By default, the provided payload is the whole request payload provided to the data object. If you want to generate rules in nested data objects then a relative payload can be more useful. You can inject such payload as follows:
+
+```php
+class AlbumData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[DataCollectionOf(SongData::class)]
+        public DataCollection $songs,
+    ) {
+    }
+}
+
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        public ?string $artist,
+    ) {
+    }
+    
+    public static function rules(array $relativePayload): array
+    {
+        return [
+            'title' => ['required'],
+            'artist' => Rule::requiredIf($relativePayload['title'] !== 'Never Gonna Give You Up'),
+        ];
+    }
+}
+```
+
+When providing such payload:
+
+```php
+[
+    'title' => 'Best songs ever made',
+    'songs' => [
+        ['title' => 'Never Gonna Give You Up'],
+        ['title' => 'Heroes', 'artist' => 'David Bowie'],
+    ],
+];
+```
+
+The rules will be:
+
+```php
+[
+    'title' => ['string', 'required'],
+    'songs' => ['present', 'array'],
+    'songs.*.title' => ['string', 'required'],
+    'songs.*.artist' => ['string', 'nullable'],
+    'songs.*' => [NestedRules(...)],
+]
+```
+
+Make sure the name of the parameter is `$relativePayload` in the `rules` method, otherwise no payload will be injected.
+
+As you can see we're using the `NestedRules` rule recently introduced with Laravel. This feature will not work if you're not using Laravel 9!
 
 ## Mapping a request onto a data object
 

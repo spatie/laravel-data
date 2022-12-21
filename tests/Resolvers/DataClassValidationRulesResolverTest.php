@@ -69,24 +69,6 @@ it('will merge overwritten rules on the data object', function () {
     ]);
 });
 
-it('will merge overwritten rules on nested data objects', function () {
-    $data = new class () extends Data {
-        public SimpleDataWithOverwrittenRules $nested;
-
-        /** @var DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules> */
-        public DataCollection $collection;
-    };
-
-    expect(
-        $this->resolver->execute($data::class)->all()
-    )->toEqualCanonicalizing([
-        'nested' => ['array', 'required'],
-        'nested.string' => ['string', 'required', 'min:10', 'max:100'],
-        'collection' => ['array', 'present'],
-        'collection.*.string' => ['string', 'required', 'min:10', 'max:100'],
-    ]);
-});
-
 it(
     'can overwrite rules for the base collection object which will not affect the collected data object rules',
     function () {

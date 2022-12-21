@@ -39,7 +39,6 @@ class DataClass
         public readonly bool $validateable,
         public readonly bool $wrappable,
         public readonly Collection $attributes,
-        public readonly bool $relativeRuleGeneration,
     ) {
     }
 
@@ -71,7 +70,6 @@ class DataClass
             validateable: $class->implementsInterface(ValidateableData::class),
             wrappable: $class->implementsInterface(WrappableData::class),
             attributes:  $attributes,
-            relativeRuleGeneration: $class->implementsInterface(RelativeRuleGenerationData::class),
         );
     }
 

@@ -48,8 +48,8 @@ class DataClassValidationRulesResolver
             return [];
         }
 
-        if ($class->relativeRuleGeneration === false || $payloadPath === null) {
-            return $this->buildOverwrittenRules($class, $payload, $payloadPath, true);
+        if ($payloadPath === null) {
+            return $this->buildOverwrittenRules($class, $payload, null, $payloadPath, true);
         }
 
         if (CannotBuildRelativeRules::shouldThrow()) {
@@ -60,13 +60,14 @@ class DataClassValidationRulesResolver
             return [
                 $payloadPath => Rule::forEach(fn(mixed $value, string $relativePath) => $value === null
                     ? []
-                    : $this->buildOverwrittenRules($class, $value, $relativePath, false)
+                    : $this->buildOverwrittenRules($class, $payload, $value, $relativePath, false)
                 ),
             ];
         }
 
         return $this->buildOverwrittenRules(
             $class,
+            $payload,
             Arr::get($payload, $payloadPath) ?? [],
             $payloadPath,
             true,
@@ -76,13 +77,20 @@ class DataClassValidationRulesResolver
     private function buildOverwrittenRules(
         DataClass $class,
         mixed $payload,
+        mixed $relativePayload,
         ?string $payloadPath,
         bool $prefixWithPayloadPath,
     ): array {
-        $overwrittenRules = app()->call([$class->name, 'rules'], [
+        $parameters = [
             'payload' => $payload,
             'path' => $payloadPath,
-        ]);
+        ];
+
+        if ($relativePayload !== null) {
+            $parameters['relativePayload'] = $relativePayload;
+        }
+
+        $overwrittenRules = app()->call([$class->name, 'rules'], $parameters);
 
         return collect($overwrittenRules)
             ->map(

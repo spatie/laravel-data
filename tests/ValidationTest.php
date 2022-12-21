@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Tests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
@@ -20,6 +21,7 @@ use Spatie\LaravelData\Support\Validation\NestedRulesWithAdditional;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
 
 it('can validate a string', function () {
@@ -283,7 +285,8 @@ it('can write custom rules based upon payloads', function () {
 });
 
 it('can validate nested data', function () {
-    class NestedClassA extends Data {
+    class NestedClassA extends Data
+    {
         public string $name;
     }
 
@@ -302,7 +305,8 @@ it('can validate nested data', function () {
 });
 
 it('can validate nested nullable data', function () {
-    class NestedClassB extends Data {
+    class NestedClassB extends Data
+    {
         public string $name;
     }
 
@@ -322,7 +326,8 @@ it('can validate nested nullable data', function () {
 });
 
 it('can validate nested optional data', function () {
-    class NestedClassC extends Data {
+    class NestedClassC extends Data
+    {
         public string $name;
     }
 
@@ -342,7 +347,8 @@ it('can validate nested optional data', function () {
 })->skip('Failures');
 
 it('can add additional rules to nested data', function () {
-    class NestedClassD extends Data {
+    class NestedClassD extends Data
+    {
         public string $name;
     }
 
@@ -373,16 +379,18 @@ it('will use name mapping with nested objects', function () {
 });
 
 it('can use nested payloads in nested data', function () {
-    class NestedClassF extends Data implements RelativeRuleGenerationData
+    class NestedClassF extends Data
     {
         public bool $strict;
 
         public string $name;
 
-        public static function rules(array $payload, ?string $path): array {
-            if($payload['strict'] ?? false) {
+        public static function rules(array $relativePayload, ?string $path): array
+        {
+            if ($relativePayload['strict'] ?? false) {
                 return ['name' => ['in:strict']];
             }
+
             return [];
         }
     }
@@ -575,11 +583,13 @@ it('can add collection class rules using attributes', function () {
  */
 
 it('can nest data in collections', function () {
-    class NestedClassE extends Data {
+    class NestedClassE extends Data
+    {
         public string $string;
     }
 
-    class CollectionClassA extends Data {
+    class CollectionClassA extends Data
+    {
         public NestedClassE $nested;
     }
 
@@ -599,16 +609,16 @@ it('can nest data in collections', function () {
 
 it('can nest data in collections using relative rule generation', function () {
 
-    class NestedClassH extends Data implements RelativeRuleGenerationData
+    class NestedClassH extends Data
     {
         public string $string;
 
         #[Required]
         public bool $isEmail;
 
-        public static function rules(array $payload, ?string $path): array
+        public static function rules(array $relativePayload, ?string $path): array
         {
-            if ($payload['isEmail'] ?? false) {
+            if ($relativePayload['isEmail'] ?? false) {
                 return [
                     'string' => ['required', 'string', 'email'],
                 ];
@@ -643,20 +653,23 @@ it('can nest data in collections using relative rule generation', function () {
 })->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 it('can nest data in classes inside collections using relative rule generation', function () {
-    class NestedClassJ extends Data implements RelativeRuleGenerationData {
+    class NestedClassJ extends Data
+    {
         public string $string;
+
         #[Required]
         public bool $isEmail;
 
-        public static function rules(array $payload, ?string $path): array
+        public static function rules(array $relativePayload, ?string $path): array
         {
-            return $payload['isEmail'] ?? false
+            return $relativePayload['isEmail'] ?? false
                 ? ['string' => ['required', 'string', 'email']]
                 : [];
         }
     }
 
-    class CollectionClassK extends Data {
+    class CollectionClassK extends Data
+    {
         public NestedClassJ $nested;
     }
 
@@ -697,30 +710,34 @@ it('can nest data in classes inside collections using relative rule generation',
 })->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 it('can nest data in deep collections using relative rule generation', function () {
-    class NestedClassL extends Data implements RelativeRuleGenerationData {
+    class NestedClassL extends Data
+    {
         public string $deepString;
+
         #[Required]
         public bool $deepIsEmail;
 
-        public static function rules(array $payload, ?string $path): array
+        public static function rules(array $relativePayload, ?string $path): array
         {
-            return $payload['deepIsEmail'] ?? false
+            return $relativePayload['deepIsEmail'] ?? false
                 ? ['deepString' => ['required', 'string', 'email']]
                 : [];
         }
     }
 
-    class NestedClassM extends Data implements RelativeRuleGenerationData {
+    class NestedClassM extends Data
+    {
         public string $string;
+
         #[Required]
         public bool $isEmail;
 
         #[DataCollectionOf(NestedClassL::class), Required]
         public DataCollection $items;
 
-        public static function rules(array $payload , ?string $path): array
+        public static function rules(array $relativePayload, ?string $path): array
         {
-            return $payload['isEmail'] ?? false
+            return $relativePayload['isEmail'] ?? false
                 ? ['string' => ['required', 'string', 'email']]
                 : [];
         }
@@ -818,27 +835,27 @@ it('can nest data in deep collections using relative rule generation', function 
 })->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
 
 it('can nest data using relative rule generation', function () {
-    eval(<<<'PHP'
-        use Spatie\LaravelData\Data;
-        class NestedClassI extends Data implements \Spatie\LaravelData\Contracts\RelativeRuleGenerationData {
-            public string $string;
-            #[\Spatie\LaravelData\Attributes\Validation\Required]
-            public bool $isEmail;
+    class NestedClassI extends Data
+    {
+        public string $string;
 
-            public static function rules(array $payload, ?string $path): array
-            {
-                if ($payload['isEmail'] ?? false) {
-                    return [
-                        'string' => ['required', 'string', 'email'],
-                    ];
-                }
-                return [];
+        #[Required]
+        public bool $isEmail;
+
+        public static function rules(array $relativePayload, ?string $path): array
+        {
+            if ($relativePayload['isEmail'] ?? false) {
+                return [
+                    'string' => ['required', 'string', 'email'],
+                ];
             }
+
+            return [];
         }
-    PHP);
+    }
 
     $dataClass = new class () extends Data {
-        public \NestedClassI $nested;
+        public NestedClassI $nested;
     };
 
     $payload = [
@@ -856,3 +873,27 @@ it('can nest data using relative rule generation', function () {
         ], $payload)
         ->assertErrors($payload);
 })->throwsIf(fn() => CannotBuildRelativeRules::shouldThrow(), CannotBuildRelativeRules::class);
+
+it('will merge overwritten rules on inherited data objects', function () {
+    $data = new class () extends Data {
+        public SimpleDataWithOverwrittenRules $nested;
+
+        /** @var DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules> */
+        public DataCollection $collection;
+    };
+
+    $payload = [
+        'nested' => ['string' => 'test'],
+        'collection' => [
+            ['string' => 'test'],
+        ],
+    ];
+
+    DataValidationAsserter::for($data)->assertRules([
+        'nested' => ['array', 'required'],
+        'nested.string' => ['string', 'required', 'min:10', 'max:100'],
+        'collection' => ['array', 'present'],
+        'collection.*.string' => ['string', 'required'],
+        'collection.0.string' => ['string', 'required', 'min:10', 'max:100'],
+    ], $payload)->assertErrors($payload);
+});
