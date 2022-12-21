@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.2.1 - 2022-12-21
+
+- fix support to return 201 status code in Json Responses (#291)
+
 ## 2.2.0 - 2022-12-21
 
 - Add generic return type for DataCollection::toCollection (#290)
