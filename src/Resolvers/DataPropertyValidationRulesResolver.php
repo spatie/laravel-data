@@ -23,16 +23,27 @@ class DataPropertyValidationRulesResolver
     ) {
     }
 
-    public function execute(DataProperty $property, array $payload = [], bool $nullable = false, ?string $payloadPath = null): Collection
-    {
+    public function execute(
+        DataProperty $property,
+        array $payload = [],
+        bool $nullable = false,
+        ?string $payloadPath = null
+    ): Collection {
         $propertyName = $property->inputMappedName ?? $property->name;
 
         if ($property->type->isDataObject || $property->type->isDataCollectable) {
-            return $this->getNestedRules($property, $propertyName, $payload, $nullable, $payloadPath);
+            return $this->getNestedRules(
+                property: $property,
+                propertyName: $propertyName,
+                payload: $payload,
+                nullable: $nullable,
+                payloadPath: $payloadPath
+            );
         }
 
-        $rulePath = $payloadPath ? "{$payloadPath}.{$propertyName}" : $propertyName;
-        return collect([$rulePath => $this->getRulesForProperty($property, $nullable)]);
+        return collect([
+            $this->resolveRulePath($payloadPath, $propertyName) => $this->getRulesForProperty($property, $nullable),
+        ]);
     }
 
     protected function getNestedRules(
@@ -42,9 +53,47 @@ class DataPropertyValidationRulesResolver
         bool $nullable,
         ?string $payloadPath = null
     ): Collection {
-        $isNullable = $nullable || $property->type->isNullable;
-        $isOptional = $property->type->isOptional;
+        $toplevelRules = $this->resolveDataClassOrCollectionTopLevelRules(
+            isNullable: $nullable || $property->type->isNullable,
+            isOptional: $property->type->isOptional,
+            property: $property
+        );
 
+        $rulePath = $this->resolveRulePath($payloadPath, $propertyName);
+
+        $nestedPayloadPath = match (true) {
+            $property->type->isDataObject => $rulePath,
+            $property->type->isDataCollectable => "{$rulePath}.*",
+            default => throw new TypeError(),
+        };
+
+        $nestedRules = $this->dataValidationRulesResolver->execute(
+            $property->type->dataClass,
+            $payload,
+            $this->isNestedDataNullable($nullable, $property),
+            $nestedPayloadPath,
+        );
+
+        $topLevelRuleResolvedInNestedRule = $nestedRules->pull($rulePath);
+
+        if ($topLevelRuleResolvedInNestedRule instanceof NestedRules) {
+            return $nestedRules->prepend(
+                NestedRulesWithAdditional::fromNestedRules(
+                    $topLevelRuleResolvedInNestedRule,
+                    [$rulePath => $toplevelRules]
+                ),
+                $rulePath
+            );
+        }
+
+        return $nestedRules->prepend($toplevelRules, $rulePath);
+    }
+
+    private function resolveDataClassOrCollectionTopLevelRules(
+        bool $isNullable,
+        bool $isOptional,
+        DataProperty $property
+    ): array {
         $toplevelRules = RulesCollection::create();
 
         if ($isNullable) {
@@ -69,32 +118,7 @@ class DataPropertyValidationRulesResolver
             $inferrer->handle($property, $toplevelRules);
         }
 
-        $payloadPropertyPath = $payloadPath ? "{$payloadPath}.{$propertyName}" : $propertyName;
-        $prefix = match (true) {
-            $property->type->isDataObject => $payloadPropertyPath,
-            $property->type->isDataCollectable => "{$payloadPropertyPath}.*",
-            default => throw new TypeError(),
-        };
-
-        $rules = $this->dataValidationRulesResolver
-            ->execute(
-                $property->type->dataClass,
-                $payload,
-                $this->isNestedDataNullable($nullable, $property),
-                $prefix,
-            );
-
-        $topLevelRulesNormalised = $toplevelRules->normalize();
-        if ($rules->has($payloadPropertyPath)) {
-            $resolvedTopLevelRules = $rules->pull($payloadPropertyPath);
-
-            // Add the top level rules to the nested rules class
-            if ($resolvedTopLevelRules instanceof NestedRules) {
-                $topLevelRulesNormalised = NestedRulesWithAdditional::fromNestedRules($resolvedTopLevelRules, [$payloadPropertyPath => $topLevelRulesNormalised]);
-            }
-        }
-
-        return $rules->prepend($topLevelRulesNormalised, $payloadPropertyPath);
+        return $toplevelRules->normalize();
     }
 
     protected function getRulesForProperty(DataProperty $property, bool $nullable): array
@@ -123,5 +147,10 @@ class DataPropertyValidationRulesResolver
         }
 
         return false;
+    }
+
+    private function resolveRulePath(?string $payloadPath, string $propertyName): string
+    {
+        return $payloadPath ? "{$payloadPath}.{$propertyName}" : $propertyName;
     }
 }
