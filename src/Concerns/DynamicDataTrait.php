@@ -36,6 +36,7 @@ trait DynamicDataTrait
         // Create the appropriate concrete data object from the properties
         /* @var class-string<DynamicData::class> $dataClass */
         $dataClass = static::dynamicClassName(Arr::only($properties, static::requiredPropertiesForResolving()));
+
         return $dataClass::from(...$payloads);
     }
 

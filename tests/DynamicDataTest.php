@@ -43,7 +43,7 @@ class Vehicle extends Data
             $properties['type'] = VehicleType::tryFrom($properties['type']);
         }
 
-        return match($properties['type']) {
+        return match ($properties['type']) {
             VehicleType::CAR => Car::class,
             VehicleType::HORSE => Horse::class,
             default => static::class,
@@ -82,7 +82,6 @@ class TransportCompany extends Data
 }
 
 it('can handle multiple classes in one data collection', function () {
-
     $transport = TransportCompany::from([
         'vehicles' => [
             [
@@ -101,11 +100,9 @@ it('can handle multiple classes in one data collection', function () {
 
     expect($transport->vehicles[0])->toBeInstanceOf(Horse::class);
     expect($transport->vehicles[1])->toBeInstanceOf(Car::class);
-
 });
 
 it('can validate', function () {
-
     DataValidationAsserter::for(TransportCompany::class)
         ->assertRules([
             'vehicles' => [
@@ -191,5 +188,4 @@ it('can validate', function () {
                 'The vehicles.1.passengers field is required.',
             ],
         ]);
-
 });
