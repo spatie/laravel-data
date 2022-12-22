@@ -20,7 +20,7 @@ class FillRouteModelPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            if (! $attribute->override && $properties->has($dataProperty->name)) {
+            if (! $attribute->replace && $properties->has($dataProperty->name)) {
                 continue;
             }
 
