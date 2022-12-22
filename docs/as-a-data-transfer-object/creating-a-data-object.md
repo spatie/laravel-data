@@ -211,7 +211,7 @@ will try to create itself from the following types:
 
 This list can be extended using extra normalizers, find more about it [here](https://spatie.be/docs/laravel-data/v2/advanced-usage/normalizers).
 
-When a data object cannot be created using magical methods or the default methods, a `CannotCreateDataFromValue`
+When a data object cannot be created using magical methods or the default methods, a `CannotCreateData`
 exception will be thrown.
 
 ## Optional creation
