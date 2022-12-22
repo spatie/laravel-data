@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Tests;
 
+use Illuminate\Foundation\Application;
 use Illuminate\Validation\Rules\Enum;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Concerns\DynamicDataTrait;
@@ -100,7 +101,7 @@ it('can handle multiple classes in one data collection', function () {
 
     expect($transport->vehicles[0])->toBeInstanceOf(Horse::class);
     expect($transport->vehicles[1])->toBeInstanceOf(Car::class);
-});
+})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
 
 it('can validate', function () {
     DataValidationAsserter::for(TransportCompany::class)
@@ -188,4 +189,4 @@ it('can validate', function () {
                 'The vehicles.1.passengers field is required.',
             ],
         ]);
-});
+})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
