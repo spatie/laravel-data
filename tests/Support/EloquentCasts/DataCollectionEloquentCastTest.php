@@ -5,7 +5,9 @@ use Illuminate\Support\Facades\DB;
 use function Pest\Laravel\assertDatabaseHas;
 
 use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
+use Spatie\LaravelData\Tests\Fakes\DummyModelWithCustomCollectionCasts;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataCollection;
 
 beforeEach(function () {
     DummyModelWithCasts::migrate();
@@ -79,4 +81,40 @@ it('can load null as a value', function () {
     $model = DummyModelWithCasts::first();
 
     expect($model->data_collection)->toBeNull();
+});
+
+it('can save a custom data collection', function () {
+    DummyModelWithCustomCollectionCasts::create([
+        'data_collection' => [
+            ['string' => 'Hello'],
+            ['string' => 'World'],
+        ],
+    ]);
+
+    assertDatabaseHas(DummyModelWithCustomCollectionCasts::class, [
+        'data_collection' => json_encode([
+            ['string' => 'Hello'],
+            ['string' => 'World'],
+        ], JSON_PRETTY_PRINT),
+    ]);
+});
+
+it('retrieves custom data collection', function () {
+    DB::table('dummy_model_with_casts')->insert([
+        'data_collection' => json_encode([
+            ['string' => 'Hello'],
+            ['string' => 'World'],
+        ]),
+    ]);
+
+    /** @var \Spatie\LaravelData\Tests\Fakes\DummyModelWithCustomCollectionCasts $model */
+    $model = DummyModelWithCustomCollectionCasts::first();
+
+    expect($model->data_collection)->toEqual(new SimpleDataCollection(
+        SimpleData::class,
+        [
+            new SimpleData('Hello'),
+            new SimpleData('World'),
+        ]
+    ));
 });
