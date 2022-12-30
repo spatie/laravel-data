@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\NestedRules;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
@@ -73,6 +74,13 @@ class DataPropertyValidationRulesResolver
             $this->isNestedDataNullable($nullable, $property),
             $nestedPayloadPath,
         );
+
+        if($this->isNestedDataNullable($nullable, $property)
+            && is_null(Arr::get($payload, $nestedPayloadPath, null))) {
+            $nestedRules = $nestedRules->map(function($rules) {
+               return array_values(array_filter($rules, fn($rule) => $rule !== 'required'));
+            });
+        }
 
         $topLevelRuleResolvedInNestedRule = $nestedRules->pull($rulePath);
 

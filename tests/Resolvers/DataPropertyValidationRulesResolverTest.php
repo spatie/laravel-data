@@ -19,6 +19,7 @@ use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRulesRequiringString;
 
 function resolveRules(object $class, array $payload = []): array
 {
@@ -147,6 +148,35 @@ it('will take rules from nested data objects', function () {
     expect($rules)->toMatchArray([
         'property' => ['nullable', 'sometimes', 'array'],
         'property.string' => ['nullable', 'string'],
+    ]);
+});
+
+it('will remove required rules from nested data object when needed', function () {
+    $rules = resolveRules(new class () {
+        public SimpleDataWithOverwrittenRulesRequiringString $property;
+    }, []);
+
+    expect($rules)->toMatchArray([
+        'property' => ['required', 'array'],
+        'property.string' => ['string', 'required', 'min:10', 'max:100'],
+    ]);
+
+    $rules = resolveRules(new class () {
+        public ?SimpleDataWithOverwrittenRulesRequiringString $property;
+    }, []);
+
+    expect($rules)->toMatchArray([
+        'property' => ['nullable', 'array'],
+        'property.string' => ['string', 'min:10', 'max:100'],
+    ]);
+
+    $rules = resolveRules(new class () {
+        public ?SimpleDataWithOverwrittenRulesRequiringString $property;
+    }, ['property' => ['string' => 'Hello']]);
+
+    expect($rules)->toMatchArray([
+        'property' => ['nullable', 'array'],
+        'property.string' => ['string', 'required', 'min:10', 'max:100'],
     ]);
 });
 
