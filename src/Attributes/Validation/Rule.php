@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Illuminate\Contracts\Validation\InvokableRule as InvokableRuleContract;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
+use Illuminate\Support\Str;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -16,7 +17,7 @@ class Rule extends ValidationRule
     {
         foreach ($rules as $rule) {
             $newRules = match (true) {
-                is_string($rule) => explode('|', $rule),
+                is_string($rule) => Str::contains($rule, 'regex:') ? [$rule] : explode('|', $rule),
                 $rule instanceof RuleContract,
                 $rule instanceof InvokableRuleContract => [$rule],
                 is_array($rule) => $rule,

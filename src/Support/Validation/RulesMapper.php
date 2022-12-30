@@ -58,7 +58,7 @@ class RulesMapper
 
     protected function resolveStringRule(string $rule): mixed
     {
-        if (! str_contains($rule, '|')) {
+        if (str_contains($rule, 'regex:') || ! str_contains($rule, '|')) {
             try {
                 return $this->ruleFactory->create($rule);
             } catch (Throwable $t) {

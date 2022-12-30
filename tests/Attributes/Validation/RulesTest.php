@@ -58,6 +58,7 @@ it('can use the Rule rule', function () {
         'test',
         ['a', 'b', 'c'],
         'x|y',
+        'regex:/test|ok/',
         $laravelRule,
         new Required()
     );
@@ -69,6 +70,7 @@ it('can use the Rule rule', function () {
         'c',
         'x',
         'y',
+        'regex:/test|ok/',
         $laravelRule,
         'required',
     ]);
@@ -91,6 +93,7 @@ it('can use the Rule rule with invokable rules', function () {
         'test',
         ['a', 'b', 'c'],
         'x|y',
+        'regex:/test|ok/',
         $invokableLaravelRule,
         new Required()
     );
@@ -102,6 +105,7 @@ it('can use the Rule rule with invokable rules', function () {
         'c',
         'x',
         'y',
+        'regex:/test|ok/',
         $invokableLaravelRule,
         'required',
     ]);

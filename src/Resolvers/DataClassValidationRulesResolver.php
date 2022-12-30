@@ -91,7 +91,7 @@ class DataClassValidationRulesResolver
         return collect($overwrittenRules)
             ->map(
                 fn (mixed $rules) => collect(Arr::wrap($rules))
-                    ->map(fn (mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
+                    ->map(fn (mixed $rule) => ! is_string($rule) || Str::contains($rule, 'regex:') ? $rule : explode('|', $rule))
                     ->map(fn (mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules() : $rule)
                     ->flatten()
                     ->all()

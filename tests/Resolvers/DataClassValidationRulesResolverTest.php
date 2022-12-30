@@ -185,3 +185,25 @@ it('will transform overwritten data rules into plain Laravel rules', function ()
         ],
     ]);
 });
+
+it('will keep custom regex rule unchanged', function () {
+    $data = new class () extends Data {
+        public string $name;
+        public string $out;
+
+        public static function rules(): array
+        {
+            return [
+                'name' => ['required', 'regex:/test|ok/'],
+                'out' => 'required|regex:/test|out/',
+            ];
+        }
+    };
+
+    expect(
+        $this->resolver->execute($data::class)->all()
+    )->toEqualCanonicalizing([
+        'name' => ['required', 'regex:/test|ok/'],
+        'out' => ['required|regex:/test|out/'],
+    ]);
+});
