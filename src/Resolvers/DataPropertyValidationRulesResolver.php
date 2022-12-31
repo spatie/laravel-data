@@ -89,7 +89,7 @@ class DataPropertyValidationRulesResolver
         return $nestedRules->prepend($toplevelRules, $rulePath);
     }
 
-    private function resolveDataClassOrCollectionTopLevelRules(
+    protected function resolveDataClassOrCollectionTopLevelRules(
         bool $isNullable,
         bool $isOptional,
         DataProperty $property
@@ -149,7 +149,7 @@ class DataPropertyValidationRulesResolver
         return false;
     }
 
-    private function resolveRulePath(?string $payloadPath, string $propertyName): string
+    protected function resolveRulePath(?string $payloadPath, string $propertyName): string
     {
         return $payloadPath ? "{$payloadPath}.{$propertyName}" : $propertyName;
     }
