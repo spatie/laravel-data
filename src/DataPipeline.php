@@ -55,6 +55,13 @@ class DataPipeline
         return $this;
     }
 
+    public function firstThrough(string|DataPipe $pipe): static
+    {
+        array_unshift($this->pipes, $pipe);
+
+        return $this;
+    }
+
     public function execute(): Collection
     {
         /** @var \Spatie\LaravelData\Normalizers\Normalizer[] $normalizers */
