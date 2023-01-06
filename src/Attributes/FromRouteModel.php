@@ -8,9 +8,9 @@ use Attribute;
 class FromRouteModel
 {
     public function __construct(
-        public string  $routeModel,
-        public ?string $routeModelProperty = null,
-        public bool    $replace = true,
+        public string  $routeParameter,
+        public ?string $modelProperty = null,
+        public bool    $replaceWhenPresentInBody = true,
     ) {
     }
 }

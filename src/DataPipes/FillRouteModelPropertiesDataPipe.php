@@ -20,12 +20,12 @@ class FillRouteModelPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            if (! $attribute->replace && $properties->has($dataProperty->name)) {
+            if (! $attribute->replaceWhenPresentInBody && $properties->has($dataProperty->name)) {
                 continue;
             }
 
-            if ($model = $payload->route($attribute->routeModel)) {
-                $routeModelProperty = $attribute->routeModelProperty ?? $dataProperty->name;
+            if ($model = $payload->route($attribute->routeParameter)) {
+                $routeModelProperty = $attribute->modelProperty ?? $dataProperty->name;
                 $properties->put($dataProperty->name, $model->{$routeModelProperty});
             }
         }

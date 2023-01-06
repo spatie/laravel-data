@@ -67,7 +67,7 @@ it('replaces properties when route model properties exist', function () {
 
 it('skips replacing properties when route model properties exist and replacing is disabled', function () {
     $dataClass = new class () extends Data {
-        #[FromRouteModel('something', replace: false)]
+        #[FromRouteModel('something', replaceWhenPresentInBody: false)]
         public string $name;
         #[FromRouteModel('something', 'long', false)]
         public string $description;
