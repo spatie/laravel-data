@@ -100,3 +100,17 @@ $song = Song::from([
     'producer' => 'Stock Aitken Waterman',
 ]);
 ```
+
+## Extending the pipeline within your data class
+
+Sometimes you want to send your payload first through a certain pipe without creating a whole new pipeline, this can be done as such:
+
+```php
+class Song extends Data
+{
+    public static function pipeline(): DataPipeline
+    {
+        return parent::pipeline()->firstThrough(GuessCasingForKeyDataPipe::class);
+    }
+}
+```
