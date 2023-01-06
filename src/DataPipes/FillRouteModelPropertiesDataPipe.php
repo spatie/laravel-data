@@ -2,7 +2,9 @@
 
 namespace Spatie\LaravelData\DataPipes;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\FromRouteModel;
 use Spatie\LaravelData\Support\DataClass;
@@ -24,9 +26,9 @@ class FillRouteModelPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            if ($model = $payload->route($attribute->routeParameter)) {
+            if (($model = $payload->route($attribute->routeParameter)) instanceof Model) {
                 $routeModelProperty = $attribute->modelProperty ?? $dataProperty->name;
-                $properties->put($dataProperty->name, $model->{$routeModelProperty});
+                $properties->put($dataProperty->name, Arr::get($model->toArray(), $routeModelProperty));
             }
         }
 

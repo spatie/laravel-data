@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 use function Pest\Laravel\mock;
@@ -14,8 +15,10 @@ it('can fill data properties from a route model', function () {
         public int $id;
     };
 
-    $somethingMock = new class () {
-        public int $id = 123;
+    $somethingMock = new class () extends Model {
+        protected $attributes = [
+            'id' => 123,
+        ];
     };
 
     $requestMock = mock(Request::class);
@@ -31,19 +34,27 @@ it('can fill data properties from a route model using custom property mapping ',
     $dataClass = new class () extends Data {
         #[FromRouteModel('something', 'name')]
         public string $title;
+        #[FromRouteModel('something', 'nested.foo')]
+        public string $foo;
     };
 
-    $somethingMock = new class () {
-        public string $name = 'Something';
+    $somethingMock = new class () extends Model {
+        protected $attributes = [
+            'name' => 'Something',
+            'nested' => [
+                'foo' => 'bar',
+            ],
+        ];
     };
 
     $requestMock = mock(Request::class);
-    $requestMock->expects('route')->with('something')->once()->andReturns($somethingMock);
+    $requestMock->expects('route')->with('something')->twice()->andReturns($somethingMock);
     $requestMock->expects('toArray')->andReturns([]);
 
     $data = $dataClass::from($requestMock);
 
     expect($data->title)->toEqual('Something');
+    expect($data->foo)->toEqual('bar');
 });
 
 it('replaces properties when route model properties exist', function () {
@@ -52,8 +63,10 @@ it('replaces properties when route model properties exist', function () {
         public string $name;
     };
 
-    $somethingMock = new class () {
-        public string $name = 'Best';
+    $somethingMock = new class () extends Model {
+        protected $attributes = [
+            'name' => 'Best',
+        ];
     };
 
     $requestMock = mock(Request::class);
