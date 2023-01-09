@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.2.2 - 2023-01-09
+
+- Add a way to prepend DataPipes to the pipeline (#305)
+- Better IDE completion (#307)
+- Make eloquent collection cast respect collection (#308)
+
 ## 2.2.1 - 2022-12-21
 
 - fix support to return 201 status code in Json Responses (#291)
