@@ -21,7 +21,7 @@ use Spatie\LaravelData\Support\Validation\DataRules;
  */
 trait ValidateableData
 {
-    public static function validate(Arrayable | array $payload): Arrayable | array
+    public static function validate(Arrayable|array $payload): Arrayable|array
     {
         $validator = app(DataValidatorResolver::class)->execute(static::class, $payload);
 
@@ -46,7 +46,7 @@ trait ValidateableData
         return $validator->validated();
     }
 
-    public static function validateAndCreate(Arrayable | array $payload): static
+    public static function validateAndCreate(Arrayable|array $payload): static
     {
         return static::from(static::validate($payload));
     }
@@ -60,16 +60,12 @@ trait ValidateableData
         array $fields = [],
         array $payload = []
     ): array {
-        $rules = app(DataValidationRulesResolver::class)->execute(
-            static::class,
-            new DataRules([]),
-            $payload
-        );
+        $rules = app(DataValidationRulesResolver::class)->execute(static::class, $payload);
 
         if (count($fields) === 0) {
-            return $rules->rules;
+            return $rules;
         }
 
-        return array_filter($rules->rules, fn (string $key): bool => in_array($key, $fields, true), ARRAY_FILTER_USE_KEY);
+        return array_filter($rules, fn(string $key): bool => in_array($key, $fields, true), ARRAY_FILTER_USE_KEY);
     }
 }

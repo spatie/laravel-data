@@ -13,6 +13,7 @@ use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Resolvers\DataCollectionPropertyRulesResolver;
 use Spatie\LaravelData\Resolvers\DataPropertyRulesResolver;
 use Spatie\LaravelData\Support\Validation\DataRules;
+use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\RulesCollection;
 use Spatie\LaravelData\Support\Validation\RulesMapper;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
@@ -29,11 +30,13 @@ class DataValidationRulesResolver
 
     public function execute(
         string $class,
-        DataRules $dataRules,
         array $payload = [],
+        ?DataRules $dataRules = null,
         ?string $path = null,
-    ): DataRules {
+    ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
+
+        $dataRules ??= new DataRules();
 
         foreach ($dataClass->properties as $dataProperty) {
             $relativePath = $this->resolveRulePath(
@@ -41,7 +44,7 @@ class DataValidationRulesResolver
                 $dataProperty->inputMappedName ?? $dataProperty->name
             );
 
-            if($dataProperty->validate === false){
+            if ($dataProperty->validate === false) {
                 continue;
             }
 
@@ -67,7 +70,13 @@ class DataValidationRulesResolver
                 continue;
             }
 
-            $dataRules->rules[$relativePath] = $this->getRulesForNonDataProperty($dataProperty);
+            $rules = new RulesCollection();
+
+            foreach ($this->dataConfig->getRuleInferrers() as $inferrer) {
+                $rules = $inferrer->handle($dataProperty, $rules);
+            }
+
+            $dataRules->rules[$relativePath] = $rules->normalize();
         }
 
         $dataRules->rules = array_merge(
@@ -75,18 +84,7 @@ class DataValidationRulesResolver
             $this->resolveOverwrittenRules($dataClass, $payload, $path)
         );
 
-        return $dataRules;
-    }
-
-    protected function getRulesForNonDataProperty(DataProperty $property): array
-    {
-        $rules = new RulesCollection();
-
-        foreach ($this->dataConfig->getRuleInferrers() as $inferrer) {
-            $rules = $inferrer->handle($property, $rules);
-        }
-
-        return $rules->normalize();
+        return $dataRules->rules;
     }
 
     private function resolveOverwrittenRules(
@@ -140,16 +138,13 @@ class DataValidationRulesResolver
         ?string $payloadPath,
         bool $prefixWithPayloadPath,
     ): array {
-        $parameters = [
-            'payload' => $payload,
-            'path' => $payloadPath,
-        ];
+        $payload = new ValidationContext(
+            $relativePayload,
+            $payload,
+            $payloadPath
+        );
 
-        if ($relativePayload !== null) {
-            $parameters['relativePayload'] = $relativePayload;
-        }
-
-        $overwrittenRules = app()->call([$class->name, 'rules'], $parameters);
+        $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $payload]);
 
         return collect($overwrittenRules)
             ->map(

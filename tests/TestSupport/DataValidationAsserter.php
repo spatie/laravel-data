@@ -81,13 +81,13 @@ class DataValidationAsserter
     ): self {
         $inferredRules = app(DataValidationRulesResolver::class)->execute(
             $this->dataClass,
-            new DataRules([]),
-            $this->pipePayload($payload)
+            $this->pipePayload($payload),
+            new DataRules([])
         );
 
         $parser = new ValidationRuleParser($payload);
 
-        expect($parser->explode($inferredRules->rules)->rules)->toEqual($rules);
+        expect($parser->explode($inferredRules)->rules)->toEqual($rules);
 
         return $this;
     }

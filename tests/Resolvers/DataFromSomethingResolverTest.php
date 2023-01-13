@@ -264,37 +264,6 @@ it('will validate a request when given as a parameter to a custom creation metho
     ])->assertCreated();
 });
 
-it('can resolve payload dependency for rules', function () {
-    $data = new class () extends Data {
-        public string $payment_method;
-
-        public string|Optional $paypal_email;
-
-        public static function rules(array $payload)
-        {
-            return [
-                'payment_method' => ['required'],
-                'paypal_email' => Rule::requiredIf($payload['payment_method'] === 'paypal'),
-            ];
-        }
-    };
-
-    $result = $data::validateAndCreate(['payment_method' => 'credit_card']);
-
-    expect($result->toArray())->toMatchArray([
-        'payment_method' => 'credit_card',
-    ]);
-
-    try {
-        $data::validate(['payment_method' => 'paypal']);
-    } catch (ValidationException $exception) {
-        expect($exception->validator->failed())->toHaveKey('paypal_email');
-
-        return;
-    }
-
-    $this->fail('We should not end up here');
-});
 
 it('can create data without custom creation methods', function () {
     $data = new class ('', '') extends Data {

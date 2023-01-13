@@ -15,6 +15,11 @@ use Spatie\LaravelData\Support\Validation\RulesCollection;
 
 class DataCollectionPropertyRulesResolver
 {
+    public function __construct(
+        protected AttributesRuleInferrer $attributesRuleInferrer,
+    ) {
+    }
+
     public function execute(
         DataProperty $property,
         string $path,
@@ -38,7 +43,7 @@ class DataCollectionPropertyRulesResolver
         $toplevelRules->add(Present::create());
         $toplevelRules->add(ArrayType::create());
 
-        app(AttributesRuleInferrer::class)->handle($property, $toplevelRules);
+        $this->attributesRuleInferrer->handle($property, $toplevelRules);
 
         $dataRules->rules[$path] = $toplevelRules->normalize();
 
@@ -51,9 +56,9 @@ class DataCollectionPropertyRulesResolver
 
             return app(DataValidationRulesResolver::class)->execute(
                 $property->type->dataClass,
-                new DataRules([]),
                 $value ?? [],
-            )->rules;
+                new DataRules([]),
+            );
         });
 
         return $dataRules;

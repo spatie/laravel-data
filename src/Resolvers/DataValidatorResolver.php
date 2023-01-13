@@ -15,7 +15,7 @@ class DataValidatorResolver
     {
         $payload = $payload instanceof Arrayable ? $payload->toArray() : $payload;
 
-        $rules = app(DataValidationRulesResolver::class)->execute($dataClass, new DataRules([]), $payload)->rules;
+        $rules = app(DataValidationRulesResolver::class)->execute($dataClass, $payload, new DataRules([]));
 
         $validator = ValidatorFacade::make(
             $payload,

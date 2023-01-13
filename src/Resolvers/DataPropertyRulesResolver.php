@@ -52,11 +52,13 @@ class DataPropertyRulesResolver
 
         $dataRules->rules[$path] = $toplevelRules->normalize();
 
-        return app(DataValidationRulesResolver::class)->execute(
+        app(DataValidationRulesResolver::class)->execute(
             $property->type->dataClass,
-            $dataRules,
             $payload,
+            $dataRules,
             $path
         );
+
+        return $dataRules;
     }
 }

@@ -32,6 +32,7 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Resolvers\DataPropertyRulesResolver;
+use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -368,9 +369,9 @@ it('can write custom rules based upon payloads', function () {
         #[MapInputName(SnakeCaseMapper::class)]
         public string $mappedProperty;
 
-        public static function rules(array $payload): array
+        public static function rules(ValidationContext $context): array
         {
-            if ($payload['strict'] === true) {
+            if ($context->payload['strict'] === true) {
                 return [
                     'property' => ['in:strict'],
                     'mapped_property' => ['in:strict'],
@@ -525,9 +526,9 @@ it('can use nested payloads in nested data', function () {
 
         public string $name;
 
-        public static function rules(array $relativePayload, ?string $path): array
+        public static function rules(ValidationContext $context): array
         {
-            if ($relativePayload['strict'] ?? false) {
+            if ($context->payload['strict'] ?? false) {
                 return ['name' => ['in:strict']];
             }
 
@@ -907,9 +908,9 @@ it('can nest data in collections using relative rule generation', function () {
         #[Required]
         public bool $validate_as_email;
 
-        public static function rules(array $relativePayload): array
+        public static function rules(ValidationContext $context): array
         {
-            if ($relativePayload['validate_as_email'] ?? false) {
+            if ($context->payload['validate_as_email'] ?? false) {
                 return [
                     'string' => ['required', 'string', 'email'],
                 ];
@@ -966,9 +967,9 @@ it('can nest data in classes inside collections using relative rule generation',
         #[Required]
         public bool $validate_as_email;
 
-        public static function rules(array $relativePayload, ?string $path): array
+        public static function rules(ValidationContext $context): array
         {
-            return $relativePayload['validate_as_email'] ?? false
+            return $context->payload['validate_as_email'] ?? false
                 ? ['string' => ['required', 'string', 'email']]
                 : [];
         }
@@ -1025,9 +1026,9 @@ it('can nest data in deep collections using relative rule generation', function 
         #[Required]
         public bool $deep_validate_as_email;
 
-        public static function rules(array $relativePayload, ?string $path): array
+        public static function rules(ValidationContext $context): array
         {
-            return $relativePayload['deep_validate_as_email'] ?? false
+            return $context->payload['deep_validate_as_email'] ?? false
                 ? ['deep_string' => ['required', 'string', 'email']]
                 : [];
         }
@@ -1043,9 +1044,9 @@ it('can nest data in deep collections using relative rule generation', function 
         #[DataCollectionOf(NestedClassL::class), Required]
         public DataCollection $items;
 
-        public static function rules(array $relativePayload, ?string $path): array
+        public static function rules(ValidationContext $context): array
         {
-            return $relativePayload['validate_as_email'] ?? false
+            return $context->payload['validate_as_email'] ?? false
                 ? ['string' => ['required', 'string', 'email']]
                 : [];
         }
@@ -1126,9 +1127,9 @@ it('can nest data using relative rule generation', function () {
         #[Required]
         public bool $validate_as_email;
 
-        public static function rules(array $relativePayload, ?string $path): array
+        public static function rules(ValidationContext $context): array
         {
-            if ($relativePayload['validate_as_email'] ?? false) {
+            if ($context->payload['validate_as_email'] ?? false) {
                 return [
                     'string' => ['required', 'string', 'email'],
                 ];
