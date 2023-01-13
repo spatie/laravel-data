@@ -5,8 +5,10 @@ namespace Spatie\LaravelData\Concerns;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
 use Spatie\LaravelData\Resolvers\DataClassValidationRulesResolver;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
+use Spatie\LaravelData\Support\Validation\DataRules;
 
 /**
  * @method static array rules(...$args)
@@ -58,14 +60,16 @@ trait ValidateableData
         array $fields = [],
         array $payload = []
     ): array {
-        $rules = app(DataClassValidationRulesResolver::class)
-            ->execute(static::class, $payload)
-            ->toArray();
+        $rules = app(DataValidationRulesResolver::class)->execute(
+            static::class,
+            new DataRules([]),
+            $payload
+        );
 
         if (count($fields) === 0) {
-            return $rules;
+            return $rules->rules;
         }
 
-        return array_filter($rules, fn (string $key): bool => in_array($key, $fields, true), ARRAY_FILTER_USE_KEY);
+        return array_filter($rules->rules, fn (string $key): bool => in_array($key, $fields, true), ARRAY_FILTER_USE_KEY);
     }
 }

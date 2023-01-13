@@ -2,25 +2,43 @@
 
 namespace Spatie\LaravelData\Tests;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rules\Exists as LaravelExists;
+use Illuminate\Validation\ValidationRuleParser;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
+use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
+use Spatie\LaravelData\Attributes\Validation\Bail;
+use Spatie\LaravelData\Attributes\Validation\Exists;
+use Spatie\LaravelData\Attributes\Validation\In;
+use Spatie\LaravelData\Attributes\Validation\IntegerType;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
+use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\RequiredWith;
+use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
+use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Resolvers\DataPropertyRulesResolver;
+use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
+use function Pest\Laravel\mock;
 
 it('can validate a string', function () {
     $dataClass = new class () extends Data {
@@ -30,7 +48,7 @@ it('can validate a string', function () {
     DataValidationAsserter::for($dataClass)
         ->assertOk(['property' => 'Hello World'])
         ->assertRules([
-            'property' => ['string', 'required'],
+            'property' => ['required', 'string'],
         ]);
 });
 
@@ -42,7 +60,7 @@ it('can validate a float', function () {
     DataValidationAsserter::for($dataClass)
         ->assertOk(['property' => 10.0])
         ->assertRules([
-            'property' => ['numeric', 'required'],
+            'property' => ['required', 'numeric'],
         ]);
 });
 
@@ -54,7 +72,7 @@ it('can validate an integer', function () {
     DataValidationAsserter::for($dataClass)
         ->assertOk(['property' => 10.0])
         ->assertRules([
-            'property' => ['numeric', 'required'],
+            'property' => ['required', 'numeric'],
         ]);
 });
 
@@ -66,7 +84,7 @@ it('can validate an array', function () {
     DataValidationAsserter::for($dataClass)
         ->assertOk(['property' => ['Hello World']])
         ->assertRules([
-            'property' => ['array', 'required'],
+            'property' => ['required', 'array'],
         ]);
 });
 
@@ -92,7 +110,7 @@ it('can validate a nullable type', function () {
         ->assertOk(['property' => null])
         ->assertOk([])
         ->assertRules([
-            'property' => ['array', 'nullable'],
+            'property' => ['nullable', 'array'],
         ]);
 });
 
@@ -158,7 +176,7 @@ it('can validate a property with attributes', function () {
 
     DataValidationAsserter::for($dataClass)
         ->assertRules([
-            'property' => ['array', 'min:5', 'nullable'],
+            'property' => ['nullable', 'array', 'min:5'],
         ]);
 });
 
@@ -180,7 +198,7 @@ it('can validate an optional attribute', function () {
         ->assertOk(['property' => []])
         ->assertOk(['property' => null])
         ->assertRules([
-            'property' => ['sometimes', 'array', 'nullable'],
+            'property' => ['sometimes', 'nullable', 'array'],
         ]);
 
     DataValidationAsserter::for(new class () extends Data {
@@ -203,20 +221,124 @@ it('can validate a native enum', function () {
     DataValidationAsserter::for($dataClass)
         ->assertOk(['property' => 'foo'])
         ->assertRules([
-            'property' => [new Enum(DummyBackedEnum::class), 'required'],
+            'property' => ['required', new Enum(DummyBackedEnum::class)],
         ]);
 });
 
-it('will use name mapping within validation', function () {
-    $dataClass = new class () extends Data {
+it('will never add extra require rules when not required', function () {
+    DataValidationAsserter::for(new class () extends Data {
+        public ?string $property;
+    })->assertRules([
+        'property' => [new Nullable(), 'string'],
+    ]);
+
+    DataValidationAsserter::for(new class () extends Data {
+        public bool $property;
+    })->assertRules([
+        'property' => ['boolean'],
+    ]);
+
+    DataValidationAsserter::for(new class () extends Data {
+        #[RequiredWith('other')]
+        public string $property;
+    })->assertRules([
+        'property' => ['string', 'required_with:other'],
+    ]);
+
+    DataValidationAsserter::for(new class () extends Data {
+        #[\Spatie\LaravelData\Attributes\Validation\Rule('required_with:other')]
+        public string $property;
+    })->assertRules([
+        'property' => ['string', 'required_with:other'],
+    ]);
+});
+
+it('it will take care of mapping', function () {
+    DataValidationAsserter::for(new class () extends Data {
         #[MapInputName('some_property')]
         public string $property;
-    };
-
-    DataValidationAsserter::for($dataClass)
+    })
         ->assertOk(['some_property' => 'foo'])
+        ->assertErrors(['property' => 'foo'])
         ->assertRules([
-            'some_property' => ['string', 'required'],
+            'some_property' => ['required', 'string'],
+        ]);
+
+    DataValidationAsserter::for(new class () extends Data {
+        #[MapName('some_property')]
+        public string $property;
+    })
+        ->assertOk(['some_property' => 'foo'])
+        ->assertErrors(['property' => 'foo'])
+        ->assertRules([
+            'some_property' => ['required', 'string'],
+        ]);
+
+
+    DataValidationAsserter::for(new class () extends Data {
+        #[MapName('some_property')]
+        public SimpleData $property;
+    })
+        ->assertOk(['some_property' => ['string' => 'hi']])
+        ->assertErrors(['property' => ['string' => 'hi']])
+        ->assertRules([
+            'some_property' => ['required', 'array'],
+            'some_property.string' => ['required', 'string'],
+        ]);
+
+    DataValidationAsserter::for(new class () extends Data {
+        #[DataCollectionOf(SimpleData::class), MapName('some_property')]
+        public DataCollection $property;
+    })
+        ->assertOk(['some_property' => [['string' => 'hi']]])
+        ->assertErrors(['property' => [['string' => 'hi']]])
+        ->assertRules([
+            'some_property' => ['present', 'array'],
+            'some_property.0.string' => ['required', 'string'],
+        ], payload: ['some_property' => [[]]]);
+
+    DataValidationAsserter::for(new class () extends Data {
+        #[MapName('some_property')]
+        public DataWithMapper $property;
+    })
+        ->assertOk([
+            'some_property' => [
+                'cased_property' => 'Hi',
+                'data_cased_property' => ['string' => 'Hi'],
+                'data_collection_cased_property' => [
+                    ['string' => 'Hi'],
+                ],
+            ],
+        ])
+        ->assertErrors([
+            'property' => [
+                'cased_property' => 'Hi',
+                'data_cased_property' => ['string' => 'Hi'],
+                'data_collection_cased_property' => [
+                    ['string' => 'Hi'],
+                ],
+            ],
+        ])
+        ->assertErrors([
+            'some_property' => [
+                'casedProperty' => 'Hi',
+                'dataCasedProperty' => ['string' => 'Hi'],
+                'dataCollectionCasedProperty' => [
+                    ['string' => 'Hi'],
+                ],
+            ],
+        ])
+        ->assertRules([
+            'some_property' => ['required', 'array'],
+            'some_property.cased_property' => ['required', 'string'],
+            'some_property.data_cased_property' => ['required', 'array'],
+            'some_property.data_cased_property.string' => ['required', 'string'],
+            'some_property.data_collection_cased_property' => ['present', 'array'],
+            'some_property.data_collection_cased_property.0.string' => ['required', 'string'],
+        ], payload: [
+            'some_property' => [
+                'data_collection_cased_property' => [[]],
+            ],
         ]);
 });
 
@@ -273,13 +395,31 @@ it('can write custom rules based upon payloads', function () {
         ->assertRules(
             rules: [
                 'strict' => ['boolean'],
-                'property' => ['string', 'required'],
-                'mapped_property' => ['string', 'required'],
+                'property' => ['required', 'string'],
+                'mapped_property' => ['required', 'string'],
             ],
             payload: [
                 'strict' => false,
             ]
         );
+});
+
+
+it('can write custom rules based upon injected dependencies', function () {
+    $dataClass = new class () extends Data {
+        public string $environment;
+
+        public static function rules(Application $app): array
+        {
+            return [
+                'environment' => [new Required(), new StringType(), In::create($app->environment())],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)->assertRules([
+        'environment' => ['required', 'string', 'in:"testing"'],
+    ]);
 });
 
 it('can validate nested data', function () {
@@ -298,7 +438,7 @@ it('can validate nested data', function () {
         ->assertErrors(['nested' => null])
         ->assertRules([
             'nested' => ['required', 'array'],
-            'nested.name' => ['string', 'required'],
+            'nested.name' => ['required', 'string'],
         ]);
 });
 
@@ -314,13 +454,14 @@ it('can validate nested nullable data', function () {
 
     DataValidationAsserter::for($dataClass)
         ->assertOk(['nested' => ['name' => 'Hello World']])
-        ->assertOk(['nested' => ['name' => null]])
         ->assertOk(['nested' => null])
-        ->assertOk(['nested' => []])
+        ->assertErrors(['nested' => ['name' => null]])
+        ->assertErrors(['nested' => []])
+        ->assertRules([], payload: [])
         ->assertRules([
             'nested' => ['nullable', 'array'],
-            'nested.name' => ['nullable', 'string'],
-        ]);
+            'nested.name' => ['required', 'string'],
+        ], payload: ['nested' => []]);
 });
 
 it('can validate nested optional data', function () {
@@ -335,14 +476,15 @@ it('can validate nested optional data', function () {
 
     DataValidationAsserter::for($dataClass)
         ->assertOk(['nested' => ['name' => 'Hello World']])
-        ->assertOk(['nested' => null])
+        ->assertErrors(['nested' => null])
         ->assertErrors(['nested' => ['name' => null]])
         ->assertErrors(['nested' => []])
+        ->assertRules([], payload: [])
         ->assertRules([
             'nested' => ['sometimes', 'array'],
-            'nested.name' => ['nullable', 'string'],
-        ]);
-})->skip('Failures');
+            'nested.name' => ['required', 'string'],
+        ], ['nested' => null]);
+});
 
 it('can add additional rules to nested data', function () {
     class NestedClassD extends Data
@@ -351,14 +493,14 @@ it('can add additional rules to nested data', function () {
     }
 
     $dataClass = new class () extends Data {
-        #[Min(100)]
-        public NestedClassD|Optional $nested;
+        #[Bail]
+        public NestedClassD $nested;
     };
 
     DataValidationAsserter::for($dataClass)
         ->assertRules([
-            'nested' => ['sometimes', 'array', 'min:100'],
-            'nested.name' => ['nullable', 'string'],
+            'nested' => ['required', 'bail', 'array'],
+            'nested.name' => ['required', 'string'],
         ]);
 });
 
@@ -372,7 +514,7 @@ it('will use name mapping with nested objects', function () {
         ->assertOk(['some_nested' => ['string' => 'Hello World']])
         ->assertRules([
             'some_nested' => ['required', 'array'],
-            'some_nested.string' => ['string', 'required'],
+            'some_nested.string' => ['required', 'string'],
         ]);
 });
 
@@ -483,7 +625,44 @@ it('will validate a collection', function () {
         ])
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.*.string' => ['string', 'required'],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array'],
+            'collection.0.string' => ['required', 'string'],
+        ], [
+            'collection' => [[]],
+        ]);
+});
+
+it('will validate a collection with extra attributes', function () {
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(SimpleDataWithExplicitValidationRuleAttributeData::class)]
+        #[Min(2)]
+        public DataCollection $collection;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'collection' => [
+                ['email' => 'ruben@spatie.be'],
+                ['email' => 'freek@spatie.be'],
+            ],
+        ])
+        ->assertErrors([
+            'collection' => [
+                ['email' => 'not-an'],
+                ['email' => 'email-address'],
+            ],
+        ])
+        ->assertErrors(['collection' => []])
+        ->assertRules([
+            'collection' => ['present', 'array', 'min:2'],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array', 'min:2'],
+            'collection.0.email' => ['required', 'string', 'email:rfc'],
+        ], [
+            'collection' => [[]],
         ]);
 });
 
@@ -508,9 +687,13 @@ it('will validate a nullable collection', function () {
                 ['other_string' => 'Hello World'],
             ],
         ])
+        ->assertRules([], payload: [])
+        ->assertRules([], payload: ['collection' => null])
         ->assertRules([
-            'collection' => ['nullable', 'array'],
-            'collection.*.string' => ['string', 'required'],
+            'collection' => ['present', 'array'],
+            'collection.0.string' => ['required', 'string'],
+        ], payload: [
+            'collection' => [[]],
         ]);
 });
 
@@ -536,8 +719,13 @@ it('will validate an optional collection', function () {
             ],
         ])
         ->assertRules([
-            'collection' => ['sometimes', 'array'],
-            'collection.*.string' => ['string', 'required'],
+            'collection' => ['present', 'array'],
+        ], payload: ['collection' => null])
+        ->assertRules([
+            'collection' => ['present', 'array'],
+            'collection.0.string' => ['required', 'string'],
+        ], payload: [
+            'collection' => [[]],
         ]);
 });
 
@@ -549,30 +737,41 @@ it('can overwrite collection class rules', function () {
         public static function rules(): array
         {
             return [
-                'collection' => ['array', 'min:1', 'max:5'],
-                'collection.*.string' => ['required', 'string', 'min:100'],
+                'collection' => ['array', 'min:1', 'max:2'],
+                // TODO: should we allow this, how to handle this?
+//                'collection.*.string' => ['required', 'string', 'min:100'],
             ];
         }
     };
 
     DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'collection' => [
+                ['string' => 'Never Gonna'],
+                ['string' => 'Give You Up'],
+            ],
+        ])
+        ->assertOk([
+            'collection' => [
+                ['string' => 'Never Gonna'],
+            ],
+        ])
+        ->assertErrors([
+            'collection' => [
+                ['string' => 'Never Gonna'],
+                ['string' => 'Give You Up'],
+                ['string' => 'Never Gonna'],
+            ],
+        ])
+        ->assertErrors(['collection' => []])
         ->assertRules([
-            'collection' => ['array', 'min:1', 'max:5'],
-            'collection.*.string' => ['required', 'string', 'min:100'],
-        ]);
-});
-
-it('can add collection class rules using attributes', function () {
-    $dataClass = new class () extends Data {
-        #[DataCollectionOf(SimpleDataWithExplicitValidationRuleAttributeData::class)]
-        #[Min(10)]
-        public DataCollection $collection;
-    };
-
-    DataValidationAsserter::for($dataClass)
+            'collection' => ['array', 'min:1', 'max:2'],
+        ], payload: [])
         ->assertRules([
-            'collection' => ['present', 'array', 'min:10'],
-            'collection.*.email' => ['string', 'required', 'email:rfc'],
+            'collection' => ['array', 'min:1', 'max:2'],
+            'collection.0.string' => ['required', 'string'],
+        ], payload: [
+            'collection' => [[]],
         ]);
 });
 
@@ -597,12 +796,107 @@ it('can nest data in collections', function () {
     };
 
     DataValidationAsserter::for($dataClass)
+        ->assertOk(['collection' => [['nested' => ['string' => 'Hello World']]]])
+        ->assertErrors(['collection' => [['nested' => null]]])
+        ->assertErrors(['collection' => [['nested' => []]]])
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.*.nested' => ['required', 'array'],
-            'collection.*.nested.string' => ['required', 'string'],
         ])
-        ->assertOk(['collection' => [['nested' => ['string' => 'Hello World']]]]);
+        ->assertRules([
+            'collection' => ['present', 'array'],
+            'collection.0.nested' => ['required', 'array'],
+            'collection.0.nested.string' => ['required', 'string'],
+        ], [
+            'collection' => [[]],
+        ]);
+});
+
+it('can nest nullable data in collections', function () {
+    class NestedClassTable extends Data
+    {
+        public string $string;
+    }
+
+    class CollectionClassTable extends Data
+    {
+        public ?NestedClassTable $nested;
+    }
+
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(CollectionClassTable::class)]
+        public DataCollection $collection;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['collection' => [['nested' => ['string' => 'Hello World']]]])
+        ->assertRules([
+            'collection' => ['present', 'array'],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array'],
+            'collection.0' => [],
+        ], [
+            'collection' => [[]],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array'],
+            'collection.0' => [],
+        ], [
+            'collection' => [['nested' => null]],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array'],
+            'collection.0.nested' => ['nullable', 'array'],
+            'collection.0.nested.string' => ['required', 'string'],
+        ], [
+            'collection' => [['nested' => []]],
+        ]);
+});
+
+
+it('can nest optional data in collections', function () {
+    class NestedClassG extends Data
+    {
+        public string $string;
+    }
+
+    class CollectionClassC extends Data
+    {
+        public Optional|NestedClassG $nested;
+    }
+
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(CollectionClassC::class)]
+        public DataCollection $collection;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['collection' => [['nested' => ['string' => 'Hello World']]]])
+        ->assertErrors(['collection' => [['nested' => null]]])
+        ->assertErrors(['collection' => [['nested' => []]]])
+        ->assertRules([
+            'collection' => ['present', 'array'],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array'],
+            'collection.0' => [],
+        ], [
+            'collection' => [[]],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array'],
+            'collection.0.nested' => ['sometimes', 'array'],
+            'collection.0.nested.string' => ['required', 'string'],
+        ], [
+            'collection' => [['nested' => null]],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array'],
+            'collection.0.nested' => ['sometimes', 'array'],
+            'collection.0.nested.string' => ['required', 'string'],
+        ], [
+            'collection' => [['nested' => []]],
+        ]);
 });
 
 it('can nest data in collections using relative rule generation', function () {
@@ -611,11 +905,11 @@ it('can nest data in collections using relative rule generation', function () {
         public string $string;
 
         #[Required]
-        public bool $isEmail;
+        public bool $validate_as_email;
 
-        public static function rules(array $relativePayload, ?string $path): array
+        public static function rules(array $relativePayload): array
         {
-            if ($relativePayload['isEmail'] ?? false) {
+            if ($relativePayload['validate_as_email'] ?? false) {
                 return [
                     'string' => ['required', 'string', 'email'],
                 ];
@@ -633,20 +927,35 @@ it('can nest data in collections using relative rule generation', function () {
     DataValidationAsserter::for($dataClass)
         ->assertOk([
             'collection' => [
-                ['string' => 'Hello World', 'isEmail' => false],
-                ['string' => 'hello@world.test', 'isEmail' => true],
+                ['string' => 'Hello World', 'validate_as_email' => false],
+                ['string' => 'hello@world.test', 'validate_as_email' => true],
             ],
         ])
         ->assertErrors([
             'collection' => [
-                ['string' => 'Invalid Email', 'isEmail' => true],
-                ['string' => 'Hello World', 'isEmail' => false],
-                ['string' => 'Invalid Email', 'isEmail' => true],
+                ['string' => 'Invalid Email', 'validate_as_email' => true],
+                ['string' => 'Hello World', 'validate_as_email' => false],
+                ['string' => 'Invalid Email', 'validate_as_email' => true],
             ],
         ], [
             'collection.0.string' => ['The collection.0.string must be a valid email address.'],
             'collection.2.string' => ['The collection.2.string must be a valid email address.'],
-        ]);
+        ])
+        ->assertRules(
+            [
+                'collection' => ['present', 'array'],
+                'collection.0.string' => ['required', 'string'],
+                'collection.0.validate_as_email' => ['boolean', 'required'],
+                'collection.1.string' => ['required', 'string', 'email'],
+                'collection.1.validate_as_email' => ['boolean', 'required'],
+            ],
+            [
+                'collection' => [
+                    ['string' => 'Hello World', 'validate_as_email' => false],
+                    ['string' => 'hello@world.test', 'validate_as_email' => true],
+                ],
+            ]
+        );
 })->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
 
 it('can nest data in classes inside collections using relative rule generation', function () {
@@ -655,11 +964,11 @@ it('can nest data in classes inside collections using relative rule generation',
         public string $string;
 
         #[Required]
-        public bool $isEmail;
+        public bool $validate_as_email;
 
         public static function rules(array $relativePayload, ?string $path): array
         {
-            return $relativePayload['isEmail'] ?? false
+            return $relativePayload['validate_as_email'] ?? false
                 ? ['string' => ['required', 'string', 'email']]
                 : [];
         }
@@ -678,27 +987,29 @@ it('can nest data in classes inside collections using relative rule generation',
     DataValidationAsserter::for($dataClass)
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.*.nested.string' => ['required', 'string'],
-            'collection.*.nested.isEmail' => ['required', 'boolean'],
-            'collection.0.nested' => [],
+            'collection.0.nested' => ['required', 'array'],
+            'collection.0.nested.string' => ['required', 'string'],
+            'collection.0.nested.validate_as_email' => ['boolean', 'required'],
+            'collection.1.nested' => ['required', 'array'],
             'collection.1.nested.string' => ['required', 'string', 'email'],
+            'collection.1.nested.validate_as_email' => ['boolean', 'required'],
         ], [
             'collection' => [
-                ['nested' => ['string' => 'Hello World', 'isEmail' => false]],
-                ['nested' => ['string' => 'hello@world.test', 'isEmail' => true]],
+                ['nested' => ['string' => 'Hello World', 'validate_as_email' => false]],
+                ['nested' => ['string' => 'hello@world.test', 'validate_as_email' => true]],
             ],
         ])
         ->assertOk([
             'collection' => [
-                ['nested' => ['string' => 'Hello World', 'isEmail' => false]],
-                ['nested' => ['string' => 'hello@world.test', 'isEmail' => true]],
+                ['nested' => ['string' => 'Hello World', 'validate_as_email' => false]],
+                ['nested' => ['string' => 'hello@world.test', 'validate_as_email' => true]],
             ],
         ])
         ->assertErrors([
             'collection' => [
-                ['nested' => ['string' => 'Invalid Email', 'isEmail' => true]],
-                ['nested' => ['string' => 'Hello World', 'isEmail' => false]],
-                ['nested' => ['string' => 'Invalid Email', 'isEmail' => true]],
+                ['nested' => ['string' => 'Invalid Email', 'validate_as_email' => true]],
+                ['nested' => ['string' => 'Hello World', 'validate_as_email' => false]],
+                ['nested' => ['string' => 'Invalid Email', 'validate_as_email' => true]],
             ],
         ], [
             'collection.0.nested.string' => ['The collection.0.nested.string must be a valid email address.'],
@@ -709,15 +1020,15 @@ it('can nest data in classes inside collections using relative rule generation',
 it('can nest data in deep collections using relative rule generation', function () {
     class NestedClassL extends Data
     {
-        public string $deepString;
+        public string $deep_string;
 
         #[Required]
-        public bool $deepIsEmail;
+        public bool $deep_validate_as_email;
 
         public static function rules(array $relativePayload, ?string $path): array
         {
-            return $relativePayload['deepIsEmail'] ?? false
-                ? ['deepString' => ['required', 'string', 'email']]
+            return $relativePayload['deep_validate_as_email'] ?? false
+                ? ['deep_string' => ['required', 'string', 'email']]
                 : [];
         }
     }
@@ -727,14 +1038,14 @@ it('can nest data in deep collections using relative rule generation', function 
         public string $string;
 
         #[Required]
-        public bool $isEmail;
+        public bool $validate_as_email;
 
         #[DataCollectionOf(NestedClassL::class), Required]
         public DataCollection $items;
 
         public static function rules(array $relativePayload, ?string $path): array
         {
-            return $relativePayload['isEmail'] ?? false
+            return $relativePayload['validate_as_email'] ?? false
                 ? ['string' => ['required', 'string', 'email']]
                 : [];
         }
@@ -747,46 +1058,22 @@ it('can nest data in deep collections using relative rule generation', function 
 
     DataValidationAsserter::for($dataClass)
         ->assertRules([
-            'collection' => [
-                'array',
-                'present',
-            ],
-            'collection.*.isEmail' => [
-                'boolean',
-                'required',
-            ],
-            'collection.*.items' => [
-                'array',
-                'present',
-                'required',
-            ],
-            'collection.*.items.*.deepIsEmail' => [
-                'boolean',
-                'required',
-            ],
-            'collection.*.items.*.deepString' => [
-                'required',
-                'string',
-            ],
-            'collection.*.string' => [
-                'required',
-                'string',
-            ],
-            'collection.0' => [],
-            'collection.0.items.0' => [],
-            'collection.0.items.1.deepString' => [
-                'email',
-                'required',
-                'string',
-            ],
+            'collection' => ['present', 'array',],
+            'collection.0.validate_as_email' => ['boolean', 'required'],
+            'collection.0.string' => ['required', 'string'],
+            'collection.0.items' => ['present', 'array', 'required'],
+            'collection.0.items.0.deep_validate_as_email' => ['boolean', 'required'],
+            'collection.0.items.0.deep_string' => ['required', 'string'],
+            'collection.0.items.1.deep_validate_as_email' => ['boolean', 'required'],
+            'collection.0.items.1.deep_string' => ['required', 'string', 'email'],
         ], [
             'collection' => [
                 [
                     'string' => 'Hello World',
-                    'isEmail' => false,
+                    'validate_as_email' => false,
                     'items' => [
-                        ['deepString' => 'Hello World', 'deepIsEmail' => false],
-                        ['deepString' => 'hello@world.test', 'deepIsEmail' => true],
+                        ['deep_string' => 'Hello World', 'deep_validate_as_email' => false],
+                        ['deep_string' => 'hello@world.test', 'deep_validate_as_email' => true],
                     ],
                 ],
             ],
@@ -795,10 +1082,10 @@ it('can nest data in deep collections using relative rule generation', function 
             'collection' => [
                 [
                     'string' => 'Hello World',
-                    'isEmail' => false,
+                    'validate_as_email' => false,
                     'items' => [
-                        ['deepString' => 'Hello World', 'deepIsEmail' => false],
-                        ['deepString' => 'hello@world.test', 'deepIsEmail' => true],
+                        ['deep_string' => 'Hello World', 'deep_validate_as_email' => false],
+                        ['deep_string' => 'hello@world.test', 'deep_validate_as_email' => true],
                     ],
                 ],
             ],
@@ -807,27 +1094,27 @@ it('can nest data in deep collections using relative rule generation', function 
             'collection' => [
                 [
                     'string' => 'Hello World',
-                    'isEmail' => false,
+                    'validate_as_email' => false,
                     'items' => [
-                        ['deepString' => 'Invalid Email', 'deepIsEmail' => true],
-                        ['deepString' => 'Hello World', 'deepIsEmail' => false],
-                        ['deepString' => 'hello@world.test', 'deepIsEmail' => true],
+                        ['deep_string' => 'Invalid Email', 'deep_validate_as_email' => true],
+                        ['deep_string' => 'Hello World', 'deep_validate_as_email' => false],
+                        ['deep_string' => 'hello@world.test', 'deep_validate_as_email' => true],
                     ],
                 ],
                 [
                     'string' => 'Invalid Email',
-                    'isEmail' => true,
+                    'validate_as_email' => true,
                     'items' => [
-                        ['deepString' => 'Invalid Email', 'deepIsEmail' => true],
-                        ['deepString' => 'Hello World', 'deepIsEmail' => false],
-                        ['deepString' => 'hello@world.test', 'deepIsEmail' => true],
+                        ['deep_string' => 'Invalid Email', 'deep_validate_as_email' => true],
+                        ['deep_string' => 'Hello World', 'deep_validate_as_email' => false],
+                        ['deep_string' => 'hello@world.test', 'deep_validate_as_email' => true],
                     ],
                 ],
             ],
         ], [
+            'collection.0.items.0.deep_string' => ['The collection.0.items.0.deep string must be a valid email address.'],
             'collection.1.string' => ['The collection.1.string must be a valid email address.'],
-            'collection.0.items.0.deepString' => ['The collection.0.items.0.deepString must be a valid email address.'],
-            'collection.1.items.0.deepString' => ['The collection.1.items.0.deepString must be a valid email address.'],
+            'collection.1.items.0.deep_string' => ['The collection.1.items.0.deep string must be a valid email address.'],
         ]);
 })->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
 
@@ -837,11 +1124,11 @@ it('can nest data using relative rule generation', function () {
         public string $string;
 
         #[Required]
-        public bool $isEmail;
+        public bool $validate_as_email;
 
         public static function rules(array $relativePayload, ?string $path): array
         {
-            if ($relativePayload['isEmail'] ?? false) {
+            if ($relativePayload['validate_as_email'] ?? false) {
                 return [
                     'string' => ['required', 'string', 'email'],
                 ];
@@ -858,7 +1145,7 @@ it('can nest data using relative rule generation', function () {
     $payload = [
         'nested' => [
             'string' => 'Hello World',
-            'isEmail' => true,
+            'validate_as_email' => true,
         ],
     ];
 
@@ -866,7 +1153,7 @@ it('can nest data using relative rule generation', function () {
         ->assertRules([
             'nested' => ['required', 'array'],
             'nested.string' => ['required', 'string', 'email'],
-            'nested.isEmail' => ['required', 'boolean'],
+            'nested.validate_as_email' => ['boolean', 'required'],
         ], $payload)
         ->assertErrors($payload);
 })->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
@@ -887,10 +1174,32 @@ it('will merge overwritten rules on inherited data objects', function () {
     ];
 
     DataValidationAsserter::for($data)->assertRules([
-        'nested' => ['array', 'required'],
+        'nested' => ['required', 'array'],
         'nested.string' => ['string', 'required', 'min:10', 'max:100'],
-        'collection' => ['array', 'present'],
-        'collection.*.string' => ['string', 'required'],
+        'collection' => ['present', 'array'],
         'collection.0.string' => ['string', 'required', 'min:10', 'max:100'],
     ], $payload)->assertErrors($payload);
 })->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+
+it('will reduce attribute rules to Laravel rules in the end', function () {
+    $dataClass = new class () extends Data {
+        public int $property;
+
+        public static function rules(): array
+        {
+            return [
+                'property' => [
+                    new IntegerType(),
+                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
+                ],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)->assertRules([
+        'property' => [
+            'integer',
+            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
+        ],
+    ]);
+});

@@ -7,6 +7,15 @@ use Illuminate\Validation\NestedRules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\ValidationRuleParser;
 
+use Spatie\LaravelData\DataPipeline;
+use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
+use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
+use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
+use Spatie\LaravelData\Normalizers\ArrayNormalizer;
+use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
+use Spatie\LaravelData\Support\Validation\DataRules;
 use function PHPUnit\Framework\assertTrue;
 
 use Spatie\LaravelData\Data;
@@ -19,22 +28,24 @@ class DataValidationAsserter
     private readonly string $dataClass;
 
     public static function for(
-        string|Data $dataClass
+        string|object $dataClass
     ): self {
         return new self($dataClass);
     }
 
     public function __construct(
-        string|Data $dataClass,
+        string|object $dataClass,
     ) {
-        $this->dataClass = $dataClass instanceof Data
+        $this->dataClass = is_object($dataClass)
             ? $dataClass::class
             : $dataClass;
     }
 
     public function assertOk(array $payload): self
     {
-        $this->dataClass::validate($payload);
+        $this->dataClass::validate(
+            $this->pipePayload($payload)
+        );
 
         expect(true)->toBeTrue();
 
@@ -46,11 +57,13 @@ class DataValidationAsserter
         ?array $errors = null
     ): self {
         try {
-            $this->dataClass::validate($payload);
+            $this->dataClass::validate(
+                $this->pipePayload($payload)
+            );
         } catch (ValidationException $exception) {
             expect(true)->toBeTrue();
 
-            if ($errors) {
+            if ($errors !== null) {
                 expect($exception->errors())->toBe($errors);
             }
 
@@ -66,31 +79,29 @@ class DataValidationAsserter
         array $rules,
         array $payload = []
     ): self {
-        $inferredRules = collect($this->dataClass::getValidationRules(payload: $payload))
-            ->mapWithKeys(function (array|NestedRules $rules, string $key) use ($payload) {
-                if ($rules instanceof NestedRules) {
-                    $parser = new ValidationRuleParser($payload);
+        $inferredRules = app(DataValidationRulesResolver::class)->execute(
+            $this->dataClass,
+            new DataRules([]),
+            $this->pipePayload($payload)
+        );
 
-                    $result = $parser->explode([$key => $rules]);
+        $parser = new ValidationRuleParser($payload);
 
-                    return collect($result->rules)
-                        ->map(fn ($rules) => array_values(Arr::sort($rules)))
-                        ->sortKeys()
-                        ->all();
-                }
-
-                return [$key => array_values(Arr::sort($rules))];
-            })
-            ->sortKeys()
-            ->all();
-
-        $rules = collect($rules)
-            ->map(fn (array $rules) => array_values(Arr::sort($rules)))
-            ->sortKeys()
-            ->all();
-
-        expect($inferredRules)->toEqual($rules);
+        expect($parser->explode($inferredRules->rules)->rules)->toEqual($rules);
 
         return $this;
+    }
+
+    private function pipePayload(array $payload): array
+    {
+        $properties = app(DataPipeline::class)
+            ->using($payload)
+            ->normalizer(ArrayNormalizer::class)
+            ->into($this->dataClass)
+            ->through(MapPropertiesDataPipe::class)
+            ->through(ValidatePropertiesDataPipe::class)
+            ->execute();
+
+        return $properties->all();
     }
 }
