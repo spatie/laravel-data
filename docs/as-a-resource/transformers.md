@@ -41,7 +41,7 @@ class ArtistData extends Data{
 }
 ```
 
-Next to a `DateTimeInterfaceTransformer` the package also ships with an `ArraybleTransformer` that transforms an `Arrayable` object to an array.
+Next to a `DateTimeInterfaceTransformer` the package also ships with an `ArrayableTransformer` that transforms an `Arrayable` object to an array.
 
 It is possible to create transformers for your specific types. You can find more info [here](/docs/laravel-data/v2/advanced-usage/creating-a-transformer).
 
