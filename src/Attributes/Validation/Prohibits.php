@@ -20,7 +20,7 @@ class Prohibits extends StringValidationAttribute
         return 'prohibits';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [
             $this->normalizeValue($this->fields),

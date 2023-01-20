@@ -16,7 +16,7 @@ class DateFormat extends StringValidationAttribute
         return 'date_format';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [$this->format];
     }

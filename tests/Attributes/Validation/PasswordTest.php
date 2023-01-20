@@ -9,7 +9,7 @@ test(
         ValidationPassword::$defaultCallback = null;
         $setDefaults();
 
-        [$rule] = (new Password(default: true))->getRules();
+        [$rule] = (new Password(default: true))->getRules(null);
         $clazz = new ReflectionClass($rule);
 
         foreach ($expectedConfig as $key => $expected) {

@@ -20,7 +20,7 @@ class StartsWith extends StringValidationAttribute
         return 'starts_with';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [$this->normalizeValue($this->values)];
     }

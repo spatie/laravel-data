@@ -47,7 +47,7 @@ class Unique extends ValidationAttribute
         $this->rule = $rule;
     }
 
-    public function getRules(): array
+    public function getRules(?string $path): array
     {
         return [$this->rule];
     }

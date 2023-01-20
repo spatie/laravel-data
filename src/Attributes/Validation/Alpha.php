@@ -12,7 +12,7 @@ class Alpha extends StringValidationAttribute
         return 'alpha';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [];
     }

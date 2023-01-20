@@ -35,7 +35,7 @@ it("won't add a required rule when a property is non-nullable", function () {
         public string $string;
     });
 
-    $rules = $this->inferrer->handle($dataProperty, new RulesCollection());
+    $rules = $this->inferrer->handle($dataProperty, new RulesCollection(), null);
 
     expect($rules->all())->toEqualCanonicalizing([new Required()]);
 });
@@ -45,7 +45,7 @@ it("won't add a required rule when a property is nullable", function () {
         public ?string $string;
     });
 
-    $rules = $this->inferrer->handle($dataProperty, new RulesCollection());
+    $rules = $this->inferrer->handle($dataProperty, new RulesCollection(), null);
 
     expect($rules->all())->toEqualCanonicalizing([]);
 });
@@ -57,7 +57,8 @@ it("won't add a required rule when a property already contains a required rule",
 
     $rules = $this->inferrer->handle(
         $dataProperty,
-        RulesCollection::create()->add(new RequiredIf('bla'))
+        RulesCollection::create()->add(new RequiredIf('bla')),
+        null
     );
 
     expect($rules->all())->toEqualCanonicalizing(['required_if:bla']);
@@ -70,10 +71,11 @@ it("won't add a required rule when a property already contains a required object
 
     $rules = $this->inferrer->handle(
         $dataProperty,
-        RulesCollection::create()->add(Required::create())
+        RulesCollection::create()->add(Required::create()),
+        null
     );
 
-    expect($rules->normalize())->toEqualCanonicalizing(['required']);
+    expect($rules->normalize(null))->toEqualCanonicalizing(['required']);
 });
 
 it(
@@ -85,10 +87,11 @@ it(
 
         $rules = $this->inferrer->handle(
             $dataProperty,
-            RulesCollection::create()->add(BooleanType::create())
+            RulesCollection::create()->add(BooleanType::create()),
+            null
         );
 
-        expect($rules->normalize())->toEqualCanonicalizing([new BooleanType()]);
+        expect($rules->normalize(null))->toEqualCanonicalizing([new BooleanType()]);
     }
 );
 
@@ -101,10 +104,11 @@ it(
 
         $rules = $this->inferrer->handle(
             $dataProperty,
-            RulesCollection::create()->add(Nullable::create())
+            RulesCollection::create()->add(Nullable::create()),
+            null
         );
 
-        expect($rules->normalize())->toEqualCanonicalizing([new Nullable()]);
+        expect($rules->normalize(null))->toEqualCanonicalizing([new Nullable()]);
     }
 );
 
@@ -117,10 +121,11 @@ it('has support for rules that cannot be converted to string', function () {
         $dataProperty,
         RulesCollection::create()->add(
             new \Spatie\LaravelData\Attributes\Validation\Enum(new BaseEnum('SomeClass'))
-        )
+        ),
+        null,
     );
 
-    expect($rules->normalize())->toEqualCanonicalizing([
+    expect($rules->normalize(null))->toEqualCanonicalizing([
         'required', new BaseEnum('SomeClass'),
     ]);
 });
@@ -133,10 +138,11 @@ it("won't add required to a data collection since it is already present", functi
 
     $rules = $this->inferrer->handle(
         $dataProperty,
-        RulesCollection::create()->add(new Present(), new ArrayType())
+        RulesCollection::create()->add(new Present(), new ArrayType()),
+        null
     );
 
-    expect($rules->normalize())->toEqualCanonicalizing(['present', 'array']);
+    expect($rules->normalize(null))->toEqualCanonicalizing(['present', 'array']);
 });
 
 it("won't add required rules to undefinable properties", function () {
@@ -144,7 +150,7 @@ it("won't add required rules to undefinable properties", function () {
         public string|Optional $string;
     });
 
-    $rules = $this->inferrer->handle($dataProperty, []);
+    $rules = $this->inferrer->handle($dataProperty, [], null);
 
     expect($rules)->toEqualCanonicalizing([]);
 })->throws(TypeError::class);

@@ -17,7 +17,7 @@ class AfterOrEqual extends StringValidationAttribute
         return 'after_or_equal';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [$this->normalizeValue($this->date)];
     }

@@ -33,10 +33,10 @@ class RulesMapper
     {
     }
 
-    public function execute(array $rules): array
+    public function execute(array $rules, ?string $path): array
     {
         $rules = array_map(fn (mixed $rule) => match (true) {
-            is_string($rule) => $this->resolveStringRule($rule),
+            is_string($rule) => $this->resolveStringRule($rule, $path),
             $rule instanceof ValidationRule => $rule,
             $rule instanceof DimensionsRule => new Dimensions(rule: $rule),
             $rule instanceof EnumRule => new Enum($rule),
@@ -49,14 +49,14 @@ class RulesMapper
             $rule instanceof RequiredIfRule => new Required($rule),
             $rule instanceof UniqueRule => new Unique(rule: $rule),
             $rule instanceof RuleContract => new Rule($rule),
-            $rule instanceof Rule => $this->execute($rule->getRules()),
+            $rule instanceof Rule => $this->execute($rule->getRules($path), $path),
             default => new Rule($rule),
         }, $rules);
 
         return Arr::flatten($rules);
     }
 
-    protected function resolveStringRule(string $rule): mixed
+    protected function resolveStringRule(string $rule, ?string $path): mixed
     {
         if (! str_contains($rule, '|')) {
             try {
@@ -68,6 +68,6 @@ class RulesMapper
 
         $rules = explode('|', $rule);
 
-        return $this->execute($rules);
+        return $this->execute($rules, $path);
     }
 }

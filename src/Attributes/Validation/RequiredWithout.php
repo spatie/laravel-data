@@ -22,7 +22,7 @@ class RequiredWithout extends StringValidationAttribute implements RequiringRule
         return 'required_without';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [
             $this->normalizeValue($this->fields),

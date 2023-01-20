@@ -45,12 +45,12 @@ class DataPropertyRulesResolver
         $toplevelRules = RulesCollection::create();
 
         foreach (app(DataConfig::class)->getRuleInferrers() as $inferrer) {
-            $inferrer->handle($property, $toplevelRules);
+            $inferrer->handle($property, $toplevelRules, $path);
         }
 
         $toplevelRules = $toplevelRules->add(ArrayType::create());
 
-        $dataRules->rules[$path] = $toplevelRules->normalize();
+        $dataRules->rules[$path] = $toplevelRules->normalize($path);
 
         app(DataValidationRulesResolver::class)->execute(
             $property->type->dataClass,

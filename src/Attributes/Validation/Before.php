@@ -17,7 +17,7 @@ class Before extends StringValidationAttribute
         return 'before';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [$this->normalizeValue($this->date)];
     }

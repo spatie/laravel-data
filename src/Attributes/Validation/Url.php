@@ -12,7 +12,7 @@ class Url extends StringValidationAttribute
         return 'url';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [];
     }

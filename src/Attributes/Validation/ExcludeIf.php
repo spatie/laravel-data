@@ -25,7 +25,7 @@ class ExcludeIf extends StringValidationAttribute
         );
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [
             $this->field,

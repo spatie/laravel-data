@@ -22,7 +22,7 @@ class NotIn extends ValidationAttribute
         $this->rule = new BaseNotIn(Arr::flatten($values));
     }
 
-    public function getRules(): array
+    public function getRules(?string $path): array
     {
         return [$this->rule];
     }

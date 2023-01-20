@@ -17,7 +17,7 @@ class CurrentPassword extends StringValidationAttribute
         return 'current_password';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return $this->guard === null
             ? []

@@ -23,6 +23,7 @@ use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\RequiredIf;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\WithoutValidation;
@@ -534,40 +535,36 @@ it('can use nested payloads in nested data', function () {
 });
 
 test('rules in nested data are rewritten according to their fields', function () {
-    // Should we do the same with the `rules` method?
-    // Also implement for collections
-    eval(<<<'PHP'
-            use Spatie\LaravelData\Attributes\Validation\In;
-            use Spatie\LaravelData\Attributes\Validation\RequiredIf;
-            use Spatie\LaravelData\Attributes\Validation\RequiredWith;
-            use Spatie\LaravelData\Data;
-            class NestedClassG extends Data {
-                public bool $alsoAString;
+    class ValidationTestNestedClassWithFieldReference extends Data
+    {
+        public bool $check_string;
 
-                #[RequiredIf('alsoAString', true)]
-                public string $string;
-            }
-        PHP);
+        #[RequiredIf('check_string', true)]
+        public string $string;
+    }
 
     $dataClass = new class () extends Data {
-        public \NestedClassG $nested;
+        public ValidationTestNestedClassWithFieldReference $nested;
     };
 
     DataValidationAsserter::for($dataClass)
         ->assertOk([
-            'nested' => ['alsoAString' => '0'],
+            'nested' => ['check_string' => '0'],
         ])
         ->assertErrors([
-            'nested' => ['alsoAString' => '1'],
-        ]) // Fails when we prefix the rule with nested.
+            'nested' => ['check_string' => '1'],
+        ])
         ->assertRules(
             rules: [
                 'nested' => ['required', 'array'],
-                'nested.alsoAString' => ['boolean'],
-                'nested.string' => ['required_if:alsoAString,1', 'string'],
+                'nested.check_string' => ['boolean'],
+                'nested.string' => ['string', 'required_if:nested.check_string,1'],
+            ],
+            payload: [
+                'nested' => ['check_string' => '1'],
             ]
         );
-})->skip('Feature to add');
+});
 
 it('will validate a collection', function () {
     $dataClass = new class () extends Data {

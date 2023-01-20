@@ -12,7 +12,7 @@ class AlphaNumeric extends StringValidationAttribute
         return 'alpha_num';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [];
     }

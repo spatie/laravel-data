@@ -14,12 +14,15 @@ class AttributesRuleInferrer implements RuleInferrer
     {
     }
 
-    public function handle(DataProperty $property, RulesCollection $rules): RulesCollection
-    {
+    public function handle(
+        DataProperty $property,
+        RulesCollection $rules,
+        ?string $path,
+    ): RulesCollection {
         $property
             ->attributes
-            ->filter(fn (object $attribute) => $attribute instanceof ValidationRule)
-            ->each(function (ValidationRule $rule) use ($rules) {
+            ->filter(fn(object $attribute) => $attribute instanceof ValidationRule)
+            ->each(function (ValidationRule $rule) use ($path, $rules) {
                 if (! $rule instanceof Rule) {
                     $rules->add($rule);
 
@@ -27,7 +30,7 @@ class AttributesRuleInferrer implements RuleInferrer
                 }
 
                 $rules->add(
-                    ...$this->ruleAttributesResolver->execute($rule->getRules())
+                    ...$this->ruleAttributesResolver->execute($rule->getRules($path), $path)
                 );
             });
 

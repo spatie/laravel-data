@@ -16,7 +16,7 @@ class InArray extends StringValidationAttribute
         return 'in_array';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [$this->field];
     }

@@ -16,7 +16,7 @@ class Regex extends StringValidationAttribute
         return 'regex';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [
             $this->normalizeValue($this->pattern),

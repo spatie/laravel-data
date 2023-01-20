@@ -20,7 +20,7 @@ class MimeTypes extends StringValidationAttribute
         return 'mimetypes';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [$this->normalizeValue($this->mimeTypes)];
     }

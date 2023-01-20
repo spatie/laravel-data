@@ -17,7 +17,7 @@ class DateEquals extends StringValidationAttribute
         return 'date_equals';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [$this->normalizeValue($this->date)];
     }

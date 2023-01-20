@@ -22,7 +22,7 @@ class In extends ValidationAttribute
         $this->rule = new BaseIn(Arr::flatten($values));
     }
 
-    public function getRules(): array
+    public function getRules(?string $path): array
     {
         return [$this->rule];
     }

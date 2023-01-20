@@ -51,10 +51,10 @@ class RulesCollection
         return $this->rules->contains(fn(ValidationRule $rule) => $rule instanceof $class);
     }
 
-    public function normalize(): array
+    public function normalize(?string $path): array
     {
         return $this->rules
-            ->map(fn(ValidationRule $rule) => $rule->getRules())
+            ->map(fn(ValidationRule $rule) => $rule->getRules($path))
             ->flatten()
             ->all();
     }

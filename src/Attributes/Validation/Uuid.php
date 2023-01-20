@@ -12,7 +12,7 @@ class Uuid extends StringValidationAttribute
         return 'uuid';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [];
     }

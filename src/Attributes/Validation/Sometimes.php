@@ -12,7 +12,7 @@ class Sometimes extends StringValidationAttribute
         return 'sometimes';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [];
     }

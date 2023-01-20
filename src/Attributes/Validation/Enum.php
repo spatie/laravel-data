@@ -20,7 +20,7 @@ class Enum extends ValidationAttribute
         return 'enum';
     }
 
-    public function getRules(): array
+    public function getRules(?string $path): array
     {
         return [$this->enum];
     }

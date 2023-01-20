@@ -44,9 +44,9 @@ class DataCollectionPropertyRulesResolver
         $toplevelRules->add(Present::create());
         $toplevelRules->add(ArrayType::create());
 
-        $this->attributesRuleInferrer->handle($property, $toplevelRules);
+        $this->attributesRuleInferrer->handle($property, $toplevelRules, $path);
 
-        $dataRules->rules[$path] = $toplevelRules->normalize();
+        $dataRules->rules[$path] = $toplevelRules->normalize($path);
 
         $dataRules->rules["{$path}.*"] = Rule::forEach(function (mixed $value, mixed $attribute) use ($fullPayload, $property) {
             // Attribute has full path, probably required for relative rule reference replacement

@@ -24,7 +24,7 @@ class RequiredUnless extends StringValidationAttribute implements RequiringRule
         return 'required_unless';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [
             $this->field,

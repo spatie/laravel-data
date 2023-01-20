@@ -12,7 +12,7 @@ class Nullable extends StringValidationAttribute
         return 'nullable';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [];
     }

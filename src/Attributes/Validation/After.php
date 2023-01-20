@@ -17,7 +17,7 @@ class After extends StringValidationAttribute
         return 'after';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [$this->normalizeValue($this->date)];
     }

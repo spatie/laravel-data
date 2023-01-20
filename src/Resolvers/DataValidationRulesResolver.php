@@ -73,10 +73,10 @@ class DataValidationRulesResolver
             $rules = new RulesCollection();
 
             foreach ($this->dataConfig->getRuleInferrers() as $inferrer) {
-                $rules = $inferrer->handle($dataProperty, $rules);
+                $rules = $inferrer->handle($dataProperty, $rules, $path);
             }
 
-            $dataRules->rules[$relativePath] = $rules->normalize();
+            $dataRules->rules[$relativePath] = $rules->normalize($path);
         }
 
         $dataRules->rules = array_merge(
@@ -105,14 +105,17 @@ class DataValidationRulesResolver
         $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $fullPayload]);
 
         return collect($overwrittenRules)
-            ->map(
-                fn(mixed $rules) => collect(Arr::wrap($rules))
+            ->mapWithKeys(function (mixed $rules, string $key) use ($payloadPath) {
+                $overwrittenKey = $payloadPath === null ? $key : "{$payloadPath}.{$key}";
+
+                $overwrittenRules = collect(Arr::wrap($rules))
                     ->map(fn(mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
-                    ->map(fn(mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules() : $rule)
+                    ->map(fn(mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules($payloadPath) : $rule)
                     ->flatten()
-                    ->all()
-            )
-            ->keyBy(fn(mixed $rules, string $key) => $payloadPath === null ? $key : "{$payloadPath}.{$key}")
+                    ->all();
+
+                return [$overwrittenKey => $overwrittenRules];
+            })
             ->all();
     }
 

@@ -13,7 +13,7 @@ class Required extends ValidationAttribute implements RequiringRule
     {
     }
 
-    public function getRules(): array
+    public function getRules(?string $path): array
     {
         return [$this->rule ?? static::keyword()];
     }

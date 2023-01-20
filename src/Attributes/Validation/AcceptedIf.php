@@ -17,7 +17,7 @@ class AcceptedIf extends StringValidationAttribute
         return 'accepted_if';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [
             $this->field,

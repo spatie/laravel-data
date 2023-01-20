@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use BackedEnum;
 use Carbon\Carbon;
 use DateTimeInterface;
+use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Stringable;
 
@@ -12,13 +13,11 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
 {
     abstract public static function keyword(): string;
 
-    abstract public function getRules(): array;
-
     abstract public static function create(string ...$parameters): static;
 
     public function __toString(): string
     {
-        return implode('|', $this->getRules());
+        return implode('|', $this->getRules(null));
     }
 
     protected function normalizeValue(mixed $mixed): ?string
@@ -40,7 +39,7 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
         }
 
         if (is_array($mixed)) {
-            return implode(',', array_map(fn (mixed $mixed) => $this->normalizeValue($mixed), $mixed));
+            return implode(',', array_map(fn(mixed $mixed) => $this->normalizeValue($mixed), $mixed));
         }
 
         if ($mixed instanceof DateTimeInterface) {
@@ -52,6 +51,13 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
         }
 
         return (string) $mixed;
+    }
+
+    protected function normalizeField(FieldReference $reference, ?string $path): string
+    {
+        return $path === null
+            ? $reference->name
+            : "{$path}.{$reference->name}";
     }
 
     protected static function parseDateValue(mixed $value): mixed
@@ -88,5 +94,13 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
         }
 
         return $value;
+    }
+
+    protected function parseFieldReference(
+        string|FieldReference $reference
+    ): FieldReference {
+        return $reference instanceof FieldReference
+            ? $reference
+            : new FieldReference($reference);
     }
 }

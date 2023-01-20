@@ -5,17 +5,21 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use BackedEnum;
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredIf extends StringValidationAttribute implements RequiringRule
 {
+    protected FieldReference $field;
+
     protected string|array $values;
 
     public function __construct(
-        protected string $field,
-        array | string | BackedEnum ...$values
+        string|FieldReference $field,
+        array|string|BackedEnum ...$values
     ) {
+        $this->field = $this->parseFieldReference($field);
         $this->values = Arr::flatten($values);
     }
 
@@ -24,10 +28,12 @@ class RequiredIf extends StringValidationAttribute implements RequiringRule
         return 'required_if';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
+        ray()->backtrace();
+
         return [
-            $this->field,
+            $this->normalizeField($this->field, $path),
             $this->normalizeValue($this->values),
         ];
     }

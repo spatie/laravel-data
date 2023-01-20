@@ -18,7 +18,7 @@ it('can normalize values', function ($input, $output) {
             return $this->normalizeValue($value);
         }
 
-        public function getRules(): array
+        public function getRules(?string $path): array
         {
             return [];
         }

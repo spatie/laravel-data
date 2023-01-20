@@ -16,7 +16,7 @@ class MultipleOf extends StringValidationAttribute
         return 'multiple_of';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [$this->value];
     }

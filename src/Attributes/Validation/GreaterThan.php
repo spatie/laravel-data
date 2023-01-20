@@ -16,7 +16,7 @@ class GreaterThan extends StringValidationAttribute
         return 'gt';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [$this->field];
     }

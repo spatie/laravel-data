@@ -50,5 +50,5 @@ it('can normalize rules', function () {
 
     expect($collection)
         ->all()->toEqual([new Min(10), new Required(), new Enum(FakeEnum::class)])
-        ->normalize()->toEqual([new Min(10), new Required(), new BaseEnum(FakeEnum::class)]);
+        ->normalize(null)->toEqual([new Min(10), new Required(), new BaseEnum(FakeEnum::class)]);
 });

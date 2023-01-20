@@ -12,7 +12,7 @@ class Prohibited extends ValidationAttribute
     {
     }
 
-    public function getRules(): array
+    public function getRules(?string $path): array
     {
         return [$this->rule ?? static::keyword()];
     }

@@ -23,7 +23,7 @@ it('gets the correct rules', function (
         $this->expectException($exception);
     }
 
-    expect($attribute->getRules())->toMatchArray([$expected]);
+    expect($attribute->getRules(null))->toMatchArray([$expected]);
 })->with('attributes');
 
 it('creates the correct attributes', function (
@@ -38,7 +38,7 @@ it('creates the correct attributes', function (
         return;
     }
 
-    $resolved = app(RulesMapper::class)->execute([$expected]);
+    $resolved = app(RulesMapper::class)->execute([$expected], null);
 
     expect($resolved[0])->toEqual($expectedCreatedAttribute);
 })->with('attributes');
@@ -62,7 +62,7 @@ it('can use the Rule rule', function () {
         new Required()
     );
 
-    expect($rule->getRules())->toMatchArray([
+    expect($rule->getRules(null))->toMatchArray([
         'test',
         'a',
         'b',
@@ -95,7 +95,7 @@ it('can use the Rule rule with invokable rules', function () {
         new Required()
     );
 
-    expect($rule->getRules())->toMatchArray([
+    expect($rule->getRules(null))->toMatchArray([
         'test',
         'a',
         'b',

@@ -16,7 +16,7 @@ class Size extends StringValidationAttribute
         return 'size';
     }
 
-    public function parameters(): array
+    public function parameters(?string $path): array
     {
         return [$this->size];
     }
