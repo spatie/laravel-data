@@ -31,7 +31,7 @@ class DataValidationRulesResolver
         array $fullPayload,
         ValidationPath $path,
         DataRules $dataRules,
-    ): DataRules {
+    ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
 
         foreach ($dataClass->properties as $dataProperty) {
@@ -63,7 +63,7 @@ class DataValidationRulesResolver
 
         $this->resolveOverwrittenRules($dataClass, $fullPayload, $path, $dataRules);
 
-        return $dataRules;
+        return $dataRules->rules;
     }
 
     protected function resolveDataSpecificRules(
@@ -142,16 +142,14 @@ class DataValidationRulesResolver
                 return ['array'];
             }
 
-            $dataRules = DataRules::create();
-
-            app(DataValidationRulesResolver::class)->execute(
+            $rules = $this->execute(
                 $dataProperty->type->dataClass,
                 $fullPayload,
                 ValidationPath::create($attribute),
-                $dataRules
+                DataRules::create()
             );
 
-            return collect($dataRules->rules)->keyBy(
+            return collect($rules)->keyBy(
                 fn (mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
             )->all();
         }));
