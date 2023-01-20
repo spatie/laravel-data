@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Attributes\Validation;
 
-use Spatie\LaravelData\Support\Validation\RulesToLaravel;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 abstract class ObjectValidationAttribute extends ValidationAttribute

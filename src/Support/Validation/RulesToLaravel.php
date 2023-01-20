@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Support\Validation;
 
 use BackedEnum;
 use DateTimeInterface;
-use Exception;
 use Illuminate\Contracts\Validation\InvokableRule as InvokableRuleContract;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Arr;
@@ -23,7 +22,7 @@ class RulesToLaravel
 
         if (is_array($rule)) {
             return Arr::flatten(array_map(
-                fn(mixed $rule) => $this->execute($rule, $path),
+                fn (mixed $rule) => $this->execute($rule, $path),
                 $rule
             ));
         }
@@ -52,8 +51,8 @@ class RulesToLaravel
         ValidationPath $path
     ): array {
         $parameters = collect($rule->parameters())
-            ->map(fn(mixed $value) => $this->normalizeRuleParameter($value, $path))
-            ->reject(fn(mixed $value) => $value === null);
+            ->map(fn (mixed $value) => $this->normalizeRuleParameter($value, $path))
+            ->reject(fn (mixed $value) => $value === null);
 
 
         if ($parameters->isEmpty()) {
@@ -61,7 +60,7 @@ class RulesToLaravel
         }
 
         $parameters = $parameters->map(
-            fn(mixed $value, int|string $key) => is_string($key) ? "{$key}={$value}" : $value
+            fn (mixed $value, int|string $key) => is_string($key) ? "{$key}={$value}" : $value
         );
 
         return ["{$rule->keyword()}:{$parameters->join(',')}"];
@@ -89,7 +88,7 @@ class RulesToLaravel
 
         if (is_array($parameter)) {
             $subParameters = array_map(
-                fn(mixed $subParameter) => $this->normalizeRuleParameter($subParameter, $path),
+                fn (mixed $subParameter) => $this->normalizeRuleParameter($subParameter, $path),
                 $parameter
             );
 

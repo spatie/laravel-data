@@ -12,11 +12,10 @@ use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\DataRules;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
-use Spatie\LaravelData\Support\Validation\RulesToValidationRule;
 use Spatie\LaravelData\Support\Validation\RulesToLaravel;
+use Spatie\LaravelData\Support\Validation\RulesToValidationRule;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
-use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 class DataValidationRulesResolver
 {
@@ -153,7 +152,7 @@ class DataValidationRulesResolver
             );
 
             return collect($dataRules->rules)->keyBy(
-                fn(mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
+                fn (mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
             )->all();
         }));
     }
@@ -179,7 +178,7 @@ class DataValidationRulesResolver
         foreach ($overwrittenRules as $key => $rules) {
             $dataRules->add(
                 $path->relative($key),
-                collect(Arr::wrap($rules))->map(fn(mixed $rule) => $this->rulesNormalizer->execute($rule, $path))->flatten()->all()
+                collect(Arr::wrap($rules))->map(fn (mixed $rule) => $this->rulesNormalizer->execute($rule, $path))->flatten()->all()
             );
         }
     }

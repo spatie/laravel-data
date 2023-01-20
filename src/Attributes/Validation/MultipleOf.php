@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
-use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class MultipleOf extends StringValidationAttribute

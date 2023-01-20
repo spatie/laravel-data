@@ -81,7 +81,7 @@ class RulesToValidationRule
     protected function resolveArrayRule(array $rules): array
     {
         return Arr::flatten(array_map(
-            fn(mixed $rule) => $this->execute($rule),
+            fn (mixed $rule) => $this->execute($rule),
             $rules
         ));
     }

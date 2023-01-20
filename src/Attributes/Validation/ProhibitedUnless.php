@@ -6,7 +6,6 @@ use Attribute;
 use BackedEnum;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
-use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ProhibitedUnless extends StringValidationAttribute

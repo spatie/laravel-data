@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
-use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
