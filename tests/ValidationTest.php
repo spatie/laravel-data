@@ -195,7 +195,7 @@ it('can validate an optional attribute', function () {
         ->assertOk(['property' => []])
         ->assertOk(['property' => null])
         ->assertRules([
-            'property' => ['sometimes', 'nullable', 'array'],
+            'property' => ['nullable', 'sometimes', 'array'],
         ]);
 
     DataValidationAsserter::for(new class () extends Data {
@@ -476,7 +476,7 @@ it('can add additional rules to nested data', function () {
 
     DataValidationAsserter::for($dataClass)
         ->assertRules([
-            'nested' => ['required', 'bail', 'array'],
+            'nested' => ['required', 'array', 'bail'],
             'nested.string' => ['required', 'string'],
         ]);
 });
@@ -647,7 +647,7 @@ it('will validate a nullable collection', function () {
         ->assertRules([], payload: [])
         ->assertRules([], payload: ['collection' => null])
         ->assertRules([
-            'collection' => ['present', 'array'],
+            'collection' => ['nullable', 'present', 'array'],
             'collection.0.string' => ['required', 'string'],
         ], payload: [
             'collection' => [[]],
@@ -676,10 +676,10 @@ it('will validate an optional collection', function () {
             ],
         ])
         ->assertRules([
-            'collection' => ['present', 'array'],
+            'collection' => ['sometimes', 'present', 'array'],
         ], payload: ['collection' => null])
         ->assertRules([
-            'collection' => ['present', 'array'],
+            'collection' => ['sometimes', 'present', 'array'],
             'collection.0.string' => ['required', 'string'],
         ], payload: [
             'collection' => [[]],
@@ -702,28 +702,28 @@ it('can overwrite collection class rules', function () {
     };
 
     DataValidationAsserter::for($dataClass)
-//        ->assertOk([
-//            'collection' => [
-//                ['string' => 'Never Gonna'],
-//                ['string' => 'Give You Up'],
-//            ],
-//        ])
-//        ->assertOk([
-//            'collection' => [
-//                ['string' => 'Never Gonna'],
-//            ],
-//        ])
-//        ->assertErrors([
-//            'collection' => [
-//                ['string' => 'Never Gonna'],
-//                ['string' => 'Give You Up'],
-//                ['string' => 'Never Gonna'],
-//            ],
-//        ])
-//        ->assertErrors(['collection' => []])
-//        ->assertRules([
-//            'collection' => ['array', 'min:1', 'max:2'],
-//        ], payload: [])
+        ->assertOk([
+            'collection' => [
+                ['string' => 'Never Gonna'],
+                ['string' => 'Give You Up'],
+            ],
+        ])
+        ->assertOk([
+            'collection' => [
+                ['string' => 'Never Gonna'],
+            ],
+        ])
+        ->assertErrors([
+            'collection' => [
+                ['string' => 'Never Gonna'],
+                ['string' => 'Give You Up'],
+                ['string' => 'Never Gonna'],
+            ],
+        ])
+        ->assertErrors(['collection' => []])
+        ->assertRules([
+            'collection' => ['array', 'min:1', 'max:2'],
+        ], payload: [])
         ->assertRules([
             'collection' => ['array', 'min:1', 'max:2'],
             'collection.0.string' => ['required', 'string'],
@@ -1239,7 +1239,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
                 ],
             ];
         }
@@ -1248,7 +1248,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
         ],
     ]);
 });

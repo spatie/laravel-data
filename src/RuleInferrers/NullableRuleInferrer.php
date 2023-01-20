@@ -15,7 +15,7 @@ class NullableRuleInferrer implements RuleInferrer
         ValidationPath $path,
     ): PropertyRules {
         if ($property->type->isNullable && ! $rules->hasType(Nullable::class)) {
-            $rules->add(new Nullable());
+            $rules->prepend(new Nullable());
         }
 
         return $rules;

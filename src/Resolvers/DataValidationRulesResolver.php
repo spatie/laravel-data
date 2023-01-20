@@ -3,8 +3,13 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Spatie\LaravelData\Attributes\Validation\ArrayType;
+use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\DataRules;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
 use Spatie\LaravelData\Support\Validation\RulesMapper;
@@ -17,8 +22,6 @@ class DataValidationRulesResolver
     public function __construct(
         protected DataConfig $dataConfig,
         protected RulesMapper $ruleAttributesResolver,
-        protected DataPropertyRulesResolver $dataPropertyRulesResolver,
-        protected DataCollectionPropertyRulesResolver $dataCollectionPropertyRulesResolver,
     ) {
     }
 
@@ -37,8 +40,8 @@ class DataValidationRulesResolver
                 continue;
             }
 
-            if ($dataProperty->type->isDataObject) {
-                $this->dataPropertyRulesResolver->execute(
+            if ($dataProperty->type->isDataObject || $dataProperty->type->isDataCollectable) {
+                $this->resolveDataSpecificRules(
                     $dataProperty,
                     $fullPayload,
                     $relativePath,
@@ -48,22 +51,11 @@ class DataValidationRulesResolver
                 continue;
             }
 
-            if ($dataProperty->type->isDataCollectable) {
-                $this->dataCollectionPropertyRulesResolver->execute(
-                    $dataProperty,
-                    $fullPayload,
-                    $relativePath,
-                    $dataRules
-                );
-
-                continue;
-            }
-
-            $rules = new PropertyRules();
-
-            foreach ($this->dataConfig->getRuleInferrers() as $inferrer) {
-                $rules = $inferrer->handle($dataProperty, $rules, $path);
-            }
+            $rules = $this->inferRulesForDataProperty(
+                $dataProperty,
+                PropertyRules::create(),
+                $path
+            );
 
             $dataRules->add($relativePath, $rules->normalize($path));
         }
@@ -73,7 +65,98 @@ class DataValidationRulesResolver
         return $dataRules;
     }
 
-    private function resolveOverwrittenRules(
+    protected function resolveDataSpecificRules(
+        DataProperty $dataProperty,
+        array $fullPayload,
+        ValidationPath $path,
+        DataRules $dataRules,
+    ): void {
+        if ($dataProperty->type->isOptional && Arr::has($fullPayload, $path->get()) === false) {
+            return;
+        }
+
+        if ($dataProperty->type->isNullable && Arr::get($fullPayload, $path->get()) === null) {
+            return;
+        }
+
+        if ($dataProperty->type->isDataObject) {
+            $this->resolveDataObjectSpecificRules(
+                $dataProperty,
+                $fullPayload,
+                $path,
+                $dataRules
+            );
+
+            return;
+        }
+
+        if ($dataProperty->type->isDataCollectable) {
+            $this->resolveDataCollectionSpecificRules(
+                $dataProperty,
+                $fullPayload,
+                $path,
+                $dataRules
+            );
+        }
+    }
+
+    protected function resolveDataObjectSpecificRules(
+        DataProperty $dataProperty,
+        array $fullPayload,
+        ValidationPath $relativePath,
+        DataRules $dataRules,
+    ): void {
+        $toplevelRules = $this->inferRulesForDataProperty(
+            $dataProperty,
+            PropertyRules::create(ArrayType::create()),
+            $relativePath
+        );
+
+        $dataRules->add($relativePath, $toplevelRules->normalize($relativePath));
+
+        $this->execute(
+            $dataProperty->type->dataClass,
+            $fullPayload,
+            $relativePath,
+            $dataRules,
+        );
+    }
+
+    protected function resolveDataCollectionSpecificRules(
+        DataProperty $dataProperty,
+        array $fullPayload,
+        ValidationPath $relativePath,
+        DataRules $dataRules,
+    ): void {
+        $toplevelRules = $this->inferRulesForDataProperty(
+            $dataProperty,
+            PropertyRules::create(Present::create(), ArrayType::create()),
+            $relativePath
+        );
+
+        $dataRules->add($relativePath, $toplevelRules->normalize($relativePath));
+
+        $dataRules->addCollection($relativePath, Rule::forEach(function (mixed $value, mixed $attribute) use ($fullPayload, $dataProperty) {
+            if (! is_array($value)) {
+                return ['array'];
+            }
+
+            $dataRules = DataRules::create();
+
+            app(DataValidationRulesResolver::class)->execute(
+                $dataProperty->type->dataClass,
+                $fullPayload,
+                ValidationPath::create($attribute),
+                $dataRules
+            );
+
+            return collect($dataRules->rules)->keyBy(
+                fn(mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
+            )->all();
+        }));
+    }
+
+    protected function resolveOverwrittenRules(
         DataClass $class,
         array $fullPayload,
         ValidationPath $path,
@@ -93,12 +176,24 @@ class DataValidationRulesResolver
 
         foreach ($overwrittenRules as $key => $rules) {
             $overwrittenRules = collect(Arr::wrap($rules))
-                ->map(fn (mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
-                ->map(fn (mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules($path) : $rule)
+                ->map(fn(mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
+                ->map(fn(mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules($path) : $rule)
                 ->flatten()
                 ->all();
 
             $dataRules->add($path->relative($key), $overwrittenRules);
         }
+    }
+
+    protected function inferRulesForDataProperty(
+        DataProperty $property,
+        PropertyRules $rules,
+        ValidationPath $path,
+    ): PropertyRules {
+        foreach ($this->dataConfig->getRuleInferrers() as $inferrer) {
+            $inferrer->handle($property, $rules, $path);
+        }
+
+        return $rules;
     }
 }

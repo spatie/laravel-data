@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support\Validation;
 
 use Illuminate\Support\Collection;
+use function Sodium\add;
 
 class PropertyRules
 {
@@ -14,15 +15,23 @@ class PropertyRules
         $this->rules = new Collection();
     }
 
-    public static function create(): self
+    public static function create(ValidationRule ...$rules): self
     {
-        return new self();
+        return (new self())->add(...$rules);
     }
 
     public function add(ValidationRule ...$rules): static
     {
         $this->removeType(...$rules);
         $this->rules->push(...$rules);
+
+        return $this;
+    }
+
+    public function prepend(ValidationRule ...$rules): static
+    {
+        $this->removeType(...$rules);
+        $this->rules->prepend(...$rules);
 
         return $this;
     }

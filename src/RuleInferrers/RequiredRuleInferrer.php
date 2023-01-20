@@ -19,7 +19,7 @@ class RequiredRuleInferrer implements RuleInferrer
         ValidationPath $path,
     ): PropertyRules {
         if ($this->shouldAddRule($property, $rules)) {
-            $rules->add(new Required());
+            $rules->prepend(new Required());
         }
 
         return $rules;

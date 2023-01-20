@@ -15,7 +15,7 @@ class SometimesRuleInferrer implements RuleInferrer
         ValidationPath $path,
     ): PropertyRules {
         if ($property->type->isOptional && ! $rules->hasType(Sometimes::class)) {
-            $rules->add(new Sometimes());
+            $rules->prepend(new Sometimes());
         }
 
         return $rules;
