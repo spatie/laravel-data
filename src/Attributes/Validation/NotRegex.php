@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class NotRegex extends StringValidationAttribute
@@ -16,7 +17,7 @@ class NotRegex extends StringValidationAttribute
         return 'not_regex';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return [$this->pattern];
     }

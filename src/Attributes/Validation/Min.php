@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Min extends StringValidationAttribute
@@ -16,7 +17,7 @@ class Min extends StringValidationAttribute
         return 'min';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return [$this->value];
     }

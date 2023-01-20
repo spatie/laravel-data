@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Distinct extends StringValidationAttribute
@@ -20,7 +21,7 @@ class Distinct extends StringValidationAttribute
         return 'distinct';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         if ($this->mode === null) {
             return [];

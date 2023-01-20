@@ -7,29 +7,26 @@ use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\DataRules;
-use Spatie\LaravelData\Support\Validation\RulesCollection;
+use Spatie\LaravelData\Support\Validation\PropertyRules;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class DataPropertyRulesResolver
 {
     public function execute(
         DataProperty $property,
-        string $path,
         array $fullPayload,
+        ValidationPath $path,
         DataRules $dataRules,
     ): DataRules {
-        if ($property->validate === false) {
+        if ($property->type->isOptional && Arr::has($fullPayload, $path->get()) === false) {
             return $dataRules;
         }
 
-        if ($property->type->isOptional && Arr::has($fullPayload, $path) === false) {
+        if ($property->type->isNullable && Arr::get($fullPayload, $path->get()) === null) {
             return $dataRules;
         }
 
-        if (($property->type->isNullable || $property->type->isMixed) && Arr::get($fullPayload, $path) === null) {
-            return $dataRules;
-        }
-
-        $toplevelRules = RulesCollection::create();
+        $toplevelRules = PropertyRules::create();
 
         foreach (app(DataConfig::class)->getRuleInferrers() as $inferrer) {
             $inferrer->handle($property, $toplevelRules, $path);
@@ -37,13 +34,13 @@ class DataPropertyRulesResolver
 
         $toplevelRules = $toplevelRules->add(ArrayType::create());
 
-        $dataRules->rules[$path] = $toplevelRules->normalize($path);
+        $dataRules->add($path, $toplevelRules->normalize($path));
 
         app(DataValidationRulesResolver::class)->execute(
             $property->type->dataClass,
             $fullPayload,
+            $path,
             $dataRules,
-            $path
         );
 
         return $dataRules;

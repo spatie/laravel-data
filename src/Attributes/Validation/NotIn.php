@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rules\NotIn as BaseNotIn;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class NotIn extends ValidationAttribute
@@ -22,7 +23,7 @@ class NotIn extends ValidationAttribute
         $this->rule = new BaseNotIn(Arr::flatten($values));
     }
 
-    public function getRules(?string $path): array
+    public function getRules(ValidationPath $path): array
     {
         return [$this->rule];
     }

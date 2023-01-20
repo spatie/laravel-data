@@ -3,13 +3,14 @@
 namespace Spatie\LaravelData\RuleInferrers;
 
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Support\Validation\RulesCollection;
+use Spatie\LaravelData\Support\Validation\PropertyRules;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 interface RuleInferrer
 {
     public function handle(
         DataProperty $property,
-        RulesCollection $rules,
-        ?string $path,
-    ): RulesCollection;
+        PropertyRules $rules,
+        ValidationPath $path,
+    ): PropertyRules;
 }

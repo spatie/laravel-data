@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Illuminate\Validation\Rules\Dimensions as BaseDimensions;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Dimensions extends ValidationAttribute
@@ -67,7 +68,7 @@ class Dimensions extends ValidationAttribute
         $this->rule = $rule;
     }
 
-    public function getRules(?string $path): array
+    public function getRules(ValidationPath $path): array
     {
         return [$this->rule];
     }

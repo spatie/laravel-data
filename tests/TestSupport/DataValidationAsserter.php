@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Tests\TestSupport;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\ValidationRuleParser;
 
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 use function PHPUnit\Framework\assertTrue;
 
 use Spatie\LaravelData\Data;
@@ -78,7 +79,8 @@ class DataValidationAsserter
         $inferredRules = app(DataValidationRulesResolver::class)->execute(
             $this->dataClass,
             $this->pipePayload($payload),
-            new DataRules([])
+            ValidationPath::create(),
+            DataRules::create()
         );
 
         $parser = new ValidationRuleParser($payload);

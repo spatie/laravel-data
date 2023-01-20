@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class AlphaDash extends StringValidationAttribute
@@ -12,7 +13,7 @@ class AlphaDash extends StringValidationAttribute
         return 'alpha_dash';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return [];
     }

@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ExcludeWithout extends StringValidationAttribute
@@ -16,7 +17,7 @@ class ExcludeWithout extends StringValidationAttribute
         return 'exclude_without';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return [
             $this->normalizeValue($this->field),

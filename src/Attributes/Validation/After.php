@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use DateTimeInterface;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class After extends StringValidationAttribute
@@ -17,7 +18,7 @@ class After extends StringValidationAttribute
         return 'after';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return [$this->normalizeValue($this->date)];
     }

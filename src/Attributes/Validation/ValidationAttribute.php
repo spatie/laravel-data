@@ -6,6 +6,7 @@ use BackedEnum;
 use Carbon\Carbon;
 use DateTimeInterface;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Stringable;
 
@@ -17,7 +18,7 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
 
     public function __toString(): string
     {
-        return implode('|', $this->getRules(null));
+        return implode('|', $this->getRules(ValidationPath::create()));
     }
 
     protected function normalizeValue(mixed $mixed): ?string
@@ -53,11 +54,9 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
         return (string) $mixed;
     }
 
-    protected function normalizeField(FieldReference $reference, ?string $path): string
+    protected function normalizeField(FieldReference $reference, ValidationPath $path): string
     {
-        return $path === null
-            ? $reference->name
-            : "{$path}.{$reference->name}";
+        return $path->relative($reference->name)->get();
     }
 
     protected static function parseDateValue(mixed $value): mixed

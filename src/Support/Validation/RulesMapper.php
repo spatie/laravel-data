@@ -33,7 +33,7 @@ class RulesMapper
     {
     }
 
-    public function execute(array $rules, ?string $path): array
+    public function execute(array $rules, ValidationPath $path): array
     {
         $rules = array_map(fn (mixed $rule) => match (true) {
             is_string($rule) => $this->resolveStringRule($rule, $path),
@@ -56,7 +56,7 @@ class RulesMapper
         return Arr::flatten($rules);
     }
 
-    protected function resolveStringRule(string $rule, ?string $path): mixed
+    protected function resolveStringRule(string $rule, ValidationPath $path): mixed
     {
         if (! str_contains($rule, '|')) {
             try {

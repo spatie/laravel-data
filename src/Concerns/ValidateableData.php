@@ -7,6 +7,8 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
+use Spatie\LaravelData\Support\Validation\DataRules;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 /**
  * @method static array rules(...$args)
@@ -58,7 +60,12 @@ trait ValidateableData
         array $fields = [],
         array $payload = []
     ): array {
-        $rules = app(DataValidationRulesResolver::class)->execute(static::class, $payload);
+        $rules = app(DataValidationRulesResolver::class)->execute(
+            static::class,
+            $payload,
+            ValidationPath::create(),
+            DataRules::create()
+        );
 
         if (count($fields) === 0) {
             return $rules;

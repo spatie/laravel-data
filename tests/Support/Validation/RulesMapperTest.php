@@ -8,37 +8,38 @@ use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Support\Validation\RulesMapper;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 beforeEach(function () {
     $this->mapper = resolve(RulesMapper::class);
 });
 
 it('can map string rules')
-    ->expect(fn () => $this->mapper->execute(['required'], null))
+    ->expect(fn () => $this->mapper->execute(['required'], ValidationPath::create()))
     ->toEqual([new Required()]);
 
 it('can map string rules with arguments')
-    ->expect(fn () => $this->mapper->execute(['exists:users'], null))
+    ->expect(fn () => $this->mapper->execute(['exists:users'], ValidationPath::create()))
     ->toEqual([new Exists(rule: new BaseExists('users'))]);
 
 it('can map string rules with key-value arguments')
-    ->expect(fn () => $this->mapper->execute(['dimensions:min_width=100,min_height=200'], null))
+    ->expect(fn () => $this->mapper->execute(['dimensions:min_width=100,min_height=200'], ValidationPath::create()))
     ->toEqual([new Dimensions(minWidth: 100, minHeight: 200)]);
 
 it('can map multiple rules')
-    ->expect(fn () => $this->mapper->execute(['required', 'min:0'], null))
+    ->expect(fn () => $this->mapper->execute(['required', 'min:0'], ValidationPath::create()))
     ->toEqual([new Required(), new Min(0)]);
 
 it('can map multiple concatenated rules')
-    ->expect(fn () => $this->mapper->execute(['required|min:0'], null))
+    ->expect(fn () => $this->mapper->execute(['required|min:0'], ValidationPath::create()))
     ->toEqual([new Required(), new Min(0)]);
 
 it('can map faulty rules')
-    ->expect(fn () => $this->mapper->execute(['min:'], null))
+    ->expect(fn () => $this->mapper->execute(['min:'], ValidationPath::create()))
     ->toEqual([new Rule('min:')]);
 
 it('can map Laravel rule objects')
-    ->expect(fn () => $this->mapper->execute([new BaseExists('users')], null))
+    ->expect(fn () => $this->mapper->execute([new BaseExists('users')], ValidationPath::create()))
     ->toEqual([new Exists('users')]);
 
 it('can map a custom Laravel rule objects', function () {
@@ -52,5 +53,5 @@ it('can map a custom Laravel rule objects', function () {
         }
     };
 
-    expect($this->mapper->execute([$rule], null))->toEqual([new Rule($rule)]);
+    expect($this->mapper->execute([$rule], ValidationPath::create()))->toEqual([new Rule($rule)]);
 });

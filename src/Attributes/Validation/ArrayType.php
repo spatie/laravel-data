@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ArrayType extends StringValidationAttribute
@@ -20,7 +21,7 @@ class ArrayType extends StringValidationAttribute
         return 'array';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return $this->keys;
     }

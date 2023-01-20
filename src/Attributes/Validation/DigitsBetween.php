@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class DigitsBetween extends StringValidationAttribute
@@ -16,7 +17,7 @@ class DigitsBetween extends StringValidationAttribute
         return 'digits_between';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return [$this->min, $this->max];
     }

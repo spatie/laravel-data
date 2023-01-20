@@ -13,7 +13,8 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer;
 use Spatie\LaravelData\Support\DataClass;
-use Spatie\LaravelData\Support\Validation\RulesCollection;
+use Spatie\LaravelData\Support\Validation\PropertyRules;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 /**
@@ -35,7 +36,7 @@ it("won't add a required rule when a property is non-nullable", function () {
         public string $string;
     });
 
-    $rules = $this->inferrer->handle($dataProperty, new RulesCollection(), null);
+    $rules = $this->inferrer->handle($dataProperty, new PropertyRules(), ValidationPath::create());
 
     expect($rules->all())->toEqualCanonicalizing([new Required()]);
 });
@@ -45,7 +46,7 @@ it("won't add a required rule when a property is nullable", function () {
         public ?string $string;
     });
 
-    $rules = $this->inferrer->handle($dataProperty, new RulesCollection(), null);
+    $rules = $this->inferrer->handle($dataProperty, new PropertyRules(), ValidationPath::create());
 
     expect($rules->all())->toEqualCanonicalizing([]);
 });
@@ -57,8 +58,8 @@ it("won't add a required rule when a property already contains a required rule",
 
     $rules = $this->inferrer->handle(
         $dataProperty,
-        RulesCollection::create()->add(new RequiredIf('bla')),
-        null
+        PropertyRules::create()->add(new RequiredIf('bla')),
+        ValidationPath::create()
     );
 
     expect($rules->all())->toEqualCanonicalizing(['required_if:bla']);
@@ -71,11 +72,11 @@ it("won't add a required rule when a property already contains a required object
 
     $rules = $this->inferrer->handle(
         $dataProperty,
-        RulesCollection::create()->add(Required::create()),
-        null
+        PropertyRules::create()->add(Required::create()),
+        ValidationPath::create()
     );
 
-    expect($rules->normalize(null))->toEqualCanonicalizing(['required']);
+    expect($rules->normalize(ValidationPath::create()))->toEqualCanonicalizing(['required']);
 });
 
 it(
@@ -87,11 +88,11 @@ it(
 
         $rules = $this->inferrer->handle(
             $dataProperty,
-            RulesCollection::create()->add(BooleanType::create()),
-            null
+            PropertyRules::create()->add(BooleanType::create()),
+            ValidationPath::create()
         );
 
-        expect($rules->normalize(null))->toEqualCanonicalizing([new BooleanType()]);
+        expect($rules->normalize(ValidationPath::create()))->toEqualCanonicalizing([new BooleanType()]);
     }
 );
 
@@ -104,11 +105,11 @@ it(
 
         $rules = $this->inferrer->handle(
             $dataProperty,
-            RulesCollection::create()->add(Nullable::create()),
-            null
+            PropertyRules::create()->add(Nullable::create()),
+            ValidationPath::create()
         );
 
-        expect($rules->normalize(null))->toEqualCanonicalizing([new Nullable()]);
+        expect($rules->normalize(ValidationPath::create()))->toEqualCanonicalizing([new Nullable()]);
     }
 );
 
@@ -119,13 +120,13 @@ it('has support for rules that cannot be converted to string', function () {
 
     $rules = $this->inferrer->handle(
         $dataProperty,
-        RulesCollection::create()->add(
+        PropertyRules::create()->add(
             new \Spatie\LaravelData\Attributes\Validation\Enum(new BaseEnum('SomeClass'))
         ),
-        null,
+        ValidationPath::create(),
     );
 
-    expect($rules->normalize(null))->toEqualCanonicalizing([
+    expect($rules->normalize(ValidationPath::create()))->toEqualCanonicalizing([
         'required', new BaseEnum('SomeClass'),
     ]);
 });
@@ -138,11 +139,11 @@ it("won't add required to a data collection since it is already present", functi
 
     $rules = $this->inferrer->handle(
         $dataProperty,
-        RulesCollection::create()->add(new Present(), new ArrayType()),
-        null
+        PropertyRules::create()->add(new Present(), new ArrayType()),
+        ValidationPath::create()
     );
 
-    expect($rules->normalize(null))->toEqualCanonicalizing(['present', 'array']);
+    expect($rules->normalize(ValidationPath::create()))->toEqualCanonicalizing(['present', 'array']);
 });
 
 it("won't add required rules to undefinable properties", function () {
@@ -150,7 +151,7 @@ it("won't add required rules to undefinable properties", function () {
         public string|Optional $string;
     });
 
-    $rules = $this->inferrer->handle($dataProperty, [], null);
+    $rules = $this->inferrer->handle($dataProperty, [], ValidationPath::create());
 
     expect($rules)->toEqualCanonicalizing([]);
 })->throws(TypeError::class);

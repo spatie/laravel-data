@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class GreaterThanOrEqualTo extends StringValidationAttribute
@@ -16,7 +17,7 @@ class GreaterThanOrEqualTo extends StringValidationAttribute
         return 'gte';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return [$this->field];
     }

@@ -4,5 +4,5 @@ namespace Spatie\LaravelData\Support\Validation;
 
 abstract class ValidationRule
 {
-    abstract public function getRules(?string $path): array;
+    abstract public function getRules(ValidationPath $path): array;
 }

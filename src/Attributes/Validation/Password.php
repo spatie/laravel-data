@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Exception;
 use Illuminate\Validation\Rules\Password as BasePassword;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Password extends ValidationAttribute
@@ -53,7 +54,7 @@ class Password extends ValidationAttribute
         $this->rule = $rule;
     }
 
-    public function getRules(?string $path): array
+    public function getRules(ValidationPath $path): array
     {
         return [$this->rule];
     }

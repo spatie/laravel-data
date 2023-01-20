@@ -6,6 +6,7 @@ use Attribute;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Email extends StringValidationAttribute
@@ -28,7 +29,7 @@ class Email extends StringValidationAttribute
         return 'email';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return collect($this->modes)
             ->whenEmpty(fn (Collection $modes) => $modes->add(self::RfcValidation))

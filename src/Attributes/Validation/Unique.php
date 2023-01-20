@@ -6,6 +6,7 @@ use Attribute;
 use Closure;
 use Exception;
 use Illuminate\Validation\Rules\Unique as BaseUnique;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Unique extends ValidationAttribute
@@ -47,7 +48,7 @@ class Unique extends ValidationAttribute
         $this->rule = $rule;
     }
 
-    public function getRules(?string $path): array
+    public function getRules(ValidationPath $path): array
     {
         return [$this->rule];
     }

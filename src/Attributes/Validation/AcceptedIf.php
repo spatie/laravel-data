@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use BackedEnum;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class AcceptedIf extends StringValidationAttribute
@@ -17,7 +18,7 @@ class AcceptedIf extends StringValidationAttribute
         return 'accepted_if';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return [
             $this->field,

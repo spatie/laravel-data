@@ -1056,7 +1056,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
         {
             $correct = $context->payload['property'] === 'J'
                 && $context->fullPayload['property'] === 'Root'
-                && $context->path === 'nested.data';
+                && $context->path->equals('nested.data');
 
             if (! $correct) {
                 throw new Exception('Should not end up here');
@@ -1074,7 +1074,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
         {
             $correct = $context->payload['property'] === 'K'
                 && $context->fullPayload['property'] === 'Root'
-                && $context->path === 'nested.collection.0.nested';
+                && $context->path->equals('nested.collection.0.nested');
 
             if (! $correct) {
                 throw new Exception('Should not end up here');
@@ -1093,7 +1093,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
         {
             $correct = $context->payload['property'] === 'L'
                 && $context->fullPayload['property'] === 'Root'
-                && $context->path === 'nested.collection.0.collection.0';
+                && $context->path->equals('nested.collection.0.collection.0');
 
             if (! $correct) {
                 throw new Exception('Should not end up here');
@@ -1116,7 +1116,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
         {
             $correct = $context->payload['property'] === 'M'
                 && $context->fullPayload['property'] === 'Root'
-                && $context->path === 'nested.collection.0';
+                && $context->path->equals('nested.collection.0');
 
             if (! $correct) {
                 throw new Exception('Should not end up here');
@@ -1139,7 +1139,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
         {
             $correct = $context->payload['property'] === 'N'
                 && $context->fullPayload['property'] === 'Root'
-                && $context->path === 'nested';
+                && $context->path->equals('nested');
 
             if (! $correct) {
                 throw new Exception('Should not end up here');
@@ -1158,7 +1158,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
         {
             $correct = $context->payload['property'] === 'Root'
                 && $context->fullPayload['property'] === 'Root'
-                && $context->path === null;
+                && $context->path->isRoot();
 
             if (! $correct) {
                 throw new Exception('Should not end up here');

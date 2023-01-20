@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Validator;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Support\Validation\DataRules;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class DataValidatorResolver
 {
@@ -15,7 +16,12 @@ class DataValidatorResolver
     {
         $payload = $payload instanceof Arrayable ? $payload->toArray() : $payload;
 
-        $rules = app(DataValidationRulesResolver::class)->execute($dataClass, $payload, new DataRules([]));
+        $rules = app(DataValidationRulesResolver::class)->execute(
+            $dataClass,
+            $payload,
+            ValidationPath::create(),
+            new DataRules([])
+        );
 
         $validator = ValidatorFacade::make(
             $payload,

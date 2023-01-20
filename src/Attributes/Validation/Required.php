@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Illuminate\Validation\Rules\RequiredIf;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Required extends ValidationAttribute implements RequiringRule
@@ -13,7 +14,7 @@ class Required extends ValidationAttribute implements RequiringRule
     {
     }
 
-    public function getRules(?string $path): array
+    public function getRules(ValidationPath $path): array
     {
         return [$this->rule ?? static::keyword()];
     }

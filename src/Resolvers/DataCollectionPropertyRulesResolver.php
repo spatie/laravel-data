@@ -10,7 +10,8 @@ use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\RuleInferrers\AttributesRuleInferrer;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\DataRules;
-use Spatie\LaravelData\Support\Validation\RulesCollection;
+use Spatie\LaravelData\Support\Validation\PropertyRules;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class DataCollectionPropertyRulesResolver
 {
@@ -21,32 +22,28 @@ class DataCollectionPropertyRulesResolver
 
     public function execute(
         DataProperty $property,
-        string $path,
         array $fullPayload,
+        ValidationPath $path,
         DataRules $dataRules,
     ): DataRules {
-        if ($property->validate === false) {
+        if ($property->type->isOptional && Arr::has($fullPayload, $path->get()) === false) {
             return $dataRules;
         }
 
-        if ($property->type->isOptional && Arr::has($fullPayload, $path) === false) {
+        if ($property->type->isNullable && Arr::get($fullPayload, $path->get()) === null) {
             return $dataRules;
         }
 
-        if ($property->type->isNullable && Arr::get($fullPayload, $path) === null) {
-            return $dataRules;
-        }
-
-        $toplevelRules = RulesCollection::create();
+        $toplevelRules = PropertyRules::create();
 
         $toplevelRules->add(Present::create());
         $toplevelRules->add(ArrayType::create());
 
         $this->attributesRuleInferrer->handle($property, $toplevelRules, $path);
 
-        $dataRules->rules[$path] = $toplevelRules->normalize($path);
+        $dataRules->add($path, $toplevelRules->normalize($path));
 
-        $dataRules->rules["{$path}.*"] = Rule::forEach(function (mixed $value, mixed $attribute) use ($fullPayload, $property) {
+        $dataRules->rules["{$path->get()}.*"] = Rule::forEach(function (mixed $value, mixed $attribute) use ($fullPayload, $property) {
             // Attribute has full path, probably required for relative rule reference replacement
 
             if (! is_array($value)) {
@@ -56,8 +53,8 @@ class DataCollectionPropertyRulesResolver
             return collect(app(DataValidationRulesResolver::class)->execute(
                 $property->type->dataClass,
                 $fullPayload,
-                new DataRules([]),
-                $attribute,
+                ValidationPath::create($attribute),
+                DataRules::create()
             ))->keyBy(
                 fn (mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
             )->all();

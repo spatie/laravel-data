@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -17,7 +18,7 @@ class CurrentPassword extends StringValidationAttribute
         return 'current_password';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return $this->guard === null
             ? []

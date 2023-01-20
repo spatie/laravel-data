@@ -6,6 +6,7 @@ use Attribute;
 use Closure;
 use Exception;
 use Illuminate\Validation\Rules\Exists as BaseExists;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Exists extends ValidationAttribute
@@ -41,7 +42,7 @@ class Exists extends ValidationAttribute
         $this->rule = $rule;
     }
 
-    public function getRules(?string $path): array
+    public function getRules(ValidationPath $path): array
     {
         return [$this->rule];
     }

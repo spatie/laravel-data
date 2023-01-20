@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredWithout extends StringValidationAttribute implements RequiringRule
@@ -22,7 +23,7 @@ class RequiredWithout extends StringValidationAttribute implements RequiringRule
         return 'required_without';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return [
             $this->normalizeValue($this->fields),

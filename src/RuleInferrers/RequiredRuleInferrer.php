@@ -8,15 +8,16 @@ use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
-use Spatie\LaravelData\Support\Validation\RulesCollection;
+use Spatie\LaravelData\Support\Validation\PropertyRules;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class RequiredRuleInferrer implements RuleInferrer
 {
     public function handle(
         DataProperty $property,
-        RulesCollection $rules,
-        ?string $path,
-    ): RulesCollection {
+        PropertyRules $rules,
+        ValidationPath $path,
+    ): PropertyRules {
         if ($this->shouldAddRule($property, $rules)) {
             $rules->add(new Required());
         }
@@ -24,7 +25,7 @@ class RequiredRuleInferrer implements RuleInferrer
         return $rules;
     }
 
-    protected function shouldAddRule(DataProperty $property, RulesCollection $rules): bool
+    protected function shouldAddRule(DataProperty $property, PropertyRules $rules): bool
     {
         if ($property->type->isNullable || $property->type->isOptional) {
             return false;

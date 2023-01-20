@@ -3,6 +3,7 @@
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 
 it('can get a string representation of rules', function () {
@@ -18,7 +19,7 @@ it('can normalize values', function ($input, $output) {
             return $this->normalizeValue($value);
         }
 
-        public function getRules(?string $path): array
+        public function getRules(ValidationPath $path): array
         {
             return [];
         }

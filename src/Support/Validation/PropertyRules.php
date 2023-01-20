@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Support\Validation;
 
 use Illuminate\Support\Collection;
 
-class RulesCollection
+class PropertyRules
 {
     /** @var Collection<\Spatie\LaravelData\Support\Validation\ValidationRule> */
     protected Collection $rules;
@@ -51,7 +51,7 @@ class RulesCollection
         return $this->rules->contains(fn (ValidationRule $rule) => $rule instanceof $class);
     }
 
-    public function normalize(?string $path): array
+    public function normalize(ValidationPath $path): array
     {
         return $this->rules
             ->map(fn (ValidationRule $rule) => $rule->getRules($path))

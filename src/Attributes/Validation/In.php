@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rules\In as BaseIn;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class In extends ValidationAttribute
@@ -22,7 +23,7 @@ class In extends ValidationAttribute
         $this->rule = new BaseIn(Arr::flatten($values));
     }
 
-    public function getRules(?string $path): array
+    public function getRules(ValidationPath $path): array
     {
         return [$this->rule];
     }

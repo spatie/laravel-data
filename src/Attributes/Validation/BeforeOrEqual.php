@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use DateTimeInterface;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class BeforeOrEqual extends StringValidationAttribute
@@ -17,7 +18,7 @@ class BeforeOrEqual extends StringValidationAttribute
         return 'before_or_equal';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return [$this->normalizeValue($this->date)];
     }

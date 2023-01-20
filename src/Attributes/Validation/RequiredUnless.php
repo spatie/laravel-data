@@ -6,6 +6,7 @@ use Attribute;
 use BackedEnum;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredUnless extends StringValidationAttribute implements RequiringRule
@@ -24,7 +25,7 @@ class RequiredUnless extends StringValidationAttribute implements RequiringRule
         return 'required_unless';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return [
             $this->field,

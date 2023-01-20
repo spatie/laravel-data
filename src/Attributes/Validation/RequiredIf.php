@@ -7,6 +7,7 @@ use BackedEnum;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredIf extends StringValidationAttribute implements RequiringRule
@@ -28,10 +29,8 @@ class RequiredIf extends StringValidationAttribute implements RequiringRule
         return 'required_if';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
-        ray()->backtrace();
-
         return [
             $this->normalizeField($this->field, $path),
             $this->normalizeValue($this->values),

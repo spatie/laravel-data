@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use BackedEnum;
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ProhibitedUnless extends StringValidationAttribute
@@ -23,7 +24,7 @@ class ProhibitedUnless extends StringValidationAttribute
         return 'prohibited_unless';
     }
 
-    public function parameters(?string $path): array
+    public function parameters(ValidationPath $path): array
     {
         return [
             $this->field,

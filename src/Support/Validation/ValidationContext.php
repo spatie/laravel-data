@@ -7,7 +7,7 @@ class ValidationContext
     public function __construct(
         public array $payload,
         public array $fullPayload,
-        public ?string $path,
+        public ValidationPath $path,
     ) {
     }
 }
