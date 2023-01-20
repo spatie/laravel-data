@@ -93,8 +93,8 @@ class DataValidationRulesResolver
 
         foreach ($overwrittenRules as $key => $rules) {
             $overwrittenRules = collect(Arr::wrap($rules))
-                ->map(fn(mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
-                ->map(fn(mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules($path) : $rule)
+                ->map(fn (mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
+                ->map(fn (mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules($path) : $rule)
                 ->flatten()
                 ->all();
 

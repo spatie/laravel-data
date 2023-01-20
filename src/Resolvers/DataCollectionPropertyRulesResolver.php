@@ -58,7 +58,7 @@ class DataCollectionPropertyRulesResolver
             );
 
             return collect($dataRules->rules)->keyBy(
-                fn(mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
+                fn (mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
             )->all();
         }));
     }
