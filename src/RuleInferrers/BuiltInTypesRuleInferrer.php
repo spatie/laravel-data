@@ -9,8 +9,8 @@ use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\Numeric;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Support\Validation\RequiringRule;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
+use Spatie\LaravelData\Support\Validation\RequiringRule;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class BuiltInTypesRuleInferrer implements RuleInferrer

@@ -7,8 +7,8 @@ use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Support\Validation\RequiringRule;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
+use Spatie\LaravelData\Support\Validation\RequiringRule;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class RequiredRuleInferrer implements RuleInferrer

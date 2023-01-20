@@ -5,17 +5,18 @@ namespace Spatie\LaravelData\Tests\TestSupport;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\ValidationRuleParser;
 
-use Spatie\LaravelData\Support\Validation\ValidationPath;
 use function PHPUnit\Framework\assertTrue;
 
 use Spatie\LaravelData\Data;
+
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\Normalizers\ArrayNormalizer;
 use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
-
 use Spatie\LaravelData\Support\Validation\DataRules;
+
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 /**
  * @property class-string<Data::class> $dataClass
