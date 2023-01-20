@@ -30,6 +30,7 @@ use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
+use Spatie\LaravelData\Tests\Fakes\DataWithReferenceFieldValidationAttribute;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyDataWithContextOverwrittenValidationRules;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -527,17 +528,28 @@ it('can use nested payloads in nested data', function () {
         );
 });
 
-test('rules in nested data are rewritten according to their fields', function () {
-    class ValidationTestNestedClassWithFieldReference extends Data
-    {
-        public bool $check_string;
+test('can use a reference to another field in data', function () {
+    DataValidationAsserter::for(DataWithReferenceFieldValidationAttribute::class)
+        ->assertOk([
+            'check_string' => '0',
+        ])
+        ->assertErrors([
+            'check_string' => '1',
+        ])
+        ->assertRules(
+            rules: [
+                'check_string' => ['boolean'],
+                'string' => ['string', 'required_if:check_string,1'],
+            ],
+            payload: [
+                'check_string' => '1',
+            ]
+        );
+});
 
-        #[RequiredIf('check_string', true)]
-        public string $string;
-    }
-
+test('can use a reference to another field in nested data', function () {
     $dataClass = new class () extends Data {
-        public ValidationTestNestedClassWithFieldReference $nested;
+        public DataWithReferenceFieldValidationAttribute $nested;
     };
 
     DataValidationAsserter::for($dataClass)
@@ -555,6 +567,72 @@ test('rules in nested data are rewritten according to their fields', function ()
             ],
             payload: [
                 'nested' => ['check_string' => '1'],
+            ]
+        );
+});
+
+test('can use a reference to another field in a collection', function () {
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(DataWithReferenceFieldValidationAttribute::class)]
+        public DataCollection $collection;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'collection' => [
+                ['check_string' => '0'],
+            ],
+        ])
+        ->assertErrors([
+            'collection' => [
+                ['check_string' => '1'],
+            ],
+        ])
+        ->assertRules(
+            rules: [
+                'collection' => ['present', 'array'],
+                'collection.0.check_string' => ['boolean'],
+                'collection.0.string' => ['string', 'required_if:collection.0.check_string,1'],
+            ],
+            payload: [
+                'collection' => [['check_string' => '1']],
+            ]
+        );
+});
+
+test('can use a reference to another field in a collection with nested data', function () {
+    class TestValidationDataWithCollectionNestedDataWithFieldReference extends Data
+    {
+        public DataWithReferenceFieldValidationAttribute $nested;
+    }
+
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(TestValidationDataWithCollectionNestedDataWithFieldReference::class)]
+        public DataCollection $collection;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'collection' => [
+                ['nested' => ['check_string' => '0']],
+            ],
+        ])
+        ->assertErrors([
+            'collection' => [
+                ['nested' => ['check_string' => '1']],
+            ],
+        ])
+        ->assertRules(
+            rules: [
+                'collection' => ['present', 'array'],
+                'collection.0.nested' => ['required', 'array'],
+                'collection.0.nested.check_string' => ['boolean'],
+                'collection.0.nested.string' => ['string', 'required_if:collection.0.nested.check_string,1'],
+            ],
+            payload: [
+                'collection' => [
+                    ['nested' => ['check_string' => '1']],
+                ],
             ]
         );
 });
@@ -1239,7 +1317,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
                 ],
             ];
         }
@@ -1248,7 +1326,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
         ],
     ]);
 });
