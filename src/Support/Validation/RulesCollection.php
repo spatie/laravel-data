@@ -48,13 +48,13 @@ class RulesCollection
 
     public function hasType(string $class): bool
     {
-        return $this->rules->contains(fn(ValidationRule $rule) => $rule instanceof $class);
+        return $this->rules->contains(fn (ValidationRule $rule) => $rule instanceof $class);
     }
 
     public function normalize(?string $path): array
     {
         return $this->rules
-            ->map(fn(ValidationRule $rule) => $rule->getRules($path))
+            ->map(fn (ValidationRule $rule) => $rule->getRules($path))
             ->flatten()
             ->all();
     }

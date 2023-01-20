@@ -3,19 +3,12 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Illuminate\Validation\NestedRules;
-use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Resolvers\DataCollectionPropertyRulesResolver;
-use Spatie\LaravelData\Resolvers\DataPropertyRulesResolver;
 use Spatie\LaravelData\Support\Validation\DataRules;
-use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\RulesCollection;
 use Spatie\LaravelData\Support\Validation\RulesMapper;
+use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 class DataValidationRulesResolver
@@ -109,8 +102,8 @@ class DataValidationRulesResolver
                 $overwrittenKey = $payloadPath === null ? $key : "{$payloadPath}.{$key}";
 
                 $overwrittenRules = collect(Arr::wrap($rules))
-                    ->map(fn(mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
-                    ->map(fn(mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules($payloadPath) : $rule)
+                    ->map(fn (mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
+                    ->map(fn (mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules($payloadPath) : $rule)
                     ->flatten()
                     ->all();
 

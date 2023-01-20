@@ -21,7 +21,7 @@ class AttributesRuleInferrer implements RuleInferrer
     ): RulesCollection {
         $property
             ->attributes
-            ->filter(fn(object $attribute) => $attribute instanceof ValidationRule)
+            ->filter(fn (object $attribute) => $attribute instanceof ValidationRule)
             ->each(function (ValidationRule $rule) use ($path, $rules) {
                 if (! $rule instanceof Rule) {
                     $rules->add($rule);

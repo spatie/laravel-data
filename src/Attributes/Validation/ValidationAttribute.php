@@ -39,7 +39,7 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
         }
 
         if (is_array($mixed)) {
-            return implode(',', array_map(fn(mixed $mixed) => $this->normalizeValue($mixed), $mixed));
+            return implode(',', array_map(fn (mixed $mixed) => $this->normalizeValue($mixed), $mixed));
         }
 
         if ($mixed instanceof DateTimeInterface) {

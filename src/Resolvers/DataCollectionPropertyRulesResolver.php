@@ -7,9 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Present;
-use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
 use Spatie\LaravelData\RuleInferrers\AttributesRuleInferrer;
-use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\DataRules;
 use Spatie\LaravelData\Support\Validation\RulesCollection;
@@ -61,7 +59,7 @@ class DataCollectionPropertyRulesResolver
                 new DataRules([]),
                 $attribute,
             ))->keyBy(
-                fn(mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
+                fn (mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
             )->all();
         });
 

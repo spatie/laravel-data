@@ -4,7 +4,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 use function Pest\Laravel\handleExceptions;
@@ -13,7 +12,6 @@ use function Pest\Laravel\postJson;
 
 use Spatie\LaravelData\Data;
 
-use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Tests\Fakes\DataWithMultipleArgumentCreationMethod;
 

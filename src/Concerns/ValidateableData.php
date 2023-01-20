@@ -6,9 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
-use Spatie\LaravelData\Resolvers\DataClassValidationRulesResolver;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
-use Spatie\LaravelData\Support\Validation\DataRules;
 
 /**
  * @method static array rules(...$args)
@@ -66,6 +64,6 @@ trait ValidateableData
             return $rules;
         }
 
-        return array_filter($rules, fn(string $key): bool => in_array($key, $fields, true), ARRAY_FILTER_USE_KEY);
+        return array_filter($rules, fn (string $key): bool => in_array($key, $fields, true), ARRAY_FILTER_USE_KEY);
     }
 }

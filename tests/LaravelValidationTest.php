@@ -3,26 +3,7 @@
 namespace Spatie\LaravelData\Tests;
 
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Enum;
-use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Attributes\MapInputName;
-use Spatie\LaravelData\Attributes\Validation\ArrayType;
-use Spatie\LaravelData\Attributes\Validation\Max;
-use Spatie\LaravelData\Attributes\Validation\Min;
-use Spatie\LaravelData\Attributes\Validation\Required;
-use Spatie\LaravelData\Attributes\WithoutValidation;
-use Spatie\LaravelData\Data;
-use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Mappers\SnakeCaseMapper;
-use Spatie\LaravelData\Optional;
-use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
-use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
-use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
 
 function expectFieldsWithErrors(ValidatorContract $validator, array $fields)
 {
@@ -323,7 +304,7 @@ it('present rule', function () {
     expectFieldsWithErrors(
         Validator::make(
             [
-                'something' => []
+                'something' => [],
             ],
             [
                 'something' => ['present', 'array'],
