@@ -13,7 +13,7 @@ class Timezone extends StringValidationAttribute
         return 'timezone';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

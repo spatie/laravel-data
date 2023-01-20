@@ -17,7 +17,7 @@ class NotRegex extends StringValidationAttribute
         return 'not_regex';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [$this->pattern];
     }

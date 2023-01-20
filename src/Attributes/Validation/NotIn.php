@@ -8,7 +8,7 @@ use Illuminate\Validation\Rules\NotIn as BaseNotIn;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class NotIn extends ValidationAttribute
+class NotIn extends ObjectValidationAttribute
 {
     protected BaseNotIn $rule;
 
@@ -23,9 +23,9 @@ class NotIn extends ValidationAttribute
         $this->rule = new BaseNotIn(Arr::flatten($values));
     }
 
-    public function getRules(ValidationPath $path): array
+    public function getRule(ValidationPath $path): object|string
     {
-        return [$this->rule];
+        return $this->rule;
     }
 
     public static function keyword(): string

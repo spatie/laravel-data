@@ -3,12 +3,13 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Dimensions as BaseDimensions;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Dimensions extends ValidationAttribute
+class Dimensions extends ObjectValidationAttribute
 {
     protected BaseDimensions $rule;
 
@@ -68,9 +69,9 @@ class Dimensions extends ValidationAttribute
         $this->rule = $rule;
     }
 
-    public function getRules(ValidationPath $path): array
+    public function getRule(ValidationPath $path): object|string
     {
-        return [$this->rule];
+        return $this->rule;
     }
 
     public static function keyword(): string
@@ -80,14 +81,10 @@ class Dimensions extends ValidationAttribute
 
     public static function create(string ...$parameters): static
     {
-        return new static(
-            $parameters['min_width'] ?? null,
-            $parameters['min_height'] ?? null,
-            $parameters['max_width'] ?? null,
-            $parameters['max_height'] ?? null,
-            $parameters['ratio'] ?? null,
-            $parameters['width'] ?? null,
-            $parameters['height'] ?? null,
-        );
+        $parameters = collect($parameters)->mapWithKeys(function (string $parameter) {
+            return [Str::camel(Str::before($parameter, '=')) => Str::after($parameter, '=')];
+        })->all();
+
+        return new static(...$parameters);
     }
 }

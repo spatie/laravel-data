@@ -8,7 +8,7 @@ use Illuminate\Validation\Rules\Password as BasePassword;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Password extends ValidationAttribute
+class Password extends ObjectValidationAttribute
 {
     protected BasePassword $rule;
 
@@ -54,9 +54,9 @@ class Password extends ValidationAttribute
         $this->rule = $rule;
     }
 
-    public function getRules(ValidationPath $path): array
+    public function getRule(ValidationPath $path): object|string
     {
-        return [$this->rule];
+        return $this->rule;
     }
 
     public static function keyword(): string

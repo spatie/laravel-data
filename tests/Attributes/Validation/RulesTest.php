@@ -5,7 +5,8 @@ use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\Rule;
-use Spatie\LaravelData\Support\Validation\RulesMapper;
+use Spatie\LaravelData\Support\Validation\RulesToLaravel;
+use Spatie\LaravelData\Support\Validation\RulesToValidationRule;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Spatie\TestTime\TestTime;
@@ -24,7 +25,9 @@ it('gets the correct rules', function (
         $this->expectException($exception);
     }
 
-    expect($attribute->getRules(ValidationPath::create()))->toMatchArray([$expected]);
+    $resolved = app(RulesToLaravel::class)->execute($attribute, ValidationPath::create());
+
+    expect($resolved[0])->toEqual($expected);
 })->with('attributes');
 
 it('creates the correct attributes', function (
@@ -39,7 +42,7 @@ it('creates the correct attributes', function (
         return;
     }
 
-    $resolved = app(RulesMapper::class)->execute([$expected], ValidationPath::create());
+    $resolved = app(RulesToValidationRule::class)->execute($expected);
 
     expect($resolved[0])->toEqual($expectedCreatedAttribute);
 })->with('attributes');
@@ -63,7 +66,7 @@ it('can use the Rule rule', function () {
         new Required()
     );
 
-    expect($rule->getRules(ValidationPath::create()))->toMatchArray([
+    expect(app(RulesToLaravel::class)->execute($rule, ValidationPath::create()))->toMatchArray([
         'test',
         'a',
         'b',
@@ -96,7 +99,7 @@ it('can use the Rule rule with invokable rules', function () {
         new Required()
     );
 
-    expect($rule->getRules(ValidationPath::create()))->toMatchArray([
+    expect(app(RulesToLaravel::class)->execute($rule, ValidationPath::create()))->toMatchArray([
         'test',
         'a',
         'b',

@@ -19,25 +19,8 @@ class Rule extends ValidationRule
         $this->rules = $rules;
     }
 
-    public function getRules(ValidationPath $path): array
+    public function get(): array
     {
-        $rules = [];
-
-        foreach ($this->rules as $rule) {
-            $newRules = match (true) {
-                is_string($rule) => explode('|', $rule),
-                $rule instanceof RuleContract, $rule instanceof InvokableRuleContract => [$rule],
-                is_array($rule) => $rule,
-                $rule instanceof ValidationRule => $rule->getRules($path),
-            };
-
-            if (empty($newRules)) {
-                continue;
-            }
-
-            array_push($rules, ...$newRules);
-        }
-
-        return $rules;
+        return $this->rules;
     }
 }

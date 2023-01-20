@@ -17,10 +17,10 @@ class Regex extends StringValidationAttribute
         return 'regex';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [
-            $this->normalizeValue($this->pattern),
+            $this->pattern,
         ];
     }
 }

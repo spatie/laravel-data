@@ -13,7 +13,7 @@ class Numeric extends StringValidationAttribute
         return 'numeric';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

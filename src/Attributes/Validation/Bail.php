@@ -13,7 +13,7 @@ class Bail extends StringValidationAttribute
         return 'bail';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

@@ -13,7 +13,7 @@ class Image extends StringValidationAttribute
         return 'image';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

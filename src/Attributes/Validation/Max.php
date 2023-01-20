@@ -17,7 +17,7 @@ class Max extends StringValidationAttribute
         return 'max';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [$this->value];
     }

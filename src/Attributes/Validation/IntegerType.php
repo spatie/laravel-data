@@ -13,7 +13,7 @@ class IntegerType extends StringValidationAttribute
         return 'integer';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

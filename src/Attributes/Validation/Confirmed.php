@@ -13,7 +13,7 @@ class Confirmed extends StringValidationAttribute
         return 'confirmed';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

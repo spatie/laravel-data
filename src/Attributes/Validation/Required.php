@@ -8,15 +8,15 @@ use Spatie\LaravelData\Support\Validation\RequiringRule;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Required extends ValidationAttribute implements RequiringRule
+class Required extends ObjectValidationAttribute implements RequiringRule
 {
     public function __construct(protected ?RequiredIf $rule = null)
     {
     }
 
-    public function getRules(ValidationPath $path): array
+    public function getRule(ValidationPath $path): object|string
     {
-        return [$this->rule ?? static::keyword()];
+        return $this->rule ?? self::keyword();
     }
 
     public static function keyword(): string

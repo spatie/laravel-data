@@ -17,7 +17,7 @@ class Between extends StringValidationAttribute
         return 'between';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [$this->min, $this->max];
     }

@@ -13,7 +13,7 @@ class ActiveUrl extends StringValidationAttribute
         return 'active_url';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

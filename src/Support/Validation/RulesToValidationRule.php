@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Support\Validation;
 
+use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rules\Dimensions as DimensionsRule;
@@ -27,17 +28,32 @@ use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\Unique;
 use Throwable;
 
-class RulesMapper
+class RulesToValidationRule
 {
     public function __construct(protected RuleFactory $ruleFactory)
     {
     }
 
-    public function execute(array $rules, ValidationPath $path): array
+    /** @return \Spatie\LaravelData\Support\Validation\ValidationRule[] */
+    public function execute(mixed $rule): array
     {
-        $rules = array_map(fn (mixed $rule) => match (true) {
-            is_string($rule) => $this->resolveStringRule($rule, $path),
-            $rule instanceof ValidationRule => $rule,
+        if (is_array($rule)) {
+            return $this->resolveArrayRule($rule);
+        }
+
+        if (is_string($rule)) {
+            return $this->resolveStringRule($rule);
+        }
+
+        if ($rule instanceof Rule) {
+            return $this->execute($rule->get());
+        }
+
+        if ($rule instanceof ValidationRule) {
+            return [$rule];
+        }
+
+        $objectRule = match (true) {
             $rule instanceof DimensionsRule => new Dimensions(rule: $rule),
             $rule instanceof EnumRule => new Enum($rule),
             $rule instanceof ExcludeIfRule => new Exclude($rule),
@@ -48,26 +64,40 @@ class RulesMapper
             $rule instanceof ProhibitedIfRule => new Prohibited($rule),
             $rule instanceof RequiredIfRule => new Required($rule),
             $rule instanceof UniqueRule => new Unique(rule: $rule),
-            $rule instanceof RuleContract => new Rule($rule),
-            $rule instanceof Rule => $this->execute($rule->getRules($path), $path),
-            default => new Rule($rule),
-        }, $rules);
+            default => null,
+        };
 
-        return Arr::flatten($rules);
+        if ($objectRule) {
+            return [$objectRule];
+        }
+
+        if ($rule instanceof RuleContract | $rule instanceof InvokableRule) {
+            return [new Rule($rule)];
+        }
+
+        return [new Rule($rule)];
     }
 
-    protected function resolveStringRule(string $rule, ValidationPath $path): mixed
+    protected function resolveArrayRule(array $rules): array
     {
-        if (! str_contains($rule, '|')) {
+        return Arr::flatten(array_map(
+            fn(mixed $rule) => $this->execute($rule),
+            $rules
+        ));
+    }
+
+    protected function resolveStringRule(string $rule): array
+    {
+        $rules = [];
+
+        foreach (explode('|', $rule) as $subRule) {
             try {
-                return $this->ruleFactory->create($rule);
+                $rules[] = $this->ruleFactory->create($subRule);
             } catch (Throwable $t) {
-                return new Rule($rule);
+                $rules[] = new Rule($subRule);
             }
         }
 
-        $rules = explode('|', $rule);
-
-        return $this->execute($rules, $path);
+        return $rules;
     }
 }

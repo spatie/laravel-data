@@ -13,7 +13,7 @@ class AlphaDash extends StringValidationAttribute
         return 'alpha_dash';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

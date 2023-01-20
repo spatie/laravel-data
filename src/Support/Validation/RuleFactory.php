@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support\Validation;
 
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationRuleParser;
 use Spatie\LaravelData\Attributes\Validation\Accepted;
 use Spatie\LaravelData\Attributes\Validation\AcceptedIf;
 use Spatie\LaravelData\Attributes\Validation\ActiveUrl;
@@ -86,36 +87,16 @@ class RuleFactory
 {
     public function create(string $rule): ValidationRule
     {
-        $keyword = Str::before($rule, ':');
-        $parameters = $this->resolveParameters($rule);
+        [$keyword, $parameters] = ValidationRuleParser::parse($rule);
 
         /** @var \Spatie\LaravelData\Attributes\Validation\StringValidationAttribute|null $ruleClass */
-        $ruleClass = $this->mapping()[$keyword] ?? null;
+        $ruleClass = $this->mapping()[Str::snake($keyword)] ?? null;
 
         if ($ruleClass === null) {
             throw CouldNotCreateValidationRule::create($rule);
         }
 
         return $ruleClass::create(...$parameters);
-    }
-
-    protected function resolveParameters(string $rule): array
-    {
-        if (! str_contains($rule, ':')) {
-            return [];
-        }
-
-        $parametersString = Str::after($rule, ':');
-
-        if ($parametersString === '') {
-            return [];
-        }
-
-        return collect(explode(',', $parametersString))->mapWithKeys(
-            fn (string $parameter, int $index) => str_contains($parameter, '=')
-                ? [Str::before($parameter, '=') => Str::after($parameter, '=')]
-                : [$index => $parameter]
-        )->all();
     }
 
     protected function mapping(): array

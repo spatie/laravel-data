@@ -17,7 +17,7 @@ class DigitsBetween extends StringValidationAttribute
         return 'digits_between';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [$this->min, $this->max];
     }

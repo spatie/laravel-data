@@ -13,7 +13,7 @@ class IPv4 extends StringValidationAttribute
         return 'ipv4';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

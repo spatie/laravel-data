@@ -13,7 +13,7 @@ class Filled extends StringValidationAttribute
         return 'filled';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

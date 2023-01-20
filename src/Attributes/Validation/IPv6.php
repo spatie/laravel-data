@@ -13,7 +13,7 @@ class IPv6 extends StringValidationAttribute
         return 'ipv6';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

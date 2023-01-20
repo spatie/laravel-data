@@ -13,7 +13,7 @@ class BooleanType extends StringValidationAttribute
         return 'boolean';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

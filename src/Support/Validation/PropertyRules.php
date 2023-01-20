@@ -63,7 +63,7 @@ class PropertyRules
     public function normalize(ValidationPath $path): array
     {
         return $this->rules
-            ->map(fn (ValidationRule $rule) => $rule->getRules($path))
+            ->map(fn (ValidationRule $rule) => app(RulesToLaravel::class)->execute($rule, $path))
             ->flatten()
             ->all();
     }

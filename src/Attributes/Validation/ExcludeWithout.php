@@ -3,13 +3,19 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use BackedEnum;
+use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ExcludeWithout extends StringValidationAttribute
 {
-    public function __construct(protected string $field)
-    {
+    protected FieldReference $field;
+
+    public function __construct(
+        string|FieldReference $field,
+    ) {
+        $this->field = $this->parseFieldReference($field);
     }
 
     public static function keyword(): string
@@ -17,10 +23,10 @@ class ExcludeWithout extends StringValidationAttribute
         return 'exclude_without';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [
-            $this->normalizeValue($this->field),
+            $this->field,
         ];
     }
 }

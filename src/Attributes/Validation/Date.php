@@ -13,7 +13,7 @@ class Date extends StringValidationAttribute
         return 'date';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

@@ -13,7 +13,7 @@ class StringType extends StringValidationAttribute
         return 'string';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

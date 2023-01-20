@@ -7,15 +7,15 @@ use Illuminate\Validation\Rules\ProhibitedIf;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Prohibited extends ValidationAttribute
+class Prohibited extends ObjectValidationAttribute
 {
     public function __construct(protected ?ProhibitedIf $rule = null)
     {
     }
 
-    public function getRules(ValidationPath $path): array
+    public function getRule(ValidationPath $path): object|string
     {
-        return [$this->rule ?? static::keyword()];
+        return $this->rule ?? self::keyword();
     }
 
     public static function keyword(): string

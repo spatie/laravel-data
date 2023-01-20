@@ -21,8 +21,8 @@ class Mimes extends StringValidationAttribute
         return 'mimes';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
-        return [$this->normalizeValue($this->mimes)];
+        return [$this->mimes];
     }
 }

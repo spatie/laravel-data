@@ -18,9 +18,9 @@ class BeforeOrEqual extends StringValidationAttribute
         return 'before_or_equal';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
-        return [$this->normalizeValue($this->date)];
+        return [$this->date];
     }
 
     public static function create(string ...$parameters): static

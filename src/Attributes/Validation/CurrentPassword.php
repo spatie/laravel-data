@@ -18,10 +18,8 @@ class CurrentPassword extends StringValidationAttribute
         return 'current_password';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
-        return $this->guard === null
-            ? []
-            : [self::normalizeValue($this->guard)];
+        return [$this->guard];
     }
 }

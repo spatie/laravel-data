@@ -7,13 +7,13 @@ use Illuminate\Validation\Rules\Enum as EnumRule;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Enum extends ValidationAttribute
+class Enum extends ObjectValidationAttribute
 {
-    protected EnumRule $enum;
+    protected EnumRule $rule;
 
     public function __construct(string|EnumRule $enum)
     {
-        $this->enum = $enum instanceof EnumRule ? $enum : new EnumRule($enum);
+        $this->rule = $enum instanceof EnumRule ? $enum : new EnumRule($enum);
     }
 
     public static function keyword(): string
@@ -21,9 +21,9 @@ class Enum extends ValidationAttribute
         return 'enum';
     }
 
-    public function getRules(ValidationPath $path): array
+    public function getRule(ValidationPath $path): object|string
     {
-        return [$this->enum];
+        return $this->rule;
     }
 
     public static function create(string ...$parameters): static

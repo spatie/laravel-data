@@ -13,7 +13,7 @@ class Present extends StringValidationAttribute
         return 'present';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

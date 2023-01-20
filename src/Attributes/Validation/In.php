@@ -8,7 +8,7 @@ use Illuminate\Validation\Rules\In as BaseIn;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class In extends ValidationAttribute
+class In extends ObjectValidationAttribute
 {
     protected BaseIn $rule;
 
@@ -23,9 +23,9 @@ class In extends ValidationAttribute
         $this->rule = new BaseIn(Arr::flatten($values));
     }
 
-    public function getRules(ValidationPath $path): array
+    public function getRule(ValidationPath $path): object|string
     {
-        return [$this->rule];
+        return $this->rule;
     }
 
     public static function keyword(): string

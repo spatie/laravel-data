@@ -17,7 +17,7 @@ class Min extends StringValidationAttribute
         return 'min';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [$this->value];
     }

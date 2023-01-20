@@ -13,7 +13,7 @@ class File extends StringValidationAttribute
         return 'file';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

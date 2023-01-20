@@ -29,7 +29,7 @@ class Email extends StringValidationAttribute
         return 'email';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return collect($this->modes)
             ->whenEmpty(fn (Collection $modes) => $modes->add(self::RfcValidation))

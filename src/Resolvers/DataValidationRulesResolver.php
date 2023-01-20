@@ -12,7 +12,8 @@ use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\DataRules;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
-use Spatie\LaravelData\Support\Validation\RulesMapper;
+use Spatie\LaravelData\Support\Validation\RulesToValidationRule;
+use Spatie\LaravelData\Support\Validation\RulesToLaravel;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
@@ -21,7 +22,8 @@ class DataValidationRulesResolver
 {
     public function __construct(
         protected DataConfig $dataConfig,
-        protected RulesMapper $ruleAttributesResolver,
+        protected RulesToValidationRule $ruleAttributesResolver,
+        protected RulesToLaravel $rulesNormalizer
     ) {
     }
 
@@ -166,22 +168,19 @@ class DataValidationRulesResolver
             return;
         }
 
-        $fullPayload = new ValidationContext(
+        $validationContext = new ValidationContext(
             $path->isRoot() ? $fullPayload : Arr::get($fullPayload, $path->get()),
             $fullPayload,
             $path
         );
 
-        $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $fullPayload]);
+        $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $validationContext]);
 
         foreach ($overwrittenRules as $key => $rules) {
-            $overwrittenRules = collect(Arr::wrap($rules))
-                ->map(fn(mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
-                ->map(fn(mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules($path) : $rule)
-                ->flatten()
-                ->all();
-
-            $dataRules->add($path->relative($key), $overwrittenRules);
+            $dataRules->add(
+                $path->relative($key),
+                collect(Arr::wrap($rules))->map(fn(mixed $rule) => $this->rulesNormalizer->execute($rule, $path))->flatten()->all()
+            );
         }
     }
 

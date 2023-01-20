@@ -13,7 +13,7 @@ class Json extends StringValidationAttribute
         return 'json';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

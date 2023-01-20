@@ -17,7 +17,7 @@ class Digits extends StringValidationAttribute
         return 'digits';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [$this->value];
     }

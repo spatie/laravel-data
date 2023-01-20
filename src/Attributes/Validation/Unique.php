@@ -9,7 +9,7 @@ use Illuminate\Validation\Rules\Unique as BaseUnique;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Unique extends ValidationAttribute
+class Unique extends ObjectValidationAttribute
 {
     protected BaseUnique $rule;
 
@@ -48,9 +48,9 @@ class Unique extends ValidationAttribute
         $this->rule = $rule;
     }
 
-    public function getRules(ValidationPath $path): array
+    public function getRule(ValidationPath $path): object|string
     {
-        return [$this->rule];
+        return $this->rule;
     }
 
     public static function keyword(): string

@@ -17,7 +17,7 @@ class Same extends StringValidationAttribute
         return 'same';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [$this->field];
     }

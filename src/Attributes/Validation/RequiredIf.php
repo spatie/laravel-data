@@ -29,11 +29,11 @@ class RequiredIf extends StringValidationAttribute implements RequiringRule
         return 'required_if';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [
-            $this->normalizeField($this->field, $path),
-            $this->normalizeValue($this->values),
+            $this->field,
+            $this->values,
         ];
     }
 }

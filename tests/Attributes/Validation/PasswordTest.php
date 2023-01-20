@@ -8,17 +8,13 @@ test(
     'password rule returns preconfigured password validators',
     function (callable|null $setDefaults, array $expectedConfig) {
         ValidationPassword::$defaultCallback = null;
+
         $setDefaults();
 
-        [$rule] = (new Password(default: true))->getRules(ValidationPath::create());
-        $clazz = new ReflectionClass($rule);
+        $rule = (new Password(default: true))->getRule(ValidationPath::create());
 
         foreach ($expectedConfig as $key => $expected) {
-            $prop = $clazz->getProperty($key);
-            $prop->setAccessible(true);
-            $actual = $prop->getValue($rule);
-
-            expect($actual)->toBe($expected);
+            expect(invade($rule)->{$key})->toBe($expected);
         }
     }
 )->with(function () {

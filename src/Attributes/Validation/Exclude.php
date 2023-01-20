@@ -7,15 +7,15 @@ use Illuminate\Validation\Rules\ExcludeIf;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Exclude extends ValidationAttribute
+class Exclude extends ObjectValidationAttribute
 {
-    public function __construct(protected ?ExcludeIf $rule = null)
+    public function __construct(protected ExcludeIf $rule)
     {
     }
 
-    public function getRules(ValidationPath $path): array
+    public function getRule(ValidationPath $path): object|string
     {
-        return [$this->rule ?? static::keyword()];
+        return $this->rule;
     }
 
     public static function keyword(): string

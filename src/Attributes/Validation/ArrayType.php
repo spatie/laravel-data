@@ -21,7 +21,7 @@ class ArrayType extends StringValidationAttribute
         return 'array';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return $this->keys;
     }

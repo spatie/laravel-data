@@ -93,7 +93,7 @@ function fixature(
     object|string|array $expected,
     object|string|null $expectCreatedAttribute = null,
     string $exception = null
-) {
+): array {
     return [
         'attribute' => $attribute,
         'expected' => $expected,

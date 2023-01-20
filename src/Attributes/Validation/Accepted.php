@@ -13,7 +13,7 @@ class Accepted extends StringValidationAttribute
         return 'accepted';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         return [];
     }

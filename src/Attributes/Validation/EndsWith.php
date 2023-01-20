@@ -21,8 +21,8 @@ class EndsWith extends StringValidationAttribute
         return 'ends_with';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
-        return [$this->normalizeValue($this->values)];
+        return [$this->values];
     }
 }

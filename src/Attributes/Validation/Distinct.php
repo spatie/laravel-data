@@ -21,7 +21,7 @@ class Distinct extends StringValidationAttribute
         return 'distinct';
     }
 
-    public function parameters(ValidationPath $path): array
+    public function parameters(): array
     {
         if ($this->mode === null) {
             return [];
