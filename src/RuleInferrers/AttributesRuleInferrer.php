@@ -4,13 +4,13 @@ namespace Spatie\LaravelData\RuleInferrers;
 
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
-use Spatie\LaravelData\Support\Validation\RulesToValidationRule;
+use Spatie\LaravelData\Support\Validation\RuleNormalizer;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 class AttributesRuleInferrer implements RuleInferrer
 {
-    public function __construct(protected RulesToValidationRule $rulesDenormalizer)
+    public function __construct(protected RuleNormalizer $rulesDenormalizer)
     {
     }
 

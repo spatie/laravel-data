@@ -83,7 +83,7 @@ use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Exceptions\CouldNotCreateValidationRule;
 
-class RuleFactory
+class ValidationRuleFactory
 {
     public function create(string $rule): ValidationRule
     {

@@ -28,9 +28,9 @@ use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\Unique;
 use Throwable;
 
-class RulesToValidationRule
+class RuleNormalizer
 {
-    public function __construct(protected RuleFactory $ruleFactory)
+    public function __construct(protected ValidationRuleFactory $ruleFactory)
     {
     }
 

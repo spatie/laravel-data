@@ -12,8 +12,9 @@ use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\StringValidationAttribute;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 
-class RulesToLaravel
+class RuleDenormalizer
 {
+    /** @return array<string|object|RuleContract|InvokableRuleContract> */
     public function execute(mixed $rule, ValidationPath $path): array
     {
         if (is_string($rule)) {

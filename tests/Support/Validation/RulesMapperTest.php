@@ -7,10 +7,10 @@ use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\Rule;
-use Spatie\LaravelData\Support\Validation\RulesToValidationRule;
+use Spatie\LaravelData\Support\Validation\RuleNormalizer;
 
 beforeEach(function () {
-    $this->mapper = resolve(RulesToValidationRule::class);
+    $this->mapper = resolve(RuleNormalizer::class);
 });
 
 it('can map string rules')

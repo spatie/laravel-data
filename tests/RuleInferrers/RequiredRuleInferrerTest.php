@@ -14,6 +14,7 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
+use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
@@ -76,7 +77,9 @@ it("won't add a required rule when a property already contains a required object
         ValidationPath::create()
     );
 
-    expect($rules->normalize(ValidationPath::create()))->toEqualCanonicalizing(['required']);
+
+    expect(app(RuleDenormalizer::class)->execute($rules->all(), ValidationPath::create()))
+        ->toEqualCanonicalizing(['required']);
 });
 
 it(
@@ -92,7 +95,8 @@ it(
             ValidationPath::create()
         );
 
-        expect($rules->normalize(ValidationPath::create()))->toEqualCanonicalizing([new BooleanType()]);
+        expect(app(RuleDenormalizer::class)->execute($rules->all(), ValidationPath::create()))
+            ->toEqualCanonicalizing([new BooleanType()]);
     }
 );
 
@@ -109,7 +113,8 @@ it(
             ValidationPath::create()
         );
 
-        expect($rules->normalize(ValidationPath::create()))->toEqualCanonicalizing([new Nullable()]);
+        expect(app(RuleDenormalizer::class)->execute($rules->all(), ValidationPath::create()))
+            ->toEqualCanonicalizing([new Nullable()]);
     }
 );
 
@@ -126,7 +131,7 @@ it('has support for rules that cannot be converted to string', function () {
         ValidationPath::create(),
     );
 
-    expect($rules->normalize(ValidationPath::create()))->toEqualCanonicalizing([
+    expect(app(RuleDenormalizer::class)->execute($rules->all(), ValidationPath::create()))->toEqualCanonicalizing([
         'required', new BaseEnum('SomeClass'),
     ]);
 });
@@ -143,7 +148,8 @@ it("won't add required to a data collection since it is already present", functi
         ValidationPath::create()
     );
 
-    expect($rules->normalize(ValidationPath::create()))->toEqualCanonicalizing(['present', 'array']);
+    expect(app(RuleDenormalizer::class)->execute($rules->all(), ValidationPath::create()))
+        ->toEqualCanonicalizing(['present', 'array']);
 });
 
 it("won't add required rules to undefinable properties", function () {

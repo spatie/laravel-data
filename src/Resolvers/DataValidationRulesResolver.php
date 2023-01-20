@@ -12,8 +12,8 @@ use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\DataRules;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
-use Spatie\LaravelData\Support\Validation\RulesToLaravel;
-use Spatie\LaravelData\Support\Validation\RulesToValidationRule;
+use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
+use Spatie\LaravelData\Support\Validation\RuleNormalizer;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
@@ -21,8 +21,8 @@ class DataValidationRulesResolver
 {
     public function __construct(
         protected DataConfig $dataConfig,
-        protected RulesToValidationRule $ruleAttributesResolver,
-        protected RulesToLaravel $rulesNormalizer
+        protected RuleNormalizer $ruleAttributesResolver,
+        protected RuleDenormalizer $ruleDenormalizer
     ) {
     }
 
@@ -58,7 +58,7 @@ class DataValidationRulesResolver
                 $path
             );
 
-            $dataRules->add($relativePath, $rules->normalize($path));
+            $dataRules->add($relativePath, $rules);
         }
 
         $this->resolveOverwrittenRules($dataClass, $fullPayload, $path, $dataRules);
@@ -113,7 +113,7 @@ class DataValidationRulesResolver
             $relativePath
         );
 
-        $dataRules->add($relativePath, $toplevelRules->normalize($relativePath));
+        $dataRules->add($relativePath, $toplevelRules);
 
         $this->execute(
             $dataProperty->type->dataClass,
@@ -135,7 +135,7 @@ class DataValidationRulesResolver
             $relativePath
         );
 
-        $dataRules->add($relativePath, $toplevelRules->normalize($relativePath));
+        $dataRules->add($relativePath, $toplevelRules);
 
         $dataRules->addCollection($relativePath, Rule::forEach(function (mixed $value, mixed $attribute) use ($fullPayload, $dataProperty) {
             if (! is_array($value)) {
@@ -152,7 +152,7 @@ class DataValidationRulesResolver
             );
 
             return collect($dataRules->rules)->keyBy(
-                fn (mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
+                fn(mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
             )->all();
         }));
     }
@@ -178,7 +178,7 @@ class DataValidationRulesResolver
         foreach ($overwrittenRules as $key => $rules) {
             $dataRules->add(
                 $path->relative($key),
-                collect(Arr::wrap($rules))->map(fn (mixed $rule) => $this->rulesNormalizer->execute($rule, $path))->flatten()->all()
+                collect(Arr::wrap($rules))->map(fn(mixed $rule) => $this->ruleDenormalizer->execute($rule, $path))->flatten()->all()
             );
         }
     }
@@ -187,11 +187,14 @@ class DataValidationRulesResolver
         DataProperty $property,
         PropertyRules $rules,
         ValidationPath $path,
-    ): PropertyRules {
+    ): array {
         foreach ($this->dataConfig->getRuleInferrers() as $inferrer) {
             $inferrer->handle($property, $rules, $path);
         }
 
-        return $rules;
+        return $this->ruleDenormalizer->execute(
+            $rules->all(),
+            $path
+        );
     }
 }

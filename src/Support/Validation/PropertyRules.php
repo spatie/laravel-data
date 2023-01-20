@@ -59,14 +59,6 @@ class PropertyRules
         return $this->rules->contains(fn (ValidationRule $rule) => $rule instanceof $class);
     }
 
-    public function normalize(ValidationPath $path): array
-    {
-        return $this->rules
-            ->map(fn (ValidationRule $rule) => app(RulesToLaravel::class)->execute($rule, $path))
-            ->flatten()
-            ->all();
-    }
-
     public function all(): array
     {
         return $this->rules->all();
