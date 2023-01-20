@@ -27,18 +27,18 @@ class DataPropertyRulesResolver
     public function execute(
         DataProperty $property,
         string $path,
-        array $payload,
+        array $fullPayload,
         DataRules $dataRules,
     ): DataRules {
         if ($property->validate === false) {
             return $dataRules;
         }
 
-        if ($property->type->isOptional && Arr::has($payload, $path) === false) {
+        if ($property->type->isOptional && Arr::has($fullPayload, $path) === false) {
             return $dataRules;
         }
 
-        if (($property->type->isNullable || $property->type->isMixed) && Arr::get($payload, $path) === null) {
+        if (($property->type->isNullable || $property->type->isMixed) && Arr::get($fullPayload, $path) === null) {
             return $dataRules;
         }
 
@@ -54,7 +54,7 @@ class DataPropertyRulesResolver
 
         app(DataValidationRulesResolver::class)->execute(
             $property->type->dataClass,
-            $payload,
+            $fullPayload,
             $dataRules,
             $path
         );

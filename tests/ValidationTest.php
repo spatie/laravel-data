@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Tests;
 
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
@@ -33,6 +34,7 @@ use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Resolvers\DataPropertyRulesResolver;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
+use Spatie\LaravelData\Tests\Fakes\DummyDataWithContextOverwrittenValidationRules;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -424,84 +426,64 @@ it('can write custom rules based upon injected dependencies', function () {
 });
 
 it('can validate nested data', function () {
-    class NestedClassA extends Data
-    {
-        public string $name;
-    }
-
     $dataClass = new class () extends Data {
-        public NestedClassA $nested;
+        public SimpleData $nested;
     };
 
     DataValidationAsserter::for($dataClass)
-        ->assertOk(['nested' => ['name' => 'Hello World']])
+        ->assertOk(['nested' => ['string' => 'Hello World']])
         ->assertErrors(['nested' => []])
         ->assertErrors(['nested' => null])
         ->assertRules([
             'nested' => ['required', 'array'],
-            'nested.name' => ['required', 'string'],
+            'nested.string' => ['required', 'string'],
         ]);
 });
 
 it('can validate nested nullable data', function () {
-    class NestedClassB extends Data
-    {
-        public string $name;
-    }
-
     $dataClass = new class () extends Data {
-        public ?NestedClassB $nested;
+        public ?SimpleData $nested;
     };
 
     DataValidationAsserter::for($dataClass)
-        ->assertOk(['nested' => ['name' => 'Hello World']])
+        ->assertOk(['nested' => ['string' => 'Hello World']])
         ->assertOk(['nested' => null])
-        ->assertErrors(['nested' => ['name' => null]])
+        ->assertErrors(['nested' => ['string' => null]])
         ->assertErrors(['nested' => []])
         ->assertRules([], payload: [])
         ->assertRules([
             'nested' => ['nullable', 'array'],
-            'nested.name' => ['required', 'string'],
+            'nested.string' => ['required', 'string'],
         ], payload: ['nested' => []]);
 });
 
 it('can validate nested optional data', function () {
-    class NestedClassC extends Data
-    {
-        public string $name;
-    }
-
     $dataClass = new class () extends Data {
-        public NestedClassC|Optional $nested;
+        public SimpleData|Optional $nested;
     };
 
     DataValidationAsserter::for($dataClass)
-        ->assertOk(['nested' => ['name' => 'Hello World']])
+        ->assertOk(['nested' => ['string' => 'Hello World']])
         ->assertErrors(['nested' => null])
-        ->assertErrors(['nested' => ['name' => null]])
+        ->assertErrors(['nested' => ['string' => null]])
         ->assertErrors(['nested' => []])
         ->assertRules([], payload: [])
         ->assertRules([
             'nested' => ['sometimes', 'array'],
-            'nested.name' => ['required', 'string'],
+            'nested.string' => ['required', 'string'],
         ], ['nested' => null]);
 });
 
 it('can add additional rules to nested data', function () {
-    class NestedClassD extends Data
-    {
-        public string $name;
-    }
-
     $dataClass = new class () extends Data {
         #[Bail]
-        public NestedClassD $nested;
+        public SimpleData $nested;
     };
 
     DataValidationAsserter::for($dataClass)
         ->assertRules([
             'nested' => ['required', 'bail', 'array'],
-            'nested.name' => ['required', 'string'],
+            'nested.string' => ['required', 'string'],
         ]);
 });
 
@@ -520,48 +502,32 @@ it('will use name mapping with nested objects', function () {
 });
 
 it('can use nested payloads in nested data', function () {
-    class NestedClassF extends Data
-    {
-        public bool $strict;
-
-        public string $name;
-
-        public static function rules(ValidationContext $context): array
-        {
-            if ($context->payload['strict'] ?? false) {
-                return ['name' => ['in:strict']];
-            }
-
-            return [];
-        }
-    }
-
     $dataClass = new class () extends Data {
-        public NestedClassF $some_nested;
+        public DummyDataWithContextOverwrittenValidationRules $some_nested;
     };
 
     DataValidationAsserter::for($dataClass)
         ->assertRules(
             rules: [
                 'some_nested' => ['required', 'array'],
-                'some_nested.strict' => ['boolean'],
-                'some_nested.name' => ['in:strict'],
+                'some_nested.validate_as_email' => ['boolean', 'required'],
+                'some_nested.string' => ['required', 'string', 'email'],
             ],
             payload: [
                 'some_nested' => [
-                    'strict' => true,
+                    'validate_as_email' => true,
                 ],
             ]
         )
         ->assertRules(
             rules: [
                 'some_nested' => ['required', 'array'],
-                'some_nested.strict' => ['boolean'],
-                'some_nested.name' => ['required', 'string'],
+                'some_nested.validate_as_email' => ['boolean', 'required'],
+                'some_nested.string' => ['required', 'string'],
             ],
             payload: [
                 'some_nested' => [
-                    'strict' => false,
+                    'validate_as_email' => false,
                 ],
             ]
         );
@@ -781,14 +747,9 @@ it('can overwrite collection class rules', function () {
  */
 
 it('can nest data in collections', function () {
-    class NestedClassE extends Data
-    {
-        public string $string;
-    }
-
     class CollectionClassA extends Data
     {
-        public NestedClassE $nested;
+        public SimpleData $nested;
     }
 
     $dataClass = new class () extends Data {
@@ -813,14 +774,9 @@ it('can nest data in collections', function () {
 });
 
 it('can nest nullable data in collections', function () {
-    class NestedClassTable extends Data
-    {
-        public string $string;
-    }
-
     class CollectionClassTable extends Data
     {
-        public ?NestedClassTable $nested;
+        public ?SimpleData $nested;
     }
 
     $dataClass = new class () extends Data {
@@ -856,14 +812,9 @@ it('can nest nullable data in collections', function () {
 
 
 it('can nest optional data in collections', function () {
-    class NestedClassG extends Data
-    {
-        public string $string;
-    }
-
     class CollectionClassC extends Data
     {
-        public Optional|NestedClassG $nested;
+        public Optional|SimpleData $nested;
     }
 
     $dataClass = new class () extends Data {
@@ -901,27 +852,8 @@ it('can nest optional data in collections', function () {
 });
 
 it('can nest data in collections using relative rule generation', function () {
-    class NestedClassH extends Data
-    {
-        public string $string;
-
-        #[Required]
-        public bool $validate_as_email;
-
-        public static function rules(ValidationContext $context): array
-        {
-            if ($context->payload['validate_as_email'] ?? false) {
-                return [
-                    'string' => ['required', 'string', 'email'],
-                ];
-            }
-
-            return [];
-        }
-    }
-
     $dataClass = new class () extends Data {
-        #[DataCollectionOf(NestedClassH::class)]
+        #[DataCollectionOf(DummyDataWithContextOverwrittenValidationRules::class)]
         public DataCollection $collection;
     };
 
@@ -960,24 +892,9 @@ it('can nest data in collections using relative rule generation', function () {
 })->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
 
 it('can nest data in classes inside collections using relative rule generation', function () {
-    class NestedClassJ extends Data
-    {
-        public string $string;
-
-        #[Required]
-        public bool $validate_as_email;
-
-        public static function rules(ValidationContext $context): array
-        {
-            return $context->payload['validate_as_email'] ?? false
-                ? ['string' => ['required', 'string', 'email']]
-                : [];
-        }
-    }
-
     class CollectionClassK extends Data
     {
-        public NestedClassJ $nested;
+        public DummyDataWithContextOverwrittenValidationRules $nested;
     }
 
     $dataClass = new class () extends Data {
@@ -1019,7 +936,7 @@ it('can nest data in classes inside collections using relative rule generation',
 })->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
 
 it('can nest data in deep collections using relative rule generation', function () {
-    class NestedClassL extends Data
+    class ValidationTestDeepNestedDataWithContextOverwrittenRules extends Data
     {
         public string $deep_string;
 
@@ -1034,14 +951,14 @@ it('can nest data in deep collections using relative rule generation', function 
         }
     }
 
-    class NestedClassM extends Data
+    class ValidationTestNestedDataWithContextOverwrittenRules extends Data
     {
         public string $string;
 
         #[Required]
         public bool $validate_as_email;
 
-        #[DataCollectionOf(NestedClassL::class), Required]
+        #[DataCollectionOf(ValidationTestDeepNestedDataWithContextOverwrittenRules::class), Required]
         public DataCollection $items;
 
         public static function rules(ValidationContext $context): array
@@ -1053,7 +970,7 @@ it('can nest data in deep collections using relative rule generation', function 
     }
 
     $dataClass = new class () extends Data {
-        #[DataCollectionOf(NestedClassM::class)]
+        #[DataCollectionOf(ValidationTestNestedDataWithContextOverwrittenRules::class)]
         public DataCollection $collection;
     };
 
@@ -1120,27 +1037,8 @@ it('can nest data in deep collections using relative rule generation', function 
 })->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
 
 it('can nest data using relative rule generation', function () {
-    class NestedClassI extends Data
-    {
-        public string $string;
-
-        #[Required]
-        public bool $validate_as_email;
-
-        public static function rules(ValidationContext $context): array
-        {
-            if ($context->payload['validate_as_email'] ?? false) {
-                return [
-                    'string' => ['required', 'string', 'email'],
-                ];
-            }
-
-            return [];
-        }
-    }
-
     $dataClass = new class () extends Data {
-        public NestedClassI $nested;
+        public DummyDataWithContextOverwrittenValidationRules $nested;
     };
 
     $payload = [
@@ -1157,6 +1055,166 @@ it('can nest data using relative rule generation', function () {
             'nested.validate_as_email' => ['boolean', 'required'],
         ], $payload)
         ->assertErrors($payload);
+})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+
+it('correctly_injects_context_in_the_rules_method', function () {
+    class NestedClassJ extends Data
+    {
+        public string $property;
+
+        public static function rules(ValidationContext $context): array
+        {
+            $correct = $context->payload['property'] === 'J'
+                && $context->fullPayload['property'] === 'Root'
+                && $context->path === 'nested.data';
+
+            if (! $correct) {
+                throw new Exception('Should not end up here');
+            }
+
+            return [];
+        }
+    }
+
+    class NestedClassK extends Data
+    {
+        public string $property;
+
+        public static function rules(ValidationContext $context): array
+        {
+            $correct = $context->payload['property'] === 'K'
+                && $context->fullPayload['property'] === 'Root'
+                && $context->path === 'nested.collection.0.nested';
+
+            if (! $correct) {
+                throw new Exception('Should not end up here');
+            }
+
+            return [];
+        }
+    }
+
+
+    class NestedClassL extends Data
+    {
+        public string $property;
+
+        public static function rules(ValidationContext $context): array
+        {
+            $correct = $context->payload['property'] === 'L'
+                && $context->fullPayload['property'] === 'Root'
+                && $context->path === 'nested.collection.0.collection.0';
+
+            if (! $correct) {
+                throw new Exception('Should not end up here');
+            }
+
+            return [];
+        }
+    }
+
+    class NestedClassM extends Data
+    {
+        public string $property;
+
+        public NestedClassK $nested;
+
+        #[DataCollectionOf(NestedClassL::class)]
+        public DataCollection $collection;
+
+        public static function rules(ValidationContext $context): array
+        {
+            $correct = $context->payload['property'] === 'M'
+                && $context->fullPayload['property'] === 'Root'
+                && $context->path === 'nested.collection.0';
+
+            if (! $correct) {
+                throw new Exception('Should not end up here');
+            }
+
+            return [];
+        }
+    }
+
+    class NestedClassN extends Data
+    {
+        public string $property;
+
+        public NestedClassJ $data;
+
+        #[DataCollectionOf(NestedClassM::class)]
+        public DataCollection $collection;
+
+        public static function rules(ValidationContext $context): array
+        {
+            $correct = $context->payload['property'] === 'N'
+                && $context->fullPayload['property'] === 'Root'
+                && $context->path === 'nested';
+
+            if (! $correct) {
+                throw new Exception('Should not end up here');
+            }
+
+            return [];
+        }
+    }
+
+    $dataClass = new class () extends Data {
+        public string $property;
+
+        public NestedClassN $nested;
+
+        public static function rules(ValidationContext $context): array
+        {
+            $correct = $context->payload['property'] === 'Root'
+                && $context->fullPayload['property'] === 'Root'
+                && $context->path === null;
+
+            if (! $correct) {
+                throw new Exception('Should not end up here');
+            }
+
+            return [];
+        }
+    };
+
+    $payload = [
+        'property' => 'Root',
+        'nested' => [
+            'property' => 'N',
+            'data' => [
+                'property' => 'J',
+            ],
+            'collection' => [
+                [
+                    'property' => 'M',
+                    'nested' => [
+                        'property' => 'K',
+                    ],
+                    'collection' => [
+                        [
+                            'property' => 'L',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    DataValidationAsserter::for($dataClass)
+        ->assertRules([
+            'property' => ['required', 'string'],
+            'nested' => ['required', 'array'],
+            'nested.property' => ['required', 'string'],
+            'nested.data' => ['required', 'array'],
+            'nested.data.property' => ['required', 'string'],
+            'nested.collection' => ['present', 'array'],
+            'nested.collection.0.property' => ['required', 'string'],
+            'nested.collection.0.nested' => ['required', 'array'],
+            'nested.collection.0.nested.property' => ['required', 'string'],
+            'nested.collection.0.collection' => ['present', 'array'],
+            'nested.collection.0.collection.0.property' => ['required', 'string'],
+        ], $payload);
 })->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
 
 it('will merge overwritten rules on inherited data objects', function () {

@@ -30,7 +30,7 @@ class DataValidationRulesResolver
 
     public function execute(
         string $class,
-        array $payload = [],
+        array $fullPayload = [],
         ?DataRules $dataRules = null,
         ?string $path = null,
     ): array {
@@ -52,7 +52,7 @@ class DataValidationRulesResolver
                 $this->dataPropertyRulesResolver->execute(
                     $dataProperty,
                     $relativePath,
-                    $payload,
+                    $fullPayload,
                     $dataRules
                 );
 
@@ -63,7 +63,7 @@ class DataValidationRulesResolver
                 $this->dataCollectionPropertyRulesResolver->execute(
                     $dataProperty,
                     $relativePath,
-                    $payload,
+                    $fullPayload,
                     $dataRules
                 );
 
@@ -81,7 +81,7 @@ class DataValidationRulesResolver
 
         $dataRules->rules = array_merge(
             $dataRules->rules,
-            $this->resolveOverwrittenRules($dataClass, $payload, $path)
+            $this->resolveOverwrittenRules($dataClass, $fullPayload, $path)
         );
 
         return $dataRules->rules;
@@ -89,62 +89,20 @@ class DataValidationRulesResolver
 
     private function resolveOverwrittenRules(
         DataClass $class,
-        array $payload = [],
+        array $fullPayload = [],
         ?string $payloadPath = null
     ): array {
         if (! method_exists($class->name, 'rules')) {
             return [];
         }
 
-        if ($payloadPath === null) {
-            return $this->buildOverwrittenRules(
-                class: $class,
-                payload: $payload,
-                relativePayload: $payload,
-                payloadPath: $payloadPath,
-                prefixWithPayloadPath: true
-            );
-        }
-
-        if (Str::contains($payloadPath, '*') && class_exists(NestedRules::class)) {
-            return [
-                $payloadPath => \Illuminate\Validation\Rule::forEach(
-                    fn(mixed $value, string $relativePath) => $value === null
-                        ? []
-                        : $this->buildOverwrittenRules(
-                            class: $class,
-                            payload: $payload,
-                            relativePayload: $value,
-                            payloadPath: $relativePath,
-                            prefixWithPayloadPath: false
-                        )
-                ),
-            ];
-        }
-
-        return $this->buildOverwrittenRules(
-            class: $class,
-            payload: $payload,
-            relativePayload: Arr::get($payload, $payloadPath) ?? [],
-            payloadPath: $payloadPath,
-            prefixWithPayloadPath: true,
-        );
-    }
-
-    private function buildOverwrittenRules(
-        DataClass $class,
-        mixed $payload,
-        mixed $relativePayload,
-        ?string $payloadPath,
-        bool $prefixWithPayloadPath,
-    ): array {
-        $payload = new ValidationContext(
-            $relativePayload,
-            $payload,
+        $fullPayload = new ValidationContext(
+            $payloadPath ? Arr::get($fullPayload, $payloadPath) : $fullPayload,
+            $fullPayload,
             $payloadPath
         );
 
-        $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $payload]);
+        $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $fullPayload]);
 
         return collect($overwrittenRules)
             ->map(
@@ -154,10 +112,7 @@ class DataValidationRulesResolver
                     ->flatten()
                     ->all()
             )
-            ->when(
-                $payloadPath && $prefixWithPayloadPath,
-                fn(Collection $collection) => $collection->keyBy(fn(mixed $rules, string $key) => "{$payloadPath}.{$key}")
-            )
+            ->keyBy(fn(mixed $rules, string $key) => $payloadPath === null ? $key : "{$payloadPath}.{$key}")
             ->all();
     }
 

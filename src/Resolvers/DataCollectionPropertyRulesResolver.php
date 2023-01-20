@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Present;
@@ -23,18 +24,18 @@ class DataCollectionPropertyRulesResolver
     public function execute(
         DataProperty $property,
         string $path,
-        array $payload,
+        array $fullPayload,
         DataRules $dataRules,
     ): DataRules {
         if ($property->validate === false) {
             return $dataRules;
         }
 
-        if ($property->type->isOptional && Arr::has($payload, $path) === false) {
+        if ($property->type->isOptional && Arr::has($fullPayload, $path) === false) {
             return $dataRules;
         }
 
-        if ($property->type->isNullable && Arr::get($payload, $path) === null) {
+        if ($property->type->isNullable && Arr::get($fullPayload, $path) === null) {
             return $dataRules;
         }
 
@@ -47,18 +48,21 @@ class DataCollectionPropertyRulesResolver
 
         $dataRules->rules[$path] = $toplevelRules->normalize();
 
-        $dataRules->rules["{$path}.*"] = Rule::forEach(function (mixed $value, mixed $attribute) use ($property) {
+        $dataRules->rules["{$path}.*"] = Rule::forEach(function (mixed $value, mixed $attribute) use ($fullPayload, $property) {
             // Attribute has full path, probably required for relative rule reference replacement
 
             if (! is_array($value)) {
                 return ['array'];
             }
 
-            return app(DataValidationRulesResolver::class)->execute(
+            return collect(app(DataValidationRulesResolver::class)->execute(
                 $property->type->dataClass,
-                $value ?? [],
+                $fullPayload,
                 new DataRules([]),
-            );
+                $attribute,
+            ))->keyBy(
+                fn(mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
+            )->all();
         });
 
         return $dataRules;
