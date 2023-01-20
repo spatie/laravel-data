@@ -152,7 +152,7 @@ class DataValidationRulesResolver
             );
 
             return collect($dataRules->rules)->keyBy(
-                fn(mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
+                fn (mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
             )->all();
         }));
     }
@@ -178,7 +178,7 @@ class DataValidationRulesResolver
         foreach ($overwrittenRules as $key => $rules) {
             $dataRules->add(
                 $path->relative($key),
-                collect(Arr::wrap($rules))->map(fn(mixed $rule) => $this->ruleDenormalizer->execute($rule, $path))->flatten()->all()
+                collect(Arr::wrap($rules))->map(fn (mixed $rule) => $this->ruleDenormalizer->execute($rule, $path))->flatten()->all()
             );
         }
     }

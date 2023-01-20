@@ -1,14 +1,9 @@
 <?php
 
-use Illuminate\Validation\Rules\Enum as BaseEnum;
-use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Prohibited;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
-use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
-use Spatie\LaravelData\Support\Validation\ValidationPath;
-use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 
 it('can add rules', function () {
     $collection = PropertyRules::create()
@@ -43,4 +38,3 @@ it('can remove rules by class', function () {
 
     expect($collection->all())->toEqual([]);
 });
-
