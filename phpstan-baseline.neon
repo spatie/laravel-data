@@ -41,6 +41,11 @@ parameters:
 			path: src/Attributes/Validation/Required.php
 
 		-
+			message: "#^Parameter \\#2 \\$array of function implode expects array\\<string\\>, array\\<object\\|string\\> given\\.$#"
+			count: 1
+			path: src/Attributes/Validation/StringValidationAttribute.php
+
+		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: src/Attributes/Validation/StringValidationAttribute.php
@@ -129,16 +134,6 @@ parameters:
 			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$isOptional is already assigned\\.$#"
 			count: 2
 			path: src/Support/DataType.php
-
-		-
-			message: "#^Instanceof between mixed and Spatie\\\\LaravelData\\\\Attributes\\\\Validation\\\\Rule will always evaluate to false\\.$#"
-			count: 1
-			path: src/Support/Validation/RulesMapper.php
-
-		-
-			message: "#^Match arm comparison between true and false is always false\\.$#"
-			count: 1
-			path: src/Support/Validation/RulesMapper.php
 
 		-
 			message: "#^Call to an undefined method DateTimeInterface\\:\\:setTimezone\\(\\)\\.$#"
