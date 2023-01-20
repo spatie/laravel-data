@@ -27,7 +27,7 @@ class DataValidationRulesResolver
         array $fullPayload,
         ValidationPath $path,
         DataRules $dataRules,
-    ): array {
+    ): DataRules {
         $dataClass = $this->dataConfig->getDataClass($class);
 
         foreach ($dataClass->properties as $dataProperty) {
@@ -68,21 +68,19 @@ class DataValidationRulesResolver
             $dataRules->add($relativePath, $rules->normalize($path));
         }
 
-        $dataRules->rules = array_merge(
-            $dataRules->rules,
-            $this->resolveOverwrittenRules($dataClass, $fullPayload, $path)
-        );
+        $this->resolveOverwrittenRules($dataClass, $fullPayload, $path, $dataRules);
 
-        return $dataRules->rules;
+        return $dataRules;
     }
 
     private function resolveOverwrittenRules(
         DataClass $class,
         array $fullPayload,
-        ValidationPath $path
-    ): array {
+        ValidationPath $path,
+        DataRules $dataRules,
+    ): void {
         if (! method_exists($class->name, 'rules')) {
-            return [];
+            return;
         }
 
         $fullPayload = new ValidationContext(
@@ -93,16 +91,14 @@ class DataValidationRulesResolver
 
         $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $fullPayload]);
 
-        return collect($overwrittenRules)
-            ->mapWithKeys(function (mixed $rules, string $key) use ($fullPayload, $path) {
-                $overwrittenRules = collect(Arr::wrap($rules))
-                    ->map(fn (mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
-                    ->map(fn (mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules($path) : $rule)
-                    ->flatten()
-                    ->all();
+        foreach ($overwrittenRules as $key => $rules) {
+            $overwrittenRules = collect(Arr::wrap($rules))
+                ->map(fn(mixed $rule) => is_string($rule) ? explode('|', $rule) : $rule)
+                ->map(fn(mixed $rule) => $rule instanceof ValidationRule ? $rule->getRules($path) : $rule)
+                ->flatten()
+                ->all();
 
-                return [$path->relative($key)->get() => $overwrittenRules];
-            })
-            ->all();
+            $dataRules->add($path->relative($key), $overwrittenRules);
+        }
     }
 }

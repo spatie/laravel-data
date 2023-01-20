@@ -25,13 +25,13 @@ class DataCollectionPropertyRulesResolver
         array $fullPayload,
         ValidationPath $path,
         DataRules $dataRules,
-    ): DataRules {
+    ): void {
         if ($property->type->isOptional && Arr::has($fullPayload, $path->get()) === false) {
-            return $dataRules;
+            return;
         }
 
         if ($property->type->isNullable && Arr::get($fullPayload, $path->get()) === null) {
-            return $dataRules;
+            return;
         }
 
         $toplevelRules = PropertyRules::create();
@@ -43,23 +43,23 @@ class DataCollectionPropertyRulesResolver
 
         $dataRules->add($path, $toplevelRules->normalize($path));
 
-        $dataRules->rules["{$path->get()}.*"] = Rule::forEach(function (mixed $value, mixed $attribute) use ($fullPayload, $property) {
-            // Attribute has full path, probably required for relative rule reference replacement
-
+        $dataRules->addCollection($path, Rule::forEach(function (mixed $value, mixed $attribute) use ($fullPayload, $property) {
             if (! is_array($value)) {
                 return ['array'];
             }
 
-            return collect(app(DataValidationRulesResolver::class)->execute(
+            $dataRules = DataRules::create();
+
+            app(DataValidationRulesResolver::class)->execute(
                 $property->type->dataClass,
                 $fullPayload,
                 ValidationPath::create($attribute),
-                DataRules::create()
-            ))->keyBy(
-                fn (mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
-            )->all();
-        });
+                $dataRules
+            );
 
-        return $dataRules;
+            return collect($dataRules->rules)->keyBy(
+                fn(mixed $rules, string $key) => Str::after($key, "{$attribute}.") // TODO: let's do this better
+            )->all();
+        }));
     }
 }

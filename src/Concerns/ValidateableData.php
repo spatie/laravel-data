@@ -65,7 +65,7 @@ trait ValidateableData
             $payload,
             ValidationPath::create(),
             DataRules::create()
-        );
+        )->rules;
 
         if (count($fields) === 0) {
             return $rules;

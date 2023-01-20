@@ -17,13 +17,13 @@ class DataPropertyRulesResolver
         array $fullPayload,
         ValidationPath $path,
         DataRules $dataRules,
-    ): DataRules {
+    ): void {
         if ($property->type->isOptional && Arr::has($fullPayload, $path->get()) === false) {
-            return $dataRules;
+            return;
         }
 
         if ($property->type->isNullable && Arr::get($fullPayload, $path->get()) === null) {
-            return $dataRules;
+            return;
         }
 
         $toplevelRules = PropertyRules::create();
@@ -42,7 +42,5 @@ class DataPropertyRulesResolver
             $path,
             $dataRules,
         );
-
-        return $dataRules;
     }
 }

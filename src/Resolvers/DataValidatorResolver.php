@@ -16,16 +16,16 @@ class DataValidatorResolver
     {
         $payload = $payload instanceof Arrayable ? $payload->toArray() : $payload;
 
-        $rules = app(DataValidationRulesResolver::class)->execute(
+        $dataRules = app(DataValidationRulesResolver::class)->execute(
             $dataClass,
             $payload,
             ValidationPath::create(),
-            new DataRules([])
+            DataRules::create()
         );
 
         $validator = ValidatorFacade::make(
             $payload,
-            $rules,
+            $dataRules->rules,
             method_exists($dataClass, 'messages') ? app()->call([$dataClass, 'messages']) : [],
             method_exists($dataClass, 'attributes') ? app()->call([$dataClass, 'attributes']) : []
         );

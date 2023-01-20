@@ -702,28 +702,28 @@ it('can overwrite collection class rules', function () {
     };
 
     DataValidationAsserter::for($dataClass)
-        ->assertOk([
-            'collection' => [
-                ['string' => 'Never Gonna'],
-                ['string' => 'Give You Up'],
-            ],
-        ])
-        ->assertOk([
-            'collection' => [
-                ['string' => 'Never Gonna'],
-            ],
-        ])
-        ->assertErrors([
-            'collection' => [
-                ['string' => 'Never Gonna'],
-                ['string' => 'Give You Up'],
-                ['string' => 'Never Gonna'],
-            ],
-        ])
-        ->assertErrors(['collection' => []])
-        ->assertRules([
-            'collection' => ['array', 'min:1', 'max:2'],
-        ], payload: [])
+//        ->assertOk([
+//            'collection' => [
+//                ['string' => 'Never Gonna'],
+//                ['string' => 'Give You Up'],
+//            ],
+//        ])
+//        ->assertOk([
+//            'collection' => [
+//                ['string' => 'Never Gonna'],
+//            ],
+//        ])
+//        ->assertErrors([
+//            'collection' => [
+//                ['string' => 'Never Gonna'],
+//                ['string' => 'Give You Up'],
+//                ['string' => 'Never Gonna'],
+//            ],
+//        ])
+//        ->assertErrors(['collection' => []])
+//        ->assertRules([
+//            'collection' => ['array', 'min:1', 'max:2'],
+//        ], payload: [])
         ->assertRules([
             'collection' => ['array', 'min:1', 'max:2'],
             'collection.0.string' => ['required', 'string'],

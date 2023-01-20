@@ -2,8 +2,13 @@
 
 namespace Spatie\LaravelData\Support\Validation;
 
+use Illuminate\Validation\NestedRules;
+
 class DataRules
 {
+    /**
+     * @param array<array|\Spatie\LaravelData\Support\Validation\PropertyRules|NestedRules> $rules
+     */
     public function __construct(
         public array $rules = [],
     ) {
@@ -19,6 +24,15 @@ class DataRules
         array $rules
     ): self {
         $this->rules[$path->get()] = $rules;
+
+        return $this;
+    }
+
+    public function addCollection(
+        ValidationPath $path,
+        NestedRules $rules
+    ): self {
+        $this->rules["{$path->get()}.*"] = $rules;
 
         return $this;
     }
