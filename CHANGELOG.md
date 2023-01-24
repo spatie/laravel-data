@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 2.2.3 - 2023-01-24
+
+- Add Laravel 10.x support (#331)
+
 ## 2.2.2 - 2023-01-09
 
 - Add a way to prepend DataPipes to the pipeline (#305)
