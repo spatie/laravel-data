@@ -3,7 +3,7 @@
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataMethod;
-use Spatie\LaravelData\Tests\DataWithDefaults;
+use Spatie\LaravelData\Tests\Fakes\DataWithDefaults;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;

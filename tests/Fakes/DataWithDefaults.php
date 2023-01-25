@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelData\Tests;
+namespace Spatie\LaravelData\Tests\Fakes;
 
 use Spatie\LaravelData\Data;
 
