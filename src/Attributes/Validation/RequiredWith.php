@@ -17,7 +17,6 @@ class RequiredWith extends StringValidationAttribute implements RequiringRule
         $this->fields = Arr::flatten($fields);
     }
 
-
     public static function keyword(): string
     {
         return 'required_with';
