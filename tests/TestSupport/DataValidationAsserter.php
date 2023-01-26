@@ -91,6 +91,40 @@ class DataValidationAsserter
         return $this;
     }
 
+    public function assertRedirect(array $payload, string $redirect): self
+    {
+        try {
+            $this->dataClass::validate(
+                $this->pipePayload($payload)
+            );
+        } catch (ValidationException $exception) {
+            expect($exception->redirectTo)->toBe($redirect);
+
+            return $this;
+        }
+
+        assertTrue(false, 'No validation errors');
+
+        return $this;
+    }
+
+    public function assertErrorBag(array $payload, string $errorBag): self
+    {
+        try {
+            $this->dataClass::validate(
+                $this->pipePayload($payload)
+            );
+        } catch (ValidationException $exception) {
+            expect($exception->errorBag)->toBe($errorBag);
+
+            return $this;
+        }
+
+        assertTrue(false, 'No validation errors');
+
+        return $this;
+    }
+
     private function pipePayload(array $payload): array
     {
         $properties = app(DataPipeline::class)

@@ -182,6 +182,7 @@ class DataValidationRulesResolver
 
         $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $validationContext]);
 
+
         foreach ($overwrittenRules as $key => $rules) {
             $dataRules->add(
                 $path->property($key),

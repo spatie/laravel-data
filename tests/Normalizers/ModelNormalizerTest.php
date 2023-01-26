@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
 use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\FakeModelData;
@@ -63,18 +64,20 @@ it('can get a data object from model with dates', function () {
         'updated_at' => Carbon::create(2020, 05, 16, 12, 00, 00),
     ]);
 
-    $dataClass = DataBlueprintFactory::new('DataFromModelWithDates')
-        ->withProperty(
-            DataPropertyBlueprintFactory::new('date')->withType(Carbon::class),
-            DataPropertyBlueprintFactory::new('datetime')->withType(Carbon::class),
-            DataPropertyBlueprintFactory::new('immutable_date')->withType(CarbonImmutable::class),
-            DataPropertyBlueprintFactory::new('immutable_datetime')->withType(CarbonImmutable::class),
-            DataPropertyBlueprintFactory::new('created_at')->withType(Carbon::class),
-            DataPropertyBlueprintFactory::new('updated_at')->withType(Carbon::class),
-        )
-        ->create();
+    class TestDataFromModelWithDates extends Data
+    {
+        public function __construct(
+            public Carbon $date,
+            public Carbon $datetime,
+            public CarbonImmutable $immutable_date,
+            public CarbonImmutable $immutable_datetime,
+            public Carbon $created_at,
+            public Carbon $updated_at,
+        ) {
+        }
+    }
 
-    $data = $dataClass::from($model);
+    $data = \TestDataFromModelWithDates::from($model);
 
     expect([
         $data->date->eq(Carbon::create(2020, 05, 16, 00, 00, 00)),

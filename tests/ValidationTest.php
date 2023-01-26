@@ -14,6 +14,9 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
+use Spatie\LaravelData\Tests\Fakes\FakeInjectable;
+use Spatie\LaravelData\Tests\Fakes\NestedData;
+use Spatie\LaravelData\Tests\Fakes\NestedNullableData;
 use function Pest\Laravel\mock;
 use function Pest\Laravel\postJson;
 use function PHPUnit\Framework\assertFalse;
@@ -1345,7 +1348,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
                 ],
             ];
         }
@@ -1354,7 +1357,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
         ],
     ]);
 });
@@ -1367,7 +1370,7 @@ it('can reference route parameters as values within rules', function () {
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('post_id')->andReturns('69');
-    $this->app->bind('request', fn () => $requestMock);
+    $this->app->bind('request', fn() => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1388,7 +1391,7 @@ it('can reference route models with a property as values within rules', function
     $requestMock->expects('route')->with('post')->andReturns(new DummyModel([
         'id' => 69,
     ]));
-    $this->app->bind('request', fn () => $requestMock);
+    $this->app->bind('request', fn() => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1422,181 +1425,154 @@ it('can set the validator to stop on the first failure', function () {
     ], ['propertyA' => [__('validation.min.numeric', ['attribute' => 'property a', 'min' => '10']),]]);
 });
 
-
-// TODO:
-
-
-it('can resolve validation dependencies for messages', function () {
-    $requestMock = mock(Request::class);
-    $requestMock->expects('input')->andReturns('value');
-    $this->app->bind(Request::class, fn () => $requestMock);
-
+it('can manually set validation messages', function () {
     $data = new class () extends Data {
         public string $name;
 
-        public static function rules()
+        public static function messages(): array
         {
             return [
-                'name' => ['required'],
-            ];
-        }
-
-        public static function messages(Request $request): array
-        {
-            return [
-                'name.required' => $request->input('key') === 'value' ? 'Name is required' : 'Bad',
+                'name.required' => 'Fix it Rick!',
             ];
         }
     };
 
-    try {
-        $data::validate(['name' => '']);
-    } catch (ValidationException $exception) {
-        expect($exception->errors())->toMatchArray([
-            "name" => [
-                "Name is required",
-            ],
-        ]);
+    DataValidationAsserter::for($data)->assertErrors(
+        payload: ['name' => null],
+        errors: ['name' => ['Fix it Rick!']]
+    );
+});
 
-        return;
-    }
+it('can resolve validation dependencies for messages', function () {
+    FakeInjectable::setup('Rick Astley');
 
-    $this->fail('We should not end up here');
+    $data = new class () extends Data {
+        public string $name;
+
+        public static function messages(FakeInjectable $injectable): array
+        {
+            return [
+                'name.required' => $injectable->value === 'Rick Astley' ? 'Fix it Rick!' : 'Fix it!',
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($data)->assertErrors(
+        payload: ['name' => null],
+        errors: ['name' => ['Fix it Rick!']]
+    );
+});
+
+it('can manually set validation attributes ', function () {
+    $data = new class () extends Data {
+        public string $name;
+
+        public static function attributes(): array
+        {
+            return [
+                'name' => 'rickster',
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($data)->assertErrors(
+        payload: ['name' => null],
+        errors: ['name' => [__('validation.required', ['attribute' => 'rickster'])]]
+    );
 });
 
 it('can resolve validation dependencies for attributes ', function () {
-    $requestMock = mock(Request::class);
-    $requestMock->expects('input')->andReturns('value');
-    $this->app->bind(Request::class, fn () => $requestMock);
+    FakeInjectable::setup('Rick Astley');
 
     $data = new class () extends Data {
         public string $name;
 
-        public static function rules()
+        public static function attributes(FakeInjectable $injectable): array
         {
             return [
-                'name' => ['required'],
-            ];
-        }
-
-        public static function attributes(Request $request): array
-        {
-            return [
-                'name' => $request->input('key') === 'value' ? 'Another name' : 'Bad',
+                'name' => $injectable->value === 'Rick Astley' ? 'rickster' : 'someone',
             ];
         }
     };
 
-    try {
-        $data::validate(['name' => '']);
-    } catch (ValidationException $exception) {
-        expect($exception->errors())->toMatchArray([
-            "name" => [
-                "The Another name field is required.",
-            ],
-        ]);
+    DataValidationAsserter::for($data)->assertErrors(
+        payload: ['name' => null],
+        errors: ['name' => [__('validation.required', ['attribute' => 'rickster'])]]
+    );
+});
 
-        return;
-    }
+it('can manually set the redirect url', function () {
+    $data = new class () extends Data {
+        public string $name;
 
-    $this->fail('We should not end up here');
+        public static function redirect(): string
+        {
+            return '/never-given-up';
+        }
+    };
+
+    DataValidationAsserter::for($data)->assertRedirect(
+        payload: ['name' => null],
+        redirect: '/never-given-up'
+    );
 });
 
 it('can resolve validation dependencies for redirect url', function () {
-    $requestMock = mock(Request::class);
-    $requestMock->expects('input')->andReturns('value');
-    $this->app->bind(Request::class, fn () => $requestMock);
+    FakeInjectable::setup('Rick Astley');
 
     $data = new class () extends Data {
         public string $name;
 
-        public static function rules()
+        public static function redirect(FakeInjectable $injectable): string
         {
-            return [
-                'name' => ['required'],
-            ];
-        }
-
-        public static function redirect(Request $request): string
-        {
-            return $request->input('key') === 'value' ? 'Another name' : 'Bad';
+            return $injectable->value === 'Rick Astley' ? '/never-given-up' : '/given-up';
         }
     };
 
-    try {
-        $data::validate(['name' => '']);
-    } catch (ValidationException $exception) {
-        expect($exception->redirectTo)->toBe('Another name');
+    DataValidationAsserter::for($data)->assertRedirect(
+        payload: ['name' => null],
+        redirect: '/never-given-up'
+    );
+});
 
-        return;
-    }
+it('can manually specify the validator', function () {
+    $dataClass = new class extends Data {
+        public string $property;
 
-    $this->fail('We should not end up here');
+        public static function withValidator(Validator $validator): void
+        {
+            $validator->setRules([]);
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)->assertOk([]);
 });
 
 it('can resolve validation dependencies for error bag', function () {
-    $requestMock = mock(Request::class);
-    $requestMock->expects('input')->andReturns('value');
-    $this->app->bind(Request::class, fn () => $requestMock);
+    FakeInjectable::setup('Rick Astley');
 
     $data = new class () extends Data {
         public string $name;
 
-        public static function rules()
+        public static function errorBag(FakeInjectable $injectable): string
         {
-            return [
-                'name' => ['required'],
-            ];
-        }
-
-        public static function errorBag(Request $request): string
-        {
-            return $request->input('key') === 'value' ? 'Another name' : 'Bad';
+            return $injectable->value === 'Rick Astley' ? 'never-given-up' : 'given-up';
         }
     };
 
-    try {
-        $data::validate(['name' => '']);
-    } catch (ValidationException $exception) {
-        expect($exception->errorBag)->toBe('Another name');
-
-        return;
-    }
-
-    $this->fail('We should not end up here');
+    DataValidationAsserter::for($data)->assertErrorBag(
+        payload: ['name' => null],
+        errorBag: 'never-given-up'
+    );
 });
 
-it('will validate a request when given as a parameter to a custom creation method', function () {
-    $data = new class ('', 0) extends Data {
-        public function __construct(
-            public string $string,
-        ) {
-        }
-
-        public static function fromRequest(Request $request)
-        {
-            return new self($request->input('string'));
-        }
-    };
-
-    Route::post('/', fn (Request $request) => $data::from($request));
-
-    postJson('/', [])->assertJsonValidationErrorFor('string');
-
-    postJson('/', [
-        'string' => 'Rick Astley',
-    ])->assertJson([
-        'string' => 'Rick Astley',
-    ])->assertCreated();
-});
-
-it('can validate if an array fits a data object an will throw an exception', function () {
-    $dataClass = DataBlueprintFactory::new()
-        ->withProperty(DataPropertyBlueprintFactory::new('string')->withType('string'))
-        ->create();
+it('can validate a payload for a data object without creating one', function () {
+    expect(SimpleData::validate(['string' => 'Hello World']))->toMatchArray([
+        'string' => 'Hello World',
+    ]);
 
     try {
-        $dataClass::validate(['string' => 10]);
+        SimpleData::validate(['string' => 10]);
     } catch (ValidationException $exception) {
         expect($exception->errors())->toMatchArray([
             'string' => ['The string must be a string.'],
@@ -1608,32 +1584,23 @@ it('can validate if an array fits a data object an will throw an exception', fun
     assertFalse(true, 'We should not end up here');
 });
 
-it('can validate if an array fits a data object an returns the data object', function () {
-    $dataClass = DataBlueprintFactory::new()
-        ->withProperty(DataPropertyBlueprintFactory::new('string')->withType('string'))
-        ->create();
-
-    $data = $dataClass::validateAndCreate(['string' => 'Hello World']);
+it('can validate a payload for a data object and create one', function () {
+    $data = SimpleData::validateAndCreate(['string' => 'Hello World']);
 
     expect($data->string)->toEqual('Hello World');
-});
-
-it('always validates requests when passed to the from method', function () {
-    RequestData::clear();
 
     try {
-        RequestData::from(new Request());
+        SimpleData::validateAndCreate(['string' => 10]);
     } catch (ValidationException $exception) {
         expect($exception->errors())->toMatchArray([
-            'string' => [__('validation.required', ['attribute' => 'string'])],
+            'string' => ['The string must be a string.'],
         ]);
 
         return;
     }
 
-    $this->fail('We should not end up here');
+    assertFalse(true, 'We should not end up here');
 });
-
 
 it('can validate non-requests payloads', function () {
     $dataClass = new class () extends Data {
@@ -1677,40 +1644,38 @@ it('can validate non-requests payloads', function () {
 })->throws(ValidationException::class);
 
 it('can the validation rules for a data object', function () {
-    expect(MultiData::getValidationRules())->toMatchArray([
+    expect(MultiData::getValidationRules())->toEqual([
         'first' => ['required', 'string'],
         'second' => ['required', 'string'],
     ]);
-});
 
-it('can get the validation rules for a data object using attributes', function () {
-    expect(
-        SimpleDataWithExplicitValidationRuleAttributeData::getValidationRules()
-    )->toMatchArray([
-        'email' => ['required', 'string', 'email:rfc'],
+    expect(NestedNullableData::getValidationRules(payload: []))->toEqual([]);
+
+    expect(NestedNullableData::getValidationRules(payload: ['nested' => []]))->toEqual([
+        'nested' => ['nullable', 'array'],
+        'nested.string' => ['required', 'string'],
     ]);
 });
 
-it('can get the validation rules for a data object for specific fields', function () {
-    expect(MultiData::getValidationRules(fields: ['first']))->toMatchArray([
-        'first' => ['required', 'string',],
+
+it('can apply custom rules onto array properties', function () {
+    $dataClass = new class extends Data {
+        #[Min(1)]
+        #[Max(5)]
+        public readonly array $emails;
+
+        public static function rules(): array
+        {
+            return [
+                'emails.*' => ['email'],
+            ];
+        }
+    };
+
+    expect($dataClass::getValidationRules())->toEqual([
+        'emails' => ['required', 'array', 'min:1', 'max:5'],
+        'emails.*' => ['email'],
     ]);
 });
 
-it('can add wildcard rules for arrays', function () {
-    expect(
-        AttributeRulesWithStaticFunctionRulesData::getValidationRules()
-    )
-        ->toMatchArray([
-            'emails' => ['required', 'array', 'min:1', 'max:5'],
-            'emails.*' => ['email'],
-        ]);
-});
 
-it('can change the validator', function () {
-    RequestData::$validatorClosure = fn (Validator $validator) => $validator->setRules([]);
-
-    performRequest('Hello world')
-        ->assertOk()
-        ->assertJson(['given' => 'Hello world']);
-});

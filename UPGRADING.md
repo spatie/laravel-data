@@ -2,7 +2,9 @@
 
 Because there are many breaking changes an upgrade is not that easy. There are many edge cases this guide does not cover. We accept PRs to improve this guide.
 
-## From v2 to v1
+## From v2 to v3
+
+Upgrading to laravel data shouldn't take long, we've documented all possible changes just to provide the whole context. You probably won't have to do anything:
 
 - Laravel 9 is now required
 - validation is completely rewritten 
@@ -31,6 +33,7 @@ class SomeData extends Data {
   - RuleInferrers now take a $context parameter which is a `ValidationCOntext` in their handle method
   - Some resolvers are removed like: `DataClassValidationRulesResolver`, `DataPropertyValidationRulesResolver`
   - The default order of rule inferrers has been changed
+  - The $fields parameter was removed from the `getValidationRules` method, this now should be done outside of the package 
 - all data specific properties are now prefixed with _, to avoid conflicts with properties with your own defined properties. This is especially important when overwriting `$collectionClass`, `$paginatedCollectionClass`, `$cursorPaginatedCollectionClass`, be sure to add the extra _ within your data classes.
 
 ## From v1 to v2

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 
+use Spatie\LaravelData\Data;
 use function Pest\Laravel\handleExceptions;
 use function Pest\Laravel\postJson;
 
@@ -65,39 +66,55 @@ it('can fail validation', function () {
         ]);
 });
 
+
+it('always validates requests when passed to the from method', function () {
+    RequestData::clear();
+
+    try {
+        RequestData::from(new Request());
+    } catch (ValidationException $exception) {
+        expect($exception->errors())->toMatchArray([
+            'string' => [__('validation.required', ['attribute' => 'string'])],
+        ]);
+
+        return;
+    }
+
+    $this->fail('We should not end up here');
+});
+
 it('can check for authorization', function () {
     RequestData::$enableAuthorizeFailure = true;
 
     performRequest('Hello')->assertStatus(403);
 });
 
-it(
-    'can manually override how the data object will be constructed',
-    function () {
-        DataBlueprintFactory::new('OverrideableDataFromRequest')
-            ->withProperty(
-                DataPropertyBlueprintFactory::new('name')
-                    ->withAttribute(WithoutValidation::class)
-                    ->withType('string')
-            )
-            ->withMethod(
-                DataMagicMethodFactory::new('fromRequest')
-                    ->withInputType(Request::class, 'request')
-                    ->withBody('return new self("{$request->input(\'first_name\')} {$request->input(\'last_name\')}");')
-            )
-            ->create();
+it('can manually override how the data object will be constructed', function () {
+    class TestOverrideableDataFromRequest extends Data
+    {
+        public function __construct(
+            #[WithoutValidation]
+            public string $name
+        ) {
+        }
 
-        Route::post('/other-route', function (\OverrideableDataFromRequest $data) {
-            return ['name' => $data->name];
-        });
-
-        postJson('/other-route', [
-            'first_name' => 'Rick',
-            'last_name' => 'Astley',
-        ])
-            ->assertOk()
-            ->assertJson(['name' => 'Rick Astley']);
+        public static function fromRequest(Request $request)
+        {
+            return new self("{$request->input('first_name')} {$request->input('last_name')}");
+        }
     }
+
+    Route::post('/other-route', function (\TestOverrideableDataFromRequest $data) {
+        return ['name' => $data->name];
+    });
+
+    postJson('/other-route', [
+        'first_name' => 'Rick',
+        'last_name' => 'Astley',
+    ])
+        ->assertOk()
+        ->assertJson(['name' => 'Rick Astley']);
+}
 );
 
 it('can wrap data', function () {
