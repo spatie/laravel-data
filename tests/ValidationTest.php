@@ -6,10 +6,29 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
 
+use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
+use Spatie\LaravelData\DataPipeline;
+use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
+use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
+use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
+use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
+use Spatie\LaravelData\Normalizers\ArrayNormalizer;
+use Spatie\LaravelData\Normalizers\ModelNormalizer;
+use Spatie\LaravelData\Normalizers\ObjectNormalizer;
+use Spatie\LaravelData\Resolvers\DataValidatorResolver;
+use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
+use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
+use Spatie\LaravelData\Tests\Fakes\AttributeRulesWithStaticFunctionRulesData;
+use Spatie\LaravelData\Tests\Fakes\MultiData;
+use Spatie\LaravelData\Tests\Fakes\RequestData;
 use function Pest\Laravel\mock;
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
@@ -43,6 +62,8 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
+use function Pest\Laravel\postJson;
+use function PHPUnit\Framework\assertFalse;
 
 it('can validate a string', function () {
     $dataClass = new class () extends Data {
@@ -1323,7 +1344,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
                 ],
             ];
         }
@@ -1332,7 +1353,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
         ],
     ]);
 });
@@ -1345,7 +1366,7 @@ it('can reference route parameters as values within rules', function () {
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('post_id')->andReturns('69');
-    $this->app->bind('request', fn () => $requestMock);
+    $this->app->bind('request', fn() => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1366,7 +1387,7 @@ it('can reference route models with a property as values within rules', function
     $requestMock->expects('route')->with('post')->andReturns(new DummyModel([
         'id' => 69,
     ]));
-    $this->app->bind('request', fn () => $requestMock);
+    $this->app->bind('request', fn() => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1375,4 +1396,320 @@ it('can reference route models with a property as values within rules', function
             'unique:posts,NULL,"69",id',
         ],
     ]);
+});
+
+it('can set the validator to stop on the first failure', function () {
+    $dataClass = new class () extends Data {
+        #[Min(10)]
+        public int $propertyA;
+
+        #[Min(10)]
+        public int $propertyB;
+
+        public static function stopOnFirstFailure(): bool
+        {
+            return true;
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)->assertRules([
+        'propertyA' => ['required', 'numeric', 'min:10'],
+        'propertyB' => ['required', 'numeric', 'min:10'],
+    ])->assertErrors([
+        'propertyA' => 0,
+        'propertyB' => 0,
+    ], ['propertyA' => [__('validation.min.numeric', ['attribute' => 'property a', 'min' => '10']),]]);
+});
+
+
+// TODO:
+
+
+it('can resolve validation dependencies for messages', function () {
+    $requestMock = mock(Request::class);
+    $requestMock->expects('input')->andReturns('value');
+    $this->app->bind(Request::class, fn() => $requestMock);
+
+    $data = new class () extends Data {
+        public string $name;
+
+        public static function rules()
+        {
+            return [
+                'name' => ['required'],
+            ];
+        }
+
+        public static function messages(Request $request): array
+        {
+            return [
+                'name.required' => $request->input('key') === 'value' ? 'Name is required' : 'Bad',
+            ];
+        }
+    };
+
+    try {
+        $data::validate(['name' => '']);
+    } catch (ValidationException $exception) {
+        expect($exception->errors())->toMatchArray([
+            "name" => [
+                "Name is required",
+            ],
+        ]);
+
+        return;
+    }
+
+    $this->fail('We should not end up here');
+});
+
+it('can resolve validation dependencies for attributes ', function () {
+    $requestMock = mock(Request::class);
+    $requestMock->expects('input')->andReturns('value');
+    $this->app->bind(Request::class, fn() => $requestMock);
+
+    $data = new class () extends Data {
+        public string $name;
+
+        public static function rules()
+        {
+            return [
+                'name' => ['required'],
+            ];
+        }
+
+        public static function attributes(Request $request): array
+        {
+            return [
+                'name' => $request->input('key') === 'value' ? 'Another name' : 'Bad',
+            ];
+        }
+    };
+
+    try {
+        $data::validate(['name' => '']);
+    } catch (ValidationException $exception) {
+        expect($exception->errors())->toMatchArray([
+            "name" => [
+                "The Another name field is required.",
+            ],
+        ]);
+
+        return;
+    }
+
+    $this->fail('We should not end up here');
+});
+
+it('can resolve validation dependencies for redirect url', function () {
+    $requestMock = mock(Request::class);
+    $requestMock->expects('input')->andReturns('value');
+    $this->app->bind(Request::class, fn() => $requestMock);
+
+    $data = new class () extends Data {
+        public string $name;
+
+        public static function rules()
+        {
+            return [
+                'name' => ['required'],
+            ];
+        }
+
+        public static function redirect(Request $request): string
+        {
+            return $request->input('key') === 'value' ? 'Another name' : 'Bad';
+        }
+    };
+
+    try {
+        $data::validate(['name' => '']);
+    } catch (ValidationException $exception) {
+        expect($exception->redirectTo)->toBe('Another name');
+
+        return;
+    }
+
+    $this->fail('We should not end up here');
+});
+
+it('can resolve validation dependencies for error bag', function () {
+    $requestMock = mock(Request::class);
+    $requestMock->expects('input')->andReturns('value');
+    $this->app->bind(Request::class, fn() => $requestMock);
+
+    $data = new class () extends Data {
+        public string $name;
+
+        public static function rules()
+        {
+            return [
+                'name' => ['required'],
+            ];
+        }
+
+        public static function errorBag(Request $request): string
+        {
+            return $request->input('key') === 'value' ? 'Another name' : 'Bad';
+        }
+    };
+
+    try {
+        $data::validate(['name' => '']);
+    } catch (ValidationException $exception) {
+        expect($exception->errorBag)->toBe('Another name');
+
+        return;
+    }
+
+    $this->fail('We should not end up here');
+});
+
+it('will validate a request when given as a parameter to a custom creation method', function () {
+    $data = new class ('', 0) extends Data {
+        public function __construct(
+            public string $string,
+        ) {
+        }
+
+        public static function fromRequest(Request $request)
+        {
+            return new self($request->input('string'));
+        }
+    };
+
+    Route::post('/', fn(Request $request) => $data::from($request));
+
+    postJson('/', [])->assertJsonValidationErrorFor('string');
+
+    postJson('/', [
+        'string' => 'Rick Astley',
+    ])->assertJson([
+        'string' => 'Rick Astley',
+    ])->assertCreated();
+});
+
+it('can validate if an array fits a data object an will throw an exception', function () {
+    $dataClass = DataBlueprintFactory::new()
+        ->withProperty(DataPropertyBlueprintFactory::new('string')->withType('string'))
+        ->create();
+
+    try {
+        $dataClass::validate(['string' => 10]);
+    } catch (ValidationException $exception) {
+        expect($exception->errors())->toMatchArray([
+            'string' => ['The string must be a string.'],
+        ]);
+
+        return;
+    }
+
+    assertFalse(true, 'We should not end up here');
+});
+
+it('can validate if an array fits a data object an returns the data object', function () {
+    $dataClass = DataBlueprintFactory::new()
+        ->withProperty(DataPropertyBlueprintFactory::new('string')->withType('string'))
+        ->create();
+
+    $data = $dataClass::validateAndCreate(['string' => 'Hello World']);
+
+    expect($data->string)->toEqual('Hello World');
+});
+
+it('always validates requests when passed to the from method', function () {
+    RequestData::clear();
+
+    try {
+        RequestData::from(new Request());
+    } catch (ValidationException $exception) {
+        expect($exception->errors())->toMatchArray([
+            'string' => [__('validation.required', ['attribute' => 'string'])],
+        ]);
+
+        return;
+    }
+
+    $this->fail('We should not end up here');
+});
+
+
+it('can validate non-requests payloads', function () {
+    $dataClass = new class () extends Data {
+        public static bool $validateAllTypes = false;
+
+        #[In('Hello World')]
+        public string $string;
+
+        public static function pipeline(): DataPipeline
+        {
+            return DataPipeline::create()
+                ->into(static::class)
+                ->normalizer(ModelNormalizer::class)
+                ->normalizer(ArrayableNormalizer::class)
+                ->normalizer(ObjectNormalizer::class)
+                ->normalizer(ArrayNormalizer::class)
+                ->through(AuthorizedDataPipe::class)
+                ->through(
+                    self::$validateAllTypes
+                        ? ValidatePropertiesDataPipe::allTypes()
+                        : ValidatePropertiesDataPipe::onlyRequests()
+                )
+                ->through(MapPropertiesDataPipe::class)
+                ->through(DefaultValuesDataPipe::class)
+                ->through(CastPropertiesDataPipe::class);
+        }
+    };
+
+    $data = $dataClass::from([
+        'string' => 'nowp',
+    ]);
+
+    expect($data)->toBeInstanceOf(Data::class)
+        ->string->toEqual('nowp');
+
+    $dataClass::$validateAllTypes = true;
+
+    $data = $dataClass::from([
+        'string' => 'nowp',
+    ]);
+})->throws(ValidationException::class);
+
+it('can the validation rules for a data object', function () {
+    expect(MultiData::getValidationRules())->toMatchArray([
+        'first' => ['required', 'string'],
+        'second' => ['required', 'string'],
+    ]);
+});
+
+it('can get the validation rules for a data object using attributes', function () {
+    expect(
+        SimpleDataWithExplicitValidationRuleAttributeData::getValidationRules()
+    )->toMatchArray([
+        'email' => ['required', 'string', 'email:rfc'],
+    ]);
+});
+
+it('can get the validation rules for a data object for specific fields', function () {
+    expect(MultiData::getValidationRules(fields: ['first']))->toMatchArray([
+        'first' => ['required', 'string',],
+    ]);
+});
+
+it('can add wildcard rules for arrays', function () {
+    expect(
+        AttributeRulesWithStaticFunctionRulesData::getValidationRules()
+    )
+        ->toMatchArray([
+            'emails' => ['required', 'array', 'min:1', 'max:5'],
+            'emails.*' => ['email'],
+        ]);
+});
+
+it('can change the validator', function () {
+    RequestData::$validatorClosure = fn (Validator $validator) => $validator->setRules([]);
+
+    performRequest('Hello world')
+        ->assertOk()
+        ->assertJson(['given' => 'Hello world']);
 });

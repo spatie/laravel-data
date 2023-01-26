@@ -726,34 +726,6 @@ it('can optimally create data', function () {
         );
 });
 
-it('can validate if an array fits a data object an will throw an exception', function () {
-    $dataClass = DataBlueprintFactory::new()
-        ->withProperty(DataPropertyBlueprintFactory::new('string')->withType('string'))
-        ->create();
-
-    try {
-        $dataClass::validate(['string' => 10]);
-    } catch (ValidationException $exception) {
-        expect($exception->errors())->toMatchArray([
-            'string' => ['The string must be a string.'],
-        ]);
-
-        return;
-    }
-
-    assertFalse(true, 'We should not end up here');
-});
-
-it('can validate if an array fits a data object an returns the data object', function () {
-    $dataClass = DataBlueprintFactory::new()
-        ->withProperty(DataPropertyBlueprintFactory::new('string')->withType('string'))
-        ->create();
-
-    $data = $dataClass::validateAndCreate(['string' => 'Hello World']);
-
-    expect($data->string)->toEqual('Hello World');
-});
-
 it('can create a data model without constructor', function () {
     expect(SimpleDataWithoutConstructor::fromString('Hello'))
         ->toEqual(SimpleDataWithoutConstructor::from('Hello'));
@@ -880,22 +852,6 @@ it('can define the WithData trait data class by method', function () {
     $data = $arrayable->getData();
 
     expect($data)->toEqual(SimpleData::from('Hello World'));
-});
-
-it('always validates requests when passed to the from method', function () {
-    RequestData::clear();
-
-    try {
-        RequestData::from(new Request());
-    } catch (ValidationException $exception) {
-        expect($exception->errors())->toMatchArray([
-            'string' => [__('validation.required', ['attribute' => 'string'])],
-        ]);
-
-        return;
-    }
-
-    $this->fail('We should not end up here');
 });
 
 it('has support fro readonly properties', function () {
@@ -1371,46 +1327,6 @@ it('can magically create a data object', function () {
         ->and($dataClass::from(new EnumData(DummyBackedEnum::FOO)))->toEqual(new $dataClass('data', '{"enum":"foo"}'));
 });
 
-it('can validate non-requests payloads', function () {
-    $dataClass = new class () extends Data {
-        public static bool $validateAllTypes = false;
-
-        #[In('Hello World')]
-        public string $string;
-
-        public static function pipeline(): DataPipeline
-        {
-            return DataPipeline::create()
-                ->into(static::class)
-                ->normalizer(ModelNormalizer::class)
-                ->normalizer(ArrayableNormalizer::class)
-                ->normalizer(ObjectNormalizer::class)
-                ->normalizer(ArrayNormalizer::class)
-                ->through(AuthorizedDataPipe::class)
-                ->through(
-                    self::$validateAllTypes
-                        ? ValidatePropertiesDataPipe::allTypes()
-                        : ValidatePropertiesDataPipe::onlyRequests()
-                )
-                ->through(MapPropertiesDataPipe::class)
-                ->through(DefaultValuesDataPipe::class)
-                ->through(CastPropertiesDataPipe::class);
-        }
-    };
-
-    $data = $dataClass::from([
-        'string' => 'nowp',
-    ]);
-
-    expect($data)->toBeInstanceOf(Data::class)
-        ->string->toEqual('nowp');
-
-    $dataClass::$validateAllTypes = true;
-
-    $data = $dataClass::from([
-        'string' => 'nowp',
-    ]);
-})->throws(ValidationException::class);
 
 it('can conditionally include', function () {
     expect(
@@ -2172,37 +2088,6 @@ it('can inherit properties from a base class', function () {
     expect($data)
         ->string->toBe('Hi')
         ->int->toBe(42);
-});
-
-it('can the validation rules for a data object', function () {
-    expect(MultiData::getValidationRules())->toMatchArray([
-        'first' => ['required', 'string'],
-        'second' => ['required', 'string'],
-    ]);
-});
-
-it('can get the validation rules for a data object using attributes', function () {
-    expect(
-        SimpleDataWithExplicitValidationRuleAttributeData::getValidationRules()
-    )->toMatchArray([
-        'email' => ['required', 'string', 'email:rfc'],
-    ]);
-});
-
-it('can get the validation rules for a data object for specific fields', function () {
-    expect(MultiData::getValidationRules(fields: ['first']))->toMatchArray([
-        'first' => ['required', 'string',],
-    ]);
-});
-
-it('can add wildcard rules for arrays', function () {
-    expect(
-        AttributeRulesWithStaticFunctionRulesData::getValidationRules()
-    )
-        ->toMatchArray([
-            'emails' => ['required', 'array', 'min:1', 'max:5'],
-            'emails.*' => ['email'],
-        ]);
 });
 
 it('can have a circular dependency', function () {
