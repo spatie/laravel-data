@@ -32,20 +32,17 @@ use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\CircData;
-use Spatie\LaravelData\Tests\Fakes\DataWithDefaults;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
-use Spatie\LaravelData\Tests\Fakes\DefaultOptionalData;
-use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
-use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\EmptyData;
 use Spatie\LaravelData\Tests\Fakes\EnumData;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\ExceptData;
 use Spatie\LaravelData\Tests\Fakes\FakeModelData;
 use Spatie\LaravelData\Tests\Fakes\FakeNestedModelData;
-use Spatie\LaravelData\Tests\Fakes\IntersectionTypeData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
@@ -54,7 +51,6 @@ use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
 use Spatie\LaravelData\Tests\Fakes\OnlyData;
 use Spatie\LaravelData\Tests\Fakes\PartialClassConditionalData;
-use Spatie\LaravelData\Tests\Fakes\ReadonlyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
@@ -90,7 +86,7 @@ it('can create a collection of resources', function () {
 });
 
 it('can include a lazy property', function () {
-    $data = new LazyData(Lazy::create(fn() => 'test'));
+    $data = new LazyData(Lazy::create(fn () => 'test'));
 
     expect($data->toArray())->toBe([]);
 
@@ -126,8 +122,8 @@ it('can include a nested lazy property', function () {
 
 
     $data = new \TestIncludeableNestedLazyDataProperties(
-        Lazy::create(fn() => LazyData::from('Hello')),
-        Lazy::create(fn() => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
+        Lazy::create(fn () => LazyData::from('Hello')),
+        Lazy::create(fn () => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
     );
 
     expect((clone $data)->toArray())->toBe([]);
@@ -177,7 +173,7 @@ it('can include specific nested data', function () {
         }
     }
 
-    $collection = Lazy::create(fn() => MultiLazyData::collection([
+    $collection = Lazy::create(fn () => MultiLazyData::collection([
         DummyDto::rick(),
         DummyDto::bon(),
     ]));
@@ -233,7 +229,7 @@ it('can have a conditional lazy data', function () {
         public static function create(string $name): static
         {
             return new self(
-                Lazy::when(fn() => $name === 'Ruben', fn() => $name)
+                Lazy::when(fn () => $name === 'Ruben', fn () => $name)
             );
         }
     };
@@ -257,7 +253,7 @@ it('cannot have conditional lazy data manually loaded', function () {
         public static function create(string $name): static
         {
             return new self(
-                Lazy::when(fn() => $name === 'Ruben', fn() => $name)
+                Lazy::when(fn () => $name === 'Ruben', fn () => $name)
             );
         }
     };
@@ -319,7 +315,7 @@ it('always transforms lazy inertia data to inertia lazy props', function () {
         public static function create(string $name): static
         {
             return new self(
-                Lazy::inertia(fn() => $name)
+                Lazy::inertia(fn () => $name)
             );
         }
     };
@@ -549,7 +545,7 @@ it('can get the data object without transforming', function () {
     $data = new class (
         $dataObject = new SimpleData('Test'),
         $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B')]),
-        Lazy::create(fn() => new SimpleData('Lazy')),
+        Lazy::create(fn () => new SimpleData('Lazy')),
         'Test',
         $transformable = new DateTime('16 may 1994')
     ) extends Data {
@@ -683,7 +679,7 @@ it('can append data via method call', function () {
 
     $transformed = $data->additional([
         'company' => 'Spatie',
-        'alt_name' => fn(Data $data) => "{$data->name} from Spatie",
+        'alt_name' => fn (Data $data) => "{$data->name} from Spatie",
     ])->toArray();
 
     expect($transformed)->toMatchArray([
@@ -829,11 +825,10 @@ it('can define the WithData trait data class by method', function () {
 });
 
 it('has support fro readonly properties', function () {
-    $dataClass = new class('') extends Data{
+    $dataClass = new class ('') extends Data {
         public function __construct(
             public readonly string $string
-        )
-        {
+        ) {
         }
     };
 
@@ -846,7 +841,7 @@ it('has support fro readonly properties', function () {
 it('has support for intersection types', function () {
     $collection = collect(['a', 'b', 'c']);
 
-    $dataClass = new class extends Data {
+    $dataClass = new class () extends Data {
         public Arrayable & \Countable $intersection;
     };
 
@@ -886,7 +881,7 @@ it(
 );
 
 it('can construct a data object with default values', function () {
-    $dataClass = new class('', '') extends Data {
+    $dataClass = new class ('', '') extends Data {
         public string $property;
 
         public string $default_property = 'Hello';
@@ -911,7 +906,7 @@ it('can construct a data object with default values', function () {
 });
 
 it('can construct a data object with default values and overwrite them', function () {
-    $dataClass = new class('', '') extends Data {
+    $dataClass = new class ('', '') extends Data {
         public string $property;
 
         public string $default_property = 'Hello';
@@ -966,7 +961,7 @@ it('can use a custom transformer', function () {
             public Data $nestedData,
             #[
                 WithTransformer(ConfidentialDataCollectionTransformer::class),
-                DataCollectionOf(SimpleData::class)
+            DataCollectionOf(SimpleData::class)
             ]
             public DataCollection $nestedDataCollection,
         ) {
@@ -1160,7 +1155,7 @@ it('can transform a partial object', function () {
 });
 
 it('will not include lazy optional values when transforming', function () {
-    $data = new class ('Hello World', Lazy::create(fn() => Optional::make())) extends Data {
+    $data = new class ('Hello World', Lazy::create(fn () => Optional::make())) extends Data {
         public function __construct(
             public string $string,
             public string|Optional|Lazy $lazy_optional_string,
@@ -1174,7 +1169,7 @@ it('will not include lazy optional values when transforming', function () {
 });
 
 it('excludes optional values data', function () {
-    $dataClass = new class extends Data {
+    $dataClass = new class () extends Data {
         public string|Optional $name;
     };
 
@@ -1184,7 +1179,7 @@ it('excludes optional values data', function () {
 });
 
 it('includes value if not optional data', function () {
-    $dataClass = new class extends Data {
+    $dataClass = new class () extends Data {
         public string|Optional $name;
     };
 
@@ -1218,7 +1213,7 @@ it('can map transformed property names', function () {
             public DataCollection $nested_collection,
             #[
                 MapOutputName('nested_other_collection'),
-                DataCollectionOf(SimpleDataWithMappedProperty::class)
+            DataCollectionOf(SimpleDataWithMappedProperty::class)
             ]
             public DataCollection $nested_renamed_collection,
         ) {
@@ -1358,7 +1353,7 @@ it('can conditionally include', function () {
 
     expect(
         MultiLazyData::from(DummyDto::rick())
-            ->includeWhen('name', fn(MultiLazyData $data) => $data->artist->resolve() === 'Rick Astley')
+            ->includeWhen('name', fn (MultiLazyData $data) => $data->artist->resolve() === 'Rick Astley')
             ->toArray()
     )
         ->toMatchArray([
@@ -1383,7 +1378,7 @@ it('can conditionally include nested', function () {
 
 it('can conditionally include using class defaults', function () {
     PartialClassConditionalData::setDefinitions(includeDefinitions: [
-        'string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        'string' => fn (PartialClassConditionalData $data) => $data->enabled,
     ]);
 
     expect(PartialClassConditionalData::createLazy(enabled: false))
@@ -1397,7 +1392,7 @@ it('can conditionally include using class defaults', function () {
 
 it('can conditionally include using class defaults nested', function () {
     PartialClassConditionalData::setDefinitions(includeDefinitions: [
-        'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        'nested.string' => fn (PartialClassConditionalData $data) => $data->enabled,
     ]);
 
     expect(PartialClassConditionalData::createLazy(enabled: true))
@@ -1407,8 +1402,8 @@ it('can conditionally include using class defaults nested', function () {
 
 it('can conditionally include using class defaults multiple', function () {
     PartialClassConditionalData::setDefinitions(includeDefinitions: [
-        'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
-        'string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        'nested.string' => fn (PartialClassConditionalData $data) => $data->enabled,
+        'string' => fn (PartialClassConditionalData $data) => $data->enabled,
     ]);
 
     expect(PartialClassConditionalData::createLazy(enabled: false))
@@ -1426,8 +1421,8 @@ it('can conditionally include using class defaults multiple', function () {
 
 it('can conditionally exclude', function () {
     $data = new MultiLazyData(
-        Lazy::create(fn() => 'Rick Astley')->defaultIncluded(),
-        Lazy::create(fn() => 'Never gonna give you up')->defaultIncluded(),
+        Lazy::create(fn () => 'Rick Astley')->defaultIncluded(),
+        Lazy::create(fn () => 'Never gonna give you up')->defaultIncluded(),
         1989
     );
 
@@ -1446,7 +1441,7 @@ it('can conditionally exclude', function () {
 
     expect(
         (clone $data)
-            ->exceptWhen('name', fn(MultiLazyData $data) => $data->artist->resolve() === 'Rick Astley')
+            ->exceptWhen('name', fn (MultiLazyData $data) => $data->artist->resolve() === 'Rick Astley')
             ->toArray()
     )
         ->toMatchArray([
@@ -1460,7 +1455,7 @@ it('can conditionally exclude nested', function () {
         public NestedLazyData $nested;
     };
 
-    $data->nested = new NestedLazyData(Lazy::create(fn() => SimpleData::from('Hello World'))->defaultIncluded());
+    $data->nested = new NestedLazyData(Lazy::create(fn () => SimpleData::from('Hello World'))->defaultIncluded());
 
     expect($data->toArray())->toMatchArray([
         'nested' => ['simple' => ['string' => 'Hello World']],
@@ -1472,7 +1467,7 @@ it('can conditionally exclude nested', function () {
 
 it('can conditionally exclude using class defaults', function () {
     PartialClassConditionalData::setDefinitions(excludeDefinitions: [
-        'string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        'string' => fn (PartialClassConditionalData $data) => $data->enabled,
     ]);
 
     expect(PartialClassConditionalData::createDefaultIncluded(enabled: false))
@@ -1493,7 +1488,7 @@ it('can conditionally exclude using class defaults', function () {
 
 it('can conditionally exclude using class defaults nested', function () {
     PartialClassConditionalData::setDefinitions(excludeDefinitions: [
-        'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        'nested.string' => fn (PartialClassConditionalData $data) => $data->enabled,
     ]);
 
     expect(PartialClassConditionalData::createDefaultIncluded(enabled: false))
@@ -1514,8 +1509,8 @@ it('can conditionally exclude using class defaults nested', function () {
 
 it('can conditionally exclude using multiple class defaults', function () {
     PartialClassConditionalData::setDefinitions(excludeDefinitions: [
-        'string' => fn(PartialClassConditionalData $data) => $data->enabled,
-        'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        'string' => fn (PartialClassConditionalData $data) => $data->enabled,
+        'nested.string' => fn (PartialClassConditionalData $data) => $data->enabled,
     ]);
 
     expect(PartialClassConditionalData::createDefaultIncluded(enabled: false))
@@ -1551,15 +1546,15 @@ it('can conditionally define only', function () {
 
     expect(
         (clone $data)
-            ->onlyWhen('second', fn(MultiData $data) => $data->second === 'World')
+            ->onlyWhen('second', fn (MultiData $data) => $data->second === 'World')
             ->toArray()
     )
         ->toMatchArray(['second' => 'World']);
 
     expect(
         (clone $data)
-            ->onlyWhen('first', fn(MultiData $data) => $data->first === 'Hello')
-            ->onlyWhen('second', fn(MultiData $data) => $data->second === 'World')
+            ->onlyWhen('first', fn (MultiData $data) => $data->first === 'Hello')
+            ->onlyWhen('second', fn (MultiData $data) => $data->second === 'World')
             ->toArray()
     )
         ->toMatchArray([
@@ -1593,7 +1588,7 @@ it('can conditionally define only nested', function () {
 
 it('can conditionally define only using class defaults', function () {
     PartialClassConditionalData::setDefinitions(onlyDefinitions: [
-        'string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        'string' => fn (PartialClassConditionalData $data) => $data->enabled,
     ]);
 
     expect(PartialClassConditionalData::create(enabled: false))
@@ -1611,7 +1606,7 @@ it('can conditionally define only using class defaults', function () {
 
 it('can conditionally define only using class defaults nested', function () {
     PartialClassConditionalData::setDefinitions(onlyDefinitions: [
-        'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        'nested.string' => fn (PartialClassConditionalData $data) => $data->enabled,
     ]);
 
     expect(PartialClassConditionalData::create(enabled: false))
@@ -1631,8 +1626,8 @@ it('can conditionally define only using class defaults nested', function () {
 
 it('can conditionally define only using multiple class defaults', function () {
     PartialClassConditionalData::setDefinitions(onlyDefinitions: [
-        'string' => fn(PartialClassConditionalData $data) => $data->enabled,
-        'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        'string' => fn (PartialClassConditionalData $data) => $data->enabled,
+        'nested.string' => fn (PartialClassConditionalData $data) => $data->enabled,
     ]);
 
     expect(PartialClassConditionalData::create(enabled: false))
@@ -1667,7 +1662,7 @@ it('can conditionally define except', function () {
 
     expect(
         (clone $data)
-            ->exceptWhen('second', fn(MultiData $data) => $data->second === 'World')
+            ->exceptWhen('second', fn (MultiData $data) => $data->second === 'World')
     )
         ->toArray()
         ->toMatchArray([
@@ -1676,8 +1671,8 @@ it('can conditionally define except', function () {
 
     expect(
         (clone $data)
-            ->exceptWhen('first', fn(MultiData $data) => $data->first === 'Hello')
-            ->exceptWhen('second', fn(MultiData $data) => $data->second === 'World')
+            ->exceptWhen('first', fn (MultiData $data) => $data->first === 'Hello')
+            ->exceptWhen('second', fn (MultiData $data) => $data->second === 'World')
             ->toArray()
     )->toBeEmpty();
 });
@@ -1700,7 +1695,7 @@ it('can conditionally define except nested', function () {
 
 it('can conditionally define except using class defaults', function () {
     PartialClassConditionalData::setDefinitions(exceptDefinitions: [
-        'string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        'string' => fn (PartialClassConditionalData $data) => $data->enabled,
     ]);
 
     expect(PartialClassConditionalData::create(enabled: false))
@@ -1721,7 +1716,7 @@ it('can conditionally define except using class defaults', function () {
 
 it('can conditionally define except using class defaults nested', function () {
     PartialClassConditionalData::setDefinitions(exceptDefinitions: [
-        'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        'nested.string' => fn (PartialClassConditionalData $data) => $data->enabled,
     ]);
 
     expect(PartialClassConditionalData::create(enabled: false))
@@ -1743,8 +1738,8 @@ it('can conditionally define except using class defaults nested', function () {
 
 it('can conditionally define except using multiple class defaults', function () {
     PartialClassConditionalData::setDefinitions(exceptDefinitions: [
-        'string' => fn(PartialClassConditionalData $data) => $data->enabled,
-        'nested.string' => fn(PartialClassConditionalData $data) => $data->enabled,
+        'string' => fn (PartialClassConditionalData $data) => $data->enabled,
+        'nested.string' => fn (PartialClassConditionalData $data) => $data->enabled,
     ]);
 
     expect(PartialClassConditionalData::create(enabled: false))

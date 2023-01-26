@@ -7,14 +7,11 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
-use Spatie\LaravelData\Tests\Fakes\BuiltInTypeWithCastData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
-use Spatie\LaravelData\Tests\Fakes\DateCastData;
-use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
-use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\EnumData;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\ModelData;
-use Spatie\LaravelData\Tests\Fakes\MoneyCast;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelData;
@@ -155,16 +152,16 @@ it('will allow a nested collection object to handle its own types', function () 
 
 it('works nicely with lazy data', function () {
     $data = NestedLazyData::from([
-        'simple' => Lazy::create(fn() => SimpleData::from('Hello')),
+        'simple' => Lazy::create(fn () => SimpleData::from('Hello')),
     ]);
 
     expect($data->simple)
         ->toBeInstanceOf(Lazy::class)
-        ->toEqual(Lazy::create(fn() => SimpleData::from('Hello')));
+        ->toEqual(Lazy::create(fn () => SimpleData::from('Hello')));
 });
 
 it('allows casting', function () {
-    $dataClass = new class extends Data {
+    $dataClass = new class () extends Data {
         #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         public DateTimeImmutable $date;
     };

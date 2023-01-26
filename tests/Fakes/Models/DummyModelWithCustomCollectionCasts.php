@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Tests\Fakes\Models;
 
-use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataCollection;
 

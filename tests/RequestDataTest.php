@@ -7,15 +7,15 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 use function Pest\Laravel\handleExceptions;
 use function Pest\Laravel\postJson;
 
 use Spatie\LaravelData\Attributes\WithoutValidation;
 
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Tests\Fakes\RequestData;
+
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 
 function performRequest(string $string): TestResponse
 {

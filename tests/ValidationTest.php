@@ -13,15 +13,14 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
-use Spatie\LaravelData\Tests\Fakes\CircData;
-use Spatie\LaravelData\Tests\Fakes\UlarData;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Attributes\MapInputName;
 
+use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
+
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Bail;
 use Spatie\LaravelData\Attributes\Validation\Exists;
@@ -34,8 +33,8 @@ use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Unique;
-
 use Spatie\LaravelData\Attributes\WithoutValidation;
+
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataPipeline;
@@ -52,17 +51,18 @@ use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
+use Spatie\LaravelData\Tests\Fakes\CircData;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DataWithReferenceFieldValidationAttribute;
-use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyDataWithContextOverwrittenValidationRules;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
-use Spatie\LaravelData\Tests\Fakes\Support\FakeInjectable;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\NestedNullableData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
+use Spatie\LaravelData\Tests\Fakes\Support\FakeInjectable;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
 
 it('can validate a string', function () {
@@ -1344,7 +1344,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
                 ],
             ];
         }
@@ -1353,7 +1353,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
         ],
     ]);
 });
@@ -1366,7 +1366,7 @@ it('can reference route parameters as values within rules', function () {
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('post_id')->andReturns('69');
-    $this->app->bind('request', fn() => $requestMock);
+    $this->app->bind('request', fn () => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1387,7 +1387,7 @@ it('can reference route models with a property as values within rules', function
     $requestMock->expects('route')->with('post')->andReturns(new DummyModel([
         'id' => 69,
     ]));
-    $this->app->bind('request', fn() => $requestMock);
+    $this->app->bind('request', fn () => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
