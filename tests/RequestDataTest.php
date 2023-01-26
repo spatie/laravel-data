@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 use function Pest\Laravel\handleExceptions;
 use function Pest\Laravel\postJson;
 
@@ -30,15 +31,19 @@ beforeEach(function () {
         ValidationException::class,
     ]);
 
-    RequestData::clear();
-
-    Route::post('/example-route', function (RequestData $data) {
+    Route::post('/example-route', function (Sim $data) {
         return ['given' => $data->string];
     });
 });
 
 it('can pass validation', function () {
-    performRequest('Hello')
+    Route::post('/example-route', function (SimpleData $data) {
+        return ['given' => $data->string];
+    });
+
+    postJson('/example-route', [
+        'string' => 'Hello',
+    ])
         ->assertOk()
         ->assertJson(['given' => 'Hello']);
 });
@@ -48,28 +53,30 @@ it('can returns a 201 response code for POST requests', function () {
         return new SimpleData(request()->input('string'));
     });
 
-    performRequest('Hello')
+    postJson('/example-route', [
+        'string' => 'Hello',
+    ])
         ->assertCreated()
         ->assertJson(['string' => 'Hello']);
 });
 
 it('can fail validation', function () {
-    performRequest('Hello World')
+    Route::post('/example-route', function (SimpleDataWithExplicitValidationRuleAttributeData $data) {
+        return ['email' => $data->email];
+    });
+
+    postJson('/example-route', [
+        'email' => 'Hello',
+    ])
         ->assertStatus(422)
         ->assertJsonValidationErrors([
-            'string' => __(
-                'validation.max.string',
-                ['attribute' => 'string', 'max' => 10]
-            ),
+            'email' => __('validation.email', ['attribute' => 'email']),
         ]);
 });
 
-
 it('always validates requests when passed to the from method', function () {
-    RequestData::clear();
-
     try {
-        RequestData::from(new Request());
+        SimpleData::from(new Request());
     } catch (ValidationException $exception) {
         expect($exception->errors())->toMatchArray([
             'string' => [__('validation.required', ['attribute' => 'string'])],
@@ -82,9 +89,22 @@ it('always validates requests when passed to the from method', function () {
 });
 
 it('can check for authorization', function () {
-    RequestData::$enableAuthorizeFailure = true;
+    class TestDataWithAuthorizationFailure extends Data
+    {
+        public string $string;
 
-    performRequest('Hello')->assertStatus(403);
+        public static function authorize()
+        {
+            return false;
+        }
+    }
+
+    Route::post('/example-route', function (\TestDataWithAuthorizationFailure $data) {
+    });
+
+    postJson('/example-route', [
+        'string' => 'test',
+    ])->assertStatus(403);
 });
 
 it(
@@ -94,7 +114,7 @@ it(
         {
             public function __construct(
                 #[WithoutValidation]
-            public string $name
+                public string $name
             ) {
             }
 

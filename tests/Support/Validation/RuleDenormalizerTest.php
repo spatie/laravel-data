@@ -19,7 +19,7 @@ use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
-use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Rules\CustomInvokableLaravelRule;
 use Spatie\LaravelData\Tests\Fakes\Rules\CustomLaravelRule;
 

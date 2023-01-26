@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
-use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class CurrentPassword extends StringValidationAttribute

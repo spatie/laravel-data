@@ -6,8 +6,8 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Tests\Fakes\DataWithMultipleArgumentCreationMethod;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
-use Spatie\LaravelData\Tests\Fakes\DummyModel;
-use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 
 it('can create data from a custom method', function () {
     $data = new class ('') extends Data {

@@ -86,7 +86,7 @@ use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
-use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 
 function fixature(
     ValidationRule $attribute,

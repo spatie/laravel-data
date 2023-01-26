@@ -10,7 +10,7 @@ use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Tests\Fakes\DummyModel;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 

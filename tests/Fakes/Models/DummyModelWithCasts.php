@@ -1,11 +1,12 @@
 <?php
 
-namespace Spatie\LaravelData\Tests\Fakes;
+namespace Spatie\LaravelData\Tests\Fakes\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 class DummyModelWithCasts extends Model
 {

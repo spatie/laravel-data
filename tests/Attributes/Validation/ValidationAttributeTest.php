@@ -3,7 +3,7 @@
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\StringValidationAttribute;
-use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 
 it('can get a string representation of rules', function () {
     $rule = new StringType();

@@ -13,6 +13,8 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
+use Spatie\LaravelData\Tests\Fakes\CircData;
+use Spatie\LaravelData\Tests\Fakes\UlarData;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
@@ -52,10 +54,10 @@ use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DataWithReferenceFieldValidationAttribute;
-use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyDataWithContextOverwrittenValidationRules;
-use Spatie\LaravelData\Tests\Fakes\DummyModel;
-use Spatie\LaravelData\Tests\Fakes\FakeInjectable;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
+use Spatie\LaravelData\Tests\Fakes\Support\FakeInjectable;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\NestedNullableData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -1342,7 +1344,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
                 ],
             ];
         }
@@ -1351,7 +1353,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
         ],
     ]);
 });
@@ -1364,7 +1366,7 @@ it('can reference route parameters as values within rules', function () {
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('post_id')->andReturns('69');
-    $this->app->bind('request', fn () => $requestMock);
+    $this->app->bind('request', fn() => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1385,7 +1387,7 @@ it('can reference route models with a property as values within rules', function
     $requestMock->expects('route')->with('post')->andReturns(new DummyModel([
         'id' => 69,
     ]));
-    $this->app->bind('request', fn () => $requestMock);
+    $this->app->bind('request', fn() => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1670,4 +1672,37 @@ it('can apply custom rules onto array properties', function () {
         'emails' => ['required', 'array', 'min:1', 'max:5'],
         'emails.*' => ['email'],
     ]);
+});
+
+it('can validate data with circular dependencies', function () {
+    DataValidationAsserter::for(CircData::class)
+        ->assertRules([
+            'string' => ['required', 'string'],
+        ]);
+
+    DataValidationAsserter::for(CircData::class)
+        ->assertOk([
+            'string' => 'Hello World',
+            'ular' => [
+                'string' => 'Hello World',
+                'circ' => [
+                    'string' => 'Hello World',
+                ],
+            ],
+        ])
+        ->assertRules([
+            'string' => ['required', 'string'],
+            'ular' => ['nullable', 'array'],
+            'ular.string' => ['required', 'string'],
+            'ular.circ' => ['nullable', 'array'],
+            'ular.circ.string' => ['required', 'string'],
+        ], payload: [
+            'string' => 'Hello World',
+            'ular' => [
+                'string' => 'Hello World',
+                'circ' => [
+                    'string' => 'Hello World',
+                ],
+            ],
+        ]);
 });

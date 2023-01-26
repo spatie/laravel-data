@@ -27,7 +27,7 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
-use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 
