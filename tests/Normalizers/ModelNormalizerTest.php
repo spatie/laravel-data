@@ -4,8 +4,6 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
-use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
 use Spatie\LaravelData\Tests\Fakes\FakeModelData;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;

@@ -7,14 +7,12 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 
-use Spatie\LaravelData\Data;
 use function Pest\Laravel\handleExceptions;
 use function Pest\Laravel\postJson;
 
 use Spatie\LaravelData\Attributes\WithoutValidation;
-use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
-use Spatie\LaravelData\Tests\Factories\DataMagicMethodFactory;
-use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
+
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
@@ -89,7 +87,9 @@ it('can check for authorization', function () {
     performRequest('Hello')->assertStatus(403);
 });
 
-it('can manually override how the data object will be constructed', function () {
+it(
+    'can manually override how the data object will be constructed',
+    function () {
     class TestOverrideableDataFromRequest extends Data
     {
         public function __construct(

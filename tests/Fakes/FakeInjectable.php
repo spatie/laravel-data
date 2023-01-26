@@ -11,6 +11,6 @@ class FakeInjectable
 
     public static function setup(mixed $value): void
     {
-        app()->bind(self::class, fn() => new self($value));
+        app()->bind(self::class, fn () => new self($value));
     }
 }
