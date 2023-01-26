@@ -2,6 +2,17 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.0.0 - ????-??-??
+
+- The validation logic is completely rewritten
+    - Add support for nested nullable and optional data objects
+    - Allow referencing other fields in validation attributes when the data is nested
+    - Allow referencing url parameters (and even model properties) in validation attributes
+    - Allow circular dependencies when validating data
+    - Add support for nested validation messages and attributes
+- Package specific properties are renamed to avoid conflicts
+- Serialization logic updated to only serialize your properties
+
 ## 2.2.3 - 2023-01-24
 
 - Add Laravel 10.x support (#331)
