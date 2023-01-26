@@ -3,18 +3,7 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
-use Spatie\LaravelData\Attributes\Validation\ArrayType;
-use Spatie\LaravelData\Attributes\Validation\Present;
-use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Support\Validation\DataRules;
-use Spatie\LaravelData\Support\Validation\PropertyRules;
-use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
-use Spatie\LaravelData\Support\Validation\RuleNormalizer;
-use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class DataValidationMessagesAndAttributesResolver
@@ -78,7 +67,8 @@ class DataValidationMessagesAndAttributesResolver
 
         if (method_exists($class, 'messages')) {
             $messages = collect(app()->call([$class, 'messages']))
-                ->keyBy(fn(mixed $messages, string $key) => ! str_contains($key, '.') && is_string($messages)
+                ->keyBy(
+                    fn (mixed $messages, string $key) => ! str_contains($key, '.') && is_string($messages)
                     ? $path->property("*.{$key}")->get()
                     : $path->property($key)->get()
                 )
@@ -88,7 +78,7 @@ class DataValidationMessagesAndAttributesResolver
 
         if (method_exists($class, 'attributes')) {
             $attributes = collect(app()->call([$class, 'attributes']))
-                ->keyBy(fn(mixed $messages, string $key) => $path->property($key)->get())
+                ->keyBy(fn (mixed $messages, string $key) => $path->property($key)->get())
                 ->merge($attributes)
                 ->all();
         }

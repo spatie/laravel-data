@@ -1344,7 +1344,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
                 ],
             ];
         }
@@ -1353,7 +1353,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
         ],
     ]);
 });
@@ -1366,7 +1366,7 @@ it('can reference route parameters as values within rules', function () {
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('post_id')->andReturns('69');
-    $this->app->bind('request', fn() => $requestMock);
+    $this->app->bind('request', fn () => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1387,7 +1387,7 @@ it('can reference route models with a property as values within rules', function
     $requestMock->expects('route')->with('post')->andReturns(new DummyModel([
         'id' => 69,
     ]));
-    $this->app->bind('request', fn() => $requestMock);
+    $this->app->bind('request', fn () => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
