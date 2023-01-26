@@ -9,6 +9,7 @@ use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
+use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class RequiredRuleInferrer implements RuleInferrer
@@ -16,7 +17,7 @@ class RequiredRuleInferrer implements RuleInferrer
     public function handle(
         DataProperty $property,
         PropertyRules $rules,
-        ValidationPath $path,
+        ValidationContext $context,
     ): PropertyRules {
         if ($this->shouldAddRule($property, $rules)) {
             $rules->prepend(new Required());

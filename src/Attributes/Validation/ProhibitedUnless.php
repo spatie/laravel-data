@@ -6,6 +6,7 @@ use Attribute;
 use BackedEnum;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class ProhibitedUnless extends StringValidationAttribute
@@ -16,7 +17,7 @@ class ProhibitedUnless extends StringValidationAttribute
 
     public function __construct(
         string|FieldReference $field,
-        array | string | BackedEnum ...$values
+        array | string | BackedEnum | RouteParameterReference ...$values
     ) {
         $this->field = $this->parseFieldReference($field);
         $this->values = Arr::flatten($values);

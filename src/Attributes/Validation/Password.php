@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Exception;
 use Illuminate\Validation\Rules\Password as BasePassword;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -13,16 +14,25 @@ class Password extends ObjectValidationAttribute
     protected BasePassword $rule;
 
     public function __construct(
-        int $min = 12,
-        bool $letters = false,
-        bool $mixedCase = false,
-        bool $numbers = false,
-        bool $symbols = false,
-        bool $uncompromised = false,
-        int $uncompromisedThreshold = 0,
-        bool $default = false,
+        int|RouteParameterReference $min = 12,
+        bool|RouteParameterReference $letters = false,
+        bool|RouteParameterReference $mixedCase = false,
+        bool|RouteParameterReference $numbers = false,
+        bool|RouteParameterReference $symbols = false,
+        bool|RouteParameterReference $uncompromised = false,
+        int|RouteParameterReference $uncompromisedThreshold = 0,
+        bool|RouteParameterReference $default = false,
         ?BasePassword $rule = null,
     ) {
+        $min = $this->normalizePossibleRouteReferenceParameter($min);
+        $letters = $this->normalizePossibleRouteReferenceParameter($letters);
+        $mixedCase = $this->normalizePossibleRouteReferenceParameter($mixedCase);
+        $numbers = $this->normalizePossibleRouteReferenceParameter($numbers);
+        $symbols = $this->normalizePossibleRouteReferenceParameter($symbols);
+        $uncompromised = $this->normalizePossibleRouteReferenceParameter($uncompromised);
+        $uncompromisedThreshold = $this->normalizePossibleRouteReferenceParameter($uncompromisedThreshold);
+        $default = $this->normalizePossibleRouteReferenceParameter($default);
+
         if ($default && $rule === null) {
             $this->rule = BasePassword::default();
 

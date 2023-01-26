@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Validation\Rules\Enum as EnumRule;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -11,9 +12,11 @@ class Enum extends ObjectValidationAttribute
 {
     protected EnumRule $rule;
 
-    public function __construct(string|EnumRule $enum)
+    public function __construct(string|EnumRule|RouteParameterReference $enum)
     {
-        $this->rule = $enum instanceof EnumRule ? $enum : new EnumRule($enum);
+        $this->rule = $enum instanceof EnumRule
+            ? $enum
+            : new EnumRule((string) $enum);
     }
 
     public static function keyword(): string

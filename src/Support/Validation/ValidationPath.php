@@ -2,6 +2,8 @@
 
 namespace Spatie\LaravelData\Support\Validation;
 
+use Illuminate\Support\Str;
+
 class ValidationPath
 {
     public function __construct(
@@ -14,7 +16,7 @@ class ValidationPath
         return new self($path);
     }
 
-    public function relative(string $property): self
+    public function property(string $property): self
     {
         return new self($this->path ? "{$this->path}.{$property}" : $property);
     }

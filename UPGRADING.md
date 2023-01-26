@@ -2,6 +2,37 @@
 
 Because there are many breaking changes an upgrade is not that easy. There are many edge cases this guide does not cover. We accept PRs to improve this guide.
 
+## From v2 to v1
+
+- Laravel 9 is now required
+- validation is completely rewritten 
+  - rules are now generated based upon the payload provided, not what a payload possibly could be. This means rules can change depending on the provided payload.
+  - When you're injecting a `$payload`, `$relativePayload` or `$path` parameter in a custom rules method in your data object, then remove this and use the new `ValidationContext`:
+
+```php
+class SomeData extends Data {
+    public bool $strict;
+
+    public string $property;
+
+    public static function rules(ValidationContext $context): array
+    {
+        if ($context->payload['strict'] === true) {
+            return [
+                'property' => ['in:strict'],
+            ];
+        }
+
+        return [];
+    }
+}
+```
+  - The type of `$rules` in the RuleInferrer handle method changed from `RulesCollection` to `PropertyRules`
+  - RuleInferrers now take a $context parameter which is a `ValidationCOntext` in their handle method
+  - Some resolvers are removed like: `DataClassValidationRulesResolver`, `DataPropertyValidationRulesResolver`
+  - The default order of rule inferrers has been changed
+- all data specific properties are now prefixed with _, to avoid conflicts with properties with your own defined properties. This is especially important when overwriting `$collectionClass`, `$paginatedCollectionClass`, `$cursorPaginatedCollectionClass`, be sure to add the extra _ within your data classes.
+
 ## From v1 to v2
 
 High impact changes

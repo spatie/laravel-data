@@ -4,11 +4,12 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use DateTimeInterface;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Before extends StringValidationAttribute
 {
-    public function __construct(protected string | DateTimeInterface $date)
+    public function __construct(protected string | DateTimeInterface|RouteParameterReference $date)
     {
     }
 

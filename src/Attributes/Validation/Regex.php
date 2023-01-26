@@ -3,11 +3,12 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Regex extends StringValidationAttribute
 {
-    public function __construct(protected string $pattern)
+    public function __construct(protected string | RouteParameterReference $pattern)
     {
     }
 

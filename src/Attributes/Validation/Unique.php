@@ -14,16 +14,24 @@ class Unique extends ObjectValidationAttribute
     protected BaseUnique $rule;
 
     public function __construct(
-        ?string $table = null,
-        ?string $column = 'NULL',
-        ?string $connection = null,
-        ?string $ignore = null,
-        ?string $ignoreColumn = null,
+        null|string $table = null,
+        null|string $column = 'NULL',
+        null|string $connection = null,
+        null|string $ignore = null,
+        null|string $ignoreColumn = null,
         bool $withoutTrashed = false,
         string $deletedAtColumn = 'deleted_at',
         ?Closure $where = null,
         ?BaseUnique $rule = null
     ) {
+        $table = $this->normalizePossibleRouteReferenceParameter($table);
+        $column = $this->normalizePossibleRouteReferenceParameter($column);
+        $connection = $this->normalizePossibleRouteReferenceParameter($connection);
+        $ignore = $this->normalizePossibleRouteReferenceParameter($ignore);
+        $ignoreColumn = $this->normalizePossibleRouteReferenceParameter($ignoreColumn);
+        $withoutTrashed = $this->normalizePossibleRouteReferenceParameter($withoutTrashed);
+        $deletedAtColumn = $this->normalizePossibleRouteReferenceParameter($deletedAtColumn);
+
         if ($table === null && $rule === null) {
             throw new Exception('Could not create unique validation rule, either table or a rule is required');
         }

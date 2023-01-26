@@ -6,6 +6,7 @@ use Attribute;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Dimensions as BaseDimensions;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -14,15 +15,23 @@ class Dimensions extends ObjectValidationAttribute
     protected BaseDimensions $rule;
 
     public function __construct(
-        ?int $minWidth = null,
-        ?int $minHeight = null,
-        ?int $maxWidth = null,
-        ?int $maxHeight = null,
-        null|float|string $ratio = null,
-        ?int $width = null,
-        ?int $height = null,
-        ?BaseDimensions $rule = null,
+        null|int|RouteParameterReference $minWidth = null,
+        null|int|RouteParameterReference $minHeight = null,
+        null|int|RouteParameterReference $maxWidth = null,
+        null|int|RouteParameterReference $maxHeight = null,
+        null|float|string|RouteParameterReference $ratio = null,
+        null|int|RouteParameterReference $width = null,
+        null|int|RouteParameterReference $height = null,
+        null|BaseDimensions $rule = null,
     ) {
+        $minWidth = $this->normalizePossibleRouteReferenceParameter($minWidth);
+        $minHeight = $this->normalizePossibleRouteReferenceParameter($minHeight);
+        $maxWidth = $this->normalizePossibleRouteReferenceParameter($maxWidth);
+        $maxHeight = $this->normalizePossibleRouteReferenceParameter($maxHeight);
+        $ratio = $this->normalizePossibleRouteReferenceParameter($ratio);
+        $width = $this->normalizePossibleRouteReferenceParameter($width);
+        $height = $this->normalizePossibleRouteReferenceParameter($height);
+
         if (
             $minWidth === null
             && $minHeight === null

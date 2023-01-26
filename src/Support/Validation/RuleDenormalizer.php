@@ -11,6 +11,7 @@ use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\StringValidationAttribute;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
 class RuleDenormalizer
 {
@@ -23,7 +24,7 @@ class RuleDenormalizer
 
         if (is_array($rule)) {
             return Arr::flatten(array_map(
-                fn (mixed $rule) => $this->execute($rule, $path),
+                fn(mixed $rule) => $this->execute($rule, $path),
                 $rule
             ));
         }
@@ -52,8 +53,8 @@ class RuleDenormalizer
         ValidationPath $path
     ): array {
         $parameters = collect($rule->parameters())
-            ->map(fn (mixed $value) => $this->normalizeRuleParameter($value, $path))
-            ->reject(fn (mixed $value) => $value === null);
+            ->map(fn(mixed $value) => $this->normalizeRuleParameter($value, $path))
+            ->reject(fn(mixed $value) => $value === null);
 
 
         if ($parameters->isEmpty()) {
@@ -61,7 +62,7 @@ class RuleDenormalizer
         }
 
         $parameters = $parameters->map(
-            fn (mixed $value, int|string $key) => is_string($key) ? "{$key}={$value}" : $value
+            fn(mixed $value, int|string $key) => is_string($key) ? "{$key}={$value}" : $value
         );
 
         return ["{$rule->keyword()}:{$parameters->join(',')}"];
@@ -89,7 +90,7 @@ class RuleDenormalizer
 
         if (is_array($parameter)) {
             $subParameters = array_map(
-                fn (mixed $subParameter) => $this->normalizeRuleParameter($subParameter, $path),
+                fn(mixed $subParameter) => $this->normalizeRuleParameter($subParameter, $path),
                 $parameter
             );
 
@@ -105,7 +106,11 @@ class RuleDenormalizer
         }
 
         if ($parameter instanceof FieldReference) {
-            return $path->relative($parameter->name)->get();
+            return $parameter->getValue($path);
+        }
+
+        if ($parameter instanceof RouteParameterReference) {
+            return $this->normalizeRuleParameter($parameter->getValue(), $path);
         }
 
         return (string) $parameter;

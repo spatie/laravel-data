@@ -8,23 +8,23 @@ use Spatie\LaravelData\Support\PartialTrees;
 
 trait IncludeableData
 {
-    protected ?PartialTrees $partialTrees = null;
+    protected ?PartialTrees $_partialTrees = null;
 
     /** @var array<string, bool|Closure> */
-    protected array $includes = [];
+    protected array $_includes = [];
 
     /** @var array<string, bool|Closure> */
-    protected array $excludes = [];
+    protected array $_excludes = [];
 
     /** @var array<string, bool|Closure> */
-    protected array $only = [];
+    protected array $_only = [];
 
     /** @var array<string, bool|Closure> */
-    protected array $except = [];
+    protected array $_except = [];
 
     public function withPartialTrees(PartialTrees $partialTrees): static
     {
-        $this->partialTrees = $partialTrees;
+        $this->_partialTrees = $partialTrees;
 
         return $this;
     }
@@ -32,7 +32,7 @@ trait IncludeableData
     public function include(string ...$includes): static
     {
         foreach ($includes as $include) {
-            $this->includes[$include] = true;
+            $this->_includes[$include] = true;
         }
 
         return $this;
@@ -41,7 +41,7 @@ trait IncludeableData
     public function exclude(string ...$excludes): static
     {
         foreach ($excludes as $exclude) {
-            $this->excludes[$exclude] = true;
+            $this->_excludes[$exclude] = true;
         }
 
         return $this;
@@ -50,7 +50,7 @@ trait IncludeableData
     public function only(string ...$only): static
     {
         foreach ($only as $onlyDefinition) {
-            $this->only[$onlyDefinition] = true;
+            $this->_only[$onlyDefinition] = true;
         }
 
         return $this;
@@ -59,7 +59,7 @@ trait IncludeableData
     public function except(string ...$except): static
     {
         foreach ($except as $exceptDefinition) {
-            $this->except[$exceptDefinition] = true;
+            $this->_except[$exceptDefinition] = true;
         }
 
         return $this;
@@ -67,28 +67,28 @@ trait IncludeableData
 
     public function includeWhen(string $include, bool|Closure $condition): static
     {
-        $this->includes[$include] = $condition;
+        $this->_includes[$include] = $condition;
 
         return $this;
     }
 
     public function excludeWhen(string $exclude, bool|Closure $condition): static
     {
-        $this->excludes[$exclude] = $condition;
+        $this->_excludes[$exclude] = $condition;
 
         return $this;
     }
 
     public function onlyWhen(string $only, bool|Closure $condition): static
     {
-        $this->only[$only] = $condition;
+        $this->_only[$only] = $condition;
 
         return $this;
     }
 
     public function exceptWhen(string $except, bool|Closure $condition): static
     {
-        $this->except[$except] = $condition;
+        $this->_except[$except] = $condition;
 
         return $this;
     }
@@ -115,8 +115,8 @@ trait IncludeableData
 
     public function getPartialTrees(): PartialTrees
     {
-        if ($this->partialTrees) {
-            return $this->partialTrees;
+        if ($this->_partialTrees) {
+            return $this->_partialTrees;
         }
 
         $filter = fn (bool|null|Closure $condition, string $definition) => match (true) {
@@ -125,10 +125,10 @@ trait IncludeableData
             is_callable($condition) => $condition($this),
         };
 
-        $includes = collect($this->includes)->merge($this->includeProperties())->filter($filter)->keys()->all();
-        $excludes = collect($this->excludes)->merge($this->excludeProperties())->filter($filter)->keys()->all();
-        $only = collect($this->only)->merge($this->onlyProperties())->filter($filter)->keys()->all();
-        $except = collect($this->except)->merge($this->exceptProperties())->filter($filter)->keys()->all();
+        $includes = collect($this->_includes)->merge($this->includeProperties())->filter($filter)->keys()->all();
+        $excludes = collect($this->_excludes)->merge($this->excludeProperties())->filter($filter)->keys()->all();
+        $only = collect($this->_only)->merge($this->onlyProperties())->filter($filter)->keys()->all();
+        $except = collect($this->_except)->merge($this->exceptProperties())->filter($filter)->keys()->all();
 
         return new PartialTrees(
             (new PartialsParser())->execute($includes),

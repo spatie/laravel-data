@@ -3,12 +3,13 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class CurrentPassword extends StringValidationAttribute
 {
-    public function __construct(protected null|string|DummyBackedEnum $guard = null)
+    public function __construct(protected null|string|DummyBackedEnum|RouteParameterReference $guard = null)
     {
     }
 

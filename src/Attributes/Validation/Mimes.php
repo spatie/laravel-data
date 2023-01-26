@@ -4,13 +4,14 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Mimes extends StringValidationAttribute
 {
     protected array $mimes;
 
-    public function __construct(string | array ...$mimes)
+    public function __construct(string|array|RouteParameterReference ...$mimes)
     {
         $this->mimes = Arr::flatten($mimes);
     }

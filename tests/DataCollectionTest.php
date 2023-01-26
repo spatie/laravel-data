@@ -419,7 +419,7 @@ it('can use magical creation methods to create a collection', function () {
 
 it('can return a custom data collection when collecting data', function () {
     $class = new class ('') extends Data {
-        protected static string $collectionClass = CustomDataCollection::class;
+        protected static string $_collectionClass = CustomDataCollection::class;
 
         public function __construct(public string $string)
         {
@@ -436,7 +436,7 @@ it('can return a custom data collection when collecting data', function () {
 
 it('can return a custom paginated data collection when collecting data', function () {
     $class = new class ('') extends Data {
-        protected static string $paginatedCollectionClass = CustomPaginatedDataCollection::class;
+        protected static string $_paginatedCollectionClass = CustomPaginatedDataCollection::class;
 
         public function __construct(public string $string)
         {

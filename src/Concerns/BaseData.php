@@ -23,11 +23,11 @@ use Spatie\LaravelData\Transformers\DataTransformer;
 
 trait BaseData
 {
-    protected static string $collectionClass = DataCollection::class;
+    protected static string $_collectionClass = DataCollection::class;
 
-    protected static string $paginatedCollectionClass = PaginatedDataCollection::class;
+    protected static string $_paginatedCollectionClass = PaginatedDataCollection::class;
 
-    protected static string $cursorPaginatedCollectionClass = CursorPaginatedDataCollection::class;
+    protected static string $_cursorPaginatedCollectionClass = CursorPaginatedDataCollection::class;
 
     public static function optional(mixed ...$payloads): ?static
     {
@@ -79,14 +79,14 @@ trait BaseData
     public static function collection(Enumerable|array|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator|DataCollection $items): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
         if ($items instanceof Paginator || $items instanceof AbstractPaginator) {
-            return new (static::$paginatedCollectionClass)(static::class, $items);
+            return new (static::$_paginatedCollectionClass)(static::class, $items);
         }
 
         if ($items instanceof AbstractCursorPaginator || $items instanceof CursorPaginator) {
-            return new (static::$cursorPaginatedCollectionClass)(static::class, $items);
+            return new (static::$_cursorPaginatedCollectionClass)(static::class, $items);
         }
 
-        return new (static::$collectionClass)(static::class, $items);
+        return new (static::$_collectionClass)(static::class, $items);
     }
 
     public static function empty(array $extra = []): array
