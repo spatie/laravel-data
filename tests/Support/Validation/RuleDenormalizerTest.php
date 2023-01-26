@@ -4,26 +4,24 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule as LaravelRule;
+
+use function Pest\Laravel\mock;
+
 use Spatie\LaravelData\Attributes\Validation\AcceptedIf;
 use Spatie\LaravelData\Attributes\Validation\After;
-use Spatie\LaravelData\Attributes\Validation\ArrayType;
-use Spatie\LaravelData\Attributes\Validation\Email;
 use Spatie\LaravelData\Attributes\Validation\EndsWith;
 use Spatie\LaravelData\Attributes\Validation\ExcludeWithout;
 use Spatie\LaravelData\Attributes\Validation\In;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Required;
-use Spatie\LaravelData\Attributes\Validation\RequiredIf;
 use Spatie\LaravelData\Attributes\Validation\Rule as RuleAttribute;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
-use Spatie\LaravelData\Tests\Fakes\FakeEnum;
 use Spatie\LaravelData\Tests\Fakes\Rules\CustomInvokableLaravelRule;
 use Spatie\LaravelData\Tests\Fakes\Rules\CustomLaravelRule;
-use function Pest\Laravel\mock;
 
 it('can denormalize rules', function ($rule, $expected, $path = null) {
     $denormalizer = new RuleDenormalizer();
@@ -33,7 +31,7 @@ it('can denormalize rules', function ($rule, $expected, $path = null) {
     'string rule' => ['string', ['string']],
     'multi rule string' => ['string|required', ['string', 'required']],
     'array rule' => [['string|min:3', 'required'], ['string', 'min:3', 'required']],
-    'string validation attribute rule' => [new Required, ['required']],
+    'string validation attribute rule' => [new Required(), ['required']],
     'string validation attribute rule with parameters' => [new Min(3), ['min:3']],
     'string validation attribute rule with parameters to normalize' => [new AcceptedIf('field', DummyBackedEnum::BOO), ['accepted_if:field,boo']],
     'object validation attribute rule' => [new In('a', 'b'), [LaravelRule::in('a', 'b')]],
@@ -55,7 +53,7 @@ it('can denormalize rules', function ($rule, $expected, $path = null) {
 it('can denormalize rules with route parameter references', function () {
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('parameter')->andReturns('69');
-    $this->app->bind('request', fn() => $requestMock);
+    $this->app->bind('request', fn () => $requestMock);
 
     $denormalizer = new RuleDenormalizer();
 

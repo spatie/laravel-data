@@ -90,31 +90,31 @@ it('can check for authorization', function () {
 it(
     'can manually override how the data object will be constructed',
     function () {
-    class TestOverrideableDataFromRequest extends Data
-    {
-        public function __construct(
-            #[WithoutValidation]
-            public string $name
-        ) {
-        }
-
-        public static function fromRequest(Request $request)
+        class TestOverrideableDataFromRequest extends Data
         {
-            return new self("{$request->input('first_name')} {$request->input('last_name')}");
+            public function __construct(
+                #[WithoutValidation]
+            public string $name
+            ) {
+            }
+
+            public static function fromRequest(Request $request)
+            {
+                return new self("{$request->input('first_name')} {$request->input('last_name')}");
+            }
         }
+
+        Route::post('/other-route', function (\TestOverrideableDataFromRequest $data) {
+            return ['name' => $data->name];
+        });
+
+        postJson('/other-route', [
+            'first_name' => 'Rick',
+            'last_name' => 'Astley',
+        ])
+            ->assertOk()
+            ->assertJson(['name' => 'Rick Astley']);
     }
-
-    Route::post('/other-route', function (\TestOverrideableDataFromRequest $data) {
-        return ['name' => $data->name];
-    });
-
-    postJson('/other-route', [
-        'first_name' => 'Rick',
-        'last_name' => 'Astley',
-    ])
-        ->assertOk()
-        ->assertJson(['name' => 'Rick Astley']);
-}
 );
 
 it('can wrap data', function () {
