@@ -6,7 +6,6 @@ use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
-use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class NullableRuleInferrer implements RuleInferrer
 {

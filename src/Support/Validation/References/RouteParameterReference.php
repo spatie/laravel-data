@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Validation\References;
 
-use Illuminate\Http\Request;
 use Spatie\LaravelData\Exceptions\CannotResolveRouteParameterReference;
 use Stringable;
 

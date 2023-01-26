@@ -6,7 +6,6 @@ use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
 use Spatie\LaravelData\Support\Validation\RuleNormalizer;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
-use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 class AttributesRuleInferrer implements RuleInferrer

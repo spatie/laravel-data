@@ -24,7 +24,7 @@ class RuleDenormalizer
 
         if (is_array($rule)) {
             return Arr::flatten(array_map(
-                fn(mixed $rule) => $this->execute($rule, $path),
+                fn (mixed $rule) => $this->execute($rule, $path),
                 $rule
             ));
         }
@@ -53,8 +53,8 @@ class RuleDenormalizer
         ValidationPath $path
     ): array {
         $parameters = collect($rule->parameters())
-            ->map(fn(mixed $value) => $this->normalizeRuleParameter($value, $path))
-            ->reject(fn(mixed $value) => $value === null);
+            ->map(fn (mixed $value) => $this->normalizeRuleParameter($value, $path))
+            ->reject(fn (mixed $value) => $value === null);
 
 
         if ($parameters->isEmpty()) {
@@ -62,7 +62,7 @@ class RuleDenormalizer
         }
 
         $parameters = $parameters->map(
-            fn(mixed $value, int|string $key) => is_string($key) ? "{$key}={$value}" : $value
+            fn (mixed $value, int|string $key) => is_string($key) ? "{$key}={$value}" : $value
         );
 
         return ["{$rule->keyword()}:{$parameters->join(',')}"];
@@ -90,7 +90,7 @@ class RuleDenormalizer
 
         if (is_array($parameter)) {
             $subParameters = array_map(
-                fn(mixed $subParameter) => $this->normalizeRuleParameter($subParameter, $path),
+                fn (mixed $subParameter) => $this->normalizeRuleParameter($subParameter, $path),
                 $parameter
             );
 

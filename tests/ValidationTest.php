@@ -6,10 +6,12 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
+
+use function Pest\Laravel\mock;
+
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
@@ -23,7 +25,6 @@ use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
-use Spatie\LaravelData\Attributes\Validation\Size;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\WithoutValidation;
@@ -42,8 +43,6 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
-use function Pest\Laravel\mock;
-
 
 it('can validate a string', function () {
     $dataClass = new class () extends Data {
@@ -1324,7 +1323,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
                 ],
             ];
         }
@@ -1333,7 +1332,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
         ],
     ]);
 });
@@ -1346,7 +1345,7 @@ it('can reference route parameters as values within rules', function () {
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('post_id')->andReturns('69');
-    $this->app->bind('request', fn() => $requestMock);
+    $this->app->bind('request', fn () => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1367,7 +1366,7 @@ it('can reference route models with a property as values within rules', function
     $requestMock->expects('route')->with('post')->andReturns(new DummyModel([
         'id' => 69,
     ]));
-    $this->app->bind('request', fn() => $requestMock);
+    $this->app->bind('request', fn () => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [

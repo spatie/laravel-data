@@ -2,8 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Validation;
 
-use Illuminate\Support\Str;
-
 class ValidationPath
 {
     public function __construct(

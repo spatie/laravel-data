@@ -2,8 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Validation;
 
-use Illuminate\Support\Arr;
-
 class ValidationContext
 {
     public function __construct(

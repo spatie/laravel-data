@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
-use Illuminate\Validation\Rules\In as BaseIn;
 use Illuminate\Validation\Rules\NotIn as BaseNotIn;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
@@ -23,7 +22,7 @@ class NotIn extends ObjectValidationAttribute
         }
 
         $values = array_map(
-            fn(string|RouteParameterReference $value) => $this->normalizePossibleRouteReferenceParameter($value),
+            fn (string|RouteParameterReference $value) => $this->normalizePossibleRouteReferenceParameter($value),
             Arr::flatten($values)
         );
 
