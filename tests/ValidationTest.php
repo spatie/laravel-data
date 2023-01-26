@@ -1344,7 +1344,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
                 ],
             ];
         }
@@ -1353,7 +1353,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
         ],
     ]);
 });
@@ -1366,7 +1366,7 @@ it('can reference route parameters as values within rules', function () {
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('post_id')->andReturns('69');
-    $this->app->bind('request', fn () => $requestMock);
+    $this->app->bind('request', fn() => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1387,7 +1387,7 @@ it('can reference route models with a property as values within rules', function
     $requestMock->expects('route')->with('post')->andReturns(new DummyModel([
         'id' => 69,
     ]));
-    $this->app->bind('request', fn () => $requestMock);
+    $this->app->bind('request', fn() => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1425,6 +1425,8 @@ it('can manually set validation messages', function () {
     $data = new class () extends Data {
         public string $name;
 
+        public string $song;
+
         public static function messages(): array
         {
             return [
@@ -1433,10 +1435,278 @@ it('can manually set validation messages', function () {
         }
     };
 
-    DataValidationAsserter::for($data)->assertErrors(
-        payload: ['name' => null],
-        errors: ['name' => ['Fix it Rick!']]
-    );
+    DataValidationAsserter::for($data)
+        ->assertMessages(
+            messages: ['name.required' => 'Fix it Rick!'],
+            payload: ['song' => 'Never Gonna Give You Up'],
+        )
+        ->assertErrors(
+            payload: ['song' => 'Never Gonna Give You Up'],
+            errors: ['name' => ['Fix it Rick!']]
+        );
+
+    $data = new class () extends Data {
+        public string $name;
+
+        public string $song;
+
+        public static function messages(): array
+        {
+            return [
+                'name' => ['required' => 'Fix it Rick!'],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($data)
+        ->assertMessages(
+            messages: ['name' => ['required' => 'Fix it Rick!']],
+            payload: ['song' => 'Never Gonna Give You Up'],
+        )
+        ->assertErrors(
+            payload: ['song' => 'Never Gonna Give You Up'],
+            errors: ['name' => ['Fix it Rick!']]
+        );
+
+    $data = new class () extends Data {
+        public string $name;
+
+        public string $song;
+
+        public static function messages(): array
+        {
+            return [
+                'required' => 'Fix it Rick!',
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($data)
+        ->assertMessages(
+            messages: ['*.required' => 'Fix it Rick!'],
+            payload: [],
+        )
+        ->assertErrors(
+            payload: [],
+            errors: ['name' => ['Fix it Rick!'], 'song' => ['Fix it Rick!']]
+        );
+});
+
+it('can manually set messages nested', function () {
+    class TestNestedValidationMessagesDataA extends Data
+    {
+        public string $name;
+
+        public string $song;
+
+        public static function messages(): array
+        {
+            return [
+                'name.required' => 'Fix it Rick!',
+            ];
+        }
+    }
+
+    DataValidationAsserter::for(new class () extends Data {
+        public TestNestedValidationMessagesDataA $nested;
+    })
+        ->assertMessages(
+            messages: ['nested.name.required' => 'Fix it Rick!'],
+            payload: ['nested' => ['song' => 'Never Gonna Give You Up']],
+        )
+        ->assertErrors(
+            payload: ['nested' => ['song' => 'Never Gonna Give You Up']],
+            errors: ['nested.name' => ['Fix it Rick!']]
+        );
+
+    class TestNestedValidationMessagesDataB extends Data
+    {
+        public string $name;
+
+        public string $song;
+
+        public static function messages(): array
+        {
+            return [
+                'name' => ['required' => 'Fix it Rick!'],
+            ];
+        }
+    }
+
+    DataValidationAsserter::for(new class () extends Data {
+        public TestNestedValidationMessagesDataB $nested;
+    })
+        ->assertMessages(
+            messages: ['nested.name' => ['required' => 'Fix it Rick!']],
+            payload: ['nested' => ['song' => 'Never Gonna Give You Up']],
+        )
+        ->assertErrors(
+            payload: ['nested' => ['song' => 'Never Gonna Give You Up']],
+            errors: ['nested.name' => ['Fix it Rick!']]
+        );
+
+    class TestNestedValidationMessagesDataC extends Data
+    {
+        public string $name;
+
+        public string $song;
+
+        public static function messages(): array
+        {
+            return [
+                'required' => 'Fix it Rick!',
+            ];
+        }
+    }
+
+    DataValidationAsserter::for(new class () extends Data {
+        public TestNestedValidationMessagesDataC $nested;
+    })
+        ->assertMessages(
+            messages: ['nested.*.required' => 'Fix it Rick!'],
+            payload: ['nested' => []],
+        )
+        ->assertErrors(
+            payload: ['nested' => []],
+            errors: [
+                'nested' => [__('validation.required', ['attribute' => 'nested'])],
+                'nested.name' => ['Fix it Rick!'],
+                'nested.song' => ['Fix it Rick!'],
+            ]
+        );
+
+    DataValidationAsserter::for(new class () extends Data {
+        public TestNestedValidationMessagesDataC $nested;
+
+        public static function messages(...$args): array
+        {
+            return [
+                'required' => 'Fix it Rick root!',
+            ];
+        }
+    })
+        ->assertMessages(
+            messages: [
+                '*.required' => 'Fix it Rick root!',
+                'nested.*.required' => 'Fix it Rick!',
+            ],
+            payload: ['nested' => []],
+        )
+        ->assertErrors(
+            payload: ['nested' => []],
+            errors: [
+                'nested' => ['Fix it Rick root!'],
+                'nested.name' => ['Fix it Rick!'],
+                'nested.song' => ['Fix it Rick!'],
+            ]
+        );
+});
+
+it('can manually set messages in collections', function () {
+    class TestCollectionValidationMessagesDataA extends Data
+    {
+        public string $name;
+
+        public string $song;
+
+        public static function messages(): array
+        {
+            return [
+                'name.required' => 'Fix it Rick!',
+            ];
+        }
+    }
+
+    DataValidationAsserter::for(new class () extends Data {
+        #[DataCollectionOf(TestCollectionValidationMessagesDataA::class)]
+        public DataCollection $collection;
+    })
+        ->assertMessages(
+            messages: ['collection.*.name.required' => 'Fix it Rick!'],
+            payload: ['collection' => [['song' => 'Never Gonna Give You Up']]],
+        )
+        ->assertErrors(
+            payload: [
+                'collection' => [
+                    ['song' => 'Never Gonna Give You Up'],
+                    ['song' => 'Together Forever'],
+                ],
+            ],
+            errors: [
+                'collection.0.name' => ['Fix it Rick!'],
+                'collection.1.name' => ['Fix it Rick!'],
+            ]
+        );
+
+    class TestCollectionValidationMessagesDataB extends Data
+    {
+        public string $name;
+
+        public string $song;
+
+        public static function messages(): array
+        {
+            return [
+                'name' => ['required' => 'Fix it Rick!'],
+            ];
+        }
+    }
+
+    DataValidationAsserter::for(new class () extends Data {
+        #[DataCollectionOf(TestCollectionValidationMessagesDataB::class)]
+        public DataCollection $collection;
+    })
+        ->assertMessages(
+            messages: ['collection.*.name' => ['required' => 'Fix it Rick!']],
+            payload: ['collection' => [['song' => 'Never Gonna Give You Up']]],
+        )
+        ->assertErrors(
+            payload: [
+                'collection' => [
+                    ['song' => 'Never Gonna Give You Up'],
+                    ['song' => 'Together Forever'],
+                ],
+            ],
+            errors: [
+                'collection.0.name' => ['Fix it Rick!'],
+                'collection.1.name' => ['Fix it Rick!'],
+            ]
+        );
+
+    class TestCollectionValidationMessagesDataC extends Data
+    {
+        public string $name;
+
+        public string $song;
+
+        public static function messages(): array
+        {
+            return [
+                'required' => 'Fix it Rick!',
+            ];
+        }
+    }
+
+    DataValidationAsserter::for(new class () extends Data {
+        #[DataCollectionOf(TestCollectionValidationMessagesDataC::class)]
+        public DataCollection $collection;
+    })
+        ->assertMessages(
+            messages: ['collection.*.*.required' => 'Fix it Rick!'],
+            payload: ['collection' => [['song' => 'Never Gonna Give You Up']]],
+        )
+        ->assertErrors(
+            payload: [
+                'collection' => [
+                    ['song' => 'Never Gonna Give You Up'],
+                    ['song' => 'Together Forever'],
+                ],
+            ],
+            errors: [
+                'collection.0.name' => ['Fix it Rick!'],
+                'collection.1.name' => ['Fix it Rick!'],
+            ]
+        );
 });
 
 it('can resolve validation dependencies for messages', function () {
@@ -1471,11 +1741,72 @@ it('can manually set validation attributes ', function () {
         }
     };
 
-    DataValidationAsserter::for($data)->assertErrors(
-        payload: ['name' => null],
-        errors: ['name' => [__('validation.required', ['attribute' => 'rickster'])]]
-    );
+    DataValidationAsserter::for($data)
+        ->assertAttributes([
+            'name' => 'rickster',
+        ])
+        ->assertErrors(
+            payload: ['name' => null],
+            errors: ['name' => [__('validation.required', ['attribute' => 'rickster'])]]
+        );
 });
+
+it('can manually set nested validation attributes ', function () {
+    class TestNestedValidationAttributesData extends Data
+    {
+        public string $name;
+
+        public static function attributes(): array
+        {
+            return [
+                'name' => 'rickster',
+            ];
+        }
+    }
+
+    $data = new class () extends Data {
+        public TestNestedValidationAttributesData $nested;
+    };
+
+    DataValidationAsserter::for($data)
+        ->assertAttributes(
+            ['nested.name' => 'rickster'],
+            payload: ['nested' => ['name' => null]]
+        )
+        ->assertErrors(
+            payload: ['nested' => ['name' => null]],
+            errors: ['nested.name' => [__('validation.required', ['attribute' => 'rickster'])]]
+        );
+});
+
+it('can manually set collected validation attributes ', function () {
+    class TestCollectedValidationAttributesData extends Data
+    {
+        public string $name;
+
+        public static function attributes(): array
+        {
+            return [
+                'name' => 'rickster',
+            ];
+        }
+    }
+
+    $data = new class () extends Data {
+        #[DataCollectionOf(TestCollectedValidationAttributesData::class)]
+        public DataCollection $collection;
+    };
+
+    DataValidationAsserter::for($data)
+        ->assertAttributes(
+            ['collection.*.name' => 'rickster'],
+            payload: ['collection' => [['name' => null]]],
+        )
+        ->assertErrors(
+            payload: ['collection' => [['name' => null]]],
+            errors: ['collection.0.name' => [__('validation.required', ['attribute' => 'rickster'])]]
+        );
+})->skip('Feature not supported by Laravel at the moment');
 
 it('can resolve validation dependencies for attributes ', function () {
     FakeInjectable::setup('Rick Astley');

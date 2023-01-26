@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Tests\TestSupport;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\ValidationRuleParser;
 
+use Spatie\LaravelData\Resolvers\DataValidatorResolver;
 use function PHPUnit\Framework\assertTrue;
 
 use Spatie\LaravelData\Data;
@@ -121,6 +122,34 @@ class DataValidationAsserter
         }
 
         assertTrue(false, 'No validation errors');
+
+        return $this;
+    }
+
+    public function assertMessages(
+        array $messages,
+        array $payload = []
+    ): self {
+        $validator = app(DataValidatorResolver::class)->execute(
+            $this->dataClass,
+            $this->pipePayload($payload),
+        );
+
+        expect($validator->customMessages)->toEqual($messages);
+
+        return $this;
+    }
+
+    public function assertAttributes(
+        array $attributes,
+        array $payload = []
+    ): self {
+        $validator = app(DataValidatorResolver::class)->execute(
+            $this->dataClass,
+            $this->pipePayload($payload),
+        );
+
+        expect($validator->customAttributes)->toEqual($attributes);
 
         return $this;
     }
