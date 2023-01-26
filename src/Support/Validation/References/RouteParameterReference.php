@@ -15,7 +15,7 @@ class RouteParameterReference implements Stringable
 
     public function getValue(): string
     {
-        $parameter = \request()?->route($this->name);
+        $parameter = \request()->route($this->name);
 
         if ($parameter === null) {
             throw CannotResolveRouteParameterReference::parameterNotFound($this->name, $this->property);
