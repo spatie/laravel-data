@@ -5,13 +5,13 @@ use Illuminate\Http\Request;
 
 use function Pest\Laravel\mock;
 
-use Spatie\LaravelData\Attributes\FromRouteModel;
+use Spatie\LaravelData\Attributes\FromRouteParameter;
 
 use Spatie\LaravelData\Data;
 
 it('can fill data properties from a route model', function () {
     $dataClass = new class () extends Data {
-        #[FromRouteModel('something')]
+        #[FromRouteParameter('something')]
         public int $id;
     };
 
@@ -32,9 +32,9 @@ it('can fill data properties from a route model', function () {
 
 it('can fill data properties from a route model using custom property mapping ', function () {
     $dataClass = new class () extends Data {
-        #[FromRouteModel('something', 'name')]
+        #[FromRouteParameter('something', 'name')]
         public string $title;
-        #[FromRouteModel('something', 'nested.foo')]
+        #[FromRouteParameter('something', 'nested.foo')]
         public string $foo;
     };
 
@@ -59,7 +59,7 @@ it('can fill data properties from a route model using custom property mapping ',
 
 it('replaces properties when route model properties exist', function () {
     $dataClass = new class () extends Data {
-        #[FromRouteModel('something')]
+        #[FromRouteParameter('something')]
         public string $name;
     };
 
@@ -80,9 +80,9 @@ it('replaces properties when route model properties exist', function () {
 
 it('skips replacing properties when route model properties exist and replacing is disabled', function () {
     $dataClass = new class () extends Data {
-        #[FromRouteModel('something', replaceWhenPresentInBody: false)]
+        #[FromRouteParameter('something', replaceWhenPresentInBody: false)]
         public string $name;
-        #[FromRouteModel('something', 'long', false)]
+        #[FromRouteParameter('something', 'long', false)]
         public string $description;
     };
 
@@ -98,7 +98,7 @@ it('skips replacing properties when route model properties exist and replacing i
 
 it('skips properties it cannot find a route model for', function () {
     $dataClass = new class () extends Data {
-        #[FromRouteModel('something')]
+        #[FromRouteParameter('something')]
         public string $name;
     };
 

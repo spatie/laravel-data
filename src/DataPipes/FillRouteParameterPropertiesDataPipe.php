@@ -2,13 +2,12 @@
 
 namespace Spatie\LaravelData\DataPipes;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Attributes\FromRouteModel;
+use Spatie\LaravelData\Attributes\FromRouteParameter;
 use Spatie\LaravelData\Support\DataClass;
 
-class FillRouteModelPropertiesDataPipe implements DataPipe
+class FillRouteParameterPropertiesDataPipe implements DataPipe
 {
     public function handle(mixed $payload, DataClass $class, Collection $properties): Collection
     {
@@ -17,7 +16,7 @@ class FillRouteModelPropertiesDataPipe implements DataPipe
         }
 
         foreach ($class->properties as $dataProperty) {
-            if (! ($attribute = $dataProperty->attributes->first(fn ($attribute) => $attribute instanceof FromRouteModel))) {
+            if (! ($attribute = $dataProperty->attributes->first(fn ($attribute) => $attribute instanceof FromRouteParameter))) {
                 continue;
             }
 
@@ -28,7 +27,7 @@ class FillRouteModelPropertiesDataPipe implements DataPipe
             if (($model = $payload->route($attribute->routeParameter))) {
                 $properties->put(
                     $dataProperty->name,
-                    data_get($model, $attribute->modelProperty ?? $dataProperty->name)
+                    data_get($model, $attribute->property ?? $dataProperty->name)
                 );
             }
         }
