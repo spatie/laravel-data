@@ -15,17 +15,21 @@ it('can fill data properties from scalar route parameters', function () {
         public int $id;
         #[FromRouteParameter('slug')]
         public string $slug;
+        #[FromRouteParameter('title', 'long')]
+        public ?string $title;
     };
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('id')->once()->andReturns(123);
     $requestMock->expects('route')->with('slug')->once()->andReturns('foo-bar');
+    $requestMock->expects('route')->with('title')->once()->andReturns('Foo Bar');
     $requestMock->expects('toArray')->andReturns([]);
 
     $data = $dataClass::from($requestMock);
 
     expect($data->id)->toEqual(123);
     expect($data->slug)->toEqual('foo-bar');
+    expect($data->title)->toEqual(null);
 });
 
 it('can fill data properties from non-scalar route properties (models, objects, arrays)', function () {
