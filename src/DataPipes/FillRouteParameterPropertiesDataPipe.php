@@ -24,10 +24,10 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            if (($model = $payload->route($attribute->routeParameter))) {
+            if (($parameter = $payload->route($attribute->routeParameter))) {
                 $properties->put(
                     $dataProperty->name,
-                    data_get($model, $attribute->property ?? $dataProperty->name)
+                    data_get($parameter, $attribute->property ?? $dataProperty->name)
                 );
             }
         }
