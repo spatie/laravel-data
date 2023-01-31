@@ -25,9 +25,11 @@ class FillRouteModelPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            if (($model = $payload->route($attribute->routeParameter)) instanceof Model) {
-                $routeModelProperty = $attribute->modelProperty ?? $dataProperty->name;
-                $properties->put($dataProperty->name, data_get($model, $routeModelProperty));
+            if (($model = $payload->route($attribute->routeParameter))) {
+                $properties->put(
+                    $dataProperty->name,
+                    data_get($model, $attribute->modelProperty ?? $dataProperty->name)
+                );
             }
         }
 
