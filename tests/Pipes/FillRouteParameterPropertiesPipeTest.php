@@ -9,7 +9,7 @@ use Spatie\LaravelData\Attributes\FromRouteParameter;
 
 use Spatie\LaravelData\Data;
 
-it('can fill data properties from a route model', function () {
+it('can fill data properties from a route parameter', function () {
     $dataClass = new class () extends Data {
         #[FromRouteParameter('something')]
         public int $id;
@@ -30,7 +30,7 @@ it('can fill data properties from a route model', function () {
     expect($data->id)->toEqual(123);
 });
 
-it('can fill data properties from a route model using custom property mapping ', function () {
+it('can fill data properties from a route parameter using custom property mapping ', function () {
     $dataClass = new class () extends Data {
         #[FromRouteParameter('something', 'name')]
         public string $title;
@@ -57,7 +57,7 @@ it('can fill data properties from a route model using custom property mapping ',
     expect($data->foo)->toEqual('bar');
 });
 
-it('replaces properties when route model properties exist', function () {
+it('replaces properties when route parameter properties exist', function () {
     $dataClass = new class () extends Data {
         #[FromRouteParameter('something')]
         public string $name;
@@ -78,7 +78,7 @@ it('replaces properties when route model properties exist', function () {
     expect($data->name)->toEqual('Best');
 });
 
-it('skips replacing properties when route model properties exist and replacing is disabled', function () {
+it('skips replacing properties when route parameter properties exist and replacing is disabled', function () {
     $dataClass = new class () extends Data {
         #[FromRouteParameter('something', replaceWhenPresentInBody: false)]
         public string $name;
@@ -96,7 +96,7 @@ it('skips replacing properties when route model properties exist and replacing i
     expect($data->description)->toEqual('Description');
 });
 
-it('skips properties it cannot find a route model for', function () {
+it('skips properties it cannot find a route parameter for', function () {
     $dataClass = new class () extends Data {
         #[FromRouteParameter('something')]
         public string $name;
