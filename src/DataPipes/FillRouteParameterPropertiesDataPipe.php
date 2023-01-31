@@ -25,10 +25,13 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
             }
 
             if (($parameter = $payload->route($attribute->routeParameter))) {
-                $properties->put(
-                    $dataProperty->name,
-                    data_get($parameter, $attribute->property ?? $dataProperty->name)
-                );
+                if ($attribute->property === false || (! $attribute->property && is_scalar($parameter))) {
+                    $value = $parameter;
+                } else {
+                    $value = data_get($parameter, $attribute->property ?? $dataProperty->name);
+                }
+
+                $properties->put($dataProperty->name, $value);
             }
         }
 
