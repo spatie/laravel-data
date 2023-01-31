@@ -9,7 +9,7 @@ use Spatie\LaravelData\Attributes\FromRouteParameter;
 
 use Spatie\LaravelData\Data;
 
-it('can fill data properties from a route parameter', function () {
+it('can fill data properties from a route model', function () {
     $dataClass = new class () extends Data {
         #[FromRouteParameter('something')]
         public int $id;
@@ -23,6 +23,21 @@ it('can fill data properties from a route parameter', function () {
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('something')->once()->andReturns($somethingMock);
+    $requestMock->expects('toArray')->andReturns([]);
+
+    $data = $dataClass::from($requestMock);
+
+    expect($data->id)->toEqual(123);
+});
+
+it('can fill data properties from a route parameter that is an array', function () {
+    $dataClass = new class () extends Data {
+        #[FromRouteParameter('something')]
+        public int $id;
+    };
+
+    $requestMock = mock(Request::class);
+    $requestMock->expects('route')->with('something')->once()->andReturns(['id' => 123]);
     $requestMock->expects('toArray')->andReturns([]);
 
     $data = $dataClass::from($requestMock);
