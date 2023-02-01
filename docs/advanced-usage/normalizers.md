@@ -12,10 +12,10 @@ SongData::from(Song::findOrFail($id));
 
 A `Normalizer` will take a payload like a model and will transform it into an array so it can be used in the pipeline (see further).
 
-By default, there are four normalizers for each data object:
+By default, there are five normalizers for each data object:
 
 - **ModelNormalizer** will cast eloquent models
-- **ArraybleNormalizer** will cast `Arrayable`'s
+- **ArrayableNormalizer** will cast `Arrayable`'s
 - **ObjectNormalizer** will cast `stdObject`'s
 - **ArrayNormalizer** will cast arrays
 - **JsonNormalizer** will cast json strings
@@ -34,7 +34,7 @@ class SongData extends Data
     {
         return [
             ModelNormalizer::class,
-            ArraybleNormalizer::class,
+            ArrayableNormalizer::class,
             ObjectNormalizer::class,
             ArrayNormalizer::class,
             JsonNormalizer::class,
@@ -46,7 +46,7 @@ class SongData extends Data
 A normalizer implements the `Normalizer` interface and should return an array representation of the payload, or null if it cannot normalize the payload:
 
 ```php
-class ArraybleNormalizer implements Normalizer
+class ArrayableNormalizer implements Normalizer
 {
     public function normalize(mixed $value): ?array
     {

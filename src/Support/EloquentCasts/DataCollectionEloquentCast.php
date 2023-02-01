@@ -12,7 +12,8 @@ use Spatie\LaravelData\Exceptions\CannotCastData;
 class DataCollectionEloquentCast implements CastsAttributes
 {
     public function __construct(
-        protected string $dataClass
+        protected string $dataClass,
+        protected string $dataCollectionClass = DataCollection::class,
     ) {
     }
 
@@ -29,7 +30,7 @@ class DataCollectionEloquentCast implements CastsAttributes
             $data
         );
 
-        return new DataCollection($this->dataClass, $data);
+        return new ($this->dataCollectionClass)($this->dataClass, $data);
     }
 
     public function set($model, string $key, $value, array $attributes): ?string
@@ -53,7 +54,7 @@ class DataCollectionEloquentCast implements CastsAttributes
             $value
         );
 
-        $dataCollection = new DataCollection($this->dataClass, $data);
+        $dataCollection = new ($this->dataCollectionClass)($this->dataClass, $data);
 
         return $dataCollection->toJson();
     }

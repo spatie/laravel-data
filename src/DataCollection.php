@@ -143,6 +143,6 @@ class DataCollection implements DataCollectable, ArrayAccess
             throw CannotCastData::dataCollectionTypeRequired();
         }
 
-        return new DataCollectionEloquentCast(current($arguments));
+        return new DataCollectionEloquentCast(current($arguments), static::class);
     }
 }

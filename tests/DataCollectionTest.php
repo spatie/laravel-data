@@ -9,13 +9,15 @@ use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
-use Spatie\LaravelData\Tests\Fakes\CustomDataCollection;
-use Spatie\LaravelData\Tests\Fakes\CustomPaginatedDataCollection;
+use Spatie\LaravelData\Support\PartialTrees;
+use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
+use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 use function Spatie\Snapshots\assertMatchesJsonSnapshot;
+use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can get a paginated data collection', function () {
     $items = Collection::times(100, fn (int $index) => "Item {$index}");
@@ -419,7 +421,7 @@ it('can use magical creation methods to create a collection', function () {
 
 it('can return a custom data collection when collecting data', function () {
     $class = new class ('') extends Data {
-        protected static string $collectionClass = CustomDataCollection::class;
+        protected static string $_collectionClass = CustomDataCollection::class;
 
         public function __construct(public string $string)
         {
@@ -436,7 +438,7 @@ it('can return a custom data collection when collecting data', function () {
 
 it('can return a custom paginated data collection when collecting data', function () {
     $class = new class ('') extends Data {
-        protected static string $paginatedCollectionClass = CustomPaginatedDataCollection::class;
+        protected static string $_paginatedCollectionClass = CustomPaginatedDataCollection::class;
 
         public function __construct(public string $string)
         {
@@ -476,4 +478,40 @@ it('can return a sole data object without specifying an operator', function () {
 
     expect('A')
         ->toEqual($filtered->string);
+});
+
+
+it('can serialize and unserialize a data collection', function () {
+    $collection = SimpleData::collection(['A', 'B']);
+
+    $serialized = serialize($collection);
+
+    assertMatchesSnapshot($serialized);
+
+    $unserialized = unserialize($serialized);
+
+    expect($unserialized)->toBeInstanceOf(DataCollection::class);
+    expect($unserialized)->toEqual(SimpleData::collection(['A', 'B']));
+});
+
+it('during the serialization process some properties are thrown away', function () {
+    $collection = SimpleData::collection(['A', 'B']);
+
+    $collection->withPartialTrees(new PartialTrees());
+    $collection->include('test');
+    $collection->exclude('test');
+    $collection->only('test');
+    $collection->except('test');
+    $collection->wrap('test');
+
+    $unserialized = unserialize(serialize($collection));
+
+    $invaded = invade($unserialized);
+
+    expect($invaded->_partialTrees)->toBeNull();
+    expect($invaded->_includes)->toBeEmpty();
+    expect($invaded->_excludes)->toBeEmpty();
+    expect($invaded->_only)->toBeEmpty();
+    expect($invaded->_except)->toBeEmpty();
+    expect($invaded->_wrap)->toBeNull();
 });

@@ -118,4 +118,4 @@ class SongData extends Data
 
 ## Creating your own casts
 
-It is possible to create your casts. You can read more about this in the [advanced chapter](/docs/laravel-data/v2/advanced-usage/creating-a-cast).
+It is possible to create your casts. You can read more about this in the [advanced chapter](/docs/laravel-data/v3/advanced-usage/creating-a-cast).

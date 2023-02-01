@@ -55,7 +55,7 @@ The `handle` method has several arguments:
 
 - **payload** the non normalized payload
 - **class** the `DataClass` object for the data
-  object [more info](/docs/laravel-data/v2/advanced-usage/internal-structures)
+  object [more info](/docs/laravel-data/v3/advanced-usage/internal-structures)
 - **properties** the key-value properties which will be used to construct the data object
 
 When using a magic creation methods, the pipeline is not being used (since you manually overwrite how a data object is
@@ -99,4 +99,18 @@ $song = Song::from([
     'release_year' => '1987',
     'producer' => 'Stock Aitken Waterman',
 ]);
+```
+
+## Extending the pipeline within your data class
+
+Sometimes you want to send your payload first through a certain pipe without creating a whole new pipeline, this can be done as such:
+
+```php
+class Song extends Data
+{
+    public static function pipeline(): DataPipeline
+    {
+        return parent::pipeline()->firstThrough(GuessCasingForKeyDataPipe::class);
+    }
+}
 ```

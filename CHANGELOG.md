@@ -2,6 +2,30 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.0.0 - 2023-02-01
+
+- The validation logic is completely rewritten
+    - Add support for nested nullable and optional data objects
+    - Allow referencing other fields in validation attributes when the data is nested
+    - Allow referencing url parameters (and even model properties) in validation attributes
+    - Allow circular dependencies when validating data
+    - Add support for nested validation messages and attributes
+- Package specific properties are renamed to avoid conflicts
+- Serialization logic updated to only serialize your properties
+- Prevent fatal error when passing a string containing only an integer to JSON Normalizer (#322)
+- Ignore leading ! in DateTimeInterfaceTransformer (#325)
+- Extend the make:data command to be more flexible (#335)
+  
+## 2.2.3 - 2023-01-24
+
+- Add Laravel 10.x support (#331)
+
+## 2.2.2 - 2023-01-09
+
+- Add a way to prepend DataPipes to the pipeline (#305)
+- Better IDE completion (#307)
+- Make eloquent collection cast respect collection (#308)
+
 ## 2.2.1 - 2022-12-21
 
 - fix support to return 201 status code in Json Responses (#291)

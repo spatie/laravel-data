@@ -3,9 +3,8 @@
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataMethod;
-use Spatie\LaravelData\Tests\DataWithDefaults;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
-use Spatie\LaravelData\Tests\Fakes\DummyModel;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 it('keeps track of a global map from attribute', function () {
@@ -34,8 +33,20 @@ it('will provide information about the constructor', function () {
 });
 
 it('will populate defaults to properties when they exist ', function () {
+    $dataClass = new class ('', '') extends Data {
+        public string $property;
+
+        public string $default_property = 'Hello';
+
+        public function __construct(
+            public string $promoted_property,
+            public string $default_promoted_property = 'Hello Again',
+        ) {
+        }
+    };
+
     /** @var \Spatie\LaravelData\Support\DataProperty[] $properties */
-    $properties = DataClass::create(new ReflectionClass(DataWithDefaults::class))->properties->values();
+    $properties = DataClass::create(new ReflectionClass($dataClass::class))->properties->values();
 
     expect($properties[0])
         ->name->toEqual('property')

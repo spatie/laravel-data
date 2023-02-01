@@ -68,7 +68,105 @@ class SongData extends Data
 When you provide an artist with a length of more than 20 characters, the validation will fail just like it would when
 you created a custom request class for the endpoint.
 
-You can find a complete list of available rules [here](/docs/laravel-data/v2/advanced-usage/validation-attributes).
+You can find a complete list of available rules [here](/docs/laravel-data/v3/advanced-usage/validation-attributes).
+
+### Referencing route parameters
+
+Sometimes you need a value within your validation attribute which is a route parameter. 
+Like the example below where the id should be unique ignoring the current id:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[Unique('songs', ignore: new RouteParameterReference('song'))]
+        public int $id,
+    ) {
+    }
+}
+```
+
+If the parameter is a model and another property should be used, then you can do the following:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[Unique('songs', ignore: new RouteParameterReference('song', 'uuid'))]
+        public string $uuid,
+    ) {
+    }
+}
+```
+
+### Referencing other fields
+
+It is possible to reference other fields in validation attributes:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[RequiredUnless('title', 'Never Gonna Give You Up')]
+        public string $artist,
+    ) {
+    }
+}
+```
+
+These references are always relative to the current data object. So when being nested like this:
+
+```php
+class AlbumData extends Data
+{
+    public function __construct(
+        public string $album_name,
+        public SongData $song,
+    ) {
+    }
+}
+```
+
+The generated rules will look like this:
+
+```php
+[
+    'album_name' => ['required', 'string'],
+    'songs' => ['required', 'array'],
+    'song.title' => ['required', 'string'],
+    'song.artist' => ['string', 'required_if:song.title,"Never Gonna Give You Up"'],
+]
+```
+
+If you want to reference fields starting from the root data object you can do the following:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[RequiredUnless(new FieldReference('album', fromRoot: true), 'Whenever You Need Somebody')]
+        public string $artist,
+    ) {
+    }
+}
+```
+
+The rules will now look like this:
+
+```php
+[
+    'album_name' => ['required', 'string'],
+    'songs' => ['required', 'array'],
+    'song.title' => ['required', 'string'],
+    'song.artist' => ['string', 'required_if:album_name,"Whenever You Need Somebody"'],
+]
+```
+
+### Rule attribute
 
 One special attribute is the `Rule` attribute. With it, you can write rules just like you would when creating a custom
 Laravel request:
@@ -155,6 +253,7 @@ class SongData extends Data
 }
 ```
 
+Sometimes a bit more context is required, in such case a `ValidationContext` parameter can be injected as such:
 Additionally, if you need to access the data payload, you can use `$payload` parameter:
 
 ```php
@@ -166,17 +265,18 @@ class SongData extends Data
     ) {
     }
     
-    public static function rules(array $payload): array
+    public static function rules(ValidationContext $context): array
     {
         return [
             'title' => ['required'],
-            'artist' => Rule::requiredIf($payload['title'] !== 'Never Gonna Give You Up'),
+            'artist' => Rule::requiredIf($context->fullPayload['title'] !== 'Never Gonna Give You Up'),
         ];
     }
 }
 ```
 
-By default, the provided payload is the whole request payload provided to the data object. If you want to generate rules in nested data objects then a relative payload can be more useful. You can inject such payload as follows:
+By default, the provided payload is the whole request payload provided to the data object. 
+If you want to generate rules in nested data objects then a relative payload can be more useful:
 
 ```php
 class AlbumData extends Data
@@ -197,11 +297,11 @@ class SongData extends Data
     ) {
     }
     
-    public static function rules(array $relativePayload): array
+    public static function rules(ValidationContext $context): array
     {
         return [
             'title' => ['required'],
-            'artist' => Rule::requiredIf($relativePayload['title'] !== 'Never Gonna Give You Up'),
+            'artist' => Rule::requiredIf($context->payload['title'] !== 'Never Gonna Give You Up'),
         ];
     }
 }
@@ -231,9 +331,9 @@ The rules will be:
 ]
 ```
 
-Make sure the name of the parameter is `$relativePayload` in the `rules` method, otherwise no payload will be injected.
+It is also possible to retrieve the current path in the data object chain we're generating rules for right now by calling `$context->path`. In the case of our previous example this would be `songs.0` and `songs.1`;
 
-As you can see we're using the `NestedRules` [rule](https://laravel.com/docs/9.x/validation#accessing-nested-array-data) recently introduced with Laravel. This feature will not work if you're not using Laravel 9!
+Make sure the name of the parameter is `$context` in the `rules` method, otherwise no context will be injected.
 
 ## Mapping a request onto a data object
 
@@ -269,8 +369,7 @@ You can resolve a data object from the container.
 app(SongData::class);
 ```
 
-We resolve a data object from the container, it's properties will allready be filled by the values of the request with
-matching key names.
+We resolve a data object from the container, it's properties will allready be filled by the values of the request with matching key names.
 If the request contains data that is not compatible with the data object, a validation exception will be thrown.
 
 ### Automatically inferring rules for properties
@@ -287,11 +386,11 @@ Rule inferrers are configured in the `data.php` config file:
  * the type of the property.
  */
 'rule_inferrers' => [
-    Spatie\LaravelData\RuleInferrers\SometimesRuleInferrer::class,
-    Spatie\LaravelData\RuleInferrers\BuiltInTypesRuleInferrer::class,
-    Spatie\LaravelData\RuleInferrers\AttributesRuleInferrer::class,
-    Spatie\LaravelData\RuleInferrers\NullableRuleInferrer::class,
-    Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer::class,
+    Spatie\LaravelData\Normalizers\ModelNormalizer::class,
+    Spatie\LaravelData\Normalizers\ArrayableNormalizer::class,
+    Spatie\LaravelData\Normalizers\ObjectNormalizer::class,
+    Spatie\LaravelData\Normalizers\ArrayNormalizer::class,
+    Spatie\LaravelData\Normalizers\JsonNormalizer::class,
 ],
 ```
 
@@ -308,7 +407,7 @@ By default, four rule inferrers are enabled:
 - **AttributesRuleInferrer** will make sure that rule attributes we described above will also add their rules
 
 It is possible to write your rule inferrers. You can find more
-information [here](/docs/laravel-data/v2/advanced-usage/creating-a-rule-inferrer).
+information [here](/docs/laravel-data/v3/advanced-usage/creating-a-rule-inferrer).
 
 ### Skipping validation
 
@@ -597,7 +696,7 @@ SongData::validateAndCreate(['title' => 'Never gonna give you up', 'artist' => '
 You can retrieve the validation rules a data object will generate as such:
 
 ```php
-AlbumData::getValidationRules();
+AlbumData::getValidationRules($payload;
 ```
 
 This will produce the following array with rules:
@@ -611,55 +710,6 @@ This will produce the following array with rules:
 ]
 ```
 
-You can also select specific fields as such:
+## Payload requirement
 
-```php
-AlbumData::getValidationRules(['title']);
-```
-
-Which will provide you the following rules:
-
-```php
-[
-    'title' => ['required', 'string'],
-]
-```
-
-When you're having rules depending on a specific payload, you can provide the payload:
-
-```php
-AlbumData::getValidationRules(payload: $payload);
-```
-
-## Validation and nesting or collecting the same class
-
-Be aware that it is impossible to nest or collect the same class and then create validation rules. The following examples will cause an infinite loop because the rules will be generated each time again and again until your memory runs dry:
-
-```php
-class Genre extends Data {
-  public function __construct(
-    public int $id,
-    public string $name,
-    public ?Genre $sub_genre
-  ) {}
-}
-```
-
-```php
-class Genre extends Data {
-  public function __construct(
-    public int $id,
-    public string $name,
-    #[DataCollectionOf(Genre::class)]
-    public DataCollection $sub_genre
-  ) {}
-}
-```
-
-You can still use this package with these kinds of data objects. Magic creation methods, transforming, and all other functionalities of this package will still work.
-
-But using this data object to generate validation rules is impossible. Notice that the package also generates validation rules when injecting a data object in a controller. The best solution in such a case is manually defining validation rules and using a magical creation method to create the data objects like this:
-
-```php
-Genre::from(request()->all());
-```
+We suggest always to provide a payload when generating validation rules. Because such a payload is used to determine which rules will be generated and which can be skipped.

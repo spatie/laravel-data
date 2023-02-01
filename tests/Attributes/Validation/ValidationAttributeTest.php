@@ -2,8 +2,8 @@
 
 use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\Validation\StringType;
-use Spatie\LaravelData\Attributes\Validation\ValidationAttribute;
-use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
+use Spatie\LaravelData\Attributes\Validation\StringValidationAttribute;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 
 it('can get a string representation of rules', function () {
     $rule = new StringType();
@@ -12,29 +12,28 @@ it('can get a string representation of rules', function () {
 });
 
 it('can normalize values', function ($input, $output) {
-    $normalizer = new class () extends ValidationAttribute {
-        public function execute(mixed $value): mixed
+    $normalizer = new class ([$input]) extends StringValidationAttribute {
+        public function __construct(protected array $parameters)
         {
-            return $this->normalizeValue($value);
-        }
-
-        public function getRules(): array
-        {
-            return [];
         }
 
         public static function create(string ...$parameters): static
         {
-            return new self();
+            return new static(...$parameters);
         }
 
         public static function keyword(): string
         {
-            return '';
+            return 'test';
+        }
+
+        public function parameters(): array
+        {
+            return $this->parameters;
         }
     };
 
-    expect($normalizer->execute($input))->toEqual($output);
+    expect((string) $normalizer)->toEqual("test:{$output}");
 })->with(function () {
     yield [
         'input' => 'Hello world',

@@ -3,24 +3,35 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Dimensions as BaseDimensions;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Dimensions extends ValidationAttribute
+class Dimensions extends ObjectValidationAttribute
 {
     protected BaseDimensions $rule;
 
     public function __construct(
-        ?int $minWidth = null,
-        ?int $minHeight = null,
-        ?int $maxWidth = null,
-        ?int $maxHeight = null,
-        null|float|string $ratio = null,
-        ?int $width = null,
-        ?int $height = null,
-        ?BaseDimensions $rule = null,
+        null|int|RouteParameterReference $minWidth = null,
+        null|int|RouteParameterReference $minHeight = null,
+        null|int|RouteParameterReference $maxWidth = null,
+        null|int|RouteParameterReference $maxHeight = null,
+        null|float|string|RouteParameterReference $ratio = null,
+        null|int|RouteParameterReference $width = null,
+        null|int|RouteParameterReference $height = null,
+        null|BaseDimensions $rule = null,
     ) {
+        $minWidth = $this->normalizePossibleRouteReferenceParameter($minWidth);
+        $minHeight = $this->normalizePossibleRouteReferenceParameter($minHeight);
+        $maxWidth = $this->normalizePossibleRouteReferenceParameter($maxWidth);
+        $maxHeight = $this->normalizePossibleRouteReferenceParameter($maxHeight);
+        $ratio = $this->normalizePossibleRouteReferenceParameter($ratio);
+        $width = $this->normalizePossibleRouteReferenceParameter($width);
+        $height = $this->normalizePossibleRouteReferenceParameter($height);
+
         if (
             $minWidth === null
             && $minHeight === null
@@ -67,9 +78,9 @@ class Dimensions extends ValidationAttribute
         $this->rule = $rule;
     }
 
-    public function getRules(): array
+    public function getRule(ValidationPath $path): object|string
     {
-        return [$this->rule];
+        return $this->rule;
     }
 
     public static function keyword(): string
@@ -79,14 +90,10 @@ class Dimensions extends ValidationAttribute
 
     public static function create(string ...$parameters): static
     {
-        return new static(
-            $parameters['min_width'] ?? null,
-            $parameters['min_height'] ?? null,
-            $parameters['max_width'] ?? null,
-            $parameters['max_height'] ?? null,
-            $parameters['ratio'] ?? null,
-            $parameters['width'] ?? null,
-            $parameters['height'] ?? null,
-        );
+        $parameters = collect($parameters)->mapWithKeys(function (string $parameter) {
+            return [Str::camel(Str::before($parameter, '=')) => Str::after($parameter, '=')];
+        })->all();
+
+        return new static(...$parameters);
     }
 }

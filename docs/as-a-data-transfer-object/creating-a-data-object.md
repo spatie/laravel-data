@@ -97,7 +97,7 @@ class ContractData extends Data
 }
 ```
 
-You can also use the `MapName` attribute when you want to combine input (see [transforming data objects](https://spatie.be/docs/laravel-data/v2/as-a-resource/from-data-to-resource#mapping-property-names)) and output property name mapping:
+You can also use the `MapName` attribute when you want to combine input (see [transforming data objects](https://spatie.be/docs/laravel-data/v3/as-a-resource/from-data-to-resource#mapping-property-names)) and output property name mapping:
 
 ```php
 #[MapName(SnakeCaseMapper::class)]
@@ -209,9 +209,9 @@ will try to create itself from the following types:
 - An *Arrayable* by calling `toArray` on it
 - An *array*
 
-This list can be extended using extra normalizers, find more about it [here](https://spatie.be/docs/laravel-data/v2/advanced-usage/normalizers).
+This list can be extended using extra normalizers, find more about it [here](https://spatie.be/docs/laravel-data/v3/advanced-usage/normalizers).
 
-When a data object cannot be created using magical methods or the default methods, a `CannotCreateDataFromValue`
+When a data object cannot be created using magical methods or the default methods, a `CannotCreateData`
 exception will be thrown.
 
 ## Optional creation
@@ -236,7 +236,7 @@ SongData::withoutMagicalCreationFrom($song);
 
 ## Advanced creation
 
-Internally this package is using a pipeline to create a data object from something. This pipeline exists of steps which transform properties into a correct structure and it can be completely customized. You can read more about it [here](/docs/laravel-data/v2/advanced-usage/pipeline).
+Internally this package is using a pipeline to create a data object from something. This pipeline exists of steps which transform properties into a correct structure and it can be completely customized. You can read more about it [here](/docs/laravel-data/v3/advanced-usage/pipeline).
 
 ## Quickly getting data from Models, Requests, ...
 

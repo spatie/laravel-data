@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\DB;
 
 use function Pest\Laravel\assertDatabaseHas;
 
-use Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 beforeEach(function () {
@@ -36,7 +36,7 @@ it('can load a data object', function () {
         'data' => json_encode(['string' => 'Test']),
     ]);
 
-    /** @var \Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts $model */
+    /** @var \Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts $model */
     $model = DummyModelWithCasts::first();
 
     expect($model->data)->toEqual(new SimpleData('Test'));
@@ -57,7 +57,7 @@ it('can load null as a value', function () {
         'data' => null,
     ]);
 
-    /** @var \Spatie\LaravelData\Tests\Fakes\DummyModelWithCasts $model */
+    /** @var \Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts $model */
     $model = DummyModelWithCasts::first();
 
     expect($model->data)->toBeNull();

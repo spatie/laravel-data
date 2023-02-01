@@ -34,10 +34,10 @@ return [
      */
     'rule_inferrers' => [
         Spatie\LaravelData\RuleInferrers\SometimesRuleInferrer::class,
-        Spatie\LaravelData\RuleInferrers\BuiltInTypesRuleInferrer::class,
-        Spatie\LaravelData\RuleInferrers\AttributesRuleInferrer::class,
         Spatie\LaravelData\RuleInferrers\NullableRuleInferrer::class,
         Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer::class,
+        Spatie\LaravelData\RuleInferrers\BuiltInTypesRuleInferrer::class,
+        Spatie\LaravelData\RuleInferrers\AttributesRuleInferrer::class,
     ],
 
     /**
@@ -67,5 +67,4 @@ return [
      * which will only enable the caster locally.
      */
     'var_dumper_caster_mode' => 'development',
-
 ];
