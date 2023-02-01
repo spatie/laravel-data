@@ -13,7 +13,8 @@ All notable changes to `laravel-data` will be documented in this file.
 - Package specific properties are renamed to avoid conflicts
 - Serialization logic updated to only serialize your properties
 - Prevent fatal error when passing a string containing only an integer to JSON Normalizer (#322)
-
+- Ignore leading ! in DateTimeInterfaceTransformer (#325)
+  
 ## 2.2.3 - 2023-01-24
 
 - Add Laravel 10.x support (#331)

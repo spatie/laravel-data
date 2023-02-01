@@ -18,13 +18,11 @@ class DateTimeInterfaceTransformer implements Transformer
     {
         [$format] = Arr::wrap($this->format ?? config('data.date_format'));
 
-        $format = ltrim($format, '!');
-
         /** @var \DateTimeInterface $value */
         if ($this->setTimeZone) {
             $value = (clone $value)->setTimezone(new DateTimeZone($this->setTimeZone));
         }
 
-        return $value->format($format);
+        return $value->format(ltrim($format, '!'));
     }
 }
