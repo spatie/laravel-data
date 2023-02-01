@@ -56,7 +56,7 @@ trait ValidateableData
         return;
     }
 
-    public static function getValidationRules(array $payload = []): array
+    public static function getValidationRules(array $payload): array
     {
         return app(DataValidationRulesResolver::class)->execute(
             static::class,

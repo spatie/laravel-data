@@ -31,8 +31,10 @@ class SomeData extends Data {
 ```
   - The type of `$rules` in the RuleInferrer handle method changed from `RulesCollection` to `PropertyRules`
   - RuleInferrers now take a $context parameter which is a `ValidationCOntext` in their handle method
+  - Validation attributes now keep track where they are being evaluated when you have nested data objects. Now field references are relative to the object and not to the root validated object
   - Some resolvers are removed like: `DataClassValidationRulesResolver`, `DataPropertyValidationRulesResolver`
   - The default order of rule inferrers has been changed
+  - The $payload parameter in the `getValidationRules` method is now required
   - The $fields parameter was removed from the `getValidationRules` method, this now should be done outside of the package 
 - all data specific properties are now prefixed with _, to avoid conflicts with properties with your own defined properties. This is especially important when overwriting `$collectionClass`, `$paginatedCollectionClass`, `$cursorPaginatedCollectionClass`, be sure to add the extra _ within your data classes.
 

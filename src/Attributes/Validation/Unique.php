@@ -6,6 +6,7 @@ use Attribute;
 use Closure;
 use Exception;
 use Illuminate\Validation\Rules\Unique as BaseUnique;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -14,13 +15,13 @@ class Unique extends ObjectValidationAttribute
     protected BaseUnique $rule;
 
     public function __construct(
-        null|string $table = null,
-        null|string $column = 'NULL',
-        null|string $connection = null,
-        null|string $ignore = null,
-        null|string $ignoreColumn = null,
-        bool $withoutTrashed = false,
-        string $deletedAtColumn = 'deleted_at',
+        null|string|RouteParameterReference $table = null,
+        null|string|RouteParameterReference $column = 'NULL',
+        null|string|RouteParameterReference $connection = null,
+        null|string|RouteParameterReference $ignore = null,
+        null|string|RouteParameterReference $ignoreColumn = null,
+        bool|RouteParameterReference $withoutTrashed = false,
+        string|RouteParameterReference $deletedAtColumn = 'deleted_at',
         ?Closure $where = null,
         ?BaseUnique $rule = null
     ) {

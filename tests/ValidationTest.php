@@ -13,6 +13,8 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
+use Spatie\LaravelData\Attributes\Validation\RequiredIf;
+use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
@@ -580,12 +582,12 @@ test('can use a reference to another field in nested data', function () {
     };
 
     DataValidationAsserter::for($dataClass)
-//        ->assertOk([
-//            'nested' => ['check_string' => '0'],
-//        ])
-//        ->assertErrors([
-//            'nested' => ['check_string' => '1'],
-//        ])
+        ->assertOk([
+            'nested' => ['check_string' => '0'],
+        ])
+        ->assertErrors([
+            'nested' => ['check_string' => '1'],
+        ])
         ->assertRules(
             rules: [
                 'nested' => ['required', 'array'],
@@ -660,6 +662,40 @@ test('can use a reference to another field in a collection with nested data', fu
                 'collection' => [
                     ['nested' => ['check_string' => '1']],
                 ],
+            ]
+        );
+});
+
+it('can reference to the root validated object in nested data', function () {
+    class TestDataWithRootReferenceFieldValidationAttribute extends Data
+    {
+        #[RequiredIf(new FieldReference('check_string', true), true)]
+        public string $string;
+    }
+
+    $dataClass = new class () extends Data {
+        public bool $check_string;
+
+        public TestDataWithRootReferenceFieldValidationAttribute $nested;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'check_string' => '0',
+            'nested' => ['something']
+        ])
+        ->assertErrors([
+            'check_string' => '1',
+            'nested' => ['something']
+        ])
+        ->assertRules(
+            rules: [
+                'check_string' => ['boolean'],
+                'nested' => ['required', 'array'],
+                'nested.string' => ['string', 'required_if:check_string,1'],
+            ],
+            payload: [
+                'nested' => ['check_string' => '1'],
             ]
         );
 });
@@ -1344,7 +1380,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
                 ],
             ];
         }
@@ -1353,7 +1389,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
         ],
     ]);
 });
@@ -1366,7 +1402,7 @@ it('can reference route parameters as values within rules', function () {
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('post_id')->andReturns('69');
-    $this->app->bind('request', fn () => $requestMock);
+    $this->app->bind('request', fn() => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1387,7 +1423,7 @@ it('can reference route models with a property as values within rules', function
     $requestMock->expects('route')->with('post')->andReturns(new DummyModel([
         'id' => 69,
     ]));
-    $this->app->bind('request', fn () => $requestMock);
+    $this->app->bind('request', fn() => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1971,7 +2007,7 @@ it('can validate non-requests payloads', function () {
 })->throws(ValidationException::class);
 
 it('can the validation rules for a data object', function () {
-    expect(MultiData::getValidationRules())->toEqual([
+    expect(MultiData::getValidationRules([]))->toEqual([
         'first' => ['required', 'string'],
         'second' => ['required', 'string'],
     ]);
@@ -1999,7 +2035,7 @@ it('can apply custom rules onto array properties', function () {
         }
     };
 
-    expect($dataClass::getValidationRules())->toEqual([
+    expect($dataClass::getValidationRules([]))->toEqual([
         'emails' => ['required', 'array', 'min:1', 'max:5'],
         'emails.*' => ['email'],
     ]);
