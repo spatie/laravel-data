@@ -8,17 +8,17 @@ use Stringable;
 class RouteParameterReference implements Stringable
 {
     public function __construct(
-        public readonly string $name,
+        public readonly string $routeParameter,
         public readonly ?string $property = null,
     ) {
     }
 
     public function getValue(): string
     {
-        $parameter = \request()->route($this->name);
+        $parameter = \request()->route($this->routeParameter);
 
         if ($parameter === null) {
-            throw CannotResolveRouteParameterReference::parameterNotFound($this->name, $this->property);
+            throw CannotResolveRouteParameterReference::parameterNotFound($this->routeParameter, $this->property);
         }
 
         if ($this->property === null) {
@@ -28,7 +28,7 @@ class RouteParameterReference implements Stringable
         $value = data_get($parameter, $this->property);
 
         if ($value === null) {
-            throw CannotResolveRouteParameterReference::propertyOnParameterNotFound($this->name, $this->property);
+            throw CannotResolveRouteParameterReference::propertyOnParameterNotFound($this->routeParameter, $this->property);
         }
 
         return $value;
