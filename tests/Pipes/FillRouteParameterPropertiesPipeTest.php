@@ -2,14 +2,12 @@
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-
-use Spatie\LaravelData\Attributes\FromRouteParameterProperty;
-use Spatie\LaravelData\Exceptions\CannotFillFromRouteParameterPropertyUsingScalarValue;
-use function Pest\Laravel\mock;
-
 use Spatie\LaravelData\Attributes\FromRouteParameter;
+use Spatie\LaravelData\Attributes\FromRouteParameterProperty;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Exceptions\CannotFillFromRouteParameterPropertyUsingScalarValue;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
+use function Pest\Laravel\mock;
 
 it('can fill data properties with route parameters', function () {
     $dataClass = new class () extends Data {
@@ -183,5 +181,4 @@ it('throws when trying to fill from a route parameter that has a scalar value', 
     $requestMock->expects('toArray')->andReturns([]);
 
     $dataClass::from($requestMock);
-});
-//})->throws(CannotFillFromRouteParameterPropertyUsingScalarValue::class);
+})->throws(CannotFillFromRouteParameterPropertyUsingScalarValue::class);
