@@ -108,7 +108,7 @@ trait BaseData
     {
         return app(DataConfig::class)->getDataClass(static::class)
             ->properties
-            ->map(fn(DataProperty $property) => $property->name)
+            ->map(fn (DataProperty $property) => $property->name)
             ->push('_additional')
             ->toArray();
     }
