@@ -15,10 +15,10 @@ it("won't create a data object from a regular string", function () {
     MultiData::from('Hello World');
 })->throws(CannotCreateData::class);
 
-it("won't create a data object from an integer", function() {
+it("won't create a data object from an integer", function () {
     MultiData::from(1234);
 })->throws(CannotCreateData::class);
 
-it("won't create a data object from a string containing only an integer", function() {
+it("won't create a data object from a string containing only an integer", function () {
     MultiData::from('1234');
 })->throws(CannotCreateData::class);
