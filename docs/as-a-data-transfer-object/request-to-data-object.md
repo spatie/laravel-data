@@ -207,6 +207,9 @@ class SongData extends Data
 }
 ```
 
+> When using the regex / not_regex patterns, it is necessary to specify rules in an array instead of using "|" delimiters,
+> especially if the regular expression contains a "|" character.
+
 It is even possible to use the validationAttribute objects within the `rules` method:
 
 ```php

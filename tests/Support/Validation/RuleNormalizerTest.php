@@ -5,6 +5,7 @@ use Illuminate\Validation\Rules\Exists as BaseExists;
 use Spatie\LaravelData\Attributes\Validation\Dimensions;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\Min;
+use Spatie\LaravelData\Attributes\Validation\Regex;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Support\Validation\RuleNormalizer;
@@ -24,6 +25,10 @@ it('can map string rules with arguments')
 it('can map string rules with key-value arguments')
     ->expect(fn () => $this->mapper->execute(['dimensions:min_width=100,min_height=200']))
     ->toEqual([new Dimensions(minWidth: 100, minHeight: 200)]);
+
+it('can map string rules with regex')
+    ->expect(fn () => $this->mapper->execute(['regex:/test|ok/']))
+    ->toEqual([new Regex('/test|ok/')]);
 
 it('can map multiple rules')
     ->expect(fn () => $this->mapper->execute(['required', 'min:0']))

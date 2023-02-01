@@ -7,6 +7,7 @@ use DateTimeInterface;
 use Illuminate\Contracts\Validation\InvokableRule as InvokableRuleContract;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\StringValidationAttribute;
@@ -19,7 +20,7 @@ class RuleDenormalizer
     public function execute(mixed $rule, ValidationPath $path): array
     {
         if (is_string($rule)) {
-            return explode('|', $rule);
+            return Str::contains($rule, 'regex:') ? [$rule] : explode('|', $rule);
         }
 
         if (is_array($rule)) {
