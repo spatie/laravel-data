@@ -2,7 +2,7 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
-## 3.0.0 - ????-??-??
+## 3.0.0 - 2023-02-01
 
 - The validation logic is completely rewritten
     - Add support for nested nullable and optional data objects
