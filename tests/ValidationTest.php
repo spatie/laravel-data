@@ -13,18 +13,17 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
-use Spatie\LaravelData\Attributes\Validation\RequiredIf;
-use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-
 use Spatie\LaravelData\Attributes\MapInputName;
+
 use Spatie\LaravelData\Attributes\MapName;
 
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Bail;
+
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\In;
 use Spatie\LaravelData\Attributes\Validation\IntegerType;
@@ -32,12 +31,13 @@ use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\RequiredIf;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\WithoutValidation;
-
 use Spatie\LaravelData\Data;
+
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
@@ -51,6 +51,7 @@ use Spatie\LaravelData\Normalizers\ArrayNormalizer;
 use Spatie\LaravelData\Normalizers\ModelNormalizer;
 use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Tests\Fakes\CircData;
@@ -682,11 +683,11 @@ it('can reference to the root validated object in nested data', function () {
     DataValidationAsserter::for($dataClass)
         ->assertOk([
             'check_string' => '0',
-            'nested' => ['something']
+            'nested' => ['something'],
         ])
         ->assertErrors([
             'check_string' => '1',
-            'nested' => ['something']
+            'nested' => ['something'],
         ])
         ->assertRules(
             rules: [
@@ -1380,7 +1381,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
                 ],
             ];
         }
@@ -1389,7 +1390,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
         ],
     ]);
 });
@@ -1402,7 +1403,7 @@ it('can reference route parameters as values within rules', function () {
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('post_id')->andReturns('69');
-    $this->app->bind('request', fn() => $requestMock);
+    $this->app->bind('request', fn () => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1423,7 +1424,7 @@ it('can reference route models with a property as values within rules', function
     $requestMock->expects('route')->with('post')->andReturns(new DummyModel([
         'id' => 69,
     ]));
-    $this->app->bind('request', fn() => $requestMock);
+    $this->app->bind('request', fn () => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
