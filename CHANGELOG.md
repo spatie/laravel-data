@@ -12,6 +12,7 @@ All notable changes to `laravel-data` will be documented in this file.
     - Add support for nested validation messages and attributes
 - Package specific properties are renamed to avoid conflicts
 - Serialization logic updated to only serialize your properties
+- Prevent fatal error when passing a string containing only an integer to JSON Normalizer (#322)
 
 ## 2.2.3 - 2023-01-24
 
