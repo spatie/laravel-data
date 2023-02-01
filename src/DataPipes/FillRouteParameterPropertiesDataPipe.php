@@ -5,6 +5,8 @@ namespace Spatie\LaravelData\DataPipes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\FromRouteParameter;
+use Spatie\LaravelData\Attributes\FromRouteParameterProperty;
+use Spatie\LaravelData\Exceptions\CannotFillFromRouteParameterPropertyUsingScalarValue;
 use Spatie\LaravelData\Support\DataClass;
 
 class FillRouteParameterPropertiesDataPipe implements DataPipe
@@ -16,7 +18,7 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
         }
 
         foreach ($class->properties as $dataProperty) {
-            if (! ($attribute = $dataProperty->attributes->first(fn ($attribute) => $attribute instanceof FromRouteParameter))) {
+            if (! ($attribute = $dataProperty->attributes->first(fn ($attribute) => $attribute instanceof FromRouteParameter || $attribute instanceof FromRouteParameterProperty))) {
                 continue;
             }
 
@@ -24,15 +26,21 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            if (($parameter = $payload->route($attribute->routeParameter))) {
-                if ($attribute->property === false || (! $attribute->property && is_scalar($parameter))) {
-                    $value = $parameter;
-                } else {
-                    $value = data_get($parameter, $attribute->property ?? $dataProperty->name);
+            if (! ($parameter = $payload->route($attribute->routeParameter))) {
+                continue;
+            }
+
+            if ($attribute instanceof FromRouteParameterProperty) {
+                if (is_scalar($parameter)) {
+                    throw CannotFillFromRouteParameterPropertyUsingScalarValue::create($dataProperty, $attribute, $parameter);
                 }
 
-                $properties->put($dataProperty->name, $value);
+                $value = data_get($parameter, $attribute->property ?? $dataProperty->name);
+            } else {
+                $value = $parameter;
             }
+
+            $properties->put($dataProperty->name, $value);
         }
 
         return $properties;
