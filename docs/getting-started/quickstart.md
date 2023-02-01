@@ -22,15 +22,7 @@ class PostData extends Data
 }
 ```
 
-The only requirement for using the package is extending your data objects from the base `Data` object. We add the requirements for a post as public properties. 
-
-You can easily generate new data objects with the artisan command `make:data`:
-
-```shell
-$ php artisan make:data PostData
-
-   INFO  Data [app/Data/PostData.php] created successfully.
-```
+The only requirement for using the package is extending your data objects from the base `Data` object. We add the requirements for a post as public properties.
 
 The `PostStatus` is an enum using the [spatie/enum](https://github.com/spatie/enum) package:
 
@@ -68,6 +60,20 @@ $post = PostData::from([
     'status' => PostStatus::published(),
     'published_at' => CarbonImmutable::now(),
 ]);
+```
+
+## The make:data command
+
+You can easily generate new data objects with the artisan command `make:data`:
+
+```shell
+php artisan make:data PostData
+```
+
+By default, this command puts data objects in the `App\Data` namespace, this can be changed as such:
+
+```shell
+php artisan make:data PostData --namespace=DataTransferObjects
 ```
 
 ## Using requests and casts

@@ -11,7 +11,9 @@ use Symfony\Component\Console\Input\InputOption;
 class DataMakeCommand extends GeneratorCommand
 {
     protected $name = 'make:data';
+
     protected $description = 'Create a new data class';
+
     protected $type = 'Data';
 
     protected function getStub(): string
@@ -23,31 +25,26 @@ class DataMakeCommand extends GeneratorCommand
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
-            : __DIR__.'/../..'.$stub;
+            : __DIR__ . '/../..' . $stub;
     }
 
     protected function getDefaultNamespace($rootNamespace): string
     {
-        $namespace = trim($this->option('namespace') ?? config('data.make.namespace', 'Data'), '\\');
+        $namespace = trim($this->option('namespace') ?? 'Data', '\\');
 
-        return trim($rootNamespace.'\\'.$namespace, '\\');
+        return trim($rootNamespace . '\\' . $namespace, '\\');
     }
 
     protected function qualifyClass($name): string
     {
-        $suffix = trim($this->option('suffix') ?? config('data.make.suffix', 'Data'));
+        $suffix = trim($this->option('suffix') ?? 'Data');
         if (! empty($suffix) && ! Str::endsWith($name, $suffix)) {
-            $name = $name.$suffix;
+            $name = $name . $suffix;
         }
 
         return parent::qualifyClass($name);
     }
 
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
     protected function getOptions(): array
     {
         return [
@@ -56,14 +53,14 @@ class DataMakeCommand extends GeneratorCommand
                 'N',
                 InputOption::VALUE_REQUIRED,
                 'The namespace (under \App) to place this Data class.',
-                config('data.make.namespace', 'Data'),
+                'Data',
             ],
             [
                 'suffix',
                 's',
                 InputOption::VALUE_REQUIRED,
                 'Suffix the class with this value.',
-                config('data.make.suffix', 'Data'),
+                'Data',
             ],
             [
                 'force',

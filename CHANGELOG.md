@@ -14,6 +14,7 @@ All notable changes to `laravel-data` will be documented in this file.
 - Serialization logic updated to only serialize your properties
 - Prevent fatal error when passing a string containing only an integer to JSON Normalizer (#322)
 - Ignore leading ! in DateTimeInterfaceTransformer (#325)
+- Extend the make:data command to be more flexible (#335)
   
 ## 2.2.3 - 2023-01-24
 
