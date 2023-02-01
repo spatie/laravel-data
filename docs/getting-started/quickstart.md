@@ -24,6 +24,14 @@ class PostData extends Data
 
 The only requirement for using the package is extending your data objects from the base `Data` object. We add the requirements for a post as public properties. 
 
+You can easily generate new data objects with the artisan command `make:data`:
+
+```shell
+$ php artisan make:data PostData
+
+   INFO  Data [app/Data/PostData.php] created successfully.
+```
+
 The `PostStatus` is an enum using the [spatie/enum](https://github.com/spatie/enum) package:
 
 ```php
