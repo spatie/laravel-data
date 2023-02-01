@@ -62,7 +62,9 @@ php artisan vendor:publish --tag=typescript-transformer-config
 ```
 
 Finally, add the `Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer` transformer to the
-transformers in the `typescript-transformer.php` config file.
+transformers in the `typescript-transformer.php` config file. 
+
+If you're using the `DtoTransformer` provided by the package, then be sure to put the `DataTypeScriptTransformer` before the `DtoTransformer`.
 
 ## Usage
 
@@ -78,6 +80,8 @@ php artisan typescript:transform
 
 If you want to transform all the data objects within your application to TypeScript, you can use
 the `DataTypeScriptCollector`, which should be added to the collectors in `typescript-transformer.php`.
+
+If you're using the `DefaultCollector` provided by the package, then be sure to put the `DataTypeScriptCollector` before the `DefaultCollector`.
 
 ### Optional types
 
