@@ -4,11 +4,12 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use DateTimeInterface;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class AfterOrEqual extends StringValidationAttribute
 {
-    public function __construct(protected string | DateTimeInterface $date)
+    public function __construct(protected string|DateTimeInterface|RouteParameterReference $date)
     {
     }
 
@@ -19,7 +20,7 @@ class AfterOrEqual extends StringValidationAttribute
 
     public function parameters(): array
     {
-        return [$this->normalizeValue($this->date)];
+        return [$this->date];
     }
 
     public static function create(string ...$parameters): static

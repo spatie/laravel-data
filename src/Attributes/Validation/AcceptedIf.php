@@ -4,12 +4,19 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use BackedEnum;
+use Spatie\LaravelData\Support\Validation\References\FieldReference;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class AcceptedIf extends StringValidationAttribute
 {
-    public function __construct(protected string $field, protected string|bool|int|float|BackedEnum $value)
-    {
+    protected FieldReference $field;
+
+    public function __construct(
+        string|FieldReference $field,
+        protected string|bool|int|float|BackedEnum|RouteParameterReference $value
+    ) {
+        $this->field = $this->parseFieldReference($field);
     }
 
     public static function keyword(): string
@@ -21,7 +28,7 @@ class AcceptedIf extends StringValidationAttribute
     {
         return [
             $this->field,
-            self::normalizeValue($this->value),
+            $this->value,
         ];
     }
 

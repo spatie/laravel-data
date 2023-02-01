@@ -134,3 +134,20 @@ it('can change the timezone', function () {
         )
     )->toEqual('1994-05-19T02:00:00+02:00');
 });
+
+it('can transform dates with leading !', function () {
+    $transformer = new DateTimeInterfaceTransformer();
+
+    $class = new class () {
+        public Carbon $carbon;
+    };
+
+    config(['data.date_format' => '!Y-m-d']);
+
+    expect(
+        $transformer->transform(
+            DataProperty::create(new ReflectionProperty($class, 'carbon')),
+            Carbon::createFromFormat('!Y-m-d', '1994-05-19')
+        )
+    )->toEqual('1994-05-19');
+});

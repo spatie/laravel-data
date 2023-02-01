@@ -2,6 +2,43 @@
 
 Because there are many breaking changes an upgrade is not that easy. There are many edge cases this guide does not cover. We accept PRs to improve this guide.
 
+## From v2 to v3
+
+Upgrading to laravel data shouldn't take long, we've documented all possible changes just to provide the whole context. You probably won't have to do anything:
+
+- Laravel 9 is now required
+- validation is completely rewritten 
+  - rules are now generated based upon the payload provided, not what a payload possibly could be. This means rules can change depending on the provided payload.
+  - When you're injecting a `$payload`, `$relativePayload` or `$path` parameter in a custom rules method in your data object, then remove this and use the new `ValidationContext`:
+
+```php
+class SomeData extends Data {
+    public bool $strict;
+
+    public string $property;
+
+    public static function rules(ValidationContext $context): array
+    {
+        if ($context->payload['strict'] === true) {
+            return [
+                'property' => ['in:strict'],
+            ];
+        }
+
+        return [];
+    }
+}
+```
+  - The type of `$rules` in the RuleInferrer handle method changed from `RulesCollection` to `PropertyRules`
+  - RuleInferrers now take a $context parameter which is a `ValidationCOntext` in their handle method
+  - Validation attributes now keep track where they are being evaluated when you have nested data objects. Now field references are relative to the object and not to the root validated object
+  - Some resolvers are removed like: `DataClassValidationRulesResolver`, `DataPropertyValidationRulesResolver`
+  - The default order of rule inferrers has been changed
+  - The $payload parameter in the `getValidationRules` method is now required
+  - The $fields parameter was removed from the `getValidationRules` method, this now should be done outside of the package 
+- all data specific properties are now prefixed with _, to avoid conflicts with properties with your own defined properties. This is especially important when overwriting `$collectionClass`, `$paginatedCollectionClass`, `$cursorPaginatedCollectionClass`, be sure to add the extra _ within your data classes.
+- Serialization logic is now updated and will only include data specific properties
+
 ## From v1 to v2
 
 High impact changes

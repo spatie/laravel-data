@@ -9,12 +9,17 @@ use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\Numeric;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Support\Validation\RulesCollection;
+use Spatie\LaravelData\Support\Validation\PropertyRules;
+use Spatie\LaravelData\Support\Validation\RequiringRule;
+use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 class BuiltInTypesRuleInferrer implements RuleInferrer
 {
-    public function handle(DataProperty $property, RulesCollection $rules): RulesCollection
-    {
+    public function handle(
+        DataProperty $property,
+        PropertyRules $rules,
+        ValidationContext $context,
+    ): PropertyRules {
         if ($property->type->acceptsType('int')) {
             $rules->add(new Numeric());
         }
@@ -24,6 +29,8 @@ class BuiltInTypesRuleInferrer implements RuleInferrer
         }
 
         if ($property->type->acceptsType('bool')) {
+            $rules->removeType(RequiringRule::class);
+
             $rules->add(new BooleanType());
         }
 

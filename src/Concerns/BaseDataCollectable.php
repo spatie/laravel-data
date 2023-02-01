@@ -52,4 +52,9 @@ trait BaseDataCollectable
 
         return $transformer->transform();
     }
+
+    public function __sleep(): array
+    {
+        return ['items', 'dataClass'];
+    }
 }

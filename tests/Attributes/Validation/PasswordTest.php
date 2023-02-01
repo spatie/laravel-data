@@ -2,22 +2,19 @@
 
 use Illuminate\Validation\Rules\Password as ValidationPassword;
 use Spatie\LaravelData\Attributes\Validation\Password;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 test(
     'password rule returns preconfigured password validators',
     function (callable|null $setDefaults, array $expectedConfig) {
         ValidationPassword::$defaultCallback = null;
+
         $setDefaults();
 
-        [$rule] = (new Password(default: true))->getRules();
-        $clazz = new ReflectionClass($rule);
+        $rule = (new Password(default: true))->getRule(ValidationPath::create());
 
         foreach ($expectedConfig as $key => $expected) {
-            $prop = $clazz->getProperty($key);
-            $prop->setAccessible(true);
-            $actual = $prop->getValue($rule);
-
-            expect($actual)->toBe($expected);
+            expect(invade($rule)->{$key})->toBe($expected);
         }
     }
 )->with(function () {
@@ -29,7 +26,7 @@ test(
     ];
 
     yield 'unconfigured' => [
-        'setDefaults' => fn () => fn () => null,
+        'setDefaults' => fn () => fn () => ValidationPath::create(),
         'expectedConfig' => [
             'min' => 8,
         ],

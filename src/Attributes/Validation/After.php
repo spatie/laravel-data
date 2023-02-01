@@ -19,7 +19,7 @@ class After extends StringValidationAttribute
 
     public function parameters(): array
     {
-        return [$this->normalizeValue($this->date)];
+        return [$this->date];
     }
 
     public static function create(string ...$parameters): static

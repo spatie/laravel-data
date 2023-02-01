@@ -59,7 +59,7 @@ class PartialsTreeFromRequestResolver
         );
     }
 
-    private function arrayFromRequest(Request $request, string $key): array
+    protected function arrayFromRequest(Request $request, string $key): array
     {
         $value = $request->get($key);
 

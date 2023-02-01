@@ -5,17 +5,10 @@ use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Validation\ValidationException;
 use Inertia\LazyProp;
-
-use function PHPUnit\Framework\assertFalse;
-
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-
 use Spatie\LaravelData\Attributes\MapOutputName;
-use Spatie\LaravelData\Attributes\Validation\In;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
@@ -24,27 +17,13 @@ use Spatie\LaravelData\Concerns\WireableData;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\DataPipeline;
-use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
-use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
-use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
-use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
-use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
-use Spatie\LaravelData\Normalizers\ArrayNormalizer;
-use Spatie\LaravelData\Normalizers\ModelNormalizer;
-use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Lazy\InertiaLazy;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
-use Spatie\LaravelData\Tests\DataWithDefaults;
-use Spatie\LaravelData\Tests\Factories\DataBlueprintFactory;
-use Spatie\LaravelData\Tests\Factories\DataPropertyBlueprintFactory;
-use Spatie\LaravelData\Tests\Fakes\AttributeRulesWithStaticFunctionRulesData;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
@@ -52,17 +31,15 @@ use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\CircData;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
-use Spatie\LaravelData\Tests\Fakes\DefaultOptionalData;
-use Spatie\LaravelData\Tests\Fakes\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
-use Spatie\LaravelData\Tests\Fakes\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\EmptyData;
 use Spatie\LaravelData\Tests\Fakes\EnumData;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\ExceptData;
 use Spatie\LaravelData\Tests\Fakes\FakeModelData;
 use Spatie\LaravelData\Tests\Fakes\FakeNestedModelData;
-use Spatie\LaravelData\Tests\Fakes\IntersectionTypeData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
@@ -71,10 +48,7 @@ use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
 use Spatie\LaravelData\Tests\Fakes\OnlyData;
 use Spatie\LaravelData\Tests\Fakes\PartialClassConditionalData;
-use Spatie\LaravelData\Tests\Fakes\ReadonlyData;
-use Spatie\LaravelData\Tests\Fakes\RequestData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithWrap;
@@ -85,12 +59,10 @@ use Spatie\LaravelData\Tests\Fakes\UlarData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\WithData;
 
-it('can create a resource', function () {
-    $dataClass = DataBlueprintFactory::new()->withProperty(
-        DataPropertyBlueprintFactory::new('string')->withType('string')
-    )->create();
+use function Spatie\Snapshots\assertMatchesSnapshot;
 
-    $data = new $dataClass('Ruben');
+it('can create a resource', function () {
+    $data = new SimpleData('Ruben');
 
     expect($data->toArray())->toMatchArray([
         'string' => 'Ruben',
@@ -113,11 +85,7 @@ it('can create a collection of resources', function () {
 });
 
 it('can include a lazy property', function () {
-    $dataClass = DataBlueprintFactory::new()->withProperty(
-        DataPropertyBlueprintFactory::new('name')->lazy()->withType('string')
-    )->create();
-
-    $data = new $dataClass(Lazy::create(fn () => 'test'));
+    $data = new LazyData(Lazy::create(fn () => 'test'));
 
     expect($data->toArray())->toBe([]);
 
@@ -128,11 +96,7 @@ it('can include a lazy property', function () {
 });
 
 it('can have a prefilled in lazy property', function () {
-    $dataClass = DataBlueprintFactory::new()->withProperty(
-        DataPropertyBlueprintFactory::new('name')->lazy()->withType('string')
-    )->create();
-
-    $data = new $dataClass('test');
+    $data = new LazyData('test');
 
     expect($data->toArray())->toMatchArray([
         'name' => 'test',
@@ -145,12 +109,18 @@ it('can have a prefilled in lazy property', function () {
 });
 
 it('can include a nested lazy property', function () {
-    $dataClass = DataBlueprintFactory::new()->withProperty(
-        DataPropertyBlueprintFactory::new('data')->lazy()->withType(LazyData::class),
-        DataPropertyBlueprintFactory::dataCollection('collection', LazyData::class)->lazy()
-    )->create();
+    class TestIncludeableNestedLazyDataProperties extends Data
+    {
+        public function __construct(
+            public LazyData|Lazy $data,
+            #[DataCollectionOf(LazyData::class)]
+            public DataCollection|Lazy $collection,
+        ) {
+        }
+    }
 
-    $data = new $dataClass(
+
+    $data = new \TestIncludeableNestedLazyDataProperties(
         Lazy::create(fn () => LazyData::from('Hello')),
         Lazy::create(fn () => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
     );
@@ -193,16 +163,21 @@ it('can include a nested lazy property', function () {
 });
 
 it('can include specific nested data', function () {
-    $dataClass = DataBlueprintFactory::new()->withProperty(
-        DataPropertyBlueprintFactory::dataCollection('songs', MultiLazyData::class)->lazy()
-    )->create();
+    class TestSpecificDefinedIncludeableCollectedAndNestedLazyData extends Data
+    {
+        public function __construct(
+            #[DataCollectionOf(MultiLazyData::class)]
+            public DataCollection|Lazy $songs
+        ) {
+        }
+    }
 
     $collection = Lazy::create(fn () => MultiLazyData::collection([
         DummyDto::rick(),
         DummyDto::bon(),
     ]));
 
-    $data = new $dataClass($collection);
+    $data = new \TestSpecificDefinedIncludeableCollectedAndNestedLazyData($collection);
 
     expect($data->include('songs.name')->toArray())
         ->toMatchArray([
@@ -211,7 +186,6 @@ it('can include specific nested data', function () {
                 ['name' => DummyDto::bon()->name],
             ],
         ]);
-
 
     expect($data->include('songs.{name,artist}')->toArray())
         ->toMatchArray([
@@ -714,44 +688,11 @@ it('can append data via method call', function () {
     ]);
 });
 
-it('can optimally create data', function () {
-    /** @var class-string<\Spatie\LaravelData\Data> $dataClass */
-    $dataClass = DataBlueprintFactory::new()
-        ->withProperty(DataPropertyBlueprintFactory::new('string')->withType('string'))
-        ->create();
-
-    expect($dataClass::optional(null))->toBeNull()
-        ->and(new $dataClass('Hello world'))->toEqual(
-            $dataClass::optional(['string' => 'Hello world'])
-        );
-});
-
-it('can validate if an array fits a data object an will throw an exception', function () {
-    $dataClass = DataBlueprintFactory::new()
-        ->withProperty(DataPropertyBlueprintFactory::new('string')->withType('string'))
-        ->create();
-
-    try {
-        $dataClass::validate(['string' => 10]);
-    } catch (ValidationException $exception) {
-        expect($exception->errors())->toMatchArray([
-            'string' => ['The string must be a string.'],
-        ]);
-
-        return;
-    }
-
-    assertFalse(true, 'We should not end up here');
-});
-
-it('can validate if an array fits a data object an returns the data object', function () {
-    $dataClass = DataBlueprintFactory::new()
-        ->withProperty(DataPropertyBlueprintFactory::new('string')->withType('string'))
-        ->create();
-
-    $data = $dataClass::validateAndCreate(['string' => 'Hello World']);
-
-    expect($data->string)->toEqual('Hello World');
+it('can optionally create data', function () {
+    expect(SimpleData::optional(null))->toBeNull();
+    expect(new SimpleData('Hello world'))->toEqual(
+        SimpleData::optional(['string' => 'Hello world'])
+    );
 });
 
 it('can create a data model without constructor', function () {
@@ -882,39 +823,30 @@ it('can define the WithData trait data class by method', function () {
     expect($data)->toEqual(SimpleData::from('Hello World'));
 });
 
-it('always validates requests when passed to the from method', function () {
-    RequestData::clear();
-
-    try {
-        RequestData::from(new Request());
-    } catch (ValidationException $exception) {
-        expect($exception->errors())->toMatchArray([
-            'string' => [__('validation.required', ['attribute' => 'string'])],
-        ]);
-
-        return;
-    }
-
-    $this->fail('We should not end up here');
-});
-
 it('has support fro readonly properties', function () {
-    onlyPHP81();
+    $dataClass = new class ('') extends Data {
+        public function __construct(
+            public readonly string $string
+        ) {
+        }
+    };
 
-    $data = ReadonlyData::from(['string' => 'Hello world']);
+    $data = $dataClass::from(['string' => 'Hello world']);
 
-    expect($data)->toBeInstanceOf(ReadonlyData::class)
+    expect($data)->toBeInstanceOf($dataClass::class)
         ->and($data->string)->toEqual('Hello world');
 });
 
 it('has support for intersection types', function () {
-    onlyPHP81();
-
     $collection = collect(['a', 'b', 'c']);
 
-    $data = IntersectionTypeData::from(['intersection' => $collection]);
+    $dataClass = new class () extends Data {
+        public Arrayable & \Countable $intersection;
+    };
 
-    expect($data)->toBeInstanceOf(IntersectionTypeData::class)
+    $data = $dataClass::from(['intersection' => $collection]);
+
+    expect($data)->toBeInstanceOf($dataClass::class)
         ->and($data->intersection)->toEqual($collection);
 });
 
@@ -948,7 +880,19 @@ it(
 );
 
 it('can construct a data object with default values', function () {
-    $data = DataWithDefaults::from([
+    $dataClass = new class ('', '') extends Data {
+        public string $property;
+
+        public string $default_property = 'Hello';
+
+        public function __construct(
+            public string $promoted_property,
+            public string $default_promoted_property = 'Hello Again',
+        ) {
+        }
+    };
+
+    $data = $dataClass::from([
         'property' => 'Test',
         'promoted_property' => 'Test Again',
     ]);
@@ -961,7 +905,19 @@ it('can construct a data object with default values', function () {
 });
 
 it('can construct a data object with default values and overwrite them', function () {
-    $data = DataWithDefaults::from([
+    $dataClass = new class ('', '') extends Data {
+        public string $property;
+
+        public string $default_property = 'Hello';
+
+        public function __construct(
+            public string $promoted_property,
+            public string $default_promoted_property = 'Hello Again',
+        ) {
+        }
+    };
+
+    $data = $dataClass::from([
         'property' => 'Test',
         'default_property' => 'Test',
         'promoted_property' => 'Test Again',
@@ -1212,13 +1168,21 @@ it('will not include lazy optional values when transforming', function () {
 });
 
 it('excludes optional values data', function () {
-    $data = DefaultOptionalData::from([]);
+    $dataClass = new class () extends Data {
+        public string|Optional $name;
+    };
+
+    $data = $dataClass::from([]);
 
     expect($data->toArray())->toBe([]);
 });
 
 it('includes value if not optional data', function () {
-    $data = DefaultOptionalData::from([
+    $dataClass = new class () extends Data {
+        public string|Optional $name;
+    };
+
+    $data = $dataClass::from([
         'name' => 'Freek',
     ]);
 
@@ -1371,46 +1335,6 @@ it('can magically create a data object', function () {
         ->and($dataClass::from(new EnumData(DummyBackedEnum::FOO)))->toEqual(new $dataClass('data', '{"enum":"foo"}'));
 });
 
-it('can validate non-requests payloads', function () {
-    $dataClass = new class () extends Data {
-        public static bool $validateAllTypes = false;
-
-        #[In('Hello World')]
-        public string $string;
-
-        public static function pipeline(): DataPipeline
-        {
-            return DataPipeline::create()
-                ->into(static::class)
-                ->normalizer(ModelNormalizer::class)
-                ->normalizer(ArrayableNormalizer::class)
-                ->normalizer(ObjectNormalizer::class)
-                ->normalizer(ArrayNormalizer::class)
-                ->through(AuthorizedDataPipe::class)
-                ->through(
-                    self::$validateAllTypes
-                        ? ValidatePropertiesDataPipe::allTypes()
-                        : ValidatePropertiesDataPipe::onlyRequests()
-                )
-                ->through(MapPropertiesDataPipe::class)
-                ->through(DefaultValuesDataPipe::class)
-                ->through(CastPropertiesDataPipe::class);
-        }
-    };
-
-    $data = $dataClass::from([
-        'string' => 'nowp',
-    ]);
-
-    expect($data)->toBeInstanceOf(Data::class)
-        ->string->toEqual('nowp');
-
-    $dataClass::$validateAllTypes = true;
-
-    $data = $dataClass::from([
-        'string' => 'nowp',
-    ]);
-})->throws(ValidationException::class);
 
 it('can conditionally include', function () {
     expect(
@@ -2174,37 +2098,6 @@ it('can inherit properties from a base class', function () {
         ->int->toBe(42);
 });
 
-it('can the validation rules for a data object', function () {
-    expect(MultiData::getValidationRules())->toMatchArray([
-        'first' => ['string', 'required'],
-        'second' => ['string', 'required'],
-    ]);
-});
-
-it('can get the validation rules for a data object using attributes', function () {
-    expect(
-        SimpleDataWithExplicitValidationRuleAttributeData::getValidationRules()
-    )->toMatchArray([
-        'email' => ['string', 'email:rfc', 'required'],
-    ]);
-});
-
-it('can get the validation rules for a data object for specific fields', function () {
-    expect(MultiData::getValidationRules(fields: ['first']))->toMatchArray([
-        'first' => ['string', 'required'],
-    ]);
-});
-
-it('can add wildcard rules for arrays', function () {
-    expect(
-        AttributeRulesWithStaticFunctionRulesData::getValidationRules()
-    )
-        ->toMatchArray([
-            'emails' => ['array', 'min:1', 'max:5', 'required'],
-            'emails.*' => ['email'],
-        ]);
-});
-
 it('can have a circular dependency', function () {
     $data = CircData::from([
         'string' => 'Hello World',
@@ -2276,4 +2169,55 @@ it('works with livewire', function () {
     $data = $class::fromLivewire(['name' => 'Freek']);
 
     expect($data)->toEqual(new $class('Freek'));
+});
+
+it('can serialize and unserialize a data object', function () {
+    $object = SimpleData::from('Hello world');
+
+    $serialized = serialize($object);
+
+    assertMatchesSnapshot($serialized);
+
+    $unserialized = unserialize($serialized);
+
+    expect($unserialized)->toBeInstanceOf(SimpleData::class);
+    expect($unserialized->string)->toEqual('Hello world');
+});
+
+it('can serialize and unserialize a data object with additional data', function () {
+    $object = SimpleData::from('Hello world')->additional([
+        'int' => 69,
+    ]);
+
+    $serialized = serialize($object);
+
+    assertMatchesSnapshot($serialized);
+
+    $unserialized = unserialize($serialized);
+
+    expect($unserialized)->toBeInstanceOf(SimpleData::class);
+    expect($unserialized->string)->toEqual('Hello world');
+    expect($unserialized->getAdditionalData())->toEqual(['int' => 69]);
+});
+
+it('during the serialization process some properties are thrown away', function () {
+    $object = SimpleData::from('Hello world');
+
+    $object->withPartialTrees(new PartialTrees());
+    $object->include('test');
+    $object->exclude('test');
+    $object->only('test');
+    $object->except('test');
+    $object->wrap('test');
+
+    $unserialized = unserialize(serialize($object));
+
+    $invaded = invade($unserialized);
+
+    expect($invaded->_partialTrees)->toBeNull();
+    expect($invaded->_includes)->toBeEmpty();
+    expect($invaded->_excludes)->toBeEmpty();
+    expect($invaded->_only)->toBeEmpty();
+    expect($invaded->_except)->toBeEmpty();
+    expect($invaded->_wrap)->toBeNull();
 });
