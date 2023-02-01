@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Distinct extends StringValidationAttribute
@@ -11,7 +12,7 @@ class Distinct extends StringValidationAttribute
     public const Strict = 'strict';
     public const IgnoreCase = 'ignore_case';
 
-    public function __construct(protected ?string $mode = null)
+    public function __construct(protected null|string|RouteParameterReference $mode = null)
     {
     }
 

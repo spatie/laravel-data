@@ -5,19 +5,25 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use BackedEnum;
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Support\Validation\References\FieldReference;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredUnless extends StringValidationAttribute implements RequiringRule
 {
+    protected FieldReference $field;
+
     protected string|array $values;
 
     public function __construct(
-        protected string $field,
-        array | string | BackedEnum ...$values
+        string|FieldReference $field,
+        array|string|BackedEnum | RouteParameterReference ...$values
     ) {
+        $this->field = $this->parseFieldReference($field);
         $this->values = Arr::flatten($values);
     }
+
 
     public static function keyword(): string
     {
@@ -28,7 +34,7 @@ class RequiredUnless extends StringValidationAttribute implements RequiringRule
     {
         return [
             $this->field,
-            $this->normalizeValue($this->values),
+            $this->values,
         ];
     }
 }

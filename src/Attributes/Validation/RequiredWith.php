@@ -4,17 +4,19 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RequiredWith extends StringValidationAttribute implements RequiringRule
 {
-    protected string|array $fields;
+    protected array $fields;
 
-    public function __construct(
-        array | string ...$fields,
-    ) {
-        $this->fields = Arr::flatten($fields);
+    public function __construct(array|string|FieldReference ...$fields)
+    {
+        foreach (Arr::flatten($fields) as $field) {
+            $this->fields[] = $field instanceof FieldReference ? $field : new FieldReference($field);
+        }
     }
 
     public static function keyword(): string
@@ -25,7 +27,7 @@ class RequiredWith extends StringValidationAttribute implements RequiringRule
     public function parameters(): array
     {
         return [
-            $this->normalizeValue($this->fields),
+            $this->fields,
         ];
     }
 }

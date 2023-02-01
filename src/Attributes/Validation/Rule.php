@@ -10,24 +10,15 @@ use Spatie\LaravelData\Support\Validation\ValidationRule;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class Rule extends ValidationRule
 {
+    /** @var array<string|array|ValidationRule|RuleContract|InvokableRuleContract> */
     protected array $rules = [];
 
-    public function __construct(string | array | ValidationRule | RuleContract | InvokableRuleContract ...$rules)
+    public function __construct(string|array|ValidationRule|RuleContract|InvokableRuleContract ...$rules)
     {
-        foreach ($rules as $rule) {
-            $newRules = match (true) {
-                is_string($rule) => explode('|', $rule),
-                $rule instanceof RuleContract,
-                $rule instanceof InvokableRuleContract => [$rule],
-                is_array($rule) => $rule,
-                $rule instanceof ValidationRule => $rule->getRules(),
-            };
-
-            $this->rules = array_merge($this->rules, $newRules);
-        }
+        $this->rules = $rules;
     }
 
-    public function getRules(): array
+    public function get(): array
     {
         return $this->rules;
     }

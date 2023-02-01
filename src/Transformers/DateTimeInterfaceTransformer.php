@@ -23,6 +23,6 @@ class DateTimeInterfaceTransformer implements Transformer
             $value = (clone $value)->setTimezone(new DateTimeZone($this->setTimeZone));
         }
 
-        return $value->format($format);
+        return $value->format(ltrim($format, '!'));
     }
 }

@@ -6,23 +6,33 @@ use Attribute;
 use Closure;
 use Exception;
 use Illuminate\Validation\Rules\Unique as BaseUnique;
+use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Unique extends ValidationAttribute
+class Unique extends ObjectValidationAttribute
 {
     protected BaseUnique $rule;
 
     public function __construct(
-        ?string $table = null,
-        ?string $column = 'NULL',
-        ?string $connection = null,
-        ?string $ignore = null,
-        ?string $ignoreColumn = null,
-        bool $withoutTrashed = false,
-        string $deletedAtColumn = 'deleted_at',
+        null|string|RouteParameterReference $table = null,
+        null|string|RouteParameterReference $column = 'NULL',
+        null|string|RouteParameterReference $connection = null,
+        null|string|RouteParameterReference $ignore = null,
+        null|string|RouteParameterReference $ignoreColumn = null,
+        bool|RouteParameterReference $withoutTrashed = false,
+        string|RouteParameterReference $deletedAtColumn = 'deleted_at',
         ?Closure $where = null,
         ?BaseUnique $rule = null
     ) {
+        $table = $this->normalizePossibleRouteReferenceParameter($table);
+        $column = $this->normalizePossibleRouteReferenceParameter($column);
+        $connection = $this->normalizePossibleRouteReferenceParameter($connection);
+        $ignore = $this->normalizePossibleRouteReferenceParameter($ignore);
+        $ignoreColumn = $this->normalizePossibleRouteReferenceParameter($ignoreColumn);
+        $withoutTrashed = $this->normalizePossibleRouteReferenceParameter($withoutTrashed);
+        $deletedAtColumn = $this->normalizePossibleRouteReferenceParameter($deletedAtColumn);
+
         if ($table === null && $rule === null) {
             throw new Exception('Could not create unique validation rule, either table or a rule is required');
         }
@@ -47,9 +57,9 @@ class Unique extends ValidationAttribute
         $this->rule = $rule;
     }
 
-    public function getRules(): array
+    public function getRule(ValidationPath $path): object|string
     {
-        return [$this->rule];
+        return $this->rule;
     }
 
     public static function keyword(): string
