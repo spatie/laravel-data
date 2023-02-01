@@ -37,6 +37,7 @@ class SomeData extends Data {
   - The $payload parameter in the `getValidationRules` method is now required
   - The $fields parameter was removed from the `getValidationRules` method, this now should be done outside of the package 
 - all data specific properties are now prefixed with _, to avoid conflicts with properties with your own defined properties. This is especially important when overwriting `$collectionClass`, `$paginatedCollectionClass`, `$cursorPaginatedCollectionClass`, be sure to add the extra _ within your data classes.
+- Serialization logic is now updated and will only include data specific properties
 
 ## From v1 to v2
 

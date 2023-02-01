@@ -18,6 +18,8 @@ use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
+use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Transformers\DataTransformer;
 
@@ -100,5 +102,14 @@ trait BaseData
         bool $mapPropertyNames = true,
     ): array {
         return DataTransformer::create($transformValues, $wrapExecutionType, $mapPropertyNames)->transform($this);
+    }
+
+    public function __sleep(): array
+    {
+        return app(DataConfig::class)->getDataClass(static::class)
+            ->properties
+            ->map(fn(DataProperty $property) => $property->name)
+            ->push('_additional')
+            ->toArray();
     }
 }

@@ -3,6 +3,8 @@
 namespace Spatie\LaravelData\Concerns;
 
 use ArrayIterator;
+use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Transformers\DataCollectableTransformer;
 
@@ -51,5 +53,10 @@ trait BaseDataCollectable
         );
 
         return $transformer->transform();
+    }
+
+    public function __sleep(): array
+    {
+        return ['items', 'dataClass'];
     }
 }
