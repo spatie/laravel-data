@@ -55,7 +55,7 @@ The `handle` method has several arguments:
 
 - **payload** the non normalized payload
 - **class** the `DataClass` object for the data
-  object [more info](/docs/laravel-data/v2/advanced-usage/internal-structures)
+  object [more info](/docs/laravel-data/v3/advanced-usage/internal-structures)
 - **properties** the key-value properties which will be used to construct the data object
 
 When using a magic creation methods, the pipeline is not being used (since you manually overwrite how a data object is

@@ -68,7 +68,7 @@ class SongData extends Data
 When you provide an artist with a length of more than 20 characters, the validation will fail just like it would when
 you created a custom request class for the endpoint.
 
-You can find a complete list of available rules [here](/docs/laravel-data/v2/advanced-usage/validation-attributes).
+You can find a complete list of available rules [here](/docs/laravel-data/v3/advanced-usage/validation-attributes).
 
 ### Referencing route parameters
 
@@ -407,7 +407,7 @@ By default, four rule inferrers are enabled:
 - **AttributesRuleInferrer** will make sure that rule attributes we described above will also add their rules
 
 It is possible to write your rule inferrers. You can find more
-information [here](/docs/laravel-data/v2/advanced-usage/creating-a-rule-inferrer).
+information [here](/docs/laravel-data/v3/advanced-usage/creating-a-rule-inferrer).
 
 ### Skipping validation
 

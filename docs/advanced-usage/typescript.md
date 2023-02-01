@@ -71,7 +71,7 @@ If you're using the `DtoTransformer` provided by the package, then be sure to pu
 Annotate each data object that you want to transform to Typescript with a `/** @typescript */` annotation or
 a `#[TypeScript]` attribute.
 
-To [generate the typescript file](https://spatie.be/docs/typescript-transformer/v2/laravel/executing-the-transform-command)
+To [generate the typescript file](https://spatie.be/docs/typescript-transformer/v3/laravel/executing-the-transform-command)
 , run this command:
 
 ```php

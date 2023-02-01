@@ -14,7 +14,7 @@ interface Cast
 }
 ```
 
-The value that should be cast is given, and a `DataProperty` object which represents the property for which the value is cast. You can read more about the internal structures of the package [here](/docs/laravel-data/v2/advanced-usage/internal-structures).
+The value that should be cast is given, and a `DataProperty` object which represents the property for which the value is cast. You can read more about the internal structures of the package [here](/docs/laravel-data/v3/advanced-usage/internal-structures).
 
 Within the `context` array the complete payload is given.
 
