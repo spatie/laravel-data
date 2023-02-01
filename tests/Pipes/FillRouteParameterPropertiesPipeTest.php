@@ -3,42 +3,52 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
+use Spatie\LaravelData\Attributes\FromRouteParameterProperty;
+use Spatie\LaravelData\Exceptions\CannotFillFromRouteParameterPropertyUsingScalarValue;
 use function Pest\Laravel\mock;
 
 use Spatie\LaravelData\Attributes\FromRouteParameter;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 
-it('can fill data properties from scalar route parameters', function () {
+it('can fill data properties with route parameters', function () {
     $dataClass = new class () extends Data {
         #[FromRouteParameter('id')]
         public int $id;
         #[FromRouteParameter('slug')]
         public string $slug;
-        #[FromRouteParameter('title', 'long')]
-        public ?string $title;
+        #[FromRouteParameter('title')]
+        public string $title;
+        #[FromRouteParameter('tags')]
+        public array $tags;
+        #[FromRouteParameter('nested')]
+        public NestedData $nested;
     };
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('id')->once()->andReturns(123);
     $requestMock->expects('route')->with('slug')->once()->andReturns('foo-bar');
     $requestMock->expects('route')->with('title')->once()->andReturns('Foo Bar');
+    $requestMock->expects('route')->with('tags')->once()->andReturns(['foo', 'bar']);
+    $requestMock->expects('route')->with('nested')->once()->andReturns(['simple' => ['string' => 'baz']]);
     $requestMock->expects('toArray')->andReturns([]);
 
     $data = $dataClass::from($requestMock);
 
     expect($data->id)->toEqual(123);
     expect($data->slug)->toEqual('foo-bar');
-    expect($data->title)->toEqual(null);
+    expect($data->title)->toEqual('Foo Bar');
+    expect($data->tags)->toEqual(['foo', 'bar']);
+    expect($data->nested->simple->string)->toEqual('baz');
 });
 
-it('can fill data properties from non-scalar route properties (models, objects, arrays)', function () {
+it('can fill data properties from route parameter properties', function () {
     $dataClass = new class () extends Data {
-        #[FromRouteParameter('foo')]
+        #[FromRouteParameterProperty('foo')]
         public int $id;
-        #[FromRouteParameter('bar')]
+        #[FromRouteParameterProperty('bar')]
         public string $name;
-        #[FromRouteParameter('baz')]
+        #[FromRouteParameterProperty('baz')]
         public string $description;
     };
 
@@ -65,15 +75,15 @@ it('can fill data properties from non-scalar route properties (models, objects, 
     expect($data->description)->toEqual('The bazzest bazz there is');
 });
 
-it('can fill data properties from a route parameter using custom property mapping ', function () {
+it('can fill data properties from route parameters using custom property mapping ', function () {
     $dataClass = new class () extends Data {
-        #[FromRouteParameter('something', 'name')]
+        #[FromRouteParameterProperty('something', 'name')]
         public string $title;
-        #[FromRouteParameter('something', 'nested.foo')]
+        #[FromRouteParameterProperty('something', 'nested.foo')]
         public string $foo;
-        #[FromRouteParameter('something', 'tags.0')]
+        #[FromRouteParameterProperty('something', 'tags.0')]
         public string $tag;
-        #[FromRouteParameter('something', 'rows.*.total')]
+        #[FromRouteParameterProperty('something', 'rows.*.total')]
         public array $totals;
     };
 
@@ -102,71 +112,76 @@ it('can fill data properties from a route parameter using custom property mappin
     expect($data->totals)->toEqual([10, 20, 30]);
 });
 
-it('can fill data properties with non-scalar route parameters ', function () {
-    $dataClass = new class () extends Data {
-        #[FromRouteParameter('tags', false)]
-        public array $tags;
-        #[FromRouteParameter('nested', false)]
-        public NestedData $nested;
-    };
-
-    $requestMock = mock(Request::class);
-    $requestMock->expects('route')->with('tags')->once()->andReturns(['foo', 'bar']);
-    $requestMock->expects('route')->with('nested')->once()->andReturns(['simple' => ['string' => 'baz']]);
-    $requestMock->expects('toArray')->andReturns([]);
-
-    $data = $dataClass::from($requestMock);
-
-    expect($data->tags)->toEqual(['foo', 'bar']);
-    expect($data->nested->simple->string)->toEqual('baz');
-});
-
 it('replaces properties when route parameter properties exist', function () {
     $dataClass = new class () extends Data {
-        #[FromRouteParameter('something')]
+        #[FromRouteParameter('foo')]
         public string $name;
+        #[FromRouteParameterProperty('bar')]
+        public string $slug;
     };
 
-    $something = ['name' => 'Best'];
+    $foo = 'Foo Lighters';
+    $bar = ['slug' => 'foo-lighters'];
 
     $requestMock = mock(Request::class);
-    $requestMock->expects('route')->with('something')->once()->andReturns($something);
-    $requestMock->expects('toArray')->andReturns(['title' => 'Better']);
+    $requestMock->expects('route')->with('foo')->once()->andReturns($foo);
+    $requestMock->expects('route')->with('bar')->once()->andReturns($bar);
+    $requestMock->expects('toArray')->andReturns(['name' => 'Loo Cleaners', 'slug' => 'loo-cleaners']);
 
     $data = $dataClass::from($requestMock);
 
-    expect($data->name)->toEqual('Best');
+    expect($data->name)->toEqual('Foo Lighters');
+    expect($data->slug)->toEqual('foo-lighters');
 });
 
 it('skips replacing properties when route parameter properties exist and replacing is disabled', function () {
     $dataClass = new class () extends Data {
-        #[FromRouteParameter('something', replaceWhenPresentInBody: false)]
+        #[FromRouteParameter('foo', replaceWhenPresentInBody: false)]
         public string $name;
-        #[FromRouteParameter('something', 'long', false)]
-        public string $description;
+        #[FromRouteParameterProperty('bar', replaceWhenPresentInBody: false)]
+        public string $slug;
     };
 
     $requestMock = mock(Request::class);
-    $requestMock->expects('route')->with('something')->never();
-    $requestMock->expects('toArray')->andReturns(['name' => 'Better', 'description' => 'Description']);
+    $requestMock->expects('route')->with('foo')->never();
+    $requestMock->expects('route')->with('bar')->never();
+    $requestMock->expects('toArray')->andReturns(['name' => 'Loo Cleaners', 'slug' => 'loo-cleaners']);
 
     $data = $dataClass::from($requestMock);
 
-    expect($data->name)->toEqual('Better');
-    expect($data->description)->toEqual('Description');
+    expect($data->name)->toEqual('Loo Cleaners');
+    expect($data->slug)->toEqual('loo-cleaners');
 });
 
 it('skips properties it cannot find a route parameter for', function () {
     $dataClass = new class () extends Data {
-        #[FromRouteParameter('something')]
+        #[FromRouteParameter('foo')]
+        public string $name;
+        #[FromRouteParameterProperty('bar')]
+        public ?string $slug = 'default-slug';
+    };
+
+    $requestMock = mock(Request::class);
+    $requestMock->expects('route')->with('foo')->once()->andReturnNull();
+    $requestMock->expects('route')->with('bar')->once()->andReturnNull();
+    $requestMock->expects('toArray')->andReturns(['name' => 'Moo Makers']);
+
+    $data = $dataClass::from($requestMock);
+
+    expect($data->name)->toEqual('Moo Makers');
+    expect($data->slug)->toEqual('default-slug');
+});
+
+it('throws when trying to fill from a route parameter that has a scalar value', function () {
+    $dataClass = new class () extends Data {
+        #[FromRouteParameterProperty('foo', 'bar')]
         public string $name;
     };
 
     $requestMock = mock(Request::class);
-    $requestMock->expects('route')->with('something')->once()->andReturnNull();
-    $requestMock->expects('toArray')->andReturns(['name' => 'Better']);
+    $requestMock->expects('route')->with('foo')->once()->andReturn('baz');
+    $requestMock->expects('toArray')->andReturns([]);
 
-    $data = $dataClass::from($requestMock);
-
-    expect($data->name)->toEqual('Better');
+    $dataClass::from($requestMock);
 });
+//})->throws(CannotFillFromRouteParameterPropertyUsingScalarValue::class);
