@@ -4,7 +4,7 @@ weight: 5
 ---
 
 The data pipeline allows you to configure how data objects are constructed from a payload. In the previous chapter we
-saw that a data object created from a payload will be first normalized into an array. This array the is passed into the
+saw that a data object created from a payload will be first normalized into an array. This array is passed into the
 pipeline.
 
 The pipeline exists of multiple pipes which will transform the normalized data into a collection of property values
