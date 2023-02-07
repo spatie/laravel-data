@@ -10,6 +10,7 @@ use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithCastable;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Concerns\DataTrait;
@@ -24,6 +25,8 @@ use Spatie\LaravelData\Support\Lazy\InertiaLazy;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
+use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastableAnonymousClass;
+use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastableClassString;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
@@ -56,10 +59,9 @@ use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataCollectionTransf
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
 use Spatie\LaravelData\Tests\Fakes\UlarData;
+
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\WithData;
-
-use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can create a resource', function () {
     $data = new SimpleData('Ruben');
@@ -1042,6 +1044,36 @@ it('can cast data object and collections using a custom cast', function () {
         ->nestedData->toEqual(SimpleData::from('CONFIDENTIAL'))
         ->and($dataWithCustomCasts)
         ->nestedDataCollection->toEqual(SimpleData::collection(['CONFIDENTIAL', 'CONFIDENTIAL']));
+});
+
+it('can cast data object with a castable property using anonymous class', function () {
+    $dataWithCastablePropertyClass = new class (new SimpleCastableAnonymousClass('')) extends Data {
+        public function __construct(
+            #[WithCastable(SimpleCastableAnonymousClass::class)]
+            public SimpleCastableAnonymousClass $castableData,
+        ) {
+        }
+    };
+
+    $dataWithCastableProperty = $dataWithCastablePropertyClass::from(['castableData' => 'HELLO WORLD']);
+
+    expect($dataWithCastableProperty)
+        ->castableData->toEqual(new SimpleCastableAnonymousClass('HELLO WORLD'));
+});
+
+it('can cast data object with a castable property using class string', function () {
+    $dataWithCastablePropertyClass = new class (new SimpleCastableClassString('')) extends Data {
+        public function __construct(
+            #[WithCastable(SimpleCastableClassString::class)]
+            public SimpleCastableClassString $castableData,
+        ) {
+        }
+    };
+
+    $dataWithCastableProperty = $dataWithCastablePropertyClass::from(['castableData' => 'HELLO WORLD']);
+
+    expect($dataWithCastableProperty)
+        ->castableData->toEqual(new SimpleCastableClassString('HELLO WORLD'));
 });
 
 it('can cast built-in types with custom casts', function () {
