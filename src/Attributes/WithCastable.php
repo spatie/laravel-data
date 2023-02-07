@@ -26,12 +26,6 @@ class WithCastable extends WithCast
 
     public function get(): Cast
     {
-        $castType = $this->castableClass::castUsing(...$this->arguments);
-
-        if (is_object($castType)) {
-            return $castType;
-        }
-
-        return new $castType(...$this->arguments);
+        return $this->castableClass::castUsing(...$this->arguments);
     }
 }

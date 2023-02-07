@@ -8,7 +8,6 @@ interface Castable
      * Get the name of the caster class to use when casting to this cast target.
      *
      * @param  array  $arguments
-     * @return class-string<Cast>|Cast
      */
-    public static function castUsing(array $arguments);
+    public static function castUsing(array $arguments): Cast;
 }

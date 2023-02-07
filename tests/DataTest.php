@@ -25,8 +25,7 @@ use Spatie\LaravelData\Support\Lazy\InertiaLazy;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
-use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastableAnonymousClass;
-use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastableClassString;
+use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastable;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
@@ -1048,10 +1047,10 @@ it('can cast data object and collections using a custom cast', function () {
 });
 
 it('can cast data object with a castable property using anonymous class', function () {
-    $dataWithCastablePropertyClass = new class (new SimpleCastableAnonymousClass('')) extends Data {
+    $dataWithCastablePropertyClass = new class (new SimpleCastable('')) extends Data {
         public function __construct(
-            #[WithCastable(SimpleCastableAnonymousClass::class)]
-            public SimpleCastableAnonymousClass $castableData,
+            #[WithCastable(SimpleCastable::class)]
+            public SimpleCastable $castableData,
         ) {
         }
     };
@@ -1059,22 +1058,7 @@ it('can cast data object with a castable property using anonymous class', functi
     $dataWithCastableProperty = $dataWithCastablePropertyClass::from(['castableData' => 'HELLO WORLD']);
 
     expect($dataWithCastableProperty)
-        ->castableData->toEqual(new SimpleCastableAnonymousClass('HELLO WORLD'));
-});
-
-it('can cast data object with a castable property using class string', function () {
-    $dataWithCastablePropertyClass = new class (new SimpleCastableClassString('')) extends Data {
-        public function __construct(
-            #[WithCastable(SimpleCastableClassString::class)]
-            public SimpleCastableClassString $castableData,
-        ) {
-        }
-    };
-
-    $dataWithCastableProperty = $dataWithCastablePropertyClass::from(['castableData' => 'HELLO WORLD']);
-
-    expect($dataWithCastableProperty)
-        ->castableData->toEqual(new SimpleCastableClassString('HELLO WORLD'));
+        ->castableData->toEqual(new SimpleCastable('HELLO WORLD'));
 });
 
 it('can cast built-in types with custom casts', function () {

@@ -5,17 +5,17 @@ use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Casts\Castable;
 use Spatie\LaravelData\Support\DataProperty;
 
-class SimpleCastableAnonymousClass implements Castable
+class SimpleCastable implements Castable
 {
   public function __construct(public string $value) {
 
   }
 
-  public static function castUsing(...$arguments)
+  public static function castUsing(...$arguments): Cast
   {
     return new class implements Cast {
         public function cast(DataProperty $property, mixed $value, array $context): mixed {
-            return new SimpleCastableAnonymousClass($value);
+            return new SimpleCastable($value);
         }
     };
   }
