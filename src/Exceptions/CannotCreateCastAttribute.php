@@ -19,6 +19,6 @@ class CannotCreateCastAttribute extends Exception
     {
         $cast = Castable::class;
 
-        return new self("WithCastable attribute needs a cast that implements `{$cast}`");
+        return new self("WithCastable attribute needs a class that implements `{$cast}`");
     }
 }
