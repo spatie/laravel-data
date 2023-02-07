@@ -8,7 +8,7 @@ use Spatie\LaravelData\Casts\Castable;
 use Spatie\LaravelData\Exceptions\CannotCreateCastAttribute;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY)]
-class WithCastable extends WithCast
+class WithCastable implements GetsCast
 {
     public array $arguments;
 
