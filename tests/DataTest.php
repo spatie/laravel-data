@@ -59,7 +59,6 @@ use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataCollectionTransf
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
 use Spatie\LaravelData\Tests\Fakes\UlarData;
-
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\WithData;
 
