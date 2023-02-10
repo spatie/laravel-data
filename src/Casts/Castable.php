@@ -9,5 +9,5 @@ interface Castable
      *
      * @param  array  $arguments
      */
-    public static function castUsing(array $arguments): Cast;
+    public static function dataCastUsing(array $arguments): Cast;
 }

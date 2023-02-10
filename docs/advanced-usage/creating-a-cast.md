@@ -36,7 +36,7 @@ class ForgotPasswordRequest extends Data
 }
 ```
 
-When using `Castable` classes, you may still provide arguments in the `WithCastable` attribute. The arguments will be passed to the `castUsing` method:
+When using `Castable` classes, you may still provide arguments in the `WithCastable` attribute. The arguments will be passed to the `dataCastUsing` method:
 
 ```php
 class DuplicateEmailCheck extends Data
@@ -48,7 +48,7 @@ class DuplicateEmailCheck extends Data
 }
 ```
 
-By combining "castables" with PHP's [anonymous classes](https://www.php.net/manual/en/language.oop5.anonymous.php), you may define a value object and its casting logic as a single castable object. To accomplish this, return an anonymous class from your value object's `castUsing` method. The anonymous class should implement the `Cast` interface:
+By combining "castables" with PHP's [anonymous classes](https://www.php.net/manual/en/language.oop5.anonymous.php), you may define a value object and its casting logic as a single castable object. To accomplish this, return an anonymous class from your value object's `dataCastUsing` method. The anonymous class should implement the `Cast` interface:
 
 ```php
 <?php
@@ -64,7 +64,7 @@ class Email implements Castable
 
   }
 
-  public static function castUsing(...$arguments)
+  public static function dataCastUsing(...$arguments)
   {
     return new class implements Cast {
         public function cast(DataProperty $property, mixed $value, array $context): mixed {

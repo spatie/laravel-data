@@ -26,6 +26,6 @@ class WithCastable implements GetsCast
 
     public function get(): Cast
     {
-        return $this->castableClass::castUsing(...$this->arguments);
+        return $this->castableClass::dataCastUsing(...$this->arguments);
     }
 }

@@ -11,7 +11,7 @@ class SimpleCastable implements Castable
 
   }
 
-  public static function castUsing(...$arguments): Cast
+  public static function dataCastUsing(...$arguments): Cast
   {
     return new class implements Cast {
         public function cast(DataProperty $property, mixed $value, array $context): mixed {
