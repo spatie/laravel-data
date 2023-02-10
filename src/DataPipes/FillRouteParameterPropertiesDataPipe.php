@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\DataPipes;
 
-use Attribute;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\FromRouteParameter;
@@ -21,7 +20,7 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
 
         foreach ($class->properties as $dataProperty) {
             $attribute = $dataProperty->attributes->first(
-                fn(object $attribute) => $attribute instanceof FromRouteParameter || $attribute instanceof FromRouteParameterProperty
+                fn (object $attribute) => $attribute instanceof FromRouteParameter || $attribute instanceof FromRouteParameterProperty
             );
 
             if ($attribute === null) {
@@ -60,6 +59,7 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
             throw CannotFillFromRouteParameterPropertyUsingScalarValue::create($dataProperty, $attribute, $parameter);
         }
 
-        return data_get($parameter, $attribute->property ?? $dataProperty->name);;
+        return data_get($parameter, $attribute->property ?? $dataProperty->name);
+        ;
     }
 }
