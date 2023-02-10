@@ -8,8 +8,8 @@ use Attribute;
 class FromRouteParameter
 {
     public function __construct(
-        public string  $routeParameter,
-        public bool    $replaceWhenPresentInBody = true,
+        public string $routeParameter,
+        public bool $replaceWhenPresentInBody = true,
     ) {
     }
 }

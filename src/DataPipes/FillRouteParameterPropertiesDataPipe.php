@@ -2,12 +2,14 @@
 
 namespace Spatie\LaravelData\DataPipes;
 
+use Attribute;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\FromRouteParameter;
 use Spatie\LaravelData\Attributes\FromRouteParameterProperty;
 use Spatie\LaravelData\Exceptions\CannotFillFromRouteParameterPropertyUsingScalarValue;
 use Spatie\LaravelData\Support\DataClass;
+use Spatie\LaravelData\Support\DataProperty;
 
 class FillRouteParameterPropertiesDataPipe implements DataPipe
 {
@@ -18,7 +20,11 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
         }
 
         foreach ($class->properties as $dataProperty) {
-            if (! ($attribute = $dataProperty->attributes->first(fn ($attribute) => $attribute instanceof FromRouteParameter || $attribute instanceof FromRouteParameterProperty))) {
+            $attribute = $dataProperty->attributes->first(
+                fn(object $attribute) => $attribute instanceof FromRouteParameter || $attribute instanceof FromRouteParameterProperty
+            );
+
+            if ($attribute === null) {
                 continue;
             }
 
@@ -26,23 +32,34 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            if (! ($parameter = $payload->route($attribute->routeParameter))) {
+            $parameter = $payload->route($attribute->routeParameter);
+
+            if ($parameter === null) {
                 continue;
             }
 
-            if ($attribute instanceof FromRouteParameterProperty) {
-                if (is_scalar($parameter)) {
-                    throw CannotFillFromRouteParameterPropertyUsingScalarValue::create($dataProperty, $attribute, $parameter);
-                }
-
-                $value = data_get($parameter, $attribute->property ?? $dataProperty->name);
-            } else {
-                $value = $parameter;
-            }
-
-            $properties->put($dataProperty->name, $value);
+            $properties->put(
+                $dataProperty->name,
+                $this->resolveValue($dataProperty, $attribute, $parameter)
+            );
         }
 
         return $properties;
+    }
+
+    protected function resolveValue(
+        DataProperty $dataProperty,
+        FromRouteParameter|FromRouteParameterProperty $attribute,
+        mixed $parameter,
+    ): mixed {
+        if ($attribute instanceof FromRouteParameter) {
+            return $parameter;
+        }
+
+        if (is_scalar($parameter)) {
+            throw CannotFillFromRouteParameterPropertyUsingScalarValue::create($dataProperty, $attribute, $parameter);
+        }
+
+        return data_get($parameter, $attribute->property ?? $dataProperty->name);;
     }
 }
