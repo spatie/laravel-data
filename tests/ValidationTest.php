@@ -3,18 +3,18 @@
 namespace Spatie\LaravelData\Tests;
 
 use Exception;
+use function Pest\Laravel\mock;
+use function PHPUnit\Framework\assertFalse;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
 
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
-
-use function Pest\Laravel\mock;
-use function PHPUnit\Framework\assertFalse;
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
@@ -2072,5 +2072,26 @@ it('can validate data with circular dependencies', function () {
                     'string' => 'Hello World',
                 ],
             ],
+        ]);
+});
+
+it('can validate a property with custom rules as array containing regex rule with "|"', function () {
+    $dataClass = new class () extends Data {
+        public string $property;
+
+        public static function rules(): array
+        {
+            return [
+                'property' => ['string', 'required', 'regex:/test|ok/'],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertRules([
+            'property' => ['string', 'required', 'regex:/test|ok/'],
+        ])
+        ->assertOk([
+            'property' => 'ok',
         ]);
 });

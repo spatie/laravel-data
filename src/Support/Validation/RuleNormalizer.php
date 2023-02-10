@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Support\Validation;
 use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Dimensions as DimensionsRule;
 use Illuminate\Validation\Rules\Enum as EnumRule;
 use Illuminate\Validation\Rules\ExcludeIf as ExcludeIfRule;
@@ -90,7 +91,8 @@ class RuleNormalizer
     {
         $rules = [];
 
-        foreach (explode('|', $rule) as $subRule) {
+        $subRules = Str::contains($rule, 'regex:') ? [$rule] : explode('|', $rule);
+        foreach ($subRules as $subRule) {
             try {
                 $rules[] = $this->ruleFactory->create($subRule);
             } catch (Throwable $t) {
