@@ -1003,8 +1003,8 @@ it('can nest data in collections using relative rule generation', function () {
                 ['string' => 'Invalid Email', 'validate_as_email' => true],
             ],
         ], [
-            'collection.0.string' => ['The collection.0.string must be a valid email address.'],
-            'collection.2.string' => ['The collection.2.string must be a valid email address.'],
+            'collection.0.string' => [__('validation.email', ['attribute' => 'collection.0.string'])],
+            'collection.2.string' => [__('validation.email', ['attribute' => 'collection.2.string'])],
         ])
         ->assertRules(
             [
@@ -1062,8 +1062,8 @@ it('can nest data in classes inside collections using relative rule generation',
                 ['nested' => ['string' => 'Invalid Email', 'validate_as_email' => true]],
             ],
         ], [
-            'collection.0.nested.string' => ['The collection.0.nested.string must be a valid email address.'],
-            'collection.2.nested.string' => ['The collection.2.nested.string must be a valid email address.'],
+            'collection.0.nested.string' => [__('validation.email', ['attribute' => 'collection.0.nested.string'])],
+            'collection.2.nested.string' => [__('validation.email', ['attribute' => 'collection.2.nested.string'])],
         ]);
 })->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
 
@@ -1162,9 +1162,9 @@ it('can nest data in deep collections using relative rule generation', function 
                 ],
             ],
         ], [
-            'collection.0.items.0.deep_string' => ['The collection.0.items.0.deep string must be a valid email address.'],
-            'collection.1.string' => ['The collection.1.string must be a valid email address.'],
-            'collection.1.items.0.deep_string' => ['The collection.1.items.0.deep string must be a valid email address.'],
+            'collection.0.items.0.deep_string' => [__('validation.email', ['attribute' => 'collection.0.items.0.deep string'])],
+            'collection.1.string' => [__('validation.email', ['attribute' => 'collection.1.string'])],
+            'collection.1.items.0.deep_string' => [__('validation.email', ['attribute' => 'collection.1.items.0.deep string'])],
         ]);
 })->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
 
@@ -1939,7 +1939,7 @@ it('can validate a payload for a data object without creating one', function () 
         SimpleData::validate(['string' => 10]);
     } catch (ValidationException $exception) {
         expect($exception->errors())->toMatchArray([
-            'string' => ['The string must be a string.'],
+            'string' => [__('validation.string', ['attribute' => 'string'])],
         ]);
 
         return;
@@ -1957,7 +1957,7 @@ it('can validate a payload for a data object and create one', function () {
         SimpleData::validateAndCreate(['string' => 10]);
     } catch (ValidationException $exception) {
         expect($exception->errors())->toMatchArray([
-            'string' => ['The string must be a string.'],
+            'string' => [__('validation.string', ['attribute' => 'string'])],
         ]);
 
         return;
