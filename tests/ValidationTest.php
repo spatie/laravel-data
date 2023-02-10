@@ -13,6 +13,7 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
+use Spatie\LaravelData\Tests\Fakes\NestedData;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
@@ -2093,5 +2094,13 @@ it('can validate a property with custom rules as array containing regex rule wit
         ])
         ->assertOk([
             'property' => 'ok',
+        ]);
+});
+
+it('can handle a string as (wrong) payload', function () {
+    DataValidationAsserter::for(NestedData::class)
+        ->assertErrors(['hello world'])
+        ->assertErrors([
+            'simple' => 'hello-world',
         ]);
 });
