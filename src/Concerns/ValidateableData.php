@@ -8,10 +8,11 @@ use Illuminate\Validation\Validator;
 use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
 use Spatie\LaravelData\Support\Validation\DataRules;
+use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 /**
- * @method static array rules(...$args)
+ * @method static array rules(ValidationContext $context)
  * @method static array messages(...$args)
  * @method static array attributes(...$args)
  * @method static bool stopOnFirstFailure()
