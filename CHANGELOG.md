@@ -2,20 +2,29 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.1.0 - 2023-02-10
+
+- Allow filling props from route parameters (#341)
+- Better handing of custom regex validation rules(#342)
+- Fix types (#348)
+- Improve validation when strings are passed for nested data objects
+- Add FieldReference to Before and After Validation attribute (#345)
+
 ## 3.0.0 - 2023-02-01
 
 - The validation logic is completely rewritten
-    - Add support for nested nullable and optional data objects
-    - Allow referencing other fields in validation attributes when the data is nested
-    - Allow referencing url parameters (and even model properties) in validation attributes
-    - Allow circular dependencies when validating data
-    - Add support for nested validation messages and attributes
+- - Add support for nested nullable and optional data objects
+- - Allow referencing other fields in validation attributes when the data is nested
+- - Allow referencing url parameters (and even model properties) in validation attributes
+- - Allow circular dependencies when validating data
+- - Add support for nested validation messages and attributes
+- 
 - Package specific properties are renamed to avoid conflicts
 - Serialization logic updated to only serialize your properties
 - Prevent fatal error when passing a string containing only an integer to JSON Normalizer (#322)
 - Ignore leading ! in DateTimeInterfaceTransformer (#325)
 - Extend the make:data command to be more flexible (#335)
-  
+
 ## 2.2.3 - 2023-01-24
 
 - Add Laravel 10.x support (#331)
