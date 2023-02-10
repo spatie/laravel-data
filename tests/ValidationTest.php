@@ -13,19 +13,19 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
-use Spatie\LaravelData\Tests\Fakes\NestedData;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Attributes\MapInputName;
 
+use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
 
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
-use Spatie\LaravelData\Attributes\Validation\Bail;
 
+use Spatie\LaravelData\Attributes\Validation\Bail;
 use Spatie\LaravelData\Attributes\Validation\Exists;
+
 use Spatie\LaravelData\Attributes\Validation\In;
 use Spatie\LaravelData\Attributes\Validation\IntegerType;
 use Spatie\LaravelData\Attributes\Validation\Max;
@@ -38,8 +38,8 @@ use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
-
 use Spatie\LaravelData\DataCollection;
+
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
@@ -62,6 +62,7 @@ use Spatie\LaravelData\Tests\Fakes\DummyDataWithContextOverwrittenValidationRule
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
+use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\NestedNullableData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
