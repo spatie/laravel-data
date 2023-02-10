@@ -207,8 +207,8 @@ class SongData extends Data
 }
 ```
 
-> When using the regex / not_regex patterns, it is necessary to specify rules in an array instead of using "|" delimiters,
-> especially if the regular expression contains a "|" character.
+> Always use the array syntax for defining rules and not a single string which spits the rules by | characters.
+> This is needed when using regexes those | can be seen as part of the regex
 
 It is even possible to use the validationAttribute objects within the `rules` method:
 
