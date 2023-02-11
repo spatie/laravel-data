@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\DefaultLazy;
 use Spatie\LaravelData\Support\Lazy\InertiaLazy;
+use Spatie\LaravelData\Support\Lazy\LivewireLazy;
 use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 
 abstract class Lazy
@@ -31,6 +32,11 @@ abstract class Lazy
     public static function inertia(Closure $value): InertiaLazy
     {
         return new InertiaLazy($value);
+    }
+    
+    public static function livewire(Closure $value): LivewireLazy
+    {
+        return new LivewireLazy($value);
     }
 
     abstract public function resolve(): mixed;
