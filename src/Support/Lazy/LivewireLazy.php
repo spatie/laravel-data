@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Support\Lazy;
 
 use Closure;
 use Illuminate\Contracts\Support\Htmlable;
-use Inertia\LazyProp;
 
 class LivewireLazy extends ConditionalLazy implements Htmlable
 {
@@ -22,10 +21,5 @@ class LivewireLazy extends ConditionalLazy implements Htmlable
     public function toHtml(): mixed
     {
         return $this->resolve();
-    }
-
-    public function __toString(): string
-    {
-        return $this->toHtml();
     }
 }
