@@ -31,6 +31,10 @@ class ModelNormalizer implements Normalizer
             $properties[$key] = $relation;
         }
 
+        foreach ($value->getMutatedAttributes() as $key) {
+            $properties[$key] = $value->getAttribute($key);
+        }
+
         return $properties;
     }
 
