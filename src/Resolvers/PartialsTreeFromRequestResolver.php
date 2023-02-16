@@ -10,6 +10,7 @@ use Spatie\LaravelData\Support\AllowedPartialsParser;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\PartialTrees;
+use Spatie\LaravelData\Support\Transformation\LocalTransformationContext;
 use TypeError;
 
 class PartialsTreeFromRequestResolver
@@ -22,9 +23,9 @@ class PartialsTreeFromRequestResolver
     }
 
     public function execute(
-        IncludeableData $data,
+        BaseData|BaseDataCollectable $data,
         Request $request,
-    ): PartialTrees {
+    ): LocalTransformationContext {
         $requestedIncludesTree = $this->partialsParser->execute(
             $request->has('include') ? $this->arrayFromRequest($request, 'include') : []
         );
@@ -49,13 +50,11 @@ class PartialsTreeFromRequestResolver
         $allowedRequestOnlyTree = $this->allowedPartialsParser->execute('allowedRequestOnly', $this->dataConfig->getDataClass($dataClass));
         $allowedRequestExceptTree = $this->allowedPartialsParser->execute('allowedRequestExcept', $this->dataConfig->getDataClass($dataClass));
 
-        $partialTrees = $data->getPartialTrees();
-
-        return new PartialTrees(
-            $partialTrees->lazyIncluded->merge($requestedIncludesTree->intersect($allowedRequestIncludesTree)),
-            $partialTrees->lazyExcluded->merge($requestedExcludesTree->intersect($allowedRequestExcludesTree)),
-            $partialTrees->only->merge($requestedOnlyTree->intersect($allowedRequestOnlyTree)),
-            $partialTrees->except->merge($requestedExceptTree->intersect($allowedRequestExceptTree))
+        return new LocalTransformationContext(
+            $requestedIncludesTree->intersect($allowedRequestIncludesTree),
+            $requestedExcludesTree->intersect($allowedRequestExcludesTree),
+            $requestedOnlyTree->intersect($allowedRequestOnlyTree),
+            $requestedExceptTree->intersect($allowedRequestExceptTree)
         );
     }
 

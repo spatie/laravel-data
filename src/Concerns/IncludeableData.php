@@ -22,13 +22,6 @@ trait IncludeableData
     /** @var array<string, bool|Closure> */
     protected array $_except = [];
 
-    public function withPartialTrees(PartialTrees $partialTrees): static
-    {
-        $this->_partialTrees = $partialTrees;
-
-        return $this;
-    }
-
     public function include(string ...$includes): static
     {
         foreach ($includes as $include) {

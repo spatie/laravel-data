@@ -136,4 +136,14 @@ class TransformationContextFactory
 
         return $this;
     }
+
+    public function mergeDataContext(DataContext $context): static
+    {
+        $this->includes = array_merge($this->includes, $context->includes);
+        $this->excludes = array_merge($this->excludes, $context->excludes);
+        $this->only = array_merge($this->only, $context->only);
+        $this->except = array_merge($this->includes, $context->except);
+
+        return $this;
+    }
 }

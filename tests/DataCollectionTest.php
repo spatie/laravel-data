@@ -497,7 +497,6 @@ it('can serialize and unserialize a data collection', function () {
 it('during the serialization process some properties are thrown away', function () {
     $collection = SimpleData::collection(['A', 'B']);
 
-    $collection->withPartialTrees(new PartialTrees());
     $collection->include('test');
     $collection->exclude('test');
     $collection->only('test');

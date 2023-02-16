@@ -34,7 +34,7 @@ trait BaseDataCollectable
     public function getIterator(): ArrayIterator
     {
         /** @var array<TValue> $data */
-        $data = $this->transform(transformValues: false);
+        $data = $this->transform2(TransformationContextFactory::create()->transformValues(false));
 
         return new ArrayIterator($data);
     }

@@ -22,20 +22,14 @@ trait ResponsableData
      */
     public function toResponse($request)
     {
-        $context = new TransformationContext(
-            wrapExecutionType: WrapExecutionType::Enabled,
-        );
+        $context = TransformationContextFactory::create()
+            ->wrapExecutionType(WrapExecutionType::Enabled)
+            ->mergeDataContext($this->getDataContext())
+            ->get();
 
-        if ($this instanceof IncludeableDataContract) {
-            $partialTrees = resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request);
-
-            $context = $context->merge(new LocalTransformationContext(
-                $partialTrees->lazyIncluded,
-                $partialTrees->lazyExcluded,
-                $partialTrees->only,
-                $partialTrees->except,
-            ));
-        }
+        $context = $this instanceof IncludeableDataContract
+            ? $context->merge(resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request))
+            : $context;
 
         return new JsonResponse(
             data: $this->transform2($context),

@@ -2191,7 +2191,6 @@ it('can serialize and unserialize a data object with additional data', function 
 it('during the serialization process some properties are thrown away', function () {
     $object = SimpleData::from('Hello world');
 
-    $object->withPartialTrees(new PartialTrees());
     $object->include('test');
     $object->exclude('test');
     $object->only('test');
