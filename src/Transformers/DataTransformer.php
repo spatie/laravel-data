@@ -82,10 +82,6 @@ class DataTransformer
                     $trees->getNested($name),
                 );
 
-                if ($value instanceof Optional) {
-                    return $payload;
-                }
-
                 if ($this->mapPropertyNames && $property->outputMappedName) {
                     $name = $property->outputMappedName;
                 }

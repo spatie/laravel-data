@@ -63,7 +63,7 @@ dataset('only-inclusion', function () {
     yield 'nested' => [
         'directive' => ['nested'],
         'expectedOnly' => [
-            'nested' => [],
+            'nested' => ['first' => 'C', 'second' => 'D'],
         ],
         'expectedExcept' => [
             'first' => 'A',
@@ -127,10 +127,8 @@ dataset('only-inclusion', function () {
         'directive' => ['collection'],
         'expectedOnly' => [
             'collection' => [
-                [],
-                [],
-                //                    ['first' => 'E', 'second' => 'F'],
-                //                    ['first' => 'G', 'second' => 'H'],
+                ['first' => 'E', 'second' => 'F'],
+                ['first' => 'G', 'second' => 'H'],
             ],
         ],
         'expectedExcept' => [

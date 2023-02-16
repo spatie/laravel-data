@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
+use Spatie\LaravelData\Support\Transformation\LocalTransformationContext;
+use Spatie\LaravelData\Support\Transformation\TransformationContext;
+use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
+use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 trait ResponsableData
@@ -18,23 +22,25 @@ trait ResponsableData
      */
     public function toResponse($request)
     {
+        $context = new TransformationContext(
+            wrapExecutionType: WrapExecutionType::Enabled,
+        );
+
         if ($this instanceof IncludeableDataContract) {
             $partialTrees = resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request);
 
-            $this->withPartialTrees($partialTrees);
+            $context = $context->merge(new LocalTransformationContext(
+                $partialTrees->lazyIncluded,
+                $partialTrees->lazyExcluded,
+                $partialTrees->only,
+                $partialTrees->except,
+            ));
         }
 
         return new JsonResponse(
-            data: $this->transform(
-                wrapExecutionType: WrapExecutionType::Enabled,
-            ),
-            status: $this->calculateResponseStatus($request)
+            data: $this->transform2($context),
+            status: $request->isMethod(Request::METHOD_POST) ? Response::HTTP_CREATED : Response::HTTP_OK,
         );
-    }
-
-    protected function calculateResponseStatus(Request $request): int
-    {
-        return $request->isMethod(Request::METHOD_POST) ? Response::HTTP_CREATED : Response::HTTP_OK;
     }
 
     public static function allowedRequestIncludes(): ?array

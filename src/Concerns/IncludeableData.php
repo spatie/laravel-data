@@ -32,6 +32,7 @@ trait IncludeableData
     public function include(string ...$includes): static
     {
         foreach ($includes as $include) {
+            $this->getDataContext()->includes[$include] = true;
             $this->_includes[$include] = true;
         }
 
@@ -41,6 +42,7 @@ trait IncludeableData
     public function exclude(string ...$excludes): static
     {
         foreach ($excludes as $exclude) {
+            $this->getDataContext()->excludes[$exclude] = true;
             $this->_excludes[$exclude] = true;
         }
 
@@ -50,6 +52,7 @@ trait IncludeableData
     public function only(string ...$only): static
     {
         foreach ($only as $onlyDefinition) {
+            $this->getDataContext()->only[$onlyDefinition] = true;
             $this->_only[$onlyDefinition] = true;
         }
 
@@ -59,6 +62,7 @@ trait IncludeableData
     public function except(string ...$except): static
     {
         foreach ($except as $exceptDefinition) {
+            $this->getDataContext()->except[$exceptDefinition] = true;
             $this->_except[$exceptDefinition] = true;
         }
 
@@ -67,6 +71,7 @@ trait IncludeableData
 
     public function includeWhen(string $include, bool|Closure $condition): static
     {
+        $this->getDataContext()->includes[$include] = $condition;
         $this->_includes[$include] = $condition;
 
         return $this;
@@ -74,6 +79,7 @@ trait IncludeableData
 
     public function excludeWhen(string $exclude, bool|Closure $condition): static
     {
+        $this->getDataContext()->excludes[$exclude] = $condition;
         $this->_excludes[$exclude] = $condition;
 
         return $this;
@@ -81,6 +87,7 @@ trait IncludeableData
 
     public function onlyWhen(string $only, bool|Closure $condition): static
     {
+        $this->getDataContext()->only[$only] = $condition;
         $this->_only[$only] = $condition;
 
         return $this;
@@ -88,6 +95,7 @@ trait IncludeableData
 
     public function exceptWhen(string $except, bool|Closure $condition): static
     {
+        $this->getDataContext()->except[$except] = $condition;
         $this->_except[$except] = $condition;
 
         return $this;

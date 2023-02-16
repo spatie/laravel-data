@@ -7,6 +7,8 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Enumerable;
+use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
+use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataPipeline;
@@ -19,9 +21,16 @@ use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
+use Spatie\LaravelData\Resolvers\TransformedDataResolver;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Transformation\DataContext;
+use Spatie\LaravelData\Support\Transformation\LocalTransformationContext;
+use Spatie\LaravelData\Support\Transformation\TransformationContext;
+use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
+use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
+use Spatie\LaravelData\Support\Wrapping\WrapType;
 use Spatie\LaravelData\Transformers\DataTransformer;
 
 trait BaseData
@@ -31,6 +40,8 @@ trait BaseData
     protected static string $_paginatedCollectionClass = PaginatedDataCollection::class;
 
     protected static string $_cursorPaginatedCollectionClass = CursorPaginatedDataCollection::class;
+
+    protected ?DataContext $_dataContext = null;
 
     public static function optional(mixed ...$payloads): ?static
     {
@@ -106,12 +117,44 @@ trait BaseData
         return DataTransformer::create($transformValues, $wrapExecutionType, $mapPropertyNames)->transform($this);
     }
 
+    public function transform2(
+        null|TransformationContextFactory|TransformationContext $context = null,
+    ): array {
+        if ($context === null) {
+            $context = new TransformationContext();
+        }
+
+        if ($context instanceof TransformationContextFactory) {
+            $context = $context->get();
+        }
+
+        return app(TransformedDataResolver::class)->execute(
+            $this,
+            $context->merge(LocalTransformationContext::create($this))
+        );
+    }
+
     public function __sleep(): array
     {
         return app(DataConfig::class)->getDataClass(static::class)
             ->properties
-            ->map(fn (DataProperty $property) => $property->name)
+            ->map(fn(DataProperty $property) => $property->name)
             ->push('_additional')
             ->toArray();
+    }
+
+    public function getDataContext(): DataContext
+    {
+        if ($this->_dataContext === null) {
+            return $this->_dataContext = new DataContext(
+                $this instanceof IncludeableDataContract ? $this->includeProperties() : [],
+                $this instanceof IncludeableDataContract ? $this->excludeProperties() : [],
+                $this instanceof IncludeableDataContract ? $this->onlyProperties() : [],
+                $this instanceof IncludeableDataContract ? $this->exceptProperties() : [],
+                $this instanceof WrappableDataContract ? $this->getWrap() : new Wrap(WrapType::UseGlobal),
+            );
+        }
+
+        return $this->_dataContext;
     }
 }

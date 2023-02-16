@@ -8,7 +8,7 @@ it('can create a data object from JSON', function () {
 
     $createdData = MultiData::from($originalData->toJson());
 
-    expect($createdData)->toEqual($originalData);
+    expect($createdData->all())->toEqual($originalData->all());
 });
 
 it("won't create a data object from a regular string", function () {

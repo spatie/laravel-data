@@ -11,6 +11,7 @@ trait WrappableData
 
     public function withoutWrapping(): static
     {
+        $this->getDataContext()->wrap = new Wrap(WrapType::Disabled);
         $this->_wrap = new Wrap(WrapType::Disabled);
 
         return $this;
@@ -18,6 +19,7 @@ trait WrappableData
 
     public function wrap(string $key): static
     {
+        $this->getDataContext()->wrap = new Wrap(WrapType::Defined, $key);
         $this->_wrap = new Wrap(WrapType::Defined, $key);
 
         return $this;
