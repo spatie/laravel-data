@@ -10,7 +10,7 @@ use Spatie\LaravelData\Support\AllowedPartialsParser;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\PartialTrees;
-use Spatie\LaravelData\Support\Transformation\LocalTransformationContext;
+use Spatie\LaravelData\Support\Transformation\PartialTransformationContext;
 use TypeError;
 
 class PartialsTreeFromRequestResolver
@@ -25,7 +25,7 @@ class PartialsTreeFromRequestResolver
     public function execute(
         BaseData|BaseDataCollectable $data,
         Request $request,
-    ): LocalTransformationContext {
+    ): PartialTransformationContext {
         $requestedIncludesTree = $this->partialsParser->execute(
             $request->has('include') ? $this->arrayFromRequest($request, 'include') : []
         );
@@ -50,7 +50,7 @@ class PartialsTreeFromRequestResolver
         $allowedRequestOnlyTree = $this->allowedPartialsParser->execute('allowedRequestOnly', $this->dataConfig->getDataClass($dataClass));
         $allowedRequestExceptTree = $this->allowedPartialsParser->execute('allowedRequestExcept', $this->dataConfig->getDataClass($dataClass));
 
-        return new LocalTransformationContext(
+        return new PartialTransformationContext(
             $requestedIncludesTree->intersect($allowedRequestIncludesTree),
             $requestedExcludesTree->intersect($allowedRequestExcludesTree),
             $requestedOnlyTree->intersect($allowedRequestOnlyTree),

@@ -18,10 +18,7 @@ class TransformationContext
         public bool $transformValues = true,
         public bool $mapPropertyNames = true,
         public WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
-        public TreeNode $lazyIncluded = new DisabledTreeNode(),
-        public TreeNode $lazyExcluded = new DisabledTreeNode(),
-        public TreeNode $only = new DisabledTreeNode(),
-        public TreeNode $except = new DisabledTreeNode(),
+        public PartialTransformationContext $partials = new PartialTransformationContext(),
     ) {
     }
 
@@ -32,23 +29,17 @@ class TransformationContext
             $this->transformValues,
             $this->mapPropertyNames,
             $this->wrapExecutionType,
-            $this->lazyIncluded->getNested($property),
-            $this->lazyExcluded->getNested($property),
-            $this->only->getNested($property),
-            $this->except->getNested($property),
+            $this->partials->getNested($property)
         );
     }
 
-    public function merge(LocalTransformationContext $localContext): self
+    public function mergePartials(PartialTransformationContext $partials): self
     {
         return new self(
             $this->transformValues,
             $this->mapPropertyNames,
             $this->wrapExecutionType,
-            $this->lazyIncluded->merge($localContext->lazyIncluded),
-            $this->lazyExcluded->merge($localContext->lazyExcluded),
-            $this->only->merge($localContext->only),
-            $this->except->merge($localContext->except),
+            $this->partials->merge($partials),
         );
     }
 
@@ -58,10 +49,7 @@ class TransformationContext
             $this->transformValues,
             $this->mapPropertyNames,
             $wrapExecutionType,
-            $this->lazyIncluded,
-            $this->lazyExcluded,
-            $this->only,
-            $this->except,
+            $this->partials,
         );
     }
 }

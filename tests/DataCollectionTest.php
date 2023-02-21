@@ -507,10 +507,6 @@ it('during the serialization process some properties are thrown away', function 
 
     $invaded = invade($unserialized);
 
-    expect($invaded->_partialTrees)->toBeNull();
-    expect($invaded->_includes)->toBeEmpty();
-    expect($invaded->_excludes)->toBeEmpty();
-    expect($invaded->_only)->toBeEmpty();
-    expect($invaded->_except)->toBeEmpty();
+    expect($invaded->_dataContext)->toBeNull();
     expect($invaded->_wrap)->toBeNull();
 });

@@ -3,8 +3,12 @@
 namespace Spatie\LaravelData\Support;
 
 use Illuminate\Support\Collection;
+use ReflectionIntersectionType;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionParameter;
+use ReflectionUnionType;
+use Spatie\LaravelData\Enums\CustomCreationMethodType;
 
 /**
  * @property Collection<DataParameter> $parameters
@@ -16,26 +20,24 @@ class DataMethod
         public readonly Collection $parameters,
         public readonly bool $isStatic,
         public readonly bool $isPublic,
-        public readonly bool $isCustomCreationMethod,
+        public readonly CustomCreationMethodType $customCreationMethodType,
+        public readonly ?Type $returnType,
     ) {
     }
 
     public static function create(ReflectionMethod $method): self
     {
-        $isCustomCreationMethod = $method->isStatic()
-            && $method->isPublic()
-            && str_starts_with($method->getName(), 'from')
-            && $method->name !== 'from'
-            && $method->name !== 'optional';
+        $returnType = Type::create($method->getReturnType());
 
         return new self(
             $method->name,
             collect($method->getParameters())->map(
-                fn (ReflectionParameter $parameter) => DataParameter::create($parameter),
+                fn(ReflectionParameter $parameter) => DataParameter::create($parameter),
             ),
             $method->isStatic(),
             $method->isPublic(),
-            $isCustomCreationMethod
+            self::resolveCustomCreationMethodType($method, $returnType),
+            $returnType
         );
     }
 
@@ -58,8 +60,33 @@ class DataMethod
             $parameters,
             false,
             $method->isPublic(),
-            false
+            CustomCreationMethodType::None,
+            null,
         );
+    }
+
+    protected static function resolveCustomCreationMethodType(
+        ReflectionMethod $method,
+        ?Type $returnType,
+    ): CustomCreationMethodType {
+        if (! $method->isStatic()
+            || ! $method->isPublic()
+            || $method->name === 'from'
+            || $method->name === 'collect'
+            || $method->name === 'collection'
+        ) {
+            return CustomCreationMethodType::None;
+        }
+
+        if (str_starts_with($method->name, 'from')) {
+            return CustomCreationMethodType::Object;
+        }
+
+        if (str_starts_with($method->name, 'collect') && $returnType && count($returnType) > 0) {
+            return CustomCreationMethodType::Collection;
+        }
+
+        return CustomCreationMethodType::None;
     }
 
     public function accepts(mixed ...$input): bool
@@ -67,7 +94,7 @@ class DataMethod
         /** @var Collection<\Spatie\LaravelData\Support\DataParameter|\Spatie\LaravelData\Support\DataProperty> $parameters */
         $parameters = array_is_list($input)
             ? $this->parameters
-            : $this->parameters->mapWithKeys(fn (DataParameter|DataProperty $parameter) => [$parameter->name => $parameter]);
+            : $this->parameters->mapWithKeys(fn(DataParameter|DataProperty $parameter) => [$parameter->name => $parameter]);
 
         if (count($input) > $parameters->count()) {
             return false;
@@ -90,5 +117,10 @@ class DataMethod
         }
 
         return true;
+    }
+
+    public function returns(string $type): bool
+    {
+        return $this->returnType->acceptsType($type);
     }
 }

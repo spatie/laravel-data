@@ -9,6 +9,7 @@ use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
+use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataConfig;
@@ -101,17 +102,17 @@ class TransformedDataResolver
 
         // Lazy excluded checks
 
-        if ($context->lazyExcluded instanceof AllTreeNode) {
+        if ($context->partials->lazyExcluded instanceof AllTreeNode) {
             return false;
         }
 
-        if ($context->lazyExcluded instanceof PartialTreeNode && $context->lazyExcluded->hasField($name)) {
+        if ($context->partials->lazyExcluded instanceof PartialTreeNode && $context->partials->lazyExcluded->hasField($name)) {
             return false;
         }
 
         // Lazy included checks
 
-        if ($context->lazyIncluded instanceof AllTreeNode) {
+        if ($context->partials->lazyIncluded instanceof AllTreeNode) {
             return true;
         }
 
@@ -119,38 +120,38 @@ class TransformedDataResolver
             return true;
         }
 
-        return $context->lazyIncluded instanceof PartialTreeNode && $context->lazyIncluded->hasField($name);
+        return $context->partials->lazyIncluded instanceof PartialTreeNode && $context->partials->lazyIncluded->hasField($name);
     }
 
     protected function isPropertyHidden(
         string $name,
         TransformationContext $context
     ): bool {
-        if ($context->except instanceof AllTreeNode) {
+        if ($context->partials->except instanceof AllTreeNode) {
             return true;
         }
 
         if (
-            $context->except instanceof PartialTreeNode
-            && $context->except->hasField($name)
-            && $context->except->getNested($name) instanceof ExcludedTreeNode
+            $context->partials->except instanceof PartialTreeNode
+            && $context->partials->except->hasField($name)
+            && $context->partials->except->getNested($name) instanceof ExcludedTreeNode
         ) {
             return true;
         }
 
-        if ($context->except instanceof PartialTreeNode) {
+        if ($context->partials->except instanceof PartialTreeNode) {
             return false;
         }
 
-        if ($context->only instanceof AllTreeNode) {
+        if ($context->partials->only instanceof AllTreeNode) {
             return false;
         }
 
-        if ($context->only instanceof PartialTreeNode && $context->only->hasField($name)) {
+        if ($context->partials->only instanceof PartialTreeNode && $context->partials->only->hasField($name)) {
             return false;
         }
 
-        if ($context->only instanceof PartialTreeNode || $context->only instanceof ExcludedTreeNode) {
+        if ($context->partials->only instanceof PartialTreeNode || $context->partials->only instanceof ExcludedTreeNode) {
             return true;
         }
 
@@ -172,12 +173,12 @@ class TransformedDataResolver
 
         $nextContext = $context->next($property->name);
 
-        if (is_array($value) && ($nextContext->only instanceof AllTreeNode || $nextContext->only instanceof PartialTreeNode)) {
-            return Arr::only($value, $nextContext->only->getFields());
+        if (is_array($value) && ($nextContext->partials->only instanceof AllTreeNode || $nextContext->partials->only instanceof PartialTreeNode)) {
+            return Arr::only($value, $nextContext->partials->only->getFields());
         }
 
-        if (is_array($value) && ($nextContext->except instanceof AllTreeNode || $nextContext->except instanceof PartialTreeNode)) {
-            return Arr::except($value, $nextContext->except->getFields());
+        if (is_array($value) && ($nextContext->partials->except instanceof AllTreeNode || $nextContext->partials->except instanceof PartialTreeNode)) {
+            return Arr::except($value, $nextContext->partials->except->getFields());
         }
 
         if ($transformer = $this->resolveTransformerForValue($property, $value, $nextContext)) {
@@ -189,13 +190,13 @@ class TransformedDataResolver
             && $value instanceof TransformableData
             && $nextContext->transformValues
         ) {
-            $wrapExecutionType = match ($context->wrapExecutionType){
+            $wrapExecutionType = match ($context->wrapExecutionType) {
                 WrapExecutionType::Enabled => WrapExecutionType::Enabled,
                 WrapExecutionType::Disabled => WrapExecutionType::Disabled,
                 WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled
             };
 
-            return $value->transform2($nextContext->setWrapExecutionType($wrapExecutionType));
+            return $value->transform($nextContext->setWrapExecutionType($wrapExecutionType));
         }
 
         if (
@@ -203,21 +204,21 @@ class TransformedDataResolver
             && $value instanceof TransformableData
             && $nextContext->transformValues
         ) {
-            $wrapExecutionType = match ($context->wrapExecutionType){
+            $wrapExecutionType = match ($context->wrapExecutionType) {
                 WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
                 WrapExecutionType::Disabled => WrapExecutionType::Disabled,
                 WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled
             };
 
-            return $value->transform2($nextContext->setWrapExecutionType($wrapExecutionType));
+            return $value->transform($nextContext->setWrapExecutionType($wrapExecutionType));
         }
 
         if (
-            $property->type->isDataCollectable
+            $property->type->kind->isDataCollectable()
             && is_iterable($value)
             && $nextContext->transformValues
         ) {
-            $wrapExecutionType = match ($context->wrapExecutionType){
+            $wrapExecutionType = match ($context->wrapExecutionType) {
                 WrapExecutionType::Enabled => WrapExecutionType::Enabled,
                 WrapExecutionType::Disabled => WrapExecutionType::Disabled,
                 WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled
@@ -228,6 +229,7 @@ class TransformedDataResolver
                 $nextContext->setWrapExecutionType($wrapExecutionType)
             );
         }
+
         return $value;
     }
 
@@ -243,7 +245,7 @@ class TransformedDataResolver
         $transformer = $property->transformer ?? $this->dataConfig->findGlobalTransformerForValue($value);
 
         $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
-            && ($property->type->isDataObject || $property->type->isDataCollectable);
+            && $property->type->kind !== DataTypeKind::Default;
 
         if ($shouldUseDefaultDataTransformer) {
             return null;

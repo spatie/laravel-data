@@ -6,6 +6,7 @@ use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
@@ -19,19 +20,20 @@ use Spatie\LaravelData\DataPipes\FillRouteParameterPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\PaginatedDataCollection;
+use Spatie\LaravelData\Resolvers\DataCollectableFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataResolver;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Partials\PartialsDefinition;
 use Spatie\LaravelData\Support\Transformation\DataContext;
-use Spatie\LaravelData\Support\Transformation\LocalTransformationContext;
+use Spatie\LaravelData\Support\Transformation\PartialTransformationContext;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
 use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Support\Wrapping\WrapType;
-use Spatie\LaravelData\Transformers\DataTransformer;
 
 trait BaseData
 {
@@ -74,6 +76,24 @@ trait BaseData
         );
     }
 
+    public static function collect(mixed $items, ?string $into = null): array|DataCollection|PaginatedDataCollection|CursorPaginatedDataCollection|Enumerable|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator
+    {
+        return app(DataCollectableFromSomethingResolver::class)->execute(
+            static::class,
+            $items,
+            $into
+        );
+    }
+
+    public static function withoutMagicalCreationCollect(mixed $items, ?string $into = null): array|DataCollection|PaginatedDataCollection|CursorPaginatedDataCollection|Enumerable|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator
+    {
+        return app(DataCollectableFromSomethingResolver::class)->withoutMagicalCreation()->execute(
+            static::class,
+            $items,
+            $into
+        );
+    }
+
     public static function normalizers(): array
     {
         return config('data.normalizers');
@@ -91,6 +111,11 @@ trait BaseData
             ->through(CastPropertiesDataPipe::class);
     }
 
+    public static function prepareForPipeline(Collection $properties): Collection
+    {
+        return $properties;
+    }
+
     public static function collection(Enumerable|array|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator|DataCollection $items): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
         if ($items instanceof Paginator || $items instanceof AbstractPaginator) {
@@ -102,36 +127,6 @@ trait BaseData
         }
 
         return new (static::$_collectionClass)(static::class, $items);
-    }
-
-    public static function empty(array $extra = []): array
-    {
-        return app(EmptyDataResolver::class)->execute(static::class, $extra);
-    }
-
-    public function transform(
-        bool $transformValues = true,
-        WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
-        bool $mapPropertyNames = true,
-    ): array {
-        return DataTransformer::create($transformValues, $wrapExecutionType, $mapPropertyNames)->transform($this);
-    }
-
-    public function transform2(
-        null|TransformationContextFactory|TransformationContext $context = null,
-    ): array {
-        if ($context === null) {
-            $context = new TransformationContext();
-        }
-
-        if ($context instanceof TransformationContextFactory) {
-            $context = $context->get();
-        }
-
-        return app(TransformedDataResolver::class)->execute(
-            $this,
-            $context->merge(LocalTransformationContext::create($this))
-        );
     }
 
     public function __sleep(): array
@@ -147,10 +142,12 @@ trait BaseData
     {
         if ($this->_dataContext === null) {
             return $this->_dataContext = new DataContext(
-                $this instanceof IncludeableDataContract ? $this->includeProperties() : [],
-                $this instanceof IncludeableDataContract ? $this->excludeProperties() : [],
-                $this instanceof IncludeableDataContract ? $this->onlyProperties() : [],
-                $this instanceof IncludeableDataContract ? $this->exceptProperties() : [],
+                new PartialsDefinition(
+                    $this instanceof IncludeableDataContract ? $this->includeProperties() : [],
+                    $this instanceof IncludeableDataContract ? $this->excludeProperties() : [],
+                    $this instanceof IncludeableDataContract ? $this->onlyProperties() : [],
+                    $this instanceof IncludeableDataContract ? $this->exceptProperties() : [],
+                ),
                 $this instanceof WrappableDataContract ? $this->getWrap() : new Wrap(WrapType::UseGlobal),
             );
         }

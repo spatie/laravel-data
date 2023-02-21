@@ -17,12 +17,14 @@ use Spatie\LaravelData\Contracts\ValidateableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
+use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
 
 /**
  * @property  class-string<DataObject> $name
  * @property  Collection<string, DataProperty> $properties
  * @property  Collection<string, DataMethod> $methods
  * @property  Collection<string, object> $attributes
+ * @property  array<string, \Spatie\LaravelData\Support\Annotations\DataCollectableAnnotation> $dataCollectablePropertyAnnotations
  */
 class DataClass
 {
@@ -39,23 +41,27 @@ class DataClass
         public readonly bool $validateable,
         public readonly bool $wrappable,
         public readonly Collection $attributes,
+        public readonly array $dataCollectablePropertyAnnotations
     ) {
     }
 
     public static function create(ReflectionClass $class): self
     {
         $attributes = collect($class->getAttributes())
-            ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
-            ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
+            ->filter(fn(ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
+            ->map(fn(ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
 
         $methods = collect($class->getMethods());
 
-        $constructor = $methods->first(fn (ReflectionMethod $method) => $method->isConstructor());
+        $constructor = $methods->first(fn(ReflectionMethod $method) => $method->isConstructor());
+
+        $dataCollectablePropertyAnnotations = DataCollectableAnnotationReader::create()->getForClass($class);
 
         $properties = self::resolveProperties(
             $class,
             $constructor,
-            NameMappersResolver::create(ignoredMappers: [ProvidedNameMapper::class])->execute($attributes)
+            NameMappersResolver::create(ignoredMappers: [ProvidedNameMapper::class])->execute($attributes),
+            $dataCollectablePropertyAnnotations,
         );
 
         return new self(
@@ -70,7 +76,8 @@ class DataClass
             transformable: $class->implementsInterface(TransformableData::class),
             validateable: $class->implementsInterface(ValidateableData::class),
             wrappable: $class->implementsInterface(WrappableData::class),
-            attributes:  $attributes,
+            attributes: $attributes,
+            dataCollectablePropertyAnnotations: $dataCollectablePropertyAnnotations
         );
     }
 
@@ -78,9 +85,9 @@ class DataClass
         ReflectionClass $reflectionClass,
     ): Collection {
         return collect($reflectionClass->getMethods())
-            ->filter(fn (ReflectionMethod $method) => str_starts_with($method->name, 'from'))
+            ->filter(fn(ReflectionMethod $method) => str_starts_with($method->name, 'from') || str_starts_with($method->name, 'collectFrom'))
             ->mapWithKeys(
-                fn (ReflectionMethod $method) => [$method->name => DataMethod::create($method)],
+                fn(ReflectionMethod $method) => [$method->name => DataMethod::create($method)],
             );
     }
 
@@ -88,19 +95,21 @@ class DataClass
         ReflectionClass $class,
         ?ReflectionMethod $constructorMethod,
         array $mappers,
+        array $dataCollectablePropertyAnnotations,
     ): Collection {
         $defaultValues = self::resolveDefaultValues($class, $constructorMethod);
 
         return collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(fn (ReflectionProperty $property) => $property->isStatic())
+            ->reject(fn(ReflectionProperty $property) => $property->isStatic())
             ->values()
-            ->mapWithKeys(fn (ReflectionProperty $property) => [
+            ->mapWithKeys(fn(ReflectionProperty $property) => [
                 $property->name => DataProperty::create(
                     $property,
                     array_key_exists($property->getName(), $defaultValues),
                     $defaultValues[$property->getName()] ?? null,
                     $mappers['inputNameMapper'],
                     $mappers['outputNameMapper'],
+                    $dataCollectablePropertyAnnotations[$property->getName()] ?? null,
                 ),
             ]);
     }
@@ -114,8 +123,8 @@ class DataClass
         }
 
         $values = collect($constructorMethod->getParameters())
-            ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-            ->mapWithKeys(fn (ReflectionParameter $parameter) => [
+            ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+            ->mapWithKeys(fn(ReflectionParameter $parameter) => [
                 $parameter->name => $parameter->getDefaultValue(),
             ])
             ->toArray();

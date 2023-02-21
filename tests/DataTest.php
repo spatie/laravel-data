@@ -607,7 +607,7 @@ it('can get the data object without mapping properties names', function () {
         }
     };
 
-    expect($data)->transform2(TransformationContextFactory::create()->mapPropertyNames(false))
+    expect($data)->transform(TransformationContextFactory::create()->mapPropertyNames(false))
         ->toMatchArray([
             'camelName' => 'Freek',
         ]);
@@ -622,7 +622,7 @@ it('can get the data object without mapping', function () {
         }
     };
 
-    expect($data)->transform2(TransformationContextFactory::create()->mapPropertyNames(false))
+    expect($data)->transform(TransformationContextFactory::create()->mapPropertyNames(false))
         ->toMatchArray([
             'camelName' => 'Freek',
         ]);
@@ -636,7 +636,7 @@ it('can get the data object with mapping properties by default', function () {
         ) {
         }
     };
-    expect($data->transform2())->toMatchArray([
+    expect($data->transform())->toMatchArray([
         'snake_name' => 'Freek',
     ]);
 });
@@ -2201,10 +2201,39 @@ it('during the serialization process some properties are thrown away', function 
 
     $invaded = invade($unserialized);
 
-    expect($invaded->_partialTrees)->toBeNull();
-    expect($invaded->_includes)->toBeEmpty();
-    expect($invaded->_excludes)->toBeEmpty();
-    expect($invaded->_only)->toBeEmpty();
-    expect($invaded->_except)->toBeEmpty();
+    expect($invaded->_dataContext)->toBeNull();
     expect($invaded->_wrap)->toBeNull();
 });
+
+
+it('can use an array to store data', function () {
+    $dataClass = new class(
+        [LazyData::from('A'), LazyData::from('B')],
+        collect([LazyData::from('A'), LazyData::from('B')]),
+    ) extends Data
+    {
+        public function __construct(
+            #[DataCollectionOf(SimpleData::class)]
+            public array $array,
+            #[DataCollectionOf(SimpleData::class)]
+            public Collection $collection,
+        ) {
+        }
+    };
+
+    $d = $dataClass::from([
+        'array' => ['A', 'B'],
+        'collection' => ['A', 'B'],
+    ]);
+
+    expect($dataClass->include('array.name', 'collection.name')->toArray())->toBe([
+        'array' => [
+            ['name' => 'A'],
+            ['name' => 'B'],
+        ],
+        'collection' => [
+            ['name' => 'A'],
+            ['name' => 'B'],
+        ],
+    ]);
+})->skip('TODO: yet to impelment');

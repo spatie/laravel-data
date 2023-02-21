@@ -15,6 +15,7 @@ use ReflectionProperty;
 use RuntimeException;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Enums\DataCollectableType;
+use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelTypeScriptTransformer\Transformers\DtoTransformer;
@@ -94,7 +95,7 @@ class DataTypeScriptTransformer extends DtoTransformer
         DataProperty $dataProperty,
         MissingSymbolsCollection $missingSymbols,
     ): ?Type {
-        if (! $dataProperty->type->isDataCollectable) {
+        if (! $dataProperty->type->kind->isDataCollectable()) {
             return $this->reflectionToType(
                 $property,
                 $missingSymbols,
@@ -102,11 +103,11 @@ class DataTypeScriptTransformer extends DtoTransformer
             );
         }
 
-        $collectionType = match ($dataProperty->type->dataCollectableType) {
-            DataCollectableType::Default => $this->defaultCollectionType($dataProperty->type->dataClass),
-            DataCollectableType::Paginated => $this->paginatedCollectionType($dataProperty->type->dataClass),
-            DataCollectableType::CursorPaginated => $this->cursorPaginatedCollectionType($dataProperty->type->dataClass),
-            null => throw new RuntimeException('Cannot end up here since the type is dataCollectable')
+        $collectionType = match ($dataProperty->type->kind) {
+            DataTypeKind::Enumerable, DataTypeKind::Array, DataTypeKind::DataCollection => $this->defaultCollectionType($dataProperty->type->dataClass),
+            DataTypeKind::Paginator, DataTypeKind::DataPaginatedCollection => $this->paginatedCollectionType($dataProperty->type->dataClass),
+            DataTypeKind::CursorPaginator, DataTypeKind::DataCursorPaginatedCollection => $this->cursorPaginatedCollectionType($dataProperty->type->dataClass),
+            default => throw new RuntimeException('Cannot end up here since the type is dataCollectable')
         };
 
         if ($dataProperty->type->isNullable) {

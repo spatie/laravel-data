@@ -79,9 +79,9 @@ it('will further transform resources', function () {
 });
 
 it('will return the base type for lazy types', function () {
-    //        $this->assertEmptyPropertyValue(null, new class() {
-    //            public Lazy | string $property;
-    //        });
+    assertEmptyPropertyValue(null, new class() {
+        public Lazy|string $property;
+    });
 
     assertEmptyPropertyValue([], new class () {
         public Lazy|array $property;

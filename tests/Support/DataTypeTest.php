@@ -5,10 +5,14 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\DataObject;
+use Spatie\LaravelData\Contracts\EmptyData;
 use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Contracts\PrepareableData;
 use Spatie\LaravelData\Contracts\ResponsableData;
@@ -19,12 +23,15 @@ use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Enums\DataCollectableType;
+use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
+use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
 use Spatie\LaravelData\Support\DataType;
+use Spatie\LaravelData\Support\Factories\DataTypeFactory;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
@@ -33,7 +40,12 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 
 function resolveDataType(object $class, string $property = 'property'): DataType
 {
-    return DataType::create(new ReflectionProperty($class, $property));
+    $reflectionProperty = new ReflectionProperty($class, $property);
+
+    return DataTypeFactory::create()->build(
+        $reflectionProperty,
+        DataCollectableAnnotationReader::create()->getForClass($reflectionProperty->getDeclaringClass())[$property] ?? null,
+    );
 }
 
 it('can deduce a type without definition', function () {
@@ -46,9 +58,9 @@ it('can deduce a type without definition', function () {
         ->isMixed->toBeTrue()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeFalse()
+        ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
+        ->dataCollectableClass->toBeNull()
         ->acceptedTypes->toBeEmpty();
 });
 
@@ -62,9 +74,9 @@ it('can deduce a type with definition', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeFalse()
+        ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
+        ->dataCollectableClass->toBeNull()
         ->acceptedTypes->toHaveKeys(['string']);
 });
 
@@ -78,9 +90,9 @@ it('can deduce a nullable type with definition', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeFalse()
+        ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
+        ->dataCollectionClass->toBeNull()
         ->acceptedTypes->toHaveKeys(['string']);
 });
 
@@ -94,10 +106,9 @@ it('can deduce a union type definition', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeFalse()
-        ->dataCollectableType->toBeNull()
+        ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
+        ->dataCollectableClass->toBeNull()
         ->acceptedTypes->toHaveKeys(['string', 'int']);
 });
 
@@ -111,10 +122,9 @@ it('can deduce a nullable union type definition', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeFalse()
-        ->dataCollectableType->toBeNull()
+        ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
+        ->dataCollectableClass->toBeNull()
         ->acceptedTypes->toHaveKeys(['string', 'int']);
 });
 
@@ -128,10 +138,9 @@ it('can deduce an intersection type definition', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeFalse()
-        ->dataCollectableType->toBeNull()
+        ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
+        ->dataCollectableClass->toBeNull()
         ->acceptedTypes->toHaveKeys([
             DateTime::class,
             DateTimeImmutable::class,
@@ -148,10 +157,9 @@ it('can deduce a mixed type', function () {
         ->isMixed->toBeTrue()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeFalse()
-        ->dataCollectableType->toBeNull()
+        ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
+        ->dataCollectableClass->toBeNull()
         ->acceptedTypes->toHaveKeys([]);
 });
 
@@ -165,10 +173,9 @@ it('can deduce a lazy type', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeFalse()
-        ->dataCollectableType->toBeNull()
+        ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
+        ->dataCollectableClass->toBeNull()
         ->acceptedTypes->toHaveKeys(['string']);
 });
 
@@ -182,10 +189,9 @@ it('can deduce an optional type', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeTrue()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeFalse()
-        ->dataCollectableType->toBeNull()
+        ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
+        ->dataCollectableClass->toBeNull()
         ->acceptedTypes->toHaveKeys(['string']);
 });
 
@@ -205,10 +211,9 @@ it('can deduce a data type', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeTrue()
-        ->isDataCollectable->toBeFalse()
-        ->dataCollectableType->toBeNull()
-        ->dataClass->toEqual(SimpleData::class)
+        ->kind->toBe(DataTypeKind::DataObject)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBeNull()
         ->acceptedTypes->toHaveKeys([SimpleData::class]);
 });
 
@@ -222,10 +227,9 @@ it('can deduce a data union type', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeTrue()
-        ->isDataCollectable->toBeFalse()
-        ->dataCollectableType->toBeNull()
-        ->dataClass->toEqual(SimpleData::class)
+        ->kind->toBe(DataTypeKind::DataObject)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBeNull()
         ->acceptedTypes->toHaveKeys([SimpleData::class]);
 });
 
@@ -240,10 +244,9 @@ it('can deduce a data collection type', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeTrue()
-        ->dataCollectableType->toEqual(DataCollectableType::Default)
-        ->dataClass->toEqual(SimpleData::class)
+        ->kind->toBe(DataTypeKind::DataCollection)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(DataCollection::class)
         ->acceptedTypes->toHaveKeys([DataCollection::class]);
 });
 
@@ -258,10 +261,9 @@ it('can deduce a data collection union type', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeTrue()
-        ->dataCollectableType->toEqual(DataCollectableType::Default)
-        ->dataClass->toEqual(SimpleData::class)
+        ->kind->toBe(DataTypeKind::DataCollection)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(DataCollection::class)
         ->acceptedTypes->toHaveKeys([DataCollection::class]);
 });
 
@@ -276,10 +278,9 @@ it('can deduce a paginated data collection type', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeTrue()
-        ->dataCollectableType->toEqual(DataCollectableType::Paginated)
-        ->dataClass->toEqual(SimpleData::class)
+        ->kind->toBe(DataTypeKind::DataPaginatedCollection)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(PaginatedDataCollection::class)
         ->acceptedTypes->toHaveKeys([PaginatedDataCollection::class]);
 });
 
@@ -294,10 +295,9 @@ it('can deduce a paginated data collection union type', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeTrue()
-        ->dataCollectableType->toEqual(DataCollectableType::Paginated)
-        ->dataClass->toEqual(SimpleData::class)
+        ->kind->toBe(DataTypeKind::DataPaginatedCollection)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(PaginatedDataCollection::class)
         ->acceptedTypes->toHaveKeys([PaginatedDataCollection::class]);
 });
 
@@ -312,10 +312,9 @@ it('can deduce a cursor paginated data collection type', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeTrue()
-        ->dataCollectableType->toEqual(DataCollectableType::CursorPaginated)
-        ->dataClass->toEqual(SimpleData::class)
+        ->kind->toBe(DataTypeKind::DataCursorPaginatedCollection)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(CursorPaginatedDataCollection::class)
         ->acceptedTypes->toHaveKeys([CursorPaginatedDataCollection::class]);
 });
 
@@ -330,11 +329,146 @@ it('can deduce a cursor paginated data collection union type', function () {
         ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
-        ->isDataObject->toBeFalse()
-        ->isDataCollectable->toBeTrue()
-        ->dataCollectableType->toEqual(DataCollectableType::CursorPaginated)
-        ->dataClass->toEqual(SimpleData::class)
+        ->kind->toBe(DataTypeKind::DataCursorPaginatedCollection)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(CursorPaginatedDataCollection::class)
         ->acceptedTypes->toHaveKeys([CursorPaginatedDataCollection::class]);
+});
+
+it('can deduce an array data collection type', function () {
+    $type = resolveDataType(new class () {
+        #[DataCollectionOf(SimpleData::class)]
+        public array $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->kind->toBe(DataTypeKind::Array)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe('array')
+        ->acceptedTypes->toHaveKeys(['array']);
+});
+
+it('can deduce an array data collection union type', function () {
+    $type = resolveDataType(new class () {
+        #[DataCollectionOf(SimpleData::class)]
+        public array|Lazy $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeTrue()
+        ->isOptional->toBeFalse()
+        ->kind->toBe(DataTypeKind::Array)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe('array')
+        ->acceptedTypes->toHaveKeys(['array']);
+});
+
+it('can deduce an enumerable data collection type', function () {
+    $type = resolveDataType(new class () {
+        #[DataCollectionOf(SimpleData::class)]
+        public Collection $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->kind->toBe(DataTypeKind::Enumerable)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(Collection::class)
+        ->acceptedTypes->toHaveKeys([Collection::class]);
+});
+
+it('can deduce an enumerable data collection union type', function () {
+    $type = resolveDataType(new class () {
+        #[DataCollectionOf(SimpleData::class)]
+        public Collection|Lazy $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeTrue()
+        ->isOptional->toBeFalse()
+        ->kind->toBe(DataTypeKind::Enumerable)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(Collection::class)
+        ->acceptedTypes->toHaveKeys([Collection::class]);
+});
+
+it('can deduce a paginator data collection type', function () {
+    $type = resolveDataType(new class () {
+        #[DataCollectionOf(SimpleData::class)]
+        public LengthAwarePaginator $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->kind->toBe(DataTypeKind::Paginator)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(LengthAwarePaginator::class)
+        ->acceptedTypes->toHaveKeys([LengthAwarePaginator::class]);
+});
+
+it('can deduce a paginator data collection union type', function () {
+    $type = resolveDataType(new class () {
+        #[DataCollectionOf(SimpleData::class)]
+        public LengthAwarePaginator|Lazy $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeTrue()
+        ->isOptional->toBeFalse()
+        ->kind->toBe(DataTypeKind::Paginator)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(LengthAwarePaginator::class)
+        ->acceptedTypes->toHaveKeys([LengthAwarePaginator::class]);
+});
+
+it('can deduce a cursor paginator data collection type', function () {
+    $type = resolveDataType(new class () {
+        #[DataCollectionOf(SimpleData::class)]
+        public CursorPaginator $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeFalse()
+        ->isOptional->toBeFalse()
+        ->kind->toBe(DataTypeKind::CursorPaginator)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(CursorPaginator::class)
+        ->acceptedTypes->toHaveKeys([CursorPaginator::class]);
+});
+
+it('can deduce a cursor paginator data collection union type', function () {
+    $type = resolveDataType(new class () {
+        #[DataCollectionOf(SimpleData::class)]
+        public CursorPaginator|Lazy $property;
+    });
+
+    expect($type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->isLazy->toBeTrue()
+        ->isOptional->toBeFalse()
+        ->kind->toBe(DataTypeKind::CursorPaginator)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(CursorPaginator::class)
+        ->acceptedTypes->toHaveKeys([CursorPaginator::class]);
 });
 
 it('cannot have multiple data types', function () {
@@ -362,28 +496,28 @@ it(
         expect(resolveDataType($class)->acceptedTypes)->toEqualCanonicalizing($expected);
     }
 )->with(function () {
-    yield [
+    yield 'no type' => [
         'class' => new class () {
             public $property;
         },
         'expected' => [],
     ];
 
-    yield [
+    yield 'mixed' => [
         'class' => new class () {
             public mixed $property;
         },
         'expected' => [],
     ];
 
-    yield [
+    yield 'single' => [
         'class' => new class () {
             public string $property;
         },
         'expected' => ['string' => []],
     ];
 
-    yield [
+    yield 'multi' => [
         'class' => new class () {
             public string|int|bool|float|array $property;
         },
@@ -396,7 +530,7 @@ it(
         ],
     ];
 
-    yield [
+    yield 'data' => [
         'class' => new class () {
             public SimpleData $property;
         },
@@ -410,18 +544,18 @@ it(
                 Arrayable::class,
                 DataObject::class,
                 AppendableData::class,
-                PrepareableData::class,
                 BaseData::class,
                 IncludeableData::class,
                 ResponsableData::class,
                 TransformableData::class,
                 ValidateableData::class,
                 WrappableData::class,
+                EmptyData::class,
             ],
         ],
     ];
 
-    yield [
+    yield 'enum' => [
         'class' => new class () {
             public DummyBackedEnum $property;
         },
@@ -698,92 +832,45 @@ it(
     ];
 });
 
-it(
-    'can get the data class for a data collection by annotation',
-    function (string $property, ?string $expected) {
-        $dataType = DataType::create(new ReflectionProperty(CollectionAnnotationsData::class, $property));
+it('can annotate data collections using attributes', function () {
+    $type = resolveDataType(new class () {
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection $property;
+    });
 
-        expect($dataType->dataClass)->toEqual($expected);
-    }
-)->with(function () {
-    yield [
-        'property' => 'propertyA',
-        'expected' => SimpleData::class,
-    ];
-
-    yield [
-        'property' => 'propertyB',
-        'expected' => SimpleData::class,
-    ];
-
-    yield [
-        'property' => 'propertyC',
-        'expected' => SimpleData::class,
-    ];
-
-    yield [
-        'property' => 'propertyD',
-        'expected' => SimpleData::class,
-    ];
-
-    yield [
-        'property' => 'propertyE',
-        'expected' => SimpleData::class,
-    ];
-
-    yield [
-        'property' => 'propertyF',
-        'expected' => SimpleData::class,
-    ];
-
-    yield [
-        'property' => 'propertyG',
-        'expected' => SimpleData::class,
-    ];
-
-    yield [
-        'property' => 'propertyH',
-        'expected' => SimpleData::class,
-    ];
-
-    yield [
-        'property' => 'propertyI',
-        'expected' => SimpleData::class,
-    ];
-
-    yield [
-        'property' => 'propertyJ',
-        'expected' => SimpleData::class,
-    ];
-
-    yield [
-        'property' => 'propertyK',
-        'expected' => SimpleData::class,
-    ];
-
-    yield [
-        'property' => 'propertyL',
-        'expected' => SimpleData::class,
-    ];
+    expect($type)
+        ->kind->toBe(DataTypeKind::DataCollection)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(DataCollection::class);
 });
 
-it('cannot get the data class for invalid annotations')
-    ->tap(
-        fn (string $property) => DataType::create(
-            new ReflectionProperty(CollectionAnnotationsData::class, $property)
-        )
-    )
-    ->throws(CannotFindDataClass::class)
-    ->with(function () {
-        yield [
-            'property' => 'propertyM',
-        ];
-
-        yield [
-            'property' => 'propertyN',
-        ];
-
-        yield [
-            'property' => 'propertyO',
-        ];
+it('can annotate data collections using var annotations', function () {
+    $type = resolveDataType(new class () {
+        /** @var DataCollection<SimpleData> */
+        public DataCollection $property;
     });
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::DataCollection)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(DataCollection::class);
+});
+
+it('can annotate data collections using property annotations', function () {
+    /**
+     * @property DataCollection<SimpleData> $property
+     */
+    class TestDataTypeWithClassAnnotatedProperty{
+        public function __construct(
+            public DataCollection $property,
+        ) {
+        }
+    }
+
+    $type = resolveDataType(new \TestDataTypeWithClassAnnotatedProperty(SimpleData::collection([])));
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::DataCollection)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe(DataCollection::class);
+});

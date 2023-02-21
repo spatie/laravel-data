@@ -3,8 +3,10 @@
 namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Resolvers\DataCollectableResolver;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
@@ -21,7 +23,7 @@ class CastPropertiesDataPipe implements DataPipe
         $castContext = $properties->all();
 
         foreach ($properties as $name => $value) {
-            $dataProperty = $class->properties->first(fn (DataProperty $dataProperty) => $dataProperty->name === $name);
+            $dataProperty = $class->properties->first(fn(DataProperty $dataProperty) => $dataProperty->name === $name);
 
             if ($dataProperty === null) {
                 continue;
@@ -56,12 +58,14 @@ class CastPropertiesDataPipe implements DataPipe
             return $cast->cast($property, $value, $castContext);
         }
 
-        if ($property->type->isDataObject) {
+        if ($property->type->kind->isDataObject()) {
             return $property->type->dataClass::from($value);
         }
 
-        if ($property->type->isDataCollectable) {
+        if ($property->type->kind->isDataCollectable()) {
             return $property->type->dataClass::collection($value);
+            // TODO: future
+            //            return $property->type->dataClass::collect($value, $property->type->dataCollectableClass);
         }
 
         return $value;

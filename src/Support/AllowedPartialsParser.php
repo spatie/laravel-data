@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Support;
 
+use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
@@ -29,7 +30,7 @@ class AllowedPartialsParser
                 /** @var \Spatie\LaravelData\Support\DataProperty $dataProperty */
                 $dataProperty = $dataClass->properties->get($field);
 
-                if ($dataProperty->type->isDataObject || $dataProperty->type->isDataCollectable) {
+                if ($dataProperty->type->kind !== DataTypeKind::Default) {
                     return [
                         $field => $this->execute(
                             $type,

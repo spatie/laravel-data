@@ -3,6 +3,7 @@
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataType;
+use Spatie\LaravelData\Support\Factories\DataTypeFactory;
 
 it('can create a data parameter', function () {
     $class = new class ('', '', '') extends Data {
@@ -23,7 +24,7 @@ it('can create a data parameter', function () {
         ->isPromoted->toBeFalse()
         ->hasDefaultValue->toBeFalse()
         ->defaultValue->toBeNull()
-        ->type->toEqual(DataType::create($reflection));
+        ->type->toEqual(DataTypeFactory::create()->build($reflection));
 
     $reflection = new ReflectionParameter([$class::class, '__construct'], 'withoutType');
     $parameter = DataParameter::create($reflection);
@@ -33,7 +34,7 @@ it('can create a data parameter', function () {
         ->isPromoted->toBeTrue()
         ->hasDefaultValue->toBeFalse()
         ->defaultValue->toBeNull()
-        ->type->toEqual(DataType::create($reflection));
+        ->type->toEqual(DataTypeFactory::create()->build($reflection));
 
     $reflection = new ReflectionParameter([$class::class, '__construct'], 'property');
     $parameter = DataParameter::create($reflection);
@@ -43,7 +44,7 @@ it('can create a data parameter', function () {
         ->isPromoted->toBeTrue()
         ->hasDefaultValue->toBeFalse()
         ->defaultValue->toBeNull()
-        ->type->toEqual(DataType::create($reflection));
+        ->type->toEqual(DataTypeFactory::create()->build($reflection));
 
     $reflection = new ReflectionParameter([$class::class, '__construct'], 'propertyWithDefault');
     $parameter = DataParameter::create($reflection);
@@ -53,5 +54,5 @@ it('can create a data parameter', function () {
         ->isPromoted->toBeTrue()
         ->hasDefaultValue->toBeTrue()
         ->defaultValue->toEqual('hello')
-        ->type->toEqual(DataType::create($reflection));
+        ->type->toEqual(DataTypeFactory::create()->build($reflection));
 });

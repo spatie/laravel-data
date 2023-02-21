@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support;
 
 use ReflectionParameter;
+use Spatie\LaravelData\Support\Factories\DataTypeFactory;
 
 class DataParameter
 {
@@ -25,7 +26,7 @@ class DataParameter
             $parameter->isPromoted(),
             $hasDefaultValue,
             $hasDefaultValue ? $parameter->getDefaultValue() : null,
-            DataType::create($parameter),
+            DataTypeFactory::create()->build($parameter),
         );
     }
 }

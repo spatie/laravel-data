@@ -1,9 +1,15 @@
 <?php
 
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
+use phpDocumentor\Reflection\Types\Self_;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Enums\CustomCreationMethodType;
 use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Type;
 use Spatie\LaravelData\Tests\Fakes\DataWithMultipleArgumentCreationMethod;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
@@ -26,7 +32,7 @@ it('can create a data method from a constructor', function () {
         ->parameters->toHaveCount(2)
         ->isPublic->toBeTrue()
         ->isStatic->toBeFalse()
-        ->isCustomCreationMethod->toBeFalse()
+        ->customCreationMethodType->toBe(CustomCreationMethodType::None)
         ->and($method->parameters[0])->toBeInstanceOf(DataProperty::class)
         ->and($method->parameters[1])->toBeInstanceOf(DataParameter::class);
 });
@@ -35,7 +41,7 @@ it('can create a data method from a magic method', function () {
     $class = new class () extends Data {
         public static function fromString(
             string $property,
-        ) {
+        ): self {
         }
     };
 
@@ -46,8 +52,58 @@ it('can create a data method from a magic method', function () {
         ->parameters->toHaveCount(1)
         ->isPublic->toBeTrue()
         ->isStatic->toBeTrue()
-        ->isCustomCreationMethod->toBeTrue()
+        ->customCreationMethodType->toBe(CustomCreationMethodType::Object)
         ->and($method->parameters[0])->toBeInstanceOf(DataParameter::class);
+});
+
+it('can create a data method from a magic collect method', function () {
+    $class = new class () extends Data {
+        public static function collectArray(
+            array $items,
+        ): array {
+        }
+    };
+
+    $method = DataMethod::create(new ReflectionMethod($class, 'collectArray'));
+
+    expect($method)
+        ->name->toEqual('collectArray')
+        ->parameters->toHaveCount(1)
+        ->isPublic->toBeTrue()
+        ->isStatic->toBeTrue()
+        ->customCreationMethodType->toBe(CustomCreationMethodType::Collection)
+        ->returnType->toEqual(new Type(isNullable: false, isMixed: false, acceptedTypes: ['array' => []]))
+        ->and($method->parameters[0])->toBeInstanceOf(DataParameter::class);
+});
+
+it('can create a data method from a magic collect method with nullable return type', function () {
+    $class = new class () extends Data {
+        public static function collectArray(
+            array $items,
+        ): ?array {
+        }
+    };
+
+    $method = DataMethod::create(new ReflectionMethod($class, 'collectArray'));
+
+    expect($method)
+        ->customCreationMethodType->toBe(CustomCreationMethodType::Collection)
+        ->returnType->toEqual(new Type(isNullable: true, isMixed: false, acceptedTypes: ['array' => []]));
+});
+
+it('will not create a magical collection method when no return type specified', function () {
+    $class = new class () extends Data {
+        public static function collectArray(
+            array $items,
+        ) {
+        }
+    };
+
+    $method = DataMethod::create(new ReflectionMethod($class, 'collectArray'));
+
+    expect($method)
+        ->customCreationMethodType->toBe(CustomCreationMethodType::None)
+        ->returnType->toEqual(new Type(isNullable: true, isMixed: true, acceptedTypes: []));
 });
 
 it('correctly accepts single values as magic creation method', function () {
@@ -136,4 +192,57 @@ it('needs a correct amount of parameters as magic creation method', function () 
         ->accepts('Hello', 'World')->toBeTrue()
         ->accepts()->toBeFalse()
         ->accepts('Hello', 'World', 'Nope')->toBeFalse();
+});
+
+it('can check if a magical method can return the exact type', function () {
+    $class = new class () extends Data {
+        public static function collectCollection(
+            Collection $property,
+        ): Collection {
+        }
+    };
+
+    $method = DataMethod::create(new ReflectionMethod($class, 'collectCollection'));
+
+    expect($method->returns(Collection::class))->toBeTrue();
+});
+
+it('can check if a magical method can return the sub type', function () {
+    $class = new class () extends Data {
+        public static function collectCollection(
+            Collection $property,
+        ): Collection {
+        }
+    };
+
+    $method = DataMethod::create(new ReflectionMethod($class, 'collectCollection'));
+
+    expect($method->returns(EloquentCollection::class))->toBeTrue();
+});
+
+it('can check if a magical method can return a built in type', function () {
+    $class = new class () extends Data {
+        public static function collectCollectionToArray(
+            Collection $property,
+        ): array {
+        }
+    };
+
+    $method = DataMethod::create(new ReflectionMethod($class, 'collectCollectionToArray'));
+
+    expect($method->returns('array'))->toBeTrue();
+});
+
+
+it('can check if a magical method cannot return a parent type', function () {
+    $class = new class () extends Data {
+        public static function collectCollection(
+            Collection $property,
+        ): Collection {
+        }
+    };
+
+    $method = DataMethod::create(new ReflectionMethod($class, 'collectCollection'));
+
+    expect($method->returns(Enumerable::class))->toBeFalse();
 });

@@ -68,45 +68,45 @@ it('will populate defaults to properties when they exist ', function () {
 });
 
 it('wont throw an error if a non existing attribute is used on a data class', function () {
+    #[\JetBrains\PhpStorm\Immutable]
+    class PhpStormClassAttributeData extends Data
+    {
+        public readonly string $property;
+
+        public function __construct(string $property)
+        {
+            $this->property = $property;
+        }
+    }
+
+    #[\Foo\Bar]
+    class NonExistingAttributeData extends Data
+    {
+        public readonly string $property;
+
+        public function __construct(string $property)
+        {
+            $this->property = $property;
+        }
+    }
+
+    #[\JetBrains\PhpStorm\Immutable]
+    class ModelWithPhpStormAttributeData extends Data
+    {
+        public function __construct(
+            public int $id
+        ) {
+        }
+
+        public static function fromDummyModel(DummyModel $model)
+        {
+            return new self($model->id);
+        }
+    }
+
     expect(PhpStormClassAttributeData::from(['property' => 'hello'])->property)->toEqual('hello')
         ->and(NonExistingAttributeData::from(['property' => 'hello'])->property)->toEqual('hello')
         ->and(PhpStormClassAttributeData::from((object)['property' => 'hello'])->property)->toEqual('hello')
         ->and(PhpStormClassAttributeData::from('{"property": "hello"}')->property)->toEqual('hello')
         ->and(ModelWithPhpStormAttributeData::from((new DummyModel())->fill(['id' => 1]))->id)->toEqual(1);
 });
-
-#[\JetBrains\PhpStorm\Immutable]
-class PhpStormClassAttributeData extends Data
-{
-    public readonly string $property;
-
-    public function __construct(string $property)
-    {
-        $this->property = $property;
-    }
-}
-
-#[\Foo\Bar]
-class NonExistingAttributeData extends Data
-{
-    public readonly string $property;
-
-    public function __construct(string $property)
-    {
-        $this->property = $property;
-    }
-}
-
-#[\JetBrains\PhpStorm\Immutable]
-class ModelWithPhpStormAttributeData extends Data
-{
-    public function __construct(
-        public int $id
-    ) {
-    }
-
-    public static function fromDummyModel(DummyModel $model)
-    {
-        return new self($model->id);
-    }
-}

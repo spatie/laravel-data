@@ -44,11 +44,11 @@ class EmptyDataResolver
             return [];
         }
 
-        if ($property->type->isDataObject) {
+        if ($property->type->kind->isDataObject()) {
             return $property->type->dataClass::empty();
         }
 
-        if ($property->type->isDataCollectable) {
+        if ($property->type->kind->isDataCollectable()) {
             return [];
         }
 

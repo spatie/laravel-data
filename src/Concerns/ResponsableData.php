@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
-use Spatie\LaravelData\Support\Transformation\LocalTransformationContext;
+use Spatie\LaravelData\Support\Transformation\PartialTransformationContext;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
 use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
@@ -24,15 +24,18 @@ trait ResponsableData
     {
         $context = TransformationContextFactory::create()
             ->wrapExecutionType(WrapExecutionType::Enabled)
-            ->mergeDataContext($this->getDataContext())
-            ->get();
+            ->get($this)
+            ->mergePartials(PartialTransformationContext::create(
+                $this,
+                $this->getDataContext()->partialsDefinition)
+            );
 
         $context = $this instanceof IncludeableDataContract
-            ? $context->merge(resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request))
+            ? $context->mergePartials(resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request))
             : $context;
 
         return new JsonResponse(
-            data: $this->transform2($context),
+            data: $this->transform($context),
             status: $request->isMethod(Request::METHOD_POST) ? Response::HTTP_CREATED : Response::HTTP_OK,
         );
     }

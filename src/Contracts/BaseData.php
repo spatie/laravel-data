@@ -24,6 +24,10 @@ interface BaseData
 
     public static function withoutMagicalCreationFrom(mixed ...$payloads): static;
 
+    public static function collect(mixed $items, ?string $into = null): array|DataCollection|PaginatedDataCollection|CursorPaginatedDataCollection|Enumerable|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator;
+
+    public static function withoutMagicalCreationCollect(mixed $items, ?string $into = null): array|DataCollection|PaginatedDataCollection|CursorPaginatedDataCollection|Enumerable|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator;
+
     /**
      * @param \Illuminate\Support\Enumerable<array-key, TValue>|TValue[]|\Illuminate\Pagination\AbstractPaginator|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Pagination\AbstractCursorPaginator|\Illuminate\Contracts\Pagination\CursorPaginator|\Spatie\LaravelData\DataCollection<array-key, TValue> $items
      *
@@ -35,7 +39,7 @@ interface BaseData
 
     public static function pipeline(): DataPipeline;
 
-    public static function empty(array $extra = []): array;
+    public static function prepareForPipeline(\Illuminate\Support\Collection $properties): \Illuminate\Support\Collection;
 
     public function getDataContext(): DataContext;
 }

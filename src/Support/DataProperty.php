@@ -11,6 +11,9 @@ use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Mappers\NameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
+use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotation;
+use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
+use Spatie\LaravelData\Support\Factories\DataTypeFactory;
 use Spatie\LaravelData\Transformers\Transformer;
 
 /**
@@ -41,6 +44,7 @@ class DataProperty
         mixed $defaultValue = null,
         ?NameMapper $classInputNameMapper = null,
         ?NameMapper $classOutputNameMapper = null,
+        ?DataCollectableAnnotation $classDefinedDataCollectableAnnotation = null,
     ): self {
         $attributes = collect($property->getAttributes())
             ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
@@ -63,7 +67,7 @@ class DataProperty
         return new self(
             name: $property->name,
             className: $property->class,
-            type: DataType::create($property),
+            type: DataTypeFactory::create()->build($property, $classDefinedDataCollectableAnnotation),
             validate: ! $attributes->contains(fn (object $attribute) => $attribute instanceof WithoutValidation),
             isPromoted: $property->isPromoted(),
             isReadonly: $property->isReadOnly(),

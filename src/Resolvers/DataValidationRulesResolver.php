@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Present;
+use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
@@ -41,7 +42,7 @@ class DataValidationRulesResolver
                 continue;
             }
 
-            if ($dataProperty->type->isDataObject || $dataProperty->type->isDataCollectable) {
+            if ($dataProperty->type->kind !== DataTypeKind::Default) {
                 $this->resolveDataSpecificRules(
                     $dataProperty,
                     $fullPayload,
@@ -83,7 +84,7 @@ class DataValidationRulesResolver
             return;
         }
 
-        if ($dataProperty->type->isDataObject) {
+        if ($dataProperty->type->kind->isDataObject()) {
             $this->resolveDataObjectSpecificRules(
                 $dataProperty,
                 $fullPayload,
@@ -95,7 +96,7 @@ class DataValidationRulesResolver
             return;
         }
 
-        if ($dataProperty->type->isDataCollectable) {
+        if ($dataProperty->type->kind->isDataCollectable()) {
             $this->resolveDataCollectionSpecificRules(
                 $dataProperty,
                 $fullPayload,
