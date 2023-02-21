@@ -27,7 +27,7 @@ class DefaultValuesDataPipe implements DataPipe
                     return;
                 }
 
-                if ($property->type->isNullable) {
+                if ($property->type->isNullable()) {
                     $properties[$property->name] = null;
 
                     return;

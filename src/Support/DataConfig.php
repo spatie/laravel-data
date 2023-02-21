@@ -47,7 +47,7 @@ class DataConfig
 
     public function findGlobalCastForProperty(DataProperty $property): ?Cast
     {
-        foreach ($property->type->acceptedTypes as $acceptedType => $baseTypes) {
+        foreach ($property->type->type->getAcceptedTypes() as $acceptedType => $baseTypes) {
             foreach ([$acceptedType, ...$baseTypes] as $type) {
                 if ($cast = $this->casts[$type] ?? null) {
                     return $cast;

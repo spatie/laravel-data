@@ -9,6 +9,7 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionUnionType;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
+use Spatie\LaravelData\Support\Types\UndefinedType;
 
 /**
  * @property Collection<DataParameter> $parameters
@@ -21,13 +22,16 @@ class DataMethod
         public readonly bool $isStatic,
         public readonly bool $isPublic,
         public readonly CustomCreationMethodType $customCreationMethodType,
-        public readonly ?Type $returnType,
+        public readonly \Spatie\LaravelData\Support\Types\Type $returnType,
     ) {
     }
 
     public static function create(ReflectionMethod $method): self
     {
-        $returnType = Type::create($method->getReturnType());
+        $returnType = \Spatie\LaravelData\Support\Types\Type::forReflection(
+            $method->getReturnType(),
+            $method->class,
+        );
 
         return new self(
             $method->name,
@@ -61,13 +65,13 @@ class DataMethod
             false,
             $method->isPublic(),
             CustomCreationMethodType::None,
-            null,
+            new UndefinedType(),
         );
     }
 
     protected static function resolveCustomCreationMethodType(
         ReflectionMethod $method,
-        ?Type $returnType,
+        ?\Spatie\LaravelData\Support\Types\Type $returnType,
     ): CustomCreationMethodType {
         if (! $method->isStatic()
             || ! $method->isPublic()
@@ -82,7 +86,7 @@ class DataMethod
             return CustomCreationMethodType::Object;
         }
 
-        if (str_starts_with($method->name, 'collect') && $returnType && count($returnType) > 0) {
+        if (str_starts_with($method->name, 'collect') && ! $returnType instanceof UndefinedType) {
             return CustomCreationMethodType::Collection;
         }
 
@@ -111,7 +115,7 @@ class DataMethod
                 continue;
             }
 
-            if (! $parameter->type->acceptsValue($input[$index])) {
+            if (! $parameter->type->type->acceptsValue($input[$index])) {
                 return false;
             }
         }

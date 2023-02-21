@@ -28,6 +28,12 @@ use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotation;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
 use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Support\Type;
+use Spatie\LaravelData\Support\Types\IntersectionType;
+use Spatie\LaravelData\Support\Types\MultiType;
+use Spatie\LaravelData\Support\Types\PartialType;
+use Spatie\LaravelData\Support\Types\SingleType;
+use Spatie\LaravelData\Support\Types\UndefinedType;
+use Spatie\LaravelData\Support\Types\UnionType;
 use TypeError;
 use function Pest\Laravel\instance;
 
@@ -44,16 +50,23 @@ class DataTypeFactory
     ): DataType {
         $type = $property->getType();
 
+        $class = match ($property::class){
+            ReflectionParameter::class => $property->getDeclaringClass()?->name,
+            ReflectionProperty::class => $property->class,
+        };
+
         return match (true) {
             $type === null => $this->buildForEmptyType(),
             $type instanceof ReflectionNamedType => $this->buildForNamedType(
                 $property,
                 $type,
+                $class,
                 $classDefinedDataCollectableAnnotation
             ),
             $type instanceof ReflectionUnionType || $type instanceof ReflectionIntersectionType => $this->buildForMultiType(
                 $property,
                 $type,
+                $class,
                 $classDefinedDataCollectableAnnotation
             ),
             default => throw new TypeError('Invalid reflection type')
@@ -62,36 +75,31 @@ class DataTypeFactory
 
     protected function buildForEmptyType(): DataType
     {
-        $type = DataType::create(null);
-
         return new DataType(
-            isNullable: $type->isNullable,
-            isMixed: $type->isMixed,
-            isLazy: false,
-            isOptional: false,
-            kind: DataTypeKind::Default,
-            dataClass: null,
-            dataCollectableClass: null,
-            acceptedTypes: $type->acceptedTypes,
+            new UndefinedType(),
+            false,
+            false,
+            DataTypeKind::Default,
+            null,
+            null
         );
     }
 
     protected function buildForNamedType(
         ReflectionParameter|ReflectionProperty $reflectionProperty,
         ReflectionNamedType $reflectionType,
+        ?string $class,
         ?DataCollectableAnnotation $classDefinedDataCollectableAnnotation,
     ): DataType {
-        $typeName = $reflectionType->getName();
+        $type = SingleType::create($reflectionType, $class);
 
-        if (is_a($typeName, Lazy::class, true)) {
+        if ($type->type->isLazy()) {
             throw InvalidDataType::onlyLazy($reflectionProperty);
         }
 
-        if (is_a($typeName, Optional::class, true)) {
+        if ($type->type->isOptional()) {
             throw InvalidDataType::onlyOptional($reflectionProperty);
         }
-
-        $type = DataType::create($reflectionType);
 
         $kind = DataTypeKind::Default;
         $dataClass = null;
@@ -104,58 +112,46 @@ class DataTypeFactory
                 'dataCollectableClass' => $dataCollectableClass,
             ] = $this->resolveDataSpecificProperties(
                 $reflectionProperty,
-                $reflectionType,
-                $type->acceptedTypes[$typeName],
+                $type->type,
                 $classDefinedDataCollectableAnnotation
             );
         }
 
         return new DataType(
-            isNullable: $reflectionType->allowsNull(),
-            isMixed: $type->isMixed,
+            type: $type,
             isLazy: false,
             isOptional: false,
             kind: $kind,
             dataClass: $dataClass,
-            dataCollectableClass: $dataCollectableClass,
-            acceptedTypes: $type->acceptedTypes,
+            dataCollectableClass: $dataCollectableClass
         );
     }
 
     protected function buildForMultiType(
         ReflectionParameter|ReflectionProperty $reflectionProperty,
         ReflectionUnionType|ReflectionIntersectionType $multiReflectionType,
+        ?string $class,
         ?DataCollectableAnnotation $classDefinedDataCollectableAnnotation,
     ): DataType {
-        $acceptedTypes = [];
-        $isNullable = false;
+        $type = match ($multiReflectionType::class) {
+            ReflectionUnionType::class => UnionType::create($multiReflectionType, $class),
+            ReflectionIntersectionType::class => IntersectionType::create($multiReflectionType, $class),
+        };
+
         $isLazy = false;
         $isOptional = false;
-        $isMixed = false;
         $kind = DataTypeKind::Default;
         $dataClass = null;
         $dataCollectableClass = null;
 
-        foreach ($multiReflectionType->getTypes() as $reflectionType) {
-            $typeName = $reflectionType->getName();
+        foreach ($type->types as $subType) {
+            $isLazy = $isLazy || $subType->isLazy();
+            $isOptional = $isOptional || $subType->isOptional();
 
-            $singleType = Type::create($reflectionType);
-
-            $singleTypeIsLazy = is_a($typeName, Lazy::class, true);
-            $singleTypeIsOptional = is_a($typeName, Optional::class, true);
-
-            $isNullable = $isNullable || $singleType->isNullable;
-            $isMixed = $isMixed || $singleType->isMixed;
-            $isLazy = $isLazy || $singleTypeIsLazy;
-            $isOptional = $isOptional || $singleTypeIsOptional;
-
-            if ($typeName
-                && array_key_exists($typeName, $singleType->acceptedTypes)
-                && ! $singleTypeIsLazy
-                && ! $singleTypeIsOptional
+            if (($subType->builtIn === false || $subType->name === 'array')
+                && $subType->isLazy() === false
+                && $subType->isOptional() === false
             ) {
-                $acceptedTypes[$typeName] = $singleType->acceptedTypes[$typeName];
-
                 if ($kind !== DataTypeKind::Default) {
                     continue;
                 }
@@ -166,52 +162,36 @@ class DataTypeFactory
                     'dataCollectableClass' => $dataCollectableClass,
                 ] = $this->resolveDataSpecificProperties(
                     $reflectionProperty,
-                    $reflectionType,
-                    $singleType->acceptedTypes[$typeName],
+                    $subType,
                     $classDefinedDataCollectableAnnotation
                 );
             }
         }
 
-        if ($kind->isDataObject() && count($acceptedTypes) > 1) {
+        if ($kind->isDataObject() && $type->acceptedTypesCount() > 1) {
             throw InvalidDataType::unionWithData($reflectionProperty);
         }
 
-        if ($kind->isDataCollectable() && count($acceptedTypes) > 1) {
+        if ($kind->isDataCollectable() && $type->acceptedTypesCount() > 1) {
             throw InvalidDataType::unionWithDataCollection($reflectionProperty);
         }
 
         return new DataType(
-            isNullable: $isNullable,
-            isMixed: false,
+            type: $type,
             isLazy: $isLazy,
             isOptional: $isOptional,
             kind: $kind,
             dataClass: $dataClass,
             dataCollectableClass: $dataCollectableClass,
-            acceptedTypes: $acceptedTypes
         );
     }
 
     protected function resolveDataSpecificProperties(
         ReflectionParameter|ReflectionProperty $reflectionProperty,
-        ReflectionNamedType $reflectionType,
-        array $baseTypes,
+        PartialType $partialType,
         ?DataCollectableAnnotation $classDefinedDataCollectableAnnotation,
     ): array {
-        $typeName = $reflectionType->getName();
-
-        $kind = match (true) {
-            in_array(BaseData::class, $baseTypes) => DataTypeKind::DataObject,
-            $typeName === 'array' => DataTypeKind::Array,
-            in_array(Enumerable::class, $baseTypes) => DataTypeKind::Enumerable,
-            in_array(DataCollection::class, $baseTypes) || $typeName === DataCollection::class => DataTypeKind::DataCollection,
-            in_array(PaginatedDataCollection::class, $baseTypes) || $typeName === PaginatedDataCollection::class => DataTypeKind::DataPaginatedCollection,
-            in_array(CursorPaginatedDataCollection::class, $baseTypes) || $typeName === CursorPaginatedDataCollection::class => DataTypeKind::DataCursorPaginatedCollection,
-            in_array(Paginator::class, $baseTypes) || in_array(AbstractPaginator::class, $baseTypes) => DataTypeKind::Paginator,
-            in_array(CursorPaginator::class, $baseTypes) || in_array(AbstractCursorPaginator::class, $baseTypes) => DataTypeKind::CursorPaginator,
-            default => DataTypeKind::Default,
-        };
+        $kind = $partialType->getDataTypeKind();
 
         if ($kind === DataTypeKind::Default) {
             return [
@@ -224,7 +204,7 @@ class DataTypeFactory
         if ($kind === DataTypeKind::DataObject) {
             return [
                 'kind' => DataTypeKind::DataObject,
-                'dataClass' => $typeName,
+                'dataClass' => $partialType->name,
                 'dataCollectableClass' => null,
             ];
         }
@@ -249,7 +229,7 @@ class DataTypeFactory
             return [
                 'kind' => $kind,
                 'dataClass' => $dataClass,
-                'dataCollectableClass' => $typeName,
+                'dataCollectableClass' => $partialType->name,
             ];
         }
 
@@ -265,17 +245,5 @@ class DataTypeFactory
             $reflectionProperty instanceof ReflectionProperty ? $reflectionProperty->class : 'unknown',
             $reflectionProperty->name
         );
-    }
-
-    protected function resolveBaseTypes(string $type): array
-    {
-        if (! class_exists($type)) {
-            return [];
-        }
-
-        return array_unique([
-            ...array_values(class_parents($type)),
-            ...array_values(class_implements($type)),
-        ]);
     }
 }

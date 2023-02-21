@@ -14,7 +14,7 @@ class NullableRuleInferrer implements RuleInferrer
         PropertyRules $rules,
         ValidationContext $context,
     ): PropertyRules {
-        if ($property->type->isNullable && ! $rules->hasType(Nullable::class)) {
+        if ($property->type->isNullable() && ! $rules->hasType(Nullable::class)) {
             $rules->prepend(new Nullable());
         }
 

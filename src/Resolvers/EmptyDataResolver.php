@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Types\MultiType;
 use Traversable;
 
 class EmptyDataResolver
@@ -32,15 +33,15 @@ class EmptyDataResolver
 
     protected function getValueForProperty(DataProperty $property): mixed
     {
-        if ($property->type->isMixed) {
+        if ($property->type->isMixed()) {
             return null;
         }
 
-        if ($property->type->count() > 1) {
+        if ($property->type->type instanceof MultiType && $property->type->type->acceptedTypesCount() > 1) {
             throw DataPropertyCanOnlyHaveOneType::create($property);
         }
 
-        if ($property->type->acceptsType('array')) {
+        if ($property->type->type->acceptsType('array')) {
             return [];
         }
 
@@ -52,7 +53,7 @@ class EmptyDataResolver
             return [];
         }
 
-        if ($property->type->findAcceptedTypeForBaseType(Traversable::class) !== null) {
+        if ($property->type->type->findAcceptedTypeForBaseType(Traversable::class) !== null) {
             return [];
         }
 

@@ -80,7 +80,7 @@ class DataValidationRulesResolver
             return;
         }
 
-        if ($dataProperty->type->isNullable && Arr::get($fullPayload, $propertyPath->get()) === null) {
+        if ($dataProperty->type->isNullable() && Arr::get($fullPayload, $propertyPath->get()) === null) {
             return;
         }
 

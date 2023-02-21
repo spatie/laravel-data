@@ -54,14 +54,16 @@ it('can deduce a type without definition', function () {
     });
 
     expect($type)
-        ->isNullable->toBeTrue()
-        ->isMixed->toBeTrue()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
-        ->acceptedTypes->toBeEmpty();
+        ->dataCollectableClass->toBeNull();
+
+    expect($type->type)
+        ->isMixed->toBeTrue()
+        ->isNullable->toBeTrue()
+        ->getAcceptedTypes()->toBe([]);
 });
 
 it('can deduce a type with definition', function () {
@@ -70,14 +72,16 @@ it('can deduce a type with definition', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
-        ->acceptedTypes->toHaveKeys(['string']);
+        ->dataCollectableClass->toBeNull();
+
+    expect($type->type)
+        ->isMixed->toBeFalse()
+        ->isNullable->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys(['string']);
 });
 
 it('can deduce a nullable type with definition', function () {
@@ -86,14 +90,16 @@ it('can deduce a nullable type with definition', function () {
     });
 
     expect($type)
-        ->isNullable->toBeTrue()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectionClass->toBeNull()
-        ->acceptedTypes->toHaveKeys(['string']);
+        ->dataCollectionClass->toBeNull();
+
+    expect($type->type)
+        ->isNullable->toBeTrue()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys(['string']);
 });
 
 it('can deduce a union type definition', function () {
@@ -102,14 +108,16 @@ it('can deduce a union type definition', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
-        ->acceptedTypes->toHaveKeys(['string', 'int']);
+        ->dataCollectableClass->toBeNull();
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys(['string', 'int']);
 });
 
 it('can deduce a nullable union type definition', function () {
@@ -118,14 +126,16 @@ it('can deduce a nullable union type definition', function () {
     });
 
     expect($type)
-        ->isNullable->toBeTrue()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
-        ->acceptedTypes->toHaveKeys(['string', 'int']);
+        ->dataCollectableClass->toBeNull();
+
+    expect($type->type)
+        ->isNullable->toBeTrue()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys(['string', 'int']);
 });
 
 it('can deduce an intersection type definition', function () {
@@ -134,14 +144,16 @@ it('can deduce an intersection type definition', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
-        ->acceptedTypes->toHaveKeys([
+        ->dataCollectableClass->toBeNull();
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([
             DateTime::class,
             DateTimeImmutable::class,
         ]);
@@ -153,14 +165,16 @@ it('can deduce a mixed type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeTrue()
-        ->isMixed->toBeTrue()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
-        ->acceptedTypes->toHaveKeys([]);
+        ->dataCollectableClass->toBeNull();
+
+    expect($type->type)
+        ->isNullable->toBeTrue()
+        ->isMixed->toBeTrue()
+        ->getAcceptedTypes()->toHaveKeys([]);
 });
 
 it('can deduce a lazy type', function () {
@@ -169,14 +183,16 @@ it('can deduce a lazy type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
-        ->acceptedTypes->toHaveKeys(['string']);
+        ->dataCollectableClass->toBeNull();
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys(['string']);
 });
 
 it('can deduce an optional type', function () {
@@ -185,14 +201,16 @@ it('can deduce an optional type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeTrue()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
-        ->acceptedTypes->toHaveKeys(['string']);
+        ->dataCollectableClass->toBeNull();
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys(['string']);
 });
 
 test('a type cannot be optional alone', function () {
@@ -207,14 +225,16 @@ it('can deduce a data type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataObject)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBeNull()
-        ->acceptedTypes->toHaveKeys([SimpleData::class]);
+        ->dataCollectableClass->toBeNull();
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([SimpleData::class]);
 });
 
 it('can deduce a data union type', function () {
@@ -223,14 +243,16 @@ it('can deduce a data union type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataObject)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBeNull()
-        ->acceptedTypes->toHaveKeys([SimpleData::class]);
+        ->dataCollectableClass->toBeNull();
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([SimpleData::class]);
 });
 
 it('can deduce a data collection type', function () {
@@ -240,14 +262,16 @@ it('can deduce a data collection type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(DataCollection::class)
-        ->acceptedTypes->toHaveKeys([DataCollection::class]);
+        ->dataCollectableClass->toBe(DataCollection::class);
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([DataCollection::class]);
 });
 
 it('can deduce a data collection union type', function () {
@@ -257,14 +281,16 @@ it('can deduce a data collection union type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(DataCollection::class)
-        ->acceptedTypes->toHaveKeys([DataCollection::class]);
+        ->dataCollectableClass->toBe(DataCollection::class);
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([DataCollection::class]);
 });
 
 it('can deduce a paginated data collection type', function () {
@@ -274,14 +300,16 @@ it('can deduce a paginated data collection type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(PaginatedDataCollection::class)
-        ->acceptedTypes->toHaveKeys([PaginatedDataCollection::class]);
+        ->dataCollectableClass->toBe(PaginatedDataCollection::class);
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([PaginatedDataCollection::class]);
 });
 
 it('can deduce a paginated data collection union type', function () {
@@ -291,14 +319,16 @@ it('can deduce a paginated data collection union type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(PaginatedDataCollection::class)
-        ->acceptedTypes->toHaveKeys([PaginatedDataCollection::class]);
+        ->dataCollectableClass->toBe(PaginatedDataCollection::class);
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([PaginatedDataCollection::class]);
 });
 
 it('can deduce a cursor paginated data collection type', function () {
@@ -308,14 +338,16 @@ it('can deduce a cursor paginated data collection type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCursorPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(CursorPaginatedDataCollection::class)
-        ->acceptedTypes->toHaveKeys([CursorPaginatedDataCollection::class]);
+        ->dataCollectableClass->toBe(CursorPaginatedDataCollection::class);
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([CursorPaginatedDataCollection::class]);
 });
 
 it('can deduce a cursor paginated data collection union type', function () {
@@ -325,14 +357,16 @@ it('can deduce a cursor paginated data collection union type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCursorPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(CursorPaginatedDataCollection::class)
-        ->acceptedTypes->toHaveKeys([CursorPaginatedDataCollection::class]);
+        ->dataCollectableClass->toBe(CursorPaginatedDataCollection::class);
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([CursorPaginatedDataCollection::class]);
 });
 
 it('can deduce an array data collection type', function () {
@@ -342,14 +376,16 @@ it('can deduce an array data collection type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Array)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe('array')
-        ->acceptedTypes->toHaveKeys(['array']);
+        ->dataCollectableClass->toBe('array');
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys(['array']);
 });
 
 it('can deduce an array data collection union type', function () {
@@ -359,14 +395,16 @@ it('can deduce an array data collection union type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Array)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe('array')
-        ->acceptedTypes->toHaveKeys(['array']);
+        ->dataCollectableClass->toBe('array');
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys(['array']);
 });
 
 it('can deduce an enumerable data collection type', function () {
@@ -376,14 +414,16 @@ it('can deduce an enumerable data collection type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Enumerable)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(Collection::class)
-        ->acceptedTypes->toHaveKeys([Collection::class]);
+        ->dataCollectableClass->toBe(Collection::class);
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([Collection::class]);
 });
 
 it('can deduce an enumerable data collection union type', function () {
@@ -393,14 +433,16 @@ it('can deduce an enumerable data collection union type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Enumerable)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(Collection::class)
-        ->acceptedTypes->toHaveKeys([Collection::class]);
+        ->dataCollectableClass->toBe(Collection::class);
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([Collection::class]);
 });
 
 it('can deduce a paginator data collection type', function () {
@@ -410,14 +452,16 @@ it('can deduce a paginator data collection type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Paginator)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(LengthAwarePaginator::class)
-        ->acceptedTypes->toHaveKeys([LengthAwarePaginator::class]);
+        ->dataCollectableClass->toBe(LengthAwarePaginator::class);
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([LengthAwarePaginator::class]);
 });
 
 it('can deduce a paginator data collection union type', function () {
@@ -427,14 +471,16 @@ it('can deduce a paginator data collection union type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Paginator)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(LengthAwarePaginator::class)
-        ->acceptedTypes->toHaveKeys([LengthAwarePaginator::class]);
+        ->dataCollectableClass->toBe(LengthAwarePaginator::class);
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([LengthAwarePaginator::class]);
 });
 
 it('can deduce a cursor paginator data collection type', function () {
@@ -444,14 +490,16 @@ it('can deduce a cursor paginator data collection type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::CursorPaginator)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(CursorPaginator::class)
-        ->acceptedTypes->toHaveKeys([CursorPaginator::class]);
+        ->dataCollectableClass->toBe(CursorPaginator::class);
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([CursorPaginator::class]);
 });
 
 it('can deduce a cursor paginator data collection union type', function () {
@@ -461,14 +509,16 @@ it('can deduce a cursor paginator data collection union type', function () {
     });
 
     expect($type)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
         ->isLazy->toBeTrue()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::CursorPaginator)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(CursorPaginator::class)
-        ->acceptedTypes->toHaveKeys([CursorPaginator::class]);
+        ->dataCollectableClass->toBe(CursorPaginator::class);
+
+    expect($type->type)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toHaveKeys([CursorPaginator::class]);
 });
 
 it('cannot have multiple data types', function () {
@@ -493,7 +543,7 @@ it('cannot combine a data collection and another type', function () {
 it(
     'will resolve the base types for accepted types',
     function (object $class, array $expected) {
-        expect(resolveDataType($class)->acceptedTypes)->toEqualCanonicalizing($expected);
+        expect(resolveDataType($class)->type->getAcceptedTypes())->toEqualCanonicalizing($expected);
     }
 )->with(function () {
     yield 'no type' => [
@@ -571,7 +621,7 @@ it(
 it(
     'can check if a data type accepts a type',
     function (object $class, string $type, bool $accepts) {
-        expect(resolveDataType($class))->acceptsType($type)->toEqual($accepts);
+        expect(resolveDataType($class))->type->acceptsType($type)->toEqual($accepts);
     }
 )->with(function () {
     // Base types
@@ -724,7 +774,7 @@ it(
 it(
     'can check if a data type accepts a value',
     function (object $class, mixed $value, bool $accepts) {
-        expect(resolveDataType($class))->acceptsValue($value)->toEqual($accepts);
+        expect(resolveDataType($class))->type->acceptsValue($value)->toEqual($accepts);
     }
 )->with(function () {
     yield [
@@ -796,7 +846,9 @@ it(
     'can find accepted type for a base type',
     function (object $class, string $type, ?string $expectedType) {
         expect(resolveDataType($class))
-            ->findAcceptedTypeForBaseType($type)->toEqual($expectedType);
+            ->type
+            ->findAcceptedTypeForBaseType($type)
+            ->toEqual($expectedType);
     }
 )->with(function () {
     yield [

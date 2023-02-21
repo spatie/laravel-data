@@ -72,8 +72,12 @@ it('can create a data method from a magic collect method', function () {
         ->isPublic->toBeTrue()
         ->isStatic->toBeTrue()
         ->customCreationMethodType->toBe(CustomCreationMethodType::Collection)
-        ->returnType->toEqual(new Type(isNullable: false, isMixed: false, acceptedTypes: ['array' => []]))
         ->and($method->parameters[0])->toBeInstanceOf(DataParameter::class);
+
+    expect($method->returnType)
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toBe(['array' => []]);
 });
 
 it('can create a data method from a magic collect method with nullable return type', function () {
@@ -87,8 +91,12 @@ it('can create a data method from a magic collect method with nullable return ty
     $method = DataMethod::create(new ReflectionMethod($class, 'collectArray'));
 
     expect($method)
-        ->customCreationMethodType->toBe(CustomCreationMethodType::Collection)
-        ->returnType->toEqual(new Type(isNullable: true, isMixed: false, acceptedTypes: ['array' => []]));
+        ->customCreationMethodType->toBe(CustomCreationMethodType::Collection);
+
+    expect($method->returnType)
+        ->isNullable->toBeTrue()
+        ->isMixed->toBeFalse()
+        ->getAcceptedTypes()->toBe(['array' => []]);
 });
 
 it('will not create a magical collection method when no return type specified', function () {
@@ -102,8 +110,12 @@ it('will not create a magical collection method when no return type specified', 
     $method = DataMethod::create(new ReflectionMethod($class, 'collectArray'));
 
     expect($method)
-        ->customCreationMethodType->toBe(CustomCreationMethodType::None)
-        ->returnType->toEqual(new Type(isNullable: true, isMixed: true, acceptedTypes: []));
+        ->customCreationMethodType->toBe(CustomCreationMethodType::None);
+
+    expect($method->returnType)
+        ->isNullable->toBeTrue()
+        ->isMixed->toBeTrue()
+        ->getAcceptedTypes()->toBe([]);
 });
 
 it('correctly accepts single values as magic creation method', function () {

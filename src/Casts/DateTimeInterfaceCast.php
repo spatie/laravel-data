@@ -21,7 +21,7 @@ class DateTimeInterfaceCast implements Cast
     {
         $formats = collect($this->format ?? config('data.date_format'));
 
-        $type = $this->type ?? $property->type->findAcceptedTypeForBaseType(DateTimeInterface::class);
+        $type = $this->type ?? $property->type->type->findAcceptedTypeForBaseType(DateTimeInterface::class);
 
         if ($type === null) {
             return Uncastable::create();
