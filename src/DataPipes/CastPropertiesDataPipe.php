@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
@@ -62,7 +63,7 @@ class CastPropertiesDataPipe implements DataPipe
             return $property->type->dataClass::from($value);
         }
 
-        if ($property->type->kind->isDataCollectable()) {
+        if($property->type->kind->isDataCollectable()){
             return $property->type->dataClass::collect($value, $property->type->dataCollectableClass);
         }
 
@@ -71,8 +72,14 @@ class CastPropertiesDataPipe implements DataPipe
 
     protected function shouldBeCasted(DataProperty $property, mixed $value): bool
     {
-        return gettype($value) === 'object'
-            ? ! $property->type->type->acceptsValue($value)
-            : true;
+        if (gettype($value) !== 'object') {
+            return true;
+        }
+
+        if ($property->type->kind->isDataCollectable()) {
+            return true; // Transform everything to data objects
+        }
+
+        return $property->type->type->acceptsValue($value) === false;
     }
 }

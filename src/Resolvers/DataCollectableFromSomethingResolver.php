@@ -20,6 +20,7 @@ use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Exceptions\CannotCreateDataCollectable;
 use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
 use Spatie\LaravelData\PaginatedDataCollection;
+use Spatie\LaravelData\Support\Creation\CollectableMetaData;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Support\Types\PartialType;
@@ -66,16 +67,18 @@ class DataCollectableFromSomethingResolver
 
         $intoDataTypeKind = $intoType->getDataTypeKind();
 
+        $collectableMetaData = CollectableMetaData::fromOther($items);
+
         $normalizedItems = $this->normalizeItems($items, $dataClass);
 
         return match ($intoDataTypeKind) {
             DataTypeKind::Array => $this->normalizeToArray($normalizedItems),
             DataTypeKind::Enumerable => new $intoType->name($this->normalizeToArray($normalizedItems)),
             DataTypeKind::DataCollection => new $intoType->name($dataClass, $this->normalizeToArray($normalizedItems)),
-            DataTypeKind::DataPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToPaginator($normalizedItems)),
-            DataTypeKind::DataCursorPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToCursorPaginator($normalizedItems)),
-            DataTypeKind::Paginator => $this->normalizeToPaginator($normalizedItems),
-            DataTypeKind::CursorPaginator => $this->normalizeToCursorPaginator($normalizedItems),
+            DataTypeKind::DataPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToPaginator($normalizedItems, $collectableMetaData)),
+            DataTypeKind::DataCursorPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToCursorPaginator($normalizedItems, $collectableMetaData)),
+            DataTypeKind::Paginator => $this->normalizeToPaginator($normalizedItems, $collectableMetaData),
+            DataTypeKind::CursorPaginator => $this->normalizeToCursorPaginator($normalizedItems, $collectableMetaData),
             default => CannotCreateDataCollectable::create(get_debug_type($items), $intoType->name)
         };
     }
@@ -130,7 +133,7 @@ class DataCollectableFromSomethingResolver
             || $items instanceof AbstractPaginator
             || $items instanceof CursorPaginator
             || $items instanceof AbstractCursorPaginator) {
-            $items = $items->items();
+            return $items->through($this->itemsToDataClosure($dataClass));
         }
 
         if ($items instanceof Enumerable) {
@@ -157,6 +160,7 @@ class DataCollectableFromSomethingResolver
 
     protected function normalizeToPaginator(
         array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator $items,
+        CollectableMetaData $collectableMetaData,
     ): Paginator|AbstractPaginator {
         if ($items instanceof Paginator || $items instanceof AbstractPaginator) {
             return $items;
@@ -166,13 +170,14 @@ class DataCollectableFromSomethingResolver
 
         return new LengthAwarePaginator(
             $normalizedItems,
-            count($normalizedItems),
-            $items instanceof CursorPaginator || $items instanceof AbstractCursorPaginator ? $items->perPage() : 15,
+            $collectableMetaData->paginator_total ?? count($items),
+            $collectableMetaData->paginator_per_page ?? 15,
         );
     }
 
     protected function normalizeToCursorPaginator(
         array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator $items,
+        CollectableMetaData $collectableMetaData,
     ): CursorPaginator|AbstractCursorPaginator {
         if ($items instanceof CursorPaginator || $items instanceof AbstractCursorPaginator) {
             return $items;
@@ -182,7 +187,8 @@ class DataCollectableFromSomethingResolver
 
         return new \Illuminate\Pagination\CursorPaginator(
             $normalizedItems,
-            $items instanceof Paginator || $items instanceof AbstractPaginator ? $items->perPage() : 15,
+            $collectableMetaData->paginator_per_page ?? 15,
+            $collectableMetaData->paginator_cursor
         );
     }
 
