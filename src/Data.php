@@ -6,6 +6,7 @@ use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\BaseData;
 use Spatie\LaravelData\Concerns\ContextableData;
 use Spatie\LaravelData\Concerns\DataTrait;
+use Spatie\LaravelData\Concerns\DefaultableData;
 use Spatie\LaravelData\Concerns\EmptyData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
@@ -25,4 +26,5 @@ abstract class Data implements DataObject
     use BaseData;
     use EmptyData;
     use ContextableData;
+    use DefaultableData;
 }

@@ -2,6 +2,17 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.0.0
+
+- Allow arrays, Collections, Paginators, ... to be used as DataCollections
+- Add support for magically creating data collections
+- Rewritten transformation system with respect to includeable properties
+- Addition of collect method
+- Removal of collection method
+- Add support for using Laravel Model attributes as data properties
+- Add support for class defined defaults
+- Allow creating data objects using `from` without parameters
+
 ## 3.1.0 - 2023-02-10
 
 - Allow filling props from route parameters (#341)

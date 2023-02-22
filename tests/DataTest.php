@@ -18,6 +18,7 @@ use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\BaseData;
 use Spatie\LaravelData\Concerns\ContextableData;
 use Spatie\LaravelData\Concerns\DataTrait;
+use Spatie\LaravelData\Concerns\DefaultableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
@@ -2068,6 +2069,7 @@ it('can use a trait', function () {
         use BaseData;
         use \Spatie\LaravelData\Concerns\EmptyData;
         use ContextableData;
+        use DefaultableData;
 
         public function __construct(public string $string)
         {
