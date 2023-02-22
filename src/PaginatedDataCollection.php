@@ -5,6 +5,7 @@ namespace Spatie\LaravelData;
 use Closure;
 use Illuminate\Contracts\Pagination\Paginator;
 use Spatie\LaravelData\Concerns\BaseDataCollectable;
+use Spatie\LaravelData\Concerns\ContextableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
@@ -29,6 +30,7 @@ class PaginatedDataCollection implements DataCollectable
 
     /** @use \Spatie\LaravelData\Concerns\BaseDataCollectable<TKey, TValue> */
     use BaseDataCollectable;
+    use ContextableData;
 
     protected Paginator $items;
 

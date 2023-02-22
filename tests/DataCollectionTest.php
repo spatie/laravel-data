@@ -514,5 +514,4 @@ it('during the serialization process some properties are thrown away', function 
     $invaded = invade($unserialized);
 
     expect($invaded->_dataContext)->toBeNull();
-    expect($invaded->_wrap)->toBeNull();
 });

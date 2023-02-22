@@ -14,8 +14,16 @@ use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
+use Spatie\LaravelData\Concerns\AppendableData;
+use Spatie\LaravelData\Concerns\BaseData;
+use Spatie\LaravelData\Concerns\ContextableData;
 use Spatie\LaravelData\Concerns\DataTrait;
+use Spatie\LaravelData\Concerns\IncludeableData;
+use Spatie\LaravelData\Concerns\ResponsableData;
+use Spatie\LaravelData\Concerns\TransformableData;
+use Spatie\LaravelData\Concerns\ValidateableData;
 use Spatie\LaravelData\Concerns\WireableData;
+use Spatie\LaravelData\Concerns\WrappableData;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -2051,7 +2059,15 @@ it('can use except when transforming', function (
 
 it('can use a trait', function () {
     $data = new class ('') implements DataObject {
-        use DataTrait;
+        use ResponsableData;
+        use IncludeableData;
+        use AppendableData;
+        use ValidateableData;
+        use WrappableData;
+        use TransformableData;
+        use BaseData;
+        use \Spatie\LaravelData\Concerns\EmptyData;
+        use ContextableData;
 
         public function __construct(public string $string)
         {
@@ -2218,7 +2234,6 @@ it('during the serialization process some properties are thrown away', function 
     $invaded = invade($unserialized);
 
     expect($invaded->_dataContext)->toBeNull();
-    expect($invaded->_wrap)->toBeNull();
 });
 
 // TODO: extend tests here

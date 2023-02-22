@@ -5,6 +5,7 @@ namespace Spatie\LaravelData;
 use Closure;
 use Illuminate\Pagination\CursorPaginator;
 use Spatie\LaravelData\Concerns\BaseDataCollectable;
+use Spatie\LaravelData\Concerns\ContextableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
@@ -29,6 +30,7 @@ class CursorPaginatedDataCollection implements DataCollectable
 
     /** @use \Spatie\LaravelData\Concerns\BaseDataCollectable<TKey, TValue> */
     use BaseDataCollectable;
+    use ContextableData;
 
     /** @var CursorPaginator<TValue> */
     protected CursorPaginator $items;

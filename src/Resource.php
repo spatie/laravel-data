@@ -4,6 +4,7 @@ namespace Spatie\LaravelData;
 
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\BaseData;
+use Spatie\LaravelData\Concerns\ContextableData;
 use Spatie\LaravelData\Concerns\EmptyData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
@@ -26,4 +27,5 @@ class Resource implements BaseDataContract, AppendableDataContract, IncludeableD
     use TransformableData;
     use WrappableData;
     use EmptyData;
+    use ContextableData;
 }

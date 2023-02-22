@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Concerns\BaseDataCollectable;
+use Spatie\LaravelData\Concerns\ContextableData;
 use Spatie\LaravelData\Concerns\EnumerableMethods;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
@@ -32,6 +33,7 @@ class DataCollection implements DataCollectable, ArrayAccess
     use IncludeableData;
     use WrappableData;
     use TransformableData;
+    use ContextableData;
 
     /** @use \Spatie\LaravelData\Concerns\EnumerableMethods<TKey, TValue> */
     use EnumerableMethods;

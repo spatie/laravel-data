@@ -49,21 +49,4 @@ trait BaseDataCollectable
     {
         return ['items', 'dataClass'];
     }
-
-    public function getDataContext(): DataContext
-    {
-        if ($this->_dataContext === null) {
-            return $this->_dataContext = new DataContext(
-                new PartialsDefinition(
-                    $this instanceof IncludeableDataContract ? $this->includeProperties() : [],
-                    $this instanceof IncludeableDataContract ? $this->excludeProperties() : [],
-                    $this instanceof IncludeableDataContract ? $this->onlyProperties() : [],
-                    $this instanceof IncludeableDataContract ? $this->exceptProperties() : [],
-                ),
-                $this instanceof WrappableDataContract ? $this->getWrap() : new Wrap(WrapType::UseGlobal),
-            );
-        }
-
-        return $this->_dataContext;
-    }
 }
