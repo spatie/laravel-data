@@ -8,7 +8,6 @@ class DataCollectableAnnotation
         public string $dataClass,
         public ?string $collectionClass = null,
         public ?string $property = null,
-    )
-    {
+    ) {
     }
 }

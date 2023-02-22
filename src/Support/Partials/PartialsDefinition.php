@@ -17,7 +17,6 @@ class PartialsDefinition
         public array $excludes = [],
         public array $only = [],
         public array $except = [],
-    )
-    {
+    ) {
     }
 }

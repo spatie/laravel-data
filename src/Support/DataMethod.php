@@ -3,11 +3,8 @@
 namespace Spatie\LaravelData\Support;
 
 use Illuminate\Support\Collection;
-use ReflectionIntersectionType;
 use ReflectionMethod;
-use ReflectionNamedType;
 use ReflectionParameter;
-use ReflectionUnionType;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
 use Spatie\LaravelData\Support\Types\Type;
 use Spatie\LaravelData\Support\Types\UndefinedType;
@@ -37,7 +34,7 @@ class DataMethod
         return new self(
             $method->name,
             collect($method->getParameters())->map(
-                fn(ReflectionParameter $parameter) => DataParameter::create($parameter, $method->class),
+                fn (ReflectionParameter $parameter) => DataParameter::create($parameter, $method->class),
             ),
             $method->isStatic(),
             $method->isPublic(),
@@ -99,7 +96,7 @@ class DataMethod
         /** @var Collection<array-key, \Spatie\LaravelData\Support\DataParameter|\Spatie\LaravelData\Support\DataProperty> $parameters */
         $parameters = array_is_list($input)
             ? $this->parameters
-            : $this->parameters->mapWithKeys(fn(DataParameter|DataProperty $parameter) => [$parameter->name => $parameter]);
+            : $this->parameters->mapWithKeys(fn (DataParameter|DataProperty $parameter) => [$parameter->name => $parameter]);
 
         if (count($input) > $parameters->count()) {
             return false;
@@ -116,17 +113,17 @@ class DataMethod
                 continue;
             }
 
-            if(
+            if (
                 $parameter instanceof DataProperty
                 && ! $parameter->type->type->acceptsValue($input[$index])
-            ){
+            ) {
                 return false;
             }
 
-            if(
+            if (
                 $parameter instanceof DataParameter
                 && ! $parameter->type->acceptsValue($input[$index])
-            ){
+            ) {
                 return false;
             }
         }

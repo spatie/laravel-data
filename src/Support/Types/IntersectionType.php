@@ -2,9 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Types;
 
-use ReflectionIntersectionType;
-use ReflectionUnionType;
-
 class IntersectionType extends MultiType
 {
     public function acceptsType(string $type): bool

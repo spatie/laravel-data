@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests\Fakes;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;

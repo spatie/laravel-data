@@ -2,8 +2,9 @@
 
 use Illuminate\Support\Facades\DB;
 
-use Spatie\LaravelData\DataCollection;
 use function Pest\Laravel\assertDatabaseHas;
+
+use Spatie\LaravelData\DataCollection;
 
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCustomCollectionCasts;

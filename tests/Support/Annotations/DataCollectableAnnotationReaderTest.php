@@ -1,9 +1,7 @@
 <?php
 
-use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotation;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
-use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 

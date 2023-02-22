@@ -12,7 +12,6 @@ use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
-use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 use function Spatie\Snapshots\assertMatchesSnapshot as baseAssertMatchesSnapshot;

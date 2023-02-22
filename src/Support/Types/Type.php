@@ -2,8 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Types;
 
-use Exception;
-use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionType;
@@ -20,8 +18,7 @@ abstract class Type
     public static function forReflection(
         ?ReflectionType $type,
         string $class,
-    ): self
-    {
+    ): self {
         return match (true) {
             $type instanceof ReflectionNamedType => SingleType::create($type, $class),
             $type instanceof ReflectionUnionType => UnionType::create($type, $class),
@@ -35,7 +32,7 @@ abstract class Type
     abstract public function findAcceptedTypeForBaseType(string $class): ?string;
 
     // TODO: remove this?
-    abstract public function getAcceptedTypes():  array;
+    abstract public function getAcceptedTypes(): array;
 
     public function acceptsValue(mixed $value): bool
     {
@@ -55,5 +52,4 @@ abstract class Type
 
         return $this->acceptsType($type);
     }
-
 }

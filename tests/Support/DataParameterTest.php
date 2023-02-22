@@ -2,8 +2,6 @@
 
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataParameter;
-use Spatie\LaravelData\Support\DataType;
-use Spatie\LaravelData\Support\Factories\DataTypeFactory;
 use Spatie\LaravelData\Support\Types\Type;
 
 it('can create a data parameter', function () {

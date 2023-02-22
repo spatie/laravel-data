@@ -4,38 +4,21 @@ namespace Spatie\LaravelData\Resolvers;
 
 use Closure;
 use Exception;
-use Faker\Provider\Base;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Enumerable;
-use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\BaseDataCollectable;
-use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
-use Spatie\LaravelData\Support\Lazy\RelationalLazy;
-use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
-use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
-use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
-use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Support\Wrapping\WrapType;
-use Spatie\LaravelData\Transformers\ArrayableTransformer;
-use Spatie\LaravelData\Transformers\Transformer;
-use TypeError;
-use function Pest\Laravel\instance;
 
 class TransformedDataCollectionResolver
 {
@@ -98,7 +81,7 @@ class TransformedDataCollectionResolver
         TransformationContext $context,
         TransformationContext $nestedContext,
     ): array {
-        $paginator->through(fn(BaseData $data) => $this->transformationClosure($nestedContext)($data));
+        $paginator->through(fn (BaseData $data) => $this->transformationClosure($nestedContext)($data));
 
         if ($context->transformValues === false) {
             return $paginator->all();

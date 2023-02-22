@@ -8,7 +8,6 @@ use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
 use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
-use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 interface TransformableData extends JsonSerializable, Jsonable, Arrayable, EloquentCastable
 {

@@ -34,4 +34,3 @@ it('can create a data object with defined defaults', function () {
 
     expect(new $dataClass('Hi'))->toEqual($dataClass::from([]));
 });
-

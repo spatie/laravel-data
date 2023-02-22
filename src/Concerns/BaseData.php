@@ -8,8 +8,6 @@ use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
-use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
-use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataPipeline;
@@ -22,18 +20,9 @@ use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Resolvers\DataCollectableFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
-use Spatie\LaravelData\Resolvers\EmptyDataResolver;
-use Spatie\LaravelData\Resolvers\TransformedDataResolver;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Support\Partials\PartialsDefinition;
 use Spatie\LaravelData\Support\Transformation\DataContext;
-use Spatie\LaravelData\Support\Transformation\PartialTransformationContext;
-use Spatie\LaravelData\Support\Transformation\TransformationContext;
-use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
-use Spatie\LaravelData\Support\Wrapping\Wrap;
-use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
-use Spatie\LaravelData\Support\Wrapping\WrapType;
 
 trait BaseData
 {
@@ -114,7 +103,7 @@ trait BaseData
     {
         return app(DataConfig::class)->getDataClass(static::class)
             ->properties
-            ->map(fn(DataProperty $property) => $property->name)
+            ->map(fn (DataProperty $property) => $property->name)
             ->push('_additional')
             ->toArray();
     }

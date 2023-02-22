@@ -5,13 +5,10 @@ namespace Spatie\LaravelData\Support\Transformation;
 use Closure;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
-use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Support\Partials\PartialsDefinition;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\TreeNode;
-use Spatie\LaravelData\Support\Wrapping\Wrap;
-use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 class PartialTransformationContext
 {
@@ -27,7 +24,7 @@ class PartialTransformationContext
         BaseData|BaseDataCollectable $data,
         PartialsDefinition $partialsDefinition,
     ): self {
-        $filter = fn(bool|null|Closure $condition, string $definition) => match (true) {
+        $filter = fn (bool|null|Closure $condition, string $definition) => match (true) {
             is_bool($condition) => $condition,
             $condition === null => false,
             is_callable($condition) => $condition($data),

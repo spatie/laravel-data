@@ -21,7 +21,7 @@ use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can get a paginated data collection', function () {
-    $items = Collection::times(100, fn(int $index) => "Item {$index}");
+    $items = Collection::times(100, fn (int $index) => "Item {$index}");
 
     $paginator = new LengthAwarePaginator(
         $items->forPage(1, 15),
@@ -36,7 +36,7 @@ it('can get a paginated data collection', function () {
 });
 
 it('can get a paginated cursor data collection', function () {
-    $items = Collection::times(100, fn(int $index) => "Item {$index}");
+    $items = Collection::times(100, fn (int $index) => "Item {$index}");
 
     $paginator = new CursorPaginator(
         $items,
@@ -71,7 +71,7 @@ test('a collection can be constructed with data object', function () {
 test('a collection can be filtered', function () {
     $collection = new DataCollection(SimpleData::class, ['A', 'B']);
 
-    $filtered = $collection->filter(fn(SimpleData $data) => $data->string === 'A')->toArray();
+    $filtered = $collection->filter(fn (SimpleData $data) => $data->string === 'A')->toArray();
 
     expect([
         ['string' => 'A'],
@@ -82,7 +82,7 @@ test('a collection can be filtered', function () {
 test('a collection can be transformed', function () {
     $collection = new DataCollection(SimpleData::class, ['A', 'B']);
 
-    $filtered = $collection->through(fn(SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
+    $filtered = $collection->through(fn (SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
 
     expect($filtered)->toMatchArray([
         ['string' => 'Ax'],
@@ -96,7 +96,7 @@ test('a paginated collection can be transformed', function () {
         new LengthAwarePaginator(['A', 'B'], 2, 15),
     );
 
-    $filtered = $collection->through(fn(SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
+    $filtered = $collection->through(fn (SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
 
     expect($filtered['data'])->toMatchArray([
         ['string' => 'Ax'],
@@ -343,7 +343,7 @@ it('supports lazy collections', function () {
         $data->string = strtoupper($data->string);
 
         return $data;
-    })->filter(fn(SimpleData $data) => $data->string === strtoupper('Never gonna give you up!'))->toArray();
+    })->filter(fn (SimpleData $data) => $data->string === strtoupper('Never gonna give you up!'))->toArray();
 
     expect($transformed)->toMatchArray([
         ['string' => strtoupper('Never gonna give you up!')],
@@ -441,7 +441,7 @@ it('can return a custom data collection when collecting data', function () {
 });
 
 it('can return a custom paginated data collection when collecting data', function () {
-    $class = new class ('') extends Data implements DeprecatedDataContract{
+    $class = new class ('') extends Data implements DeprecatedDataContract {
         use DeprecatedData;
 
         protected static string $_paginatedCollectionClass = CustomPaginatedDataCollection::class;

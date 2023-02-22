@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Contracts;
 
 use Closure;
-use Spatie\LaravelData\Support\PartialTrees;
 
 interface IncludeableData
 {

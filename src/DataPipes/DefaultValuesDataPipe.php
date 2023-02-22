@@ -17,7 +17,7 @@ class DefaultValuesDataPipe implements DataPipe
 
         $class
             ->properties
-            ->filter(fn(DataProperty $property) => ! $properties->has($property->name))
+            ->filter(fn (DataProperty $property) => ! $properties->has($property->name))
             ->each(function (DataProperty $property) use ($dataDefaults, &$properties) {
                 if (array_key_exists($property->name, $dataDefaults)) {
                     $properties[$property->name] = $dataDefaults[$property->name];

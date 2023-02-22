@@ -6,7 +6,7 @@ use Closure;
 
 trait ForwardsToPartialsDefinition
 {
-    protected abstract function getPartialsDefinition(): PartialsDefinition;
+    abstract protected function getPartialsDefinition(): PartialsDefinition;
 
     public function include(string ...$includes): static
     {

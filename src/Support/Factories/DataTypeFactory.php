@@ -2,40 +2,25 @@
 
 namespace Spatie\LaravelData\Support\Factories;
 
-use Illuminate\Contracts\Pagination\CursorPaginator;
-use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Pagination\AbstractCursorPaginator;
-use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Enumerable;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\BaseDataCollectable;
-use Spatie\LaravelData\CursorPaginatedDataCollection;
-use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
-use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Optional;
-use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotation;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
 use Spatie\LaravelData\Support\DataType;
-use Spatie\LaravelData\Support\Type;
 use Spatie\LaravelData\Support\Types\IntersectionType;
-use Spatie\LaravelData\Support\Types\MultiType;
 use Spatie\LaravelData\Support\Types\PartialType;
 use Spatie\LaravelData\Support\Types\SingleType;
 use Spatie\LaravelData\Support\Types\UndefinedType;
 use Spatie\LaravelData\Support\Types\UnionType;
 use TypeError;
-use function Pest\Laravel\instance;
 
 class DataTypeFactory
 {
@@ -50,7 +35,7 @@ class DataTypeFactory
     ): DataType {
         $type = $property->getType();
 
-        $class = match ($property::class){
+        $class = match ($property::class) {
             ReflectionParameter::class => $property->getDeclaringClass()?->name,
             ReflectionProperty::class => $property->class,
         };

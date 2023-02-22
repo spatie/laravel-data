@@ -6,12 +6,10 @@ use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Enumerable;
-use Illuminate\Support\Str;
 use phpDocumentor\Reflection\FqsenResolver;
 use phpDocumentor\Reflection\Types\Context;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use ReflectionClass;
-use ReflectionParameter;
 use ReflectionProperty;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
@@ -29,7 +27,7 @@ class DataCollectableAnnotationReader
     /** @return array<string, \Spatie\LaravelData\Support\Annotations\DataCollectableAnnotation> */
     public function getForClass(ReflectionClass $class): array
     {
-        return collect($this->get($class))->keyBy(fn(DataCollectableAnnotation $annotation) => $annotation->property)->all();
+        return collect($this->get($class))->keyBy(fn (DataCollectableAnnotation $annotation) => $annotation->property)->all();
     }
 
     public function getForProperty(ReflectionProperty $property): ?DataCollectableAnnotation

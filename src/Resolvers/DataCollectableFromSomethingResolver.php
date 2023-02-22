@@ -6,25 +6,20 @@ use Closure;
 use Exception;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
-use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Exceptions\CannotCreateDataCollectable;
-use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\Creation\CollectableMetaData;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Support\Types\PartialType;
-use function Pest\Laravel\instance;
 
 class DataCollectableFromSomethingResolver
 {
@@ -122,10 +117,10 @@ class DataCollectableFromSomethingResolver
         mixed $items,
         string $dataClass,
     ): array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator {
-        if($items instanceof PaginatedDataCollection
+        if ($items instanceof PaginatedDataCollection
             || $items instanceof CursorPaginatedDataCollection
             || $items instanceof DataCollection
-        ){
+        ) {
             $items = $items->items();
         }
 
@@ -194,6 +189,6 @@ class DataCollectableFromSomethingResolver
 
     protected function itemsToDataClosure(string $dataClass): Closure
     {
-        return fn(mixed $data) => $data instanceof $dataClass ? $data : $dataClass::from($data);
+        return fn (mixed $data) => $data instanceof $dataClass ? $data : $dataClass::from($data);
     }
 }

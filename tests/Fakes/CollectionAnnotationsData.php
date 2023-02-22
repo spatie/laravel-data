@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Tests\Fakes;
 
-use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
@@ -50,13 +49,13 @@ class CollectionAnnotationsData
 
     public DataCollection $propertyK;
 
-    /** @var array<\Spatie\LaravelData\Tests\Fakes\SimpleData>  */
+    /** @var array<\Spatie\LaravelData\Tests\Fakes\SimpleData> */
     public array $propertyL;
 
-    /** @var LengthAwarePaginator<\Spatie\LaravelData\Tests\Fakes\SimpleData>  */
+    /** @var LengthAwarePaginator<\Spatie\LaravelData\Tests\Fakes\SimpleData> */
     public LengthAwarePaginator $propertyM;
 
-    /** @var \Illuminate\Support\Collection<\Spatie\LaravelData\Tests\Fakes\SimpleData>  */
+    /** @var \Illuminate\Support\Collection<\Spatie\LaravelData\Tests\Fakes\SimpleData> */
     public Collection $propertyN;
 
     public DataCollection $propertyO;

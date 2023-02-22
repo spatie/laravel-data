@@ -23,7 +23,7 @@ class FakeModel extends Model
 
     public function accessor(): Attribute
     {
-        return Attribute::get(fn() => "accessor_{$this->string}");
+        return Attribute::get(fn () => "accessor_{$this->string}");
     }
 
     public function getOldAccessorAttribute()

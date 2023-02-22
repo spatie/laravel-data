@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Tests\Fakes\Casts;
 
 use Spatie\LaravelData\Casts\Cast;
-use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 

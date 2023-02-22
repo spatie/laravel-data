@@ -15,7 +15,6 @@ use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Contracts\DefaultableData;
 use Spatie\LaravelData\Contracts\EmptyData;
 use Spatie\LaravelData\Contracts\IncludeableData;
-use Spatie\LaravelData\Contracts\PrepareableData;
 use Spatie\LaravelData\Contracts\ResponsableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\ValidateableData;
@@ -23,9 +22,7 @@ use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Enums\DataCollectableType;
 use Spatie\LaravelData\Enums\DataTypeKind;
-use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
@@ -33,7 +30,6 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
 use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Support\Factories\DataTypeFactory;
-use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -914,7 +910,8 @@ it('can annotate data collections using property annotations', function () {
     /**
      * @property DataCollection<SimpleData> $property
      */
-    class TestDataTypeWithClassAnnotatedProperty{
+    class TestDataTypeWithClassAnnotatedProperty
+    {
         public function __construct(
             public array $property,
         ) {

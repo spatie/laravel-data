@@ -2,8 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Types;
 
-use ReflectionUnionType;
-
 class UnionType extends MultiType
 {
     public function acceptsType(string $type): bool

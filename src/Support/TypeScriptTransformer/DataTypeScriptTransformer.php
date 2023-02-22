@@ -14,7 +14,6 @@ use ReflectionClass;
 use ReflectionProperty;
 use RuntimeException;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Enums\DataCollectableType;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;

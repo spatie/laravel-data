@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Transformation;
 
-use Closure;
 use Spatie\LaravelData\Support\Partials\PartialsDefinition;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 

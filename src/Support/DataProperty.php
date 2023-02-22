@@ -12,7 +12,6 @@ use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Mappers\NameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotation;
-use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
 use Spatie\LaravelData\Support\Factories\DataTypeFactory;
 use Spatie\LaravelData\Transformers\Transformer;
 

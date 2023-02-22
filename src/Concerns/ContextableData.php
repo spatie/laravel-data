@@ -14,7 +14,7 @@ trait ContextableData
     public function getDataContext(): DataContext
     {
         if ($this->_dataContext === null) {
-            $wrap = match (true){
+            $wrap = match (true) {
                 method_exists($this, 'defaultWrap') => new Wrap(WrapType::Defined, $this->defaultWrap()),
                 default => new Wrap(WrapType::UseGlobal),
             };

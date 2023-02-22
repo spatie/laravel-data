@@ -21,8 +21,7 @@ abstract class MultiType extends Type
     public static function create(
         ReflectionUnionType|ReflectionIntersectionType $multiType,
         ?string $class,
-    ): static
-    {
+    ): static {
         $isNullable = $multiType->allowsNull();
         $isMixed = false;
         $types = [];
@@ -61,7 +60,7 @@ abstract class MultiType extends Type
     {
         return count(array_filter(
             $this->types,
-            fn(PartialType $subType) => ! $subType->isLazy() && ! $subType->isOptional()
+            fn (PartialType $subType) => ! $subType->isLazy() && ! $subType->isOptional()
         ));
     }
 }

@@ -5,7 +5,6 @@ namespace Spatie\LaravelData;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\BaseData;
 use Spatie\LaravelData\Concerns\ContextableData;
-use Spatie\LaravelData\Concerns\DataTrait;
 use Spatie\LaravelData\Concerns\DefaultableData;
 use Spatie\LaravelData\Concerns\EmptyData;
 use Spatie\LaravelData\Concerns\IncludeableData;

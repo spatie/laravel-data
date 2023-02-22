@@ -186,12 +186,12 @@ it('will allow a nested collection object to handle its own types', function () 
 
 it('works nicely with lazy data', function () {
     $data = NestedLazyData::from([
-        'simple' => Lazy::create(fn() => SimpleData::from('Hello')),
+        'simple' => Lazy::create(fn () => SimpleData::from('Hello')),
     ]);
 
     expect($data->simple)
         ->toBeInstanceOf(Lazy::class)
-        ->toEqual(Lazy::create(fn() => SimpleData::from('Hello')));
+        ->toEqual(Lazy::create(fn () => SimpleData::from('Hello')));
 });
 
 it('allows casting', function () {

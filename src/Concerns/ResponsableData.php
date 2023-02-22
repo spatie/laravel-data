@@ -8,9 +8,7 @@ use Illuminate\Http\Response;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
 use Spatie\LaravelData\Support\Transformation\PartialTransformationContext;
-use Spatie\LaravelData\Support\Transformation\TransformationContext;
 use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
-use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 trait ResponsableData
@@ -25,9 +23,11 @@ trait ResponsableData
         $context = TransformationContextFactory::create()
             ->wrapExecutionType(WrapExecutionType::Enabled)
             ->get($this)
-            ->mergePartials(PartialTransformationContext::create(
+            ->mergePartials(
+                PartialTransformationContext::create(
                 $this,
-                $this->getDataContext()->partialsDefinition)
+                $this->getDataContext()->partialsDefinition
+            )
             );
 
         $context = $this instanceof IncludeableDataContract
