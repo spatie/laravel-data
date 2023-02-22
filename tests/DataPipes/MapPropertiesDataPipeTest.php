@@ -158,7 +158,7 @@ it('can map properties into data objects which map properties again', function (
 it('can map properties into data collections', function () {
     $dataClass = new class () extends Data {
         #[MapInputName('something'), DataCollectionOf(SimpleData::class)]
-        public DataCollection $mapped;
+        public array $mapped;
     };
 
     $value = collect([
@@ -171,7 +171,7 @@ it('can map properties into data collections', function () {
     $data = $dataClass::from($value);
 
     expect($data->mapped)->toEqual(
-        SimpleData::collection([
+        SimpleData::collect([
             'We are the knights who say, ni!',
             'Bring us a, shrubbery!',
         ])
@@ -181,7 +181,7 @@ it('can map properties into data collections', function () {
 it('can map properties into data collections which map properties again', function () {
     $dataClass = new class () extends Data {
         #[MapInputName('something'), DataCollectionOf(SimpleDataWithMappedProperty::class)]
-        public DataCollection $mapped;
+        public array $mapped;
     };
 
     $value = collect([
@@ -194,7 +194,7 @@ it('can map properties into data collections which map properties again', functi
     $data = $dataClass::from($value);
 
     expect($data->mapped)->toEqual(
-        SimpleDataWithMappedProperty::collection([
+        SimpleDataWithMappedProperty::collect([
             ['description' => 'We are the knights who say, ni!'],
             ['description' => 'Bring us a, shrubbery!'],
         ])
@@ -215,7 +215,7 @@ it('can map properties from a complete class', function () {
     expect($data)
         ->casedProperty->toEqual('We are the knights who say, ni!')
         ->dataCasedProperty->toEqual(SimpleData::from('Bring us a, shrubbery!'))
-        ->dataCollectionCasedProperty->toEqual(SimpleData::collection([
+        ->dataCollectionCasedProperty->toEqual(SimpleData::collect([
             'One that looks nice!',
             'But not too expensive!',
         ]));

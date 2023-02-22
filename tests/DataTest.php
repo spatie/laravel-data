@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
 use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapOutputName;
@@ -72,11 +73,11 @@ it('can create a resource', function () {
 });
 
 it('can create a collection of resources', function () {
-    $collection = SimpleData::collection(collect([
+    $collection = SimpleData::collect(collect([
         'Ruben',
         'Freek',
         'Brent',
-    ]));
+    ]), DataCollection::class);
 
     expect($collection->toArray())
         ->toMatchArray([
@@ -116,7 +117,7 @@ it('can include a nested lazy property', function () {
         public function __construct(
             public LazyData|Lazy $data,
             #[DataCollectionOf(LazyData::class)]
-            public DataCollection|Lazy $collection,
+            public array|Lazy $collection,
         ) {
         }
     }
@@ -124,7 +125,7 @@ it('can include a nested lazy property', function () {
 
     $data = new \TestIncludeableNestedLazyDataProperties(
         Lazy::create(fn() => LazyData::from('Hello')),
-        Lazy::create(fn() => LazyData::collection(['is', 'it', 'me', 'your', 'looking', 'for',])),
+        Lazy::create(fn() => LazyData::collect(['is', 'it', 'me', 'your', 'looking', 'for',])),
     );
 
     expect((clone $data)->toArray())->toBe([]);
@@ -169,12 +170,12 @@ it('can include specific nested data', function () {
     {
         public function __construct(
             #[DataCollectionOf(MultiLazyData::class)]
-            public DataCollection|Lazy $songs
+            public array|Lazy $songs
         ) {
         }
     }
 
-    $collection = Lazy::create(fn() => MultiLazyData::collection([
+    $collection = Lazy::create(fn() => MultiLazyData::collect([
         DummyDto::rick(),
         DummyDto::bon(),
     ]));
@@ -327,7 +328,26 @@ it('always transforms lazy inertia data to inertia lazy props', function () {
 });
 
 it('can get the empty version of a data object', function () {
-    expect(EmptyData::empty())->toMatchArray([
+    $dataClass = new class extends Data {
+        public string $property;
+
+        public string|Lazy $lazyProperty;
+
+        public array $array;
+
+        public Collection $collection;
+
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection $dataCollection;
+
+        public SimpleData $data;
+
+        public Lazy|SimpleData $lazyData;
+
+        public bool $defaultProperty = true;
+    };
+
+    expect($dataClass::empty())->toMatchArray([
         'property' => null,
         'lazyProperty' => null,
         'array' => [],
@@ -548,7 +568,7 @@ it('can disabled except data dynamically from the request', function () {
 it('can get the data object without transforming', function () {
     $data = new class (
         $dataObject = new SimpleData('Test'),
-        $dataCollection = SimpleData::collection([new SimpleData('A'), new SimpleData('B')]),
+        $dataCollection = new DataCollection(SimpleData::class, ['A', 'B']),
         Lazy::create(fn() => new SimpleData('Lazy')),
         'Test',
         $transformable = new DateTime('16 may 1994')
@@ -698,7 +718,7 @@ it('can create a data model without constructor', function () {
             SimpleDataWithoutConstructor::fromString('World'),
         ])
     )
-        ->toEqual(SimpleDataWithoutConstructor::collection(['Hello', 'World']));
+        ->toEqual(SimpleDataWithoutConstructor::collect(['Hello', 'World'], DataCollection::class));
 });
 
 it('can create a data object from a model', function () {
@@ -928,7 +948,7 @@ it('can use a custom transformer', function () {
         }
     };
 
-    $nestedDataCollection = $nestedData::collection([
+    $nestedDataCollection = $nestedData::collect([
         ['integer' => 314, 'string' => 'pi'],
         ['integer' => '69', 'string' => 'Laravel after hours'],
     ]);
@@ -937,7 +957,7 @@ it('can use a custom transformer', function () {
         public function __construct(
             public Data $nestedData,
             #[DataCollectionOf(SimpleData::class)]
-            public DataCollection $nestedDataCollection,
+            public array $nestedDataCollection,
         ) {
         }
     };
@@ -950,7 +970,7 @@ it('can use a custom transformer', function () {
                 WithTransformer(ConfidentialDataCollectionTransformer::class),
                 DataCollectionOf(SimpleData::class)
             ]
-            public DataCollection $nestedDataCollection,
+            public array $nestedDataCollection,
         ) {
         }
     };
@@ -991,24 +1011,20 @@ it('can transform built it types with custom transformers', function () {
 });
 
 it('can cast data object and collections using a custom cast', function () {
-    $dataWithDefaultCastsClass = new class (new SimpleData(''), SimpleData::collection([])) extends Data {
-        public function __construct(
-            public SimpleData $nestedData,
-            #[DataCollectionOf(SimpleData::class)]
-            public DataCollection $nestedDataCollection,
-        ) {
-        }
+    $dataWithDefaultCastsClass = new class () extends Data {
+        public SimpleData $nestedData;
+
+        #[DataCollectionOf(SimpleData::class)]
+        public array $nestedDataCollection;
     };
 
-    $dataWithCustomCastsClass = new class (new SimpleData(''), SimpleData::collection([])) extends Data {
-        public function __construct(
-            #[WithCast(ConfidentialDataCast::class)]
-            public SimpleData $nestedData,
-            #[WithCast(ConfidentialDataCollectionCast::class)]
-            #[DataCollectionOf(SimpleData::class)]
-            public DataCollection $nestedDataCollection,
-        ) {
-        }
+    $dataWithCustomCastsClass = new class () extends Data {
+        #[WithCast(ConfidentialDataCast::class)]
+        public SimpleData $nestedData;
+
+        #[WithCast(ConfidentialDataCollectionCast::class)]
+        #[DataCollectionOf(SimpleData::class)]
+        public array $nestedDataCollection;
     };
 
     $dataWithDefaultCasts = $dataWithDefaultCastsClass::from([
@@ -1024,12 +1040,12 @@ it('can cast data object and collections using a custom cast', function () {
     expect($dataWithDefaultCasts)
         ->nestedData->toEqual(SimpleData::from('a secret'))
         ->and($dataWithDefaultCasts)
-        ->nestedDataCollection->toEqual(SimpleData::collection(['another secret', 'yet another secret']));
+        ->nestedDataCollection->toEqual(SimpleData::collect(['another secret', 'yet another secret']));
 
     expect($dataWithCustomCasts)
         ->nestedData->toEqual(SimpleData::from('CONFIDENTIAL'))
         ->and($dataWithCustomCasts)
-        ->nestedDataCollection->toEqual(SimpleData::collection(['CONFIDENTIAL', 'CONFIDENTIAL']));
+        ->nestedDataCollection->toEqual(SimpleData::collect(['CONFIDENTIAL', 'CONFIDENTIAL']));
 });
 
 it('can cast built-in types with custom casts', function () {
@@ -1181,7 +1197,7 @@ it('includes value if not optional data', function () {
 
 it('can map transformed property names', function () {
     $data = new SimpleDataWithMappedProperty('hello');
-    $dataCollection = SimpleDataWithMappedProperty::collection([
+    $dataCollection = SimpleDataWithMappedProperty::collect([
         ['description' => 'never'],
         ['description' => 'gonna'],
         ['description' => 'give'],
@@ -1197,12 +1213,12 @@ it('can map transformed property names', function () {
             #[MapOutputName('nested_other')]
             public SimpleDataWithMappedProperty $nested_renamed,
             #[DataCollectionOf(SimpleDataWithMappedProperty::class)]
-            public DataCollection $nested_collection,
+            public array $nested_collection,
             #[
                 MapOutputName('nested_other_collection'),
                 DataCollectionOf(SimpleDataWithMappedProperty::class)
             ]
-            public DataCollection $nested_renamed_collection,
+            public array $nested_renamed_collection,
         ) {
         }
     };
@@ -1791,7 +1807,7 @@ it('can wrap data objects', function () {
     )->toMatchArray(['wrap' => ['string' => 'Hello World']]);
 
     expect(
-        SimpleData::collection(['Hello', 'World'])
+        SimpleData::collect(['Hello', 'World'], DataCollection::class)
             ->wrap('wrap')
             ->toResponse(\request())
             ->getData(true)
@@ -1826,7 +1842,7 @@ it('can wrap data objects using a global default', function () {
         ->toMatchArray(['string' => 'Hello World']);
 
     expect(
-        SimpleData::collection(['Hello', 'World'])
+        SimpleData::collect(['Hello', 'World'], DataCollection::class)
             ->toResponse(\request())->getData(true)
     )
         ->toMatchArray([
@@ -1844,7 +1860,7 @@ it('can wrap data objects using a global default', function () {
         ->toMatchArray(['string' => 'Hello World']);
 
     expect(
-        SimpleData::collection(['Hello', 'World'])
+        (new DataCollection(SimpleData::class, ['Hello', 'World']))
             ->wrap('other-wrap')
             ->toResponse(\request())
             ->getData(true)
@@ -1857,7 +1873,7 @@ it('can wrap data objects using a global default', function () {
         ]);
 
     expect(
-        SimpleData::collection(['Hello', 'World'])
+        (new DataCollection(SimpleData::class, ['Hello', 'World']))
             ->withoutWrapping()
             ->toResponse(\request())->getData(true)
     )
@@ -1918,9 +1934,9 @@ it('wraps additional data', function () {
 it('wraps complex data structures', function () {
     $data = new MultiNestedData(
         new NestedData(SimpleData::from('Hello')),
-        NestedData::collection([
+        [
             new NestedData(SimpleData::from('World')),
-        ]),
+        ],
     );
 
     expect(
@@ -1940,9 +1956,9 @@ it('wraps complex data structures with a global', function () {
 
     $data = new MultiNestedData(
         new NestedData(SimpleData::from('Hello')),
-        NestedData::collection([
+        [
             new NestedData(SimpleData::from('World')),
-        ]),
+        ],
     );
 
     expect(
@@ -1967,7 +1983,7 @@ it('only wraps responses', function () {
         ->toMatchArray(['string' => 'Hello World']);
 
     expect(
-        SimpleData::collection(['Hello', 'World'])->wrap('wrap')
+        SimpleData::collect(['Hello', 'World'], DataCollection::class)->wrap('wrap')
     )
         ->toArray()
         ->toMatchArray([
@@ -2205,13 +2221,12 @@ it('during the serialization process some properties are thrown away', function 
     expect($invaded->_wrap)->toBeNull();
 });
 
-
+// TODO: extend tests here
 it('can use an array to store data', function () {
     $dataClass = new class(
         [LazyData::from('A'), LazyData::from('B')],
         collect([LazyData::from('A'), LazyData::from('B')]),
-    ) extends Data
-    {
+    ) extends Data {
         public function __construct(
             #[DataCollectionOf(SimpleData::class)]
             public array $array,
@@ -2236,4 +2251,40 @@ it('can use an array to store data', function () {
             ['name' => 'B'],
         ],
     ]);
-})->skip('TODO: yet to impelment');
+});
+
+it('can write collection logic in a class', function () {
+    class TestSomeCustomCollection extends Collection
+    {
+        public function nameAll(): string
+        {
+            return $this->map(fn($data) => $data->string)->join(', ');
+        }
+    }
+
+    $dataClass = new class() extends Data {
+        public string $string;
+
+        public static function fromString(string $string): self
+        {
+            $s = new self();
+
+            $s->string = $string;
+
+            return $s;
+        }
+
+        public static function collectArray(array $items): \TestSomeCustomCollection
+        {
+            return new \TestSomeCustomCollection($items);
+        }
+    };
+
+    expect($dataClass::collect(['a', 'b', 'c']))
+        ->toBeInstanceOf(\TestSomeCustomCollection::class)
+        ->all()->toEqual([
+            $dataClass::from('a'),
+            $dataClass::from('b'),
+            $dataClass::from('c'),
+        ]);
+});

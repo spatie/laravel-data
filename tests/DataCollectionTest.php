@@ -5,11 +5,12 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Spatie\LaravelData\Concerns\DeprecatedData;
+use Spatie\LaravelData\Contracts\DeprecatedData as DeprecatedDataContract;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
-use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
@@ -20,7 +21,7 @@ use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can get a paginated data collection', function () {
-    $items = Collection::times(100, fn (int $index) => "Item {$index}");
+    $items = Collection::times(100, fn(int $index) => "Item {$index}");
 
     $paginator = new LengthAwarePaginator(
         $items->forPage(1, 15),
@@ -28,21 +29,21 @@ it('can get a paginated data collection', function () {
         15
     );
 
-    $collection = SimpleData::collection($paginator);
+    $collection = new PaginatedDataCollection(SimpleData::class, $paginator);
 
     expect($collection)->toBeInstanceOf(PaginatedDataCollection::class);
     assertMatchesJsonSnapshot($collection->toJson());
 });
 
 it('can get a paginated cursor data collection', function () {
-    $items = Collection::times(100, fn (int $index) => "Item {$index}");
+    $items = Collection::times(100, fn(int $index) => "Item {$index}");
 
     $paginator = new CursorPaginator(
         $items,
         15,
     );
 
-    $collection = SimpleData::collection($paginator);
+    $collection = new CursorPaginatedDataCollection(SimpleData::class, $paginator);
 
     if (version_compare(app()->version(), '9.0.0', '<=')) {
         $this->markTestIncomplete('Laravel 8 uses a different format');
@@ -53,24 +54,24 @@ it('can get a paginated cursor data collection', function () {
 });
 
 test('a collection can be constructed with data object', function () {
-    $collectionA = SimpleData::collection([
+    $collectionA = new DataCollection(SimpleData::class, [
         SimpleData::from('A'),
         SimpleData::from('B'),
     ]);
 
-    $collectionB = SimpleData::collection([
+    $collectionB = SimpleData::collect([
         'A',
         'B',
-    ]);
+    ], DataCollection::class);
 
     expect($collectionB)->toArray()
         ->toMatchArray($collectionA->toArray());
 });
 
 test('a collection can be filtered', function () {
-    $collection = SimpleData::collection(['A', 'B']);
+    $collection = new DataCollection(SimpleData::class, ['A', 'B']);
 
-    $filtered = $collection->filter(fn (SimpleData $data) => $data->string === 'A')->toArray();
+    $filtered = $collection->filter(fn(SimpleData $data) => $data->string === 'A')->toArray();
 
     expect([
         ['string' => 'A'],
@@ -79,9 +80,9 @@ test('a collection can be filtered', function () {
 });
 
 test('a collection can be transformed', function () {
-    $collection = SimpleData::collection(['A', 'B']);
+    $collection = new DataCollection(SimpleData::class, ['A', 'B']);
 
-    $filtered = $collection->through(fn (SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
+    $filtered = $collection->through(fn(SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
 
     expect($filtered)->toMatchArray([
         ['string' => 'Ax'],
@@ -90,11 +91,12 @@ test('a collection can be transformed', function () {
 });
 
 test('a paginated collection can be transformed', function () {
-    $collection = SimpleData::collection(
-        new LengthAwarePaginator(['A', 'B'], 2, 15)
+    $collection = new PaginatedDataCollection(
+        SimpleData::class,
+        new LengthAwarePaginator(['A', 'B'], 2, 15),
     );
 
-    $filtered = $collection->through(fn (SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
+    $filtered = $collection->through(fn(SimpleData $data) => new SimpleData("{$data->string}x"))->toArray();
 
     expect($filtered['data'])->toMatchArray([
         ['string' => 'Ax'],
@@ -103,7 +105,7 @@ test('a paginated collection can be transformed', function () {
 });
 
 it('is iteratable', function () {
-    $collection = SimpleData::collection([
+    $collection = new DataCollection(SimpleData::class, [
         'A', 'B', 'C', 'D',
     ]);
 
@@ -153,7 +155,7 @@ it('has array access', function (DataCollection $collection) {
 it('can dynamically include data based upon the request', function () {
     LazyData::$allowedIncludes = [''];
 
-    $response = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request());
+    $response = (new DataCollection(LazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request());
 
     expect($response)->getData(true)
         ->toMatchArray([
@@ -164,7 +166,7 @@ it('can dynamically include data based upon the request', function () {
 
     LazyData::$allowedIncludes = ['name'];
 
-    $includedResponse = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+    $includedResponse = (new DataCollection(LazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'include' => 'name',
     ]));
 
@@ -179,7 +181,7 @@ it('can dynamically include data based upon the request', function () {
 it('can disabled manually including data in the request', function () {
     LazyData::$allowedIncludes = [];
 
-    $response = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+    $response = (new DataCollection(LazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'include' => 'name',
     ]));
 
@@ -192,7 +194,7 @@ it('can disabled manually including data in the request', function () {
 
     LazyData::$allowedIncludes = ['name'];
 
-    $response = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+    $response = (new DataCollection(LazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'include' => 'name',
     ]));
 
@@ -205,7 +207,7 @@ it('can disabled manually including data in the request', function () {
 
     LazyData::$allowedIncludes = null;
 
-    $response = LazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+    $response = (new DataCollection(LazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'include' => 'name',
     ]));
 
@@ -220,7 +222,7 @@ it('can disabled manually including data in the request', function () {
 it('can dynamically exclude data based upon the request', function () {
     DefaultLazyData::$allowedExcludes = [];
 
-    $response = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request());
+    $response = (new DataCollection(DefaultLazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request());
 
     expect($response)->getData(true)
         ->toMatchArray([
@@ -231,7 +233,7 @@ it('can dynamically exclude data based upon the request', function () {
 
     DefaultLazyData::$allowedExcludes = ['name'];
 
-    $excludedResponse = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+    $excludedResponse = (new DataCollection(DefaultLazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'exclude' => 'name',
     ]));
 
@@ -246,7 +248,7 @@ it('can dynamically exclude data based upon the request', function () {
 it('can disable manually excluding data in the request', function () {
     DefaultLazyData::$allowedExcludes = [];
 
-    $response = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+    $response = (new DataCollection(DefaultLazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'exclude' => 'name',
     ]));
 
@@ -259,7 +261,7 @@ it('can disable manually excluding data in the request', function () {
 
     DefaultLazyData::$allowedExcludes = ['name'];
 
-    $response = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+    $response = (new DataCollection(DefaultLazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'exclude' => 'name',
     ]));
 
@@ -272,7 +274,7 @@ it('can disable manually excluding data in the request', function () {
 
     DefaultLazyData::$allowedExcludes = null;
 
-    $response = DefaultLazyData::collection(['Ruben', 'Freek', 'Brent'])->toResponse(request()->merge([
+    $response = (new DataCollection(DefaultLazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'exclude' => 'name',
     ]));
 
@@ -285,7 +287,7 @@ it('can disable manually excluding data in the request', function () {
 });
 
 it('can update data properties withing a collection', function () {
-    $collection = LazyData::collection([
+    $collection = new DataCollection(LazyData::class, [
         LazyData::from('Never gonna give you up!'),
     ]);
 
@@ -329,7 +331,7 @@ it('supports lazy collections', function () {
         }
     });
 
-    $collection = SimpleData::collection($lazyCollection);
+    $collection = new DataCollection(SimpleData::class, $lazyCollection);
 
     expect($collection)->items()
         ->toMatchArray([
@@ -341,7 +343,7 @@ it('supports lazy collections', function () {
         $data->string = strtoupper($data->string);
 
         return $data;
-    })->filter(fn (SimpleData $data) => $data->string === strtoupper('Never gonna give you up!'))->toArray();
+    })->filter(fn(SimpleData $data) => $data->string === strtoupper('Never gonna give you up!'))->toArray();
 
     expect($transformed)->toMatchArray([
         ['string' => strtoupper('Never gonna give you up!')],
@@ -357,12 +359,12 @@ it('can convert a data collection into a Laravel collection', function () {
         ])
     )
         ->toEqual(
-            SimpleData::collection(['A', 'B', 'C'])->toCollection()
+            (new DataCollection(SimpleData::class, ['A', 'B', 'C']))->toCollection()
         );
 });
 
 test('a collection can be transformed to JSON', function () {
-    $collection = SimpleData::collection(['A', 'B', 'C']);
+    $collection = (new DataCollection(SimpleData::class, ['A', 'B', 'C']));
 
     expect('[{"string":"A"},{"string":"B"},{"string":"C"}]')
         ->toEqual($collection->toJson())
@@ -381,7 +383,7 @@ it('will cast data object into the data collection objects', function () {
         }
     };
 
-    $collection = $dataClass::collection([
+    $collection = new DataCollection($dataClass::class, [
         SimpleData::from('A'),
         SimpleData::from('B'),
     ]);
@@ -396,13 +398,13 @@ it('will cast data object into the data collection objects', function () {
 });
 
 it('can reset the keys', function () {
-    $collection = SimpleData::collection([
+    $collection = new DataCollection(SimpleData::class, [
         1 => SimpleData::from('a'),
         3 => SimpleData::from('b'),
     ]);
 
     expect(
-        SimpleData::collection([
+        new DataCollection(SimpleData::class, [
             0 => SimpleData::from('a'),
             1 => SimpleData::from('b'),
         ])
@@ -410,7 +412,7 @@ it('can reset the keys', function () {
 });
 
 it('can use magical creation methods to create a collection', function () {
-    $collection = SimpleData::collection(['A', 'B']);
+    $collection = new DataCollection(SimpleData::class, ['A', 'B']);
 
     expect($collection->toCollection()->all())
         ->toMatchArray([
@@ -420,7 +422,9 @@ it('can use magical creation methods to create a collection', function () {
 });
 
 it('can return a custom data collection when collecting data', function () {
-    $class = new class ('') extends Data {
+    $class = new class ('') extends Data implements DeprecatedDataContract {
+        use DeprecatedData;
+
         protected static string $_collectionClass = CustomDataCollection::class;
 
         public function __construct(public string $string)
@@ -437,7 +441,9 @@ it('can return a custom data collection when collecting data', function () {
 });
 
 it('can return a custom paginated data collection when collecting data', function () {
-    $class = new class ('') extends Data {
+    $class = new class ('') extends Data implements DeprecatedDataContract{
+        use DeprecatedData;
+
         protected static string $_paginatedCollectionClass = CustomPaginatedDataCollection::class;
 
         public function __construct(public string $string)
@@ -453,7 +459,7 @@ it('can return a custom paginated data collection when collecting data', functio
 it(
     'can perform some collection operations',
     function (string $operation, array $arguments, array $expected) {
-        $collection = SimpleData::collection(['A', 'B', 'C']);
+        $collection = new DataCollection(SimpleData::class, ['A', 'B', 'C']);
 
         $changedCollection = $collection->{$operation}(...$arguments);
 
@@ -463,7 +469,7 @@ it(
 )->with('collection-operations');
 
 it('can return a sole data object', function () {
-    $collection = SimpleData::collection(['A', 'B']);
+    $collection = new DataCollection(SimpleData::class, ['A', 'B']);
 
     $filtered = $collection->sole('string', '=', 'A');
 
@@ -472,7 +478,7 @@ it('can return a sole data object', function () {
 });
 
 it('can return a sole data object without specifying an operator', function () {
-    $collection = SimpleData::collection(['A', 'B']);
+    $collection = new DataCollection(SimpleData::class, ['A', 'B']);
 
     $filtered = $collection->sole('string', 'A');
 
@@ -482,7 +488,7 @@ it('can return a sole data object without specifying an operator', function () {
 
 
 it('can serialize and unserialize a data collection', function () {
-    $collection = SimpleData::collection(['A', 'B']);
+    $collection = new DataCollection(SimpleData::class, ['A', 'B']);
 
     $serialized = serialize($collection);
 
@@ -491,11 +497,11 @@ it('can serialize and unserialize a data collection', function () {
     $unserialized = unserialize($serialized);
 
     expect($unserialized)->toBeInstanceOf(DataCollection::class);
-    expect($unserialized)->toEqual(SimpleData::collection(['A', 'B']));
+    expect($unserialized)->toEqual(new DataCollection(SimpleData::class, ['A', 'B']));
 });
 
 it('during the serialization process some properties are thrown away', function () {
-    $collection = SimpleData::collection(['A', 'B']);
+    $collection = new DataCollection(SimpleData::class, ['A', 'B']);
 
     $collection->include('test');
     $collection->exclude('test');

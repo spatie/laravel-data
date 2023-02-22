@@ -11,7 +11,7 @@ class MultiNestedData extends Data
     public function __construct(
         public NestedData $nested,
         #[DataCollectionOf(NestedData::class)]
-        public DataCollection $nestedCollection
+        public array $nestedCollection
     ) {
     }
 }

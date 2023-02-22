@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 
+use Spatie\LaravelData\DataCollection;
 use function Pest\Laravel\handleExceptions;
 use function Pest\Laravel\postJson;
 
@@ -149,10 +150,10 @@ it('can wrap data', function () {
 
 it('can wrap data collections', function () {
     Route::post('/example-route', function () {
-        return SimpleData::collection([
+        return SimpleData::collect([
             request()->input('string'),
             strtoupper(request()->input('string')),
-        ])->wrap('data');
+        ], DataCollection::class)->wrap('data');
     });
 
     performRequest('Hello World')

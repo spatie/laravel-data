@@ -63,9 +63,7 @@ class CastPropertiesDataPipe implements DataPipe
         }
 
         if ($property->type->kind->isDataCollectable()) {
-            return $property->type->dataClass::collection($value);
-            // TODO: future
-            //            return $property->type->dataClass::collect($value, $property->type->dataCollectableClass);
+            return $property->type->dataClass::collect($value, $property->type->dataCollectableClass);
         }
 
         return $value;

@@ -85,7 +85,8 @@ class DataClass
         ReflectionClass $reflectionClass,
     ): Collection {
         return collect($reflectionClass->getMethods())
-            ->filter(fn(ReflectionMethod $method) => str_starts_with($method->name, 'from') || str_starts_with($method->name, 'collectFrom'))
+            ->filter(fn(ReflectionMethod $method) => str_starts_with($method->name, 'from') || str_starts_with($method->name, 'collect'))
+            ->reject(fn(ReflectionMethod $method) => in_array($method->name, ['from', 'collect', 'collection']))
             ->mapWithKeys(
                 fn(ReflectionMethod $method) => [$method->name => DataMethod::create($method)],
             );

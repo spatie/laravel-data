@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Tests\Fakes;
 
 use Carbon\CarbonImmutable;
 use DateTime;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
@@ -28,6 +29,8 @@ class ComplicatedData extends Data
         public SimpleData $nestedData,
         /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */
         public DataCollection $nestedCollection,
+        #[DataCollectionOf(SimpleData::class)]
+        public array $nestedArray,
     ) {
     }
 }

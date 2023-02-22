@@ -28,7 +28,7 @@ it('will correctly reduce a tree based upon allowed includes', function (
     $data = new class (
         'Hello',
         LazyData::from('Hello'),
-        LazyData::collection(['Hello', 'World'])
+        LazyData::collect(['Hello', 'World'])
     ) extends Data {
         public static ?array $allowedIncludes;
 
@@ -36,7 +36,7 @@ it('will correctly reduce a tree based upon allowed includes', function (
             public string $property,
             public LazyData $nested,
             #[DataCollectionOf(LazyData::class)]
-            public DataCollection $collection,
+            public array $collection,
         ) {
         }
 

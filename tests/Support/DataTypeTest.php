@@ -914,15 +914,15 @@ it('can annotate data collections using property annotations', function () {
      */
     class TestDataTypeWithClassAnnotatedProperty{
         public function __construct(
-            public DataCollection $property,
+            public array $property,
         ) {
         }
     }
 
-    $type = resolveDataType(new \TestDataTypeWithClassAnnotatedProperty(SimpleData::collection([])));
+    $type = resolveDataType(new \TestDataTypeWithClassAnnotatedProperty([]));
 
     expect($type)
-        ->kind->toBe(DataTypeKind::DataCollection)
+        ->kind->toBe(DataTypeKind::Array)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(DataCollection::class);
+        ->dataCollectableClass->toBe('array');
 });

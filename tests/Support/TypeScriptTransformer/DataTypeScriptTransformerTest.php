@@ -12,6 +12,7 @@ use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
+use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 use function Spatie\Snapshots\assertMatchesSnapshot as baseAssertMatchesSnapshot;
@@ -28,7 +29,7 @@ function assertMatchesSnapshot($actual, Driver $driver = null): void
 it('can convert a data object to Typescript', function () {
     $config = TypeScriptTransformerConfig::create();
 
-    $data = new class (null, Optional::create(), 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn () => 'Lazy'), SimpleData::from('Simple data'), SimpleData::collection([]), SimpleData::collection([]), SimpleData::collection([])) extends Data {
+    $data = new class (null, Optional::create(), 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn () => 'Lazy'), SimpleData::from('Simple data'), new DataCollection(SimpleData::class, []), new DataCollection(SimpleData::class, []), new DataCollection(SimpleData::class, [])) extends Data {
         public function __construct(
             public null|int $nullable,
             public Optional|int $undefineable,
@@ -61,7 +62,7 @@ it('can convert a data object to Typescript', function () {
 it('uses the correct types for data collection of attributes', function () {
     $config = TypeScriptTransformerConfig::create();
 
-    $collection = SimpleData::collection([]);
+    $collection = new DataCollection(SimpleData::class, []);
 
     $data = new class ($collection, $collection, $collection, $collection, $collection, $collection, $collection) extends Data {
         public function __construct(
@@ -94,7 +95,7 @@ it('uses the correct types for data collection of attributes', function () {
 it('uses the correct types for paginated data collection for attributes ', function () {
     $config = TypeScriptTransformerConfig::create();
 
-    $collection = SimpleData::collection(new LengthAwarePaginator([], 0, 15));
+    $collection = new PaginatedDataCollection(SimpleData::class, new LengthAwarePaginator([], 0, 15));
 
     $data = new class ($collection, $collection, $collection, $collection, $collection, $collection, $collection) extends Data {
         public function __construct(
@@ -127,7 +128,7 @@ it('uses the correct types for paginated data collection for attributes ', funct
 it('uses the correct types for cursor paginated data collection of attributes', function () {
     $config = TypeScriptTransformerConfig::create();
 
-    $collection = SimpleData::collection(new CursorPaginator([], 15));
+    $collection = new CursorPaginatedDataCollection(SimpleData::class, new CursorPaginator([], 15));
 
     $data = new class ($collection, $collection, $collection, $collection, $collection, $collection, $collection) extends Data {
         public function __construct(

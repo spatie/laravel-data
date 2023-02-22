@@ -37,12 +37,6 @@ use Spatie\LaravelData\Support\Wrapping\WrapType;
 
 trait BaseData
 {
-    protected static string $_collectionClass = DataCollection::class;
-
-    protected static string $_paginatedCollectionClass = PaginatedDataCollection::class;
-
-    protected static string $_cursorPaginatedCollectionClass = CursorPaginatedDataCollection::class;
-
     protected ?DataContext $_dataContext = null;
 
     public static function optional(mixed ...$payloads): ?static
@@ -114,19 +108,6 @@ trait BaseData
     public static function prepareForPipeline(Collection $properties): Collection
     {
         return $properties;
-    }
-
-    public static function collection(Enumerable|array|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator|DataCollection $items): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
-    {
-        if ($items instanceof Paginator || $items instanceof AbstractPaginator) {
-            return new (static::$_paginatedCollectionClass)(static::class, $items);
-        }
-
-        if ($items instanceof AbstractCursorPaginator || $items instanceof CursorPaginator) {
-            return new (static::$_cursorPaginatedCollectionClass)(static::class, $items);
-        }
-
-        return new (static::$_collectionClass)(static::class, $items);
     }
 
     public function __sleep(): array

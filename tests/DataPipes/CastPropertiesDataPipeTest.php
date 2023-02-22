@@ -4,6 +4,7 @@ use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
@@ -43,6 +44,13 @@ it('maps default types', function () {
             ['string' => 'you'],
             ['string' => 'up'],
         ],
+        'nestedArray' => [
+            ['string' => 'never'],
+            ['string' => 'gonna'],
+            ['string' => 'give'],
+            ['string' => 'you'],
+            ['string' => 'up'],
+        ],
     ]);
 
     expect($data)->toBeInstanceOf(ComplicatedData::class)
@@ -58,7 +66,14 @@ it('maps default types', function () {
         ->defaultCast->toEqual(DateTime::createFromFormat(DATE_ATOM, '1994-05-16T12:00:00+01:00'))
         ->explicitCast->toEqual(CarbonImmutable::createFromFormat('d-m-Y', '16-06-1994'))
         ->nestedData->toEqual(SimpleData::from('hello'))
-        ->nestedCollection->toEqual(SimpleData::collection([
+        ->nestedCollection->toEqual(SimpleData::collect([
+            SimpleData::from('never'),
+            SimpleData::from('gonna'),
+            SimpleData::from('give'),
+            SimpleData::from('you'),
+            SimpleData::from('up'),
+        ], DataCollection::class))
+        ->nestedArray->toEqual(SimpleData::collect([
             SimpleData::from('never'),
             SimpleData::from('gonna'),
             SimpleData::from('give'),
@@ -80,7 +95,10 @@ it("won't cast a property that is already in the correct type", function () {
         'explicitCast' => DateTime::createFromFormat('d-m-Y', '16-06-1994'),
         'defaultCast' => DateTime::createFromFormat(DATE_ATOM, '1994-05-16T12:00:00+02:00'),
         'nestedData' => SimpleData::from('hello'),
-        'nestedCollection' => SimpleData::collection([
+        'nestedCollection' => SimpleData::collect([
+            'never', 'gonna', 'give', 'you', 'up',
+        ], DataCollection::class),
+        'nestedArray' => SimpleData::collect([
             'never', 'gonna', 'give', 'you', 'up',
         ]),
     ]);
@@ -97,7 +115,14 @@ it("won't cast a property that is already in the correct type", function () {
         ->defaultCast->toEqual(DateTime::createFromFormat(DATE_ATOM, '1994-05-16T12:00:00+02:00'))
         ->explicitCast->toEqual(DateTime::createFromFormat('d-m-Y', '16-06-1994'))
         ->nestedData->toEqual(SimpleData::from('hello'))
-        ->nestedCollection->toEqual(SimpleData::collection([
+        ->nestedCollection->toEqual(SimpleData::collect([
+            SimpleData::from('never'),
+            SimpleData::from('gonna'),
+            SimpleData::from('give'),
+            SimpleData::from('you'),
+            SimpleData::from('up'),
+        ], DataCollection::class))
+        ->nestedArray->toEqual(SimpleData::collect([
             SimpleData::from('never'),
             SimpleData::from('gonna'),
             SimpleData::from('give'),
@@ -132,32 +157,41 @@ it('will allow a nested collection object to handle its own types', function () 
         'models' => [['id' => 10], ['id' => 20],],
     ]);
 
-    expect($data)->toBeInstanceOf(NestedModelCollectionData::class)
-        ->models->toEqual(ModelData::collection([['id' => 10], ['id' => 20]]));
+    expect($data)
+        ->toBeInstanceOf(NestedModelCollectionData::class)
+        ->models->toEqual(
+            ModelData::collect([['id' => 10], ['id' => 20]], DataCollection::class)
+        );
 
     $data = NestedModelCollectionData::from([
         'models' => [new DummyModel(['id' => 10]), new DummyModel(['id' => 20]),],
     ]);
 
-    expect($data)->toBeInstanceOf(NestedModelCollectionData::class)
-        ->models->toEqual(ModelData::collection([['id' => 10], ['id' => 20]]));
+    expect($data)
+        ->toBeInstanceOf(NestedModelCollectionData::class)
+        ->models->toEqual(
+            ModelData::collect([['id' => 10], ['id' => 20]], DataCollection::class)
+        );
 
     $data = NestedModelCollectionData::from([
-        'models' => ModelData::collection([['id' => 10], ['id' => 20]]),
+        'models' => ModelData::collect([['id' => 10], ['id' => 20]], DataCollection::class),
     ]);
 
-    expect($data)->toBeInstanceOf(NestedModelCollectionData::class)
-        ->models->toEqual(ModelData::collection([['id' => 10], ['id' => 20]]));
+    expect($data)
+        ->toBeInstanceOf(NestedModelCollectionData::class)
+        ->models->toEqual(
+            ModelData::collect([['id' => 10], ['id' => 20]], DataCollection::class)
+        );
 });
 
 it('works nicely with lazy data', function () {
     $data = NestedLazyData::from([
-        'simple' => Lazy::create(fn () => SimpleData::from('Hello')),
+        'simple' => Lazy::create(fn() => SimpleData::from('Hello')),
     ]);
 
     expect($data->simple)
         ->toBeInstanceOf(Lazy::class)
-        ->toEqual(Lazy::create(fn () => SimpleData::from('Hello')));
+        ->toEqual(Lazy::create(fn() => SimpleData::from('Hello')));
 });
 
 it('allows casting', function () {

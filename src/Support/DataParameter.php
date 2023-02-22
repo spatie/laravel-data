@@ -3,7 +3,7 @@
 namespace Spatie\LaravelData\Support;
 
 use ReflectionParameter;
-use Spatie\LaravelData\Support\Factories\DataTypeFactory;
+use Spatie\LaravelData\Support\Types\Type;
 
 class DataParameter
 {
@@ -12,12 +12,13 @@ class DataParameter
         public readonly bool $isPromoted,
         public readonly bool $hasDefaultValue,
         public readonly mixed $defaultValue,
-        public readonly DataType $type,
+        public readonly Type $type,
     ) {
     }
 
     public static function create(
-        ReflectionParameter $parameter
+        ReflectionParameter $parameter,
+        string $class,
     ): self {
         $hasDefaultValue = $parameter->isDefaultValueAvailable();
 
@@ -26,7 +27,7 @@ class DataParameter
             $parameter->isPromoted(),
             $hasDefaultValue,
             $hasDefaultValue ? $parameter->getDefaultValue() : null,
-            DataTypeFactory::create()->build($parameter),
+            Type::forReflection($parameter->getType(), $class),
         );
     }
 }

@@ -39,16 +39,29 @@ class PartialType
             $typeName = $class;
         }
 
-        $acceptedTypes = array_unique([
-            ...array_values(class_parents($typeName)),
-            ...array_values(class_implements($typeName)),
-        ]);
-
         return new self(
             name: $typeName,
             builtIn: $type->isBuiltin(),
-            acceptedTypes: $acceptedTypes
+            acceptedTypes: self::resolveAcceptedTypes($typeName)
         );
+    }
+
+    public static function createFromTypeString(string $type): self
+    {
+        $builtIn = in_array($type, ['float', 'bool', 'int', 'array', 'string', 'mixed']);
+
+        return new self(
+            name: $type,
+            builtIn: $builtIn,
+            acceptedTypes: ! $builtIn
+                ? self::resolveAcceptedTypes($type)
+                : []
+        );
+    }
+
+    public static function createFromValue(mixed $value): self
+    {
+        return self::createFromTypeString(get_debug_type($value));
     }
 
     public function acceptsType(string $type): bool
@@ -112,5 +125,13 @@ class PartialType
             in_array(CursorPaginator::class, $this->acceptedTypes) || in_array(AbstractCursorPaginator::class, $this->acceptedTypes) => DataTypeKind::CursorPaginator,
             default => DataTypeKind::Default,
         };
+    }
+
+    protected static function resolveAcceptedTypes(string $type): array
+    {
+        return array_unique([
+            ...array_values(class_parents($type)),
+            ...array_values(class_implements($type)),
+        ]);
     }
 }

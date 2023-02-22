@@ -10,7 +10,7 @@ class ConfidentialDataCollectionTransformer implements Transformer
 {
     public function transform(DataProperty $property, mixed $value): mixed
     {
-        /** @var \Spatie\LaravelData\DataCollection $value */
-        return $value->toCollection()->map(fn (Data $data) => (new ConfidentialDataTransformer())->transform($property, $data))->toArray();
+        /** @var array $value */
+        return array_map(fn (Data $data) => (new ConfidentialDataTransformer())->transform($property, $data), $value);
     }
 }

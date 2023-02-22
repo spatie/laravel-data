@@ -16,5 +16,5 @@ class DataWithMapper extends Data
     public SimpleData $dataCasedProperty;
 
     #[DataCollectionOf(SimpleData::class)]
-    public DataCollection $dataCollectionCasedProperty;
+    public array $dataCollectionCasedProperty;
 }

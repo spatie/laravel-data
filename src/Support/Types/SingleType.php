@@ -47,12 +47,12 @@ class SingleType extends Type
 
     public function getAcceptedTypes(): array
     {
-        if($this->isMixed){
+        if ($this->isMixed) {
             return [];
         }
 
         return [
-            $this->type->name => $this->type->acceptedTypes
+            $this->type->name => $this->type->acceptedTypes,
         ];
     }
 }
