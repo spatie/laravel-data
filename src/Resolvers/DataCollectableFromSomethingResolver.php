@@ -9,6 +9,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Contracts\BaseData;
@@ -22,6 +23,7 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Support\Types\PartialType;
+use function Pest\Laravel\instance;
 
 class DataCollectableFromSomethingResolver
 {
@@ -62,37 +64,20 @@ class DataCollectableFromSomethingResolver
             return $collectable;
         }
 
-        $dataTypeKind = $intoType->getDataTypeKind();
+        $intoDataTypeKind = $intoType->getDataTypeKind();
 
-        if ($dataTypeKind === DataTypeKind::Array) {
-            return $this->createArray($dataClass, $items);
-        }
+        $normalizedItems = $this->normalizeItems($items, $dataClass);
 
-        if ($dataTypeKind === DataTypeKind::Enumerable) {
-            return $this->createEnumerable($dataClass, $items, $intoType);
-        }
-
-        if ($dataTypeKind === DataTypeKind::DataCollection) {
-            return $this->createDataCollection($dataClass, $items, $intoType);
-        }
-
-        if ($dataTypeKind === DataTypeKind::Paginator) {
-            return $this->createPaginator($dataClass, $items, $intoType);
-        }
-
-        if ($dataTypeKind === DataTypeKind::DataPaginatedCollection) {
-            return $this->createPaginatedDataCollection($dataClass, $items, $intoType);
-        }
-
-        if ($dataTypeKind === DataTypeKind::CursorPaginator) {
-            return $this->createCursorPaginator($dataClass, $items, $intoType);
-        }
-
-        if ($dataTypeKind === DataTypeKind::DataCursorPaginatedCollection) {
-            return $this->createCursorPaginatedDataCollection($dataClass, $items, $intoType);
-        }
-
-        throw CannotCreateDataCollectable::create(get_debug_type($items), $intoType->name);
+        return match ($intoDataTypeKind) {
+            DataTypeKind::Array => $this->normalizeToArray($normalizedItems),
+            DataTypeKind::Enumerable => new $intoType->name($this->normalizeToArray($normalizedItems)),
+            DataTypeKind::DataCollection => new $intoType->name($dataClass, $this->normalizeToArray($normalizedItems)),
+            DataTypeKind::DataPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToPaginator($normalizedItems)),
+            DataTypeKind::DataCursorPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToCursorPaginator($normalizedItems)),
+            DataTypeKind::Paginator => $this->normalizeToPaginator($normalizedItems),
+            DataTypeKind::CursorPaginator => $this->normalizeToCursorPaginator($normalizedItems),
+            default => CannotCreateDataCollectable::create(get_debug_type($items), $intoType->name)
+        };
     }
 
     protected function createFromCustomCreationMethod(
@@ -130,11 +115,21 @@ class DataCollectableFromSomethingResolver
         return null;
     }
 
-    protected function createArray(
+    protected function normalizeItems(
+        mixed $items,
         string $dataClass,
-        mixed $items
-    ): array {
-        if ($items instanceof DataCollection) {
+    ): array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator {
+        if($items instanceof PaginatedDataCollection
+            || $items instanceof CursorPaginatedDataCollection
+            || $items instanceof DataCollection
+        ){
+            $items = $items->items();
+        }
+
+        if ($items instanceof Paginator
+            || $items instanceof AbstractPaginator
+            || $items instanceof CursorPaginator
+            || $items instanceof AbstractCursorPaginator) {
             $items = $items->items();
         }
 
@@ -145,131 +140,54 @@ class DataCollectableFromSomethingResolver
         if (is_array($items)) {
             return array_map(
                 $this->itemsToDataClosure($dataClass),
-                $items,
+                $items
             );
         }
 
-        throw CannotCreateDataCollectable::create(get_debug_type($items), 'array');
+        throw new Exception('Unable to normalize items');
     }
 
-    protected function createEnumerable(
-        string $dataClass,
-        mixed $items,
-        PartialType $intoType,
-    ): Enumerable {
-        if ($items instanceof DataCollection) {
-            $items = $items->items();
-        }
-
-        if (is_array($items)) {
-            return new $intoType->name($items);
-        }
-
-        if ($items instanceof Enumerable) {
-            return $items->map(
-                $this->itemsToDataClosure($dataClass)
-            );
-        }
-
-        throw CannotCreateDataCollectable::create(get_debug_type($items), Enumerable::class);
+    protected function normalizeToArray(
+        array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator $items,
+    ): array {
+        return is_array($items)
+            ? $items
+            : $items->items();
     }
 
-    protected function createDataCollection(
-        string $dataClass,
-        mixed $items,
-        PartialType $intoType,
-    ): DataCollection {
-        if ($items instanceof Enumerable) {
-            $items = $items->all();
+    protected function normalizeToPaginator(
+        array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator $items,
+    ): Paginator|AbstractPaginator {
+        if ($items instanceof Paginator || $items instanceof AbstractPaginator) {
+            return $items;
         }
 
-        if (is_array($items)) {
-            return new $intoType->name($dataClass, $items);
-        }
+        $normalizedItems = $this->normalizeToArray($items);
 
-        if ($items instanceof DataCollection) {
-            return $items->map(
-                $this->itemsToDataClosure($dataClass)
-            );
-        }
-
-        throw CannotCreateDataCollectable::create(get_debug_type($items), DataCollection::class);
+        return new LengthAwarePaginator(
+            $normalizedItems,
+            count($normalizedItems),
+            $items instanceof CursorPaginator || $items instanceof AbstractCursorPaginator ? $items->perPage() : 15,
+        );
     }
 
-    protected function createPaginator(
-        string $dataClass,
-        mixed $items,
-        PartialType $intoType,
-    ): AbstractPaginator|Paginator {
-        if ($items instanceof PaginatedDataCollection) {
-            $items = $items->items();
-        }
-
-        if ($items instanceof AbstractPaginator || $items instanceof Paginator) {
-            return $items->through(
-                $this->itemsToDataClosure($dataClass)
-            );
-        }
-
-        throw CannotCreateDataCollectable::create(get_debug_type($items), Paginator::class);
-    }
-
-    protected function createPaginatedDataCollection(
-        string $dataClass,
-        mixed $items,
-        PartialType $intoType,
-    ): PaginatedDataCollection {
-        if ($items instanceof AbstractPaginator || $items instanceof Paginator) {
-            return new $intoType->name($dataClass, $items);
-        }
-
-        if ($items instanceof PaginatedDataCollection) {
-            return $items->through(
-                $this->itemsToDataClosure($dataClass)
-            );
-        }
-
-        throw CannotCreateDataCollectable::create(get_debug_type($items), PaginatedDataCollection::class);
-    }
-
-    protected function createCursorPaginator(
-        string $dataClass,
-        mixed $items,
-        PartialType $intoType,
+    protected function normalizeToCursorPaginator(
+        array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator $items,
     ): CursorPaginator|AbstractCursorPaginator {
-        if ($items instanceof CursorPaginatedDataCollection) {
-            $items = $items->items();
+        if ($items instanceof CursorPaginator || $items instanceof AbstractCursorPaginator) {
+            return $items;
         }
 
-        if ($items instanceof AbstractCursorPaginator || $items instanceof CursorPaginator) {
-            return $items->through(
-                $this->itemsToDataClosure($dataClass)
-            );
-        }
+        $normalizedItems = $this->normalizeToArray($items);
 
-        throw CannotCreateDataCollectable::create(get_debug_type($items), CursorPaginator::class);
-    }
-
-    protected function createCursorPaginatedDataCollection(
-        string $dataClass,
-        mixed $items,
-        PartialType $intoType,
-    ): CursorPaginatedDataCollection {
-        if ($items instanceof AbstractCursorPaginator || $items instanceof CursorPaginator) {
-            return new $intoType->name($dataClass, $items);
-        }
-
-        if ($items instanceof CursorPaginatedDataCollection) {
-            return $items->through(
-                $this->itemsToDataClosure($dataClass)
-            );
-        }
-
-        throw CannotCreateDataCollectable::create(get_debug_type($items), CursorPaginatedDataCollection::class);
+        return new \Illuminate\Pagination\CursorPaginator(
+            $normalizedItems,
+            $items instanceof Paginator || $items instanceof AbstractPaginator ? $items->perPage() : 15,
+        );
     }
 
     protected function itemsToDataClosure(string $dataClass): Closure
     {
-        return fn(mixed $data) => $dataClass::from($data);
+        return fn(mixed $data) => $data instanceof $dataClass ? $data : $dataClass::from($data);
     }
 }
