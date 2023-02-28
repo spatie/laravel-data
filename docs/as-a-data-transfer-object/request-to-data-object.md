@@ -699,7 +699,7 @@ SongData::validateAndCreate(['title' => 'Never gonna give you up', 'artist' => '
 You can retrieve the validation rules a data object will generate as such:
 
 ```php
-AlbumData::getValidationRules($payload;
+AlbumData::getValidationRules($payload);
 ```
 
 This will produce the following array with rules:
