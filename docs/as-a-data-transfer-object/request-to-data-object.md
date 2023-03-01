@@ -389,11 +389,11 @@ Rule inferrers are configured in the `data.php` config file:
  * the type of the property.
  */
 'rule_inferrers' => [
-    Spatie\LaravelData\Normalizers\ModelNormalizer::class,
-    Spatie\LaravelData\Normalizers\ArrayableNormalizer::class,
-    Spatie\LaravelData\Normalizers\ObjectNormalizer::class,
-    Spatie\LaravelData\Normalizers\ArrayNormalizer::class,
-    Spatie\LaravelData\Normalizers\JsonNormalizer::class,
+    Spatie\LaravelData\RuleInferrers\SometimesRuleInferrer::class,
+    Spatie\LaravelData\RuleInferrers\NullableRuleInferrer::class,
+    Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer::class,
+    Spatie\LaravelData\RuleInferrers\BuiltInTypesRuleInferrer::class,
+    Spatie\LaravelData\RuleInferrers\AttributesRuleInferrer::class,
 ],
 ```
 
