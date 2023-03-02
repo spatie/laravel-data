@@ -160,10 +160,12 @@ it('uses the correct types for cursor paginated data collection of attributes', 
 it('outputs types with properties using their mapped name', function () {
     $config = TypeScriptTransformerConfig::create();
 
-    $data = new class ('Good job Ruben') extends Data {
+    $data = new class ('Good job Ruben', 'Hi Ruben') extends Data {
         public function __construct(
             #[MapOutputName(SnakeCaseMapper::class)]
             public string $someCamelCaseProperty,
+            #[MapOutputName('some:non:standard:property')]
+            public string $someNonStandardProperty,
         ) {
         }
     };
