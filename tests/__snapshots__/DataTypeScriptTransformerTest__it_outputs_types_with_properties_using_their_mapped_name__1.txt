@@ -1,3 +1,4 @@
 {
 some_camel_case_property: string;
+'some:non:standard:property': string;
 }
