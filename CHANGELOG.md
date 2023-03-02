@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.1.1 - 2023-03-02
+
+- Add WithCastable attribute (#349)
+- Quote non-standard object keys when transforming to Typescript (#367)
+
 ## 3.1.0 - 2023-02-10
 
 - Allow filling props from route parameters (#341)
@@ -14,10 +19,15 @@ All notable changes to `laravel-data` will be documented in this file.
 
 - The validation logic is completely rewritten
 - - Add support for nested nullable and optional data objects
+- 
 - - Allow referencing other fields in validation attributes when the data is nested
+- 
 - - Allow referencing url parameters (and even model properties) in validation attributes
+- 
 - - Allow circular dependencies when validating data
+- 
 - - Add support for nested validation messages and attributes
+- 
 - 
 - Package specific properties are renamed to avoid conflicts
 - Serialization logic updated to only serialize your properties
