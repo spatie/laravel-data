@@ -33,6 +33,4 @@ interface BaseData
     public static function prepareForPipeline(\Illuminate\Support\Collection $properties): \Illuminate\Support\Collection;
 
     public static function pipeline(): DataPipeline;
-
-    public function getDataContext(): DataContext;
 }

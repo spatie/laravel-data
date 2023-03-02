@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Contracts;
 
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 
-interface WrappableData
+interface WrappableData extends ContextableData
 {
     public function withoutWrapping();
 

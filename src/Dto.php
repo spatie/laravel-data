@@ -14,6 +14,5 @@ class Dto implements ValidateableDataContract, BaseDataContract, DefaultDataCont
 {
     use ValidateableData;
     use BaseData;
-    use ContextableData;
     use DefaultableData;
 }

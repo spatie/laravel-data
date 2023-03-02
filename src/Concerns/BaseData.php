@@ -26,8 +26,6 @@ use Spatie\LaravelData\Support\Transformation\DataContext;
 
 trait BaseData
 {
-    protected ?DataContext $_dataContext = null;
-
     public static function optional(mixed ...$payloads): ?static
     {
         if (count($payloads) === 0) {

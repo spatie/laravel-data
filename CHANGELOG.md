@@ -12,6 +12,7 @@ All notable changes to `laravel-data` will be documented in this file.
 - Add support for using Laravel Model attributes as data properties
 - Add support for class defined defaults
 - Allow creating data objects using `from` without parameters
+- Add support for a Dto and Resource object
 
 ## 3.1.0 - 2023-02-10
 

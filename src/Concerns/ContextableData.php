@@ -11,6 +11,8 @@ use Spatie\LaravelData\Support\Wrapping\WrapType;
 
 trait ContextableData
 {
+    protected ?DataContext $_dataContext = null;
+
     public function getDataContext(): DataContext
     {
         if ($this->_dataContext === null) {

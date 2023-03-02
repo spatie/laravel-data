@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\ContextableData;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Contracts\DefaultableData;
 use Spatie\LaravelData\Contracts\EmptyData;
@@ -591,6 +592,7 @@ it(
                 Arrayable::class,
                 DataObject::class,
                 AppendableData::class,
+                ContextableData::class,
                 BaseData::class,
                 DefaultableData::class,
                 IncludeableData::class,

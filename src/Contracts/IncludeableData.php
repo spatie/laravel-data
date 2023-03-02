@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Contracts;
 
 use Closure;
 
-interface IncludeableData
+interface IncludeableData extends ContextableData
 {
     public function include(string ...$includes): object;
 
