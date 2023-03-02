@@ -10,6 +10,7 @@ use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithCastable;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Concerns\DataTrait;
@@ -24,6 +25,7 @@ use Spatie\LaravelData\Support\Lazy\InertiaLazy;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
+use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastable;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
@@ -1042,6 +1044,21 @@ it('can cast data object and collections using a custom cast', function () {
         ->nestedData->toEqual(SimpleData::from('CONFIDENTIAL'))
         ->and($dataWithCustomCasts)
         ->nestedDataCollection->toEqual(SimpleData::collection(['CONFIDENTIAL', 'CONFIDENTIAL']));
+});
+
+it('can cast data object with a castable property using anonymous class', function () {
+    $dataWithCastablePropertyClass = new class (new SimpleCastable('')) extends Data {
+        public function __construct(
+            #[WithCastable(SimpleCastable::class)]
+            public SimpleCastable $castableData,
+        ) {
+        }
+    };
+
+    $dataWithCastableProperty = $dataWithCastablePropertyClass::from(['castableData' => 'HELLO WORLD']);
+
+    expect($dataWithCastableProperty)
+        ->castableData->toEqual(new SimpleCastable('HELLO WORLD'));
 });
 
 it('can cast built-in types with custom casts', function () {
