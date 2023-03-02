@@ -51,6 +51,8 @@ class SongController{
 When creating a data object from a request, the package can also validate the values from the request that will be used
 to construct the data object.
 
+Be aware, first the rules will be generated from the data object you're trying to create, then if the validation is successful a data object will be created with the validated data. This means validation will be run before a data object exists. 
+
 It is possible to add rules as attributes to properties of a data object:
 
 ```php
