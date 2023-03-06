@@ -595,6 +595,46 @@ it('can append data via method overwriting', function () {
     ]);
 });
 
+it('can append data via method overwriting with closures', function () {
+    $data = new class ('Freek') extends Data {
+        public function __construct(public string $name)
+        {
+        }
+
+        public function with(): array
+        {
+            return ['alt_name' => static function (self $data) {
+                return $data->name . ' from Spatie via closure';
+            }];
+        }
+    };
+
+    expect($data->toArray())->toMatchArray([
+        'name' => 'Freek',
+        'alt_name' => 'Freek from Spatie via closure',
+    ]);
+});
+
+test('when using additional method and with method additional method gets priority', function () {
+    $data = new class ('Freek') extends Data {
+        public function __construct(public string $name)
+        {
+        }
+
+        public function with(): array
+        {
+            return ['alt_name' => static function (self $data) {
+                return $data->name . ' from Spatie via closure';
+            }];
+        }
+    };
+
+    expect($data->additional(['alt_name' => 'I m Freek from additional'])->toArray())->toMatchArray([
+        'name' => 'Freek',
+        'alt_name' => 'I m Freek from additional',
+    ]);
+});
+
 it('can get the data object without mapping properties names', function () {
     $data = new class ('Freek') extends Data {
         public function __construct(
