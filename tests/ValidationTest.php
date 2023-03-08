@@ -2107,14 +2107,26 @@ it('can handle a string as (wrong) payload', function () {
 });
 
 it('can use laravel-data validation rules in laravel validator', function () {
-    $validator = ValidatorFacade::make(
+    $rules = [new Required(), new StringType(), new Max(10)];
+
+    $validatorToPass = ValidatorFacade::make(
         [
             'property' => 'test',
         ],
         [
-            'property' => [new Required(), new StringType(), new Max(10)],
+            'property' => $rules,
         ],
     );
 
-    expect($validator->passes())->toBeTrue();
+    $validatorToFail = ValidatorFacade::make(
+        [
+            'property' => 'testLongerText',
+        ],
+        [
+            'property' => $rules,
+        ],
+    );
+
+    expect($validatorToPass->passes())->toBeTrue()
+        ->and($validatorToFail->passes())->toBeFalse();
 });
