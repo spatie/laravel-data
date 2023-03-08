@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
 
@@ -2103,4 +2104,17 @@ it('can handle a string as (wrong) payload', function () {
         ->assertErrors([
             'simple' => 'hello-world',
         ]);
+});
+
+it('can use laravel-data validation rules in laravel validator', function () {
+    $validator = ValidatorFacade::make(
+        [
+            'property' => 'test',
+        ],
+        [
+            'property' => [new Required(), new StringType(), new Max(10)],
+        ],
+    );
+
+    expect($validator->passes())->toBeTrue();
 });
