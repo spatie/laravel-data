@@ -4,13 +4,21 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Carbon\Carbon;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
+use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
+use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
+use Stringable;
 
-abstract class ValidationAttribute extends ValidationRule
+abstract class ValidationAttribute extends ValidationRule implements Stringable
 {
     abstract public static function keyword(): string;
 
     abstract public static function create(string ...$parameters): static;
+
+    public function __toString(): string
+    {
+        return implode('|', app(RuleDenormalizer::class)->execute($this, ValidationPath::create()));
+    }
 
     protected static function parseDateValue(mixed $value): mixed
     {
