@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.1.2 - 2023-03-10
+
+- Fix issue where promoted protected constructor parameters were seen as possible property canidates
+- Allow using closures within the with method (#372)
+- Add support for Validation Rule Contract in Rule rule (#362)
+- Allow laravel-data validation rules to be used in Laravel validator (#375)
+
 ## 3.1.1 - 2023-03-02
 
 - Add WithCastable attribute (#349)
@@ -20,13 +27,18 @@ All notable changes to `laravel-data` will be documented in this file.
 - The validation logic is completely rewritten
 - - Add support for nested nullable and optional data objects
 - 
+- 
 - - Allow referencing other fields in validation attributes when the data is nested
+- 
 - 
 - - Allow referencing url parameters (and even model properties) in validation attributes
 - 
+- 
 - - Allow circular dependencies when validating data
 - 
+- 
 - - Add support for nested validation messages and attributes
+- 
 - 
 - 
 - Package specific properties are renamed to avoid conflicts
