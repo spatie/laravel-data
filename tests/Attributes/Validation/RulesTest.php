@@ -109,4 +109,6 @@ it('can use the Rule rule with validation rule contract', function () {
         new CustomLaravelValidationRule(),
         'required',
     ]);
-});
+})->skip(
+    fn() => version_compare(app()->version(), '10.0.0', '<')
+);
