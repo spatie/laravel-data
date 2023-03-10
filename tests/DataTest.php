@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
 use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithCastable;

@@ -31,7 +31,7 @@ class DataMethod
         return new self(
             $method->name,
             collect($method->getParameters())->map(
-                fn (ReflectionParameter $parameter) => DataParameter::create($parameter),
+                fn(ReflectionParameter $parameter) => DataParameter::create($parameter),
             ),
             $method->isStatic(),
             $method->isPublic(),
@@ -45,13 +45,20 @@ class DataMethod
             return null;
         }
 
-        $parameters = collect($method->getParameters())->map(function (ReflectionParameter $parameter) use ($properties) {
-            if ($parameter->isPromoted()) {
-                return $properties->get($parameter->name);
-            }
+        $parameters = collect($method->getParameters())
+            ->map(function (ReflectionParameter $parameter) use ($properties) {
+                if(! $parameter->isPromoted()){
+                    return DataParameter::create($parameter);
+                }
 
-            return DataParameter::create($parameter);
-        });
+                if($properties->has($parameter->name)){
+                    return $properties->get($parameter->name);
+                }
+
+                return null;
+            })
+            ->filter()
+            ->values();
 
         return new self(
             '__construct',
@@ -67,7 +74,7 @@ class DataMethod
         /** @var Collection<\Spatie\LaravelData\Support\DataParameter|\Spatie\LaravelData\Support\DataProperty> $parameters */
         $parameters = array_is_list($input)
             ? $this->parameters
-            : $this->parameters->mapWithKeys(fn (DataParameter|DataProperty $parameter) => [$parameter->name => $parameter]);
+            : $this->parameters->mapWithKeys(fn(DataParameter|DataProperty $parameter) => [$parameter->name => $parameter]);
 
         if (count($input) > $parameters->count()) {
             return false;
