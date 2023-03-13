@@ -168,6 +168,34 @@ The rules will now look like this:
 ]
 ```
 
+### Overwrite Request Validation Data
+
+Overwrite the data that needs to be verified in the request. You can add a `validationData` method like FromRequest to
+provide the data used to participate in the form validation, but which must be a static method.
+
+A Request object will be provided as the first parameter.
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        public string $artist,
+    ) {
+    }
+    
+    public static function validationData(\Illuminate\Http\Request $request): array
+    {
+        return [
+            'title'  => $request->header('title'),
+            'artist' => $request->input('artist');
+        ];
+    }
+}
+
+
+```
+
 ### Rule attribute
 
 One special attribute is the `Rule` attribute. With it, you can write rules just like you would when creating a custom
