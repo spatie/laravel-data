@@ -47,6 +47,7 @@ return [
      */
     'normalizers' => [
         Spatie\LaravelData\Normalizers\ModelNormalizer::class,
+        // Spatie\LaravelData\Normalizers\FormRequestNormalizer::class,
         Spatie\LaravelData\Normalizers\ArrayableNormalizer::class,
         Spatie\LaravelData\Normalizers\ObjectNormalizer::class,
         Spatie\LaravelData\Normalizers\ArrayNormalizer::class,
