@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\DataPipes\RequestValidationDataPipe;
 use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
@@ -44,6 +45,9 @@ class DataFromSomethingResolver
             function (Collection $carry, mixed $payload) use ($class) {
                 /** @var BaseData $class */
                 $pipeline = $class::pipeline();
+                if ($payload instanceof Request) {
+                    $pipeline->firstThrough(RequestValidationDataPipe::class);
+                }
 
                 foreach ($class::normalizers() as $normalizer) {
                     $pipeline->normalizer($normalizer);
@@ -89,6 +93,7 @@ class DataFromSomethingResolver
         foreach ($payloads as $payload) {
             if ($payload instanceof Request) {
                 $class::pipeline()
+                    ->firstThrough(RequestValidationDataPipe::class)
                     ->normalizer(ArrayableNormalizer::class)
                     ->into($class)
                     ->using($payload)
