@@ -15,6 +15,7 @@ use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
 use Spatie\LaravelData\DataPipes\FillRouteParameterPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\RequestValidationDataPipe;
 use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
@@ -72,6 +73,7 @@ trait BaseData
     {
         return DataPipeline::create()
             ->into(static::class)
+            ->through(RequestValidationDataPipe::class)
             ->through(AuthorizedDataPipe::class)
             ->through(MapPropertiesDataPipe::class)
             ->through(FillRouteParameterPropertiesDataPipe::class)
