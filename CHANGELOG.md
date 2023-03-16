@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.1.3 - 2023-03-16
+
+- Performance improvements
+
 ## 3.1.2 - 2023-03-10
 
 - Fix issue where promoted protected constructor parameters were seen as possible property canidates
@@ -28,16 +32,21 @@ All notable changes to `laravel-data` will be documented in this file.
 - - Add support for nested nullable and optional data objects
 - 
 - 
+- 
 - - Allow referencing other fields in validation attributes when the data is nested
+- 
 - 
 - 
 - - Allow referencing url parameters (and even model properties) in validation attributes
 - 
 - 
+- 
 - - Allow circular dependencies when validating data
 - 
 - 
+- 
 - - Add support for nested validation messages and attributes
+- 
 - 
 - 
 - 
