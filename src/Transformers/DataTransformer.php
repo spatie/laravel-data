@@ -67,33 +67,61 @@ class DataTransformer
 
         $dataClass = $this->config->getDataClass($data::class);
 
-        return $dataClass
-            ->properties
-            ->reduce(function (array $payload, DataProperty $property) use ($data, $trees) {
-                $name = $property->name;
+        $payload = [];
 
-                if (! $this->shouldIncludeProperty($name, $data->{$name}, $trees)) {
-                    return $payload;
-                }
+        foreach ($dataClass->properties as $property) {
+            $name = $property->name;
 
-                $value = $this->resolvePropertyValue(
-                    $property,
-                    $data->{$name},
-                    $trees->getNested($name),
-                );
+            if (! $this->shouldIncludeProperty($name, $data->{$name}, $trees)) {
+                continue;
+            }
 
-                if ($value instanceof Optional) {
-                    return $payload;
-                }
+            $value = $this->resolvePropertyValue(
+                $property,
+                $data->{$name},
+                $trees->getNested($name),
+            );
 
-                if ($this->mapPropertyNames && $property->outputMappedName) {
-                    $name = $property->outputMappedName;
-                }
+            if ($value instanceof Optional) {
+                continue;
+            }
 
-                $payload[$name] = $value;
+            if ($this->mapPropertyNames && $property->outputMappedName) {
+                $name = $property->outputMappedName;
+            }
 
-                return $payload;
-            }, []);
+            $payload[$name] = $value;
+        }
+
+        return $payload;
+
+//        return $dataClass
+//            ->properties
+//            ->reduce(function (array $payload, DataProperty $property) use ($data, $trees) {
+//                $name = $property->name;
+//
+//                if (! $this->shouldIncludeProperty($name, $data->{$name}, $trees)) {
+//                    return $payload;
+//                }
+//
+//                $value = $this->resolvePropertyValue(
+//                    $property,
+//                    $data->{$name},
+//                    $trees->getNested($name),
+//                );
+//
+//                if ($value instanceof Optional) {
+//                    return $payload;
+//                }
+//
+//                if ($this->mapPropertyNames && $property->outputMappedName) {
+//                    $name = $property->outputMappedName;
+//                }
+//
+//                $payload[$name] = $value;
+//
+//                return $payload;
+//            }, []);
     }
 
     protected function shouldIncludeProperty(
@@ -230,7 +258,7 @@ class DataTransformer
         };
 
         if ($value instanceof TransformableData && $this->transformValues) {
-            return $value->transform($this->transformValues, $wrapExecutionType, $this->mapPropertyNames, );
+            return $value->transform($this->transformValues, $wrapExecutionType, $this->mapPropertyNames,);
         }
 
         return $value;

@@ -39,6 +39,21 @@ class DataFromSomethingResolver
             return $data;
         }
 
+//        $properties = new Collection();
+//
+//        foreach ($payloads as $payload) {
+//            /** @var BaseData $class */
+//            $pipeline = $class::pipeline();
+//
+//            foreach ($class::normalizers() as $normalizer) {
+//                $pipeline->normalizer($normalizer);
+//            }
+//
+//            foreach ($pipeline->using($payload)->execute() as $key => $value) {
+//                $properties[$key] = $value;
+//            }
+//        }
+
         $properties = array_reduce(
             $payloads,
             function (Collection $carry, mixed $payload) use ($class) {
@@ -68,8 +83,8 @@ class DataFromSomethingResolver
             ->getDataClass($class)
             ->methods
             ->filter(
-                fn (DataMethod $method) => $method->isCustomCreationMethod
-                && ! in_array($method->name, $this->ignoredMagicalMethods)
+                fn(DataMethod $method) => $method->isCustomCreationMethod
+                    && ! in_array($method->name, $this->ignoredMagicalMethods)
             );
 
         $methodName = null;

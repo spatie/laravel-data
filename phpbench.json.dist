@@ -1,0 +1,9 @@
+{
+    "php_disable_ini": true,
+    "bootstrap": "vendor/autoload.php",
+    "path": "benchmark",
+    "php_config": {
+        "extension": [ "json.so" ]
+    },
+    "time_unit": "milliseconds"
+}
