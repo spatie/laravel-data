@@ -83,7 +83,7 @@ class DataFromSomethingResolver
             ->getDataClass($class)
             ->methods
             ->filter(
-                fn(DataMethod $method) => $method->isCustomCreationMethod
+                fn (DataMethod $method) => $method->isCustomCreationMethod
                     && ! in_array($method->name, $this->ignoredMagicalMethods)
             );
 
