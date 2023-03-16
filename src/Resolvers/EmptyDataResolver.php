@@ -17,7 +17,9 @@ class EmptyDataResolver
     {
         $dataClass = $this->dataConfig->getDataClass($class);
 
-        return $dataClass->properties->reduce(function (array $payload, DataProperty $property) use ($extra) {
+        $payload = [];
+
+        foreach ($dataClass->properties as $property){
             $name = $property->outputMappedName ?? $property->name;
 
             if ($property->hasDefaultValue) {
@@ -25,9 +27,9 @@ class EmptyDataResolver
             } else {
                 $payload[$name] = $extra[$property->name] ?? $this->getValueForProperty($property);
             }
+        }
 
-            return $payload;
-        }, []);
+        return $payload;
     }
 
     protected function getValueForProperty(DataProperty $property): mixed

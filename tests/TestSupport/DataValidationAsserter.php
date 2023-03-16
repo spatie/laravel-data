@@ -163,6 +163,7 @@ class DataValidationAsserter
             ->into($this->dataClass)
             ->through(MapPropertiesDataPipe::class)
             ->through(ValidatePropertiesDataPipe::class)
+            ->prepare()
             ->execute();
 
         return $properties->all();

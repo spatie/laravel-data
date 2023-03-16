@@ -4,6 +4,8 @@ namespace Spatie\LaravelData\Support;
 
 use ReflectionClass;
 use Spatie\LaravelData\Casts\Cast;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\Transformers\Transformer;
 
 class DataConfig
@@ -16,6 +18,9 @@ class DataConfig
 
     /** @var array<string, \Spatie\LaravelData\Casts\Cast> */
     protected array $casts = [];
+
+    /** @var array<string, \Spatie\LaravelData\DataPipeline>  */
+    protected array $dataPipelines = [];
 
     /** @var \Spatie\LaravelData\RuleInferrers\RuleInferrer[] */
     protected array $ruleInferrers;
@@ -43,6 +48,24 @@ class DataConfig
         }
 
         return $this->dataClasses[$class] = DataClass::create(new ReflectionClass($class));
+    }
+
+    public function getDataPipeLine(string $class):  DataPipeline
+    {
+        if(array_key_exists($class,  $this->dataPipelines)){
+            return $this->dataPipelines[$class];
+        }
+
+        /** @var BaseData $class */
+        $pipeline = $class::pipeline();
+
+        foreach ($class::normalizers() as $normalizer) {
+            $pipeline->normalizer($normalizer);
+        }
+
+        $pipeline->prepare();
+
+        return $this->dataPipelines[$class] = $pipeline;
     }
 
     public function findGlobalCastForProperty(DataProperty $property): ?Cast

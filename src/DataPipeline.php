@@ -62,23 +62,28 @@ class DataPipeline
         return $this;
     }
 
-    public function execute(): Collection
+    public function prepare(): self
     {
         /** @var \Spatie\LaravelData\Normalizers\Normalizer[] $normalizers */
-        $normalizers = array_map(
+        $this->normalizers = array_map(
             fn (string|Normalizer $normalizer) => is_string($normalizer) ? app($normalizer) : $normalizer,
             $this->normalizers
         );
 
         /** @var \Spatie\LaravelData\DataPipes\DataPipe[] $pipes */
-        $pipes = array_map(
+        $this->pipes = array_map(
             fn (string|DataPipe $pipe) => is_string($pipe) ? app($pipe) : $pipe,
             $this->pipes
         );
 
+        return $this;
+    }
+
+    public function execute(): Collection
+    {
         $properties = null;
 
-        foreach ($normalizers as $normalizer) {
+        foreach ($this->normalizers as $normalizer) {
             $properties = $normalizer->normalize($this->value);
 
             if ($properties !== null) {
@@ -96,7 +101,7 @@ class DataPipeline
 
         $properties = ($class->name)::prepareForPipeline($properties);
 
-        foreach ($pipes as $pipe) {
+        foreach ($this->pipes as $pipe) {
             $piped = $pipe->handle($this->value, $class, $properties);
 
             $properties = $piped;
