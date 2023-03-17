@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.2.0 - 2023-03-17
+
+- Add benchmarks for testing data performance
+- Add some performance improvements for data creation and transformation
+
 ## 3.1.3 - 2023-03-16
 
 - Performance improvements
@@ -33,7 +38,9 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Allow referencing other fields in validation attributes when the data is nested
+- 
 - 
 - 
 - 
@@ -41,11 +48,14 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Allow circular dependencies when validating data
 - 
 - 
 - 
+- 
 - - Add support for nested validation messages and attributes
+- 
 - 
 - 
 - 
