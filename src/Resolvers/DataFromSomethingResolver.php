@@ -41,10 +41,10 @@ class DataFromSomethingResolver
 
         $properties = new Collection();
 
-        $pipeline = $this->dataConfig->getDataPipeLine($class);
+        $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
 
         foreach ($payloads as $payload) {
-            foreach ($pipeline->using($payload)->execute() as $key => $value) {
+            foreach ($pipeline->execute($payload) as $key => $value) {
                 $properties[$key] = $value;
             }
         }
@@ -81,14 +81,11 @@ class DataFromSomethingResolver
             return null;
         }
 
+        $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
+
         foreach ($payloads as $payload) {
             if ($payload instanceof Request) {
-                $class::pipeline()
-                    ->normalizer(ArrayableNormalizer::class)
-                    ->into($class)
-                    ->using($payload)
-                    ->prepare()
-                    ->execute();
+                $pipeline->execute($payload);
             }
         }
 

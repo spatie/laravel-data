@@ -13,6 +13,7 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
+use Spatie\LaravelData\Support\DataConfig;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
@@ -2001,6 +2002,8 @@ it('can validate non-requests payloads', function () {
 
     expect($data)->toBeInstanceOf(Data::class)
         ->string->toEqual('nowp');
+
+    app(DataConfig::class)->reset();
 
     $dataClass::$validateAllTypes = true;
 

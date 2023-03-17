@@ -19,8 +19,8 @@ class DataConfig
     /** @var array<string, \Spatie\LaravelData\Casts\Cast> */
     protected array $casts = [];
 
-    /** @var array<string, \Spatie\LaravelData\DataPipeline>  */
-    protected array $dataPipelines = [];
+    /** @var array<string, \Spatie\LaravelData\Support\ResolvedDataPipeline>  */
+    protected array $resolvedDataPipelines = [];
 
     /** @var \Spatie\LaravelData\RuleInferrers\RuleInferrer[] */
     protected array $ruleInferrers;
@@ -50,22 +50,13 @@ class DataConfig
         return $this->dataClasses[$class] = DataClass::create(new ReflectionClass($class));
     }
 
-    public function getDataPipeLine(string $class):  DataPipeline
+    public function getResolvedDataPipeline(string $class):  ResolvedDataPipeline
     {
-        if(array_key_exists($class,  $this->dataPipelines)){
-            return $this->dataPipelines[$class];
+        if(array_key_exists($class,  $this->resolvedDataPipelines)){
+            return $this->resolvedDataPipelines[$class];
         }
 
-        /** @var BaseData $class */
-        $pipeline = $class::pipeline();
-
-        foreach ($class::normalizers() as $normalizer) {
-            $pipeline->normalizer($normalizer);
-        }
-
-        $pipeline->prepare();
-
-        return $this->dataPipelines[$class] = $pipeline;
+        return $this->resolvedDataPipelines[$class] = $class::pipeline()->resolve();
     }
 
     public function findGlobalCastForProperty(DataProperty $property): ?Cast
@@ -103,5 +94,13 @@ class DataConfig
     public function getRuleInferrers(): array
     {
         return $this->ruleInferrers;
+    }
+
+    public function reset(): self
+    {
+       $this->dataClasses = [];
+       $this->resolvedDataPipelines = [];
+
+       return $this;
     }
 }

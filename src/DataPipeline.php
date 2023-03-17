@@ -7,6 +7,7 @@ use Spatie\LaravelData\DataPipes\DataPipe;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Normalizers\Normalizer;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\ResolvedDataPipeline;
 
 class DataPipeline
 {
@@ -25,13 +26,6 @@ class DataPipeline
     public static function create(): static
     {
         return app(static::class);
-    }
-
-    public function using(mixed $value): static
-    {
-        $this->value = $value;
-
-        return $this;
     }
 
     public function into(string $classString): static
@@ -62,51 +56,37 @@ class DataPipeline
         return $this;
     }
 
-    public function prepare(): self
+    public function resolve(): ResolvedDataPipeline
     {
+        $normalizers = array_merge(
+            $this->normalizers,
+            $this->classString::normalizers()
+        );
+
         /** @var \Spatie\LaravelData\Normalizers\Normalizer[] $normalizers */
-        $this->normalizers = array_map(
-            fn (string|Normalizer $normalizer) => is_string($normalizer) ? app($normalizer) : $normalizer,
-            $this->normalizers
+        $normalizers = array_map(
+            fn(string|Normalizer $normalizer) => is_string($normalizer) ? app($normalizer) : $normalizer,
+            $normalizers
         );
 
         /** @var \Spatie\LaravelData\DataPipes\DataPipe[] $pipes */
-        $this->pipes = array_map(
-            fn (string|DataPipe $pipe) => is_string($pipe) ? app($pipe) : $pipe,
+        $pipes = array_map(
+            fn(string|DataPipe $pipe) => is_string($pipe) ? app($pipe) : $pipe,
             $this->pipes
         );
 
-        return $this;
+        return new ResolvedDataPipeline(
+            $normalizers,
+            $pipes,
+            $this->dataConfig->getDataClass($this->classString)
+        );
     }
 
+    /** @deprecated */
     public function execute(): Collection
     {
-        $properties = null;
-
-        foreach ($this->normalizers as $normalizer) {
-            $properties = $normalizer->normalize($this->value);
-
-            if ($properties !== null) {
-                break;
-            }
-        }
-
-        if ($properties === null) {
-            throw CannotCreateData::noNormalizerFound($this->classString, $this->value);
-        }
-
-        $properties = collect($properties);
-
-        $class = $this->dataConfig->getDataClass($this->classString);
-
-        $properties = ($class->name)::prepareForPipeline($properties);
-
-        foreach ($this->pipes as $pipe) {
-            $piped = $pipe->handle($this->value, $class, $properties);
-
-            $properties = $piped;
-        }
-
-        return $properties;
+        return $this->dataConfig
+            ->getResolvedDataPipeline($this->classString)
+            ->execute($this->value);
     }
 }
