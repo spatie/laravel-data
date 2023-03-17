@@ -19,7 +19,7 @@ class EmptyDataResolver
 
         $payload = [];
 
-        foreach ($dataClass->properties as $property){
+        foreach ($dataClass->properties as $property) {
             $name = $property->outputMappedName ?? $property->name;
 
             if ($property->hasDefaultValue) {

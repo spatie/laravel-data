@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
 
@@ -63,7 +62,7 @@ class DataFromSomethingResolver
             ->getDataClass($class)
             ->methods
             ->filter(
-                fn(DataMethod $method) => $method->isCustomCreationMethod
+                fn (DataMethod $method) => $method->isCustomCreationMethod
                     && ! in_array($method->name, $this->ignoredMagicalMethods)
             );
 

@@ -4,8 +4,6 @@ namespace Spatie\LaravelData\Support;
 
 use ReflectionClass;
 use Spatie\LaravelData\Casts\Cast;
-use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\Transformers\Transformer;
 
 class DataConfig
@@ -19,7 +17,7 @@ class DataConfig
     /** @var array<string, \Spatie\LaravelData\Casts\Cast> */
     protected array $casts = [];
 
-    /** @var array<string, \Spatie\LaravelData\Support\ResolvedDataPipeline>  */
+    /** @var array<string, \Spatie\LaravelData\Support\ResolvedDataPipeline> */
     protected array $resolvedDataPipelines = [];
 
     /** @var \Spatie\LaravelData\RuleInferrers\RuleInferrer[] */
@@ -50,9 +48,9 @@ class DataConfig
         return $this->dataClasses[$class] = DataClass::create(new ReflectionClass($class));
     }
 
-    public function getResolvedDataPipeline(string $class):  ResolvedDataPipeline
+    public function getResolvedDataPipeline(string $class): ResolvedDataPipeline
     {
-        if(array_key_exists($class,  $this->resolvedDataPipelines)){
+        if (array_key_exists($class,  $this->resolvedDataPipelines)) {
             return $this->resolvedDataPipelines[$class];
         }
 
@@ -98,9 +96,9 @@ class DataConfig
 
     public function reset(): self
     {
-       $this->dataClasses = [];
-       $this->resolvedDataPipelines = [];
+        $this->dataClasses = [];
+        $this->resolvedDataPipelines = [];
 
-       return $this;
+        return $this;
     }
 }

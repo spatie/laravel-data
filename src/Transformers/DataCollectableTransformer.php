@@ -9,7 +9,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\IncludeableData;
-use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
@@ -71,7 +70,7 @@ class DataCollectableTransformer
 
     protected function transformItemClosure(): Closure
     {
-        return fn(BaseData $item) => $item instanceof IncludeableData
+        return fn (BaseData $item) => $item instanceof IncludeableData
             ? $item->withPartialTrees($this->trees)
             : $item;
     }

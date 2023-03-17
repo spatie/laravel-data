@@ -4,7 +4,6 @@ namespace Spatie\LaravelData;
 
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\DataPipes\DataPipe;
-use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Normalizers\Normalizer;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\ResolvedDataPipeline;
@@ -65,13 +64,13 @@ class DataPipeline
 
         /** @var \Spatie\LaravelData\Normalizers\Normalizer[] $normalizers */
         $normalizers = array_map(
-            fn(string|Normalizer $normalizer) => is_string($normalizer) ? app($normalizer) : $normalizer,
+            fn (string|Normalizer $normalizer) => is_string($normalizer) ? app($normalizer) : $normalizer,
             $normalizers
         );
 
         /** @var \Spatie\LaravelData\DataPipes\DataPipe[] $pipes */
         $pipes = array_map(
-            fn(string|DataPipe $pipe) => is_string($pipe) ? app($pipe) : $pipe,
+            fn (string|DataPipe $pipe) => is_string($pipe) ? app($pipe) : $pipe,
             $this->pipes
         );
 
