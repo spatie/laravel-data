@@ -19,14 +19,15 @@ use function PHPUnit\Framework\assertFalse;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 
 use Spatie\LaravelData\Attributes\MapInputName;
-use Spatie\LaravelData\Attributes\MapName;
 
+use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 
 use Spatie\LaravelData\Attributes\Validation\Bail;
-use Spatie\LaravelData\Attributes\Validation\Exists;
 
+use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\In;
+
 use Spatie\LaravelData\Attributes\Validation\IntegerType;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
@@ -39,8 +40,8 @@ use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-
 use Spatie\LaravelData\DataPipeline;
+
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
@@ -52,6 +53,7 @@ use Spatie\LaravelData\Normalizers\ArrayNormalizer;
 use Spatie\LaravelData\Normalizers\ModelNormalizer;
 use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
@@ -2001,6 +2003,8 @@ it('can validate non-requests payloads', function () {
 
     expect($data)->toBeInstanceOf(Data::class)
         ->string->toEqual('nowp');
+
+    app(DataConfig::class)->reset();
 
     $dataClass::$validateAllTypes = true;
 

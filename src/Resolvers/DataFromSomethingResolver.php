@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
 
@@ -39,35 +38,15 @@ class DataFromSomethingResolver
             return $data;
         }
 
-//        $properties = new Collection();
-//
-//        foreach ($payloads as $payload) {
-//            /** @var BaseData $class */
-//            $pipeline = $class::pipeline();
-//
-//            foreach ($class::normalizers() as $normalizer) {
-//                $pipeline->normalizer($normalizer);
-//            }
-//
-//            foreach ($pipeline->using($payload)->execute() as $key => $value) {
-//                $properties[$key] = $value;
-//            }
-//        }
+        $properties = new Collection();
 
-        $properties = array_reduce(
-            $payloads,
-            function (Collection $carry, mixed $payload) use ($class) {
-                /** @var BaseData $class */
-                $pipeline = $class::pipeline();
+        $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
 
-                foreach ($class::normalizers() as $normalizer) {
-                    $pipeline->normalizer($normalizer);
-                }
-
-                return $carry->merge($pipeline->using($payload)->execute());
-            },
-            collect(),
-        );
+        foreach ($payloads as $payload) {
+            foreach ($pipeline->execute($payload) as $key => $value) {
+                $properties[$key] = $value;
+            }
+        }
 
         return $this->dataFromArrayResolver->execute($class, $properties);
     }
@@ -101,13 +80,11 @@ class DataFromSomethingResolver
             return null;
         }
 
+        $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
+
         foreach ($payloads as $payload) {
             if ($payload instanceof Request) {
-                $class::pipeline()
-                    ->normalizer(ArrayableNormalizer::class)
-                    ->into($class)
-                    ->using($payload)
-                    ->execute();
+                $pipeline->execute($payload);
             }
         }
 
