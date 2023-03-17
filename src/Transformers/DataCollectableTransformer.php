@@ -44,27 +44,34 @@ class DataCollectableTransformer
 
     protected function transformCollection(Enumerable $items): array
     {
-        $items = $items->map($this->transformItemClosure())
-            ->when(
+        $payload = [];
+
+        foreach ($items as $key => $item) {
+            $normalized = $this->transformItemClosure()($item);
+
+            if (! $this->transformValues) {
+                $payload[$key] = $normalized;
+
+                continue;
+            }
+
+            $payload[$key] = $normalized->transform(
                 $this->transformValues,
-                fn (Enumerable $collection) => $collection->map(fn (TransformableData $data) => $data->transform(
-                    $this->transformValues,
-                    $this->wrapExecutionType->shouldExecute()
-                        ? WrapExecutionType::TemporarilyDisabled
-                        : $this->wrapExecutionType,
-                    $this->mapPropertyNames,
-                ))
-            )
-            ->all();
+                $this->wrapExecutionType->shouldExecute()
+                    ? WrapExecutionType::TemporarilyDisabled
+                    : $this->wrapExecutionType,
+                $this->mapPropertyNames,
+            );
+        }
 
         return $this->wrapExecutionType->shouldExecute()
-            ? $this->wrap->wrap($items)
-            : $items;
+            ? $this->wrap->wrap($payload)
+            : $payload;
     }
 
     protected function transformItemClosure(): Closure
     {
-        return fn (BaseData $item) => $item instanceof IncludeableData
+        return fn(BaseData $item) => $item instanceof IncludeableData
             ? $item->withPartialTrees($this->trees)
             : $item;
     }
