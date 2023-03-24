@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.2.1 - 2023-03-24
+
+- Introduce FormRequestNormalizer (#380)
+- Add support for models without all columns (#385)
+
 ## 3.2.0 - 2023-03-17
 
 - Add benchmarks for testing data performance
@@ -39,7 +44,9 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Allow referencing other fields in validation attributes when the data is nested
+- 
 - 
 - 
 - 
@@ -49,12 +56,15 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Allow circular dependencies when validating data
 - 
 - 
 - 
 - 
+- 
 - - Add support for nested validation messages and attributes
+- 
 - 
 - 
 - 
