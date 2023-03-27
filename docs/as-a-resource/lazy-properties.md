@@ -378,3 +378,49 @@ It is also possible to run exclude, except and only operations on a data object:
 - You can define **except** in `allowedRequestExcept` and use the `except` key in your query string
 - You can define **only** in `allowedRequestOnly` and use the `only` key in your query string
 
+### Mapping attributes support
+
+When a data object uses attributes like MapName, MapOutputName, the operations **includes**, **excludes**, **except**, and **only**
+expects these output names to be specified in a query string.
+
+Example:
+
+```php
+class UserData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[MapOutputName('favorite_song')] // Mapped output name
+        public Lazy|SongData $song,
+    ) {
+    }
+
+    public static function allowedRequestExcept(): ?array
+    {
+        return [
+            'song' // Original property name
+        ];
+    }
+
+    public static function fromModel(User $user): self
+    {
+        return new self(
+            $user->title,
+            Lazy::create(fn() => SongData::from($user->song))
+        );
+    }
+}
+```
+
+To except the `song` property in your code:
+```php
+UserData::from(User::first())->except('song');
+```
+
+To except the `song` property in a query string you must use mapped output name — `favorite_song`:
+```
+https://spatie.be/my-account?except[]=favorite_song
+```
+
+The same is when a data object uses `MapName` attribute with any case mapper.
+
