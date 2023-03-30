@@ -1,6 +1,6 @@
 ---
 title: Validation attributes
-weight: 12
+weight: 13
 ---
 
 It is possible to validate the request before a data object is constructed. This can be done by adding validation attributes to the properties of a data object like this:
