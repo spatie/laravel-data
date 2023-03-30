@@ -4,9 +4,6 @@ namespace Spatie\LaravelData\Support;
 
 class PartialTreesMapping
 {
-    /**
-     * @param array<string, \Spatie\LaravelData\Support\PartialTreesMapping> $children
-     */
     public function __construct(
         readonly public string $original,
         readonly public string $mapped,
