@@ -167,9 +167,9 @@ it('will correctly reduce a tree based upon allowed includes', function (
 
 it('can combine request and manual includes', function () {
     $dataclass = new class (
-        Lazy::create(fn () => 'Rick Astley'),
-        Lazy::create(fn () => 'Never gonna give you up'),
-        Lazy::create(fn () => 1986),
+        Lazy::create(fn() => 'Rick Astley'),
+        Lazy::create(fn() => 'Never gonna give you up'),
+        Lazy::create(fn() => 1986),
     ) extends MultiLazyData {
         public static function allowedRequestIncludes(): ?array
         {
@@ -189,9 +189,9 @@ it('can combine request and manual includes', function () {
 
 it('handles parsing includes from request', function (array $input, array $expected) {
     $dataclass = new class (
-        Lazy::create(fn () => 'Rick Astley'),
-        Lazy::create(fn () => 'Never gonna give you up'),
-        Lazy::create(fn () => 1986),
+        Lazy::create(fn() => 'Rick Astley'),
+        Lazy::create(fn() => 'Never gonna give you up'),
+        Lazy::create(fn() => 1986),
     ) extends MultiLazyData {
         public static function allowedRequestIncludes(): ?array
         {
@@ -218,13 +218,13 @@ it('handles parsing includes from request', function (array $input, array $expec
 
 it('handles parsing except from request with mapped output name', function (array $input, array $expectedArray) {
     $dataclass = SimpleDataWithMappedOutputName::from([
-        'id'         => 1,
-        'amount'     => 1000,
+        'id' => 1,
+        'amount' => 1000,
         'any_string' => 'test',
-        'child'      => SimpleChildDataWithMappedOutputName::from([
-            'id'     => 2,
+        'child' => SimpleChildDataWithMappedOutputName::from([
+            'id' => 2,
             'amount' => 2000,
-        ])
+        ]),
     ]);
 
     $request = request()->merge($input);
@@ -234,12 +234,12 @@ it('handles parsing except from request with mapped output name', function (arra
     expect($data)->toMatchArray($expectedArray);
 })->with(function () {
     yield 'input as array' => [
-        'input'       => ['except' => ['paid_amount', 'any_string', 'child.child_amount']],
+        'input' => ['except' => ['paid_amount', 'any_string', 'child.child_amount']],
         'expectedArray' => [
             'id' => 1,
             'child' => [
-                'id' => 2
-            ]
+                'id' => 2,
+            ],
         ],
     ];
 });

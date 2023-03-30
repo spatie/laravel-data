@@ -10,7 +10,9 @@ use Spatie\LaravelData\Support\AllowedPartialsParser;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\PartialTrees;
+use Spatie\LaravelData\Support\PartialTreesMapping;
 use Spatie\LaravelData\Support\RequestPartialsParser;
 use TypeError;
 
@@ -18,37 +20,9 @@ class PartialsTreeFromRequestResolver
 {
     public function __construct(
         protected DataConfig $dataConfig,
-        protected RequestPartialsParser $partialsParser,
+        protected PartialsParser $partialsParser,
         protected AllowedPartialsParser $allowedPartialsParser,
     ) {
-    }
-
-    protected function createOutputNameMapping(DataClass $dataClass): array
-    {
-        return $dataClass
-            ->properties
-            ->mapWithKeys(function (DataProperty $dataProperty) {
-                $field = $dataProperty->name;
-                $outputMappedName = $dataProperty->outputMappedName ?? $dataProperty->name;
-
-                if ($dataProperty->type->isDataObject || $dataProperty->type->isDataCollectable) {
-                    return [
-                        $outputMappedName => [
-                            'name' => $field,
-                            'children' => $this->createOutputNameMapping(
-                                $this->dataConfig->getDataClass($dataProperty->type->dataClass)
-                            ),
-                        ],
-                    ];
-                }
-
-                return [
-                    $outputMappedName => [
-                        'name' => $field,
-                        'children' => [],
-                    ],
-                ];
-            })->all();
     }
 
     public function execute(
@@ -63,21 +37,23 @@ class PartialsTreeFromRequestResolver
 
         $dataClass = $this->dataConfig->getDataClass($dataClass);
 
-        $outputNameMapping = $this->createOutputNameMapping($dataClass);
-
-        $this->partialsParser->setOutputNameMapping($outputNameMapping);
+        $mapping = PartialTreesMapping::fromRootDataClass($dataClass);
 
         $requestedIncludesTree = $this->partialsParser->execute(
-            $request->has('include') ? $this->arrayFromRequest($request, 'include') : []
+            $request->has('include') ? $this->arrayFromRequest($request, 'include') : [],
+            $mapping
         );
         $requestedExcludesTree = $this->partialsParser->execute(
-            $request->has('exclude') ? $this->arrayFromRequest($request, 'exclude') : []
+            $request->has('exclude') ? $this->arrayFromRequest($request, 'exclude') : [],
+            $mapping
         );
         $requestedOnlyTree = $this->partialsParser->execute(
-            $request->has('only') ? $this->arrayFromRequest($request, 'only') : []
+            $request->has('only') ? $this->arrayFromRequest($request, 'only') : [],
+            $mapping
         );
         $requestedExceptTree = $this->partialsParser->execute(
-            $request->has('except') ? $this->arrayFromRequest($request, 'except') : []
+            $request->has('except') ? $this->arrayFromRequest($request, 'except') : [],
+            $mapping
         );
 
         $allowedRequestIncludesTree = $this->allowedPartialsParser->execute('allowedRequestIncludes', $dataClass);
