@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.2.2 - 2023-03-30
+
+- Fix issue when validating and creating a data object was impossible to use magic creation methods
+- Fix usage of properties' mapped output names in 'only', 'except', 'includes', and 'excludes' operations (#393)
+- Add some extra documentation
+
 ## 3.2.1 - 2023-03-24
 
 - Introduce FormRequestNormalizer (#380)
@@ -45,7 +51,9 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Allow referencing other fields in validation attributes when the data is nested
+- 
 - 
 - 
 - 
@@ -57,13 +65,16 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Allow circular dependencies when validating data
 - 
 - 
 - 
 - 
 - 
+- 
 - - Add support for nested validation messages and attributes
+- 
 - 
 - 
 - 
