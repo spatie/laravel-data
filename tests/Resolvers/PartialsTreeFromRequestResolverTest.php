@@ -12,6 +12,8 @@ use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\TreeNode;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
+use Spatie\LaravelData\Tests\Fakes\SimpleChildDataWithMappedOutputName;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedOutputName;
 
 beforeEach(function () {
     $this->resolver = resolve(PartialsTreeFromRequestResolver::class);
@@ -211,5 +213,33 @@ it('handles parsing includes from request', function (array $input, array $expec
     yield 'input as comma separated' => [
         'input' => ['include' => 'artist,name'],
         'expected' => ['artist', 'name'],
+    ];
+});
+
+it('handles parsing except from request with mapped output name', function (array $input, array $expectedArray) {
+    $dataclass = SimpleDataWithMappedOutputName::from([
+        'id' => 1,
+        'amount' => 1000,
+        'any_string' => 'test',
+        'child' => SimpleChildDataWithMappedOutputName::from([
+            'id' => 2,
+            'amount' => 2000,
+        ]),
+    ]);
+
+    $request = request()->merge($input);
+
+    $data = $dataclass->toResponse($request)->getData(assoc: true);
+
+    expect($data)->toMatchArray($expectedArray);
+})->with(function () {
+    yield 'input as array' => [
+        'input' => ['except' => ['paid_amount', 'any_string', 'child.child_amount']],
+        'expectedArray' => [
+            'id' => 1,
+            'child' => [
+                'id' => 2,
+            ],
+        ],
     ];
 });
