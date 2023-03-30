@@ -27,8 +27,7 @@ class PartialsTreeFromRequestResolver
     {
         return $dataClass
             ->properties
-            ->mapWithKeys(function (DataProperty $dataProperty) use ($dataClass) {
-
+            ->mapWithKeys(function (DataProperty $dataProperty) {
                 $field = $dataProperty->name;
                 $outputMappedName = $dataProperty->outputMappedName ?? $dataProperty->name;
 
@@ -38,7 +37,7 @@ class PartialsTreeFromRequestResolver
                             'name' => $field,
                             'children' => $this->createOutputNameMapping(
                                 $this->dataConfig->getDataClass($dataProperty->type->dataClass)
-                            )
+                            ),
                         ],
                     ];
                 }
@@ -46,8 +45,8 @@ class PartialsTreeFromRequestResolver
                 return [
                     $outputMappedName => [
                         'name' => $field,
-                        'children' => []
-                    ]
+                        'children' => [],
+                    ],
                 ];
             })->all();
     }
@@ -56,7 +55,6 @@ class PartialsTreeFromRequestResolver
         IncludeableData $data,
         Request $request,
     ): PartialTrees {
-
         $dataClass = match (true) {
             $data instanceof BaseData => $data::class,
             $data instanceof BaseDataCollectable => $data->getDataClass(),
