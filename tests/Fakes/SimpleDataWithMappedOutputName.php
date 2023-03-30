@@ -24,7 +24,7 @@ class SimpleDataWithMappedOutputName extends Data
         return [
             'amount',
             'anyString',
-            'child'
+            'child',
         ];
     }
 }

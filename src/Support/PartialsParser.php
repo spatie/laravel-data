@@ -28,9 +28,9 @@ class PartialsParser
             if (Str::startsWith($field, '{') && Str::endsWith($field, '}')) {
                 $children = collect(explode(',', substr($field, 1, -1)))
                     ->values()
-                    ->map(fn(string $child) => $mapping?->getChild($child)?->original ?? $child)
+                    ->map(fn (string $child) => $mapping?->getChild($child)?->original ?? $child)
                     ->flip()
-                    ->map(fn() => new ExcludedTreeNode())
+                    ->map(fn () => new ExcludedTreeNode())
                     ->all();
 
                 $nodes = $nodes->merge(new PartialTreeNode($children));

@@ -255,7 +255,7 @@ it('can parse directives with mapping', function (array $partials, TreeNode $exp
             'structuur.*',
         ],
         'expected' => new PartialTreeNode([
-            'struct' => new AllTreeNode()
+            'struct' => new AllTreeNode(),
         ]),
     ];
 });

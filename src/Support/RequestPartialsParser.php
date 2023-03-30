@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
@@ -17,6 +16,7 @@ class RequestPartialsParser
     public function setOutputNameMapping(array $outputNameMapping = []): self
     {
         $this->outputNameMapping = $outputNameMapping;
+
         return $this;
     }
 

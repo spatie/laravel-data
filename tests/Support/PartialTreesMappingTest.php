@@ -19,7 +19,7 @@ it('wont create a mapping for non mapped properties', function () {
 });
 
 it('can create a mapping', function () {
-    $dataClass = new class extends Data {
+    $dataClass = new class () extends Data {
         #[MapOutputName('naam')]
         public string $name;
 
