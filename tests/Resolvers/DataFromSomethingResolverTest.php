@@ -128,10 +128,10 @@ it('can create data ignoring certain magical methods', function () {
     }
 
     expect(
-        app(DataFromSomethingResolver::class)->ignoreMagicalMethods('fromArray')->execute(DummyA::class, ['hash_id' => 1, 'name' => 'Taylor'])
+        app(DataFromSomethingResolver::class)->reset()->ignoreMagicalMethods('fromArray')->execute(DummyA::class, ['hash_id' => 1, 'name' => 'Taylor'])
     )->toEqual(new DummyA(null, 'Taylor'));
 
     expect(
-        app(DataFromSomethingResolver::class)->execute(DummyA::class, ['hash_id' => 1, 'name' => 'Taylor'])
+        app(DataFromSomethingResolver::class)->reset()->execute(DummyA::class, ['hash_id' => 1, 'name' => 'Taylor'])
     )->toEqual(new DummyA(1, 'Taylor'));
 });
