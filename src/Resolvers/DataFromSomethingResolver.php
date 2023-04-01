@@ -18,6 +18,14 @@ class DataFromSomethingResolver
     ) {
     }
 
+    public function reset(): self
+    {
+        $this->withoutMagicalCreation = false;
+        $this->ignoredMagicalMethods = [];
+
+        return $this;
+    }
+
     public function withoutMagicalCreation(bool $withoutMagicalCreation = true): self
     {
         $this->withoutMagicalCreation = $withoutMagicalCreation;

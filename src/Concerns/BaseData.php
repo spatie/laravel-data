@@ -49,7 +49,7 @@ trait BaseData
 
     public static function from(mixed ...$payloads): static
     {
-        return app(DataFromSomethingResolver::class)->execute(
+        return app(DataFromSomethingResolver::class)->reset()->execute(
             static::class,
             ...$payloads
         );
@@ -57,7 +57,7 @@ trait BaseData
 
     public static function withoutMagicalCreationFrom(mixed ...$payloads): static
     {
-        return app(DataFromSomethingResolver::class)->withoutMagicalCreation()->execute(
+        return app(DataFromSomethingResolver::class)->reset()->withoutMagicalCreation()->execute(
             static::class,
             ...$payloads
         );

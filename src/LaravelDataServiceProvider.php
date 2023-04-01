@@ -4,6 +4,8 @@ namespace Spatie\LaravelData;
 
 use Spatie\LaravelData\Commands\DataMakeCommand;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Resolvers\DataFromArrayResolver;
+use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\VarDumper\VarDumperManager;
 use Spatie\LaravelPackageTools\Package;
@@ -24,6 +26,14 @@ class LaravelDataServiceProvider extends PackageServiceProvider
         $this->app->singleton(
             DataConfig::class,
             fn () => new DataConfig(config('data'))
+        );
+
+        $this->app->singleton(
+            DataFromSomethingResolver::class,
+            fn () => new DataFromSomethingResolver(
+                app(DataConfig::class),
+                app(DataFromArrayResolver::class),
+            ),
         );
 
         /** @psalm-suppress UndefinedInterfaceMethod */
