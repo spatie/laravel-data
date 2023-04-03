@@ -301,16 +301,18 @@ public string $value;
 [Docs](https://laravel.com/docs/9.x/validation#rule-email)
 
 ```php
+use Spatie\LaravelData\Attributes\Validation\Email;
+
 #[Email]
 public string $value;
 
 #[Email(Email::RfcValidation)]
 public string $value;  
 
-#[Email([Distinct::RfcValidation, Distinct::DnsCheckValidation])]
+#[Email([Email::RfcValidation, Email::DnsCheckValidation])]
 public string $value;  
 
-#[Email(Distinct::RfcValidation, Distinct::DnsCheckValidation)]
+#[Email(Email::RfcValidation, Email::DnsCheckValidation)]
 public string $value;  
 ```
 
