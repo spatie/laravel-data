@@ -301,8 +301,6 @@ public string $value;
 [Docs](https://laravel.com/docs/9.x/validation#rule-email)
 
 ```php
-use Spatie\LaravelData\Attributes\Validation\Email;
-
 #[Email]
 public string $value;
 
