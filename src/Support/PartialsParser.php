@@ -11,7 +11,7 @@ use Spatie\LaravelData\Support\TreeNodes\TreeNode;
 
 class PartialsParser
 {
-    public function execute(array $partials, ?PartialTreesMapping $mapping = null): TreeNode
+    public function execute(array $partials): TreeNode
     {
         $nodes = new DisabledTreeNode();
 
@@ -28,7 +28,6 @@ class PartialsParser
             if (Str::startsWith($field, '{') && Str::endsWith($field, '}')) {
                 $children = collect(explode(',', substr($field, 1, -1)))
                     ->values()
-                    ->map(fn (string $child) => $mapping?->getChild($child)?->original ?? $child)
                     ->flip()
                     ->map(fn () => new ExcludedTreeNode())
                     ->all();
@@ -38,16 +37,12 @@ class PartialsParser
                 continue;
             }
 
-            $mappingForField = $mapping?->getChild($field);
-
             $nestedNode = $nested === null
                 ? new ExcludedTreeNode()
-                : $this->execute([$nested], $mappingForField);
-
-            $fieldName = $mappingForField?->original ?? $field;
+                : $this->execute([$nested]);
 
             $nodes = $nodes->merge(new PartialTreeNode([
-                $fieldName => $nestedNode,
+                $field => $nestedNode,
             ]));
         }
 
