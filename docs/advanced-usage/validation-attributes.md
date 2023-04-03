@@ -307,10 +307,10 @@ public string $value;
 #[Email(Email::RfcValidation)]
 public string $value;  
 
-#[Email([Distinct::RfcValidation, Distinct::DnsCheckValidation])]
+#[Email([Email::RfcValidation, Email::DnsCheckValidation])]
 public string $value;  
 
-#[Email(Distinct::RfcValidation, Distinct::DnsCheckValidation)]
+#[Email(Email::RfcValidation, Email::DnsCheckValidation)]
 public string $value;  
 ```
 
