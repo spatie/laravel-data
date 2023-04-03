@@ -1002,7 +1002,7 @@ it('can use a custom transformer', function () {
             public Data $nestedData,
             #[
                 WithTransformer(ConfidentialDataCollectionTransformer::class),
-            DataCollectionOf(SimpleData::class)
+                DataCollectionOf(SimpleData::class)
             ]
             public DataCollection $nestedDataCollection,
         ) {
@@ -1269,7 +1269,7 @@ it('can map transformed property names', function () {
             public DataCollection $nested_collection,
             #[
                 MapOutputName('nested_other_collection'),
-            DataCollectionOf(SimpleDataWithMappedProperty::class)
+                DataCollectionOf(SimpleDataWithMappedProperty::class)
             ]
             public DataCollection $nested_renamed_collection,
         ) {
