@@ -46,4 +46,14 @@ abstract class Lazy
     {
         return $this->defaultIncluded ?? false;
     }
+
+    public function __get(string $name): mixed
+    {
+        return $this->resolve()->$name;
+    }
+
+    public function __call(string $name, array $arguments): mixed
+    {
+        return call_user_func_array([$this->resolve(), $name], $arguments);
+    }
 }
