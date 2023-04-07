@@ -119,7 +119,7 @@ trait IncludeableData
             return $this->_partialTrees;
         }
 
-        $filter = fn (bool|null|Closure $condition, string $definition) => match (true) {
+        $filter = fn(bool|null|Closure $condition, string $definition) => match (true) {
             is_bool($condition) => $condition,
             $condition === null => false,
             is_callable($condition) => $condition($this),
@@ -130,11 +130,13 @@ trait IncludeableData
         $only = collect($this->_only)->merge($this->onlyProperties())->filter($filter)->keys()->all();
         $except = collect($this->_except)->merge($this->exceptProperties())->filter($filter)->keys()->all();
 
+        $partialsParser = app(PartialsParser::class);
+
         return new PartialTrees(
-            (new PartialsParser())->execute($includes),
-            (new PartialsParser())->execute($excludes),
-            (new PartialsParser())->execute($only),
-            (new PartialsParser())->execute($except),
+            $partialsParser->execute($includes),
+            $partialsParser->execute($excludes),
+            $partialsParser->execute($only),
+            $partialsParser->execute($except),
         );
     }
 }

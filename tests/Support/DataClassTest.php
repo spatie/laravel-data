@@ -1,11 +1,15 @@
 <?php
 
+use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataClass;
+use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
+use Spatie\LaravelData\Support\NameMapping\DataClassOutputNameMapper;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedOutputName;
 
 it('keeps track of a global map from attribute', function () {
     $dataClass = DataClass::create(new ReflectionClass(DataWithMapper::class));
@@ -73,6 +77,16 @@ it('wont throw an error if a non existing attribute is used on a data class', fu
         ->and(PhpStormClassAttributeData::from((object)['property' => 'hello'])->property)->toEqual('hello')
         ->and(PhpStormClassAttributeData::from('{"property": "hello"}')->property)->toEqual('hello')
         ->and(ModelWithPhpStormAttributeData::from((new DummyModel())->fill(['id' => 1]))->id)->toEqual(1);
+});
+
+it('wont create an output name mapping for non mapped properties', function () {
+    $mapping = DataClass::create(new ReflectionClass(SimpleData::class))
+        ->outputNameMapping
+        ->resolve();
+
+    expect($mapping)
+        ->mapped->toBeEmpty()
+        ->mappedDataObjects->toBeEmpty();
 });
 
 #[\JetBrains\PhpStorm\Immutable]
