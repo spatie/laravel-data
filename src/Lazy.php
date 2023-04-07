@@ -4,6 +4,7 @@ namespace Spatie\LaravelData;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Traits\Macroable;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\DefaultLazy;
 use Spatie\LaravelData\Support\Lazy\InertiaLazy;
@@ -11,6 +12,8 @@ use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 
 abstract class Lazy
 {
+    use Macroable;
+
     protected ?bool $defaultIncluded = null;
 
     public static function create(Closure $value): DefaultLazy
