@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support;
 
 use Illuminate\Support\Str;
-use Spatie\LaravelData\Support\NameMapping\DataClassOutputNameMapper;
 use Spatie\LaravelData\Support\NameMapping\DataClassNameMapping;
 use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
@@ -35,9 +34,9 @@ class PartialsParser
             if (Str::startsWith($field, '{') && Str::endsWith($field, '}')) {
                 $children = collect(explode(',', substr($field, 1, -1)))
                     ->values()
-                    ->map(fn(string $child) => $mapping?->getOriginal($child) ?? $child)
+                    ->map(fn (string $child) => $mapping?->getOriginal($child) ?? $child)
                     ->flip()
-                    ->map(fn() => new ExcludedTreeNode())
+                    ->map(fn () => new ExcludedTreeNode())
                     ->all();
 
                 $nodes = $nodes->merge(new PartialTreeNode($children));

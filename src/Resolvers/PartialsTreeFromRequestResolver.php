@@ -9,7 +9,6 @@ use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\AllowedPartialsParser;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\NameMapping\DataClassOutputNameMapper;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\PartialTrees;
 use TypeError;

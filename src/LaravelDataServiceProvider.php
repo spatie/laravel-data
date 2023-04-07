@@ -5,7 +5,6 @@ namespace Spatie\LaravelData;
 use Spatie\LaravelData\Commands\DataMakeCommand;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\NameMapping\DataClassOutputNameMapper;
 use Spatie\LaravelData\Support\VarDumper\VarDumperManager;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -24,7 +23,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
     {
         $this->app->singleton(
             DataConfig::class,
-            fn() => new DataConfig(config('data'))
+            fn () => new DataConfig(config('data'))
         );
 
         /** @psalm-suppress UndefinedInterfaceMethod */
@@ -35,7 +34,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
             $app->bind(
                 $class,
-                fn($container) => $class::from($container['request'])
+                fn ($container) => $class::from($container['request'])
             );
         });
     }

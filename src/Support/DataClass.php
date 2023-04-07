@@ -15,12 +15,10 @@ use Spatie\LaravelData\Contracts\ResponsableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\ValidateableData;
 use Spatie\LaravelData\Contracts\WrappableData;
-use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Lazy\CachedLazy;
 use Spatie\LaravelData\Support\NameMapping\DataClassNameMapping;
-use Spatie\LaravelData\Support\NameMapping\DataClassOutputNameMapper;
 
 /**
  * @property  class-string<DataObject> $name
@@ -51,12 +49,12 @@ class DataClass
     public static function create(ReflectionClass $class): self
     {
         $attributes = collect($class->getAttributes())
-            ->filter(fn(ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
-            ->map(fn(ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
+            ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
+            ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
 
         $methods = collect($class->getMethods());
 
-        $constructor = $methods->first(fn(ReflectionMethod $method) => $method->isConstructor());
+        $constructor = $methods->first(fn (ReflectionMethod $method) => $method->isConstructor());
 
         $properties = self::resolveProperties(
             $class,
@@ -77,7 +75,7 @@ class DataClass
             validateable: $class->implementsInterface(ValidateableData::class),
             wrappable: $class->implementsInterface(WrappableData::class),
             attributes: $attributes,
-            outputNameMapping: new CachedLazy(fn() => self::resolveOutputNameMapping($properties)),
+            outputNameMapping: new CachedLazy(fn () => self::resolveOutputNameMapping($properties)),
         );
     }
 
@@ -85,9 +83,9 @@ class DataClass
         ReflectionClass $reflectionClass,
     ): Collection {
         return collect($reflectionClass->getMethods())
-            ->filter(fn(ReflectionMethod $method) => str_starts_with($method->name, 'from'))
+            ->filter(fn (ReflectionMethod $method) => str_starts_with($method->name, 'from'))
             ->mapWithKeys(
-                fn(ReflectionMethod $method) => [$method->name => DataMethod::create($method)],
+                fn (ReflectionMethod $method) => [$method->name => DataMethod::create($method)],
             );
     }
 
@@ -99,9 +97,9 @@ class DataClass
         $defaultValues = self::resolveDefaultValues($class, $constructorMethod);
 
         return collect($class->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->reject(fn(ReflectionProperty $property) => $property->isStatic())
+            ->reject(fn (ReflectionProperty $property) => $property->isStatic())
             ->values()
-            ->mapWithKeys(fn(ReflectionProperty $property) => [
+            ->mapWithKeys(fn (ReflectionProperty $property) => [
                 $property->name => DataProperty::create(
                     $property,
                     array_key_exists($property->getName(), $defaultValues),
@@ -121,8 +119,8 @@ class DataClass
         }
 
         $values = collect($constructorMethod->getParameters())
-            ->filter(fn(ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-            ->mapWithKeys(fn(ReflectionParameter $parameter) => [
+            ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
+            ->mapWithKeys(fn (ReflectionParameter $parameter) => [
                 $parameter->name => $parameter->getDefaultValue(),
             ])
             ->toArray();

@@ -2,7 +2,6 @@
 
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\NameMapping\DataClassNameMapping;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;

@@ -119,7 +119,7 @@ trait IncludeableData
             return $this->_partialTrees;
         }
 
-        $filter = fn(bool|null|Closure $condition, string $definition) => match (true) {
+        $filter = fn (bool|null|Closure $condition, string $definition) => match (true) {
             is_bool($condition) => $condition,
             $condition === null => false,
             is_callable($condition) => $condition($this),

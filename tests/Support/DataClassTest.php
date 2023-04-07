@@ -1,15 +1,11 @@
 <?php
 
-use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataClass;
-use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
-use Spatie\LaravelData\Support\NameMapping\DataClassOutputNameMapper;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedOutputName;
 
 it('keeps track of a global map from attribute', function () {
     $dataClass = DataClass::create(new ReflectionClass(DataWithMapper::class));

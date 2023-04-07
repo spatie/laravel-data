@@ -2,12 +2,8 @@
 
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\NameMapping\DataClassOutputNameMapper;
-use Spatie\LaravelData\Support\NameMapping\DataClassNameMapping;
 use Spatie\LaravelData\Support\PartialsParser;
-use Spatie\LaravelData\Support\PartialTreesMapping;
 use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
@@ -195,7 +191,7 @@ function complexPartialsProvider(): Generator
 }
 
 it('can parse directives with mapping', function (array $partials, TreeNode $expected) {
-    $fakeClass = new class extends Data {
+    $fakeClass = new class () extends Data {
         #[MapOutputName('naam')]
         public string $name;
 
