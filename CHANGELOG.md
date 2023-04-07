@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.4.0 - 2023-04-07
+
+- Allow to fetch Lazy data properties in unified way (#403)
+
 ## 3.3.3 - 2023-04-03
 
 - revert: Fix usage of properties' mapped output names in 'only', 'except', 'includes', and 'excludes' operations (https://github.com/spatie/laravel-data/pull/393)
@@ -57,7 +61,9 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Allow referencing other fields in validation attributes when the data is nested
+- 
 - 
 - 
 - 
@@ -73,6 +79,7 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Allow circular dependencies when validating data
 - 
 - 
@@ -81,7 +88,9 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Add support for nested validation messages and attributes
+- 
 - 
 - 
 - 
