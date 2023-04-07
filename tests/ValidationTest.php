@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
 
@@ -19,14 +19,15 @@ use function PHPUnit\Framework\assertFalse;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 
 use Spatie\LaravelData\Attributes\MapInputName;
-use Spatie\LaravelData\Attributes\MapName;
 
+use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 
 use Spatie\LaravelData\Attributes\Validation\Bail;
-use Spatie\LaravelData\Attributes\Validation\Exists;
 
+use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\In;
+
 use Spatie\LaravelData\Attributes\Validation\IntegerType;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
@@ -39,8 +40,8 @@ use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-
 use Spatie\LaravelData\DataPipeline;
+
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
@@ -52,6 +53,7 @@ use Spatie\LaravelData\Normalizers\ArrayNormalizer;
 use Spatie\LaravelData\Normalizers\ModelNormalizer;
 use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
@@ -1968,6 +1970,41 @@ it('can validate a payload for a data object and create one', function () {
     assertFalse(true, 'We should not end up here');
 });
 
+it('can validate a payload for a data object and create one using a magic from method', function () {
+    $dataClass = new class () extends Data {
+        public string $string;
+
+        public static function fromRequest(Request $request): self
+        {
+            $self = new self();
+
+            $self->string = strtoupper($request->input('string'));
+
+            return $self;
+        }
+    };
+
+    $data = $dataClass::validateAndCreate(
+        (new Request())->merge(['string' => 'hello world']),
+    );
+
+    expect($data)
+        ->string->toBe('HELLO WORLD')
+        ->string->not()->toBe('hello world');
+
+    try {
+        SimpleData::validateAndCreate(new Request());
+    } catch (ValidationException $exception) {
+        expect($exception->errors())->toMatchArray([
+            'string' => [__('validation.required', ['attribute' => 'string'])],
+        ]);
+
+        return;
+    }
+
+    assertFalse(true, 'We should not end up here');
+});
+
 it('can validate non-requests payloads', function () {
     $dataClass = new class () extends Data {
         public static bool $validateAllTypes = false;
@@ -2001,6 +2038,8 @@ it('can validate non-requests payloads', function () {
 
     expect($data)->toBeInstanceOf(Data::class)
         ->string->toEqual('nowp');
+
+    app(DataConfig::class)->reset();
 
     $dataClass::$validateAllTypes = true;
 
@@ -2104,4 +2143,29 @@ it('can handle a string as (wrong) payload', function () {
         ->assertErrors([
             'simple' => 'hello-world',
         ]);
+});
+
+it('can use laravel-data validation rules in laravel validator', function () {
+    $rules = [new Required(), new StringType(), new Max(10)];
+
+    $validatorToPass = ValidatorFacade::make(
+        [
+            'property' => 'test',
+        ],
+        [
+            'property' => $rules,
+        ],
+    );
+
+    $validatorToFail = ValidatorFacade::make(
+        [
+            'property' => 'testLongerText',
+        ],
+        [
+            'property' => $rules,
+        ],
+    );
+
+    expect($validatorToPass->passes())->toBeTrue()
+        ->and($validatorToFail->passes())->toBeFalse();
 });

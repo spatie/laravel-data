@@ -51,6 +51,8 @@ class SongController{
 When creating a data object from a request, the package can also validate the values from the request that will be used
 to construct the data object.
 
+Be aware, first the rules will be generated from the data object you're trying to create, then if the validation is successful a data object will be created with the validated data. This means validation will be run before a data object exists. 
+
 It is possible to add rules as attributes to properties of a data object:
 
 ```php
@@ -389,11 +391,11 @@ Rule inferrers are configured in the `data.php` config file:
  * the type of the property.
  */
 'rule_inferrers' => [
-    Spatie\LaravelData\Normalizers\ModelNormalizer::class,
-    Spatie\LaravelData\Normalizers\ArrayableNormalizer::class,
-    Spatie\LaravelData\Normalizers\ObjectNormalizer::class,
-    Spatie\LaravelData\Normalizers\ArrayNormalizer::class,
-    Spatie\LaravelData\Normalizers\JsonNormalizer::class,
+    Spatie\LaravelData\RuleInferrers\SometimesRuleInferrer::class,
+    Spatie\LaravelData\RuleInferrers\NullableRuleInferrer::class,
+    Spatie\LaravelData\RuleInferrers\RequiredRuleInferrer::class,
+    Spatie\LaravelData\RuleInferrers\BuiltInTypesRuleInferrer::class,
+    Spatie\LaravelData\RuleInferrers\AttributesRuleInferrer::class,
 ],
 ```
 
@@ -699,7 +701,7 @@ SongData::validateAndCreate(['title' => 'Never gonna give you up', 'artist' => '
 You can retrieve the validation rules a data object will generate as such:
 
 ```php
-AlbumData::getValidationRules($payload;
+AlbumData::getValidationRules($payload);
 ```
 
 This will produce the following array with rules:

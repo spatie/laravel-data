@@ -49,13 +49,20 @@ class DataMethod
             return null;
         }
 
-        $parameters = collect($method->getParameters())->map(function (ReflectionParameter $parameter) use ($method, $properties) {
-            if ($parameter->isPromoted()) {
-                return $properties->get($parameter->name);
-            }
+        $parameters = collect($method->getParameters())
+            ->map(function (ReflectionParameter $parameter) use ($method, $properties) {
+                if (! $parameter->isPromoted()) {
+                    return DataParameter::create($parameter, $method->class);
+                }
 
-            return DataParameter::create($parameter, $method->class);
-        });
+                if ($properties->has($parameter->name)) {
+                    return $properties->get($parameter->name);
+                }
+
+                return null;
+            })
+            ->filter()
+            ->values();
 
         return new self(
             '__construct',
@@ -129,10 +136,5 @@ class DataMethod
         }
 
         return true;
-    }
-
-    public function returns(string $type): bool
-    {
-        return $this->returnType->acceptsType($type);
     }
 }

@@ -10,6 +10,7 @@ use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithCastable;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Concerns\AppendableData;
@@ -29,6 +30,10 @@ use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Lazy\InertiaLazy;
+use Spatie\LaravelData\Support\PartialTrees;
+use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
+use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
+use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastable;
 use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
@@ -620,6 +625,46 @@ it('can append data via method overwriting', function () {
     ]);
 });
 
+it('can append data via method overwriting with closures', function () {
+    $data = new class ('Freek') extends Data {
+        public function __construct(public string $name)
+        {
+        }
+
+        public function with(): array
+        {
+            return ['alt_name' => static function (self $data) {
+                return $data->name . ' from Spatie via closure';
+            }];
+        }
+    };
+
+    expect($data->toArray())->toMatchArray([
+        'name' => 'Freek',
+        'alt_name' => 'Freek from Spatie via closure',
+    ]);
+});
+
+test('when using additional method and with method additional method gets priority', function () {
+    $data = new class ('Freek') extends Data {
+        public function __construct(public string $name)
+        {
+        }
+
+        public function with(): array
+        {
+            return ['alt_name' => static function (self $data) {
+                return $data->name . ' from Spatie via closure';
+            }];
+        }
+    };
+
+    expect($data->additional(['alt_name' => 'I m Freek from additional'])->toArray())->toMatchArray([
+        'name' => 'Freek',
+        'alt_name' => 'I m Freek from additional',
+    ]);
+});
+
 it('can get the data object without mapping properties names', function () {
     $data = new class ('Freek') extends Data {
         public function __construct(
@@ -970,7 +1015,7 @@ it('can use a custom transformer', function () {
             public Data $nestedData,
             #[
                 WithTransformer(ConfidentialDataCollectionTransformer::class),
-            DataCollectionOf(SimpleData::class)
+                DataCollectionOf(SimpleData::class)
             ]
             public array $nestedDataCollection,
         ) {
@@ -1048,6 +1093,21 @@ it('can cast data object and collections using a custom cast', function () {
         ->nestedData->toEqual(SimpleData::from('CONFIDENTIAL'))
         ->and($dataWithCustomCasts)
         ->nestedDataCollection->toEqual(SimpleData::collect(['CONFIDENTIAL', 'CONFIDENTIAL']));
+});
+
+it('can cast data object with a castable property using anonymous class', function () {
+    $dataWithCastablePropertyClass = new class (new SimpleCastable('')) extends Data {
+        public function __construct(
+            #[WithCastable(SimpleCastable::class)]
+            public SimpleCastable $castableData,
+        ) {
+        }
+    };
+
+    $dataWithCastableProperty = $dataWithCastablePropertyClass::from(['castableData' => 'HELLO WORLD']);
+
+    expect($dataWithCastableProperty)
+        ->castableData->toEqual(new SimpleCastable('HELLO WORLD'));
 });
 
 it('can cast built-in types with custom casts', function () {
@@ -1218,7 +1278,7 @@ it('can map transformed property names', function () {
             public array $nested_collection,
             #[
                 MapOutputName('nested_other_collection'),
-            DataCollectionOf(SimpleDataWithMappedProperty::class)
+                DataCollectionOf(SimpleDataWithMappedProperty::class)
             ]
             public array $nested_renamed_collection,
         ) {

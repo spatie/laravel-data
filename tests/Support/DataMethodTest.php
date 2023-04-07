@@ -15,6 +15,7 @@ it('can create a data method from a constructor', function () {
     $class = new class () extends Data {
         public function __construct(
             public string $promotedProperty = 'hello',
+            protected string $protectedPromotedProperty = 'hello',
             string $property = 'hello',
         ) {
         }

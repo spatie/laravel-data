@@ -14,6 +14,42 @@ All notable changes to `laravel-data` will be documented in this file.
 - Allow creating data objects using `from` without parameters
 - Add support for a Dto and Resource object
 
+## 3.3.3 - 2023-04-03
+
+- revert: Fix usage of properties' mapped output names in 'only', 'except', 'includes', and 'excludes' operations (https://github.com/spatie/laravel-data/pull/393)
+
+## 3.2.2 - 2023-03-30
+
+- Fix issue when validating and creating a data object was impossible to use magic creation methods
+- Fix usage of properties' mapped output names in 'only', 'except', 'includes', and 'excludes' operations (#393)
+- Add some extra documentation
+
+## 3.2.1 - 2023-03-24
+
+- Introduce FormRequestNormalizer (#380)
+- Add support for models without all columns (#385)
+
+## 3.2.0 - 2023-03-17
+
+- Add benchmarks for testing data performance
+- Add some performance improvements for data creation and transformation
+
+## 3.1.3 - 2023-03-16
+
+- Performance improvements
+
+## 3.1.2 - 2023-03-10
+
+- Fix issue where promoted protected constructor parameters were seen as possible property canidates
+- Allow using closures within the with method (#372)
+- Add support for Validation Rule Contract in Rule rule (#362)
+- Allow laravel-data validation rules to be used in Laravel validator (#375)
+
+## 3.1.1 - 2023-03-02
+
+- Add WithCastable attribute (#349)
+- Quote non-standard object keys when transforming to Typescript (#367)
+
 ## 3.1.0 - 2023-02-10
 
 - Allow filling props from route parameters (#341)

@@ -81,6 +81,10 @@ class DataTypeScriptTransformer extends DtoTransformer
 
                 $propertyName = $dataProperty->outputMappedName ?? $dataProperty->name;
 
+                if (! preg_match('/^[$_a-zA-Z][$_a-zA-Z0-9]*$/', $propertyName)) {
+                    $propertyName = "'{$propertyName}'";
+                }
+
                 return $isOptional
                     ? "{$carry}{$propertyName}?: {$transformed};" . PHP_EOL
                     : "{$carry}{$propertyName}: {$transformed};" . PHP_EOL;

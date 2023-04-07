@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Support;
 use Illuminate\Support\Collection;
 use ReflectionAttribute;
 use ReflectionProperty;
-use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\GetsCast;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\Cast;
@@ -72,7 +72,7 @@ class DataProperty
             isReadonly: $property->isReadOnly(),
             hasDefaultValue: $property->isPromoted() ? $hasDefaultValue : $property->hasDefaultValue(),
             defaultValue: $property->isPromoted() ? $defaultValue : $property->getDefaultValue(),
-            cast: $attributes->first(fn (object $attribute) => $attribute instanceof WithCast)?->get(),
+            cast: $attributes->first(fn (object $attribute) => $attribute instanceof GetsCast)?->get(),
             transformer: $attributes->first(fn (object $attribute) => $attribute instanceof WithTransformer)?->get(),
             inputMappedName: $inputMappedName,
             outputMappedName: $outputMappedName,

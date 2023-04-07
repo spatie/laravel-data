@@ -16,19 +16,25 @@ class ModelNormalizer implements Normalizer
         $properties = $value->toArray();
 
         foreach ($value->getDates() as $key) {
-            $properties[$key] = $value->getAttribute($key);
+            if (isset($properties[$key])) {
+                $properties[$key] = $value->getAttribute($key);
+            }
         }
 
         foreach ($value->getCasts() as $key => $cast) {
             if ($this->isDateCast($cast)) {
-                $properties[$key] = $value->getAttribute($key);
+                if (isset($properties[$key])) {
+                    $properties[$key] = $value->getAttribute($key);
+                }
             }
         }
 
         foreach ($value->getRelations() as $key => $relation) {
             $key = $value::$snakeAttributes ? Str::snake($key) : $key;
 
-            $properties[$key] = $relation;
+            if (isset($properties[$key])) {
+                $properties[$key] = $relation;
+            }
         }
 
         foreach ($value->getMutatedAttributes() as $key) {

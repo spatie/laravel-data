@@ -4,20 +4,21 @@ namespace Spatie\LaravelData\Attributes;
 
 use Attribute;
 use Spatie\LaravelData\Casts\Cast;
+use Spatie\LaravelData\Casts\Castable;
 use Spatie\LaravelData\Exceptions\CannotCreateCastAttribute;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY)]
-class WithCast implements GetsCast
+class WithCastable implements GetsCast
 {
     public array $arguments;
 
     public function __construct(
-        /** @var class-string<\Spatie\LaravelData\Casts\Cast> $castClass */
-        public string $castClass,
+        /** @var class-string<\Spatie\LaravelData\Casts\Castable> $castableClass */
+        public string $castableClass,
         mixed ...$arguments
     ) {
-        if (! is_a($this->castClass, Cast::class, true)) {
-            throw CannotCreateCastAttribute::notACast();
+        if (! is_a($this->castableClass, Castable::class, true)) {
+            throw CannotCreateCastAttribute::notACastable();
         }
 
         $this->arguments = $arguments;
@@ -25,6 +26,6 @@ class WithCast implements GetsCast
 
     public function get(): Cast
     {
-        return new ($this->castClass)(...$this->arguments);
+        return $this->castableClass::dataCastUsing(...$this->arguments);
     }
 }

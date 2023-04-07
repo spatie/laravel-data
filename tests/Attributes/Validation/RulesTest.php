@@ -9,6 +9,7 @@ use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Spatie\LaravelData\Tests\Fakes\Rules\CustomInvokableLaravelRule;
 use Spatie\LaravelData\Tests\Fakes\Rules\CustomLaravelRule;
+use Spatie\LaravelData\Tests\Fakes\Rules\CustomLaravelValidationRule;
 use Spatie\TestTime\TestTime;
 
 beforeEach(function () {
@@ -88,3 +89,26 @@ it('can use the Rule rule with invokable rules', function () {
         'required',
     ]);
 });
+
+it('can use the Rule rule with validation rule contract', function () {
+    $rule = new Rule(
+        'test',
+        ['a', 'b', 'c'],
+        'x|y',
+        new CustomLaravelValidationRule(),
+        new Required()
+    );
+
+    expect(app(RuleDenormalizer::class)->execute($rule, ValidationPath::create()))->toMatchArray([
+        'test',
+        'a',
+        'b',
+        'c',
+        'x',
+        'y',
+        new CustomLaravelValidationRule(),
+        'required',
+    ]);
+})->skip(
+    fn () => version_compare(app()->version(), '10.0.0', '<')
+);
