@@ -49,11 +49,11 @@ class DataBench
     {
         $data = new MultiNestedData(
             new NestedData(new SimpleData('Hello')),
-            new DataCollection(NestedData::class, [
+            [
                 new NestedData(new SimpleData('I')),
                 new NestedData(new SimpleData('am')),
                 new NestedData(new SimpleData('groot')),
-            ])
+            ]
         );
 
         $data->toArray();
@@ -85,10 +85,17 @@ class DataBench
                     ['string' => 'you'],
                     ['string' => 'up'],
                 ],
+                'nestedArray' => [
+                    ['string' => 'never'],
+                    ['string' => 'gonna'],
+                    ['string' => 'give'],
+                    ['string' => 'you'],
+                    ['string' => 'up'],
+                ],
             ]
         )->all();
 
-        ComplicatedData::collection($collection);
+        ComplicatedData::collect($collection, DataCollection::class);
     }
 
     #[Revs(500), Iterations(2)]
@@ -113,11 +120,16 @@ class DataBench
                     new NestedData(new SimpleData('I')),
                     new NestedData(new SimpleData('am')),
                     new NestedData(new SimpleData('groot')),
-                ])
+                ]),
+                [
+                    new NestedData(new SimpleData('I')),
+                    new NestedData(new SimpleData('am')),
+                    new NestedData(new SimpleData('groot')),
+                ],
             )
         )->all();
 
-        $collection = ComplicatedData::collection($collection);
+        $collection = ComplicatedData::collect($collection, DataCollection::class);
 
         $collection->toArray();
     }
