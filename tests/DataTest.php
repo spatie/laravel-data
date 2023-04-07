@@ -63,6 +63,7 @@ use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataCollectionTransf
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
 use Spatie\LaravelData\Tests\Fakes\UlarData;
+use Spatie\LaravelData\Tests\Fakes\UnionData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\WithData;
 
@@ -2354,4 +2355,22 @@ it('can write collection logic in a class', function () {
             $dataClass::from('b'),
             $dataClass::from('c'),
         ]);
+});
+
+it('can fetch lazy union data', function () {
+    $data = UnionData::from(1);
+
+    expect($data->id)->toBe(1);
+    expect($data->simple->string)->toBe('A');
+    expect($data->dataCollection->toCollection()->pluck('string')->toArray())->toBe(['B', 'C']);
+    expect($data->fakeModel->string)->toBe('lazy');
+});
+
+it('can fetch non-lazy union data', function () {
+    $data = UnionData::from('A');
+
+    expect($data->id)->toBe(1);
+    expect($data->simple->string)->toBe('A');
+    expect($data->dataCollection->toCollection()->pluck('string')->toArray())->toBe(['B', 'C']);
+    expect($data->fakeModel->string)->toBe('non-lazy');
 });

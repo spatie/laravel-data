@@ -14,6 +14,14 @@ All notable changes to `laravel-data` will be documented in this file.
 - Allow creating data objects using `from` without parameters
 - Add support for a Dto and Resource object
 
+## 3.4.1 - 2023-04-07
+
+- reverted the reverted #393 branch
+
+## 3.4.0 - 2023-04-07
+
+- Allow to fetch Lazy data properties in unified way (#403)
+
 ## 3.3.3 - 2023-04-03
 
 - revert: Fix usage of properties' mapped output names in 'only', 'except', 'includes', and 'excludes' operations (https://github.com/spatie/laravel-data/pull/393)
@@ -61,12 +69,11 @@ All notable changes to `laravel-data` will be documented in this file.
 ## 3.0.0 - 2023-02-01
 
 - The validation logic is completely rewritten
-- - Add support for nested nullable and optional data objects
-- - Allow referencing other fields in validation attributes when the data is nested
-- - Allow referencing url parameters (and even model properties) in validation attributes
-- - Allow circular dependencies when validating data
-- - Add support for nested validation messages and attributes
-- 
+- Add support for nested nullable and optional data objects
+- Allow referencing other fields in validation attributes when the data is nested
+- Allow referencing url parameters (and even model properties) in validation attributes
+- Allow circular dependencies when validating data
+- Add support for nested validation messages and attributes
 - Package specific properties are renamed to avoid conflicts
 - Serialization logic updated to only serialize your properties
 - Prevent fatal error when passing a string containing only an integer to JSON Normalizer (#322)

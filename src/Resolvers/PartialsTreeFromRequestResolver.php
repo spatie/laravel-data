@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Support\AllowedPartialsParser;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\PartialsParser;
@@ -24,29 +25,35 @@ class PartialsTreeFromRequestResolver
         BaseData|BaseDataCollectable $data,
         Request $request,
     ): PartialTransformationContext {
-        $requestedIncludesTree = $this->partialsParser->execute(
-            $request->has('include') ? $this->arrayFromRequest($request, 'include') : []
-        );
-        $requestedExcludesTree = $this->partialsParser->execute(
-            $request->has('exclude') ? $this->arrayFromRequest($request, 'exclude') : []
-        );
-        $requestedOnlyTree = $this->partialsParser->execute(
-            $request->has('only') ? $this->arrayFromRequest($request, 'only') : []
-        );
-        $requestedExceptTree = $this->partialsParser->execute(
-            $request->has('except') ? $this->arrayFromRequest($request, 'except') : []
-        );
-
-        $dataClass = match (true) {
+        $dataClass = $this->dataConfig->getDataClass(match (true) {
             $data instanceof BaseData => $data::class,
             $data instanceof BaseDataCollectable => $data->getDataClass(),
             default => throw new TypeError('Invalid type of data')
-        };
+        });
 
-        $allowedRequestIncludesTree = $this->allowedPartialsParser->execute('allowedRequestIncludes', $this->dataConfig->getDataClass($dataClass));
-        $allowedRequestExcludesTree = $this->allowedPartialsParser->execute('allowedRequestExcludes', $this->dataConfig->getDataClass($dataClass));
-        $allowedRequestOnlyTree = $this->allowedPartialsParser->execute('allowedRequestOnly', $this->dataConfig->getDataClass($dataClass));
-        $allowedRequestExceptTree = $this->allowedPartialsParser->execute('allowedRequestExcept', $this->dataConfig->getDataClass($dataClass));
+        $mapping = $dataClass->outputNameMapping->resolve();
+
+        $requestedIncludesTree = $this->partialsParser->execute(
+            $request->has('include') ? $this->arrayFromRequest($request, 'include') : [],
+            $mapping
+        );
+        $requestedExcludesTree = $this->partialsParser->execute(
+            $request->has('exclude') ? $this->arrayFromRequest($request, 'exclude') : [],
+            $mapping
+        );
+        $requestedOnlyTree = $this->partialsParser->execute(
+            $request->has('only') ? $this->arrayFromRequest($request, 'only') : [],
+            $mapping
+        );
+        $requestedExceptTree = $this->partialsParser->execute(
+            $request->has('except') ? $this->arrayFromRequest($request, 'except') : [],
+            $mapping
+        );
+
+        $allowedRequestIncludesTree = $this->allowedPartialsParser->execute('allowedRequestIncludes', $dataClass);
+        $allowedRequestExcludesTree = $this->allowedPartialsParser->execute('allowedRequestExcludes', $dataClass);
+        $allowedRequestOnlyTree = $this->allowedPartialsParser->execute('allowedRequestOnly', $dataClass);
+        $allowedRequestExceptTree = $this->allowedPartialsParser->execute('allowedRequestExcept', $dataClass);
 
         return new PartialTransformationContext(
             $requestedIncludesTree->intersect($allowedRequestIncludesTree),

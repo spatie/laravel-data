@@ -9,8 +9,12 @@ use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\TreeNode;
+use Spatie\LaravelData\Tests\Fakes\CircData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
+use Spatie\LaravelData\Tests\Fakes\SimpleChildDataWithMappedOutputName;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedOutputName;
+use Spatie\LaravelData\Tests\Fakes\UlarData;
 
 beforeEach(function () {
     $this->resolver = resolve(PartialsTreeFromRequestResolver::class);
@@ -211,4 +215,52 @@ it('handles parsing includes from request', function (array $input, array $expec
         'input' => ['include' => 'artist,name'],
         'expected' => ['artist', 'name'],
     ];
+});
+
+it('handles parsing except from request with mapped output name', function () {
+    $dataclass = SimpleDataWithMappedOutputName::from([
+        'id' => 1,
+        'amount' => 1000,
+        'any_string' => 'test',
+        'child' => SimpleChildDataWithMappedOutputName::from([
+            'id' => 2,
+            'amount' => 2000,
+        ]),
+    ]);
+
+    $request = request()->merge(['except' => ['paid_amount', 'any_string', 'child.child_amount']]);
+
+    $data = $dataclass->toResponse($request)->getData(assoc: true);
+
+    expect($data)->toMatchArray([
+        'id' => 1,
+        'child' => [
+            'id' => 2,
+        ],
+    ]);
+});
+
+it('handles circular dependencies', function () {
+    $dataClass = new CircData(
+        'test',
+        new UlarData(
+            'test',
+            new CircData('test', null)
+        )
+    );
+
+    $data = $dataClass->toResponse(request())->getData(assoc: true);
+
+    expect($data)->toBe([
+        'string' => 'test',
+        'ular' => [
+            'string' => 'test',
+            'circ' => [
+                'string' => 'test',
+                'ular' => null,
+            ],
+        ],
+    ]);
+
+    // Not really a test with expectation, we just want to check we don't end up in an infinite loop
 });
