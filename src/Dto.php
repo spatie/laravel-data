@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData;
 
 use Spatie\LaravelData\Concerns\BaseData;
-use Spatie\LaravelData\Concerns\ContextableData;
 use Spatie\LaravelData\Concerns\DefaultableData;
 use Spatie\LaravelData\Concerns\ValidateableData;
 use Spatie\LaravelData\Contracts\BaseData as BaseDataContract;

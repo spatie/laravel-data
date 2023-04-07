@@ -25,9 +25,9 @@ trait ResponsableData
             ->get($this)
             ->mergePartials(
                 PartialTransformationContext::create(
-                $this,
-                $this->getDataContext()->partialsDefinition
-            )
+                    $this,
+                    $this->getDataContext()->partialsDefinition
+                )
             );
 
         $context = $this instanceof IncludeableDataContract
