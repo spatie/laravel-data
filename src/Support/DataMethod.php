@@ -137,4 +137,9 @@ class DataMethod
 
         return true;
     }
+
+    public function returns(string $type): bool
+    {
+        return $this->returnType->acceptsType($type);
+    }
 }
