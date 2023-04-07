@@ -2283,27 +2283,17 @@ it('during the serialization process some properties are thrown away', function 
 it('can fetch lazy union data', function () {
     $data = UnionData::from(1);
 
-    expect($data->id)
-        ->toBe(1)
-        ->and($data->simple->string)
-        ->toBe('A')
-        ->and($data->dataCollection->toCollection()->pluck('string')->toArray())
-        ->toBe(['B', 'C'])
-        ->and($data->fakeModel->string)
-        ->toBe('lazy')
-    ;
+    expect($data->id)->toBe(1);
+    expect($data->simple->string)->toBe('A');
+    expect($data->dataCollection->toCollection()->pluck('string')->toArray())->toBe(['B', 'C']);
+    expect($data->fakeModel->string)->toBe('lazy');
 });
 
 it('can fetch non-lazy union data', function () {
     $data = UnionData::from('A');
 
-    expect($data->id)
-        ->toBe(1)
-        ->and($data->simple->string)
-        ->toBe('A')
-        ->and($data->dataCollection->toCollection()->pluck('string')->toArray())
-        ->toBe(['B', 'C'])
-        ->and($data->fakeModel->string)
-        ->toBe('non-lazy')
-    ;
+    expect($data->id)->toBe(1);
+    expect($data->simple->string)->toBe('A');
+    expect($data->dataCollection->toCollection()->pluck('string')->toArray())->toBe(['B', 'C']);
+    expect($data->fakeModel->string)->toBe('non-lazy');
 });
