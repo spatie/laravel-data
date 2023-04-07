@@ -18,9 +18,9 @@ use Spatie\LaravelData\Contracts\ValidateableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
+use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
 use Spatie\LaravelData\Support\Lazy\CachedLazy;
 use Spatie\LaravelData\Support\NameMapping\DataClassNameMapping;
-use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
 
 /**
  * @property  class-string<DataObject> $name
