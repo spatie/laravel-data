@@ -34,9 +34,7 @@ class PartialsTreeFromRequestResolver
 
         $dataClass = $this->dataConfig->getDataClass($dataClass);
 
-        $mapping = $dataClass->outputNameMapping instanceof Lazy
-            ? $dataClass->outputNameMapping->resolve()
-            : $dataClass->outputNameMapping;
+        $mapping = $dataClass->outputNameMapping->resolve();
 
         $requestedIncludesTree = $this->partialsParser->execute(
             $request->has('include') ? $this->arrayFromRequest($request, 'include') : [],

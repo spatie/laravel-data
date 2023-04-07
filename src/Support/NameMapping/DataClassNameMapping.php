@@ -34,8 +34,6 @@ class DataClassNameMapping
 
         $outputNameMapping = $dataConfig->getDataClass($dataClass)->outputNameMapping;
 
-        return $outputNameMapping instanceof CachedLazy
-            ? $outputNameMapping->resolve()
-            : $outputNameMapping;
+        return $outputNameMapping->resolve();
     }
 }
