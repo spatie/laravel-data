@@ -1,6 +1,11 @@
 <?php
 
+use Spatie\LaravelData\Support\DataClass;
+use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\NameMapping\PartialTreesNameMapper;
+use Spatie\LaravelData\Support\NameMapping\PartialTreesNameMapping;
 use Spatie\LaravelData\Support\PartialsParser;
+use Spatie\LaravelData\Support\PartialTreesMapping;
 use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
@@ -15,6 +20,7 @@ it('can parse directives', function (array $partials, TreeNode $expected) {
     yield from invalidPartialsProvider();
     yield from complexPartialsProvider();
 });
+
 
 function rootPartialsProvider(): Generator
 {
@@ -184,3 +190,104 @@ function complexPartialsProvider(): Generator
         ]),
     ];
 }
+
+it('can parse directives with mapping', function (array $partials, TreeNode $expected) {
+    $fakeMapper = new class extends PartialTreesNameMapper {
+        public function __construct()
+        {
+            // Fake
+        }
+
+        public function getMapping(string|DataClass $dataClass): PartialTreesNameMapping
+        {
+            if ($dataClass === 'root') {
+                return new PartialTreesNameMapping(
+                    $this,
+                    [
+                        'naam' => 'name',
+                        'leeftijd' => 'age',
+                        'geslacht' => 'gender',
+                        'structuur' => 'struct',
+                    ],
+                    [
+                        'struct' => 'struct_data_class',
+                    ]
+                );
+            }
+
+            if ($dataClass === 'struct_data_class') {
+                return new PartialTreesNameMapping(
+                    $this,
+                    [
+                        'naam' => 'name',
+                        'leeftijd' => 'age',
+                        'geslacht' => 'gender',
+                    ],
+                    []
+                );
+            }
+
+            throw new Exception('Outside test scope');
+        }
+    };
+
+    expect((new PartialsParser()))
+        ->execute($partials, $fakeMapper->getMapping('root'))
+        ->toEqual($expected);
+})->with(function () {
+    yield "empty" => [
+        'partials' => [],
+        'expected' => new DisabledTreeNode(),
+    ];
+
+    yield "all mapped" => [
+        'partials' => [
+            'naam',
+            '{leeftijd, geslacht}',
+            'structuur.naam',
+            'structuur.{leeftijd, geslacht}',
+        ],
+        'expected' => new PartialTreeNode([
+            'name' => new ExcludedTreeNode(),
+            'age' => new ExcludedTreeNode(),
+            'gender' => new ExcludedTreeNode(),
+            'struct' => new PartialTreeNode([
+                'name' => new ExcludedTreeNode(),
+                'age' => new ExcludedTreeNode(),
+                'gender' => new ExcludedTreeNode(),
+            ]),
+        ]),
+    ];
+
+    yield "some mapped, some not + non defined mappings" => [
+        'partials' => [
+            'name',
+            'bio',
+            '{leeftijd, gender}',
+            'structuur.name',
+            'struct.bio',
+            'structuur.{leeftijd, gender}',
+        ],
+        'expected' => new PartialTreeNode([
+            'name' => new ExcludedTreeNode(),
+            'bio' => new ExcludedTreeNode(),
+            'age' => new ExcludedTreeNode(),
+            'gender' => new ExcludedTreeNode(),
+            'struct' => new PartialTreeNode([
+                'name' => new ExcludedTreeNode(),
+                'bio' => new ExcludedTreeNode(),
+                'age' => new ExcludedTreeNode(),
+                'gender' => new ExcludedTreeNode(),
+            ]),
+        ]),
+    ];
+
+    yield "star operator" => [
+        'partials' => [
+            'structuur.*',
+        ],
+        'expected' => new PartialTreeNode([
+            'struct' => new AllTreeNode(),
+        ]),
+    ];
+});
