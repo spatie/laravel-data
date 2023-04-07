@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support\NameMapping;
 
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\Lazy\CachedLazy;
 
 class DataClassNameMapping
 {
