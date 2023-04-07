@@ -17,12 +17,15 @@ use Spatie\LaravelData\Contracts\ValidateableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
+use Spatie\LaravelData\Support\Lazy\CachedLazy;
+use Spatie\LaravelData\Support\NameMapping\DataClassNameMapping;
 
 /**
  * @property  class-string<DataObject> $name
  * @property  Collection<string, DataProperty> $properties
  * @property  Collection<string, DataMethod> $methods
  * @property  Collection<string, object> $attributes
+ * @property CachedLazy<DataClassNameMapping> $outputNameMapping
  */
 class DataClass
 {
@@ -39,6 +42,7 @@ class DataClass
         public readonly bool $validateable,
         public readonly bool $wrappable,
         public readonly Collection $attributes,
+        public readonly CachedLazy $outputNameMapping,
     ) {
     }
 
@@ -70,7 +74,8 @@ class DataClass
             transformable: $class->implementsInterface(TransformableData::class),
             validateable: $class->implementsInterface(ValidateableData::class),
             wrappable: $class->implementsInterface(WrappableData::class),
-            attributes:  $attributes,
+            attributes: $attributes,
+            outputNameMapping: new CachedLazy(fn () => self::resolveOutputNameMapping($properties)),
         );
     }
 
@@ -123,6 +128,30 @@ class DataClass
         return array_merge(
             $class->getDefaultProperties(),
             $values
+        );
+    }
+
+    protected static function resolveOutputNameMapping(
+        Collection $properties,
+    ): DataClassNameMapping {
+        $mapped = [];
+        $mappedDataObjects = [];
+
+        $properties->each(function (DataProperty $dataProperty) use (&$mapped, &$mappedDataObjects) {
+            if ($dataProperty->type->isDataObject || $dataProperty->type->isDataCollectable) {
+                $mappedDataObjects[$dataProperty->name] = $dataProperty->type->dataClass;
+            }
+
+            if ($dataProperty->outputMappedName === null) {
+                return;
+            }
+
+            $mapped[$dataProperty->outputMappedName] = $dataProperty->name;
+        });
+
+        return new DataClassNameMapping(
+            $mapped,
+            $mappedDataObjects
         );
     }
 }

@@ -1,20 +1,25 @@
 <?php
 
+use Spatie\LaravelData\Attributes\MapOutputName;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\TreeNode;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedOutputName;
 
 it('can parse directives', function (array $partials, TreeNode $expected) {
-    expect((new PartialsParser()))->execute($partials)->toEqual($expected);
+    expect(app(PartialsParser::class))->execute($partials)->toEqual($expected);
 })->with(function () {
     yield from rootPartialsProvider();
     yield from nestedPartialsProvider();
     yield from invalidPartialsProvider();
     yield from complexPartialsProvider();
 });
+
 
 function rootPartialsProvider(): Generator
 {
@@ -184,3 +189,80 @@ function complexPartialsProvider(): Generator
         ]),
     ];
 }
+
+it('can parse directives with mapping', function (array $partials, TreeNode $expected) {
+    $fakeClass = new class () extends Data {
+        #[MapOutputName('naam')]
+        public string $name;
+
+        #[MapOutputName('leeftijd')]
+        public string $age;
+
+        #[MapOutputName('geslacht')]
+        public string $gender;
+
+        #[MapOutputName('structuur')]
+        public SimpleDataWithMappedOutputName $struct;
+    };
+
+    $mapping = app(DataConfig::class)->getDataClass($fakeClass::class)->outputNameMapping->resolve();
+
+    expect(app(PartialsParser::class))
+        ->execute($partials, $mapping)
+        ->toEqual($expected);
+})->with(function () {
+    yield "empty" => [
+        'partials' => [],
+        'expected' => new DisabledTreeNode(),
+    ];
+
+    yield "all mapped" => [
+        'partials' => [
+            'naam',
+            '{leeftijd, geslacht}',
+            'structuur.any_string',
+            'structuur.{paid_amount}',
+        ],
+        'expected' => new PartialTreeNode([
+            'name' => new ExcludedTreeNode(),
+            'age' => new ExcludedTreeNode(),
+            'gender' => new ExcludedTreeNode(),
+            'struct' => new PartialTreeNode([
+                'anyString' => new ExcludedTreeNode(),
+                'amount' => new ExcludedTreeNode(),
+            ]),
+        ]),
+    ];
+
+    yield "some mapped, some not + non defined mappings" => [
+        'partials' => [
+            'name',
+            'bio',
+            '{leeftijd, gender}',
+            'structuur.anyString',
+            'struct.id',
+            'structuur.{paid_amount, child}',
+        ],
+        'expected' => new PartialTreeNode([
+            'name' => new ExcludedTreeNode(),
+            'bio' => new ExcludedTreeNode(),
+            'age' => new ExcludedTreeNode(),
+            'gender' => new ExcludedTreeNode(),
+            'struct' => new PartialTreeNode([
+                'id' => new ExcludedTreeNode(),
+                'anyString' => new ExcludedTreeNode(),
+                'amount' => new ExcludedTreeNode(),
+                'child' => new ExcludedTreeNode(),
+            ]),
+        ]),
+    ];
+
+    yield "star operator" => [
+        'partials' => [
+            'structuur.*',
+        ],
+        'expected' => new PartialTreeNode([
+            'struct' => new AllTreeNode(),
+        ]),
+    ];
+});
