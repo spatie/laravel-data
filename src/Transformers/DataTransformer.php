@@ -199,12 +199,16 @@ class DataTransformer
             return null;
         }
 
-        if (is_array($value) && ($trees->only instanceof AllTreeNode || $trees->only instanceof PartialTreeNode)) {
-            $value = Arr::only($value, $trees->only->getFields());
-        }
+        if (is_array($value)) {
+            if ($trees->only instanceof PartialTreeNode) {
+                $value = Arr::only($value, $trees->only->getFields());
+            }
 
-        if (is_array($value) && ($trees->except instanceof AllTreeNode || $trees->except instanceof PartialTreeNode)) {
-            $value = Arr::except($value, $trees->except->getFields());
+            if ($trees->except instanceof AllTreeNode) {
+                $value = [];
+            } elseif ($trees->except instanceof PartialTreeNode) {
+                $value = Arr::except($value, $trees->except->getFields());
+            }
         }
 
         if ($transformer = $this->resolveTransformerForValue($property, $value)) {
