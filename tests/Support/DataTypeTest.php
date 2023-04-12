@@ -25,6 +25,10 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataType;
+use Spatie\LaravelData\Support\Lazy\ClosureLazy;
+use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
+use Spatie\LaravelData\Support\Lazy\InertiaLazy;
+use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
@@ -44,11 +48,11 @@ it('can deduce a type without definition', function () {
     expect($type)
         ->isNullable->toBeTrue()
         ->isMixed->toBeTrue()
-        ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeFalse()
         ->dataClass->toBeNull()
+        ->lazyType->toBeNull()
         ->acceptedTypes->toBeEmpty();
 });
 
@@ -60,11 +64,11 @@ it('can deduce a type with definition', function () {
     expect($type)
         ->isNullable->toBeFalse()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeFalse()
         ->dataClass->toBeNull()
+        ->lazyType->toBeNull()
         ->acceptedTypes->toHaveKeys(['string']);
 });
 
@@ -76,7 +80,7 @@ it('can deduce a nullable type with definition', function () {
     expect($type)
         ->isNullable->toBeTrue()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeFalse()
@@ -92,7 +96,7 @@ it('can deduce a union type definition', function () {
     expect($type)
         ->isNullable->toBeFalse()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeFalse()
@@ -109,7 +113,7 @@ it('can deduce a nullable union type definition', function () {
     expect($type)
         ->isNullable->toBeTrue()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeFalse()
@@ -126,7 +130,7 @@ it('can deduce an intersection type definition', function () {
     expect($type)
         ->isNullable->toBeFalse()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeFalse()
@@ -146,7 +150,7 @@ it('can deduce a mixed type', function () {
     expect($type)
         ->isNullable->toBeTrue()
         ->isMixed->toBeTrue()
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeFalse()
@@ -163,7 +167,7 @@ it('can deduce a lazy type', function () {
     expect($type)
         ->isNullable->toBeFalse()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeFalse()
@@ -180,7 +184,7 @@ it('can deduce an optional type', function () {
     expect($type)
         ->isNullable->toBeFalse()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeTrue()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeFalse()
@@ -203,7 +207,7 @@ it('can deduce a data type', function () {
     expect($type)
         ->isNullable->toBeFalse()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->isDataObject->toBeTrue()
         ->isDataCollectable->toBeFalse()
@@ -220,7 +224,7 @@ it('can deduce a data union type', function () {
     expect($type)
         ->isNullable->toBeFalse()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->isDataObject->toBeTrue()
         ->isDataCollectable->toBeFalse()
@@ -238,7 +242,7 @@ it('can deduce a data collection type', function () {
     expect($type)
         ->isNullable->toBeFalse()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeTrue()
@@ -256,7 +260,7 @@ it('can deduce a data collection union type', function () {
     expect($type)
         ->isNullable->toBeFalse()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeTrue()
@@ -274,7 +278,7 @@ it('can deduce a paginated data collection type', function () {
     expect($type)
         ->isNullable->toBeFalse()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeTrue()
@@ -292,7 +296,7 @@ it('can deduce a paginated data collection union type', function () {
     expect($type)
         ->isNullable->toBeFalse()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeTrue()
@@ -310,7 +314,7 @@ it('can deduce a cursor paginated data collection type', function () {
     expect($type)
         ->isNullable->toBeFalse()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeTrue()
@@ -328,7 +332,7 @@ it('can deduce a cursor paginated data collection union type', function () {
     expect($type)
         ->isNullable->toBeFalse()
         ->isMixed->toBeFalse()
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->isDataObject->toBeFalse()
         ->isDataCollectable->toBeTrue()
@@ -787,3 +791,35 @@ it('cannot get the data class for invalid annotations')
             'property' => 'propertyO',
         ];
     });
+
+it('can deduce the types of lazy', function (){
+    $type = resolveDataType(new class () {
+        public SimpleData|Lazy $property;
+    });
+
+    expect($type)->lazyType->toBe(Lazy::class);
+
+    $type = resolveDataType(new class () {
+        public SimpleData|ClosureLazy $property;
+    });
+
+    expect($type)->lazyType->toBe(ClosureLazy::class);
+
+    $type = resolveDataType(new class () {
+        public SimpleData|InertiaLazy $property;
+    });
+
+    expect($type)->lazyType->toBe(InertiaLazy::class);
+
+    $type = resolveDataType(new class () {
+        public SimpleData|ConditionalLazy $property;
+    });
+
+    expect($type)->lazyType->toBe(ConditionalLazy::class);
+
+    $type = resolveDataType(new class () {
+        public SimpleData|RelationalLazy $property;
+    });
+
+    expect($type)->lazyType->toBe(RelationalLazy::class);
+});

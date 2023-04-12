@@ -26,6 +26,7 @@ class DataType implements Countable
 
     public readonly bool $isMixed;
 
+    /** @deprecated will be removed in v4, check lazyType for a more correct check */
     public readonly bool $isLazy;
 
     public readonly bool $isOptional;
@@ -40,6 +41,8 @@ class DataType implements Countable
     public readonly ?string $dataClass;
 
     public readonly array $acceptedTypes;
+
+    public readonly ?string $lazyType;
 
     public static function create(ReflectionParameter|ReflectionProperty $reflection): self
     {
@@ -60,6 +63,7 @@ class DataType implements Countable
             $this->isDataCollectable = false;
             $this->dataCollectableType = null;
             $this->dataClass = null;
+            $this->lazyType = null;
 
             return;
         }
@@ -85,6 +89,7 @@ class DataType implements Countable
             $this->isDataObject = is_a($type->getName(), BaseData::class, true);
             $this->dataCollectableType = $this->resolveDataCollectableType($type);
             $this->isDataCollectable = $this->dataCollectableType !== null;
+            $this->lazyType = null;
 
             $this->dataClass = match (true) {
                 $this->isDataObject => $type->getName(),
@@ -106,20 +111,26 @@ class DataType implements Countable
         $isOptional = false;
         $isDataObject = false;
         $dataCollectableType = null;
+        $lazyType = null;
 
         foreach ($type->getTypes() as $namedType) {
-            if ($namedType->getName() !== 'null'
-                && ! is_a($namedType->getName(), Lazy::class, true)
-                && ! is_a($namedType->getName(), Optional::class, true)
-            ) {
-                $acceptedTypes[$namedType->getName()] = $this->resolveBaseTypes($namedType->getName());
+            $namedTypeName = $namedType->getName();
+            $namedTypeIsLazy = is_a($namedTypeName, Lazy::class, true);
+            $namedTypeIsOptional = is_a($namedTypeName, Optional::class, true);
+
+            if ($namedTypeName !== 'null' && ! $namedTypeIsLazy && ! $namedTypeIsOptional) {
+                $acceptedTypes[$namedTypeName] = $this->resolveBaseTypes($namedTypeName);
+            }
+
+            if($namedTypeIsLazy){
+                $lazyType = $namedTypeName;
             }
 
             $isNullable = $isNullable || $namedType->allowsNull();
-            $isMixed = $namedType->getName() === 'mixed';
-            $isLazy = $isLazy || is_a($namedType->getName(), Lazy::class, true);
-            $isOptional = $isOptional || is_a($namedType->getName(), Optional::class, true);
-            $isDataObject = $isDataObject || is_a($namedType->getName(), BaseData::class, true);
+            $isMixed = $namedTypeName === 'mixed';
+            $isLazy = $isLazy || $namedTypeIsLazy;
+            $isOptional = $isOptional || $namedTypeIsOptional;
+            $isDataObject = $isDataObject || is_a($namedTypeName, BaseData::class, true);
             $dataCollectableType = $dataCollectableType ?? $this->resolveDataCollectableType($namedType);
         }
 
@@ -131,6 +142,7 @@ class DataType implements Countable
         $this->isDataObject = $isDataObject;
         $this->dataCollectableType = $dataCollectableType;
         $this->isDataCollectable = $this->dataCollectableType !== null;
+        $this->lazyType = $lazyType;
 
         if ($this->isDataObject && count($this->acceptedTypes) > 1) {
             throw InvalidDataType::unionWithData($reflection);
