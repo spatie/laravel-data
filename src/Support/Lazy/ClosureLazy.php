@@ -3,8 +3,6 @@
 namespace Spatie\LaravelData\Support\Lazy;
 
 use Closure;
-use Inertia\LazyProp;
-use Spatie\LaravelData\Lazy;
 
 class ClosureLazy extends ConditionalLazy
 {
