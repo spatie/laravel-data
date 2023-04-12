@@ -34,11 +34,16 @@ class SongData extends Data
     {
         return new self(
             Lazy::inertia(fn() => $song->title),
-            Lazy::inertia(fn() => $song->artist)
+            Lazy::closure(fn() => $song->artist)
         );
     }
 }
 ```
+
+We provide two kinds of lazy properties:
+
+- **Lazy::inertia()** Never included on first visit, optionally included on partial reloads
+- **Lazy::closure()** Always included on first visit, optionally included on partial reloads
 
 Now within your JavaScript code, you can include the properties as such:
 

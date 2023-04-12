@@ -21,6 +21,7 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\Lazy\ClosureLazy;
 use Spatie\LaravelData\Support\Lazy\InertiaLazy;
 use Spatie\LaravelData\Support\PartialTrees;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
@@ -325,6 +326,26 @@ it('always transforms lazy inertia data to inertia lazy props', function () {
     $data = $blueprint::create('Freek');
 
     expect($data->toArray()['name'])->toBeInstanceOf(LazyProp::class);
+});
+
+it('always transforms closure lazy into closures for inertia', function () {
+    $blueprint = new class () extends Data {
+        public function __construct(
+            public string|ClosureLazy|null $name = null
+        ) {
+        }
+
+        public static function create(string $name): static
+        {
+            return new self(
+                Lazy::closure(fn () => $name)
+            );
+        }
+    };
+
+    $data = $blueprint::create('Freek');
+
+    expect($data->toArray()['name'])->toBeInstanceOf(Closure::class);
 });
 
 it('can get the empty version of a data object', function () {

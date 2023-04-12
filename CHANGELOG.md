@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.4.2 - 2023-04-12
+
+- Add support for Lazy Closures which can be used with inertia
+
+## 3.4.1 - 2023-04-07
+
+- reverted the reverted #393 branch
+
 ## 3.4.0 - 2023-04-07
 
 - Allow to fetch Lazy data properties in unified way (#403)
@@ -62,7 +70,11 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
+- 
 - - Allow referencing other fields in validation attributes when the data is nested
+- 
+- 
 - 
 - 
 - 
@@ -80,6 +92,8 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
+- 
 - - Allow circular dependencies when validating data
 - 
 - 
@@ -89,7 +103,11 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
+- 
 - - Add support for nested validation messages and attributes
+- 
+- 
 - 
 - 
 - 
