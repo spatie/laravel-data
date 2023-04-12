@@ -4,6 +4,7 @@ namespace Spatie\LaravelData;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\LaravelData\Support\Lazy\ClosureLazy;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\DefaultLazy;
 use Spatie\LaravelData\Support\Lazy\InertiaLazy;
@@ -31,6 +32,11 @@ abstract class Lazy
     public static function inertia(Closure $value): InertiaLazy
     {
         return new InertiaLazy($value);
+    }
+
+    public static function closure(Closure $closure): ClosureLazy
+    {
+        return new ClosureLazy($closure);
     }
 
     abstract public function resolve(): mixed;
