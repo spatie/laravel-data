@@ -122,7 +122,7 @@ class DataType implements Countable
                 $acceptedTypes[$namedTypeName] = $this->resolveBaseTypes($namedTypeName);
             }
 
-            if($namedTypeIsLazy){
+            if($namedTypeIsLazy) {
                 $lazyType = $namedTypeName;
             }
 

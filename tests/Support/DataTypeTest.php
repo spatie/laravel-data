@@ -792,7 +792,7 @@ it('cannot get the data class for invalid annotations')
         ];
     });
 
-it('can deduce the types of lazy', function (){
+it('can deduce the types of lazy', function () {
     $type = resolveDataType(new class () {
         public SimpleData|Lazy $property;
     });
