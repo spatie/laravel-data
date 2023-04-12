@@ -74,8 +74,6 @@ class DataTypeScriptTransformer extends DtoTransformer
                     || ($dataProperty->type->lazyType && $dataProperty->type->lazyType !== ClosureLazy::class)
                     || $dataProperty->type->isOptional;
 
-                ray($dataProperty->type);
-
                 $transformed = $this->typeToTypeScript(
                     $type,
                     $missingSymbols,
