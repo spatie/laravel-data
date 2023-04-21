@@ -28,7 +28,7 @@ class CannotCreateData extends Exception
         $message = "Could not create `{$dataClass->name}`: the constructor requires {$dataClass->constructorMethod->parameters->count()} parameters, {$parameters->count()} given.";
 
         if ($parameters->isNotEmpty()) {
-            $message .= "Parameters given: {$parameters->keys()->join(', ')}.";
+            $message .= " Parameters given: {$parameters->keys()->join(', ')}.";
         }
 
         return new self($message, previous: $previous);
