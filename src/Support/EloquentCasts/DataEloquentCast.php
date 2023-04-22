@@ -11,12 +11,18 @@ class DataEloquentCast implements CastsAttributes
 {
     public function __construct(
         /** @var class-string<\Spatie\LaravelData\Contracts\BaseData> $dataClass */
-        protected string $dataClass
+        protected string $dataClass,
+        /** @var string[] $arguments */
+        protected array $arguments = []
     ) {
     }
 
     public function get($model, string $key, $value, array $attributes): ?BaseData
     {
+        if (is_null($value) && in_array('nullable', $this->arguments)) {
+            $value = '{}';
+        }
+
         if ($value === null) {
             return null;
         }

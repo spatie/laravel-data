@@ -139,10 +139,10 @@ class DataCollection implements DataCollectable, ArrayAccess
 
     public static function castUsing(array $arguments)
     {
-        if (count($arguments) !== 1) {
+        if (count($arguments) < 1) {
             throw CannotCastData::dataCollectionTypeRequired();
         }
 
-        return new DataCollectionEloquentCast(current($arguments), static::class);
+        return new DataCollectionEloquentCast($arguments[0], static::class, array_slice($arguments, 1));
     }
 }

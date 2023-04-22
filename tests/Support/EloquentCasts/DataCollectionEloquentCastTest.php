@@ -5,7 +5,9 @@ use Illuminate\Support\Facades\DB;
 use function Pest\Laravel\assertDatabaseHas;
 
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
+
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCustomCollectionCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithNullableCasts;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataCollection;
 
@@ -117,4 +119,17 @@ it('retrieves custom data collection', function () {
             new SimpleData('World'),
         ]
     ));
+});
+
+it('loads a custom data collection when nullable argument used and value is null in database', function () {
+    DB::table('dummy_model_with_casts')->insert([
+        'data' => null,
+    ]);
+
+    /** @var \Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithNullableCasts $model */
+    $model = DummyModelWithNullableCasts::first();
+
+    expect($model->data_collection)
+        ->toBeInstanceOf(SimpleDataCollection::class)
+        ->toBeEmpty();
 });
