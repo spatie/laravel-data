@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Exceptions;
 use Exception;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataClass;
+use Spatie\LaravelData\Support\DataProperty;
 use Throwable;
 
 class CannotCreateData extends Exception
@@ -28,7 +29,12 @@ class CannotCreateData extends Exception
         $message = "Could not create `{$dataClass->name}`: the constructor requires {$dataClass->constructorMethod->parameters->count()} parameters, {$parameters->count()} given.";
 
         if ($parameters->isNotEmpty()) {
-            $message .= " Parameters given: {$parameters->keys()->join(', ')}.";
+            $message .= " Parameters given: {$parameters->keys()->join(', ')}. Parameters missing: {$dataClass
+                ->constructorMethod
+                ->parameters
+                ->reject(fn (DataProperty $parameter) => $parameters->has($parameter->name))
+                ->map(fn (DataProperty $parameter) => $parameter->name)
+                ->join(', ')}";
         }
 
         return new self($message, previous: $previous);
