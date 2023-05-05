@@ -487,8 +487,8 @@ it('can return a sole data object without specifying an operator', function () {
 });
 
 test('a collection can be merged', function () {
-    $collectionA = SimpleData::collection(['A', 'B']);
-    $collectionB = SimpleData::collection(['C', 'D']);
+    $collectionA = SimpleData::collect(collect(['A', 'B']));
+    $collectionB = SimpleData::collect(collect(['C', 'D']));
 
     $filtered = $collectionA->merge($collectionB)->toArray();
 

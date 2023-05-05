@@ -29,7 +29,7 @@ function assertMatchesSnapshot($actual, Driver $driver = null): void
 it('can convert a data object to Typescript', function () {
     $config = TypeScriptTransformerConfig::create();
 
-    $data = new class (null, Optional::create(), 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn () => 'Lazy'), SimpleData::from('Simple data'), new DataCollection(SimpleData::class, []), new DataCollection(SimpleData::class, []), new DataCollection(SimpleData::class, [])) extends Data {
+    $data = new class (null, Optional::create(), 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn () => 'Lazy'), Lazy::closure(fn () => 'Lazy'), SimpleData::from('Simple data'), new DataCollection(SimpleData::class, []), new DataCollection(SimpleData::class, []), new DataCollection(SimpleData::class, [])) extends Data {
         public function __construct(
             public null|int $nullable,
             public Optional|int $undefineable,
@@ -217,7 +217,9 @@ it('it respects a TypeScript class optional attribute', function () {
             public string $name,
         ) {
         }
-    };
+    }
+
+    ;
 
     $transformer = new DataTypeScriptTransformer($config);
     $reflection = new ReflectionClass(DummyTypeScriptOptionalClass::class);

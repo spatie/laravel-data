@@ -62,7 +62,7 @@ class DataTypeFactory
     {
         return new DataType(
             new UndefinedType(),
-            false,
+            null,
             false,
             DataTypeKind::Default,
             null,
@@ -104,7 +104,7 @@ class DataTypeFactory
 
         return new DataType(
             type: $type,
-            isLazy: false,
+            lazyType: null,
             isOptional: false,
             kind: $kind,
             dataClass: $dataClass,
@@ -123,14 +123,18 @@ class DataTypeFactory
             ReflectionIntersectionType::class => IntersectionType::create($multiReflectionType, $class),
         };
 
-        $isLazy = false;
         $isOptional = false;
         $kind = DataTypeKind::Default;
         $dataClass = null;
         $dataCollectableClass = null;
+        $lazyType = null;
+
 
         foreach ($type->types as $subType) {
-            $isLazy = $isLazy || $subType->isLazy();
+            if($subType->isLazy()){
+                $lazyType = $subType->name;
+            }
+
             $isOptional = $isOptional || $subType->isOptional();
 
             if (($subType->builtIn === false || $subType->name === 'array')
@@ -163,7 +167,7 @@ class DataTypeFactory
 
         return new DataType(
             type: $type,
-            isLazy: $isLazy,
+            lazyType: $lazyType,
             isOptional: $isOptional,
             kind: $kind,
             dataClass: $dataClass,

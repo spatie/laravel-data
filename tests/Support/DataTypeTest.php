@@ -303,7 +303,7 @@ it('can deduce a paginated data collection type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
@@ -322,7 +322,7 @@ it('can deduce a paginated data collection union type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
@@ -360,7 +360,7 @@ it('can deduce a cursor paginated data collection union type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCursorPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
@@ -379,7 +379,7 @@ it('can deduce an array data collection type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Array)
         ->dataClass->toBe(SimpleData::class)
@@ -417,7 +417,7 @@ it('can deduce an enumerable data collection type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Enumerable)
         ->dataClass->toBe(SimpleData::class)
@@ -436,7 +436,7 @@ it('can deduce an enumerable data collection union type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Enumerable)
         ->dataClass->toBe(SimpleData::class)
@@ -474,7 +474,7 @@ it('can deduce a paginator data collection union type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Paginator)
         ->dataClass->toBe(SimpleData::class)
@@ -493,7 +493,7 @@ it('can deduce a cursor paginator data collection type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::CursorPaginator)
         ->dataClass->toBe(SimpleData::class)
@@ -512,7 +512,7 @@ it('can deduce a cursor paginator data collection union type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::CursorPaginator)
         ->dataClass->toBe(SimpleData::class)
