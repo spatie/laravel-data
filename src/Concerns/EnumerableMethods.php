@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Spatie\LaravelData\Contracts\DataCollectable;
+use Spatie\LaravelData\DataCollection;
 
 /**
  * @template TKey of array-key
@@ -124,5 +125,19 @@ trait EnumerableMethods
     public function sole(callable|string|null $key = null, mixed $operator = null, mixed $value = null)
     {
         return $this->items->sole(...func_get_args());
+    }
+
+    /**
+     * @param DataCollection $collection
+     *
+     * @return static
+     */
+    public function merge(DataCollection $collection): static
+    {
+        $cloned = clone $this;
+
+        $cloned->items = $cloned->items->merge($collection->items);
+
+        return $cloned;
     }
 }
