@@ -14,7 +14,7 @@ trait ResponsableData
     /**
      * @param \Illuminate\Http\Request $request
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function toResponse($request)
     {
