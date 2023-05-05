@@ -486,6 +486,20 @@ it('can return a sole data object without specifying an operator', function () {
         ->toEqual($filtered->string);
 });
 
+test('a collection can be merged', function () {
+    $collectionA = SimpleData::collection(['A', 'B']);
+    $collectionB = SimpleData::collection(['C', 'D']);
+
+    $filtered = $collectionA->merge($collectionB)->toArray();
+
+    expect([
+        ['string' => 'A'],
+        ['string' => 'B'],
+        ['string' => 'C'],
+        ['string' => 'D'],
+    ])
+        ->toMatchArray($filtered);
+});
 
 it('can serialize and unserialize a data collection', function () {
     $collection = new DataCollection(SimpleData::class, ['A', 'B']);

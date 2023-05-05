@@ -14,6 +14,27 @@ All notable changes to `laravel-data` will be documented in this file.
 - Allow creating data objects using `from` without parameters
 - Add support for a Dto and Resource object
 
+## 3.5.0 - 2023-05-05
+
+- Add support for computed values
+- Add merge method to Data Collections (#419)
+- Allow field references in same validation attribute
+- Generic return type of toResponse function (#437)
+- Only use validated data (#438)
+- Add missing constructor parameters to error message (#433)
+
+## 3.4.4 - 2023-04-14
+
+- Make Lazy Macroable
+
+## 3.4.3 - 2023-04-12
+
+- Update TypeScript Transformer with new closure lazy type
+
+## 3.4.2 - 2023-04-12
+
+- Add support for Lazy Closures which can be used with inertia
+
 ## 3.4.1 - 2023-04-07
 
 - reverted the reverted #393 branch

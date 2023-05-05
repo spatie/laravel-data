@@ -31,6 +31,11 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
 use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Support\Factories\DataTypeFactory;
+use Spatie\LaravelData\Support\Lazy\ClosureLazy;
+use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
+use Spatie\LaravelData\Support\Lazy\InertiaLazy;
+use Spatie\LaravelData\Support\Lazy\RelationalLazy;
+use Spatie\LaravelData\Tests\Fakes\CollectionAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -52,10 +57,10 @@ it('can deduce a type without definition', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
+        ->lazyType->toBeNull()
         ->dataCollectableClass->toBeNull();
 
     expect($type->type)
@@ -70,7 +75,7 @@ it('can deduce a type with definition', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
@@ -88,7 +93,7 @@ it('can deduce a nullable type with definition', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
@@ -106,7 +111,7 @@ it('can deduce a union type definition', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
@@ -124,7 +129,7 @@ it('can deduce a nullable union type definition', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
@@ -142,7 +147,7 @@ it('can deduce an intersection type definition', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
@@ -163,7 +168,7 @@ it('can deduce a mixed type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
@@ -181,7 +186,7 @@ it('can deduce a lazy type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
@@ -199,7 +204,7 @@ it('can deduce an optional type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeTrue()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
@@ -223,7 +228,7 @@ it('can deduce a data type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataObject)
         ->dataClass->toBe(SimpleData::class)
@@ -241,7 +246,7 @@ it('can deduce a data union type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataObject)
         ->dataClass->toBe(SimpleData::class)
@@ -260,7 +265,7 @@ it('can deduce a data collection type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCollection)
         ->dataClass->toBe(SimpleData::class)
@@ -279,7 +284,7 @@ it('can deduce a data collection union type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCollection)
         ->dataClass->toBe(SimpleData::class)
@@ -336,7 +341,7 @@ it('can deduce a cursor paginated data collection type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCursorPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
@@ -393,7 +398,7 @@ it('can deduce an array data collection union type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeTrue()
+        ->lazyType->toBe(Lazy::class)
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Array)
         ->dataClass->toBe(SimpleData::class)
@@ -450,7 +455,7 @@ it('can deduce a paginator data collection type', function () {
     });
 
     expect($type)
-        ->isLazy->toBeFalse()
+        ->lazyType->toBeNull()
         ->isOptional->toBeFalse()
         ->kind->toBe(DataTypeKind::Paginator)
         ->dataClass->toBe(SimpleData::class)
@@ -926,4 +931,36 @@ it('can annotate data collections using property annotations', function () {
         ->kind->toBe(DataTypeKind::Array)
         ->dataClass->toBe(SimpleData::class)
         ->dataCollectableClass->toBe('array');
+});
+
+it('can deduce the types of lazy', function () {
+    $type = resolveDataType(new class () {
+        public SimpleData|Lazy $property;
+    });
+
+    expect($type)->lazyType->toBe(Lazy::class);
+
+    $type = resolveDataType(new class () {
+        public SimpleData|ClosureLazy $property;
+    });
+
+    expect($type)->lazyType->toBe(ClosureLazy::class);
+
+    $type = resolveDataType(new class () {
+        public SimpleData|InertiaLazy $property;
+    });
+
+    expect($type)->lazyType->toBe(InertiaLazy::class);
+
+    $type = resolveDataType(new class () {
+        public SimpleData|ConditionalLazy $property;
+    });
+
+    expect($type)->lazyType->toBe(ConditionalLazy::class);
+
+    $type = resolveDataType(new class () {
+        public SimpleData|RelationalLazy $property;
+    });
+
+    expect($type)->lazyType->toBe(RelationalLazy::class);
 });

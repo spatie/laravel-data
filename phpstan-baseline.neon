@@ -91,6 +91,11 @@ parameters:
 			path: src/PaginatedDataCollection.php
 
 		-
+			message: "#^Dead catch \\- ArgumentCountError is never thrown in the try block\\.$#"
+			count: 1
+			path: src/Resolvers/DataFromArrayResolver.php
+
+		-
 			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$acceptedTypes is already assigned\\.$#"
 			count: 2
 			path: src/Support/DataType.php
@@ -132,6 +137,11 @@ parameters:
 
 		-
 			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$isOptional is already assigned\\.$#"
+			count: 2
+			path: src/Support/DataType.php
+
+		-
+			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$lazyType is already assigned\\.$#"
 			count: 2
 			path: src/Support/DataType.php
 

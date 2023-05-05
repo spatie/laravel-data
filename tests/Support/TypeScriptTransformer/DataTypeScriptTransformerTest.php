@@ -11,6 +11,7 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
+use Spatie\LaravelData\Support\Lazy\ClosureLazy;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
@@ -39,6 +40,7 @@ it('can convert a data object to Typescript', function () {
             /** @var string[] */
             public array $array,
             public Lazy|string $lazy,
+            public ClosureLazy|string $closureLazy,
             public SimpleData $simpleData,
             /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */
             public DataCollection $dataCollection,

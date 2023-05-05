@@ -9,7 +9,7 @@ class DataType
 {
     public function __construct(
         public readonly Type $type,
-        public readonly bool $isLazy,
+        public readonly ?string $lazyType,
         public readonly bool $isOptional,
         public readonly DataTypeKind $kind,
         public readonly ?string $dataClass,

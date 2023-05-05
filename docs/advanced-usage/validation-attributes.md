@@ -41,7 +41,7 @@ class CustomRule extends ValidationRule
 
 ```php
 #[Accepted]
-public bool $value; 
+public bool $closure; 
 ```
 
 ### AcceptedIf
@@ -50,7 +50,7 @@ public bool $value;
 
 ```php
 #[AcceptedIf('other_field', 'equals_this')]
-public bool $value; 
+public bool $closure; 
 ```
 
 ### ActiveUrl
@@ -59,7 +59,7 @@ public bool $value;
 
 ```php
 #[ActiveUrl]
-public string $value; 
+public string $closure; 
 ```
 
 ### After
@@ -68,13 +68,13 @@ public string $value;
 
 ```php
 #[After('other_field')]
-public Carbon $value; 
+public Carbon $closure; 
 
 #[After('tomorrow')]
-public Carbon $value; 
+public Carbon $closure; 
 
 #[After(Carbon::yesterday())]
-public Carbon $value; 
+public Carbon $closure; 
 ```
 
 ### AfterOrEqual
@@ -83,13 +83,13 @@ public Carbon $value;
 
 ```php
 #[AfterOrEqual('other_field')]
-public Carbon $value; 
+public Carbon $closure; 
 
 #[AfterOrEqual('tomorrow')]
-public Carbon $value; 
+public Carbon $closure; 
 
 #[AfterOrEqual(Carbon::yesterday())]
-public Carbon $value; 
+public Carbon $closure; 
 ```
 
 ### Alpha
@@ -98,7 +98,7 @@ public Carbon $value;
 
 ```php
 #[Alpha]
-public string $value; 
+public string $closure; 
 ```
 
 ### AlphaDash
@@ -107,7 +107,7 @@ public string $value;
 
 ```php
 #[AlphaDash]
-public string $value; 
+public string $closure; 
 ```
 
 ### AlphaNumeric
@@ -116,7 +116,7 @@ public string $value;
 
 ```php
 #[AlphaNumeric]
-public string $value; 
+public string $closure; 
 ```
 
 ### ArrayType
@@ -125,13 +125,13 @@ public string $value;
 
 ```php
 #[ArrayType]
-public array $value; 
+public array $closure; 
 
 #[ArrayType(['valid_key', 'other_valid_key'])]
-public array $value; 
+public array $closure; 
 
 #[ArrayType('valid_key', 'other_valid_key')]
-public array $value; 
+public array $closure; 
 ```
 
 ### Bail
@@ -140,7 +140,7 @@ public array $value;
 
 ```php
 #[Bail]
-public string $value; 
+public string $closure; 
 ```
 
 ### Before
@@ -149,13 +149,13 @@ public string $value;
 
 ```php
 #[Before('other_field')]
-public Carbon $value; 
+public Carbon $closure; 
 
 #[Before('tomorrow')]
-public Carbon $value; 
+public Carbon $closure; 
 
 #[Before(Carbon::yesterday())]
-public Carbon $value; 
+public Carbon $closure; 
 ```
 
 ### BeforeOrEqual
@@ -164,13 +164,13 @@ public Carbon $value;
 
 ```php
 #[BeforeOrEqual('other_field')]
-public Carbon $value; 
+public Carbon $closure; 
 
 #[BeforeOrEqual('tomorrow')]
-public Carbon $value; 
+public Carbon $closure; 
 
 #[BeforeOrEqual(Carbon::yesterday())]
-public Carbon $value; 
+public Carbon $closure; 
 ```
 
 ### Between
@@ -179,7 +179,7 @@ public Carbon $value;
 
 ```php
 #[Between(3.14, 42)]
-public int $value; 
+public int $closure; 
 ```
 
 ### BooleanType
@@ -188,7 +188,7 @@ public int $value;
 
 ```php
 #[BooleanType]
-public bool $value; 
+public bool $closure; 
 ```
 
 ### Confirmed
@@ -197,7 +197,7 @@ public bool $value;
 
 ```php
 #[Confirmed]
-public string $value; 
+public string $closure; 
 ```
 
 ### CurrentPassword
@@ -206,10 +206,10 @@ public string $value;
 
 ```php
 #[CurrentPassword]
-public string $value; 
+public string $closure; 
 
 #[CurrentPassword('api')]
-public string $value; 
+public string $closure; 
 ```
 
 ### Date
@@ -218,7 +218,7 @@ public string $value;
 
 ```php
 #[Date]
-public Carbon $value; 
+public Carbon $closure; 
 ```
 
 ### DateEquals
@@ -227,10 +227,10 @@ public Carbon $value;
 
 ```php
 #[DateEquals('tomorrow')]
-public Carbon $value; 
+public Carbon $closure; 
 
 #[DateEquals(Carbon::yesterday())]
-public Carbon $value; 
+public Carbon $closure; 
 ```
 
 ### DateFormat
@@ -239,7 +239,7 @@ public Carbon $value;
 
 ```php
 #[DateFormat('d-m-Y')]
-public Carbon $value; 
+public Carbon $closure; 
 ```
 
 ### Different
@@ -248,7 +248,7 @@ public Carbon $value;
 
 ```php
 #[Different('other_field')]
-public string $value; 
+public string $closure; 
 ```
 
 ### Digits
@@ -257,7 +257,7 @@ public string $value;
 
 ```php
 #[Digits(10)]
-public int $value; 
+public int $closure; 
 ```
 
 ### DigitsBetween
@@ -266,7 +266,7 @@ public int $value;
 
 ```php
 #[DigitsBetween(2, 10)]
-public int $value; 
+public int $closure; 
 ```
 
 ### Dimensions
@@ -275,10 +275,10 @@ public int $value;
 
 ```php
 #[Dimensions(ratio: 1.5)]
-public UploadedFile $value; 
+public UploadedFile $closure; 
 
 #[Dimensions(maxWidth: 100, maxHeight: 100)]
-public UploadedFile $value; 
+public UploadedFile $closure; 
 ```
 
 ### Distinct
@@ -287,13 +287,13 @@ public UploadedFile $value;
 
 ```php
 #[Distinct]
-public string $value;
+public string $closure;
 
 #[Distinct(Distinct::Strict)]
-public string $value;  
+public string $closure;  
 
 #[Distinct(Distinct::IgnoreCase)]
-public string $value;  
+public string $closure;  
 ```
 
 ### Email
@@ -302,16 +302,16 @@ public string $value;
 
 ```php
 #[Email]
-public string $value;
+public string $closure;
 
 #[Email(Email::RfcValidation)]
-public string $value;  
+public string $closure;  
 
 #[Email([Email::RfcValidation, Email::DnsCheckValidation])]
-public string $value;  
+public string $closure;  
 
 #[Email(Email::RfcValidation, Email::DnsCheckValidation)]
-public string $value;  
+public string $closure;  
 ```
 
 ### EndsWith
@@ -320,13 +320,13 @@ public string $value;
 
 ```php
 #[EndsWith('a')]
-public string $value;
+public string $closure;
 
 #[EndsWith(['a', 'b'])]
-public string $value;
+public string $closure;
 
 #[EndsWith('a', 'b')]
-public string $value;
+public string $closure;
 ```
 
 ### Enum
@@ -335,7 +335,7 @@ public string $value;
 
 ```php
 #[Enum(ChannelType::class)]
-public string $value;
+public string $closure;
 ```
 
 ### ExcludeIf
@@ -344,7 +344,7 @@ public string $value;
 
 ```php
 #[ExcludeIf('other_field', 'has_value')]
-public string $value;
+public string $closure;
 ```
 
 ### ExcludeUnless
@@ -353,7 +353,7 @@ public string $value;
 
 ```php
 #[ExcludeUnless('other_field', 'has_value')]
-public string $value;
+public string $closure;
 ```
 
 ### ExcludeWithout
@@ -362,7 +362,7 @@ public string $value;
 
 ```php
 #[ExcludeWithout('other_field')]
-public string $value;
+public string $closure;
 ```
 
 ### Exists
@@ -371,19 +371,19 @@ public string $value;
 
 ```php
 #[Exists('users')]
-public string $value; 
+public string $closure; 
 
 #[Exists(User::class)]
-public string $value; 
+public string $closure; 
 
 #[Exists('users', 'email')]
-public string $value;
+public string $closure;
 
 #[Exists('users', 'email', connection: 'tenant')]
-public string $value;
+public string $closure;
 
 #[Exists('users', 'email', withoutTrashed: true)]
-public string $value;
+public string $closure;
 ```
 
 ### File
@@ -392,7 +392,7 @@ public string $value;
 
 ```php
 #[File]
-public UploadedFile $value; 
+public UploadedFile $closure; 
 ```
 
 ### Filled
@@ -401,7 +401,7 @@ public UploadedFile $value;
 
 ```php
 #[Filled]
-public string $value; 
+public string $closure; 
 ```
 
 ### GreaterThan
@@ -410,7 +410,7 @@ public string $value;
 
 ```php
 #[GreaterThan('other_field')]
-public int $value; 
+public int $closure; 
 ```
 
 ### GreaterThanOrEqualTo
@@ -419,7 +419,7 @@ public int $value;
 
 ```php
 #[GreaterThanOrEqualTo('other_field')]
-public int $value; 
+public int $closure; 
 ```
 
 ### Image
@@ -428,7 +428,7 @@ public int $value;
 
 ```php
 #[Image]
-public UploadedFile $value; 
+public UploadedFile $closure; 
 ```
 
 ### In
@@ -437,10 +437,10 @@ public UploadedFile $value;
 
 ```php
 #[In([1, 2, 3, 'a', 'b'])]
-public mixed $value; 
+public mixed $closure; 
 
 #[In(1, 2, 3, 'a', 'b')]
-public mixed $value; 
+public mixed $closure; 
 ```
 
 ### InArray
@@ -449,7 +449,7 @@ public mixed $value;
 
 ```php
 #[InArray('other_field')]
-public string $value; 
+public string $closure; 
 ```
 
 ### IntegerType
@@ -458,7 +458,7 @@ public string $value;
 
 ```php
 #[IntegerType]
-public int $value; 
+public int $closure; 
 ```
 
 ### IP
@@ -467,7 +467,7 @@ public int $value;
 
 ```php
 #[IP]
-public string $value; 
+public string $closure; 
 ```
 
 ### IPv4
@@ -476,7 +476,7 @@ public string $value;
 
 ```php
 #[IPv4]
-public string $value; 
+public string $closure; 
 ```
 
 ### IPv6
@@ -485,7 +485,7 @@ public string $value;
 
 ```php
 #[IPv6]
-public string $value; 
+public string $closure; 
 ```
 
 ### Json
@@ -494,7 +494,7 @@ public string $value;
 
 ```php
 #[Json]
-public string $value; 
+public string $closure; 
 ```
 
 ### LessThan
@@ -503,7 +503,7 @@ public string $value;
 
 ```php
 #[LessThan('other_field')]
-public int $value; 
+public int $closure; 
 ```
 
 ### LessThanOrEqualTo
@@ -512,7 +512,7 @@ public int $value;
 
 ```php
 #[LessThanOrEqualTo('other_field')]
-public int $value; 
+public int $closure; 
 ```
 
 ### Max
@@ -521,7 +521,7 @@ public int $value;
 
 ```php
 #[Max(20)]
-public int $value; 
+public int $closure; 
 ```
 
 ### MimeTypes
@@ -530,13 +530,13 @@ public int $value;
 
 ```php
 #[MimeTypes('video/quicktime')]
-public UploadedFile $value; 
+public UploadedFile $closure; 
 
 #[MimeTypes(['video/quicktime', 'video/avi'])]
-public UploadedFile $value; 
+public UploadedFile $closure; 
 
 #[MimeTypes('video/quicktime', 'video/avi')]
-public UploadedFile $value; 
+public UploadedFile $closure; 
 ```
 
 ### Mimes
@@ -545,13 +545,13 @@ public UploadedFile $value;
 
 ```php
 #[Mimes('jpg')]
-public UploadedFile $value; 
+public UploadedFile $closure; 
 
 #[Mimes(['jpg', 'png'])]
-public UploadedFile $value; 
+public UploadedFile $closure; 
 
 #[Mimes('jpg', 'png')]
-public UploadedFile $value; 
+public UploadedFile $closure; 
 ```
 
 ### Min
@@ -560,7 +560,7 @@ public UploadedFile $value;
 
 ```php
 #[Min(20)]
-public int $value; 
+public int $closure; 
 ```
 
 ### MultipleOf
@@ -569,7 +569,7 @@ public int $value;
 
 ```php
 #[MultipleOf(3)]
-public int $value; 
+public int $closure; 
 ```
 
 ### NotIn
@@ -578,10 +578,10 @@ public int $value;
 
 ```php
 #[NotIn([1, 2, 3, 'a', 'b'])]
-public mixed $value; 
+public mixed $closure; 
 
 #[NotIn(1, 2, 3, 'a', 'b')]
-public mixed $value; 
+public mixed $closure; 
 ```
 
 ### NotRegex
@@ -590,7 +590,7 @@ public mixed $value;
 
 ```php
 #[NotRegex('/^.+$/i')]
-public string $value; 
+public string $closure; 
 ```
 
 ### Nullable
@@ -599,7 +599,7 @@ public string $value;
 
 ```php
 #[Nullable]
-public ?string $value; 
+public ?string $closure; 
 ```
 
 ### Numeric
@@ -608,7 +608,7 @@ public ?string $value;
 
 ```php
 #[Numeric]
-public ?string $value; 
+public ?string $closure; 
 ```
 
 ### Password
@@ -617,7 +617,7 @@ public ?string $value;
 
 ```php
 #[Password(min: 12, letters: true, mixedCase: true, numbers: false, symbols: false, uncompromised: true, uncompromisedThreshold: 0)]
-public string $value; 
+public string $closure; 
 ```
 
 ### Present
@@ -626,7 +626,7 @@ public string $value;
 
 ```php
 #[Present]
-public string $value; 
+public string $closure; 
 ```
 
 ### Prohibited
@@ -635,7 +635,7 @@ public string $value;
 
 ```php
 #[Prohibited]
-public ?string $value; 
+public ?string $closure; 
 ```
 
 ### ProhibitedIf
@@ -644,10 +644,10 @@ public ?string $value;
 
 ```php
 #[ProhibitedIf('other_field', 'has_value')]
-public ?string $value; 
+public ?string $closure; 
 
 #[ProhibitedIf('other_field', ['has_value', 'or_this_value'])]
-public ?string $value; 
+public ?string $closure; 
 ```
 
 ### ProhibitedUnless
@@ -656,10 +656,10 @@ public ?string $value;
 
 ```php
 #[ProhibitedUnless('other_field', 'has_value')]
-public ?string $value; 
+public ?string $closure; 
 
 #[ProhibitedUnless('other_field', ['has_value', 'or_this_value'])]
-public ?string $value; 
+public ?string $closure; 
 ```
 
 ### Prohibits
@@ -668,13 +668,13 @@ public ?string $value;
 
 ```php
 #[Prohibits('other_field')]
-public ?string $value; 
+public ?string $closure; 
 
 #[Prohibits(['other_field', 'another_field'])]
-public ?string $value; 
+public ?string $closure; 
 
 #[Prohibits('other_field', 'another_field')]
-public ?string $value; 
+public ?string $closure; 
 ```
 
 ### Regex
@@ -683,7 +683,7 @@ public ?string $value;
 
 ```php
 #[Regex('/^.+$/i')]
-public string $value; 
+public string $closure; 
 ```
 
 ### Required
@@ -692,7 +692,7 @@ public string $value;
 
 ```php
 #[Required]
-public string $value; 
+public string $closure; 
 ```
 
 ### RequiredIf
@@ -701,10 +701,10 @@ public string $value;
 
 ```php
 #[RequiredIf('other_field', 'value')]
-public ?string $value; 
+public ?string $closure; 
 
 #[RequiredIf('other_field', ['value', 'another_value'])]
-public ?string $value; 
+public ?string $closure; 
 ```
 
 ### RequiredUnless
@@ -713,10 +713,10 @@ public ?string $value;
 
 ```php
 #[RequiredUnless('other_field', 'value')]
-public ?string $value; 
+public ?string $closure; 
 
 #[RequiredUnless('other_field', ['value', 'another_value'])]
-public ?string $value; 
+public ?string $closure; 
 ```
 
 ### RequiredWith
@@ -725,13 +725,13 @@ public ?string $value;
 
 ```php
 #[RequiredWith('other_field')]
-public ?string $value; 
+public ?string $closure; 
 
 #[RequiredWith(['other_field', 'another_field'])]
-public ?string $value; 
+public ?string $closure; 
 
 #[RequiredWith('other_field', 'another_field')]
-public ?string $value; 
+public ?string $closure; 
 ```
 
 ### RequiredWithAll
@@ -740,13 +740,13 @@ public ?string $value;
 
 ```php
 #[RequiredWithAll('other_field')]
-public ?string $value; 
+public ?string $closure; 
 
 #[RequiredWithAll(['other_field', 'another_field'])]
-public ?string $value; 
+public ?string $closure; 
 
 #[RequiredWithAll('other_field', 'another_field')]
-public ?string $value; 
+public ?string $closure; 
 ```
 
 ### RequiredWithout
@@ -755,13 +755,13 @@ public ?string $value;
 
 ```php
 #[RequiredWithout('other_field')]
-public ?string $value; 
+public ?string $closure; 
 
 #[RequiredWithout(['other_field', 'another_field'])]
-public ?string $value; 
+public ?string $closure; 
 
 #[RequiredWithout('other_field', 'another_field')]
-public ?string $value; 
+public ?string $closure; 
 ```
 
 ### RequiredWithoutAll
@@ -770,23 +770,23 @@ public ?string $value;
 
 ```php
 #[RequiredWithoutAll('other_field')]
-public ?string $value; 
+public ?string $closure; 
 
 #[RequiredWithoutAll(['other_field', 'another_field'])]
-public ?string $value; 
+public ?string $closure; 
 
 #[RequiredWithoutAll('other_field', 'another_field')]
-public ?string $value; 
+public ?string $closure; 
 ```
 
 ### Rule
 
 ```php
 #[Rule('string|uuid')]
-public string $value; 
+public string $closure; 
 
 #[Rule(['string','uuid'])]
-public string $value; 
+public string $closure; 
 ```
 
 ### Same
@@ -795,7 +795,7 @@ public string $value;
 
 ```php
 #[Same('other_field')]
-public string $value; 
+public string $closure; 
 ```
 
 ### Size
@@ -804,7 +804,7 @@ public string $value;
 
 ```php
 #[Size(10)]
-public string $value; 
+public string $closure; 
 ```
 
 ### Sometimes
@@ -813,7 +813,7 @@ public string $value;
 
 ```php
 #[Sometimes]
-public string $value; 
+public string $closure; 
 ```
 
 ### StartsWith
@@ -822,13 +822,13 @@ public string $value;
 
 ```php
 #[StartsWith('a')]
-public string $value;
+public string $closure;
 
 #[StartsWith(['a', 'b'])]
-public string $value;
+public string $closure;
 
 #[StartsWith('a', 'b')]
-public string $value;
+public string $closure;
 ```
 
 ### StringType
@@ -837,7 +837,7 @@ public string $value;
 
 ```php
 #[StringType()]
-public string $value; 
+public string $closure; 
 ```
 
 ### TimeZone
@@ -846,7 +846,7 @@ public string $value;
 
 ```php
 #[TimeZone()]
-public string $value; 
+public string $closure; 
 ```
 
 ### Unique
@@ -855,22 +855,22 @@ public string $value;
 
 ```php
 #[Unique('users')]
-public string $value; 
+public string $closure; 
 
 #[Unique(User::class)]
-public string $value; 
+public string $closure; 
 
 #[Unique('users', 'email')]
-public string $value;
+public string $closure;
 
 #[Unique('users', connection: 'tenant')]
-public string $value;
+public string $closure;
 
 #[Unique('users', withoutTrashed: true)]
-public string $value;
+public string $closure;
 
 #[Unique('users', ignore: 5)]
-public string $value;
+public string $closure;
 ```
 
 ### Url
@@ -879,7 +879,7 @@ public string $value;
 
 ```php
 #[Url]
-public string $value; 
+public string $closure; 
 ```
 
 ### Uuid
@@ -888,5 +888,5 @@ public string $value;
 
 ```php
 #[Uuid]
-public string $value; 
+public string $closure; 
 ```

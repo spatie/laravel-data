@@ -4,6 +4,8 @@ namespace Spatie\LaravelData;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Traits\Macroable;
+use Spatie\LaravelData\Support\Lazy\ClosureLazy;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\DefaultLazy;
 use Spatie\LaravelData\Support\Lazy\InertiaLazy;
@@ -11,6 +13,8 @@ use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 
 abstract class Lazy
 {
+    use Macroable;
+
     protected ?bool $defaultIncluded = null;
 
     public static function create(Closure $value): DefaultLazy
@@ -31,6 +35,11 @@ abstract class Lazy
     public static function inertia(Closure $value): InertiaLazy
     {
         return new InertiaLazy($value);
+    }
+
+    public static function closure(Closure $closure): ClosureLazy
+    {
+        return new ClosureLazy($closure);
     }
 
     abstract public function resolve(): mixed;
