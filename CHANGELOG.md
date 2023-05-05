@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.5.0 - 2023-05-05
+
+- Add support for computed values
+- Add merge method to Data Collections (#419)
+- Allow field references in same validation attribute
+- Generic return type of toResponse function (#437)
+- Only use validated data (#438)
+- Add missing constructor parameters to error message (#433)
+
 ## 3.4.4 - 2023-04-14
 
 - Make Lazy Macroable
@@ -82,7 +91,9 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Allow referencing other fields in validation attributes when the data is nested
+- 
 - 
 - 
 - 
@@ -108,6 +119,7 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Allow circular dependencies when validating data
 - 
 - 
@@ -121,7 +133,9 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Add support for nested validation messages and attributes
+- 
 - 
 - 
 - 
