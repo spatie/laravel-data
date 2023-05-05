@@ -1,5 +1,6 @@
 <?php
 
+use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapOutputName;
@@ -127,6 +128,28 @@ it('can check if a property should be validated', function () {
             public string $property;
         })->validate
     )->toBeFalse();
+
+    expect(
+        resolveHelper(new class () {
+            #[Computed]
+            public string $property;
+        })->validate
+    )->toBeFalse();
+});
+
+it('can check if a property is computed', function () {
+    expect(
+        resolveHelper(new class () {
+            public string $property;
+        })->computed
+    )->toBeFalse();
+
+    expect(
+        resolveHelper(new class () {
+            #[Computed]
+            public string $property;
+        })->computed
+    )->toBeTrue();
 });
 
 it('wont throw an error if non existing attribute is used on a data class property', function () {

@@ -6,11 +6,16 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use Inertia\LazyProp;
+use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapOutputName;
+use Spatie\LaravelData\Attributes\Validation\Max;
+use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithCastable;
+use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Concerns\DataTrait;
@@ -19,6 +24,7 @@ use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
+use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Lazy\ClosureLazy;
@@ -625,9 +631,11 @@ it('can append data via method overwriting with closures', function () {
 
         public function with(): array
         {
-            return ['alt_name' => static function (self $data) {
-                return $data->name . ' from Spatie via closure';
-            }];
+            return [
+                'alt_name' => static function (self $data) {
+                    return $data->name.' from Spatie via closure';
+                },
+            ];
         }
     };
 
@@ -645,9 +653,11 @@ test('when using additional method and with method additional method gets priori
 
         public function with(): array
         {
-            return ['alt_name' => static function (self $data) {
-                return $data->name . ' from Spatie via closure';
-            }];
+            return [
+                'alt_name' => static function (self $data) {
+                    return $data->name.' from Spatie via closure';
+                },
+            ];
         }
     };
 
@@ -2317,4 +2327,63 @@ it('can fetch non-lazy union data', function () {
     expect($data->simple->string)->toBe('A');
     expect($data->dataCollection->toCollection()->pluck('string')->toArray())->toBe(['B', 'C']);
     expect($data->fakeModel->string)->toBe('non-lazy');
+});
+
+it('can set a default value for data object', function () {
+    $dataObject = new class('', '') extends Data {
+        #[Min(10)]
+        public string|Optional $full_name;
+
+        public function __construct(
+            public string $first_name,
+            public string $last_name,
+        ) {
+            $this->full_name = "{$this->first_name} {$this->last_name}";
+        }
+    };
+
+    expect($dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche']))
+        ->first_name->toBe('Ruben')
+        ->last_name->toBe('Van Assche')
+        ->full_name->toBe('Ruben Van Assche');
+
+    expect($dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Ruben Versieck']))
+        ->first_name->toBe('Ruben')
+        ->last_name->toBe('Van Assche')
+        ->full_name->toBe('Ruben Versieck');
+
+    expect($dataObject::validateAndCreate(['first_name' => 'Ruben', 'last_name' => 'Van Assche']))
+        ->first_name->toBe('Ruben')
+        ->last_name->toBe('Van Assche')
+        ->full_name->toBe('Ruben Van Assche');
+
+    expect(fn() => $dataObject::validateAndCreate(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'too short']))
+        ->toThrow(ValidationException::class);
+});
+
+it('can have a computed value', function (){
+    $dataObject = new class('', '') extends Data {
+        #[Computed]
+        public string $full_name;
+
+        public function __construct(
+            public string $first_name,
+            public string $last_name,
+        ) {
+            $this->full_name = "{$this->first_name} {$this->last_name}";
+        }
+    };
+
+    expect($dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche']))
+        ->first_name->toBe('Ruben')
+        ->last_name->toBe('Van Assche')
+        ->full_name->toBe('Ruben Van Assche');
+
+    expect($dataObject::validateAndCreate(['first_name' => 'Ruben', 'last_name' => 'Van Assche']))
+        ->first_name->toBe('Ruben')
+        ->last_name->toBe('Van Assche')
+        ->full_name->toBe('Ruben Van Assche');
+
+    expect(fn() => $dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Ruben Versieck']))
+        ->toThrow(CannotSetComputedValue::class);
 });

@@ -1,6 +1,6 @@
 ---
 title: From a request
-weight: 6
+weight: 8
 ---
 
 You can create a data object by the values given in the request.

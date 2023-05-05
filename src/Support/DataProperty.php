@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Support;
 use Illuminate\Support\Collection;
 use ReflectionAttribute;
 use ReflectionProperty;
+use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\GetsCast;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
@@ -23,6 +24,7 @@ class DataProperty
         public readonly string $className,
         public readonly DataType $type,
         public readonly bool $validate,
+        public readonly bool $computed,
         public readonly bool $isPromoted,
         public readonly bool $isReadonly,
         public readonly bool $hasDefaultValue,
@@ -60,11 +62,18 @@ class DataProperty
             default => null,
         };
 
+        $computed = $attributes->contains(
+            fn (object $attribute) => $attribute instanceof Computed
+        );
+
         return new self(
             name: $property->name,
             className: $property->class,
             type: DataType::create($property),
-            validate: ! $attributes->contains(fn (object $attribute) => $attribute instanceof WithoutValidation),
+            validate: ! $attributes->contains(
+                fn (object $attribute) => $attribute instanceof WithoutValidation
+            ) && ! $computed,
+            computed: $computed,
             isPromoted: $property->isPromoted(),
             isReadonly: $property->isReadOnly(),
             hasDefaultValue: $property->isPromoted() ? $hasDefaultValue : $property->hasDefaultValue(),
