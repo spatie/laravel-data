@@ -13,6 +13,7 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
+use Spatie\LaravelData\Attributes\Computed;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
@@ -2168,4 +2169,39 @@ it('can use laravel-data validation rules in laravel validator', function () {
 
     expect($validatorToPass->passes())->toBeTrue()
         ->and($validatorToFail->passes())->toBeFalse();
+});
+
+it('can exclude data based upon validation rules', function () {
+    $dataObject = new class('', '') extends Data {
+        public function __construct(
+            public readonly ?string $email,
+            public readonly Optional|string $email_md5,
+        ) {
+        }
+
+        public static function rules()
+        {
+            return [
+                'email' => ['email'],
+                'email_md5' => ['exclude_with:email'],
+            ];
+        }
+    };
+
+    expect($dataObject::validateAndCreate([
+        "email" => 'ruben@spatie.be',
+        "email_md5" => md5('ruben@spatie.be'),
+    ]))
+        ->email->toBe('ruben@spatie.be')
+        ->email_md5->toBeInstanceOf(Optional::class);
+
+    // Requests use the pipeline flow
+    $request = \request()->merge([
+        "email" => 'ruben@spatie.be',
+        "email_md5" => md5('ruben@spatie.be'),
+    ]);
+
+    expect($dataObject::from($request))
+        ->email->toBe('ruben@spatie.be')
+        ->email_md5->toBeInstanceOf(Optional::class);
 });

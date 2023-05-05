@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
@@ -49,7 +50,9 @@ trait ValidateableData
 
     public static function validateAndCreate(Arrayable|array $payload): static
     {
-        static::validate($payload);
+        if (! $payload instanceof Request) {
+            $payload = static::validate($payload);
+        }
 
         return static::from($payload);
     }
