@@ -131,7 +131,7 @@ class DataTypeFactory
 
 
         foreach ($type->types as $subType) {
-            if($subType->isLazy()){
+            if($subType->isLazy()) {
                 $lazyType = $subType->name;
             }
 

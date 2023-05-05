@@ -76,7 +76,8 @@ class DataProperty
             validate: ! $attributes->contains(
                 fn (object $attribute) => $attribute instanceof WithoutValidation
             ) && ! $computed,
-            computed: $computed,            isPromoted: $property->isPromoted(),
+            computed: $computed,
+            isPromoted: $property->isPromoted(),
             isReadonly: $property->isReadOnly(),
             hasDefaultValue: $property->isPromoted() ? $hasDefaultValue : $property->hasDefaultValue(),
             defaultValue: $property->isPromoted() ? $defaultValue : $property->getDefaultValue(),
