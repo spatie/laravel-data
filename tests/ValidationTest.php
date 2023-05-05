@@ -13,7 +13,6 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
-use Spatie\LaravelData\Attributes\Computed;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
@@ -2172,7 +2171,7 @@ it('can use laravel-data validation rules in laravel validator', function () {
 });
 
 it('can exclude data based upon validation rules', function () {
-    $dataObject = new class('', '') extends Data {
+    $dataObject = new class ('', '') extends Data {
         public function __construct(
             public readonly ?string $email,
             public readonly Optional|string $email_md5,
