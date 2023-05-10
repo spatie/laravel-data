@@ -19,7 +19,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
             ->hasConfigFile('data');
     }
 
-    public function packageRegistered()
+    public function packageRegistered(): void
     {
         $this->app->singleton(
             DataConfig::class,
@@ -39,7 +39,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
         });
     }
 
-    public function packageBooted()
+    public function packageBooted(): void
     {
         $enableVarDumperCaster = match (config('data.var_dumper_caster_mode')) {
             'enabled' => true,
