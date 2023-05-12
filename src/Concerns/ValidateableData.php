@@ -50,9 +50,7 @@ trait ValidateableData
 
     public static function validateAndCreate(Arrayable|array $payload): static
     {
-        if (! $payload instanceof Request) {
-            $payload = static::validate($payload);
-        }
+        static::validate($payload);
 
         return static::from($payload);
     }
