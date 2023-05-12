@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.5.1 - 2023-05-12
+
+- Add ability to instantiate an eloquent cast when null value using null database values (#425)
+- Revert only use validated data (https://github.com/spatie/laravel-data/pull/438) -> see #432
+
 ## 3.5.0 - 2023-05-05
 
 - Add support for computed values
@@ -92,7 +97,9 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Allow referencing other fields in validation attributes when the data is nested
+- 
 - 
 - 
 - 
@@ -120,6 +127,7 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Allow circular dependencies when validating data
 - 
 - 
@@ -134,7 +142,9 @@ All notable changes to `laravel-data` will be documented in this file.
 - 
 - 
 - 
+- 
 - - Add support for nested validation messages and attributes
+- 
 - 
 - 
 - 
