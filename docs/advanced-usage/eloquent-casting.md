@@ -109,7 +109,7 @@ Song::findOrFail($id)->artist->name; // 'Default name'
 
 You can also use the `default` argument in the case where you _always_ want a `DataCollection` to be returned.
 
-The first argument (after `:`) should always be the data class to be used with the `DataCollection`, but you can add `nullable` as a comma separated second argument.
+The first argument (after `:`) should always be the data class to be used with the `DataCollection`, but you can add `default` as a comma separated second argument.
 
 ```php
 class Artist extends Model
