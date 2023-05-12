@@ -19,7 +19,7 @@ class DataEloquentCast implements CastsAttributes
 
     public function get($model, string $key, $value, array $attributes): ?BaseData
     {
-        if (is_null($value) && in_array('nullable', $this->arguments)) {
+        if (is_null($value) && in_array('default', $this->arguments)) {
             $value = '{}';
         }
 

@@ -20,7 +20,7 @@ class DataCollectionEloquentCast implements CastsAttributes
 
     public function get($model, string $key, $value, array $attributes): ?DataCollection
     {
-        if ($value === null && in_array('nullable', $this->arguments)) {
+        if ($value === null && in_array('default', $this->arguments)) {
             $value = '[]';
         }
 

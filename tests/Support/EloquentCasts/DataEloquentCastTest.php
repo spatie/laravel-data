@@ -6,7 +6,7 @@ use function Pest\Laravel\assertDatabaseHas;
 
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 
-use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithNullableCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
 
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithDefaultValue;
@@ -72,8 +72,8 @@ it('loads a cast object when nullable argument used and value is null in databas
         'data' => null,
     ]);
 
-    /** @var \Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithNullableCasts $model */
-    $model = DummyModelWithNullableCasts::first();
+    /** @var \Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts $model */
+    $model = DummyModelWithDefaultCasts::first();
 
     expect($model->data)
         ->toBeInstanceOf(SimpleDataWithDefaultValue::class)

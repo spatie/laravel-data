@@ -79,13 +79,13 @@ Artist::create([
 
 By default, if a database value is `null`, then the model attribute will also be `null`. However, sometimes you might want to instantiate the attribute with some default values.
 
-To achieve this, you may provide an additional `nullable` [Cast Parameter](https://laravel.com/docs/eloquent-mutators#cast-parameters) to ensure the caster gets instantiated.
+To achieve this, you may provide an additional `default` [Cast Parameter](https://laravel.com/docs/eloquent-mutators#cast-parameters) to ensure the caster gets instantiated.
 
 ```php
 class Song extends Model
 {
     protected $casts = [
-        'artist' => ArtistData::class . ':nullable',
+        'artist' => ArtistData::class . ':default',
     ];
 }
 ```
@@ -107,7 +107,7 @@ Song::findOrFail($id)->artist->name; // 'Default name'
 
 ### Nullable collections
 
-You can also use the `nullable` argument in the case where you _always_ want a `DataCollection` to be returned.
+You can also use the `default` argument in the case where you _always_ want a `DataCollection` to be returned.
 
 The first argument (after `:`) should always be the data class to be used with the `DataCollection`, but you can add `nullable` as a comma separated second argument.
 
@@ -115,7 +115,7 @@ The first argument (after `:`) should always be the data class to be used with t
 class Artist extends Model
 {
     protected $casts = [
-        'songs' => DataCollection::class.':'.SongData::class.',nullable',
+        'songs' => DataCollection::class.':'.SongData::class.',default',
     ];
 }
 ```
@@ -125,6 +125,6 @@ $artist = Artist::create([
     'songs' => null
 ]);
 
-$artist->songs;             // DataCollection
-$artist->songs->count();    // 0
+$artist->songs; // DataCollection
+$artist->songs->count();// 0
 ```
