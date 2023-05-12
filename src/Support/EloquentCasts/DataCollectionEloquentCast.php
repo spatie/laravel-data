@@ -14,11 +14,16 @@ class DataCollectionEloquentCast implements CastsAttributes
     public function __construct(
         protected string $dataClass,
         protected string $dataCollectionClass = DataCollection::class,
+        protected array $arguments = []
     ) {
     }
 
     public function get($model, string $key, $value, array $attributes): ?DataCollection
     {
+        if ($value === null && in_array('nullable', $this->arguments)) {
+            $value = '[]';
+        }
+
         if ($value === null) {
             return null;
         }

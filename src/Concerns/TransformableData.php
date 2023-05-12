@@ -28,6 +28,6 @@ trait TransformableData
 
     public static function castUsing(array $arguments)
     {
-        return new DataEloquentCast(static::class);
+        return new DataEloquentCast(static::class, $arguments);
     }
 }

@@ -5,7 +5,11 @@ use Illuminate\Support\Facades\DB;
 use function Pest\Laravel\assertDatabaseHas;
 
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
+
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithNullableCasts;
+
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithDefaultValue;
 
 beforeEach(function () {
     DummyModelWithCasts::migrate();
@@ -61,4 +65,17 @@ it('can load null as a value', function () {
     $model = DummyModelWithCasts::first();
 
     expect($model->data)->toBeNull();
+});
+
+it('loads a cast object when nullable argument used and value is null in database', function () {
+    DB::table('dummy_model_with_casts')->insert([
+        'data' => null,
+    ]);
+
+    /** @var \Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithNullableCasts $model */
+    $model = DummyModelWithNullableCasts::first();
+
+    expect($model->data)
+        ->toBeInstanceOf(SimpleDataWithDefaultValue::class)
+        ->string->toEqual('default');
 });
