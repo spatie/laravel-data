@@ -340,6 +340,8 @@ public string $closure;
 
 ### ExcludeIf
 
+*At the moment the data is not yet excluded due to technical reasons, v4 should fix this*
+
 [Docs](https://laravel.com/docs/9.x/validation#rule-exclude-if)
 
 ```php
@@ -349,6 +351,8 @@ public string $closure;
 
 ### ExcludeUnless
 
+*At the moment the data is not yet excluded due to technical reasons, v4 should fix this*
+
 [Docs](https://laravel.com/docs/9.x/validation#rule-exclude-unless)
 
 ```php
@@ -357,6 +361,8 @@ public string $closure;
 ```
 
 ### ExcludeWithout
+
+*At the moment the data is not yet excluded due to technical reasons, v4 should fix this*
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-exclude-without)
 
