@@ -29,7 +29,7 @@ class ValidatePropertiesDataPipe implements DataPipe
             return $properties;
         }
 
-       ($class->name)::validate($properties);
+        ($class->name)::validate($properties);
 
         return $properties;
     }

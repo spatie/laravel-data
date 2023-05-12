@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
