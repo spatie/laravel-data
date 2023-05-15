@@ -18,15 +18,13 @@ class SongData extends Data
 }
 ```
 
-The `Format` property here is an `Enum` from our [enum package](https://github.com/spatie/enum) and looks like this:
+The `Format` property here is an `Enum` and looks like this:
 
 ```php
-/**
- * @method static self cd()
- * @method static self vinyl()
- * @method static self cassette()
- */
-class Format extends Enum{
+enum Format {
+    case cd;
+    case vinyl;
+    case cassette;
 }
 ```
 
@@ -80,7 +78,7 @@ SongData::from([
 It is possible to provide parameters to the casts like this:
 
 ```php
-#[WithCast(EnumCast::class, class: Format::class)]
+#[WithCast(EnumCast::class, type: Format::class)]
 public Format $format
 ```
 
