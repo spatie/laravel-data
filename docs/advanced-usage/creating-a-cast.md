@@ -74,3 +74,29 @@ class Email implements Castable
   }
 }
 ```
+
+## Example: Custom cast for our [enum package](https://github.com/spatie/enum)
+
+```php
+class SpatieEnumCast implements Cast
+{
+
+    public function __construct(
+        protected string $type
+    ) { }
+
+    public function cast(DataProperty $property, mixed $value, array $context): Uncastable|\Spatie\Enum\Enum
+    {
+        if ($this->type === null) {
+            return Uncastable::create();
+        }
+
+        try {
+            return $this->type::from($value);
+        } catch (Throwable $e) {
+            throw CannotCastEnum::create($this->type, $value);
+        }
+    }
+
+}
+```
