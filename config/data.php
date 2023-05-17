@@ -68,4 +68,16 @@ return [
      * which will only enable the caster locally.
      */
     'var_dumper_caster_mode' => 'development',
+
+    /*
+     * This configuration property is used to override default namespace to store data objects.
+     * The --namespace option has the higher priority.
+     */
+    'namespace' => 'Data',
+
+    /*
+     * This configuration property is used for override default suffix in data objects class names.
+     * The --suffix option has higher priority.
+     */
+    'suffix' => 'Data',
 ];
