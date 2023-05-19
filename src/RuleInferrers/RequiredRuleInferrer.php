@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\RuleInferrers;
 
+use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\BooleanType;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Present;
@@ -32,6 +33,10 @@ class RequiredRuleInferrer implements RuleInferrer
         }
 
         if ($property->type->isDataCollectable && $rules->hasType(Present::class)) {
+            return false;
+        }
+
+        if ($rules->hasType(ArrayType::class) && $rules->hasType(Present::class)) {
             return false;
         }
 
