@@ -113,7 +113,7 @@ Route::patch('/songs/{slug}', [SongController::class, 'update']);
 // { "slug": "never-gonna-give-you-up", "name": "Never gonna give you up" }
 
 class SongData extends Data {
-    #[FromRouteParamete('slug', replaceWhenPresentInBody: false )]
+    #[FromRouteParameter('slug', replaceWhenPresentInBody: false )]
     public string $slug;
 }
 ```
