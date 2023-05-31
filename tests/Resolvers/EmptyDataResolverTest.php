@@ -76,9 +76,9 @@ class EmptyDataResolverTest extends TestCase
     /** @test */
     public function it_will_return_the_base_type_for_lazy_types()
     {
-//        $this->assertEmptyPropertyValue(null, new class() {
-//            public Lazy | string $property;
-//        });
+        //        $this->assertEmptyPropertyValue(null, new class() {
+        //            public Lazy | string $property;
+        //        });
 
         $this->assertEmptyPropertyValue([], new class () {
             public Lazy | array $property;

@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Tests\Fakes\Transformers;
 
 use function collect;
+
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Transformers\Transformer;
 
