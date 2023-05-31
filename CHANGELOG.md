@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 1.5.2 - 2023-05-31
+
+- Add laravel v10 support
+
 ## 3.5.1 - 2023-05-12
 
 - Add ability to instantiate an eloquent cast when null value using null database values (#425)
@@ -83,7 +87,7 @@ All notable changes to `laravel-data` will be documented in this file.
 ## 3.0.0 - 2023-02-01
 
 - The validation logic is completely rewritten
-- Add support for nested nullable and optional data objects 
+- Add support for nested nullable and optional data objects
 - Allow referencing other fields in validation attributes when the data is nested
 - Allow referencing url parameters (and even model properties) in validation attributes
 - Allow circular dependencies when validating data
