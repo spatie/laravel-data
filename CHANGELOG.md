@@ -14,6 +14,14 @@ All notable changes to `laravel-data` will be documented in this file.
 - Allow creating data objects using `from` without parameters
 - Add support for a Dto and Resource object
 
+## 3.6.0 - 2023-06-02
+
+- Add some config options to the `make:data` command (#449, #335)
+
+## 1.5.2 - 2023-05-31
+
+- Add laravel v10 support
+
 ## 3.5.1 - 2023-05-12
 
 - Add ability to instantiate an eloquent cast when null value using null database values (#425)

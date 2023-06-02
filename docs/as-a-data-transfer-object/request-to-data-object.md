@@ -51,9 +51,11 @@ class SongController{
 When creating a data object from a request, the package can also validate the values from the request that will be used
 to construct the data object.
 
+The package automatically infers rules for certain properties. For example, a `?string` property will automatically have the `nullable` and `string` rules.
+
 Be aware, first the rules will be generated from the data object you're trying to create, then if the validation is successful a data object will be created with the validated data. This means validation will be run before a data object exists. 
 
-It is possible to add rules as attributes to properties of a data object:
+It is possible to add extra rules as attributes to properties of a data object:
 
 ```php
 class SongData extends Data
@@ -71,6 +73,8 @@ When you provide an artist with a length of more than 20 characters, the validat
 you created a custom request class for the endpoint.
 
 You can find a complete list of available rules [here](/docs/laravel-data/v3/advanced-usage/validation-attributes).
+
+If you want to have full control over the rules, you can also define them in a dedicated `rules` method on the data object (see later).
 
 ### Referencing route parameters
 
@@ -208,6 +212,8 @@ class SongData extends Data
     }
 }
 ```
+
+By overwriting a property's rules within the `rules` method, no other rules will be inferred automatically anymore for that property.
 
 > Always use the array syntax for defining rules and not a single string which spits the rules by | characters.
 > This is needed when using regexes those | can be seen as part of the regex

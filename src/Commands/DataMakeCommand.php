@@ -53,14 +53,14 @@ class DataMakeCommand extends GeneratorCommand
                 'N',
                 InputOption::VALUE_REQUIRED,
                 'The namespace (under \App) to place this Data class.',
-                'Data',
+                config('data.commands.make.namespace', 'Data'),
             ],
             [
                 'suffix',
                 's',
                 InputOption::VALUE_REQUIRED,
                 'Suffix the class with this value.',
-                'Data',
+                config('data.commands.make.suffix', 'Data'),
             ],
             [
                 'force',
