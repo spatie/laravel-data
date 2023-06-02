@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.6.0 - 2023-06-02
+
+- Add some config options to the `make:data` command (#449, #335)
+
 ## 1.5.2 - 2023-05-31
 
 - Add laravel v10 support
