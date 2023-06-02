@@ -1,16 +1,7 @@
----
-name: Bug report
-about: Create a report to help us improve laravel-data
-title: ''
-labels: ''
-assignees: ''
-
----
-
-**Describe the bug**
+**✏️ Describe the bug**
 A clear and concise description of what the bug is.
 
-**To Reproduce**
+**↪️ To Reproduce**
 Provide us a pest test like this one which shows the problem:
 
 ```php
@@ -38,12 +29,12 @@ it('cannot validate nested data', function () {
 });
 ```
 
-Assertions aren't required, a simple dump or dd statement of what's going wrong is good enough :smile
+Assertions aren't required, a simple dump or dd statement of what's going wrong is good enough 😄
 
-**Expected behavior**
+**✅ Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Versions**
+**🖥️ Versions**
 
 Laravel:
 Laravel Data:
