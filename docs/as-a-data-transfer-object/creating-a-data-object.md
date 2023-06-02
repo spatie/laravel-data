@@ -263,7 +263,7 @@ Song::firstOrFail($id)->getData(); // A SongData object
 We can do the same with a FormRequest, we don't use a property here to define the data class but use a method instead:
 
 ```php
-class SongRequest extends Request
+class SongRequest extends FormRequest
 {
     use WithData;
     
