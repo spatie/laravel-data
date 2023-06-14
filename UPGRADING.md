@@ -30,7 +30,7 @@ class SomeData extends Data {
 }
 ```
   - The type of `$rules` in the RuleInferrer handle method changed from `RulesCollection` to `PropertyRules`
-  - RuleInferrers now take a $context parameter which is a `ValidationCOntext` in their handle method
+  - RuleInferrers now take a $context parameter which is a `ValidationContext` in their handle method
   - Validation attributes now keep track where they are being evaluated when you have nested data objects. Now field references are relative to the object and not to the root validated object
   - Some resolvers are removed like: `DataClassValidationRulesResolver`, `DataPropertyValidationRulesResolver`
   - The default order of rule inferrers has been changed
