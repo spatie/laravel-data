@@ -89,10 +89,10 @@ class DataCollectableAnnotationReader
 
             $arrayType = Arr::first(
                 explode('|', $types),
-                fn(string $type) => str_contains($type, '[]'),
+                fn (string $type) => str_contains($type, '[]'),
             );
 
-            if(empty($arrayType)){
+            if(empty($arrayType)) {
                 continue;
             }
 

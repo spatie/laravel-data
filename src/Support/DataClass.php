@@ -63,7 +63,7 @@ class DataClass
 
         $dataCollectablePropertyAnnotations = DataCollectableAnnotationReader::create()->getForClass($class);
 
-        if($constructor){
+        if($constructor) {
             $dataCollectablePropertyAnnotations = array_merge(
                 $dataCollectablePropertyAnnotations,
                 DataCollectableAnnotationReader::create()->getForMethod($constructor)
