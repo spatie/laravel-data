@@ -96,3 +96,17 @@ it('can get the data class for a data collection by class annotation', function 
         new DataCollectableAnnotation(SimpleData::class, property: 'propertyT'),
     ]);
 });
+
+it('can get data class for a data collection by method annotation', function () {
+    $annotations = app(DataCollectableAnnotationReader::class)->getForMethod(new ReflectionMethod(CollectionAnnotationsData::class, 'method'));
+
+    expect($annotations)->toEqualCanonicalizing([
+        new DataCollectableAnnotation(SimpleData::class, property: 'propertyA'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'propertyB'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'propertyC'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'propertyD'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'propertyE'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'propertyF'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'propertyG'),
+    ]);
+});

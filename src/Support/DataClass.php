@@ -63,6 +63,13 @@ class DataClass
 
         $dataCollectablePropertyAnnotations = DataCollectableAnnotationReader::create()->getForClass($class);
 
+        if($constructor){
+            $dataCollectablePropertyAnnotations = array_merge(
+                $dataCollectablePropertyAnnotations,
+                DataCollectableAnnotationReader::create()->getForMethod($constructor)
+            );
+        }
+
         $properties = self::resolveProperties(
             $class,
             $constructor,

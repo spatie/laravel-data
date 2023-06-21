@@ -28,9 +28,8 @@ use Spatie\LaravelData\Exceptions\InvalidDataType;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
-use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
+use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataType;
-use Spatie\LaravelData\Support\Factories\DataTypeFactory;
 use Spatie\LaravelData\Support\Lazy\ClosureLazy;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\InertiaLazy;
@@ -42,12 +41,9 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 
 function resolveDataType(object $class, string $property = 'property'): DataType
 {
-    $reflectionProperty = new ReflectionProperty($class, $property);
+    $class = DataClass::create(new ReflectionClass($class));
 
-    return DataTypeFactory::create()->build(
-        $reflectionProperty,
-        DataCollectableAnnotationReader::create()->getForClass($reflectionProperty->getDeclaringClass())[$property] ?? null,
-    );
+    return $class->properties->get($property)->type;
 }
 
 it('can deduce a type without definition', function () {
@@ -925,6 +921,26 @@ it('can annotate data collections using property annotations', function () {
     }
 
     $type = resolveDataType(new \TestDataTypeWithClassAnnotatedProperty([]));
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::Array)
+        ->dataClass->toBe(SimpleData::class)
+        ->dataCollectableClass->toBe('array');
+});
+
+it('can annotate data collections using constructor parameter annotations', function () {
+    class TestDataTypeWithClassAnnotatedConstructorParam
+    {
+        /**
+         * @param array<SimpleData> $property
+         */
+        public function __construct(
+            public array $property,
+        ) {
+        }
+    }
+
+    $type = resolveDataType(new \TestDataTypeWithClassAnnotatedConstructorParam([]));
 
     expect($type)
         ->kind->toBe(DataTypeKind::Array)

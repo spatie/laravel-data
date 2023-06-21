@@ -67,5 +67,27 @@ class CollectionAnnotationsData
     public array $propertyR;
 
     public array $propertyS;
+
     public array $propertyT;
+
+    /**
+     * @param \Spatie\LaravelData\Tests\Fakes\SimpleData[]|null $propertyA
+     * @param null|\Spatie\LaravelData\Tests\Fakes\SimpleData[] $propertyB
+     * @param  ?\Spatie\LaravelData\Tests\Fakes\SimpleData[] $propertyC
+     * @param ?\Spatie\LaravelData\Tests\Fakes\SimpleData[] $propertyD
+     * @param \Spatie\LaravelData\DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData> $propertyE
+     * @param ?\Spatie\LaravelData\DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData> $propertyF
+     * @param SimpleData[] $propertyG
+     */
+    public function method(
+        array $propertyA,
+        ?array $propertyB,
+        ?array $propertyC,
+        array $propertyD,
+        DataCollection $propertyE,
+        ?DataCollection $propertyF,
+        array $propertyG,
+    ) {
+
+    }
 }
