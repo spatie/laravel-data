@@ -1,0 +1,14 @@
+<?php
+
+namespace DummyNamespace;
+
+use Spatie\LaravelData\Casts\Cast;
+use Spatie\LaravelData\Support\DataProperty;
+
+class DummyClass implements Cast
+{
+    public function cast(DataProperty $property, mixed $value, array $context): mixed
+    {
+        //
+    }
+}
