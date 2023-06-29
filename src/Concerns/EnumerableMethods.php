@@ -66,6 +66,19 @@ trait EnumerableMethods
     }
 
     /**
+     * @template            TLastDefault
+     *
+     * @param null|         (callable(TValue,TKey): bool) $callback
+     * @param TLastDefault|(\Closure(): TLastDefault)  $default
+     *
+     * @return TValue|TLastDefault
+     */
+    public function last(callable|null $callback = null, $default = null)
+    {
+        return $this->items->last($callback, $default);
+    }
+
+    /**
      * @param callable(TValue, TKey): mixed $callback
      *
      * @return static
