@@ -38,7 +38,6 @@
         {
             "id": "spatie.create-laravel-data",
             "name": "Create Data",
-            "inputFilter": "data",
             "classSuffix": "Data",
             "files": [
                 {
@@ -59,7 +58,6 @@
         {
             "id": "spatie.create-laravel-data-cast",
             "name": "Create Data Cast",
-            "inputFilter": "cast",
             "classSuffix": "Cast",
             "files": [
                 {
@@ -80,7 +78,6 @@
         {
             "id": "spatie.create-laravel-data-transformer",
             "name": "Create Data Transformer",
-            "inputFilter": "data",
             "classSuffix": "Transformer",
             "files": [
                 {
@@ -101,7 +98,6 @@
         {
             "id": "spatie.create-laravel-data-rule",
             "name": "Create Data Rule",
-            "inputFilter": "rule",
             "classSuffix": "Rule",
             "files": [
                 {
