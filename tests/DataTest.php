@@ -68,6 +68,8 @@ use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\WithData;
 
 use function Spatie\Snapshots\assertMatchesSnapshot;
+use Spatie\LaravelData\Tests\Fakes\DataWithDatetimeImmutable;
+use Spatie\LaravelData\Attributes\Validation\Nullable;
 
 it('can create a resource', function () {
     $data = new SimpleData('Ruben');
@@ -566,6 +568,36 @@ it('can disabled except data dynamically from the request', function () {
     expect($response->getData(true))->toMatchArray([
         'last_name' => 'Van Assche',
     ]);
+});
+
+it('can validate nested data collection date from json string', function () {
+
+    $objectWithDataCollection = new class () extends Data {
+        #[DataCollectionOf(DataWithDatetimeImmutable::class), Nullable]
+        public ?DataCollection $collection;
+
+        public bool $boolean;
+    };
+
+    $firstJson = '{"date_to": "2020-05-16", "date_from": "2020-05-17"}';
+    $secondJson = '{"date_to": "2020-05-16", "date_from": "2020-05-15"}';
+
+    expect(DataWithDatetimeImmutable::from(json_decode($firstJson, true)))
+        ->date_to
+        ->toBeInstanceOf(DateTimeImmutable::class)
+        ->toEqual(DateTimeImmutable::createFromFormat('Y-m-d', '2020-05-16'));
+
+    expect(fn() => DataWithDatetimeImmutable::validateAndCreate(json_decode($secondJson, true)))
+        ->toThrow(ValidationException::class);
+
+    $jsonArray = json_decode('{"boolean":true,"collection":[{"date_to":"2020-05-16","date_from":"2020-05-15"},{"date_to":"2020-05-16","date_from":"2020-05-17"}]}', true);
+
+    expect($objectWithDataCollection::validateAndCreate($jsonArray))
+        ->boolean->toBeTrue();
+
+    expect(fn() => $objectWithDataCollection::validateAndCreate($jsonArray))
+        ->toThrow(ValidationException::class);
+
 });
 
 it('can get the data object without transforming', function () {
