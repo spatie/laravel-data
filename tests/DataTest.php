@@ -66,6 +66,7 @@ use Spatie\LaravelData\Tests\Fakes\UlarData;
 use Spatie\LaravelData\Tests\Fakes\UnionData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\WithData;
+
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can create a resource', function () {
