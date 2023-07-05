@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Exceptions;
 use Exception;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataClass;
+use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;
 use Throwable;
 
@@ -36,8 +37,8 @@ class CannotCreateData extends Exception
         $message .= " Parameters missing: {$dataClass
                 ->constructorMethod
                 ->parameters
-                ->reject(fn (DataProperty $parameter) => $parameters->has($parameter->name))
-                ->map(fn (DataProperty $parameter) => $parameter->name)
+                ->reject(fn (DataProperty|DataParameter $parameter) => $parameters->has($parameter->name))
+                ->map(fn (DataProperty|DataParameter $parameter) => $parameter->name)
                 ->join(', ')}.";
 
         return new self($message, previous: $previous);
