@@ -9,25 +9,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
-
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
-
-use function Pest\Laravel\mock;
-use function PHPUnit\Framework\assertFalse;
-
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-
 use Spatie\LaravelData\Attributes\MapInputName;
-
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
-
 use Spatie\LaravelData\Attributes\Validation\Bail;
-
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\In;
-
 use Spatie\LaravelData\Attributes\Validation\IntegerType;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
@@ -41,7 +31,6 @@ use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataPipeline;
-
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
@@ -71,6 +60,8 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttribute
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\Fakes\Support\FakeInjectable;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
+use function Pest\Laravel\mock;
+use function PHPUnit\Framework\assertFalse;
 
 it('can validate a string', function () {
     $dataClass = new class () extends Data {
@@ -2168,4 +2159,44 @@ it('can use laravel-data validation rules in laravel validator', function () {
 
     expect($validatorToPass->passes())->toBeTrue()
         ->and($validatorToFail->passes())->toBeFalse();
+});
+
+it('wont validate default values when they are not provided', function () {
+    $dataClass = new class () extends Data {
+        #[Min(10)]
+        public string $default = 'Hello World';
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([])
+        ->assertOk(['default' => 'Hi there in this world'])
+        ->assertErrors(['default' => 'minimal'])
+        ->assertErrors(['default' => null])
+        ->assertRules([], payload: [])
+        ->assertRules([
+            'default' => ['required', 'string', 'min:10'],
+        ], ['default' => 'something']);
+});
+
+it('wont validate default values when they are not provided and rules are overwritten', function () {
+    $dataClass = new class () extends Data {
+        public string $default = 'Hello World';
+
+        public static function rules(ValidationContext $context): array
+        {
+            return [
+                'default' => ['required', 'string', 'min:10'],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([])
+        ->assertOk(['default' => 'Hi there in this world'])
+        ->assertErrors(['default' => 'minimal'])
+        ->assertErrors(['default' => null])
+        ->assertRules([], payload: [])
+        ->assertRules([
+            'default' => ['required', 'string', 'min:10'],
+        ], ['default' => 'something']);
 });

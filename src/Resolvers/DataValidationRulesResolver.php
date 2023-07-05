@@ -34,10 +34,14 @@ class DataValidationRulesResolver
     ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
 
+        $withoutValidationProperties = [];
+
         foreach ($dataClass->properties as $dataProperty) {
             $propertyPath = $path->property($dataProperty->inputMappedName ?? $dataProperty->name);
 
-            if ($dataProperty->validate === false) {
+            if ($this->shouldSkipPropertyValidation($dataProperty, $fullPayload, $propertyPath)) {
+                $withoutValidationProperties[] = $dataProperty->name;
+
                 continue;
             }
 
@@ -63,9 +67,31 @@ class DataValidationRulesResolver
             $dataRules->add($propertyPath, $rules);
         }
 
-        $this->resolveOverwrittenRules($dataClass, $fullPayload, $path, $dataRules);
+        $this->resolveOverwrittenRules(
+            $dataClass,
+            $fullPayload,
+            $path,
+            $dataRules,
+            $withoutValidationProperties
+        );
 
         return $dataRules->rules;
+    }
+
+    protected function shouldSkipPropertyValidation(
+        DataProperty $dataProperty,
+        array $fullPayload,
+        ValidationPath $propertyPath,
+    ): bool {
+        if ($dataProperty->validate === false) {
+            return true;
+        }
+
+        if ($dataProperty->hasDefaultValue && Arr::has($fullPayload, $propertyPath->get()) === false) {
+            return true;
+        }
+
+        return false;
     }
 
     protected function resolveDataSpecificRules(
@@ -169,6 +195,7 @@ class DataValidationRulesResolver
         array $fullPayload,
         ValidationPath $path,
         DataRules $dataRules,
+        array $withoutValidationProperties
     ): void {
         if (! method_exists($class->name, 'rules')) {
             return;
@@ -183,6 +210,10 @@ class DataValidationRulesResolver
         $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $validationContext]);
 
         foreach ($overwrittenRules as $key => $rules) {
+            if (in_array($key, $withoutValidationProperties)) {
+                continue;
+            }
+
             $dataRules->add(
                 $path->property($key),
                 collect(Arr::wrap($rules))
