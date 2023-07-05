@@ -12,6 +12,7 @@ use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\Validation\Min;
+use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithCastable;
 use Spatie\LaravelData\Attributes\WithTransformer;
@@ -66,7 +67,6 @@ use Spatie\LaravelData\Tests\Fakes\UlarData;
 use Spatie\LaravelData\Tests\Fakes\UnionData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\WithData;
-
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can create a resource', function () {

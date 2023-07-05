@@ -26,6 +26,7 @@ use Spatie\LaravelData\Attributes\Validation\IntegerType;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
+use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\RequiredIf;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
@@ -2201,4 +2202,19 @@ it('wont validate default values when they are not provided and rules are overwr
         ->assertRules([
             'default' => ['required', 'string', 'min:10'],
         ], ['default' => 'something']);
+});
+
+it('a manual written present attribute rule always overwrites a generated required rule', function () {
+    $dataClass = new class () extends Data {
+        #[Present]
+        public array $array;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['array' => []])
+        ->assertOk(['array' => ['a', 'b']])
+        ->assertErrors(['array' => null])
+        ->assertRules([
+            'array' => ['array', 'present'],
+        ], []);
 });
