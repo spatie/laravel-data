@@ -1,0 +1,14 @@
+<?php
+
+namespace DummyNamespace;
+
+use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Transformers\Transformer;
+
+class DummyClass implements Transformer
+{
+    public function transform(DataProperty $property, mixed $value): mixed
+    {
+        //
+    }
+}

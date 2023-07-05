@@ -33,5 +33,87 @@
                 }
             ]
         }
+    ],
+    "codeGenerations": [
+        {
+            "id": "spatie.create-laravel-data",
+            "name": "Create Data",
+            "classSuffix": "Data",
+            "files": [
+                {
+                    "directory": "/app/Data",
+                    "name": "${INPUT_CLASS|className|upperCamelCase}.php",
+                    "template": {
+                        "type": "stub",
+                        "path": "/stubs/data.stub",
+                        "fallbackPath": "stubs/data.stub",
+                        "parameters": {
+                            "DummyClass": "${INPUT_CLASS|className|upperCamelCase}",
+                            "DummyNamespace": "${INPUT_FQN|namespace}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "spatie.create-laravel-data-cast",
+            "name": "Create Data Cast",
+            "classSuffix": "Cast",
+            "files": [
+                {
+                    "directory": "/app/Data/Casts",
+                    "name": "${INPUT_CLASS|className|upperCamelCase}.php",
+                    "template": {
+                        "type": "stub",
+                        "path": "/stubs/data-cast.stub",
+                        "fallbackPath": "stubs/data-cast.stub",
+                        "parameters": {
+                            "DummyClass": "${INPUT_CLASS|className|upperCamelCase}",
+                            "DummyNamespace": "${INPUT_FQN|namespace}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "spatie.create-laravel-data-transformer",
+            "name": "Create Data Transformer",
+            "classSuffix": "Transformer",
+            "files": [
+                {
+                    "directory": "/app/Data/Transformers",
+                    "name": "${INPUT_CLASS|className|upperCamelCase}.php",
+                    "template": {
+                        "type": "stub",
+                        "path": "/stubs/data-transformer.stub",
+                        "fallbackPath": "stubs/data-transformer.stub",
+                        "parameters": {
+                            "DummyClass": "${INPUT_CLASS|className|upperCamelCase}",
+                            "DummyNamespace": "${INPUT_FQN|namespace}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "spatie.create-laravel-data-rule",
+            "name": "Create Data Rule",
+            "classSuffix": "Rule",
+            "files": [
+                {
+                    "directory": "/app/Data/Rules",
+                    "name": "${INPUT_CLASS|className|upperCamelCase}.php",
+                    "template": {
+                        "type": "stub",
+                        "path": "/stubs/data-rule.stub",
+                        "fallbackPath": "stubs/data-rule.stub",
+                        "parameters": {
+                            "DummyClass": "${INPUT_CLASS|className|upperCamelCase}",
+                            "DummyNamespace": "${INPUT_FQN|namespace}"
+                        }
+                    }
+                }
+            ]
+        }
     ]
 }
