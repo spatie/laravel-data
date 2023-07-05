@@ -96,56 +96,6 @@ parameters:
 			path: src/Resolvers/DataFromArrayResolver.php
 
 		-
-			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$acceptedTypes is already assigned\\.$#"
-			count: 2
-			path: src/Support/DataType.php
-
-		-
-			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$dataClass is already assigned\\.$#"
-			count: 2
-			path: src/Support/DataType.php
-
-		-
-			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$dataCollectableType is already assigned\\.$#"
-			count: 2
-			path: src/Support/DataType.php
-
-		-
-			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$isDataCollectable is already assigned\\.$#"
-			count: 2
-			path: src/Support/DataType.php
-
-		-
-			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$isDataObject is already assigned\\.$#"
-			count: 2
-			path: src/Support/DataType.php
-
-		-
-			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$isLazy is already assigned\\.$#"
-			count: 2
-			path: src/Support/DataType.php
-
-		-
-			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$isMixed is already assigned\\.$#"
-			count: 2
-			path: src/Support/DataType.php
-
-		-
-			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$isNullable is already assigned\\.$#"
-			count: 2
-			path: src/Support/DataType.php
-
-		-
-			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$isOptional is already assigned\\.$#"
-			count: 2
-			path: src/Support/DataType.php
-
-		-
-			message: "#^Readonly property Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:\\$lazyType is already assigned\\.$#"
-			count: 2
-			path: src/Support/DataType.php
-
-		-
 			message: "#^Call to an undefined method DateTimeInterface\\:\\:setTimezone\\(\\)\\.$#"
 			count: 1
 			path: src/Transformers/DateTimeInterfaceTransformer.php
