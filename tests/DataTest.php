@@ -2462,3 +2462,21 @@ it('can have a computed value', function () {
     expect(fn () => $dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Ruben Versieck']))
         ->toThrow(CannotSetComputedValue::class);
 });
+
+it('throws a readable exception message when the constructor fails', function (
+    array $data,
+    string $message,
+) {
+    try {
+        MultiData::from($data);
+    } catch (CannotCreateData $e) {
+        expect($e->getMessage())->toBe($message);
+
+        return;
+    }
+
+    throw new Exception('We should not reach this point');
+})->with(fn () => [
+    yield 'no params' => [[], 'Could not create `Spatie\LaravelData\Tests\Fakes\MultiData`: the constructor requires 2 parameters, 0 given. Parameters missing: first, second.'],
+    yield 'one param' => [['first' => 'First'], 'Could not create `Spatie\LaravelData\Tests\Fakes\MultiData`: the constructor requires 2 parameters, 1 given. Parameters given: first. Parameters missing: second.'],
+]);

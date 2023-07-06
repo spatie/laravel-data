@@ -1,10 +1,10 @@
 <?php
 
-namespace {{ namespace }};
+namespace DummyNamespace;
 
 use Spatie\LaravelData\Data;
 
-class {{ class }} extends Data
+class DummyClass extends Data
 {
     public function __construct(
       //

@@ -29,7 +29,7 @@ Now the JSON looks like this:
 }
 ```
 
-Data objects will only get wrapped when you're sending them as a response and never when calling `toArray` or `toJson` on it.
+Data objects and collections will only get wrapped when you're sending them as a response and never when calling `toArray` or `toJson` on it.
 
 It is possible to define a default wrap key inside a data object:
 
@@ -211,4 +211,12 @@ Whenever a data object is wrapped due to the default wrap method or a global wra
 
 ```php
 SongData::from(Song::first())->withoutWrapping();
+```
+
+## Getting a wrapped array
+
+By default, `toArray` and `toJson` will never wrap a data object or collection, but it is possible to get a wrapped array:
+
+```php
+SongData::from(Song::first())->wrap('data')->transform(wrapExecutionType: WrapExecutionType::Enabled);
 ```
