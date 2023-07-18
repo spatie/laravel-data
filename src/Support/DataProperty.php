@@ -7,6 +7,7 @@ use ReflectionAttribute;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\GetsCast;
+use Spatie\LaravelData\Attributes\Hidden;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\Cast;
@@ -25,6 +26,7 @@ class DataProperty
         public readonly DataType $type,
         public readonly bool $validate,
         public readonly bool $computed,
+        public readonly bool $hidden,
         public readonly bool $isPromoted,
         public readonly bool $isReadonly,
         public readonly bool $hasDefaultValue,
@@ -66,6 +68,10 @@ class DataProperty
             fn (object $attribute) => $attribute instanceof Computed
         );
 
+        $hidden = $attributes->contains(
+            fn (object $attribute) => $attribute instanceof Hidden
+        );
+
         return new self(
             name: $property->name,
             className: $property->class,
@@ -74,6 +80,7 @@ class DataProperty
                 fn (object $attribute) => $attribute instanceof WithoutValidation
             ) && ! $computed,
             computed: $computed,
+            hidden: $hidden,
             isPromoted: $property->isPromoted(),
             isReadonly: $property->isReadOnly(),
             hasDefaultValue: $property->isPromoted() ? $hasDefaultValue : $property->hasDefaultValue(),

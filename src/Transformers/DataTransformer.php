@@ -70,6 +70,10 @@ class DataTransformer
         $payload = [];
 
         foreach ($dataClass->properties as $property) {
+            if ($property->hidden) {
+                continue;
+            }
+
             $name = $property->name;
 
             if (! $this->shouldIncludeProperty($name, $data->{$name}, $trees)) {

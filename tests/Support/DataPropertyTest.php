@@ -2,6 +2,7 @@
 
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\Hidden;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\WithCast;
@@ -149,6 +150,21 @@ it('can check if a property is computed', function () {
             #[Computed]
             public string $property;
         })->computed
+    )->toBeTrue();
+});
+
+it('can check if a property is hidden', function () {
+    expect(
+        resolveHelper(new class () {
+            public string $property;
+        })->hidden
+    )->toBeFalse();
+
+    expect(
+        resolveHelper(new class () {
+            #[Hidden]
+            public string $property;
+        })->hidden
     )->toBeTrue();
 });
 
