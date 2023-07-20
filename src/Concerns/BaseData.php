@@ -102,8 +102,9 @@ trait BaseData
         bool $transformValues = true,
         WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
         bool $mapPropertyNames = true,
+        bool $hideProperties = true,
     ): array {
-        return DataTransformer::create($transformValues, $wrapExecutionType, $mapPropertyNames)->transform($this);
+        return DataTransformer::create($transformValues, $wrapExecutionType, $mapPropertyNames, $hideProperties)->transform($this);
     }
 
     public function __sleep(): array

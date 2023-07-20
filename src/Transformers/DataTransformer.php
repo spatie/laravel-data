@@ -30,14 +30,16 @@ class DataTransformer
         bool $transformValues,
         WrapExecutionType $wrapExecutionType,
         bool $mapPropertyNames,
+        bool $hideProperties,
     ): self {
-        return new self($transformValues, $wrapExecutionType, $mapPropertyNames);
+        return new self($transformValues, $wrapExecutionType, $mapPropertyNames, $hideProperties);
     }
 
     public function __construct(
         protected bool $transformValues,
         protected WrapExecutionType $wrapExecutionType,
         protected bool $mapPropertyNames,
+        protected bool $hideProperties,
     ) {
         $this->config = app(DataConfig::class);
     }
@@ -70,7 +72,7 @@ class DataTransformer
         $payload = [];
 
         foreach ($dataClass->properties as $property) {
-            if ($property->hidden) {
+            if ($this->hideProperties && $property->hidden) {
                 continue;
             }
 

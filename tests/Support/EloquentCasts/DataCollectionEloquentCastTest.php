@@ -4,8 +4,10 @@ use Illuminate\Support\Facades\DB;
 
 use function Pest\Laravel\assertDatabaseHas;
 
-use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
+use Spatie\LaravelData\Tests\Fakes\HiddenData;
 
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCastsWithHidden;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCustomCollectionCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -13,6 +15,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataCollection;
 
 beforeEach(function () {
     DummyModelWithCasts::migrate();
+    DummyModelWithCastsWithHidden::migrate();
 });
 
 it('can save a data collection', function () {
@@ -61,6 +64,55 @@ it('can load a data object', function () {
     expect($model->data_collection)->toEqual(SimpleData::collection([
         new SimpleData('Hello'),
         new SimpleData('World'),
+    ]));
+});
+
+it('can save a data collection with hidden', function () {
+    DummyModelWithCastsWithHidden::create([
+        'data_collection' => HiddenData::collection([
+            new HiddenData(string: 'Hello', hidden: 'World'),
+            new HiddenData(string: 'World', hidden: 'Hello'),
+        ]),
+    ]);
+
+    assertDatabaseHas(DummyModelWithCastsWithHidden::class, [
+        'data_collection' => json_encode([
+            ['string' => 'Hello', 'hidden' => 'World'],
+            ['string' => 'World', 'hidden' => 'Hello'],
+        ]),
+    ]);
+});
+
+it('can save a data object as an array with hidden', function () {
+    DummyModelWithCastsWithHidden::create([
+        'data_collection' => [
+            ['string' => 'Hello', 'hidden' => 'World'],
+            ['string' => 'World', 'hidden' => 'Hello'],
+        ],
+    ]);
+
+    assertDatabaseHas(DummyModelWithCastsWithHidden::class, [
+        'data_collection' => json_encode([
+            ['string' => 'Hello', 'hidden' => 'World'],
+            ['string' => 'World', 'hidden' => 'Hello'],
+        ]),
+    ]);
+});
+
+it('can load a data object with hidden', function () {
+    DB::table('dummy_model_with_casts_with_hiddens')->insert([
+        'data_collection' => json_encode([
+            ['string' => 'Hello', 'hidden' => 'World'],
+            ['string' => 'World', 'hidden' => 'Hello'],
+        ]),
+    ]);
+
+    /** @var \Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCastsWithHidden $model */
+    $model = DummyModelWithCastsWithHidden::first();
+
+    expect($model->data_collection)->toEqual(HiddenData::collection([
+        new HiddenData(string: 'Hello', hidden: 'World'),
+        new HiddenData(string: 'World', hidden: 'Hello'),
     ]));
 });
 

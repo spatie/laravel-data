@@ -20,6 +20,7 @@ class DataCollectableTransformer
         protected bool $transformValues,
         protected WrapExecutionType $wrapExecutionType,
         protected bool $mapPropertyNames,
+        protected bool $hideProperties,
         protected PartialTrees $trees,
         protected Enumerable|CursorPaginator|Paginator $items,
         protected Wrap $wrap,
@@ -60,6 +61,7 @@ class DataCollectableTransformer
                     ? WrapExecutionType::TemporarilyDisabled
                     : $this->wrapExecutionType,
                 $this->mapPropertyNames,
+                $this->hideProperties,
             );
         }
 
