@@ -48,7 +48,6 @@ $post = new PostData(
     'Hello laravel-data',
     'This is an introduction post for the new package',
     PostStatus::published,
-    null,
     CarbonImmutable::now()
 );
 ```
