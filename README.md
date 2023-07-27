@@ -48,7 +48,7 @@ Why would you be using this package?
 
 ## Are you a visual learner?
 
-In this talk, given at Laracon, you'll see [an introduction to Laravel Data](https://www.youtube.com/watch?v=f4QShF42c6E&t=29110s).
+In this talk, given at Laracon, you'll see [an introduction to Laravel Data](https://www.youtube.com/watch?v=CrO_7Df1cBc).
 
 ## Support us
 
