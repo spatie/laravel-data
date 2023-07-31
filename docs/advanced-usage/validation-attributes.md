@@ -857,7 +857,7 @@ public string $closure;
 
 ### Unique
 
-[Docs](https://laravel.com/docs/9.x/validation#rule-unqiue)
+[Docs](https://laravel.com/docs/9.x/validation#rule-unique)
 
 ```php
 #[Unique('users')]
