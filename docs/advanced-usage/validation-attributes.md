@@ -888,6 +888,15 @@ public string $closure;
 public string $closure; 
 ```
 
+### Ulid
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-ulid)
+
+```php
+#[Ulid]
+public string $closure; 
+```
+
 ### Uuid
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-uuid)
