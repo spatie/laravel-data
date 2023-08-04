@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.7.1 - 2023-08-04
+
+- fix target namespace when creating files with Laravel Idea (#497)
+- allow collection to be created passing null (#507)
+- add Ulid validation rule (#510)   
+  -add TARGET_PARAMETER to Attribute for improved Validation (#523)
+
 ## 3.7.0 - 2023-07-05
 
 - Add support for better exception messages when parameters are missing
