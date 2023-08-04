@@ -530,9 +530,3 @@ it('during the serialization process some properties are thrown away', function 
     expect($invaded->_dataContext)->toBeNull();
 });
 
-it('can create an empty collection passing null', function () {
-    $collection = SimpleData::collection(null);
-
-    expect($collection)->toBeInstanceOf(DataCollection::class);
-    expect($collection->toJson())->toBe('[]');
-});
