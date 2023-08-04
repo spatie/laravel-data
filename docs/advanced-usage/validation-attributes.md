@@ -67,13 +67,14 @@ public string $closure;
 [Docs](https://laravel.com/docs/9.x/validation#rule-after)
 
 ```php
-#[After('other_field')]
-public Carbon $closure; 
-
 #[After('tomorrow')]
 public Carbon $closure; 
 
 #[After(Carbon::yesterday())]
+public Carbon $closure; 
+
+// Always use field references when referencing other fields
+#[After(new FieldReference('other_field'))]
 public Carbon $closure; 
 ```
 
@@ -82,13 +83,14 @@ public Carbon $closure;
 [Docs](https://laravel.com/docs/9.x/validation#rule-after-or-equal)
 
 ```php
-#[AfterOrEqual('other_field')]
-public Carbon $closure; 
-
 #[AfterOrEqual('tomorrow')]
 public Carbon $closure; 
 
 #[AfterOrEqual(Carbon::yesterday())]
+public Carbon $closure; 
+
+// Always use field references when referencing other fields
+#[AfterOrEqual(new FieldReference('other_field'))]
 public Carbon $closure; 
 ```
 
@@ -148,13 +150,14 @@ public string $closure;
 [Docs](https://laravel.com/docs/9.x/validation#rule-before)
 
 ```php
-#[Before('other_field')]
-public Carbon $closure; 
-
 #[Before('tomorrow')]
 public Carbon $closure; 
 
 #[Before(Carbon::yesterday())]
+public Carbon $closure; 
+
+// Always use field references when referencing other fields
+#[Before(new FieldReference('other_field'))]
 public Carbon $closure; 
 ```
 
@@ -163,13 +166,14 @@ public Carbon $closure;
 [Docs](https://laravel.com/docs/9.x/validation#rule-before-or-equal)
 
 ```php
-#[BeforeOrEqual('other_field')]
-public Carbon $closure; 
-
 #[BeforeOrEqual('tomorrow')]
 public Carbon $closure; 
 
 #[BeforeOrEqual(Carbon::yesterday())]
+public Carbon $closure; 
+
+// Always use field references when referencing other fields
+#[BeforeOrEqual(new FieldReference('other_field'))]
 public Carbon $closure; 
 ```
 
