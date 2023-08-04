@@ -61,6 +61,6 @@ class DataCollectionEloquentCast implements CastsAttributes
 
         $dataCollection = new ($this->dataCollectionClass)($this->dataClass, $data);
 
-        return $dataCollection->hideAttributes(false)->toJson();
+        return $dataCollection->toJson();
     }
 }

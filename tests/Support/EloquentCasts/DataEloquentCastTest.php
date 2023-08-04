@@ -4,10 +4,8 @@ use Illuminate\Support\Facades\DB;
 
 use function Pest\Laravel\assertDatabaseHas;
 
-use Spatie\LaravelData\Tests\Fakes\HiddenData;
-
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
-use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCastsWithHidden;
+
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
 
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -15,7 +13,6 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataWithDefaultValue;
 
 beforeEach(function () {
     DummyModelWithCasts::migrate();
-    DummyModelWithCastsWithHidden::migrate();
 });
 
 it('can save a data object', function () {
@@ -47,37 +44,6 @@ it('can load a data object', function () {
     $model = DummyModelWithCasts::first();
 
     expect($model->data)->toEqual(new SimpleData('Test'));
-});
-
-it('can save a data object with hidden', function () {
-    DummyModelWithCastsWithHidden::create([
-        'data' => new HiddenData(string: 'Test', hidden: 'Hidden'),
-    ]);
-
-    assertDatabaseHas(DummyModelWithCastsWithHidden::class, [
-        'data' => json_encode(['string' => 'Test', 'hidden' => 'Hidden']),
-    ]);
-});
-
-it('can save a data object as an array with hidden', function () {
-    DummyModelWithCastsWithHidden::create([
-        'data' => ['string' => 'Test', 'hidden' => 'Hidden'],
-    ]);
-
-    assertDatabaseHas(DummyModelWithCastsWithHidden::class, [
-        'data' => json_encode(['string' => 'Test', 'hidden' => 'Hidden']),
-    ]);
-});
-
-it('can load a data object with hidden', function () {
-    DB::table('dummy_model_with_casts_with_hiddens')->insert([
-        'data' => json_encode(['string' => 'Test', 'hidden' => 'Hidden']),
-    ]);
-
-    /** @var \Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts $model */
-    $model = DummyModelWithCastsWithHidden::first();
-
-    expect($model->data)->toEqual(new HiddenData(string: 'Test', hidden: 'Hidden'));
 });
 
 it('can save a null as a value', function () {

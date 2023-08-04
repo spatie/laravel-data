@@ -50,6 +50,6 @@ class DataEloquentCast implements CastsAttributes
             throw CannotCastData::shouldBeTransformableData($model::class, $key);
         }
 
-        return $value->hideAttributes(false)->toJson();
+        return $value->toJson();
     }
 }

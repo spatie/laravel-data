@@ -25,6 +25,4 @@ interface TransformableData extends JsonSerializable, Jsonable, Arrayable, Eloqu
     ): array;
 
     public static function castUsing(array $arguments);
-
-    public function hideAttributes(bool $hideProperties): static;
 }
