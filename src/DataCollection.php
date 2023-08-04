@@ -45,9 +45,9 @@ class DataCollection implements DataCollectable, ArrayAccess
      */
     public function __construct(
         public readonly string $dataClass,
-        Enumerable|array|DataCollection $items
+        Enumerable|array|DataCollection|null $items
     ) {
-        if (is_array($items)) {
+        if (is_array($items) || is_null($items)) {
             $items = new Collection($items);
         }
 
