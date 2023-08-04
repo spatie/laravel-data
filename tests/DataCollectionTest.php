@@ -529,4 +529,3 @@ it('during the serialization process some properties are thrown away', function 
 
     expect($invaded->_dataContext)->toBeNull();
 });
-
