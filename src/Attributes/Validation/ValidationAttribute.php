@@ -22,7 +22,7 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
 
     protected static function parseDateValue(mixed $value): mixed
     {
-        if (! is_string($value)) {
+        if (!is_string($value)) {
             return $value;
         }
 
@@ -41,7 +41,7 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
 
     protected static function parseBooleanValue(mixed $value): mixed
     {
-        if (! is_string($value)) {
+        if (!is_string($value)) {
             return $value;
         }
 
@@ -58,7 +58,8 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
 
     protected function parseFieldReference(
         string|FieldReference $reference
-    ): FieldReference {
+    ): FieldReference
+    {
         return $reference instanceof FieldReference
             ? $reference
             : new FieldReference($reference);

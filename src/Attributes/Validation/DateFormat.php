@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class DateFormat extends StringValidationAttribute
 {
     public function __construct(protected string $format)

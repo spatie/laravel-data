@@ -6,10 +6,10 @@ use Attribute;
 use DateTimeInterface;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class DateEquals extends StringValidationAttribute
 {
-    public function __construct(protected string | DateTimeInterface|RouteParameterReference $date)
+    public function __construct(protected string|DateTimeInterface|RouteParameterReference $date)
     {
     }
 

@@ -8,7 +8,7 @@ use Illuminate\Validation\Rules\NotIn as BaseNotIn;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class NotIn extends ObjectValidationAttribute
 {
     protected BaseNotIn $rule;
@@ -22,7 +22,7 @@ class NotIn extends ObjectValidationAttribute
         }
 
         $values = array_map(
-            fn (string|RouteParameterReference $value) => $this->normalizePossibleRouteReferenceParameter($value),
+            fn(string|RouteParameterReference $value) => $this->normalizePossibleRouteReferenceParameter($value),
             Arr::flatten($values)
         );
 

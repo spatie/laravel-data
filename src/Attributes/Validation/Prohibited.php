@@ -6,7 +6,7 @@ use Attribute;
 use Illuminate\Validation\Rules\ProhibitedIf;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Prohibited extends ObjectValidationAttribute
 {
     public function __construct(protected ?ProhibitedIf $rule = null)
