@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Email extends StringValidationAttribute
 {
     public const RfcValidation = 'rfc';

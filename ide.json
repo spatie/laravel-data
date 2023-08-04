@@ -41,7 +41,7 @@
             "classSuffix": "Data",
             "files": [
                 {
-                    "directory": "/app/Data",
+                    "appNamespace": "Data",
                     "name": "${INPUT_CLASS|className|upperCamelCase}.php",
                     "template": {
                         "type": "stub",
@@ -61,7 +61,7 @@
             "classSuffix": "Cast",
             "files": [
                 {
-                    "directory": "/app/Data/Casts",
+                    "appNamespace": "Data\\Casts",
                     "name": "${INPUT_CLASS|className|upperCamelCase}.php",
                     "template": {
                         "type": "stub",
@@ -81,7 +81,7 @@
             "classSuffix": "Transformer",
             "files": [
                 {
-                    "directory": "/app/Data/Transformers",
+                    "appNamespace": "Data\\Transformers",
                     "name": "${INPUT_CLASS|className|upperCamelCase}.php",
                     "template": {
                         "type": "stub",
@@ -101,7 +101,7 @@
             "classSuffix": "Rule",
             "files": [
                 {
-                    "directory": "/app/Data/Rules",
+                    "appNamespace": "Data\\Rules",
                     "name": "${INPUT_CLASS|className|upperCamelCase}.php",
                     "template": {
                         "type": "stub",

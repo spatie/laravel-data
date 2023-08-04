@@ -9,7 +9,7 @@ use Illuminate\Validation\Rules\Unique as BaseUnique;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Unique extends ObjectValidationAttribute
 {
     protected BaseUnique $rule;
@@ -20,10 +20,10 @@ class Unique extends ObjectValidationAttribute
         null|string|RouteParameterReference $connection = null,
         null|string|RouteParameterReference $ignore = null,
         null|string|RouteParameterReference $ignoreColumn = null,
-        bool|RouteParameterReference $withoutTrashed = false,
-        string|RouteParameterReference $deletedAtColumn = 'deleted_at',
-        ?Closure $where = null,
-        ?BaseUnique $rule = null
+        bool|RouteParameterReference        $withoutTrashed = false,
+        string|RouteParameterReference      $deletedAtColumn = 'deleted_at',
+        ?Closure                            $where = null,
+        ?BaseUnique                         $rule = null
     ) {
         $table = $this->normalizePossibleRouteReferenceParameter($table);
         $column = $this->normalizePossibleRouteReferenceParameter($column);

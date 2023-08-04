@@ -9,7 +9,7 @@ use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class RequiredUnless extends StringValidationAttribute implements RequiringRule
 {
     protected FieldReference $field;
@@ -17,8 +17,8 @@ class RequiredUnless extends StringValidationAttribute implements RequiringRule
     protected string|array $values;
 
     public function __construct(
-        string|FieldReference $field,
-        array|string|BackedEnum | RouteParameterReference ...$values
+        string|FieldReference                           $field,
+        array|string|BackedEnum|RouteParameterReference ...$values
     ) {
         $this->field = $this->parseFieldReference($field);
         $this->values = Arr::flatten($values);

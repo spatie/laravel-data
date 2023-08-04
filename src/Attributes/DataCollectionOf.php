@@ -14,7 +14,7 @@ class DataCollectionOf
         public string $class
     ) {
         if (! is_subclass_of($this->class, BaseData::class)) {
-            throw new CannotFindDataClass('Class given does not implement `DataObject::class`');
+            throw new CannotFindDataClass("Class {$this->class} given does not implement `DataObject::class`");
         }
     }
 }

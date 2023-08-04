@@ -78,6 +78,7 @@ use Spatie\LaravelData\Attributes\Validation\Sometimes;
 use Spatie\LaravelData\Attributes\Validation\StartsWith;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Timezone;
+use Spatie\LaravelData\Attributes\Validation\Ulid;
 use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
@@ -178,6 +179,7 @@ class ValidationRuleFactory
             Timezone::keyword() => Timezone::class,
             Unique::keyword() => Unique::class,
             Url::keyword() => Url::class,
+            Ulid::keyword() => Ulid::class,
             Uuid::keyword() => Uuid::class,
         ];
     }

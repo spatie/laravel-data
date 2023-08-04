@@ -81,6 +81,7 @@ use Spatie\LaravelData\Attributes\Validation\Sometimes;
 use Spatie\LaravelData\Attributes\Validation\StartsWith;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Timezone;
+use Spatie\LaravelData\Attributes\Validation\Ulid;
 use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
@@ -360,6 +361,11 @@ dataset('attributes', function () {
     yield fixature(
         attribute: new Url(),
         expected: 'url',
+    );
+
+    yield fixature(
+        attribute: new Ulid(),
+        expected: 'ulid',
     );
 
     yield fixature(

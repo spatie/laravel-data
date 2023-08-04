@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class RequiredWith extends StringValidationAttribute implements RequiringRule
 {
     protected array $fields;

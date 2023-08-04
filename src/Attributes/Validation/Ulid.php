@@ -4,12 +4,12 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 
-#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
-class ActiveUrl extends StringValidationAttribute
+#[Attribute(Attribute::TARGET_PROPERTY)]
+class Ulid extends StringValidationAttribute
 {
     public static function keyword(): string
     {
-        return 'active_url';
+        return 'ulid';
     }
 
     public function parameters(): array

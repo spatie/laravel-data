@@ -6,7 +6,7 @@ use Attribute;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Prohibits extends StringValidationAttribute
 {
     protected array $fields;

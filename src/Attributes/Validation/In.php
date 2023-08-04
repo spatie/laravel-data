@@ -8,7 +8,7 @@ use Illuminate\Validation\Rules\In as BaseIn;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class In extends ObjectValidationAttribute
 {
     protected BaseIn $rule;

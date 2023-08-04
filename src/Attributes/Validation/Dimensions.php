@@ -9,20 +9,20 @@ use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Dimensions extends ObjectValidationAttribute
 {
     protected BaseDimensions $rule;
 
     public function __construct(
-        null|int|RouteParameterReference $minWidth = null,
-        null|int|RouteParameterReference $minHeight = null,
-        null|int|RouteParameterReference $maxWidth = null,
-        null|int|RouteParameterReference $maxHeight = null,
+        null|int|RouteParameterReference          $minWidth = null,
+        null|int|RouteParameterReference          $minHeight = null,
+        null|int|RouteParameterReference          $maxWidth = null,
+        null|int|RouteParameterReference          $maxHeight = null,
         null|float|string|RouteParameterReference $ratio = null,
-        null|int|RouteParameterReference $width = null,
-        null|int|RouteParameterReference $height = null,
-        null|BaseDimensions $rule = null,
+        null|int|RouteParameterReference          $width = null,
+        null|int|RouteParameterReference          $height = null,
+        null|BaseDimensions                       $rule = null,
     ) {
         $minWidth = $this->normalizePossibleRouteReferenceParameter($minWidth);
         $minHeight = $this->normalizePossibleRouteReferenceParameter($minHeight);
