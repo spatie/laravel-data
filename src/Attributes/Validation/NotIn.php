@@ -22,7 +22,7 @@ class NotIn extends ObjectValidationAttribute
         }
 
         $values = array_map(
-            fn(string|RouteParameterReference $value) => $this->normalizePossibleRouteReferenceParameter($value),
+            fn (string|RouteParameterReference $value) => $this->normalizePossibleRouteReferenceParameter($value),
             Arr::flatten($values)
         );
 

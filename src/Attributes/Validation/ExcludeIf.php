@@ -15,8 +15,7 @@ class ExcludeIf extends StringValidationAttribute
     public function __construct(
         string|FieldReference                                              $field,
         protected string|int|float|bool|BackedEnum|RouteParameterReference $value
-    )
-    {
+    ) {
         $this->field = $this->parseFieldReference($field);
     }
 

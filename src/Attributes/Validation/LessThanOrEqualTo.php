@@ -12,8 +12,7 @@ class LessThanOrEqualTo extends StringValidationAttribute
 
     public function __construct(
         string|FieldReference $field,
-    )
-    {
+    ) {
         $this->field = $this->parseFieldReference($field);
     }
 

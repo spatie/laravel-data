@@ -24,8 +24,7 @@ class Unique extends ObjectValidationAttribute
         string|RouteParameterReference      $deletedAtColumn = 'deleted_at',
         ?Closure                            $where = null,
         ?BaseUnique                         $rule = null
-    )
-    {
+    ) {
         $table = $this->normalizePossibleRouteReferenceParameter($table);
         $column = $this->normalizePossibleRouteReferenceParameter($column);
         $connection = $this->normalizePossibleRouteReferenceParameter($connection);

@@ -23,8 +23,7 @@ class Dimensions extends ObjectValidationAttribute
         null|int|RouteParameterReference          $width = null,
         null|int|RouteParameterReference          $height = null,
         null|BaseDimensions                       $rule = null,
-    )
-    {
+    ) {
         $minWidth = $this->normalizePossibleRouteReferenceParameter($minWidth);
         $minHeight = $this->normalizePossibleRouteReferenceParameter($minHeight);
         $maxWidth = $this->normalizePossibleRouteReferenceParameter($maxWidth);

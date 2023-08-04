@@ -19,8 +19,7 @@ class RequiredIf extends StringValidationAttribute implements RequiringRule
     public function __construct(
         string|FieldReference                           $field,
         array|string|BackedEnum|RouteParameterReference ...$values
-    )
-    {
+    ) {
         $this->field = $this->parseFieldReference($field);
         $this->values = Arr::flatten($values);
     }

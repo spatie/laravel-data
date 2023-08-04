@@ -23,8 +23,7 @@ class Password extends ObjectValidationAttribute
         int|RouteParameterReference  $uncompromisedThreshold = 0,
         bool|RouteParameterReference $default = false,
         ?BasePassword                $rule = null,
-    )
-    {
+    ) {
         $min = $this->normalizePossibleRouteReferenceParameter($min);
         $letters = $this->normalizePossibleRouteReferenceParameter($letters);
         $mixedCase = $this->normalizePossibleRouteReferenceParameter($mixedCase);
