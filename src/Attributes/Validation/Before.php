@@ -7,7 +7,7 @@ use DateTimeInterface;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Before extends StringValidationAttribute
 {
     public function __construct(protected string|DateTimeInterface|RouteParameterReference|FieldReference $date)

@@ -7,7 +7,7 @@ use Illuminate\Validation\Rules\RequiredIf;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Required extends ObjectValidationAttribute implements RequiringRule
 {
     public function __construct(protected ?RequiredIf $rule = null)

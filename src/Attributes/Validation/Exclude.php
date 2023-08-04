@@ -6,7 +6,7 @@ use Attribute;
 use Illuminate\Validation\Rules\ExcludeIf;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Exclude extends ObjectValidationAttribute
 {
     public function __construct(protected ExcludeIf $rule)

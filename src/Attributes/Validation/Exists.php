@@ -9,7 +9,7 @@ use Illuminate\Validation\Rules\Exists as BaseExists;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Exists extends ObjectValidationAttribute
 {
     protected BaseExists $rule;

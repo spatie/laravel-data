@@ -8,22 +8,23 @@ use Illuminate\Validation\Rules\Password as BasePassword;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Password extends ObjectValidationAttribute
 {
     protected BasePassword $rule;
 
     public function __construct(
-        int|RouteParameterReference $min = 12,
+        int|RouteParameterReference  $min = 12,
         bool|RouteParameterReference $letters = false,
         bool|RouteParameterReference $mixedCase = false,
         bool|RouteParameterReference $numbers = false,
         bool|RouteParameterReference $symbols = false,
         bool|RouteParameterReference $uncompromised = false,
-        int|RouteParameterReference $uncompromisedThreshold = 0,
+        int|RouteParameterReference  $uncompromisedThreshold = 0,
         bool|RouteParameterReference $default = false,
-        ?BasePassword $rule = null,
-    ) {
+        ?BasePassword                $rule = null,
+    )
+    {
         $min = $this->normalizePossibleRouteReferenceParameter($min);
         $letters = $this->normalizePossibleRouteReferenceParameter($letters);
         $mixedCase = $this->normalizePossibleRouteReferenceParameter($mixedCase);

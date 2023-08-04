@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\ValidationRule as ValidationRuleContract;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Rule extends ValidationRule
 {
     /** @var array<string|array|ValidationRule|RuleContract|InvokableRuleContract|ValidationRuleContract> */
