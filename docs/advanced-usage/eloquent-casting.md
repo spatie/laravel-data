@@ -126,7 +126,7 @@ app(DataConfig::class)->enforceMorphMap([
     'cd_record_config' => CdRecordConfig::class,
     'vinyl_record_config' => VinylRecordConfig::class,
 ]);
-```php
+```
 
 ## Casting data collections
 
