@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support;
 
-
 use Spatie\LaravelData\Contracts\BaseData;
 
 class DataClassMorphMap

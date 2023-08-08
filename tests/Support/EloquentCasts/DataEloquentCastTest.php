@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\DB;
+
+use function Pest\Laravel\assertDatabaseHas;
+
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
@@ -8,7 +11,6 @@ use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithDefaultValue;
-use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(function () {
     DummyModelWithCasts::migrate();
@@ -103,7 +105,7 @@ it('can use an abstract data class with multiple children', function () {
         ->b->toBe('B\B');
 });
 
-it('can use an abstract data class with morph map', function (){
+it('can use an abstract data class with morph map', function () {
     app(DataConfig::class)->enforceMorphMap([
         'a' => AbstractDataA::class,
     ]);

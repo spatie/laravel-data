@@ -6,7 +6,6 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
-use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 
 class DataEloquentCast implements CastsAttributes
