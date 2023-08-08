@@ -106,6 +106,14 @@ trait BaseData
         return DataTransformer::create($transformValues, $wrapExecutionType, $mapPropertyNames)->transform($this);
     }
 
+    public function getMorphClass(): string
+    {
+        /** @var class-string<\Spatie\LaravelData\Contracts\BaseData> $class */
+        $class = static::class;
+
+        return app(DataConfig::class)->morphMap->getDataClassAlias($class) ?? $class;
+    }
+
     public function __sleep(): array
     {
         return app(DataConfig::class)->getDataClass(static::class)

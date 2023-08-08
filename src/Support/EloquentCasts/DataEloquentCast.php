@@ -6,15 +6,20 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
+use Spatie\LaravelData\Support\DataClass;
+use Spatie\LaravelData\Support\DataConfig;
 
 class DataEloquentCast implements CastsAttributes
 {
+    protected DataConfig $dataConfig;
+
     public function __construct(
         /** @var class-string<\Spatie\LaravelData\Contracts\BaseData> $dataClass */
         protected string $dataClass,
         /** @var string[] $arguments */
         protected array $arguments = []
     ) {
+        $this->dataConfig = app(DataConfig::class);
     }
 
     public function get($model, string $key, $value, array $attributes): ?BaseData
@@ -29,6 +34,13 @@ class DataEloquentCast implements CastsAttributes
 
         $payload = json_decode($value, true, flags: JSON_THROW_ON_ERROR);
 
+        if ($this->isAbstractClassCast()) {
+            /** @var class-string<BaseData> $dataClass */
+            $dataClass = $this->dataConfig->morphMap->getMorphedDataClass($payload['type']) ?? $payload['type'];
+
+            return $dataClass::from($payload['data']);
+        }
+
         return ($this->dataClass)::from($payload);
     }
 
@@ -38,7 +50,9 @@ class DataEloquentCast implements CastsAttributes
             return null;
         }
 
-        if (is_array($value)) {
+        $isAbstractClassCast = $this->isAbstractClassCast();
+
+        if (is_array($value) && ! $isAbstractClassCast) {
             $value = ($this->dataClass)::from($value);
         }
 
@@ -50,6 +64,18 @@ class DataEloquentCast implements CastsAttributes
             throw CannotCastData::shouldBeTransformableData($model::class, $key);
         }
 
+        if ($isAbstractClassCast) {
+            return json_encode([
+                'type' => $this->dataConfig->morphMap->getDataClassAlias($value::class) ?? $value::class,
+                'data' => $value->toJson(),
+            ]);
+        }
+
         return $value->toJson();
+    }
+
+    protected function isAbstractClassCast(): bool
+    {
+        return $this->dataConfig->getDataClass($this->dataClass)->isAbstract;
     }
 }

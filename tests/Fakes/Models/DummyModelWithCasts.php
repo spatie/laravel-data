@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 class DummyModelWithCasts extends Model
@@ -13,6 +14,7 @@ class DummyModelWithCasts extends Model
     protected $casts = [
         'data' => SimpleData::class,
         'data_collection' => DataCollection::class.':'.SimpleData::class,
+        'abstract_data' => AbstractData::class,
     ];
 
     public $timestamps = false;
@@ -24,6 +26,7 @@ class DummyModelWithCasts extends Model
 
             $blueprint->text('data')->nullable();
             $blueprint->text('data_collection')->nullable();
+            $blueprint->text('abstract_data')->nullable();
         });
     }
 }

@@ -40,6 +40,94 @@ This will internally be converted to a data object which you can later retrieve 
 Song::findOrFail($id)->artist; // ArtistData object
 ```
 
+### Abstract data objects
+
+Sometimes you have an abstract parent data object with multiple child data objects, for example:
+
+```php
+abstract class RecordConfig extends Data
+{
+    public function __construct(
+        public int $tracks,
+    ) {}
+}
+
+class CdRecordConfig extends RecordConfig
+{
+    public function __construct(
+        int $tracks
+        public int $bytes,
+    ) {
+        parent::__construct($tracks);
+    }
+}
+
+class VinylRecord extends RecordConfig
+{
+    public function __construct(
+        int $tracks
+        public int $rpm,
+    ) {
+        parent::__construct($tracks);
+    }
+}
+```
+
+A model can have a JSON field which is either one of these data objects:
+
+```php
+class Record extends Model
+{
+    protected $casts = [
+        'config' => RecordConfig::class,
+    ];
+}
+```
+
+You can then store either a `CdRecordConfig` or a `VinylRecord` in the `config` field:
+
+```php
+$cdRecord = Record::create([
+    'config' => new CdRecordConfig(tracks: 12, bytes: 1000),
+]);
+
+$vinylRecord = Record::create([
+    'config' => new VinylRecord(tracks: 12, rpm: 33),
+]);
+
+$cdRecord->config; // CdRecordConfig object
+$vinylRecord->config; // VinylRecord object
+```
+
+When a data object class is abstract and used as an Eloquent cast then this feature will work out of the box.
+
+The child data object value of the model will be stored in the database as a JSON string with the class name as the key:
+
+```json
+{
+    "type": "\\App\\Data\\CdRecordConfig",
+    "value": {
+        "tracks": 12,
+        "bytes": 1000
+    }
+}
+```
+
+When retrieving the model, the data object will be instantiated based on the `type` key in the JSON string.
+
+#### Abstract data class morphs
+
+By default, the `type` key in the JSON string will be the fully qualified class name of the child data object. This can break your application quite easily when you refactor your code. To prevent this, you can add a morph map like with [Eloquent models](https://laravel.com/docs/10.x/eloquent-relationships#polymorphic-relationships). Within your `AppServiceProvivder` you can add the following mapping:
+
+```php
+use Spatie\LaravelData\Support\DataConfig;
+
+app(DataConfig::class)->enforceMorphMap([
+    'cd_record_config' => CdRecordConfig::class,
+    'vinyl_record_config' => VinylRecordConfig::class,
+]);
+```php
+
 ## Casting data collections
 
 It is also possible to store data collections in an Eloquent model:
