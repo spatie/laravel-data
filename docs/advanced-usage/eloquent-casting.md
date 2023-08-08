@@ -62,7 +62,7 @@ class CdRecordConfig extends RecordConfig
     }
 }
 
-class VinylRecord extends RecordConfig
+class VinylRecordConfig extends RecordConfig
 {
     public function __construct(
         int $tracks
@@ -92,11 +92,11 @@ $cdRecord = Record::create([
 ]);
 
 $vinylRecord = Record::create([
-    'config' => new VinylRecord(tracks: 12, rpm: 33),
+    'config' => new VinylRecordConfig(tracks: 12, rpm: 33),
 ]);
 
 $cdRecord->config; // CdRecordConfig object
-$vinylRecord->config; // VinylRecord object
+$vinylRecord->config; // VinylRecordConfig object
 ```
 
 When a data object class is abstract and used as an Eloquent cast then this feature will work out of the box.
