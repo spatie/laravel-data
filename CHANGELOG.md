@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.8.0 - 2023-08-09
+
+- Add Hidden Attribute (#505)
+- Add Null value support for RequiredUnless Validation (#525)
+- Add abstract eloquent casts (#526)
+
 ## 3.7.1 - 2023-08-04
 
 - fix target namespace when creating files with Laravel Idea (#497)
