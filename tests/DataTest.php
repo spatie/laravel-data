@@ -10,6 +10,7 @@ use Illuminate\Validation\ValidationException;
 use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\Hidden;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\WithCast;
@@ -2384,6 +2385,27 @@ it('can have a computed value', function () {
 
     expect(fn () => $dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Ruben Versieck']))
         ->toThrow(CannotSetComputedValue::class);
+});
+
+it('can have a hidden value', function () {
+    $dataObject = new class ('', '') extends Data {
+        public function __construct(
+            public string $show,
+            #[Hidden]
+            public string $hidden,
+        ) {
+        }
+    };
+
+    expect($dataObject::from(['show' => 'Yes', 'hidden' => 'No']))
+        ->show->toBe('Yes')
+        ->hidden->toBe('No');
+
+    expect($dataObject::validateAndCreate(['show' => 'Yes', 'hidden' => 'No']))
+        ->show->toBe('Yes')
+        ->hidden->toBe('No');
+
+    expect($dataObject::from(['show' => 'Yes', 'hidden' => 'No'])->toArray())->toBe(['show' => 'Yes']);
 });
 
 it('throws a readable exception message when the constructor fails', function (
