@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Support;
 
 use ReflectionClass;
 use Spatie\LaravelData\Casts\Cast;
+use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Transformers\Transformer;
 
 class DataConfig
@@ -23,6 +24,8 @@ class DataConfig
     /** @var \Spatie\LaravelData\RuleInferrers\RuleInferrer[] */
     protected array $ruleInferrers;
 
+    public readonly DataClassMorphMap $morphMap;
+
     public function __construct(array $config)
     {
         $this->ruleInferrers = array_map(
@@ -37,6 +40,8 @@ class DataConfig
         foreach ($config['casts'] ?? [] as $castable => $cast) {
             $this->casts[ltrim($castable, ' \\')] = app($cast);
         }
+
+        $this->morphMap = new DataClassMorphMap();
     }
 
     public function getDataClass(string $class): DataClass
@@ -50,7 +55,7 @@ class DataConfig
 
     public function getResolvedDataPipeline(string $class): ResolvedDataPipeline
     {
-        if (array_key_exists($class,  $this->resolvedDataPipelines)) {
+        if (array_key_exists($class, $this->resolvedDataPipelines)) {
             return $this->resolvedDataPipelines[$class];
         }
 
@@ -92,6 +97,14 @@ class DataConfig
     public function getRuleInferrers(): array
     {
         return $this->ruleInferrers;
+    }
+
+    /**
+     * @param array<string, class-string<BaseData>> $map
+     */
+    public function enforceMorphMap(array $map): void
+    {
+        $this->morphMap->merge($map);
     }
 
     public function reset(): self
