@@ -17,8 +17,8 @@ class RequiredUnless extends StringValidationAttribute implements RequiringRule
     protected string|array $values;
 
     public function __construct(
-        string|FieldReference                           $field,
-        array|string|BackedEnum|RouteParameterReference ...$values
+        string|FieldReference                                $field,
+        null|array|string|BackedEnum|RouteParameterReference ...$values
     ) {
         $this->field = $this->parseFieldReference($field);
         $this->values = Arr::flatten($values);
