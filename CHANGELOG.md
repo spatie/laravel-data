@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.8.1 - 2023-08-11
+
+- fix abstract json cast format
+
 ## 3.8.0 - 2023-08-09
 
 - Add Hidden Attribute (#505)
