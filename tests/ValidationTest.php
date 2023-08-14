@@ -11,7 +11,7 @@ use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
-
+use Spatie\LaravelData\Attributes\Validation\RequiredWithout;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
@@ -490,7 +490,10 @@ it('can validate nested optional data', function () {
         ->assertErrors(['nested' => null])
         ->assertErrors(['nested' => ['string' => null]])
         ->assertErrors(['nested' => []])
-        ->assertRules([], payload: [])
+        ->assertRules([
+            'nested' => ['sometimes', 'array'],
+            'nested.string' => ['required', 'string'],
+        ], payload: [])
         ->assertRules([
             'nested' => ['sometimes', 'array'],
             'nested.string' => ['required', 'string'],
@@ -961,7 +964,8 @@ it('can nest optional data in collections', function () {
         ])
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.0' => [],
+            'collection.0.nested' => ['sometimes', 'array'],
+            'collection.0.nested.string' => ['required', 'string'],
         ], [
             'collection' => [[]],
         ])
@@ -1020,6 +1024,37 @@ it('can nest data in collections using relative rule generation', function () {
             ]
         );
 })->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+
+it('supports required without validation for optional collections', function () {
+    $dataClass = new class () extends Data {
+        #[RequiredWithout('someOtherData')]
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection|Optional $someData;
+
+        #[RequiredWithout('someData')]
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection|Optional $someOtherData;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertRules(
+            [
+                'someData' => [
+                    'sometimes',
+                    'present',
+                    'array',
+                    'required_without:someOtherData',
+                ],
+                'someOtherData' => [
+                    'sometimes',
+                    'present',
+                    'array',
+                    'required_without:someData',
+                ],
+            ],
+            []
+        );
+});
 
 it('can nest data in classes inside collections using relative rule generation', function () {
     class CollectionClassK extends Data
