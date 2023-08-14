@@ -733,6 +733,40 @@ it('will validate a collection', function () {
         ]);
 });
 
+it('will validate collection with explicit require', function () {
+    $dataClass = new class () extends Data {
+        #[Required]
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection $collection;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'collection' => [
+                ['string' => 'Never Gonna'],
+                ['string' => 'Give You Up'],
+            ],
+        ])
+        ->assertErrors(['collection' => []])
+        ->assertErrors(['collection' => null])
+        ->assertErrors([])
+        ->assertErrors([
+            'collection' => [
+                ['other_string' => 'Hello World'],
+            ],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array', 'required'],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array', 'required'],
+            'collection.0.string' => ['required', 'string'],
+        ], [
+            'collection' => [[]],
+        ]);
+});
+
+
 it('will validate a collection with extra attributes', function () {
     $dataClass = new class () extends Data {
         #[DataCollectionOf(SimpleDataWithExplicitValidationRuleAttributeData::class)]
