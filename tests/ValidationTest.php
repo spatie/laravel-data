@@ -473,7 +473,7 @@ it('can validate nested nullable data', function () {
         ->assertOk(['nested' => null])
         ->assertErrors(['nested' => ['string' => null]])
         ->assertErrors(['nested' => []])
-        ->assertRules([], payload: [])
+        ->assertRules(['nested' => ['nullable', 'array']], payload: [])
         ->assertRules([
             'nested' => ['nullable', 'array'],
             'nested.string' => ['required', 'string'],
@@ -492,7 +492,6 @@ it('can validate nested optional data', function () {
         ->assertErrors(['nested' => []])
         ->assertRules([
             'nested' => ['sometimes', 'array'],
-            'nested.string' => ['required', 'string'],
         ], payload: [])
         ->assertRules([
             'nested' => ['sometimes', 'array'],
@@ -787,8 +786,8 @@ it('will validate a nullable collection', function () {
                 ['other_string' => 'Hello World'],
             ],
         ])
-        ->assertRules([], payload: [])
-        ->assertRules([], payload: ['collection' => null])
+        ->assertRules(['collection' => ['nullable', 'array']], payload: [])
+        ->assertRules(['collection' => ['nullable', 'array']], payload: ['collection' => null])
         ->assertRules([
             'collection' => ['nullable', 'present', 'array'],
             'collection.0.string' => ['required', 'string'],
@@ -924,13 +923,13 @@ it('can nest nullable data in collections', function () {
         ])
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.0' => [],
+            'collection.0.nested' => ['nullable', 'array'],
         ], [
             'collection' => [[]],
         ])
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.0' => [],
+            'collection.0.nested' => ['nullable', 'array'],
         ], [
             'collection' => [['nested' => null]],
         ])
@@ -965,7 +964,6 @@ it('can nest optional data in collections', function () {
         ->assertRules([
             'collection' => ['present', 'array'],
             'collection.0.nested' => ['sometimes', 'array'],
-            'collection.0.nested.string' => ['required', 'string'],
         ], [
             'collection' => [[]],
         ])
@@ -1041,13 +1039,40 @@ it('supports required without validation for optional collections', function () 
             [
                 'someData' => [
                     'sometimes',
-                    'present',
                     'array',
                     'required_without:someOtherData',
                 ],
                 'someOtherData' => [
                     'sometimes',
-                    'present',
+                    'array',
+                    'required_without:someData',
+                ],
+            ],
+            []
+        );
+});
+
+it('supports required without validation for nullable collections', function () {
+    $dataClass = new class () extends Data {
+        #[RequiredWithout('someOtherData')]
+        #[DataCollectionOf(SimpleData::class)]
+        public ?DataCollection $someData;
+
+        #[RequiredWithout('someData')]
+        #[DataCollectionOf(SimpleData::class)]
+        public ?DataCollection $someOtherData;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertRules(
+            [
+                'someData' => [
+                    'nullable',
+                    'array',
+                    'required_without:someOtherData',
+                ],
+                'someOtherData' => [
+                    'nullable',
                     'array',
                     'required_without:someData',
                 ],
@@ -2083,7 +2108,7 @@ it('can the validation rules for a data object', function () {
         'second' => ['required', 'string'],
     ]);
 
-    expect(NestedNullableData::getValidationRules(payload: []))->toEqual([]);
+    expect(NestedNullableData::getValidationRules(payload: []))->toEqual(['nested' => ['nullable', 'array']]);
 
     expect(NestedNullableData::getValidationRules(payload: ['nested' => []]))->toEqual([
         'nested' => ['nullable', 'array'],
@@ -2116,6 +2141,7 @@ it('can validate data with circular dependencies', function () {
     DataValidationAsserter::for(CircData::class)
         ->assertRules([
             'string' => ['required', 'string'],
+            'ular' => ['nullable', 'array'],
         ]);
 
     DataValidationAsserter::for(CircData::class)
@@ -2134,6 +2160,7 @@ it('can validate data with circular dependencies', function () {
             'ular.string' => ['required', 'string'],
             'ular.circ' => ['nullable', 'array'],
             'ular.circ.string' => ['required', 'string'],
+            'ular.circ.ular' => ['nullable', 'array'],
         ], payload: [
             'string' => 'Hello World',
             'ular' => [
