@@ -29,9 +29,11 @@ trait EnumerableMethods
     }
 
     /**
-     * @param callable(TValue, TKey): TValue $map
+     * @template TMapValue
      *
-     * @return static
+     * @param  callable(TValue, TKey): TMapValue  $callback
+     *
+     * @return static<TKey, TMapValue>
      */
     public function map(callable $map): static
     {
