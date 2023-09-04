@@ -18,6 +18,8 @@ class SongData extends Data
 }
 ```
 
+**Important Note** Validation rules are *only* applied to the data object when using the `validateAndCreate` method.
+
 ## Creating your validation attribute
 
 A validation attribute is a class that extends `ValidationRule` and returns an array of validation rules when the `getRules` method is called:
