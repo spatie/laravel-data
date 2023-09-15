@@ -10,12 +10,13 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\PartialTrees;
+use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
+use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-
 use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
@@ -116,7 +117,11 @@ it('is iteratable', function () {
     expect($letters)->toMatchArray(['A', 'B', 'C', 'D']);
 });
 
-it('has array access', function (DataCollection $collection) {
+it('has array access', function () {
+    $collection = SimpleData::collection([
+        'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
+    ]);
+
     // Count
     expect($collection)->toHaveCount(4);
 
@@ -126,9 +131,9 @@ it('has array access', function (DataCollection $collection) {
     expect(empty($collection[5]))->toBeTrue();
 
     // Offset get
-    expect(SimpleData::from('A'))->toEqual($collection[0]);
+    expect($collection[0])->toEqual(SimpleData::from('A')->withPartialTrees(new PartialTrees()));
 
-    expect(SimpleData::from('D'))->toEqual($collection[3]);
+    expect($collection[3])->toEqual(SimpleData::from('D')->withPartialTrees(new PartialTrees()));
 
     if ($collection->items() instanceof AbstractPaginator || $collection->items() instanceof CursorPaginator) {
         return;
@@ -138,17 +143,24 @@ it('has array access', function (DataCollection $collection) {
     $collection[2] = 'And now something completely different';
     $collection[4] = 'E';
 
-    expect(
-        SimpleData::from('And now something completely different')
-    )
-        ->toEqual($collection[2]);
-    expect(SimpleData::from('E'))->toEqual($collection[4]);
+    expect($collection[2])->toEqual(
+        SimpleData::from('And now something completely different')->withPartialTrees(new PartialTrees())
+    );
+    expect($collection[4])->toEqual(SimpleData::from('E')->withPartialTrees(new PartialTrees()));
 
     // Offset unset
     unset($collection[4]);
 
     expect($collection)->toHaveCount(4);
-})->with('array-access-collections');
+});
+
+it('has array access and will replicate partialtrees', function () {
+    $collection = MultiData::collection([
+        new MultiData('first', 'second'),
+    ])->only('second');
+
+    expect($collection[0]->toArray())->toEqual(['second' => 'second']);
+});
 
 it('can dynamically include data based upon the request', function () {
     LazyData::$allowedIncludes = [''];

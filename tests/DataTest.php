@@ -67,7 +67,6 @@ use Spatie\LaravelData\Tests\Fakes\UlarData;
 use Spatie\LaravelData\Tests\Fakes\UnionData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\WithData;
-
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can create a resource', function () {
@@ -2461,3 +2460,4 @@ it('throws a readable exception message when the constructor fails', function (
     yield 'no params' => [[], 'Could not create `Spatie\LaravelData\Tests\Fakes\MultiData`: the constructor requires 2 parameters, 0 given. Parameters missing: first, second.'],
     yield 'one param' => [['first' => 'First'], 'Could not create `Spatie\LaravelData\Tests\Fakes\MultiData`: the constructor requires 2 parameters, 1 given. Parameters given: first. Parameters missing: second.'],
 ]);
+
