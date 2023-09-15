@@ -14,6 +14,9 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\Lazy\ClosureLazy;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+
+use function Spatie\Snapshots\assertMatchesSnapshot as baseAssertMatchesSnapshot;
+
 use Spatie\Snapshots\Driver;
 use Spatie\TypeScriptTransformer\Attributes\Optional as TypeScriptOptional;
 use Spatie\TypeScriptTransformer\References\Reference;
@@ -21,8 +24,6 @@ use Spatie\TypeScriptTransformer\Support\TransformationContext;
 use Spatie\TypeScriptTransformer\Support\WritingContext;
 use Spatie\TypeScriptTransformer\Transformed\Transformed;
 use Spatie\TypeScriptTransformer\Transformed\Untransformable;
-use Spatie\TypeScriptTransformer\TypeScriptTransformerConfig;
-use function Spatie\Snapshots\assertMatchesSnapshot as baseAssertMatchesSnapshot;
 
 function assertMatchesSnapshot($actual, Driver $driver = null): void
 {
@@ -53,8 +54,7 @@ it('will transform data objects', function () {
 
     expect($transformed)->toBeInstanceOf(Transformed::class);
 
-    $someClass = new class {
-
+    $someClass = new class () {
     };
 
     $transformed = $transformer->transform(

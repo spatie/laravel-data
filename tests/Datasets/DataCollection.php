@@ -1,6 +1,5 @@
 <?php
 
-use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 dataset('collection-operations', function () {

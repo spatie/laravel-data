@@ -18,7 +18,6 @@ use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\InvalidDataCollectionOperation;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
-use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 
 /**
  * @template TKey of array-key
