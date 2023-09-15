@@ -67,7 +67,6 @@ use Spatie\LaravelData\Tests\Fakes\UlarData;
 use Spatie\LaravelData\Tests\Fakes\UnionData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\WithData;
-
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can create a resource', function () {
@@ -2385,6 +2384,42 @@ it('can have a computed value', function () {
 
     expect(fn () => $dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Ruben Versieck']))
         ->toThrow(CannotSetComputedValue::class);
+});
+
+it('can have a nullable computed value', function (){
+    $dataObject = new class ('', '') extends Data {
+        #[Computed]
+        public ?string $upper_name;
+
+        public function __construct(
+            public ?string $name,
+        ) {
+            $this->upper_name = $name ? strtoupper($name) : null;
+        }
+    };
+
+    expect($dataObject::from(['name' => 'Ruben']))
+        ->name->toBe('Ruben')
+        ->upper_name->toBe('RUBEN');
+
+    expect($dataObject::from(['name' => null]))
+        ->name->toBeNull()
+        ->upper_name->toBeNull();
+
+    expect($dataObject::validateAndCreate(['name' => 'Ruben']))
+        ->name->toBe('Ruben')
+        ->upper_name->toBe('RUBEN');
+
+    expect($dataObject::validateAndCreate(['name' => null]))
+        ->name->toBeNull()
+        ->upper_name->toBeNull();
+
+    expect(fn () => $dataObject::from(['name' => 'Ruben', 'upper_name' => 'RUBEN']))
+        ->toThrow(CannotSetComputedValue::class);
+
+    expect(fn () => $dataObject::from(['name' => 'Ruben', 'upper_name' => null]))
+        ->name->toBeNull()
+        ->upper_name->toBeNull(); // Case conflicts with DefaultsPipe, ignoring it for now
 });
 
 it('can have a hidden value', function () {
