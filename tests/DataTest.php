@@ -67,6 +67,7 @@ use Spatie\LaravelData\Tests\Fakes\UlarData;
 use Spatie\LaravelData\Tests\Fakes\UnionData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\WithData;
+
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can create a resource', function () {
@@ -2386,7 +2387,7 @@ it('can have a computed value', function () {
         ->toThrow(CannotSetComputedValue::class);
 });
 
-it('can have a nullable computed value', function (){
+it('can have a nullable computed value', function () {
     $dataObject = new class ('', '') extends Data {
         #[Computed]
         public ?string $upper_name;
