@@ -102,9 +102,9 @@ class DataCollection implements DataCollectable, ArrayAccess
             throw InvalidDataCollectionOperation::create();
         }
 
-        $data =  $this->items->offsetGet($offset);
+        $data = $this->items->offsetGet($offset);
 
-        if($data instanceof IncludeableDataContract){
+        if($data instanceof IncludeableDataContract) {
             $data->withPartialTrees($this->getPartialTrees());
         }
 

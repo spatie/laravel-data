@@ -2,7 +2,6 @@
 
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
-
 dataset('collection-operations', function () {
     yield [
         'operation' => 'filter',
