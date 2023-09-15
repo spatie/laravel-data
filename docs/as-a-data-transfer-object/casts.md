@@ -21,10 +21,10 @@ class SongData extends Data
 The `Format` property here is an `Enum` and looks like this:
 
 ```php
-enum Format {
-    case cd;
-    case vinyl;
-    case cassette;
+enum Format: string {
+    case cd = 'cd';
+    case vinyl = 'vinyl';
+    case cassette = 'cassette';
 }
 ```
 
