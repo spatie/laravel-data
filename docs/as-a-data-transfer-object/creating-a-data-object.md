@@ -46,7 +46,7 @@ SongData::from(Song::firstOrFail($id));
 Data can also be created from JSON strings:
 
 ```php
-SongData::from('{"name" : "Never Gonna Give You Up","artist" : "Rick Astley"}');
+SongData::from('{"title" : "Never Gonna Give You Up","artist" : "Rick Astley"}');
 ```
 
 The package will find the required properties within the model and use them to construct the data object.
