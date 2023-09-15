@@ -41,10 +41,10 @@ class DataFromArrayResolver
 
         $dataClass
             ->properties
-            ->filter(
-                fn (DataProperty $property) => ! $property->isPromoted &&
-                    ! $property->isReadonly &&
-                    $properties->has($property->name)
+            ->reject(
+                fn (DataProperty $property) => $property->isPromoted
+                    || $property->isReadonly
+                    || ! $properties->has($property->name)
             )
             ->each(function (DataProperty $property) use ($properties, $data) {
                 if ($property->type->isOptional
@@ -52,6 +52,13 @@ class DataFromArrayResolver
                     && $properties->get($property->name) instanceof Optional
                 ) {
                     return;
+                }
+
+                if ($property->computed
+                    && $property->type->isNullable()
+                    && $properties->get($property->name) === null
+                ) {
+                    return; // Nullable properties get assigned null by default
                 }
 
                 if ($property->computed) {

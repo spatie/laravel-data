@@ -8,6 +8,7 @@ use Illuminate\Contracts\Validation\InvokableRule as InvokableRuleContract;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Spatie\LaravelData\Attributes\Validation\CustomValidationAttribute;
 use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\StringValidationAttribute;
@@ -36,6 +37,10 @@ class RuleDenormalizer
 
         if ($rule instanceof ObjectValidationAttribute) {
             return [$rule->getRule($path)];
+        }
+
+        if($rule instanceof CustomValidationAttribute) {
+            return Arr::wrap($rule->getRules($path));
         }
 
         if ($rule instanceof Rule) {

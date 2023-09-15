@@ -15,6 +15,7 @@ use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
+use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 use function Spatie\Snapshots\assertMatchesJsonSnapshot;
@@ -118,7 +119,11 @@ it('is iteratable', function () {
     expect($letters)->toMatchArray(['A', 'B', 'C', 'D']);
 });
 
-it('has array access', function (DataCollection $collection) {
+it('has array access', function () {
+    $collection = SimpleData::collect([
+        'A', 'B', SimpleData::from('C'), SimpleData::from('D'),
+    ], DataCollection::class);
+
     // Count
     expect($collection)->toHaveCount(4);
 
@@ -128,9 +133,15 @@ it('has array access', function (DataCollection $collection) {
     expect(empty($collection[5]))->toBeTrue();
 
     // Offset get
-    expect(SimpleData::from('A'))->toEqual($collection[0]);
+    $dataA = SimpleData::from('A');
+    $dataA->getDataContext();
 
-    expect(SimpleData::from('D'))->toEqual($collection[3]);
+    expect($collection[0])->toEqual($dataA);
+
+    $dataD = SimpleData::from('D');
+    $dataD->getDataContext();
+
+    expect($collection[3])->toEqual($dataD);
 
     if ($collection->items() instanceof AbstractPaginator || $collection->items() instanceof CursorPaginator) {
         return;
@@ -140,17 +151,29 @@ it('has array access', function (DataCollection $collection) {
     $collection[2] = 'And now something completely different';
     $collection[4] = 'E';
 
-    expect(
-        SimpleData::from('And now something completely different')
-    )
-        ->toEqual($collection[2]);
-    expect(SimpleData::from('E'))->toEqual($collection[4]);
+    $otherData = SimpleData::from('And now something completely different');
+    $otherData->getDataContext();
+
+    expect($collection[2])->toEqual($otherData);
+
+    $dataE = SimpleData::from('E');
+    $dataE->getDataContext();
+
+    expect($collection[4])->toEqual($dataE);
 
     // Offset unset
     unset($collection[4]);
 
     expect($collection)->toHaveCount(4);
-})->with('array-access-collections');
+});
+
+it('has array access and will replicate partialtrees', function () {
+    $collection = MultiData::collect([
+        new MultiData('first', 'second'),
+    ], DataCollection::class)->only('second');
+
+    expect($collection[0]->toArray())->toEqual(['second' => 'second']);
+});
 
 it('can dynamically include data based upon the request', function () {
     LazyData::$allowedIncludes = [''];

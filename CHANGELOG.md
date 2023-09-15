@@ -14,6 +14,31 @@ All notable changes to `laravel-data` will be documented in this file.
 - Allow creating data objects using `from` without parameters
 - Add support for a Dto and Resource object
 
+## 3.9.0 - 2023-09-15
+
+- Fix an issue where computed values could not be set as null
+- Fix for no rules created on optional|nullable Data object and Collection (#532)
+- Add `CustomValidationAttribute`'s
+- Copy partial trees when using array access on a collection
+
+## 3.8.1 - 2023-08-11
+
+- fix abstract json cast format
+
+## 3.8.0 - 2023-08-09
+
+- Add Hidden Attribute (#505)
+- Add Null value support for RequiredUnless Validation (#525)
+- Add abstract eloquent casts (#526)
+
+## 3.7.1 - 2023-08-04
+
+- fix target namespace when creating files with Laravel Idea (#497)
+- allow collection to be created passing null (#507)
+- add Ulid validation rule (#510)   
+  -add TARGET_PARAMETER to Attribute for improved Validation (#523)
+>>>>>>> main
+
 ## 3.7.0 - 2023-07-05
 
 - Add support for better exception messages when parameters are missing

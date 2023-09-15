@@ -102,11 +102,18 @@ class DataValidationRulesResolver
         ValidationPath $propertyPath,
         DataRules $dataRules,
     ): void {
-        if ($dataProperty->type->isOptional && Arr::has($fullPayload, $propertyPath->get()) === false) {
-            return;
-        }
+        $isOptionalAndEmpty = $dataProperty->type->isOptional && Arr::has($fullPayload, $propertyPath->get()) === false;
+        $isNullableAndEmpty = $dataProperty->type->isNullable() && Arr::get($fullPayload, $propertyPath->get()) === null;
 
-        if ($dataProperty->type->isNullable() && Arr::get($fullPayload, $propertyPath->get()) === null) {
+        if ($isOptionalAndEmpty || $isNullableAndEmpty) {
+            $this->resolveToplevelRules(
+                $dataProperty,
+                $fullPayload,
+                $path,
+                $propertyPath,
+                $dataRules
+            );
+
             return;
         }
 
@@ -140,14 +147,13 @@ class DataValidationRulesResolver
         ValidationPath $propertyPath,
         DataRules $dataRules,
     ): void {
-        $toplevelRules = $this->inferRulesForDataProperty(
+        $this->resolveToplevelRules(
             $dataProperty,
-            PropertyRules::create(ArrayType::create()),
             $fullPayload,
             $path,
+            $propertyPath,
+            $dataRules
         );
-
-        $dataRules->add($propertyPath, $toplevelRules);
 
         $this->execute(
             $dataProperty->type->dataClass,
@@ -164,14 +170,14 @@ class DataValidationRulesResolver
         ValidationPath $propertyPath,
         DataRules $dataRules,
     ): void {
-        $toplevelRules = $this->inferRulesForDataProperty(
+        $this->resolveToplevelRules(
             $dataProperty,
-            PropertyRules::create(Present::create(), ArrayType::create()),
             $fullPayload,
             $path,
+            $propertyPath,
+            $dataRules,
+            shouldBePresent: true
         );
-
-        $dataRules->add($propertyPath, $toplevelRules);
 
         $dataRules->addCollection($propertyPath, Rule::forEach(function (mixed $value, mixed $attribute) use ($fullPayload, $dataProperty) {
             if (! is_array($value)) {
@@ -190,6 +196,33 @@ class DataValidationRulesResolver
             )->all();
         }));
     }
+
+    protected function resolveToplevelRules(
+        DataProperty $dataProperty,
+        array $fullPayload,
+        ValidationPath $path,
+        ValidationPath $propertyPath,
+        DataRules $dataRules,
+        bool $shouldBePresent = false
+    ): void {
+        $rules = [];
+
+        if ($shouldBePresent) {
+            $rules[] = Present::create();
+        }
+
+        $rules[] = ArrayType::create();
+
+        $toplevelRules = $this->inferRulesForDataProperty(
+            $dataProperty,
+            PropertyRules::create(...$rules),
+            $fullPayload,
+            $path,
+        );
+
+        $dataRules->add($propertyPath, $toplevelRules);
+    }
+
 
     protected function resolveOverwrittenRules(
         DataClass $class,

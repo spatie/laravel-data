@@ -1,4 +1,4 @@
-{
-some_camel_case_property: string;
-'some:non:standard:property': string;
-}
+export type SomeData = {
+some_camel_case_property: string
+some:non:standard:property: string
+};

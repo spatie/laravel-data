@@ -1,0 +1,4 @@
+export type SomeData = {
+id?: number
+name: string
+};

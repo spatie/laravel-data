@@ -64,11 +64,11 @@ class Email implements Castable
 
   }
 
-  public static function dataCastUsing(...$arguments)
+  public static function dataCastUsing(...$arguments): Cast
   {
     return new class implements Cast {
         public function cast(DataProperty $property, mixed $value, array $context): mixed {
-            return new self($value);
+            return new Email($value);
         }
     };
   }

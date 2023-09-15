@@ -2,9 +2,25 @@
 
 namespace Spatie\LaravelData\Support\TypeScriptTransformer;
 
-use Spatie\TypeScriptTransformer\Laravel\Transformers\DataClassTransformer;
+use ReflectionClass;
+use ReflectionProperty;
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Support\DataConfig;
+use Spatie\TypeScriptTransformer\Laravel\ClassPropertyProcessors\RemoveDataLazyTypeClassPropertyProcessor;
+use Spatie\TypeScriptTransformer\Transformers\ClassTransformer;
+use Spatie\TypeScriptTransformer\TypeScript\TypeScriptNode;
 
-class DataTypeScriptTransformer extends DataClassTransformer
+class DataTypeScriptTransformer extends ClassTransformer
 {
-    // TODO implement this ourselves
+    protected function shouldTransform(ReflectionClass $reflection): bool
+    {
+        return $reflection->implementsInterface(BaseData::class);
+    }
+
+    protected function classPropertyProcessors(): array
+    {
+        return array_merge(parent::classPropertyProcessors(), [
+            new DataUtilitiesClassPropertyProcessor(),
+        ]);
+    }
 }

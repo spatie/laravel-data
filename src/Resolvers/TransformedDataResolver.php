@@ -55,6 +55,10 @@ class TransformedDataResolver
             ->reduce(function (array $payload, DataProperty $property) use ($data, $context) {
                 $name = $property->name;
 
+                if ($property->hidden) {
+                    return $payload;
+                }
+
                 if (! $this->shouldIncludeProperty($name, $data->{$name}, $context)) {
                     return $payload;
                 }

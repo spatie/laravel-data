@@ -896,6 +896,10 @@ function requiredUnlessAttributes(): Generator
         attribute: new RequiredUnless('field', 'key', 'other'),
         expected: 'required_unless:field,key,other',
     );
+    yield fixature(
+        attribute: new RequiredUnless('key', 'null'),
+        expected: 'required_unless:key,null',
+    );
 }
 
 function requiredWithAttributes(): Generator

@@ -14,9 +14,11 @@ use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\WrappableData;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\DataCollectable;
+use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\InvalidDataCollectionOperation;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
+use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 
 /**
  * @template TKey of array-key
@@ -103,7 +105,13 @@ class DataCollection implements DataCollectable, ArrayAccess
             throw InvalidDataCollectionOperation::create();
         }
 
-        return $this->items->offsetGet($offset);
+        $data = $this->items->offsetGet($offset);
+
+        if ($data instanceof IncludeableDataContract) {
+            $data->getDataContext()->partialsDefinition->merge($this->getPartialsDefinition());
+        }
+
+        return $data;
     }
 
     /**

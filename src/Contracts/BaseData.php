@@ -32,4 +32,7 @@ interface BaseData
     public static function prepareForPipeline(\Illuminate\Support\Collection $properties): \Illuminate\Support\Collection;
 
     public static function pipeline(): DataPipeline;
+    public static function empty(array $extra = []): array;
+
+    public function getMorphClass(): string;
 }

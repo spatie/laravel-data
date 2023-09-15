@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
+use Illuminate\Validation\Rules\In as LaravelIn;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
@@ -20,6 +21,7 @@ use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Bail;
+use Spatie\LaravelData\Attributes\Validation\BooleanType;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\In;
 use Spatie\LaravelData\Attributes\Validation\IntegerType;
@@ -30,6 +32,7 @@ use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\RequiredIf;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
+use Spatie\LaravelData\Attributes\Validation\RequiredWithout;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\WithoutValidation;
@@ -64,6 +67,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\Fakes\Support\FakeInjectable;
+use Spatie\LaravelData\Tests\Fakes\ValidationAttributes\PassThroughCustomValidationAttribute;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
 
 it('can validate a string', function () {
@@ -473,7 +477,7 @@ it('can validate nested nullable data', function () {
         ->assertOk(['nested' => null])
         ->assertErrors(['nested' => ['string' => null]])
         ->assertErrors(['nested' => []])
-        ->assertRules([], payload: [])
+        ->assertRules(['nested' => ['nullable', 'array']], payload: [])
         ->assertRules([
             'nested' => ['nullable', 'array'],
             'nested.string' => ['required', 'string'],
@@ -490,7 +494,9 @@ it('can validate nested optional data', function () {
         ->assertErrors(['nested' => null])
         ->assertErrors(['nested' => ['string' => null]])
         ->assertErrors(['nested' => []])
-        ->assertRules([], payload: [])
+        ->assertRules([
+            'nested' => ['sometimes', 'array'],
+        ], payload: [])
         ->assertRules([
             'nested' => ['sometimes', 'array'],
             'nested.string' => ['required', 'string'],
@@ -731,6 +737,40 @@ it('will validate a collection', function () {
         ]);
 });
 
+it('will validate collection with explicit require', function () {
+    $dataClass = new class () extends Data {
+        #[Required]
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection $collection;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'collection' => [
+                ['string' => 'Never Gonna'],
+                ['string' => 'Give You Up'],
+            ],
+        ])
+        ->assertErrors(['collection' => []])
+        ->assertErrors(['collection' => null])
+        ->assertErrors([])
+        ->assertErrors([
+            'collection' => [
+                ['other_string' => 'Hello World'],
+            ],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array', 'required'],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array', 'required'],
+            'collection.0.string' => ['required', 'string'],
+        ], [
+            'collection' => [[]],
+        ]);
+});
+
+
 it('will validate a collection with extra attributes', function () {
     $dataClass = new class () extends Data {
         #[DataCollectionOf(SimpleDataWithExplicitValidationRuleAttributeData::class)]
@@ -784,8 +824,8 @@ it('will validate a nullable collection', function () {
                 ['other_string' => 'Hello World'],
             ],
         ])
-        ->assertRules([], payload: [])
-        ->assertRules([], payload: ['collection' => null])
+        ->assertRules(['collection' => ['nullable', 'array']], payload: [])
+        ->assertRules(['collection' => ['nullable', 'array']], payload: ['collection' => null])
         ->assertRules([
             'collection' => ['nullable', 'present', 'array'],
             'collection.0.string' => ['required', 'string'],
@@ -921,13 +961,13 @@ it('can nest nullable data in collections', function () {
         ])
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.0' => [],
+            'collection.0.nested' => ['nullable', 'array'],
         ], [
             'collection' => [[]],
         ])
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.0' => [],
+            'collection.0.nested' => ['nullable', 'array'],
         ], [
             'collection' => [['nested' => null]],
         ])
@@ -961,7 +1001,7 @@ it('can nest optional data in collections', function () {
         ])
         ->assertRules([
             'collection' => ['present', 'array'],
-            'collection.0' => [],
+            'collection.0.nested' => ['sometimes', 'array'],
         ], [
             'collection' => [[]],
         ])
@@ -1020,6 +1060,64 @@ it('can nest data in collections using relative rule generation', function () {
             ]
         );
 })->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+
+it('supports required without validation for optional collections', function () {
+    $dataClass = new class () extends Data {
+        #[RequiredWithout('someOtherData')]
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection|Optional $someData;
+
+        #[RequiredWithout('someData')]
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection|Optional $someOtherData;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertRules(
+            [
+                'someData' => [
+                    'sometimes',
+                    'array',
+                    'required_without:someOtherData',
+                ],
+                'someOtherData' => [
+                    'sometimes',
+                    'array',
+                    'required_without:someData',
+                ],
+            ],
+            []
+        );
+});
+
+it('supports required without validation for nullable collections', function () {
+    $dataClass = new class () extends Data {
+        #[RequiredWithout('someOtherData')]
+        #[DataCollectionOf(SimpleData::class)]
+        public ?DataCollection $someData;
+
+        #[RequiredWithout('someData')]
+        #[DataCollectionOf(SimpleData::class)]
+        public ?DataCollection $someOtherData;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertRules(
+            [
+                'someData' => [
+                    'nullable',
+                    'array',
+                    'required_without:someOtherData',
+                ],
+                'someOtherData' => [
+                    'nullable',
+                    'array',
+                    'required_without:someData',
+                ],
+            ],
+            []
+        );
+});
 
 it('can nest data in classes inside collections using relative rule generation', function () {
     class CollectionClassK extends Data
@@ -2048,7 +2146,7 @@ it('can the validation rules for a data object', function () {
         'second' => ['required', 'string'],
     ]);
 
-    expect(NestedNullableData::getValidationRules(payload: []))->toEqual([]);
+    expect(NestedNullableData::getValidationRules(payload: []))->toEqual(['nested' => ['nullable', 'array']]);
 
     expect(NestedNullableData::getValidationRules(payload: ['nested' => []]))->toEqual([
         'nested' => ['nullable', 'array'],
@@ -2081,6 +2179,7 @@ it('can validate data with circular dependencies', function () {
     DataValidationAsserter::for(CircData::class)
         ->assertRules([
             'string' => ['required', 'string'],
+            'ular' => ['nullable', 'array'],
         ]);
 
     DataValidationAsserter::for(CircData::class)
@@ -2099,6 +2198,7 @@ it('can validate data with circular dependencies', function () {
             'ular.string' => ['required', 'string'],
             'ular.circ' => ['nullable', 'array'],
             'ular.circ.string' => ['required', 'string'],
+            'ular.circ.ular' => ['nullable', 'array'],
         ], payload: [
             'string' => 'Hello World',
             'ular' => [
@@ -2218,3 +2318,64 @@ it('a manual written present attribute rule always overwrites a generated requir
             'array' => ['array', 'present'],
         ], []);
 });
+
+it('supports custom validation attributes', function () {
+    $dataClass = new class () extends Data {
+        #[PassThroughCustomValidationAttribute(['url'])]
+        public string $url;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['url' => 'https://spatie.be'])
+        ->assertErrors(['url' => 'nowp'])
+        ->assertRules([
+            'url' => ['required', 'string', 'url'],
+        ], []);
+
+    $dataClass = new class () extends Data {
+        #[PassThroughCustomValidationAttribute(['url', 'max:20'])]
+        public string $url;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['url' => 'https://spatie.be'])
+        ->assertErrors(['url' => 'nowp'])
+        ->assertErrors(['url' => 'https://rubenvanassche.com'])
+        ->assertRules([
+            'url' => ['required', 'string', 'url', 'max:20'],
+        ], []);
+
+    $dataClass = new class () extends Data {
+        #[PassThroughCustomValidationAttribute([new LaravelIn(['a', 'b'])])]
+        public string $something;
+    };
+
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['something' => 'a'])
+        ->assertOk(['something' => 'b'])
+        ->assertErrors(['something' => 'c'])
+        ->assertRules([
+            'something' => ['required', 'string', new LaravelIn(['a', 'b'])],
+        ], []);
+});
+
+it('can add a requiring rule on an attribute which will overwrite the optional type', function () {
+    $dataClass = new class () extends Data {
+        #[Required]
+        #[BooleanType]
+        public bool $success;
+
+        #[RequiredIf('success', 'false')]
+        #[StringType]
+        public string $error = '';
+
+        #[RequiredIf('success', 'true')]
+        #[IntegerType]
+        public Optional|int $id;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['success' => true, 'id' => 1])
+        ->assertErrors(['success' => true]);
+})->skip('V4: The rule inferrers need to be rewritten/removed for this, we need to first add attribute rules and then decide require stuff');

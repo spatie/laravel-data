@@ -19,4 +19,14 @@ class PartialsDefinition
         public array $except = [],
     ) {
     }
+
+    public function merge(PartialsDefinition $other): self
+    {
+        $this->includes = array_merge($this->includes, $other->includes);
+        $this->only = array_merge($this->only, $other->only);
+        $this->excludes = array_merge($this->excludes, $other->excludes);
+        $this->except = array_merge($this->except, $other->except);
+
+        return $this;
+    }
 }

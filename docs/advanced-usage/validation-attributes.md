@@ -20,18 +20,23 @@ class SongData extends Data
 
 ## Creating your validation attribute
 
-A validation attribute is a class that extends `ValidationRule` and returns an array of validation rules when the `getRules` method is called:
+It is possible to create your own validation attribute by extending the `CustomValidationAttribute` class, this class has a `getRules` method that returns the rules that should be applied to the property.
 
 ```php
-#[Attribute(Attribute::TARGET_PROPERTY)]
-class CustomRule extends ValidationRule
+#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
+class CustomRule extends CustomValidationAttribute
 {
-    public function getRules(): array
+    /**
+     * @return array<object|string>|object|string
+     */
+    public function getRules(ValidationPath $path): array|object|string;
     {
         return [new CustomRule()];
     }
 }
 ```
+
+Quick note: you can only use these rules as an attribute, not as a class rule within the static `rules` method of the data class.
 
 ## Available validation attributes
 
