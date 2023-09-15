@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.9.0 - 2023-09-15
+
+- Fix an issue where computed values could not be set as null
+- Fix for no rules created on optional|nullable Data object and Collection (#532)
+- Add `CustomValidationAttribute`'s
+- Copy partial trees when using array access on a collection
+
 ## 3.8.1 - 2023-08-11
 
 - fix abstract json cast format
