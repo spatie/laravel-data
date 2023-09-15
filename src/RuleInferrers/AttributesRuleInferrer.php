@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\RuleInferrers;
 
+use Spatie\LaravelData\Attributes\Validation\CustomValidationAttribute;
 use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\PropertyRules;

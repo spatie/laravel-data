@@ -9,14 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
+use Illuminate\Validation\Rules\In as LaravelIn;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
-
-use function Pest\Laravel\mock;
-use function PHPUnit\Framework\assertFalse;
-
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
@@ -66,7 +62,10 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\Fakes\Support\FakeInjectable;
+use Spatie\LaravelData\Tests\Fakes\ValidationAttributes\PassThroughCustomValidationAttribute;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
+use function Pest\Laravel\mock;
+use function PHPUnit\Framework\assertFalse;
 
 it('can validate a string', function () {
     $dataClass = new class () extends Data {
@@ -2314,5 +2313,46 @@ it('a manual written present attribute rule always overwrites a generated requir
         ->assertErrors(['array' => null])
         ->assertRules([
             'array' => ['array', 'present'],
+        ], []);
+});
+
+it('supports custom validation attributes', function () {
+    $dataClass = new class () extends Data {
+        #[PassThroughCustomValidationAttribute(['url'])]
+        public string $url;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['url' => 'https://spatie.be'])
+        ->assertErrors(['url' => 'nowp'])
+        ->assertRules([
+            'url' => ['required', 'string', 'url'],
+        ], []);
+
+    $dataClass = new class () extends Data {
+        #[PassThroughCustomValidationAttribute(['url', 'max:20'])]
+        public string $url;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['url' => 'https://spatie.be'])
+        ->assertErrors(['url' => 'nowp'])
+        ->assertErrors(['url' => 'https://rubenvanassche.com'])
+        ->assertRules([
+            'url' => ['required', 'string', 'url', 'max:20'],
+        ], []);
+
+    $dataClass = new class () extends Data {
+        #[PassThroughCustomValidationAttribute([new LaravelIn(['a', 'b'])])]
+        public string $something;
+    };
+
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['something' => 'a'])
+        ->assertOk(['something' => 'b'])
+        ->assertErrors(['something' => 'c'])
+        ->assertRules([
+            'something' => ['required', 'string', new LaravelIn(['a', 'b'])],
         ], []);
 });
