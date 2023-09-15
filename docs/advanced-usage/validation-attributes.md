@@ -36,6 +36,8 @@ class CustomRule extends CustomValidationAttribute
 }
 ```
 
+Quick note: you can only use these rules as an attribute, not as a class rule within the static `rules` method of the data class.
+
 ## Available validation attributes
 
 ### Accepted
