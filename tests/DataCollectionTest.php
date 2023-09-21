@@ -13,9 +13,7 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomPaginatedDataCollection;
-use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
-use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 use function Spatie\Snapshots\assertMatchesJsonSnapshot;
