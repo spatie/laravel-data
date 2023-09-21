@@ -26,7 +26,7 @@ use Spatie\LaravelData\Tests\Fakes\UnionData;
 it('can include a lazy property', function () {
     $data = new LazyData(Lazy::create(fn () => 'test'));
 
-//    expect($data->toArray())->toBe([]);
+    expect($data->toArray())->toBe([]);
 
     expect($data->include('name')->toArray())
         ->toMatchArray([
@@ -66,39 +66,35 @@ it('can include a nested lazy property', function () {
 
     expect((clone $data)->toArray())->toBe([]);
 
-    expect((clone $data)->include('data')->toArray())
-        ->toMatchArray([
-            'data' => [],
-        ]);
+    expect((clone $data)->include('data')->toArray())->toMatchArray([
+        'data' => [],
+    ]);
 
-    expect((clone $data)->include('data.name')->toArray())
-        ->toMatchArray([
-            'data' => ['name' => 'Hello'],
-        ]);
+    expect((clone $data)->include('data.name')->toArray())->toMatchArray([
+        'data' => ['name' => 'Hello'],
+    ]);
 
-    expect((clone $data)->include('collection')->toArray())
-        ->toMatchArray([
-            'collection' => [
-                [],
-                [],
-                [],
-                [],
-                [],
-                [],
-            ],
-        ]);
+    expect((clone $data)->include('collection')->toArray())->toMatchArray([
+        'collection' => [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+        ],
+    ]);
 
-    expect((clone $data)->include('collection.name')->toArray())
-        ->toMatchArray([
-            'collection' => [
-                ['name' => 'is'],
-                ['name' => 'it'],
-                ['name' => 'me'],
-                ['name' => 'your'],
-                ['name' => 'looking'],
-                ['name' => 'for'],
-            ],
-        ]);
+    expect((clone $data)->include('collection.name')->toArray())->toMatchArray([
+        'collection' => [
+            ['name' => 'is'],
+            ['name' => 'it'],
+            ['name' => 'me'],
+            ['name' => 'your'],
+            ['name' => 'looking'],
+            ['name' => 'for'],
+        ],
+    ]);
 });
 
 it('can include specific nested data', function () {
