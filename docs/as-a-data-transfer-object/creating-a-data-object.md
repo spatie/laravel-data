@@ -32,8 +32,9 @@ You can use the `from` method to create a data object from nearly anything. For 
 model like this:
 
 ```php
-class Song extends Model{
-
+class Song extends Model
+{
+    // Your model code
 }
 ```
 
@@ -43,13 +44,13 @@ You can create a data object from such a model like this:
 SongData::from(Song::firstOrFail($id));
 ```
 
+The package will find the required properties within the model and use them to construct the data object.
+
 Data can also be created from JSON strings:
 
 ```php
 SongData::from('{"title" : "Never Gonna Give You Up","artist" : "Rick Astley"}');
 ```
-
-The package will find the required properties within the model and use them to construct the data object.
 
 Although the PHP 8.0 constructor properties look great in data objects, it is perfectly valid to use regular properties without a constructor like so:
 
@@ -58,56 +59,6 @@ class SongData extends Data
 {
     public string $title;
     public string $artist;
-}
-```
-
-## Mapping property names
-
-Sometimes the property names in the array from which you're creating a data object might be different. You can define another name for a property when it is created from array using attributes:
-
-```php
-class ContractData extends Data
-{
-    public function __construct(
-        public string $name,
-        #[MapInputName('record_company')]
-        public string $recordCompany,
-    ) {
-    }
-}
-```
-
-Creating the data object can now be done as such:
-
-```php
-SongData::from(['name' => 'Rick Astley', 'record_company' => 'RCA Records']);
-```
-
-Changing all property names in a data object to snake_case in the data the object is created from can be done as such:
-
-```php
-#[MapInputName(SnakeCaseMapper::class)]
-class ContractData extends Data
-{
-    public function __construct(
-        public string $name,
-        public string $recordCompany,
-    ) {
-    }
-}
-```
-
-You can also use the `MapName` attribute when you want to combine input (see [transforming data objects](https://spatie.be/docs/laravel-data/v3/as-a-resource/from-data-to-resource#mapping-property-names)) and output property name mapping:
-
-```php
-#[MapName(SnakeCaseMapper::class)]
-class ContractData extends Data
-{
-    public function __construct(
-        public string $name,
-        public string $recordCompany,
-    ) {
-    }
 }
 ```
 
@@ -237,55 +188,3 @@ SongData::withoutMagicalCreationFrom($song);
 ## Advanced creation
 
 Internally this package is using a pipeline to create a data object from something. This pipeline exists of steps which transform properties into a correct structure and it can be completely customized. You can read more about it [here](/docs/laravel-data/v3/advanced-usage/pipeline).
-
-## Quickly getting data from Models, Requests, ...
-
-By adding the `WithData` trait to a Model, Request or any class that can be magically be converted to a data object,
-you'll enable support for the `getData` method. This method will automatically generate a data object for the object it
-is called upon.
-
-For example, let's retake a look at the `Song` model we saw earlier. We can add the `WithData` trait as follows:
-
-```php
-class Song extends Model{
-    use WithData;
-    
-    protected $dataClass = SongData::class;
-}
-```
-
-Now we can quickly get the data object for the model as such:
-
-```php
-Song::firstOrFail($id)->getData(); // A SongData object
-```
-
-We can do the same with a FormRequest, we don't use a property here to define the data class but use a method instead:
-
-```php
-class SongRequest extends FormRequest
-{
-    use WithData;
-    
-    protected function dataClass(): string
-    {
-        return SongData::class;
-    }
-}
-```
-
-Now within a controller where the request is injected, we can get the data object like this:
-
-```php
-class SongController
-{
-    public function __invoke(SongRequest $request): SongData
-    {
-        $data = $request->getData();
-    
-        $song = Song::create($data);
-        
-        return $data;
-    }
-}
-```

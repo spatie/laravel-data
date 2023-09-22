@@ -1,60 +1,169 @@
 ---
 title: Collections
-weight: 4
+weight: 3
 ---
 
-The package provides next to the `Data` class also a `DataCollection`, `PaginatedCollection` and `CursorPaginatedCollection` class. This collection can store a set of data objects, and we advise you to use it when storing a collection of data objects within a data object.
-
-For example:
+It is possible to create a collection of data objects by using the `collect` method:
 
 ```php
-class AlbumData extends Data
+SongData::collect([
+    ['title' => 'Never Gonna Give You Up', 'artist' => 'Rick Astley'],
+    ['title' => 'Giving Up on Love', 'artist' => 'Rick Astley'],
+]); // returns an array of SongData objects
+```
+
+Whatever type of collection you pass in, the package will return the same type of collection with the freshly created data objects within it. As long as this type is an array, Laravel collection or paginator or a class extending from it.
+
+This opens up possibilities to create collections of Eloquent models:
+
+```php
+SongData::collect(Song::all()); // return an Eloquent collection of SongData objects
+```
+
+Or use a paginator:
+
+```php
+SongData::collect(Song::paginate()); // return a LengthAwarePaginator of SongData objects
+
+// or
+
+SongData::collect(Song::cursorPaginate()); // return a CursorPaginator of SongData objects
+```
+
+Internally the `from` method of the data class will be used to create a new data object for each item in the collection.
+
+When the collection already exists of data objects, the `collect` method will return the same collection:
+
+```php
+SongData::collect([
+    SongData::from(['title' => 'Never Gonna Give You Up', 'artist' => 'Rick Astley']),
+    SongData::from(['title' => 'Giving Up on Love', 'artist' => 'Rick Astley']),
+]); // returns an array of SongData objects
+```
+
+The collect method also allows you to cast collections from one type into another. For example, you can pass in an `array`and get back a Laravel collection:
+
+```php
+SongData::collect($songs, Collection::class); // returns a Laravel collection of SongData objects
+```
+
+This transformation will only work with non paginator collections.
+
+## Magically creating collections
+
+We've already seen that `from` can create data objects magically. It is also possible to create a collection of data objects magically when using `collect`.
+
+Let's say you've implemented a custom collection class called `SongCollection`:
+
+```php
+class SongCollection extends Collection
 {
     public function __construct(
-        public string $title,
-        #[DataCollectionOf(SongData::class)]
-        public DataCollection $songs,
+        $items = [],
+        public array $artists = [],
     ) {
+        parent::__construct($items);
     }
 }
 ```
 
-Using specific data collections is required for internal state management within the data object, which will become clear in the following chapters.
-
-## Creating `DataCollection`s
-
-There are a few different ways to create a `DataCollection`:
+Since the constructor of this collection requires an extra property it cannot be created automatically. However, it is possible to define a custom collect method which can create it:
 
 ```php
-SongData::collection([
+class SongData extends Data
+{
+    public string $title;
+    public string $artist;
+
+    public static function collectArray(array $items): SongCollection
+    {
+        return new SongCollection(
+            parent::collect($items),
+            array_unique(array_map(fn(SongData $song) => $song->artist, $items))
+        );
+    }
+}
+```
+
+Now when collecting an array data objects a `SongCollection` will be returned:
+
+```php
+SongData::collect([
     ['title' => 'Never Gonna Give You Up', 'artist' => 'Rick Astley'],
-    ['title' => 'Giving Up on Love', 'artist' => 'Rick Astley'],
-]);
+    ['title' => 'Living on a prayer', 'artist' => 'Bon Jovi'],
+]); // returns an SongCollection of SongData objects
 ```
 
-If you have a collection of models, you can do the following:
+There are a few requirements for this to work:
+
+- The method must be **static and public**
+- The method must **start with collect**
+- The method cannot be called **collect**
+- A **return type** must be defined
+
+## DataCollection's, PaginatedDataCollection's and CursorPaginatedCollection's
+
+The package also provides a few collection classes which can be used to create collections of data objects, it was a requirement to use these classes in the past versions of the package when nesting data objects collections in data objects. This is no longer the case and there are still valid use cases for them.
+
+You can create a DataCollection like this:
 
 ```php
-SongData::collection(Song::all());
+use Spatie\LaravelData\DataCollection;
+
+SongData::collect(Song::all(), DataCollection::class);
 ```
 
-It is even possible to add a collection of data objects:
+A PaginatedDataCollection can be created like this:
 
 ```php
-SongData::collection([
-    SongData::from(['title' => 'Never Gonna Give You Up', 'artist' => 'Rick Astley']),
-    SongData::from(['title' => 'Giving Up on Love', 'artist' => 'Rick Astley']),
-]);
+use Spatie\LaravelData\PaginatedDataCollection;
+
+SongData::collect(Song::paginate(), PaginatedDataCollection::class);
+````
+
+And a CursorPaginatedCollection can be created like this:
+
+```php
+use Spatie\LaravelData\CursorPaginatedCollection;
+
+SongData::collect(Song::cursorPaginate(), CursorPaginatedCollection::class);
 ```
 
-A `DataCollection` just works like a regular array:
+### Why using these collection classes?
+
+We advise you to always use arrays, Laravel collections and paginators within your data objects. But let's say you have a controller like this:
 
 ```php
-$collection = SongData::collection([
-    SongData::from(['title' => 'Never Gonna Give You Up', 'artist' => 'Rick Astley'])
-]);
+class SongController
+{
+    public function index()
+    {
+        return SongData::collect(Song::all());    
+    }
+}
+```
 
-// Count the amount of items in the collection
+In the next chapters of this documentation we'll see that is possible to include or exclude properties from the data objects like this:
+
+```php
+class SongController
+{
+    public function index()
+    {
+        return SongData::collect(Song::all(), DataCollection::class)->include('artist');    
+    }
+}
+```
+
+This will only work when you're using a `DataCollection`, `PaginatedDataCollection` or `CursorPaginatedCollection`. 
+
+
+### DataCollections
+
+DataCollections provide some extra functionalities like:
+
+```php
+// Counting the amount of items in the collection
 count($collection);
 
 // Changing an item in the collection
@@ -75,75 +184,6 @@ foreach ($songs as $song){
 }
 ```
 
-## Paginated collections
-
-It is also possible to pass in a paginated collection:
-
-```php
-SongData::collection(Song::paginate());
-```
-
-This will return a `PaginatedDataCollection` instead of a `DataCollection`.
-
-A cursor paginated collection can also be used:
-
-```php
-SongData::collection(Song::cursorPaginate());
-```
-
-This will result into a `CursorPaginatedCollection`
-
-## Typing data within your collections
-
-When nesting a data collection into your data object, always type the kind of data objects that will be stored within the collection:
-
-```php
-class AlbumData extends Data
-{
-    public function __construct(
-        public string $title,
-        #[DataCollectionOf(SongData::class)]
-        public DataCollection $songs,
-    ) {
-    }
-}
-```
-
-Because we typed `$songs` as `SongData`, the package automatically knows it should create `SongData` objects when creating an `AlbumData` object from an array.
-
-There are quite a few ways to type data collections:
-
-```php
-// Without namespace
-
-/** @var SongData[] */
-public DataCollection $songs;
-
-// With namespace
-
-/** @var \App\Data\SongData[] */
-public DataCollection $songs;
-
-// As an array
-
-/** @var array<SongData> */
-public DataCollection $songs;
-
-// As a data collection
-
-/** @var \Spatie\LaravelData\DataCollection<SongData> */
-public DataCollection $songs;
-
-// With an attribute
-
-#[DataCollectionOf(SongData::class)]
-public DataCollection $songs;
-```
-
-You're free to use one of these annotations/attributes as long as you're using one of them when adding a data collection to a data object.
-
-## `DataCollection` methods
-
 The `DataCollection` class implements a few of the Laravel collection methods:
 
 - through
@@ -159,5 +199,30 @@ The `DataCollection` class implements a few of the Laravel collection methods:
 You can for example get the first item within a collection like this:
 
 ```php
-SongData::collection(Song::all())->first(); // SongData object
+SongData::collect(Song::all(), DataCollection::class)->first(); // SongData object
 ```
+
+### The `collection` method
+
+In previous versions of the package it was possible to use the `collection` method to create a collection of data objects:
+
+```php
+SongData::collection(Song::all()); // returns a DataCollection of SongData objects
+SongData::collection(Song::paginate()); // returns a PaginatedDataCollection of SongData objects
+SongData::collection(Song::cursorPaginate()); // returns a CursorPaginatedCollection of SongData objects
+```
+
+This method was removed with version v4 of the package in favor for the more powerful `collect` method. The `collection` method can still be used by using the `WithDeprecatedCollectionMethod` trait:
+
+```php
+use Spatie\LaravelData\WithDeprecatedCollectionMethod;
+
+class SongData extends Data
+{
+    use WithDeprecatedCollectionMethod;
+    
+    // ...
+}
+```
+
+Please note that this trait will be removed in the next major version of the package.

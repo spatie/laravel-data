@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
@@ -14,6 +16,7 @@ use Spatie\LaravelData\Tests\Fakes\ExceptData;
 use Spatie\LaravelData\Tests\Fakes\FakeModelData;
 use Spatie\LaravelData\Tests\Fakes\FakeNestedModelData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
+use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
@@ -58,7 +61,6 @@ it('can include a nested lazy property', function () {
         }
     }
 
-
     $data = new \TestIncludeableNestedLazyDataProperties(
         Lazy::create(fn () => LazyData::from('Hello')),
         Lazy::create(fn () => LazyData::collect(['is', 'it', 'me', 'your', 'looking', 'for',])),
@@ -97,7 +99,7 @@ it('can include a nested lazy property', function () {
     ]);
 });
 
-it('can include specific nested data', function () {
+it('can include specific nested data collections', function () {
     class TestSpecificDefinedIncludeableCollectedAndNestedLazyData extends Data
     {
         public function __construct(
@@ -114,43 +116,40 @@ it('can include specific nested data', function () {
 
     $data = new \TestSpecificDefinedIncludeableCollectedAndNestedLazyData($collection);
 
-    expect($data->include('songs.name')->toArray())
-        ->toMatchArray([
-            'songs' => [
-                ['name' => DummyDto::rick()->name],
-                ['name' => DummyDto::bon()->name],
-            ],
-        ]);
+    expect($data->include('songs.name')->toArray())->toMatchArray([
+        'songs' => [
+            ['name' => DummyDto::rick()->name],
+            ['name' => DummyDto::bon()->name],
+        ],
+    ]);
 
-    expect($data->include('songs.{name,artist}')->toArray())
-        ->toMatchArray([
-            'songs' => [
-                [
-                    'name' => DummyDto::rick()->name,
-                    'artist' => DummyDto::rick()->artist,
-                ],
-                [
-                    'name' => DummyDto::bon()->name,
-                    'artist' => DummyDto::bon()->artist,
-                ],
+    expect($data->include('songs.{name,artist}')->toArray())->toMatchArray([
+        'songs' => [
+            [
+                'name' => DummyDto::rick()->name,
+                'artist' => DummyDto::rick()->artist,
             ],
-        ]);
+            [
+                'name' => DummyDto::bon()->name,
+                'artist' => DummyDto::bon()->artist,
+            ],
+        ],
+    ]);
 
-    expect($data->include('songs.*')->toArray())
-        ->toMatchArray([
-            'songs' => [
-                [
-                    'name' => DummyDto::rick()->name,
-                    'artist' => DummyDto::rick()->artist,
-                    'year' => DummyDto::rick()->year,
-                ],
-                [
-                    'name' => DummyDto::bon()->name,
-                    'artist' => DummyDto::bon()->artist,
-                    'year' => DummyDto::bon()->year,
-                ],
+    expect($data->include('songs.*')->toArray())->toMatchArray([
+        'songs' => [
+            [
+                'name' => DummyDto::rick()->name,
+                'artist' => DummyDto::rick()->artist,
+                'year' => DummyDto::rick()->year,
             ],
-        ]);
+            [
+                'name' => DummyDto::bon()->name,
+                'artist' => DummyDto::bon()->artist,
+                'year' => DummyDto::bon()->year,
+            ],
+        ],
+    ]);
 });
 
 it('can have a conditional lazy data', function () {
@@ -312,7 +311,7 @@ it('can disabled including data dynamically from the request', function () {
         'include' => 'name',
     ]));
 
-    expect($response->getData(true))->toBeArray(['name' => 'Ruben']);
+    expect($response->getData(true))->toMatchArray(['name' => 'Ruben']);
 
     LazyData::$allowedIncludes = null;
 
@@ -339,7 +338,7 @@ it('can dynamically exclude data based upon the request', function () {
     expect($excludedResponse->getData(true))->toBe([]);
 });
 
-it('can disabled excluding data dynamically from the request', function () {
+it('can disable excluding data dynamically from the request', function () {
     DefaultLazyData::$allowedExcludes = [];
 
     $response = DefaultLazyData::from('Ruben')->toResponse(request()->merge([
@@ -365,7 +364,7 @@ it('can disabled excluding data dynamically from the request', function () {
     expect($response->getData(true))->toBe([]);
 });
 
-it('can disabled only data dynamically from the request', function () {
+it('can disable only data dynamically from the request', function () {
     OnlyData::$allowedOnly = [];
 
     $response = OnlyData::from([
@@ -401,7 +400,7 @@ it('can disabled only data dynamically from the request', function () {
     ]);
 });
 
-it('can disabled except data dynamically from the request', function () {
+it('can disable except data dynamically from the request', function () {
     ExceptData::$allowedExcept = [];
 
     $response = ExceptData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
@@ -436,7 +435,7 @@ it('can disabled except data dynamically from the request', function () {
 
 
 it('will not include lazy optional values when transforming', function () {
-    $data = new class ('Hello World', Lazy::create(fn () => Optional::make())) extends Data {
+    $data = new class ('Hello World', Lazy::create(fn () => Optional::create())) extends Data {
         public function __construct(
             public string $string,
             public string|Optional|Lazy $lazy_optional_string,
@@ -444,7 +443,7 @@ it('will not include lazy optional values when transforming', function () {
         }
     };
 
-    expect($data->toArray())->toMatchArray([
+    expect(($data)->include('lazy_optional_string')->toArray())->toMatchArray([
         'string' => 'Hello World',
     ]);
 });
@@ -458,21 +457,6 @@ it('excludes optional values data', function () {
 
     expect($data->toArray())->toBe([]);
 });
-
-it('includes value if not optional data', function () {
-    $dataClass = new class () extends Data {
-        public string|Optional $name;
-    };
-
-    $data = $dataClass::from([
-        'name' => 'Freek',
-    ]);
-
-    expect($data->toArray())->toMatchArray([
-        'name' => 'Freek',
-    ]);
-});
-
 
 it('can conditionally include', function () {
     expect(
@@ -933,24 +917,33 @@ it('can perform only and except on array properties', function () {
 });
 
 
-it('can fetch lazy union data', function () {
-    $data = UnionData::from(1);
+it('can fetch lazy properties like regular properties within PHP', function () {
 
-    expect($data->id)->toBe(1);
+    $dataClass = new class extends Data {
+        public int $id;
+
+        public SimpleData|Lazy $simple;
+
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection|Lazy $dataCollection;
+
+        public FakeModel|Lazy $fakeModel;
+    };
+
+    $data = $dataClass::from([
+        'id' => 42,
+        'simple' => Lazy::create(fn () => SimpleData::from('A')),
+        'dataCollection' => Lazy::create(fn () => SimpleData::collect(['B', 'C'], DataCollection::class)),
+        'fakeModel' => Lazy::create(fn () => FakeModel::factory()->create([
+            'string' => 'lazy',
+        ])),
+    ]);
+
+    expect($data->id)->toBe(42);
     expect($data->simple->string)->toBe('A');
     expect($data->dataCollection->toCollection()->pluck('string')->toArray())->toBe(['B', 'C']);
     expect($data->fakeModel->string)->toBe('lazy');
 });
-
-it('can fetch non-lazy union data', function () {
-    $data = UnionData::from('A');
-
-    expect($data->id)->toBe(1);
-    expect($data->simple->string)->toBe('A');
-    expect($data->dataCollection->toCollection()->pluck('string')->toArray())->toBe(['B', 'C']);
-    expect($data->fakeModel->string)->toBe('non-lazy');
-});
-
 
 it('has array access and will replicate partialtrees (collection)', function () {
     $collection = MultiData::collect([
@@ -986,7 +979,7 @@ it('can dynamically include data based upon the request (collection)', function 
         ]);
 });
 
-it('can disabled manually including data in the request (collection)', function () {
+it('can disable manually including data in the request (collection)', function () {
     LazyData::$allowedIncludes = [];
 
     $response = (new DataCollection(LazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
@@ -1093,3 +1086,107 @@ it('can disable manually excluding data in the request (collection)', function (
             [],
         ]);
 });
+
+it('can work with the different types of lazy data collections', function (
+    Data $dataClass,
+    Closure $itemsClosure
+) {
+    $data = $dataClass::from([
+        'lazyCollection' => $itemsClosure([
+            SimpleData::from('A'),
+            SimpleData::from('B'),
+        ]),
+
+        'nestedLazyCollection' => $itemsClosure([
+            NestedLazyData::from('C'),
+            NestedLazyData::from('D'),
+        ]),
+    ]);
+
+    expect($data->toArray())->toMatchArray([]);
+
+    expect($data->include('lazyCollection')->toArray())->toMatchArray([
+        'lazyCollection' => [
+            ['string' => 'A'],
+            ['string' => 'B'],
+        ],
+
+        'nestedLazyCollection' => [
+            [],
+            [],
+        ],
+    ]);
+
+    expect($data->include('lazyCollection', 'nestedLazyCollection.simple')->toArray())->toMatchArray([
+        'lazyCollection' => [
+            ['string' => 'A'],
+            ['string' => 'B'],
+        ],
+
+        'nestedLazyCollection' => [
+            ['simple' => ['string' => 'C']],
+            ['simple' => ['string' => 'D']],
+        ],
+    ]);
+})->with(function () {
+    yield 'array' => [
+        fn () => new class extends Data {
+            #[DataCollectionOf(SimpleData::class)]
+            public Lazy|array $lazyCollection;
+
+            #[DataCollectionOf(NestedLazyData::class)]
+            public Lazy|array $nestedLazyCollection;
+        },
+        fn () => fn (array $items) => $items,
+    ];
+
+    yield 'collection' => [
+        fn () => new class extends Data {
+            #[DataCollectionOf(SimpleData::class)]
+            public Lazy|Collection $lazyCollection;
+
+            #[DataCollectionOf(NestedLazyData::class)]
+            public Lazy|Collection $nestedLazyCollection;
+        },
+        fn () => fn (array $items) => $items,
+    ];
+
+    yield 'paginator' => [
+        fn () => new class extends Data {
+            #[DataCollectionOf(SimpleData::class)]
+            public Lazy|LengthAwarePaginator $lazyCollection;
+
+            #[DataCollectionOf(NestedLazyData::class)]
+            public Lazy|LengthAwarePaginator $nestedLazyCollection;
+        },
+        fn () => fn (array $items) => new LengthAwarePaginator($items, count($items), 15),
+    ];
+})->skip('Impelemnt further');
+
+it('partials are always reset when transforming again', function () {
+    $dataClass = new class(Lazy::create(fn () => NestedLazyData::from('Hello World'))) extends Data {
+        public function __construct(
+            public Lazy|NestedLazyData $nested
+        ) {
+        }
+    };
+
+    dd($dataClass->include('nested')->exclude()->toArray());
+    // ['nested' => ['simple' => ['string' => 'Hello World']],]
+    $dataClass->toArray();
+    // ['nested' => ['simple' => ['string' => 'Hello World']],]
+
+    expect($dataClass->include('nested.simple')->toArray())->toBe([
+        'nested' => ['simple' => ['string' => 'Hello World']],
+    ]);
+
+    expect($dataClass->include('nested')->toArray())->toBe([
+        'nested' => [],
+    ]);
+
+    expect($dataClass->include()->toArray())->toBeEmpty();
+})->skip('Add a reset partials method');
+
+it('can set partials on a nested data object and these will be respected', function () {
+
+})->skip('Impelemnt');

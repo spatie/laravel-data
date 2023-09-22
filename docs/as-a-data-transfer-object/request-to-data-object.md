@@ -1,6 +1,6 @@
 ---
 title: From a request
-weight: 8
+weight: 9
 ---
 
 You can create a data object by the values given in the request.
@@ -32,10 +32,9 @@ You can now inject the `SongData` class in your controller. It will already be f
 request.
 
 ```php
-class SongController{
-    ...
-    
-    public function update(
+class UpdateSongController
+{
+    public function __invoke(
         Song $model,
         SongData $data
     ){
@@ -45,6 +44,26 @@ class SongController{
     }
 }
 ```
+
+As an added benefit, these values will be validated before the data object is created. If the validation fails, a `ValidationException` will be thrown which will look like you've written the validation rules yourself.
+
+The package will also automatically validate all requests when passed to the from method:
+
+```php
+class UpdateSongController
+{
+    public function __invoke(
+        Song $model,
+        SongRequest $request
+    ){
+        $model->update(SongData::from($request)->all());
+        
+        return redirect()->back();
+    }
+}
+```
+
+We have a complete section within these docs dedicated to validation, you can find it [here](/docs/laravel-data/v3/validation).
 
 ## Using validation
 

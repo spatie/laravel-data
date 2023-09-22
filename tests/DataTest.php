@@ -1426,42 +1426,6 @@ it('can use an array to store data', function () {
     ]);
 });
 
-it('can write collection logic in a class', function () {
-    class TestSomeCustomCollection extends Collection
-    {
-        public function nameAll(): string
-        {
-            return $this->map(fn ($data) => $data->string)->join(', ');
-        }
-    }
-
-    $dataClass = new class () extends Data {
-        public string $string;
-
-        public static function fromString(string $string): self
-        {
-            $s = new self();
-
-            $s->string = $string;
-
-            return $s;
-        }
-
-        public static function collectArray(array $items): \TestSomeCustomCollection
-        {
-            return new \TestSomeCustomCollection($items);
-        }
-    };
-
-    expect($dataClass::collect(['a', 'b', 'c']))
-        ->toBeInstanceOf(\TestSomeCustomCollection::class)
-        ->all()->toEqual([
-            $dataClass::from('a'),
-            $dataClass::from('b'),
-            $dataClass::from('c'),
-        ]);
-});
-
 
 it('can set a default value for data object', function () {
     $dataObject = new class ('', '') extends Data {

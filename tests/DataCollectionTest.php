@@ -5,7 +5,7 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
-use Spatie\LaravelData\Concerns\DeprecatedData;
+use Spatie\LaravelData\Concerns\WithDeprecatedCollectionMethod;
 use Spatie\LaravelData\Contracts\DeprecatedData as DeprecatedDataContract;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\Data;
@@ -15,7 +15,7 @@ use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-
+use Spatie\LaravelData\Tests\Fakes\Collections\CustomCollection;
 use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
@@ -303,7 +303,7 @@ it('can use magical creation methods to create a collection', function () {
 
 it('can return a custom data collection when collecting data', function () {
     $class = new class ('') extends Data implements DeprecatedDataContract {
-        use DeprecatedData;
+        use WithDeprecatedCollectionMethod;
 
         protected static string $_collectionClass = CustomDataCollection::class;
 
@@ -322,7 +322,7 @@ it('can return a custom data collection when collecting data', function () {
 
 it('can return a custom paginated data collection when collecting data', function () {
     $class = new class ('') extends Data implements DeprecatedDataContract {
-        use DeprecatedData;
+        use WithDeprecatedCollectionMethod;
 
         protected static string $_paginatedCollectionClass = CustomPaginatedDataCollection::class;
 
@@ -408,4 +408,47 @@ it('during the serialization process some properties are thrown away', function 
     $invaded = invade($unserialized);
 
     expect($invaded->_dataContext)->toBeNull();
+});
+
+it('can use a custom collection extended from collection to collect a collection of data objects', function () {
+    $collection = SimpleData::collect(new CustomCollection([
+        ['string' => 'A'],
+        ['string' => 'B'],
+    ]));
+
+    expect($collection)->toBeInstanceOf(CustomCollection::class);
+    expect($collection[0])->toBeInstanceOf(SimpleData::class);
+    expect($collection[1])->toBeInstanceOf(SimpleData::class);
+});
+
+it('can magically collect data', function () {
+    class TestSomeCustomCollection extends Collection
+    {
+    }
+
+    $dataClass = new class () extends Data {
+        public string $string;
+
+        public static function fromString(string $string): self
+        {
+            $s = new self();
+
+            $s->string = $string;
+
+            return $s;
+        }
+
+        public static function collectArray(array $items): \TestSomeCustomCollection
+        {
+            return new \TestSomeCustomCollection($items);
+        }
+    };
+
+    expect($dataClass::collect(['a', 'b', 'c']))
+        ->toBeInstanceOf(\TestSomeCustomCollection::class)
+        ->all()->toEqual([
+            $dataClass::from('a'),
+            $dataClass::from('b'),
+            $dataClass::from('c'),
+        ]);
 });

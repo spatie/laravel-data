@@ -2,6 +2,28 @@
 
 Because there are many breaking changes an upgrade is not that easy. There are many edge cases this guide does not cover. We accept PRs to improve this guide.
 
+## From v3 to v4
+
+The following things are required when upgrading:
+
+- Start by going through your code and replace all static `SomeData::collection($items)` method calls with `SomeData::collect($items, DataCollection::class)`
+  - Use `DataPaginatedCollection::class` when you're expecting a paginated collection
+  - Use `DataCursorPaginatedCollection::class` when you're expecting a cursor paginated collection
+  - For a more gentle upgrade you can also use the `WithDeprecatedCollectionMethod` trait which adds the collection method again, but this trait will be removed in v5
+  - If you were using `$_collectionClass`, `$_paginatedCollectionClass` or `$_cursorPaginatedCollectionClass` then take a look at the magic collect functionality on information about how to replace these
+- If you were manually working with `$_includes`, ` $_excludes`, `$_only`, `$_except` or `$_wrap` these can now be found within the `$_dataContext`
+- We split up some traits and interfaces, if you're manually using these on you own data implementation then take a look what has changed
+  - DataTrait (T) and PrepareableData (T/I) were removed
+  - EmptyData (T/I) and ContextableData (T/I) was added
+- If you were calling the transform method on a data object, a `TransformationContextFactory` or `TransformationContext` is now the only parameter you can pass
+  - Take a look within the docs what has changed
+- If you were using internal data structures like `DataClass` and `DataProperty` then take a look at what has been changed
+- The `DataCollectableTransformer` and `DataTransformer` were replaced with their appropriate resolvers
+
+We advise you to take a look at the following things:
+- Take a look within your data objects if `DataCollection`'s, `DataPaginatedCollection`'s and `DataCursorPaginatedCollection`'s can be replaced with regular arrays, Laravel Collections and Paginator
+- Replace `DataCollectionOf` attributes with annotations, providing IDE completion and more info for static analyzers
+- Replace some `extends Data` definitions with `extends Resource` or `extends Dto` for more minimal data objects
 ## From v2 to v3
 
 Upgrading to laravel data shouldn't take long, we've documented all possible changes just to provide the whole context. You probably won't have to do anything:

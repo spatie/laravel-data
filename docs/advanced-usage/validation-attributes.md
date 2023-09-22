@@ -1,46 +1,11 @@
 ---
 title: Validation attributes
-weight: 14
+weight: 16
 ---
 
-It is possible to validate the request before a data object is constructed. This can be done by adding validation attributes to the properties of a data object like this:
+These are all the validation attributes currently available in laravel-data.
 
-```php
-class SongData extends Data
-{
-    public function __construct(
-        #[Uuid()]
-        public string $uuid,
-        #[Max(15), IP, StartsWith('192.')]
-        public string $ip,
-    ) {
-    }
-}
-```
-
-## Creating your validation attribute
-
-It is possible to create your own validation attribute by extending the `CustomValidationAttribute` class, this class has a `getRules` method that returns the rules that should be applied to the property.
-
-```php
-#[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
-class CustomRule extends CustomValidationAttribute
-{
-    /**
-     * @return array<object|string>|object|string
-     */
-    public function getRules(ValidationPath $path): array|object|string;
-    {
-        return [new CustomRule()];
-    }
-}
-```
-
-Quick note: you can only use these rules as an attribute, not as a class rule within the static `rules` method of the data class.
-
-## Available validation attributes
-
-### Accepted
+## Accepted
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-accepted)
 
@@ -49,7 +14,7 @@ Quick note: you can only use these rules as an attribute, not as a class rule wi
 public bool $closure; 
 ```
 
-### AcceptedIf
+## AcceptedIf
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-accepted-if)
 
@@ -58,7 +23,7 @@ public bool $closure;
 public bool $closure; 
 ```
 
-### ActiveUrl
+## ActiveUrl
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-active-url)
 
@@ -67,7 +32,7 @@ public bool $closure;
 public string $closure; 
 ```
 
-### After
+## After
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-after)
 
@@ -83,7 +48,7 @@ public Carbon $closure;
 public Carbon $closure; 
 ```
 
-### AfterOrEqual
+## AfterOrEqual
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-after-or-equal)
 
@@ -99,7 +64,7 @@ public Carbon $closure;
 public Carbon $closure; 
 ```
 
-### Alpha
+## Alpha
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-alpha)
 
@@ -108,7 +73,7 @@ public Carbon $closure;
 public string $closure; 
 ```
 
-### AlphaDash
+## AlphaDash
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-alpha-dash)
 
@@ -117,7 +82,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### AlphaNumeric
+## AlphaNumeric
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-alpha-num)
 
@@ -126,7 +91,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### ArrayType
+## ArrayType
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-array)
 
@@ -141,7 +106,7 @@ public array $closure;
 public array $closure; 
 ```
 
-### Bail
+## Bail
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-bail)
 
@@ -150,7 +115,7 @@ public array $closure;
 public string $closure; 
 ```
 
-### Before
+## Before
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-before)
 
@@ -166,7 +131,7 @@ public Carbon $closure;
 public Carbon $closure; 
 ```
 
-### BeforeOrEqual
+## BeforeOrEqual
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-before-or-equal)
 
@@ -182,7 +147,7 @@ public Carbon $closure;
 public Carbon $closure; 
 ```
 
-### Between
+## Between
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-between)
 
@@ -191,7 +156,7 @@ public Carbon $closure;
 public int $closure; 
 ```
 
-### BooleanType
+## BooleanType
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-boolean)
 
@@ -200,7 +165,7 @@ public int $closure;
 public bool $closure; 
 ```
 
-### Confirmed
+## Confirmed
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-confirmed)
 
@@ -209,7 +174,7 @@ public bool $closure;
 public string $closure; 
 ```
 
-### CurrentPassword
+## CurrentPassword
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-current-password)
 
@@ -221,7 +186,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### Date
+## Date
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-date)
 
@@ -230,7 +195,7 @@ public string $closure;
 public Carbon $closure; 
 ```
 
-### DateEquals
+## DateEquals
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-date-equals)
 
@@ -242,7 +207,7 @@ public Carbon $closure;
 public Carbon $closure; 
 ```
 
-### DateFormat
+## DateFormat
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-date-format)
 
@@ -251,7 +216,7 @@ public Carbon $closure;
 public Carbon $closure; 
 ```
 
-### Different
+## Different
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-different)
 
@@ -260,7 +225,7 @@ public Carbon $closure;
 public string $closure; 
 ```
 
-### Digits
+## Digits
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-digits)
 
@@ -269,7 +234,7 @@ public string $closure;
 public int $closure; 
 ```
 
-### DigitsBetween
+## DigitsBetween
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-digits-between)
 
@@ -278,7 +243,7 @@ public int $closure;
 public int $closure; 
 ```
 
-### Dimensions
+## Dimensions
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-dimensions)
 
@@ -290,7 +255,7 @@ public UploadedFile $closure;
 public UploadedFile $closure; 
 ```
 
-### Distinct
+## Distinct
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-distinct)
 
@@ -305,7 +270,7 @@ public string $closure;
 public string $closure;  
 ```
 
-### Email
+## Email
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-email)
 
@@ -323,7 +288,7 @@ public string $closure;
 public string $closure;  
 ```
 
-### EndsWith
+## EndsWith
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-ends-with)
 
@@ -338,7 +303,7 @@ public string $closure;
 public string $closure;
 ```
 
-### Enum
+## Enum
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-enum)
 
@@ -347,7 +312,7 @@ public string $closure;
 public string $closure;
 ```
 
-### ExcludeIf
+## ExcludeIf
 
 *At the moment the data is not yet excluded due to technical reasons, v4 should fix this*
 
@@ -358,7 +323,7 @@ public string $closure;
 public string $closure;
 ```
 
-### ExcludeUnless
+## ExcludeUnless
 
 *At the moment the data is not yet excluded due to technical reasons, v4 should fix this*
 
@@ -369,7 +334,7 @@ public string $closure;
 public string $closure;
 ```
 
-### ExcludeWithout
+## ExcludeWithout
 
 *At the moment the data is not yet excluded due to technical reasons, v4 should fix this*
 
@@ -380,7 +345,7 @@ public string $closure;
 public string $closure;
 ```
 
-### Exists
+## Exists
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-exists)
 
@@ -401,7 +366,7 @@ public string $closure;
 public string $closure;
 ```
 
-### File
+## File
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-file)
 
@@ -410,7 +375,7 @@ public string $closure;
 public UploadedFile $closure; 
 ```
 
-### Filled
+## Filled
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-filled)
 
@@ -419,7 +384,7 @@ public UploadedFile $closure;
 public string $closure; 
 ```
 
-### GreaterThan
+## GreaterThan
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-gt)
 
@@ -428,7 +393,7 @@ public string $closure;
 public int $closure; 
 ```
 
-### GreaterThanOrEqualTo
+## GreaterThanOrEqualTo
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-gte)
 
@@ -437,7 +402,7 @@ public int $closure;
 public int $closure; 
 ```
 
-### Image
+## Image
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-image)
 
@@ -446,7 +411,7 @@ public int $closure;
 public UploadedFile $closure; 
 ```
 
-### In
+## In
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-in)
 
@@ -458,7 +423,7 @@ public mixed $closure;
 public mixed $closure; 
 ```
 
-### InArray
+## InArray
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-in-array)
 
@@ -467,7 +432,7 @@ public mixed $closure;
 public string $closure; 
 ```
 
-### IntegerType
+## IntegerType
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-integer)
 
@@ -476,7 +441,7 @@ public string $closure;
 public int $closure; 
 ```
 
-### IP
+## IP
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-ip)
 
@@ -485,7 +450,7 @@ public int $closure;
 public string $closure; 
 ```
 
-### IPv4
+## IPv4
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-ipv4)
 
@@ -494,7 +459,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### IPv6
+## IPv6
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-ipv6)
 
@@ -503,7 +468,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### Json
+## Json
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-json)
 
@@ -512,7 +477,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### LessThan
+## LessThan
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-lt)
 
@@ -521,7 +486,7 @@ public string $closure;
 public int $closure; 
 ```
 
-### LessThanOrEqualTo
+## LessThanOrEqualTo
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-lte)
 
@@ -530,7 +495,7 @@ public int $closure;
 public int $closure; 
 ```
 
-### Max
+## Max
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-max)
 
@@ -539,7 +504,7 @@ public int $closure;
 public int $closure; 
 ```
 
-### MimeTypes
+## MimeTypes
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-mimetypes)
 
@@ -554,7 +519,7 @@ public UploadedFile $closure;
 public UploadedFile $closure; 
 ```
 
-### Mimes
+## Mimes
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-mimes)
 
@@ -569,7 +534,7 @@ public UploadedFile $closure;
 public UploadedFile $closure; 
 ```
 
-### Min
+## Min
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-min)
 
@@ -578,7 +543,7 @@ public UploadedFile $closure;
 public int $closure; 
 ```
 
-### MultipleOf
+## MultipleOf
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-multiple-of)
 
@@ -587,7 +552,7 @@ public int $closure;
 public int $closure; 
 ```
 
-### NotIn
+## NotIn
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-not-in)
 
@@ -599,7 +564,7 @@ public mixed $closure;
 public mixed $closure; 
 ```
 
-### NotRegex
+## NotRegex
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-not-regex)
 
@@ -608,7 +573,7 @@ public mixed $closure;
 public string $closure; 
 ```
 
-### Nullable
+## Nullable
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-nullable)
 
@@ -617,7 +582,7 @@ public string $closure;
 public ?string $closure; 
 ```
 
-### Numeric
+## Numeric
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-numeric)
 
@@ -626,7 +591,7 @@ public ?string $closure;
 public ?string $closure; 
 ```
 
-### Password
+## Password
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-password)
 
@@ -635,7 +600,7 @@ public ?string $closure;
 public string $closure; 
 ```
 
-### Present
+## Present
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-present)
 
@@ -644,7 +609,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### Prohibited
+## Prohibited
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-prohibited)
 
@@ -653,7 +618,7 @@ public string $closure;
 public ?string $closure; 
 ```
 
-### ProhibitedIf
+## ProhibitedIf
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-prohibited-if)
 
@@ -665,7 +630,7 @@ public ?string $closure;
 public ?string $closure; 
 ```
 
-### ProhibitedUnless
+## ProhibitedUnless
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-prohibited-unless)
 
@@ -677,7 +642,7 @@ public ?string $closure;
 public ?string $closure; 
 ```
 
-### Prohibits
+## Prohibits
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-prohibits)
 
@@ -692,7 +657,7 @@ public ?string $closure;
 public ?string $closure; 
 ```
 
-### Regex
+## Regex
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-regex)
 
@@ -701,7 +666,7 @@ public ?string $closure;
 public string $closure; 
 ```
 
-### Required
+## Required
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-required)
 
@@ -710,7 +675,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### RequiredIf
+## RequiredIf
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-required-if)
 
@@ -722,7 +687,7 @@ public ?string $closure;
 public ?string $closure; 
 ```
 
-### RequiredUnless
+## RequiredUnless
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-required-unless)
 
@@ -734,7 +699,7 @@ public ?string $closure;
 public ?string $closure; 
 ```
 
-### RequiredWith
+## RequiredWith
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-required-with)
 
@@ -749,7 +714,7 @@ public ?string $closure;
 public ?string $closure; 
 ```
 
-### RequiredWithAll
+## RequiredWithAll
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-required-with-all)
 
@@ -764,7 +729,7 @@ public ?string $closure;
 public ?string $closure; 
 ```
 
-### RequiredWithout
+## RequiredWithout
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-required-without)
 
@@ -779,7 +744,7 @@ public ?string $closure;
 public ?string $closure; 
 ```
 
-### RequiredWithoutAll
+## RequiredWithoutAll
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-required-without-all)
 
@@ -794,7 +759,7 @@ public ?string $closure;
 public ?string $closure; 
 ```
 
-### Rule
+## Rule
 
 ```php
 #[Rule('string|uuid')]
@@ -804,7 +769,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### Same
+## Same
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-same)
 
@@ -813,7 +778,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### Size
+## Size
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-size)
 
@@ -822,7 +787,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### Sometimes
+## Sometimes
 
 [Docs](https://laravel.com/docs/9.x/validation#validating-when-present)
 
@@ -831,7 +796,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### StartsWith
+## StartsWith
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-starts-with)
 
@@ -846,7 +811,7 @@ public string $closure;
 public string $closure;
 ```
 
-### StringType
+## StringType
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-string)
 
@@ -855,7 +820,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### TimeZone
+## TimeZone
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-timezone)
 
@@ -864,7 +829,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### Unique
+## Unique
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-unique)
 
@@ -888,7 +853,7 @@ public string $closure;
 public string $closure;
 ```
 
-### Url
+## Url
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-url)
 
@@ -897,7 +862,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### Ulid
+## Ulid
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-ulid)
 
@@ -906,7 +871,7 @@ public string $closure;
 public string $closure; 
 ```
 
-### Uuid
+## Uuid
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-uuid)
 

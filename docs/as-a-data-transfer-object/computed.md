@@ -1,6 +1,6 @@
 ---
 title: Computed values
-weight: 7
+weight: 8
 ---
 
 Earlier we saw how default values can be set for a data object, the same approach can be used to set computed values, although slightly different:
@@ -26,7 +26,6 @@ You can now do the following:
 
 ```php
 SongData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche']);
-SongData::validateAndCreate(['first_name' => 'Ruben', 'last_name' => 'Van Assche']);
 ```
 
 Again there are a few conditions for this approach:
