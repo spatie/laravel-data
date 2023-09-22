@@ -24,7 +24,6 @@ use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
 use Spatie\LaravelData\Tests\Fakes\OnlyData;
 use Spatie\LaravelData\Tests\Fakes\PartialClassConditionalData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\Fakes\UnionData;
 
 it('can include a lazy property', function () {
     $data = new LazyData(Lazy::create(fn () => 'test'));
@@ -919,7 +918,7 @@ it('can perform only and except on array properties', function () {
 
 it('can fetch lazy properties like regular properties within PHP', function () {
 
-    $dataClass = new class extends Data {
+    $dataClass = new class () extends Data {
         public int $id;
 
         public SimpleData|Lazy $simple;
@@ -1130,7 +1129,7 @@ it('can work with the different types of lazy data collections', function (
     ]);
 })->with(function () {
     yield 'array' => [
-        fn () => new class extends Data {
+        fn () => new class () extends Data {
             #[DataCollectionOf(SimpleData::class)]
             public Lazy|array $lazyCollection;
 
@@ -1141,7 +1140,7 @@ it('can work with the different types of lazy data collections', function (
     ];
 
     yield 'collection' => [
-        fn () => new class extends Data {
+        fn () => new class () extends Data {
             #[DataCollectionOf(SimpleData::class)]
             public Lazy|Collection $lazyCollection;
 
@@ -1152,7 +1151,7 @@ it('can work with the different types of lazy data collections', function (
     ];
 
     yield 'paginator' => [
-        fn () => new class extends Data {
+        fn () => new class () extends Data {
             #[DataCollectionOf(SimpleData::class)]
             public Lazy|LengthAwarePaginator $lazyCollection;
 
@@ -1164,7 +1163,7 @@ it('can work with the different types of lazy data collections', function (
 })->skip('Impelemnt further');
 
 it('partials are always reset when transforming again', function () {
-    $dataClass = new class(Lazy::create(fn () => NestedLazyData::from('Hello World'))) extends Data {
+    $dataClass = new class (Lazy::create(fn () => NestedLazyData::from('Hello World'))) extends Data {
         public function __construct(
             public Lazy|NestedLazyData $nested
         ) {
