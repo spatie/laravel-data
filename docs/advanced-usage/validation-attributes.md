@@ -487,7 +487,7 @@ public string $closure;
 
 ### IPv4
 
-[Docs](https://laravel.com/docs/9.x/validation#rule-ipv4)
+[Docs](https://laravel.com/docs/9.x/validation#ipv4)
 
 ```php
 #[IPv4]
@@ -496,7 +496,7 @@ public string $closure;
 
 ### IPv6
 
-[Docs](https://laravel.com/docs/9.x/validation#rule-ipv6)
+[Docs](https://laravel.com/docs/9.x/validation#ipv6)
 
 ```php
 #[IPv6]
