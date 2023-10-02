@@ -530,6 +530,15 @@ public int $closure;
 public int $closure; 
 ```
 
+### MacAddress
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-mac)
+
+```php
+#[MacAddress]
+public string $closure; 
+```
+
 ### Max
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-max)
