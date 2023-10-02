@@ -794,6 +794,21 @@ public ?string $closure;
 public ?string $closure; 
 ```
 
+### RequiredArrayKeys
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-required-array-keys)
+
+```php
+#[RequiredArrayKeys('a')]
+public array $closure;
+
+#[RequiredArrayKeys(['a', 'b'])]
+public array $closure;
+
+#[RequiredArrayKeys('a', 'b')]
+public array $closure;
+```
+
 ### Rule
 
 ```php

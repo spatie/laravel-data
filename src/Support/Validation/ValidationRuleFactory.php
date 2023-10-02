@@ -66,6 +66,7 @@ use Spatie\LaravelData\Attributes\Validation\ProhibitedUnless;
 use Spatie\LaravelData\Attributes\Validation\Prohibits;
 use Spatie\LaravelData\Attributes\Validation\Regex;
 use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\RequiredArrayKeys;
 use Spatie\LaravelData\Attributes\Validation\RequiredIf;
 use Spatie\LaravelData\Attributes\Validation\RequiredUnless;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
@@ -165,6 +166,7 @@ class ValidationRuleFactory
             Prohibits::keyword() => Prohibits::class,
             Regex::keyword() => Regex::class,
             Required::keyword() => Required::class,
+            RequiredArrayKeys::keyword() => RequiredArrayKeys::class,
             RequiredIf::keyword() => RequiredIf::class,
             RequiredUnless::keyword() => RequiredUnless::class,
             RequiredWith::keyword() => RequiredWith::class,
