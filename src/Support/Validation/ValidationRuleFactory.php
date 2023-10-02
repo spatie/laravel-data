@@ -23,6 +23,8 @@ use Spatie\LaravelData\Attributes\Validation\CurrentPassword;
 use Spatie\LaravelData\Attributes\Validation\Date;
 use Spatie\LaravelData\Attributes\Validation\DateEquals;
 use Spatie\LaravelData\Attributes\Validation\DateFormat;
+use Spatie\LaravelData\Attributes\Validation\Declined;
+use Spatie\LaravelData\Attributes\Validation\DeclinedIf;
 use Spatie\LaravelData\Attributes\Validation\Different;
 use Spatie\LaravelData\Attributes\Validation\Digits;
 use Spatie\LaravelData\Attributes\Validation\DigitsBetween;
@@ -122,6 +124,8 @@ class ValidationRuleFactory
             Date::keyword() => Date::class,
             DateEquals::keyword() => DateEquals::class,
             DateFormat::keyword() => DateFormat::class,
+            Declined::keyword() => Declined::class,
+            DeclinedIf::keyword() => DeclinedIf::class,
             Different::keyword() => Different::class,
             Digits::keyword() => Digits::class,
             DigitsBetween::keyword() => DigitsBetween::class,
