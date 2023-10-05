@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support\EloquentCasts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Contracts\Support\Arrayable;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\TransformableData;
@@ -46,6 +47,10 @@ class DataCollectionEloquentCast implements CastsAttributes
 
         if ($value instanceof BaseDataCollectable && $value instanceof TransformableData) {
             $value = $value->all();
+        }
+
+        if ($value instanceof Arrayable) {
+            $value = $value->toArray();
         }
 
         if (! is_array($value)) {
