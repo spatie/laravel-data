@@ -1,11 +1,17 @@
 <?php
 
+use Spatie\LaravelData\Attributes\MapName;
+use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithTransformer;
+use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 it('keeps track of a global map from attribute', function () {
     $dataClass = DataClass::create(new ReflectionClass(DataWithMapper::class));
@@ -85,6 +91,16 @@ it('wont create an output name mapping for non mapped properties', function () {
         ->mappedDataObjects->toBeEmpty();
 });
 
+it('resolves parent attributes', function () {
+    $dataClass = DataClass::create(new ReflectionClass(ChildData::class));
+
+    expect($dataClass->attributes)
+        ->toHaveCount(3)
+        ->contains(fn ($attribute) => $attribute instanceof MapName)->toBeTrue()
+        ->contains(fn ($attribute) => $attribute instanceof WithTransformer)->toBeTrue()
+        ->contains(fn ($attribute) => $attribute instanceof WithCast)->toBeTrue();
+});
+
 #[\JetBrains\PhpStorm\Immutable]
 class PhpStormClassAttributeData extends Data
 {
@@ -118,5 +134,20 @@ class ModelWithPhpStormAttributeData extends Data
     public static function fromDummyModel(DummyModel $model)
     {
         return new self($model->id);
+    }
+}
+
+#[MapName(SnakeCaseMapper::class)]
+#[WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-Y')]
+#[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
+class ParentData extends Data
+{
+}
+
+class ChildData extends ParentData
+{
+    public function __construct(
+        public DateTimeInterface $dateTime
+    ) {
     }
 }

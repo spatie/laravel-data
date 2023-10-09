@@ -15,6 +15,7 @@ use Spatie\LaravelData\Contracts\ResponsableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\ValidateableData;
 use Spatie\LaravelData\Contracts\WrappableData;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Lazy\CachedLazy;
@@ -49,9 +50,7 @@ class DataClass
 
     public static function create(ReflectionClass $class): self
     {
-        $attributes = collect($class->getAttributes())
-            ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
-            ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
+        $attributes = static::resolveAttributes($class);
 
         $methods = collect($class->getMethods());
 
@@ -79,6 +78,21 @@ class DataClass
             attributes: $attributes,
             outputNameMapping: new CachedLazy(fn () => self::resolveOutputNameMapping($properties)),
         );
+    }
+
+    protected static function resolveAttributes(
+        ReflectionClass $class
+    ): Collection {
+        $attributes = collect($class->getAttributes())
+            ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
+            ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
+
+        $parent = $class->getParentClass();
+        if ($parent !== false && $class->getName() !== Data::class) {
+            $attributes = $attributes->merge(static::resolveAttributes($parent));
+        }
+
+        return $attributes;
     }
 
     protected static function resolveMethods(
