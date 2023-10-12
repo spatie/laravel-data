@@ -13,17 +13,22 @@ trait TransformableData
 
     public function toArray(): array
     {
-        return $this->transform();
+        return $this->transform(context: 'array');
     }
 
     public function toJson($options = 0): string
     {
-        return json_encode($this->transform(), $options);
+        return json_encode($this->transform(context: 'json'), $options);
+    }
+
+    public function toEloquent(): string
+    {
+        return json_encode($this->transform(context: 'eloquent'));
     }
 
     public function jsonSerialize(): array
     {
-        return $this->transform();
+        return $this->transform(context: 'json');
     }
 
     public static function castUsing(array $arguments)

@@ -14,7 +14,7 @@ class DateTimeInterfaceTransformer implements Transformer
     ) {
     }
 
-    public function transform(DataProperty $property, mixed $value): string
+    public function transform(DataProperty $property, mixed $value, ?string $context = null): string
     {
         [$format] = Arr::wrap($this->format ?? config('data.date_format'));
 

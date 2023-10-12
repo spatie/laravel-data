@@ -20,6 +20,7 @@ class DataCollectableTransformer
         protected bool $transformValues,
         protected WrapExecutionType $wrapExecutionType,
         protected bool $mapPropertyNames,
+        protected ?string $context,
         protected PartialTrees $trees,
         protected Enumerable|CursorPaginator|Paginator $items,
         protected Wrap $wrap,
@@ -33,7 +34,9 @@ class DataCollectableTransformer
         }
 
         $this->items->through(
-            $this->transformItemClosure()
+            fn (mixed $item) => $item instanceof BaseData
+                ? $this->transformItemClosure()($item)->transform(context: $this->context)
+                : $item
         );
 
         return $this->transformValues
@@ -60,6 +63,7 @@ class DataCollectableTransformer
                     ? WrapExecutionType::TemporarilyDisabled
                     : $this->wrapExecutionType,
                 $this->mapPropertyNames,
+                $this->context,
             );
         }
 

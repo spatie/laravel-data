@@ -27,6 +27,7 @@ trait ResponsableData
         return new JsonResponse(
             data: $this->transform(
                 wrapExecutionType: WrapExecutionType::Enabled,
+                context: 'response'
             ),
             status: $this->calculateResponseStatus($request)
         );

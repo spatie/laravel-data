@@ -31,14 +31,16 @@ class DataTransformer
         bool $transformValues,
         WrapExecutionType $wrapExecutionType,
         bool $mapPropertyNames,
+        ?string $context = null,
     ): self {
-        return new self($transformValues, $wrapExecutionType, $mapPropertyNames);
+        return new self($transformValues, $wrapExecutionType, $mapPropertyNames, $context);
     }
 
     public function __construct(
         protected bool $transformValues,
         protected WrapExecutionType $wrapExecutionType,
         protected bool $mapPropertyNames,
+        protected ?string $context = null,
     ) {
         $this->config = app(DataConfig::class);
     }
@@ -198,7 +200,7 @@ class DataTransformer
     protected function resolvePropertyValue(
         DataProperty $property,
         mixed $value,
-        PartialTrees $trees
+        PartialTrees $trees,
     ): mixed {
         if ($value instanceof Lazy) {
             $value = $value->resolve();
@@ -208,17 +210,17 @@ class DataTransformer
             return null;
         }
 
-        if (is_array($value) && ($trees->only instanceof AllTreeNode || $trees->only instanceof PartialTreeNode)) {
+        if (\is_array($value) && ($trees->only instanceof AllTreeNode || $trees->only instanceof PartialTreeNode)) {
             $value = Arr::only($value, $trees->only->getFields());
         }
 
-        if (is_array($value) && ($trees->except instanceof AllTreeNode || $trees->except instanceof PartialTreeNode)) {
+        if (\is_array($value) && ($trees->except instanceof AllTreeNode || $trees->except instanceof PartialTreeNode)) {
             $value = Arr::except($value, $trees->except->getFields());
         }
 
-        if (count($transformers = $this->resolveTransformersForValue($property, $value))) {
+        if (\count($transformers = $this->resolveTransformersForValue($property, $value))) {
             foreach ($transformers as $transformer) {
-                if ($result = $transformer->transform($property, $value)) {
+                if ($result = $transformer->transform($property, $value, $this->context)) {
                     return $result;
                 }
             }
@@ -243,12 +245,13 @@ class DataTransformer
         };
 
         if ($value instanceof TransformableData && $this->transformValues) {
-            return $value->transform($this->transformValues, $wrapExecutionType, $this->mapPropertyNames, );
+            return $value->transform($this->transformValues, $wrapExecutionType, $this->mapPropertyNames, $this->context);
         }
 
         return $value;
     }
 
+    /** @return Collection<int,Transformer> */
     protected function resolveTransformersForValue(
         DataProperty $property,
         mixed $value,

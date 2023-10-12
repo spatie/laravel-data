@@ -8,9 +8,9 @@ use Spatie\LaravelData\Transformers\Transformer;
 
 class ConfidentialDataCollectionTransformer implements Transformer
 {
-    public function transform(DataProperty $property, mixed $value): mixed
+    public function transform(DataProperty $property, mixed $value, ?string $context = null): mixed
     {
         /** @var \Spatie\LaravelData\DataCollection $value */
-        return $value->toCollection()->map(fn (Data $data) => (new ConfidentialDataTransformer())->transform($property, $data))->toArray();
+        return $value->toCollection()->map(fn (Data $data) => (new ConfidentialDataTransformer())->transform($property, $data, $context))->toArray();
     }
 }

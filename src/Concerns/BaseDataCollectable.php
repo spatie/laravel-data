@@ -39,12 +39,14 @@ trait BaseDataCollectable
         bool $transformValues = true,
         WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
         bool $mapPropertyNames = true,
+        ?string $context = null,
     ): array {
         $transformer = new DataCollectableTransformer(
             $this->dataClass,
             $transformValues,
             $wrapExecutionType,
             $mapPropertyNames,
+            $context,
             $this->getPartialTrees(),
             $this->items,
             $this->getWrap(),

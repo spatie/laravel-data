@@ -6,5 +6,5 @@ use Spatie\LaravelData\Support\DataProperty;
 
 interface Transformer
 {
-    public function transform(DataProperty $property, mixed $value): mixed;
+    public function transform(DataProperty $property, mixed $value, ?string $context = null): mixed;
 }

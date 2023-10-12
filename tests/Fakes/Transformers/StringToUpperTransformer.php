@@ -7,7 +7,7 @@ use Spatie\LaravelData\Transformers\Transformer;
 
 class StringToUpperTransformer implements Transformer
 {
-    public function transform(DataProperty $property, mixed $value): string
+    public function transform(DataProperty $property, mixed $value, ?string $context = null): string
     {
         return strtoupper($value);
     }

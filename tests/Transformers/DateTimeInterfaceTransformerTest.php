@@ -64,7 +64,6 @@ it('can transform dates with an alternative format', function () {
         $transformer->transform(
             DataProperty::create(new ReflectionProperty($class, 'carbon')),
             new Carbon('19-05-1994 00:00:00'),
-            []
         )
     )->toEqual('19-05-1994');
 
@@ -72,7 +71,6 @@ it('can transform dates with an alternative format', function () {
         $transformer->transform(
             DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')),
             new CarbonImmutable('19-05-1994 00:00:00'),
-            []
         )
     )->toEqual('19-05-1994');
 
@@ -80,7 +78,6 @@ it('can transform dates with an alternative format', function () {
         $transformer->transform(
             DataProperty::create(new ReflectionProperty($class, 'dateTime')),
             new DateTime('19-05-1994 00:00:00'),
-            []
         )
     )->toEqual('19-05-1994');
 
@@ -88,7 +85,6 @@ it('can transform dates with an alternative format', function () {
         $transformer->transform(
             DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')),
             new DateTimeImmutable('19-05-1994 00:00:00'),
-            []
         )
     )->toEqual('19-05-1994');
 });
