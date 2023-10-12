@@ -26,6 +26,8 @@ use Spatie\LaravelData\Attributes\Validation\CurrentPassword;
 use Spatie\LaravelData\Attributes\Validation\Date;
 use Spatie\LaravelData\Attributes\Validation\DateEquals;
 use Spatie\LaravelData\Attributes\Validation\DateFormat;
+use Spatie\LaravelData\Attributes\Validation\Declined;
+use Spatie\LaravelData\Attributes\Validation\DeclinedIf;
 use Spatie\LaravelData\Attributes\Validation\Different;
 use Spatie\LaravelData\Attributes\Validation\Digits;
 use Spatie\LaravelData\Attributes\Validation\DigitsBetween;
@@ -115,6 +117,7 @@ dataset('attributes', function () {
     yield from dateEqualsAttributes();
     yield from dimensionsAttributes();
     yield from distinctAttributes();
+    yield from declinedIfAttributes();
     yield from emailAttributes();
     yield from endsWithAttributes();
     yield from existsAttributes();
@@ -184,6 +187,12 @@ dataset('attributes', function () {
         attribute: new DateFormat('Y-m-d'),
         expected: 'date_format:Y-m-d',
     );
+
+    yield fixature(
+        attribute: new Declined(),
+        expected: 'declined',
+    );
+
 
     yield fixature(
         attribute: new Different('field'),
@@ -583,6 +592,35 @@ function distinctAttributes(): Generator
         attribute: new Distinct('fake'),
         expected: '',
         exception: CannotBuildValidationRule::class
+    );
+}
+
+function declinedIfAttributes(): Generator
+{
+    yield fixature(
+        attribute: new DeclinedIf('value', 'string'),
+        expected: 'declined_if:value,string',
+    );
+
+    yield fixature(
+        attribute: new DeclinedIf('value', true),
+        expected: 'declined_if:value,true',
+    );
+
+    yield fixature(
+        attribute: new DeclinedIf('value', 42),
+        expected: 'declined_if:value,42',
+    );
+
+    yield fixature(
+        attribute: new DeclinedIf('value', 3.14),
+        expected: 'declined_if:value,3.14',
+    );
+
+    yield fixature(
+        attribute: new DeclinedIf('value', DummyBackedEnum::FOO),
+        expected: 'declined_if:value,foo',
+        expectCreatedAttribute: new DeclinedIf('value', 'foo')
     );
 }
 

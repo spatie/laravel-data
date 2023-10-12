@@ -251,6 +251,24 @@ public Carbon $closure;
 public Carbon $closure; 
 ```
 
+### Declined
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-declined)
+
+```php
+#[Declined]
+public bool $closure; 
+```
+
+### DeclinedIf
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-declined-if)
+
+```php
+#[DeclinedIf('other_field', 'equals_this')]
+public bool $closure; 
+```
+
 ### Different
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-different)
