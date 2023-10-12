@@ -41,7 +41,7 @@ it('can get the transformer attribute', function () {
         public SimpleData $property;
     });
 
-    expect($helper->transformer)->toEqual(new DateTimeInterfaceTransformer());
+    expect($helper->transformers->first())->toEqual(new DateTimeInterfaceTransformer());
 });
 
 it('can get the transformer attribute with arguments', function () {
@@ -50,7 +50,7 @@ it('can get the transformer attribute with arguments', function () {
         public SimpleData $property;
     });
 
-    expect($helper->transformer)->toEqual(new DateTimeInterfaceTransformer('d-m-y'));
+    expect($helper->transformers->first())->toEqual(new DateTimeInterfaceTransformer('d-m-y'));
 });
 
 it('can get the mapped input name', function () {

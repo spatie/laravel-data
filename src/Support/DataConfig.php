@@ -2,17 +2,17 @@
 
 namespace Spatie\LaravelData\Support;
 
+use Illuminate\Support\Arr;
 use ReflectionClass;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Transformers\Transformer;
 
 class DataConfig
 {
     /** @var array<string, \Spatie\LaravelData\Support\DataClass> */
     protected array $dataClasses = [];
 
-    /** @var array<string, \Spatie\LaravelData\Transformers\Transformer> */
+    /** @var array<string, \Spatie\LaravelData\Transformers\Transformer[]> */
     protected array $transformers = [];
 
     /** @var array<string, \Spatie\LaravelData\Casts\Cast> */
@@ -33,15 +33,22 @@ class DataConfig
             $config['rule_inferrers'] ?? []
         );
 
-        foreach ($config['transformers'] ?? [] as $transformable => $transformer) {
-            $this->transformers[ltrim($transformable, ' \\')] = app($transformer);
-        }
+        $this->setTransformers($config['transformers'] ?? []);
 
         foreach ($config['casts'] ?? [] as $castable => $cast) {
             $this->casts[ltrim($castable, ' \\')] = app($cast);
         }
 
         $this->morphMap = new DataClassMorphMap();
+    }
+
+    public function setTransformers(array $transformers): self
+    {
+        foreach ($transformers as $transformable => $transformers) {
+            $this->transformers[ltrim($transformable, ' \\')] = array_map(resolve(...), Arr::wrap($transformers));
+        }
+
+        return $this;
     }
 
     public function getDataClass(string $class): DataClass
@@ -75,23 +82,23 @@ class DataConfig
         return null;
     }
 
-    public function findGlobalTransformerForValue(mixed $value): ?Transformer
+    public function findGlobalTransformersForValue(mixed $value): array
     {
         if (gettype($value) !== 'object') {
-            return null;
+            return [];
         }
 
-        foreach ($this->transformers as $transformable => $transformer) {
+        foreach ($this->transformers as $transformable => $transformers) {
             if ($value::class === $transformable) {
-                return $transformer;
+                return $transformers;
             }
 
             if (is_a($value::class, $transformable, true)) {
-                return $transformer;
+                return $transformers;
             }
         }
 
-        return null;
+        return [];
     }
 
     public function getRuleInferrers(): array

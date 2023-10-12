@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Transformers;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
@@ -215,8 +216,12 @@ class DataTransformer
             $value = Arr::except($value, $trees->except->getFields());
         }
 
-        if ($transformer = $this->resolveTransformerForValue($property, $value)) {
-            return $transformer->transform($property, $value);
+        if (count($transformers = $this->resolveTransformersForValue($property, $value))) {
+            foreach ($transformers as $transformer) {
+                if ($result = $transformer->transform($property, $value)) {
+                    return $result;
+                }
+            }
         }
 
         if (! $value instanceof BaseData && ! $value instanceof BaseDataCollectable) {
@@ -244,23 +249,28 @@ class DataTransformer
         return $value;
     }
 
-    protected function resolveTransformerForValue(
+    protected function resolveTransformersForValue(
         DataProperty $property,
         mixed $value,
-    ): ?Transformer {
+    ): Collection {
         if (! $this->transformValues) {
-            return null;
+            return collect();
         }
 
-        $transformer = $property->transformer ?? $this->config->findGlobalTransformerForValue($value);
+        // NOTE: maybe these should be merged instead, but that would be a breaking change.
+        $transformers = $property->transformers->isNotEmpty()
+            ? $property->transformers
+            : collect($this->config->findGlobalTransformersForValue($value));
 
-        $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
-            && ($property->type->isDataObject || $property->type->isDataCollectable);
+        return $transformers->filter(function (Transformer $transformer) use ($property) {
+            $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
+                && ($property->type->isDataObject || $property->type->isDataCollectable);
 
-        if ($shouldUseDefaultDataTransformer) {
-            return null;
-        }
+            if ($shouldUseDefaultDataTransformer) {
+                return false;
+            }
 
-        return $transformer;
+            return true;
+        });
     }
 }

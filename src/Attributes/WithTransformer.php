@@ -6,7 +6,7 @@ use Attribute;
 use Spatie\LaravelData\Exceptions\CannotCreateTransformerAttribute;
 use Spatie\LaravelData\Transformers\Transformer;
 
-#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::IS_REPEATABLE | Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY)]
 class WithTransformer
 {
     public array $arguments;
