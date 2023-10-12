@@ -15,7 +15,6 @@ use Spatie\LaravelData\Contracts\ResponsableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\ValidateableData;
 use Spatie\LaravelData\Contracts\WrappableData;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Lazy\CachedLazy;
@@ -88,7 +87,8 @@ class DataClass
             ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
 
         $parent = $class->getParentClass();
-        if ($parent !== false && $class->getName() !== Data::class) {
+
+        if ($parent !== false) {
             $attributes = $attributes->merge(static::resolveAttributes($parent));
         }
 

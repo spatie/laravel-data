@@ -92,7 +92,22 @@ it('wont create an output name mapping for non mapped properties', function () {
 });
 
 it('resolves parent attributes', function () {
-    $dataClass = DataClass::create(new ReflectionClass(ChildData::class));
+    #[MapName(SnakeCaseMapper::class)]
+    #[WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-Y')]
+    #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
+    class TestRecursiveAttributesParentData extends Data
+    {
+    }
+
+    class TestRecursiveAttributesChildData extends TestRecursiveAttributesParentData
+    {
+        public function __construct(
+            public DateTimeInterface $dateTime
+        ) {
+        }
+    }
+
+    $dataClass = DataClass::create(new ReflectionClass(TestRecursiveAttributesChildData::class));
 
     expect($dataClass->attributes)
         ->toHaveCount(3)
@@ -134,20 +149,5 @@ class ModelWithPhpStormAttributeData extends Data
     public static function fromDummyModel(DummyModel $model)
     {
         return new self($model->id);
-    }
-}
-
-#[MapName(SnakeCaseMapper::class)]
-#[WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-Y')]
-#[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
-class ParentData extends Data
-{
-}
-
-class ChildData extends ParentData
-{
-    public function __construct(
-        public DateTimeInterface $dateTime
-    ) {
     }
 }
