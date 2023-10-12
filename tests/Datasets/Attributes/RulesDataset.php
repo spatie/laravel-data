@@ -72,6 +72,7 @@ use Spatie\LaravelData\Attributes\Validation\ProhibitedUnless;
 use Spatie\LaravelData\Attributes\Validation\Prohibits;
 use Spatie\LaravelData\Attributes\Validation\Regex;
 use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\RequiredArrayKeys;
 use Spatie\LaravelData\Attributes\Validation\RequiredIf;
 use Spatie\LaravelData\Attributes\Validation\RequiredUnless;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
@@ -130,6 +131,7 @@ dataset('attributes', function () {
     yield from prohibitedIfAttributes();
     yield from prohibitedUnlessAttributes();
     yield from prohibitsAttributes();
+    yield from requiredArrayKeysAttributes();
     yield from requiredIfAttributes();
     yield from requiredUnlessAttributes();
     yield from requiredWithAttributes();
@@ -886,6 +888,24 @@ function prohibitsAttributes(): Generator
     yield fixature(
         attribute: new Prohibits('key', 'other'),
         expected: 'prohibits:key,other',
+    );
+}
+
+function requiredArrayKeysAttributes(): Generator
+{
+    yield fixature(
+        attribute: new RequiredArrayKeys('x'),
+        expected: 'required_array_keys:x',
+    );
+
+    yield fixature(
+        attribute: new RequiredArrayKeys(['x', 'y']),
+        expected: 'required_array_keys:x,y',
+    );
+
+    yield fixature(
+        attribute: new RequiredArrayKeys('x', 'y'),
+        expected: 'required_array_keys:x,y',
     );
 }
 
