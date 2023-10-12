@@ -52,6 +52,7 @@ use Spatie\LaravelData\Attributes\Validation\IPv6;
 use Spatie\LaravelData\Attributes\Validation\Json;
 use Spatie\LaravelData\Attributes\Validation\LessThan;
 use Spatie\LaravelData\Attributes\Validation\LessThanOrEqualTo;
+use Spatie\LaravelData\Attributes\Validation\Lowercase;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Mimes;
 use Spatie\LaravelData\Attributes\Validation\MimeTypes;
@@ -83,6 +84,7 @@ use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Timezone;
 use Spatie\LaravelData\Attributes\Validation\Ulid;
 use Spatie\LaravelData\Attributes\Validation\Unique;
+use Spatie\LaravelData\Attributes\Validation\Uppercase;
 use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
@@ -289,6 +291,11 @@ dataset('attributes', function () {
     );
 
     yield fixature(
+        attribute: new Lowercase(),
+        expected: 'lowercase',
+    );
+
+    yield fixature(
         attribute: new Max(10),
         expected: 'max:10',
     );
@@ -356,6 +363,11 @@ dataset('attributes', function () {
     yield fixature(
         attribute: new Timezone(),
         expected: 'timezone',
+    );
+
+    yield fixature(
+        attribute: new Uppercase(),
+        expected: 'uppercase',
     );
 
     yield fixature(

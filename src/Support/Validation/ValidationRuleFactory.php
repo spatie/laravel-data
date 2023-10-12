@@ -49,6 +49,7 @@ use Spatie\LaravelData\Attributes\Validation\IPv6;
 use Spatie\LaravelData\Attributes\Validation\Json;
 use Spatie\LaravelData\Attributes\Validation\LessThan;
 use Spatie\LaravelData\Attributes\Validation\LessThanOrEqualTo;
+use Spatie\LaravelData\Attributes\Validation\Lowercase;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Mimes;
 use Spatie\LaravelData\Attributes\Validation\MimeTypes;
@@ -80,6 +81,7 @@ use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Timezone;
 use Spatie\LaravelData\Attributes\Validation\Ulid;
 use Spatie\LaravelData\Attributes\Validation\Unique;
+use Spatie\LaravelData\Attributes\Validation\Uppercase;
 use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Exceptions\CouldNotCreateValidationRule;
@@ -148,6 +150,7 @@ class ValidationRuleFactory
             Json::keyword() => Json::class,
             LessThan::keyword() => LessThan::class,
             LessThanOrEqualTo::keyword() => LessThanOrEqualTo::class,
+            Lowercase::keyword() => Lowercase::class,
             Max::keyword() => Max::class,
             Mimes::keyword() => Mimes::class,
             MimeTypes::keyword() => MimeTypes::class,
@@ -178,6 +181,7 @@ class ValidationRuleFactory
             StringType::keyword() => StringType::class,
             Timezone::keyword() => Timezone::class,
             Unique::keyword() => Unique::class,
+            Uppercase::keyword() => Uppercase::class,
             Url::keyword() => Url::class,
             Ulid::keyword() => Ulid::class,
             Uuid::keyword() => Uuid::class,
