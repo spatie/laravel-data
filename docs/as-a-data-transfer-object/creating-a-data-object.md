@@ -283,7 +283,7 @@ class SongController
     {
         $data = $request->getData();
     
-        $song = Song::create($data);
+        $song = Song::create($data->toArray());
         
         return $data;
     }
