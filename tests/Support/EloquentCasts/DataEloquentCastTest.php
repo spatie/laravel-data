@@ -7,13 +7,20 @@ use function Pest\Laravel\assertDatabaseHas;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnumWithOptions;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithEloquentExcludedCasts;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithDefaultValue;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithEloquentExcludedTransformerData;
+use Spatie\LaravelData\Tests\Fakes\Transformers\OptionsTransformer;
+use Spatie\LaravelData\Transformers\EnumTransformer;
 
 beforeEach(function () {
     DummyModelWithCasts::migrate();
+    DummyModelWithEloquentExcludedCasts::migrate();
 });
 
 it('can save a data object', function () {
@@ -129,4 +136,65 @@ it('can use an abstract data class with morph map', function () {
     expect($loadedMorphedModel->abstract_data)
         ->toBeInstanceOf(AbstractDataA::class)
         ->a->toBe('A\A');
+});
+
+it('skips eloquent-excluded transformers during casting', function () {
+    resolve(DataConfig::class)->setTransformers([
+        BackedEnum::class => [OptionsTransformer::class, EnumTransformer::class],
+    ]);
+
+    $model = DummyModelWithEloquentExcludedCasts::create([
+        'data' => [
+            'string' => 'Test',
+            'enum' => DummyBackedEnumWithOptions::CAPTAIN,
+            'normal_enum' => DummyBackedEnum::FOO,
+        ],
+        'eloquent_excluded_enum' => DummyBackedEnumWithOptions::CAPTAIN,
+    ]);
+
+    // Ensures the value is saved properly to the database
+    assertDatabaseHas($model::class, [
+        'data' => json_encode(['string' => 'Test', 'enum' => 'captain', 'normal_enum' => 'foo']),
+        'eloquent_excluded_enum' => 'captain',
+    ]);
+
+    // Ensures the value is serialized properly otherwise
+    expect($model->jsonSerialize())->toMatchArray([
+        'data' => [
+            'string' => 'Test',
+            'enum' => [
+                ['value' => 'captain', 'label' => 'Captain'],
+                ['value' => 'first_officer', 'label' => 'First Officer'],
+            ],
+            'normal_enum' => 'foo',
+        ],
+        'eloquent_excluded_enum' => 'captain',
+    ]);
+});
+
+test('transforming data takes `ExcludeFromEloquentCasts` into account', function () {
+    resolve(DataConfig::class)->setTransformers([
+        BackedEnum::class => [OptionsTransformer::class, EnumTransformer::class],
+    ]);
+
+    $data = SimpleDataWithEloquentExcludedTransformerData::from([
+        'string' => 'Test',
+        'enum' => DummyBackedEnumWithOptions::CAPTAIN,
+        'normal_enum' => DummyBackedEnum::FOO,
+    ]);
+
+    expect($data->transform(castingForEloquent: true))->toBe([
+        'string' => 'Test',
+        'enum' => 'captain',
+        'normal_enum' => 'foo',
+    ]);
+
+    expect($data->transform(castingForEloquent: false))->toBe([
+        'string' => 'Test',
+        'enum' => [
+            ['value' => 'captain', 'label' => 'Captain'],
+            ['value' => 'first_officer', 'label' => 'First Officer'],
+        ],
+        'normal_enum' => 'foo',
+    ]);
 });

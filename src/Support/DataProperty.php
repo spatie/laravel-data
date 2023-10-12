@@ -13,7 +13,6 @@ use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Mappers\NameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
-use Spatie\LaravelData\Transformers\Transformer;
 
 /**
  * @property Collection<string, object> $attributes
@@ -32,7 +31,7 @@ class DataProperty
         public readonly bool $hasDefaultValue,
         public readonly mixed $defaultValue,
         public readonly ?Cast $cast,
-        public readonly ?Transformer $transformer,
+        public readonly Collection $transformers,
         public readonly ?string $inputMappedName,
         public readonly ?string $outputMappedName,
         public readonly Collection $attributes,
@@ -86,7 +85,7 @@ class DataProperty
             hasDefaultValue: $property->isPromoted() ? $hasDefaultValue : $property->hasDefaultValue(),
             defaultValue: $property->isPromoted() ? $defaultValue : $property->getDefaultValue(),
             cast: $attributes->first(fn (object $attribute) => $attribute instanceof GetsCast)?->get(),
-            transformer: $attributes->first(fn (object $attribute) => $attribute instanceof WithTransformer)?->get(),
+            transformers: $attributes->filter(fn (object $attribute) => $attribute instanceof WithTransformer)->map->get(),
             inputMappedName: $inputMappedName,
             outputMappedName: $outputMappedName,
             attributes: $attributes,

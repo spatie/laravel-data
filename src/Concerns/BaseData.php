@@ -102,8 +102,9 @@ trait BaseData
         bool $transformValues = true,
         WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
         bool $mapPropertyNames = true,
+        bool $castingForEloquent = false,
     ): array {
-        return DataTransformer::create($transformValues, $wrapExecutionType, $mapPropertyNames)->transform($this);
+        return DataTransformer::create($transformValues, $wrapExecutionType, $mapPropertyNames, $castingForEloquent)->transform($this);
     }
 
     public function getMorphClass(): string

@@ -66,11 +66,11 @@ class DataEloquentCast implements CastsAttributes
         if ($isAbstractClassCast) {
             return json_encode([
                 'type' => $this->dataConfig->morphMap->getDataClassAlias($value::class) ?? $value::class,
-                'data' => json_decode($value->toJson(), associative: true, flags: JSON_THROW_ON_ERROR),
+                'data' => json_decode(json_encode($value->transform(castingForEloquent: true)), associative: true, flags: JSON_THROW_ON_ERROR),
             ]);
         }
 
-        return $value->toJson();
+        return json_encode($value->transform(castingForEloquent: true));
     }
 
     protected function isAbstractClassCast(): bool

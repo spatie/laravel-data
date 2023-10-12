@@ -3,9 +3,11 @@
 namespace Spatie\LaravelData\Transformers;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Contracts\ExcludeFromEloquentCasts;
 use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
@@ -30,14 +32,16 @@ class DataTransformer
         bool $transformValues,
         WrapExecutionType $wrapExecutionType,
         bool $mapPropertyNames,
+        bool $castingForEloquent,
     ): self {
-        return new self($transformValues, $wrapExecutionType, $mapPropertyNames);
+        return new self($transformValues, $wrapExecutionType, $mapPropertyNames, $castingForEloquent);
     }
 
     public function __construct(
         protected bool $transformValues,
         protected WrapExecutionType $wrapExecutionType,
         protected bool $mapPropertyNames,
+        protected bool $castingForEloquent,
     ) {
         $this->config = app(DataConfig::class);
     }
@@ -215,8 +219,12 @@ class DataTransformer
             $value = Arr::except($value, $trees->except->getFields());
         }
 
-        if ($transformer = $this->resolveTransformerForValue($property, $value)) {
-            return $transformer->transform($property, $value);
+        if (count($transformers = $this->resolveTransformersForValue($property, $value))) {
+            foreach ($transformers as $transformer) {
+                if ($result = $transformer->transform($property, $value)) {
+                    return $result;
+                }
+            }
         }
 
         if (! $value instanceof BaseData && ! $value instanceof BaseDataCollectable) {
@@ -244,23 +252,32 @@ class DataTransformer
         return $value;
     }
 
-    protected function resolveTransformerForValue(
+    protected function resolveTransformersForValue(
         DataProperty $property,
         mixed $value,
-    ): ?Transformer {
+    ): Collection {
         if (! $this->transformValues) {
-            return null;
+            return collect();
         }
 
-        $transformer = $property->transformer ?? $this->config->findGlobalTransformerForValue($value);
+        // NOTE: maybe these should be merged instead, but that would be a breaking change.
+        $transformers = $property->transformers->isNotEmpty()
+            ? $property->transformers
+            : collect($this->config->findGlobalTransformersForValue($value));
 
-        $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
-            && ($property->type->isDataObject || $property->type->isDataCollectable);
+        return $transformers->filter(function (Transformer $transformer) use ($property) {
+            if ($this->castingForEloquent && $transformer instanceof ExcludeFromEloquentCasts) {
+                return false;
+            }
 
-        if ($shouldUseDefaultDataTransformer) {
-            return null;
-        }
+            $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
+                && ($property->type->isDataObject || $property->type->isDataCollectable);
 
-        return $transformer;
+            if ($shouldUseDefaultDataTransformer) {
+                return false;
+            }
+
+            return true;
+        });
     }
 }
