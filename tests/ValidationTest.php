@@ -2379,3 +2379,13 @@ it('can add a requiring rule on an attribute which will overwrite the optional t
         ->assertOk(['success' => true, 'id' => 1])
         ->assertErrors(['success' => true]);
 })->skip('V4: The rule inferrers need to be rewritten/removed for this, we need to first add attribute rules and then decide require stuff');
+
+it('will not transform non set optional properties ', function () {
+    $dataClass = new class () extends Data {
+        public array|Optional $optional;
+    };
+
+    expect($dataClass::from([])->toArray())->toBeEmpty();
+    expect($dataClass::from()->toArray())->toBeEmpty();
+    expect((new ($dataClass::class))->toArray())->toBeEmpty();
+});

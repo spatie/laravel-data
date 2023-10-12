@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.9.1 - 2023-10-12
+
+- Add Declined and DeclinedIf validation attributes (#572)
+- Add MacAddress validation attribute (#573)
+- Add RequiredArrayKeys validation attribute (#574)
+- Support Arrayable when casting to DataCollection (#577)
+- Fetch attributes from parent classes to allow reusability (#581)
+- Fix issue where non-set optional values would be transformed
+
 ## 3.9.0 - 2023-09-15
 
 - Fix an issue where computed values could not be set as null

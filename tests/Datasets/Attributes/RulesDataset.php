@@ -26,6 +26,8 @@ use Spatie\LaravelData\Attributes\Validation\CurrentPassword;
 use Spatie\LaravelData\Attributes\Validation\Date;
 use Spatie\LaravelData\Attributes\Validation\DateEquals;
 use Spatie\LaravelData\Attributes\Validation\DateFormat;
+use Spatie\LaravelData\Attributes\Validation\Declined;
+use Spatie\LaravelData\Attributes\Validation\DeclinedIf;
 use Spatie\LaravelData\Attributes\Validation\Different;
 use Spatie\LaravelData\Attributes\Validation\Digits;
 use Spatie\LaravelData\Attributes\Validation\DigitsBetween;
@@ -53,6 +55,7 @@ use Spatie\LaravelData\Attributes\Validation\Json;
 use Spatie\LaravelData\Attributes\Validation\LessThan;
 use Spatie\LaravelData\Attributes\Validation\LessThanOrEqualTo;
 use Spatie\LaravelData\Attributes\Validation\Lowercase;
+use Spatie\LaravelData\Attributes\Validation\MacAddress;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Mimes;
 use Spatie\LaravelData\Attributes\Validation\MimeTypes;
@@ -70,6 +73,7 @@ use Spatie\LaravelData\Attributes\Validation\ProhibitedUnless;
 use Spatie\LaravelData\Attributes\Validation\Prohibits;
 use Spatie\LaravelData\Attributes\Validation\Regex;
 use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\RequiredArrayKeys;
 use Spatie\LaravelData\Attributes\Validation\RequiredIf;
 use Spatie\LaravelData\Attributes\Validation\RequiredUnless;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
@@ -117,6 +121,7 @@ dataset('attributes', function () {
     yield from dateEqualsAttributes();
     yield from dimensionsAttributes();
     yield from distinctAttributes();
+    yield from declinedIfAttributes();
     yield from emailAttributes();
     yield from endsWithAttributes();
     yield from existsAttributes();
@@ -128,6 +133,7 @@ dataset('attributes', function () {
     yield from prohibitedIfAttributes();
     yield from prohibitedUnlessAttributes();
     yield from prohibitsAttributes();
+    yield from requiredArrayKeysAttributes();
     yield from requiredIfAttributes();
     yield from requiredUnlessAttributes();
     yield from requiredWithAttributes();
@@ -186,6 +192,12 @@ dataset('attributes', function () {
         attribute: new DateFormat('Y-m-d'),
         expected: 'date_format:Y-m-d',
     );
+
+    yield fixature(
+        attribute: new Declined(),
+        expected: 'declined',
+    );
+
 
     yield fixature(
         attribute: new Different('field'),
@@ -293,6 +305,11 @@ dataset('attributes', function () {
     yield fixature(
         attribute: new Lowercase(),
         expected: 'lowercase',
+    );
+
+    yield fixature(
+        attribute: new MacAddress(),
+        expected: 'mac_address',
     );
 
     yield fixature(
@@ -598,6 +615,35 @@ function distinctAttributes(): Generator
     );
 }
 
+function declinedIfAttributes(): Generator
+{
+    yield fixature(
+        attribute: new DeclinedIf('value', 'string'),
+        expected: 'declined_if:value,string',
+    );
+
+    yield fixature(
+        attribute: new DeclinedIf('value', true),
+        expected: 'declined_if:value,true',
+    );
+
+    yield fixature(
+        attribute: new DeclinedIf('value', 42),
+        expected: 'declined_if:value,42',
+    );
+
+    yield fixature(
+        attribute: new DeclinedIf('value', 3.14),
+        expected: 'declined_if:value,3.14',
+    );
+
+    yield fixature(
+        attribute: new DeclinedIf('value', DummyBackedEnum::FOO),
+        expected: 'declined_if:value,foo',
+        expectCreatedAttribute: new DeclinedIf('value', 'foo')
+    );
+}
+
 function emailAttributes(): Generator
 {
     yield fixature(
@@ -854,6 +900,24 @@ function prohibitsAttributes(): Generator
     yield fixature(
         attribute: new Prohibits('key', 'other'),
         expected: 'prohibits:key,other',
+    );
+}
+
+function requiredArrayKeysAttributes(): Generator
+{
+    yield fixature(
+        attribute: new RequiredArrayKeys('x'),
+        expected: 'required_array_keys:x',
+    );
+
+    yield fixature(
+        attribute: new RequiredArrayKeys(['x', 'y']),
+        expected: 'required_array_keys:x,y',
+    );
+
+    yield fixature(
+        attribute: new RequiredArrayKeys('x', 'y'),
+        expected: 'required_array_keys:x,y',
     );
 }
 
