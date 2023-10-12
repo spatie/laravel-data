@@ -36,6 +36,7 @@ use Spatie\LaravelData\Attributes\Validation\EndsWith;
 use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\ExcludeIf;
 use Spatie\LaravelData\Attributes\Validation\ExcludeUnless;
+use Spatie\LaravelData\Attributes\Validation\ExcludeWith;
 use Spatie\LaravelData\Attributes\Validation\ExcludeWithout;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\File;
@@ -216,6 +217,11 @@ dataset('attributes', function () {
     yield fixature(
         attribute: new ExcludeUnless('field', 42),
         expected: 'exclude_unless:field,42',
+    );
+
+    yield fixature(
+        attribute: new ExcludeWith('field'),
+        expected: 'exclude_with:field',
     );
 
     yield fixature(
