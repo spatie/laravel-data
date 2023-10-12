@@ -12,6 +12,10 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\Rules\In as LaravelIn;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+
+use function Pest\Laravel\mock;
+use function PHPUnit\Framework\assertFalse;
+
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
@@ -65,8 +69,6 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\Fakes\Support\FakeInjectable;
 use Spatie\LaravelData\Tests\Fakes\ValidationAttributes\PassThroughCustomValidationAttribute;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
-use function Pest\Laravel\mock;
-use function PHPUnit\Framework\assertFalse;
 
 it('can validate a string', function () {
     $dataClass = new class () extends Data {
@@ -2379,7 +2381,7 @@ it('can add a requiring rule on an attribute which will overwrite the optional t
 })->skip('V4: The rule inferrers need to be rewritten/removed for this, we need to first add attribute rules and then decide require stuff');
 
 it('will not transform non set optional properties ', function () {
-    $dataClass = new  class extends Data {
+    $dataClass = new class () extends Data {
         public array|Optional $optional;
     };
 
