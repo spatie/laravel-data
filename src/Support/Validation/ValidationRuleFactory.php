@@ -51,6 +51,7 @@ use Spatie\LaravelData\Attributes\Validation\IPv6;
 use Spatie\LaravelData\Attributes\Validation\Json;
 use Spatie\LaravelData\Attributes\Validation\LessThan;
 use Spatie\LaravelData\Attributes\Validation\LessThanOrEqualTo;
+use Spatie\LaravelData\Attributes\Validation\MacAddress;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Mimes;
 use Spatie\LaravelData\Attributes\Validation\MimeTypes;
@@ -152,6 +153,7 @@ class ValidationRuleFactory
             Json::keyword() => Json::class,
             LessThan::keyword() => LessThan::class,
             LessThanOrEqualTo::keyword() => LessThanOrEqualTo::class,
+            MacAddress::keyword() => MacAddress::class,
             Max::keyword() => Max::class,
             Mimes::keyword() => Mimes::class,
             MimeTypes::keyword() => MimeTypes::class,
