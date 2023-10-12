@@ -76,6 +76,10 @@ class DataTransformer
 
             $name = $property->name;
 
+            if ($property->type->isOptional && ! isset($data->{$name})) {
+                continue;
+            }
+
             if (! $this->shouldIncludeProperty($name, $data->{$name}, $trees)) {
                 continue;
             }
@@ -234,7 +238,7 @@ class DataTransformer
         };
 
         if ($value instanceof TransformableData && $this->transformValues) {
-            return $value->transform($this->transformValues, $wrapExecutionType, $this->mapPropertyNames, );
+            return $value->transform($this->transformValues, $wrapExecutionType, $this->mapPropertyNames,);
         }
 
         return $value;
