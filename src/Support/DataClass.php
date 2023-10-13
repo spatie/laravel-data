@@ -54,9 +54,7 @@ class DataClass
 
     public static function create(ReflectionClass $class): self
     {
-        $attributes = collect($class->getAttributes())
-            ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
-            ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
+        $attributes = static::resolveAttributes($class);
 
         $methods = collect($class->getMethods());
 
@@ -96,6 +94,22 @@ class DataClass
             dataCollectablePropertyAnnotations: $dataCollectablePropertyAnnotations,
             outputNameMapping: new CachedLazy(fn () => self::resolveOutputNameMapping($properties)),
         );
+    }
+
+    protected static function resolveAttributes(
+        ReflectionClass $class
+    ): Collection {
+        $attributes = collect($class->getAttributes())
+            ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
+            ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
+
+        $parent = $class->getParentClass();
+
+        if ($parent !== false) {
+            $attributes = $attributes->merge(static::resolveAttributes($parent));
+        }
+
+        return $attributes;
     }
 
     protected static function resolveMethods(

@@ -216,6 +216,24 @@ public Carbon $closure;
 public Carbon $closure; 
 ```
 
+## Declined
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-declined)
+
+```php
+#[Declined]
+public bool $closure; 
+```
+
+## DeclinedIf
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-declined-if)
+
+```php
+#[DeclinedIf('other_field', 'equals_this')]
+public bool $closure; 
+```
+
 ## Different
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-different)
@@ -452,7 +470,7 @@ public string $closure;
 
 ## IPv4
 
-[Docs](https://laravel.com/docs/9.x/validation#rule-ipv4)
+[Docs](https://laravel.com/docs/9.x/validation#ipv4)
 
 ```php
 #[IPv4]
@@ -461,7 +479,7 @@ public string $closure;
 
 ## IPv6
 
-[Docs](https://laravel.com/docs/9.x/validation#rule-ipv6)
+[Docs](https://laravel.com/docs/9.x/validation#ipv6)
 
 ```php
 #[IPv6]
@@ -493,6 +511,15 @@ public int $closure;
 ```php
 #[LessThanOrEqualTo('other_field')]
 public int $closure; 
+```
+
+## MacAddress
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-mac)
+
+```php
+#[MacAddress]
+public string $closure; 
 ```
 
 ## Max
@@ -757,6 +784,21 @@ public ?string $closure;
 
 #[RequiredWithoutAll('other_field', 'another_field')]
 public ?string $closure; 
+```
+
+## RequiredArrayKeys
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-required-array-keys)
+
+```php
+#[RequiredArrayKeys('a')]
+public array $closure;
+
+#[RequiredArrayKeys(['a', 'b'])]
+public array $closure;
+
+#[RequiredArrayKeys('a', 'b')]
+public array $closure;
 ```
 
 ## Rule

@@ -14,6 +14,15 @@ All notable changes to `laravel-data` will be documented in this file.
 - Allow creating data objects using `from` without parameters
 - Add support for a Dto and Resource object
 
+## 3.9.1 - 2023-10-12
+
+- Add Declined and DeclinedIf validation attributes (#572)
+- Add MacAddress validation attribute (#573)
+- Add RequiredArrayKeys validation attribute (#574)
+- Support Arrayable when casting to DataCollection (#577)
+- Fetch attributes from parent classes to allow reusability (#581)
+- Fix issue where non-set optional values would be transformed
+
 ## 3.9.0 - 2023-09-15
 
 - Fix an issue where computed values could not be set as null
@@ -37,7 +46,6 @@ All notable changes to `laravel-data` will be documented in this file.
 - allow collection to be created passing null (#507)
 - add Ulid validation rule (#510)   
   -add TARGET_PARAMETER to Attribute for improved Validation (#523)
->>>>>>> main
 
 ## 3.7.0 - 2023-07-05
 

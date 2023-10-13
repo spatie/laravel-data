@@ -49,6 +49,22 @@ it('can save a data object as an array', function () {
     ]);
 });
 
+it('can save a data object as an array from a collection', function () {
+    DummyModelWithCasts::create([
+        'data_collection' => collect([
+            ['string' => 'Hello'],
+            ['string' => 'World'],
+        ]),
+    ]);
+
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data_collection' => json_encode([
+            ['string' => 'Hello'],
+            ['string' => 'World'],
+        ]),
+    ]);
+});
+
 it('can load a data object', function () {
     DB::table('dummy_model_with_casts')->insert([
         'data_collection' => json_encode([
