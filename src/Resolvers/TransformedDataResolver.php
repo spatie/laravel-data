@@ -59,6 +59,10 @@ class TransformedDataResolver
                     return $payload;
                 }
 
+                if ($property->type->isOptional && ! isset($data->{$name})) {
+                    return $payload;
+                }
+
                 if (! $this->shouldIncludeProperty($name, $data->{$name}, $context)) {
                     return $payload;
                 }
