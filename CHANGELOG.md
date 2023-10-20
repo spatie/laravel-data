@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.9.2 - 2023-10-20
+
+- Fix breaking compatibility #590
+
 ## 3.9.1 - 2023-10-12
 
 - Add Declined and DeclinedIf validation attributes (#572)
