@@ -17,6 +17,6 @@ class MimeTypes extends ValidationAttribute
 
     public function getRules(): array
     {
-        return ["mimestypes:{$this->normalizeValue($this->mimeTypes)}"];
+        return ["mimetypes:{$this->normalizeValue($this->mimeTypes)}"];
     }
 }
