@@ -2386,6 +2386,7 @@ it('can validate an optional but nonexists attribute', function () {
     };
 
     expect($dataClass::from()->toArray())->toBe([]);
+    expect($dataClass::from([])->toArray())->toBe([]);
     expect($dataClass::from(['property' => null])->toArray())->toBe(['property' => null]);
     expect($dataClass::from(['property' => []])->toArray())->toBe(['property' => []]);
     expect($dataClass::validateAndCreate([])->toArray())->toBe([]);
