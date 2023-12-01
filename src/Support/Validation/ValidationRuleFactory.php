@@ -23,6 +23,8 @@ use Spatie\LaravelData\Attributes\Validation\CurrentPassword;
 use Spatie\LaravelData\Attributes\Validation\Date;
 use Spatie\LaravelData\Attributes\Validation\DateEquals;
 use Spatie\LaravelData\Attributes\Validation\DateFormat;
+use Spatie\LaravelData\Attributes\Validation\Declined;
+use Spatie\LaravelData\Attributes\Validation\DeclinedIf;
 use Spatie\LaravelData\Attributes\Validation\Different;
 use Spatie\LaravelData\Attributes\Validation\Digits;
 use Spatie\LaravelData\Attributes\Validation\DigitsBetween;
@@ -35,6 +37,7 @@ use Spatie\LaravelData\Attributes\Validation\EndsWith;
 use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\ExcludeIf;
 use Spatie\LaravelData\Attributes\Validation\ExcludeUnless;
+use Spatie\LaravelData\Attributes\Validation\ExcludeWith;
 use Spatie\LaravelData\Attributes\Validation\ExcludeWithout;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\File;
@@ -51,6 +54,7 @@ use Spatie\LaravelData\Attributes\Validation\IPv6;
 use Spatie\LaravelData\Attributes\Validation\Json;
 use Spatie\LaravelData\Attributes\Validation\LessThan;
 use Spatie\LaravelData\Attributes\Validation\LessThanOrEqualTo;
+use Spatie\LaravelData\Attributes\Validation\MacAddress;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Mimes;
 use Spatie\LaravelData\Attributes\Validation\MimeTypes;
@@ -68,6 +72,7 @@ use Spatie\LaravelData\Attributes\Validation\ProhibitedUnless;
 use Spatie\LaravelData\Attributes\Validation\Prohibits;
 use Spatie\LaravelData\Attributes\Validation\Regex;
 use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\RequiredArrayKeys;
 use Spatie\LaravelData\Attributes\Validation\RequiredIf;
 use Spatie\LaravelData\Attributes\Validation\RequiredUnless;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
@@ -124,6 +129,8 @@ class ValidationRuleFactory
             Date::keyword() => Date::class,
             DateEquals::keyword() => DateEquals::class,
             DateFormat::keyword() => DateFormat::class,
+            Declined::keyword() => Declined::class,
+            DeclinedIf::keyword() => DeclinedIf::class,
             Different::keyword() => Different::class,
             Digits::keyword() => Digits::class,
             DigitsBetween::keyword() => DigitsBetween::class,
@@ -136,6 +143,7 @@ class ValidationRuleFactory
             Enum::keyword() => Enum::class,
             ExcludeIf::keyword() => ExcludeIf::class,
             ExcludeUnless::keyword() => ExcludeUnless::class,
+            ExcludeWith::keyword() => ExcludeWith::class,
             ExcludeWithout::keyword() => ExcludeWithout::class,
             Exists::keyword() => Exists::class,
             File::keyword() => File::class,
@@ -152,6 +160,7 @@ class ValidationRuleFactory
             Json::keyword() => Json::class,
             LessThan::keyword() => LessThan::class,
             LessThanOrEqualTo::keyword() => LessThanOrEqualTo::class,
+            MacAddress::keyword() => MacAddress::class,
             Max::keyword() => Max::class,
             Mimes::keyword() => Mimes::class,
             MimeTypes::keyword() => MimeTypes::class,
@@ -169,6 +178,7 @@ class ValidationRuleFactory
             Prohibits::keyword() => Prohibits::class,
             Regex::keyword() => Regex::class,
             Required::keyword() => Required::class,
+            RequiredArrayKeys::keyword() => RequiredArrayKeys::class,
             RequiredIf::keyword() => RequiredIf::class,
             RequiredUnless::keyword() => RequiredUnless::class,
             RequiredWith::keyword() => RequiredWith::class,
