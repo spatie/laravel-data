@@ -3,12 +3,17 @@
 namespace Spatie\LaravelData;
 
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Exceptions\InvalidDataClass;
 
+/**
+ * @template T
+ */
 trait WithData
 {
-    public function getData(): DataObject
+    /**
+     * @return T
+     */
+    public function getData()
     {
         $dataClass = match (true) {
             /** @psalm-suppress UndefinedThisPropertyFetch */
