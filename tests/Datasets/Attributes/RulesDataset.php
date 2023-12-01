@@ -33,6 +33,8 @@ use Spatie\LaravelData\Attributes\Validation\Digits;
 use Spatie\LaravelData\Attributes\Validation\DigitsBetween;
 use Spatie\LaravelData\Attributes\Validation\Dimensions;
 use Spatie\LaravelData\Attributes\Validation\Distinct;
+use Spatie\LaravelData\Attributes\Validation\DoesntEndWith;
+use Spatie\LaravelData\Attributes\Validation\DoesntStartWith;
 use Spatie\LaravelData\Attributes\Validation\Email;
 use Spatie\LaravelData\Attributes\Validation\EndsWith;
 use Spatie\LaravelData\Attributes\Validation\Enum;
@@ -122,6 +124,8 @@ dataset('attributes', function () {
     yield from dateEqualsAttributes();
     yield from dimensionsAttributes();
     yield from distinctAttributes();
+    yield from doesntEndWithAttributes();
+    yield from doesntStartWithAttributes();
     yield from declinedIfAttributes();
     yield from emailAttributes();
     yield from endsWithAttributes();
@@ -621,6 +625,42 @@ function distinctAttributes(): Generator
     );
 }
 
+function doesntEndWithAttributes(): Generator
+{
+    yield fixature(
+        attribute: new DoesntEndWith('x'),
+        expected: 'doesnt_end_with:x',
+    );
+
+    yield fixature(
+        attribute: new DoesntEndWith(['x', 'y']),
+        expected: 'doesnt_end_with:x,y',
+    );
+
+    yield fixature(
+        attribute: new DoesntEndWith('x', 'y'),
+        expected: 'doesnt_end_with:x,y',
+    );
+}
+
+function doesntStartWithAttributes(): Generator
+{
+    yield fixature(
+        attribute: new DoesntStartWith('x'),
+        expected: 'doesnt_start_with:x',
+    );
+
+    yield fixature(
+        attribute: new DoesntStartWith(['x', 'y']),
+        expected: 'doesnt_start_with:x,y',
+    );
+
+    yield fixature(
+        attribute: new DoesntStartWith('x', 'y'),
+        expected: 'doesnt_start_with:x,y',
+    );
+}
+      
 function declinedIfAttributes(): Generator
 {
     yield fixature(

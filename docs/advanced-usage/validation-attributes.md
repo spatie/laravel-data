@@ -323,6 +323,36 @@ public string $closure;
 public string $closure;  
 ```
 
+### DoesntEndWith
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-doesnt-end-with)
+
+```php
+#[DoesntEndWith('a')]
+public string $closure;
+
+#[DoesntEndWith(['a', 'b'])]
+public string $closure;
+
+#[DoesntEndWith('a', 'b')]
+public string $closure;
+```
+
+### DoesntStartWith
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-doesnt-start-with)
+
+```php
+#[DoesntStartWith('a')]
+public string $closure;
+
+#[DoesntStartWith(['a', 'b'])]
+public string $closure;
+
+#[DoesntStartWith('a', 'b')]
+public string $closure;
+```
+
 ### Email
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-email)

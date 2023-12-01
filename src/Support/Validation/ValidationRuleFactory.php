@@ -30,6 +30,8 @@ use Spatie\LaravelData\Attributes\Validation\Digits;
 use Spatie\LaravelData\Attributes\Validation\DigitsBetween;
 use Spatie\LaravelData\Attributes\Validation\Dimensions;
 use Spatie\LaravelData\Attributes\Validation\Distinct;
+use Spatie\LaravelData\Attributes\Validation\DoesntEndWith;
+use Spatie\LaravelData\Attributes\Validation\DoesntStartWith;
 use Spatie\LaravelData\Attributes\Validation\Email;
 use Spatie\LaravelData\Attributes\Validation\EndsWith;
 use Spatie\LaravelData\Attributes\Validation\Enum;
@@ -137,6 +139,8 @@ class ValidationRuleFactory
             Dimensions::keyword() => Dimensions::class,
             Distinct::keyword() => Distinct::class,
             Email::keyword() => Email::class,
+            DoesntEndWith::keyword() => DoesntEndWith::class,
+            DoesntStartWith::keyword() => DoesntStartWith::class,
             EndsWith::keyword() => EndsWith::class,
             Enum::keyword() => Enum::class,
             ExcludeIf::keyword() => ExcludeIf::class,
