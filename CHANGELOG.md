@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 1.5.3 - 2023-12-01
+
+- MimeTypes validation fix on v1 (#596)
+
 ## 3.9.2 - 2023-10-20
 
 - Fix breaking compatibility #590
@@ -36,7 +40,7 @@ All notable changes to `laravel-data` will be documented in this file.
 
 - fix target namespace when creating files with Laravel Idea (#497)
 - allow collection to be created passing null (#507)
-- add Ulid validation rule (#510)   
+- add Ulid validation rule (#510)
   -add TARGET_PARAMETER to Attribute for improved Validation (#523)
 
 ## 3.7.0 - 2023-07-05
