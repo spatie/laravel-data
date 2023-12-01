@@ -672,7 +672,7 @@ function doesntStartWithAttributes(): Generator
         expected: 'doesnt_start_with:x,y',
     );
 }
-      
+
 function declinedIfAttributes(): Generator
 {
     yield fixature(
