@@ -577,6 +577,15 @@ public string $closure;
 public int $closure; 
 ```
 
+### MaxDigits
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-max-digits)
+
+```php
+#[MaxDigits(10)]
+public int $closure; 
+```
+
 ### MimeTypes
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-mimetypes)
@@ -613,6 +622,15 @@ public UploadedFile $closure;
 
 ```php
 #[Min(20)]
+public int $closure; 
+```
+
+### MinDigits
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-min-digits)
+
+```php
+#[MinDigits(2)]
 public int $closure; 
 ```
 

@@ -57,9 +57,11 @@ use Spatie\LaravelData\Attributes\Validation\LessThan;
 use Spatie\LaravelData\Attributes\Validation\LessThanOrEqualTo;
 use Spatie\LaravelData\Attributes\Validation\MacAddress;
 use Spatie\LaravelData\Attributes\Validation\Max;
+use Spatie\LaravelData\Attributes\Validation\MaxDigits;
 use Spatie\LaravelData\Attributes\Validation\Mimes;
 use Spatie\LaravelData\Attributes\Validation\MimeTypes;
 use Spatie\LaravelData\Attributes\Validation\Min;
+use Spatie\LaravelData\Attributes\Validation\MinDigits;
 use Spatie\LaravelData\Attributes\Validation\MultipleOf;
 use Spatie\LaravelData\Attributes\Validation\NotIn;
 use Spatie\LaravelData\Attributes\Validation\NotRegex;
@@ -317,8 +319,18 @@ dataset('attributes', function () {
     );
 
     yield fixature(
+        attribute: new MaxDigits(10),
+        expected: 'max_digits:10',
+    );
+
+    yield fixature(
         attribute: new Min(10),
         expected: 'min:10',
+    );
+
+    yield fixature(
+        attribute: new MinDigits(10),
+        expected: 'min_digits:10',
     );
 
     yield fixature(

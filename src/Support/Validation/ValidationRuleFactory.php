@@ -54,9 +54,11 @@ use Spatie\LaravelData\Attributes\Validation\LessThan;
 use Spatie\LaravelData\Attributes\Validation\LessThanOrEqualTo;
 use Spatie\LaravelData\Attributes\Validation\MacAddress;
 use Spatie\LaravelData\Attributes\Validation\Max;
+use Spatie\LaravelData\Attributes\Validation\MaxDigits;
 use Spatie\LaravelData\Attributes\Validation\Mimes;
 use Spatie\LaravelData\Attributes\Validation\MimeTypes;
 use Spatie\LaravelData\Attributes\Validation\Min;
+use Spatie\LaravelData\Attributes\Validation\MinDigits;
 use Spatie\LaravelData\Attributes\Validation\MultipleOf;
 use Spatie\LaravelData\Attributes\Validation\NotIn;
 use Spatie\LaravelData\Attributes\Validation\NotRegex;
@@ -158,9 +160,11 @@ class ValidationRuleFactory
             LessThanOrEqualTo::keyword() => LessThanOrEqualTo::class,
             MacAddress::keyword() => MacAddress::class,
             Max::keyword() => Max::class,
+            MaxDigits::keyword() => MaxDigits::class,
             Mimes::keyword() => Mimes::class,
             MimeTypes::keyword() => MimeTypes::class,
             Min::keyword() => Min::class,
+            MinDigits::keyword() => MinDigits::class,
             MultipleOf::keyword() => MultipleOf::class,
             NotIn::keyword() => NotIn::class,
             NotRegex::keyword() => NotRegex::class,
