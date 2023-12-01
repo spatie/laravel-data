@@ -53,6 +53,20 @@ trait EnumerableMethods
     }
 
     /**
+     * @param callable(TValue): bool $filter
+     *
+     * @return static
+     */
+    public function reject(callable $filter): static
+    {
+        $cloned = clone $this;
+
+        $cloned->items = $cloned->items->reject($filter);
+
+        return $cloned;
+    }
+
+    /**
      * @template            TFirstDefault
      *
      * @param null|         (callable(TValue,TKey): bool) $callback
