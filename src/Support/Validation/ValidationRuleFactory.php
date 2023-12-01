@@ -30,11 +30,14 @@ use Spatie\LaravelData\Attributes\Validation\Digits;
 use Spatie\LaravelData\Attributes\Validation\DigitsBetween;
 use Spatie\LaravelData\Attributes\Validation\Dimensions;
 use Spatie\LaravelData\Attributes\Validation\Distinct;
+use Spatie\LaravelData\Attributes\Validation\DoesntEndWith;
+use Spatie\LaravelData\Attributes\Validation\DoesntStartWith;
 use Spatie\LaravelData\Attributes\Validation\Email;
 use Spatie\LaravelData\Attributes\Validation\EndsWith;
 use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\ExcludeIf;
 use Spatie\LaravelData\Attributes\Validation\ExcludeUnless;
+use Spatie\LaravelData\Attributes\Validation\ExcludeWith;
 use Spatie\LaravelData\Attributes\Validation\ExcludeWithout;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\File;
@@ -51,11 +54,14 @@ use Spatie\LaravelData\Attributes\Validation\IPv6;
 use Spatie\LaravelData\Attributes\Validation\Json;
 use Spatie\LaravelData\Attributes\Validation\LessThan;
 use Spatie\LaravelData\Attributes\Validation\LessThanOrEqualTo;
+use Spatie\LaravelData\Attributes\Validation\Lowercase;
 use Spatie\LaravelData\Attributes\Validation\MacAddress;
 use Spatie\LaravelData\Attributes\Validation\Max;
+use Spatie\LaravelData\Attributes\Validation\MaxDigits;
 use Spatie\LaravelData\Attributes\Validation\Mimes;
 use Spatie\LaravelData\Attributes\Validation\MimeTypes;
 use Spatie\LaravelData\Attributes\Validation\Min;
+use Spatie\LaravelData\Attributes\Validation\MinDigits;
 use Spatie\LaravelData\Attributes\Validation\MultipleOf;
 use Spatie\LaravelData\Attributes\Validation\NotIn;
 use Spatie\LaravelData\Attributes\Validation\NotRegex;
@@ -84,6 +90,7 @@ use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Timezone;
 use Spatie\LaravelData\Attributes\Validation\Ulid;
 use Spatie\LaravelData\Attributes\Validation\Unique;
+use Spatie\LaravelData\Attributes\Validation\Uppercase;
 use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Exceptions\CouldNotCreateValidationRule;
@@ -134,10 +141,13 @@ class ValidationRuleFactory
             Dimensions::keyword() => Dimensions::class,
             Distinct::keyword() => Distinct::class,
             Email::keyword() => Email::class,
+            DoesntEndWith::keyword() => DoesntEndWith::class,
+            DoesntStartWith::keyword() => DoesntStartWith::class,
             EndsWith::keyword() => EndsWith::class,
             Enum::keyword() => Enum::class,
             ExcludeIf::keyword() => ExcludeIf::class,
             ExcludeUnless::keyword() => ExcludeUnless::class,
+            ExcludeWith::keyword() => ExcludeWith::class,
             ExcludeWithout::keyword() => ExcludeWithout::class,
             Exists::keyword() => Exists::class,
             File::keyword() => File::class,
@@ -154,11 +164,14 @@ class ValidationRuleFactory
             Json::keyword() => Json::class,
             LessThan::keyword() => LessThan::class,
             LessThanOrEqualTo::keyword() => LessThanOrEqualTo::class,
+            Lowercase::keyword() => Lowercase::class,
             MacAddress::keyword() => MacAddress::class,
             Max::keyword() => Max::class,
+            MaxDigits::keyword() => MaxDigits::class,
             Mimes::keyword() => Mimes::class,
             MimeTypes::keyword() => MimeTypes::class,
             Min::keyword() => Min::class,
+            MinDigits::keyword() => MinDigits::class,
             MultipleOf::keyword() => MultipleOf::class,
             NotIn::keyword() => NotIn::class,
             NotRegex::keyword() => NotRegex::class,
@@ -186,6 +199,7 @@ class ValidationRuleFactory
             StringType::keyword() => StringType::class,
             Timezone::keyword() => Timezone::class,
             Unique::keyword() => Unique::class,
+            Uppercase::keyword() => Uppercase::class,
             Url::keyword() => Url::class,
             Ulid::keyword() => Ulid::class,
             Uuid::keyword() => Uuid::class,

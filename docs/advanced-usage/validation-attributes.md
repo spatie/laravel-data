@@ -288,6 +288,36 @@ public string $closure;
 public string $closure;  
 ```
 
+## DoesntEndWith
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-doesnt-end-with)
+
+```php
+#[DoesntEndWith('a')]
+public string $closure;
+
+#[DoesntEndWith(['a', 'b'])]
+public string $closure;
+
+#[DoesntEndWith('a', 'b')]
+public string $closure;
+```
+
+## DoesntStartWith
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-doesnt-start-with)
+
+```php
+#[DoesntStartWith('a')]
+public string $closure;
+
+#[DoesntStartWith(['a', 'b'])]
+public string $closure;
+
+#[DoesntStartWith('a', 'b')]
+public string $closure;
+```
+
 ## Email
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-email)
@@ -349,6 +379,17 @@ public string $closure;
 
 ```php
 #[ExcludeUnless('other_field', 'has_value')]
+public string $closure;
+```
+
+## ExcludeWith
+
+*At the moment the data is not yet excluded due to technical reasons, v4 should fix this*
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-exclude-with)
+
+```php
+#[ExcludeWith('other_field')]
 public string $closure;
 ```
 
@@ -513,6 +554,15 @@ public int $closure;
 public int $closure; 
 ```
 
+## Lowercase
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-lowercase)
+
+```php
+#[Lowercase]
+public string $closure; 
+```
+
 ## MacAddress
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-mac)
@@ -528,6 +578,15 @@ public string $closure;
 
 ```php
 #[Max(20)]
+public int $closure; 
+```
+
+## MaxDigits
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-max-digits)
+
+```php
+#[MaxDigits(10)]
 public int $closure; 
 ```
 
@@ -567,6 +626,15 @@ public UploadedFile $closure;
 
 ```php
 #[Min(20)]
+public int $closure; 
+```
+
+## MinDigits
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-min-digits)
+
+```php
+#[MinDigits(2)]
 public int $closure; 
 ```
 
@@ -893,6 +961,15 @@ public string $closure;
 
 #[Unique('users', ignore: 5)]
 public string $closure;
+```
+
+## Uppercase
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-uppercase)
+
+```php
+#[Uppercase]
+public string $closure; 
 ```
 
 ## Url

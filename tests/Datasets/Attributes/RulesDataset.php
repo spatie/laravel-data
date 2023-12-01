@@ -33,11 +33,14 @@ use Spatie\LaravelData\Attributes\Validation\Digits;
 use Spatie\LaravelData\Attributes\Validation\DigitsBetween;
 use Spatie\LaravelData\Attributes\Validation\Dimensions;
 use Spatie\LaravelData\Attributes\Validation\Distinct;
+use Spatie\LaravelData\Attributes\Validation\DoesntEndWith;
+use Spatie\LaravelData\Attributes\Validation\DoesntStartWith;
 use Spatie\LaravelData\Attributes\Validation\Email;
 use Spatie\LaravelData\Attributes\Validation\EndsWith;
 use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\ExcludeIf;
 use Spatie\LaravelData\Attributes\Validation\ExcludeUnless;
+use Spatie\LaravelData\Attributes\Validation\ExcludeWith;
 use Spatie\LaravelData\Attributes\Validation\ExcludeWithout;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\File;
@@ -54,11 +57,14 @@ use Spatie\LaravelData\Attributes\Validation\IPv6;
 use Spatie\LaravelData\Attributes\Validation\Json;
 use Spatie\LaravelData\Attributes\Validation\LessThan;
 use Spatie\LaravelData\Attributes\Validation\LessThanOrEqualTo;
+use Spatie\LaravelData\Attributes\Validation\Lowercase;
 use Spatie\LaravelData\Attributes\Validation\MacAddress;
 use Spatie\LaravelData\Attributes\Validation\Max;
+use Spatie\LaravelData\Attributes\Validation\MaxDigits;
 use Spatie\LaravelData\Attributes\Validation\Mimes;
 use Spatie\LaravelData\Attributes\Validation\MimeTypes;
 use Spatie\LaravelData\Attributes\Validation\Min;
+use Spatie\LaravelData\Attributes\Validation\MinDigits;
 use Spatie\LaravelData\Attributes\Validation\MultipleOf;
 use Spatie\LaravelData\Attributes\Validation\NotIn;
 use Spatie\LaravelData\Attributes\Validation\NotRegex;
@@ -87,6 +93,7 @@ use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Timezone;
 use Spatie\LaravelData\Attributes\Validation\Ulid;
 use Spatie\LaravelData\Attributes\Validation\Unique;
+use Spatie\LaravelData\Attributes\Validation\Uppercase;
 use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
@@ -119,6 +126,8 @@ dataset('attributes', function () {
     yield from dateEqualsAttributes();
     yield from dimensionsAttributes();
     yield from distinctAttributes();
+    yield from doesntEndWithAttributes();
+    yield from doesntStartWithAttributes();
     yield from declinedIfAttributes();
     yield from emailAttributes();
     yield from endsWithAttributes();
@@ -231,6 +240,11 @@ dataset('attributes', function () {
     );
 
     yield fixature(
+        attribute: new ExcludeWith('field'),
+        expected: 'exclude_with:field',
+    );
+
+    yield fixature(
         attribute: new ExcludeWithout('field'),
         expected: 'exclude_without:field',
     );
@@ -301,6 +315,11 @@ dataset('attributes', function () {
     );
 
     yield fixature(
+        attribute: new Lowercase(),
+        expected: 'lowercase',
+    );
+
+    yield fixature(
         attribute: new MacAddress(),
         expected: 'mac_address',
     );
@@ -311,8 +330,18 @@ dataset('attributes', function () {
     );
 
     yield fixature(
+        attribute: new MaxDigits(10),
+        expected: 'max_digits:10',
+    );
+
+    yield fixature(
         attribute: new Min(10),
         expected: 'min:10',
+    );
+
+    yield fixature(
+        attribute: new MinDigits(10),
+        expected: 'min_digits:10',
     );
 
     yield fixature(
@@ -373,6 +402,11 @@ dataset('attributes', function () {
     yield fixature(
         attribute: new Timezone(),
         expected: 'timezone',
+    );
+
+    yield fixature(
+        attribute: new Uppercase(),
+        expected: 'uppercase',
     );
 
     yield fixature(
@@ -600,6 +634,42 @@ function distinctAttributes(): Generator
         attribute: new Distinct('fake'),
         expected: '',
         exception: CannotBuildValidationRule::class
+    );
+}
+
+function doesntEndWithAttributes(): Generator
+{
+    yield fixature(
+        attribute: new DoesntEndWith('x'),
+        expected: 'doesnt_end_with:x',
+    );
+
+    yield fixature(
+        attribute: new DoesntEndWith(['x', 'y']),
+        expected: 'doesnt_end_with:x,y',
+    );
+
+    yield fixature(
+        attribute: new DoesntEndWith('x', 'y'),
+        expected: 'doesnt_end_with:x,y',
+    );
+}
+
+function doesntStartWithAttributes(): Generator
+{
+    yield fixature(
+        attribute: new DoesntStartWith('x'),
+        expected: 'doesnt_start_with:x',
+    );
+
+    yield fixature(
+        attribute: new DoesntStartWith(['x', 'y']),
+        expected: 'doesnt_start_with:x,y',
+    );
+
+    yield fixature(
+        attribute: new DoesntStartWith('x', 'y'),
+        expected: 'doesnt_start_with:x,y',
     );
 }
 

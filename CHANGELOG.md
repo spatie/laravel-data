@@ -14,6 +14,26 @@ All notable changes to `laravel-data` will be documented in this file.
 - Allow creating data objects using `from` without parameters
 - Add support for a Dto and Resource object
 
+## 3.10.0 - 2023-12-01
+
+A fresh release after a month of vacation, enjoy!
+
+- Add ExcludeWith validation rule (#584)
+- Add DoesntEndWith and DoesntStartWith validation rules (#585)
+- Add MinDigits and MaxDigits validation rules (#586)
+- Add DataCollection reject() method (#593)
+- Add generic type for WithData trait (#597)
+- Fix issue where non set optional values were transformed (#602)
+- Fix issue where parameters passed to Laravel Collection methods would sometimes provide alternative results (issue: #607)
+
+## 1.5.3 - 2023-12-01
+
+- MimeTypes validation fix on v1 (#596)
+
+## 3.9.2 - 2023-10-20
+
+- Fix breaking compatibility #590
+
 ## 3.9.1 - 2023-10-12
 
 - Add Declined and DeclinedIf validation attributes (#572)
@@ -44,7 +64,7 @@ All notable changes to `laravel-data` will be documented in this file.
 
 - fix target namespace when creating files with Laravel Idea (#497)
 - allow collection to be created passing null (#507)
-- add Ulid validation rule (#510)   
+- add Ulid validation rule (#510)
   -add TARGET_PARAMETER to Attribute for improved Validation (#523)
 
 ## 3.7.0 - 2023-07-05

@@ -79,6 +79,17 @@ test('a collection can be filtered', function () {
         ->toMatchArray($filtered);
 });
 
+test('a collection can be rejected', function () {
+    $collection = SimpleData::collection(['A', 'B']);
+
+    $filtered = $collection->reject(fn (SimpleData $data) => $data->string === 'B')->toArray();
+
+    expect([
+        ['string' => 'A'],
+    ])
+        ->toMatchArray($filtered);
+});
+
 test('a collection can be transformed', function () {
     $collection = new DataCollection(SimpleData::class, ['A', 'B']);
 
