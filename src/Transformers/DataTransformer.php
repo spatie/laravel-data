@@ -76,6 +76,10 @@ class DataTransformer
 
             $name = $property->name;
 
+            if ($property->type->isOptional && ! array_key_exists($name, get_object_vars($data))) {
+                continue;
+            }
+
             if (! $this->shouldIncludeProperty($name, $data->{$name}, $trees)) {
                 continue;
             }
