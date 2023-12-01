@@ -80,7 +80,7 @@ test('a collection can be filtered', function () {
 });
 
 test('a collection can be rejected', function () {
-    $collection = SimpleData::collection(['A', 'B']);
+    $collection = new DataCollection(SimpleData::class, ['A', 'B']);
 
     $filtered = $collection->reject(fn (SimpleData $data) => $data->string === 'B')->toArray();
 

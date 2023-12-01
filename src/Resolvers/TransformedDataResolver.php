@@ -59,7 +59,7 @@ class TransformedDataResolver
                     return $payload;
                 }
 
-                if ($property->type->isOptional && ! isset($data->{$name})) {
+                if ($property->type->isOptional && ! array_key_exists($name, get_object_vars($data))) {
                     return $payload;
                 }
 
