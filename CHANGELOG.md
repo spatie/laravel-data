@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.10.0 - 2023-12-01
+
+A fresh release after a month of vacation, enjoy!
+
+- Add ExcludeWith validation rule (#584)
+- Add DoesntEndWith and DoesntStartWith validation rules (#585)
+- Add MinDigits and MaxDigits validation rules (#586)
+- Add DataCollection reject() method (#593)
+- Add generic type for WithData trait (#597)
+- Fix issue where non set optional values were transformed (#602)
+- Fix issue where parameters passed to Laravel Collection methods would sometimes provide alternative results (issue: #607)
+
 ## 1.5.3 - 2023-12-01
 
 - MimeTypes validation fix on v1 (#596)
