@@ -589,6 +589,15 @@ public int $closure;
 public int $closure; 
 ```
 
+### Lowercase
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-lowercase)
+
+```php
+#[Lowercase]
+public string $closure; 
+```
+
 ### MacAddress
 
 [Docs](https://laravel.com/docs/9.x/validation#rule-mac)
@@ -987,6 +996,15 @@ public string $closure;
 
 #[Unique('users', ignore: 5)]
 public string $closure;
+```
+
+### Uppercase
+
+[Docs](https://laravel.com/docs/9.x/validation#rule-uppercase)
+
+```php
+#[Uppercase]
+public string $closure; 
 ```
 
 ### Url
