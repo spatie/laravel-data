@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.10.1 - 2023-12-04
+
+- Make ValidationPath Stringable
+- Fix PHPStan
+- Improve performance when optional peoperty exists (#612)
+
 ## 3.10.0 - 2023-12-01
 
 A fresh release after a month of vacation, enjoy!
