@@ -96,6 +96,16 @@ parameters:
 			path: src/Resolvers/DataFromArrayResolver.php
 
 		-
+			message: "#^Call to an undefined method ReflectionType\\:\\:getName\\(\\)\\.$#"
+			count: 1
+			path: src/Support/DataType.php
+
+		-
+			message: "#^Parameter \\#1 \\$reflection of method Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:resolveDataCollectableType\\(\\) expects ReflectionNamedType, ReflectionType given\\.$#"
+			count: 1
+			path: src/Support/DataType.php
+
+		-
 			message: "#^Call to an undefined method DateTimeInterface\\:\\:setTimezone\\(\\)\\.$#"
 			count: 1
 			path: src/Transformers/DateTimeInterfaceTransformer.php
