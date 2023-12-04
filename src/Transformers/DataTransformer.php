@@ -69,6 +69,8 @@ class DataTransformer
 
         $payload = [];
 
+        $objVars = get_object_vars($data);
+
         foreach ($dataClass->properties as $property) {
             if ($property->hidden) {
                 continue;
@@ -76,7 +78,7 @@ class DataTransformer
 
             $name = $property->name;
 
-            if ($property->type->isOptional && ! array_key_exists($name, get_object_vars($data))) {
+            if ($property->type->isOptional && ! array_key_exists($name, $objVars)) {
                 continue;
             }
 
