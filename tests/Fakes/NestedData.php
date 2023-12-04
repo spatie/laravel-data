@@ -10,4 +10,11 @@ class NestedData extends Data
         public SimpleData $simple
     ) {
     }
+
+    public function toUserDefinedToArray(): array
+    {
+        return [
+            'simple' => $this->simple->toUserDefinedToArray(),
+        ];
+    }
 }

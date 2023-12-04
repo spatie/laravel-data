@@ -15,4 +15,11 @@ class SimpleData extends Data
     {
         return new self($string);
     }
+
+    public function toUserDefinedToArray(): array
+    {
+        return [
+            'string' => $this->string,
+        ];
+    }
 }
