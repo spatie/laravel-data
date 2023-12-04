@@ -49,8 +49,8 @@ class ComplicatedData extends Data
             'explicitCast' => $this->explicitCast,
             'defaultCast' => $this->defaultCast,
             'nestedData' => $this->nestedData?->toUserDefinedToArray(),
-            'nestedCollection' => array_map(fn(NestedData $data) => $data->toUserDefinedToArray(), $this->nestedCollection->toCollection()->all()),
-            'nestedArray' => array_map(fn(NestedData $data) => $data->toUserDefinedToArray(), $this->nestedArray),
+            'nestedCollection' => array_map(fn (NestedData $data) => $data->toUserDefinedToArray(), $this->nestedCollection->toCollection()->all()),
+            'nestedArray' => array_map(fn (NestedData $data) => $data->toUserDefinedToArray(), $this->nestedArray),
         ];
     }
 }

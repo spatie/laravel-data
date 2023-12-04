@@ -52,13 +52,14 @@ it('can transform collected data', function () {
     );
 
     bench(
-        fn() => $data->toArray(),
-        fn() => $data->toUserDefinedToArray(),
+        fn () => $data->toArray(),
+        fn () => $data->toUserDefinedToArray(),
         name: 'single',
     );
 });
 
-function benchSingle(Closure $closure, $times): float{
+function benchSingle(Closure $closure, $times): float
+{
     $start = microtime(true);
 
     for ($i = 0; $i < $times; $i++) {
@@ -77,8 +78,6 @@ function bench(Closure $data, Closure $userDefined, string $name, $times = 100):
 
     dump("{$name} data - " . number_format($dataBench, 10));
     dump("{$name} user defined - " . number_format($userDefinedBench, 10));
-    dump("{$name} data is " . round($dataBench / $userDefinedBench,0) . " times slower than user defined");
+    dump("{$name} data is " . round($dataBench / $userDefinedBench, 0) . " times slower than user defined");
 
 }
-
-
