@@ -7,6 +7,7 @@ use Spatie\LaravelData\Contracts\BaseData as BaseDataContract;
 use Spatie\LaravelData\Contracts\BaseDataCollectable as BaseDataCollectableContract;
 use Spatie\LaravelData\Resolvers\TransformedDataCollectionResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataResolver;
+use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
 use Spatie\LaravelData\Support\Transformation\PartialTransformationContext;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
@@ -26,8 +27,8 @@ trait TransformableData
         }
 
         $resolver = match (true) {
-            $this instanceof BaseDataContract => app(TransformedDataResolver::class),
-            $this instanceof BaseDataCollectableContract => app(TransformedDataCollectionResolver::class),
+            $this instanceof BaseDataContract => DataContainer::get()->transformedDataResolver(),
+            $this instanceof BaseDataCollectableContract => DataContainer::get()->transformedDataCollectionResolver(),
             default => throw new Exception('Cannot transform data object')
         };
 

@@ -38,7 +38,8 @@
         "spatie/typescript-transformer" : "v3.x-dev#b89615c",
         "spatie/pest-plugin-snapshots" : "^1.1",
         "spatie/phpunit-snapshot-assertions" : "^4.2",
-        "spatie/test-time" : "^1.2"
+        "spatie/test-time" : "^1.2",
+        "ext-xdebug" : "*"
     },
     "autoload" : {
         "psr-4" : {
@@ -57,7 +58,7 @@
         "test-coverage" : "vendor/bin/pest --coverage-html coverage",
         "format" : "vendor/bin/php-cs-fixer fix --allow-risky=yes",
         "benchmark" : "vendor/bin/phpbench run  --report=default",
-        "benchmark-profiled" : "vendor/bin/phpbench xdebug:profile"
+        "benchmark-profiled" : "vendor/bin/phpbench "
     },
     "config" : {
         "sort-packages" : true,

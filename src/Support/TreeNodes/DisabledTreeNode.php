@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Support\TreeNodes;
 
 class DisabledTreeNode implements TreeNode
 {
+
     public function merge(TreeNode $other): TreeNode
     {
         return $other;

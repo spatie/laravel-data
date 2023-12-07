@@ -136,13 +136,13 @@ it('can change the timezone', function () {
 });
 
 it('can transform dates with leading !', function () {
+    config(['data.date_format' => '!Y-m-d']);
+
     $transformer = new DateTimeInterfaceTransformer();
 
     $class = new class () {
         public Carbon $carbon;
     };
-
-    config(['data.date_format' => '!Y-m-d']);
 
     expect(
         $transformer->transform(

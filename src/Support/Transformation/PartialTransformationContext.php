@@ -2,11 +2,10 @@
 
 namespace Spatie\LaravelData\Support\Transformation;
 
-use Closure;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Support\Partials\PartialsDefinition;
-use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\TreeNode;
 
@@ -18,30 +17,25 @@ class PartialTransformationContext
         public TreeNode $only = new DisabledTreeNode(),
         public TreeNode $except = new DisabledTreeNode(),
     ) {
+
     }
 
     public static function create(
         BaseData|BaseDataCollectable $data,
         PartialsDefinition $partialsDefinition,
     ): self {
-        $filter = fn (bool|null|Closure $condition, string $definition) => match (true) {
-            is_bool($condition) => $condition,
-            $condition === null => false,
-            is_callable($condition) => $condition($data),
-        };
-
         return new self(
-            app(PartialsParser::class)->execute(
-                collect($partialsDefinition->includes)->filter($filter)->keys()->all()
+            DataContainer::get()->partialsParser()->execute(
+                static::filterDefinitions($data, $partialsDefinition->includes),
             ),
-            app(PartialsParser::class)->execute(
-                collect($partialsDefinition->excludes)->filter($filter)->keys()->all()
+            DataContainer::get()->partialsParser()->execute(
+                static::filterDefinitions($data, $partialsDefinition->excludes),
             ),
-            app(PartialsParser::class)->execute(
-                collect($partialsDefinition->only)->filter($filter)->keys()->all()
+            DataContainer::get()->partialsParser()->execute(
+                static::filterDefinitions($data, $partialsDefinition->only),
             ),
-            app(PartialsParser::class)->execute(
-                collect($partialsDefinition->except)->filter($filter)->keys()->all()
+            DataContainer::get()->partialsParser()->execute(
+                static::filterDefinitions($data, $partialsDefinition->except),
             ),
         );
     }
@@ -64,5 +58,24 @@ class PartialTransformationContext
             $this->only->getNested($field),
             $this->except->getNested($field),
         );
+    }
+
+    private static function filterDefinitions(
+        BaseData|BaseDataCollectable $data,
+        array $definitions
+    ): array {
+        $filtered = [];
+
+        foreach ($definitions as $definition => $condition) {
+            if ($condition === true) {
+                $filtered[] = $definition;
+            }
+
+            if (is_callable($condition) && $condition($data)) {
+                $filtered[] = $definition;
+            }
+        }
+
+        return $filtered;
     }
 }

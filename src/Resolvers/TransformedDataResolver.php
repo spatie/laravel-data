@@ -12,6 +12,7 @@ use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\RelationalLazy;
@@ -49,38 +50,37 @@ class TransformedDataResolver
 
     private function transform(BaseData&TransformableData $data, TransformationContext $context): array
     {
-        return $this->dataConfig
-            ->getDataClass($data::class)
-            ->properties
-            ->reduce(function (array $payload, DataProperty $property) use ($data, $context) {
-                $name = $property->name;
+        $payload = [];
 
-                if ($property->hidden) {
-                    return $payload;
-                }
+        foreach ($this->dataConfig->getDataClass($data::class)->properties as $property) {
+            $name = $property->name;
 
-                if ($property->type->isOptional && ! array_key_exists($name, get_object_vars($data))) {
-                    return $payload;
-                }
+            if ($property->hidden) {
+                continue;
+            }
 
-                if (! $this->shouldIncludeProperty($name, $data->{$name}, $context)) {
-                    return $payload;
-                }
+            if ($property->type->isOptional && ! array_key_exists($name, get_object_vars($data))) {
+                continue;
+            }
 
-                $value = $this->resolvePropertyValue(
-                    $property,
-                    $data->{$name},
-                    $context,
-                );
+            if (! $this->shouldIncludeProperty($name, $data->{$name}, $context)) {
+                continue;
+            }
 
-                if ($context->mapPropertyNames && $property->outputMappedName) {
-                    $name = $property->outputMappedName;
-                }
+            $value = $this->resolvePropertyValue(
+                $property,
+                $data->{$name},
+                $context,
+            );
 
-                $payload[$name] = $value;
+            if ($context->mapPropertyNames && $property->outputMappedName) {
+                $name = $property->outputMappedName;
+            }
 
-                return $payload;
-            }, []);
+            $payload[$name] = $value;
+        }
+
+        return $payload;
     }
 
     protected function shouldIncludeProperty(
@@ -175,24 +175,18 @@ class TransformedDataResolver
             return null;
         }
 
-        $nextContext = $context->next($property->name);
-
-        if (is_array($value) && ($nextContext->partials->only instanceof AllTreeNode || $nextContext->partials->only instanceof PartialTreeNode)) {
-            return Arr::only($value, $nextContext->partials->only->getFields());
-        }
-
-        if (is_array($value) && ($nextContext->partials->except instanceof AllTreeNode || $nextContext->partials->except instanceof PartialTreeNode)) {
-            return Arr::except($value, $nextContext->partials->except->getFields());
-        }
-
-        if ($transformer = $this->resolveTransformerForValue($property, $value, $nextContext)) {
+        if ($transformer = $this->resolveTransformerForValue($property, $value, $context)) {
             return $transformer->transform($property, $value);
+        }
+
+        if (is_array($value) && ! $property->type->kind->isDataCollectable()) {
+            return $this->resolvePotentialPartialArray($value, $context->next($property->name));
         }
 
         if (
             $value instanceof BaseDataCollectable
             && $value instanceof TransformableData
-            && $nextContext->transformValues
+            && $context->transformValues
         ) {
             $wrapExecutionType = match ($context->wrapExecutionType) {
                 WrapExecutionType::Enabled => WrapExecutionType::Enabled,
@@ -200,13 +194,15 @@ class TransformedDataResolver
                 WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled
             };
 
-            return $value->transform($nextContext->setWrapExecutionType($wrapExecutionType));
+            return $value->transform(
+                $context->next($property->name)->setWrapExecutionType($wrapExecutionType)
+            );
         }
 
         if (
             $value instanceof BaseData
             && $value instanceof TransformableData
-            && $nextContext->transformValues
+            && $context->transformValues
         ) {
             $wrapExecutionType = match ($context->wrapExecutionType) {
                 WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
@@ -214,13 +210,15 @@ class TransformedDataResolver
                 WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled
             };
 
-            return $value->transform($nextContext->setWrapExecutionType($wrapExecutionType));
+            return $value->transform(
+                $context->next($property->name)->setWrapExecutionType($wrapExecutionType)
+            );
         }
 
         if (
             $property->type->kind->isDataCollectable()
             && is_iterable($value)
-            && $nextContext->transformValues
+            && $context->transformValues
         ) {
             $wrapExecutionType = match ($context->wrapExecutionType) {
                 WrapExecutionType::Enabled => WrapExecutionType::Enabled,
@@ -228,10 +226,25 @@ class TransformedDataResolver
                 WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled
             };
 
-            return app(TransformedDataCollectionResolver::class)->execute(
+            return DataContainer::get()->transformedDataCollectionResolver()->execute(
                 $value,
-                $nextContext->setWrapExecutionType($wrapExecutionType)
+                $context->next($property->name)->setWrapExecutionType($wrapExecutionType)
             );
+        }
+
+        return $value;
+    }
+
+    protected function resolvePotentialPartialArray(
+        array $value,
+        TransformationContext $nextContext,
+    ) {
+        if ($nextContext->partials->only instanceof AllTreeNode || $nextContext->partials->only instanceof PartialTreeNode) {
+            return Arr::only($value, $nextContext->partials->only->getFields());
+        }
+
+        if ($nextContext->partials->except instanceof AllTreeNode || $nextContext->partials->except instanceof PartialTreeNode) {
+            return Arr::except($value, $nextContext->partials->except->getFields());
         }
 
         return $value;
