@@ -14,9 +14,18 @@ class DataCollectionSynth extends Synth
         return get_class($target) == DataCollection::class;
     }
 
-    public function dehydrate(DataCollection $target)
+    public function dehydrate(DataCollection $target, $dehydrateChild)
     {
-        return [$target->toArray(), ['class' => $target->dataClass]];
+        $data = $target->all();
+
+        foreach ($data as $key => $child) {
+            $data[$key] = $dehydrateChild($key, $child);
+        }
+
+        return [
+            $data,
+            ['class' => get_class($target)],
+        ];
     }
 
     public function hydrate($value, $meta)
