@@ -28,9 +28,19 @@ class DataCollectionSynth extends Synth
         ];
     }
 
-    public function hydrate($value, $meta)
+    /**
+     * @param  array<mixed>  $value
+     * @param  array<string, class-string>  $meta
+     * @param  mixed  $hydrateChild
+     * @return \Spatie\LaravelData\DataCollection
+     */
+    public function hydrate($value, $meta, $hydrateChild)
     {
-        return new DataCollection($meta['class'], $value);
+        foreach ($value as $key => $child) {
+            $value[$key] = $hydrateChild($key, $child);
+        }
+
+        return $meta['class']::make($value);
     }
 
     public function get(&$target, $key)
