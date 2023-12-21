@@ -30,8 +30,15 @@ class DataClassMorphMap
     /**
      * @param array<string, class-string<BaseData>> $map
      */
-    public function merge(array $map): self
+    public function merge(array|DataClassMorphMap $map): self
     {
+        if ($map instanceof DataClassMorphMap) {
+            $map->map = array_merge($this->map, $map->map);
+            $map->reversedMap = array_merge($this->reversedMap, $map->reversedMap);
+
+            return $this;
+        }
+
         foreach ($map as $alias => $class) {
             $this->add($alias, $class);
         }

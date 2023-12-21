@@ -24,8 +24,7 @@ it('can create a mapping', function () {
 
     /** @var \Spatie\LaravelData\Support\NameMapping\DataClassNameMapping $mapping */
     $mapping = app(DataConfig::class)->getDataClass($dataClass::class)
-        ->outputNameMapping
-        ->resolve();
+        ->outputNameMapping;
 
     expect($mapping->getOriginal('non_mapped'))->toBeNull();
     expect($mapping->getOriginal('naam'))->toBe('name');

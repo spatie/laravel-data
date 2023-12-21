@@ -2,7 +2,9 @@
 
 namespace Spatie\LaravelData\Support\Validation;
 
-class ValidationPath
+use Stringable;
+
+class ValidationPath implements Stringable
 {
     public function __construct(
         protected readonly ?string $path
@@ -34,5 +36,10 @@ class ValidationPath
     public function get(): ?string
     {
         return $this->path;
+    }
+
+    public function __toString()
+    {
+        return $this->get();
     }
 }

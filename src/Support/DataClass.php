@@ -19,7 +19,6 @@ use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
-use Spatie\LaravelData\Support\Lazy\CachedLazy;
 use Spatie\LaravelData\Support\NameMapping\DataClassNameMapping;
 
 /**
@@ -28,7 +27,6 @@ use Spatie\LaravelData\Support\NameMapping\DataClassNameMapping;
  * @property  Collection<string, DataMethod> $methods
  * @property  Collection<string, object> $attributes
  * @property  array<string, \Spatie\LaravelData\Support\Annotations\DataCollectableAnnotation> $dataCollectablePropertyAnnotations
- * @property  CachedLazy<DataClassNameMapping> $outputNameMapping
  */
 class DataClass
 {
@@ -48,7 +46,6 @@ class DataClass
         public readonly bool $wrappable,
         public readonly Collection $attributes,
         public readonly array $dataCollectablePropertyAnnotations,
-        public readonly CachedLazy $outputNameMapping,
     ) {
     }
 
@@ -92,7 +89,7 @@ class DataClass
             wrappable: $class->implementsInterface(WrappableData::class),
             attributes: $attributes,
             dataCollectablePropertyAnnotations: $dataCollectablePropertyAnnotations,
-            outputNameMapping: new CachedLazy(fn () => self::resolveOutputNameMapping($properties)),
+            outputNameMapping: self::resolveOutputNameMapping($properties),
         );
     }
 

@@ -1,14 +1,14 @@
 <?php
 
 return [
-    /*
+    /**
      * The package will use this format when working with dates. If this option
      * is an array, it will try to convert from the first format that works,
      * and will serialize dates using the first format from the array.
      */
     'date_format' => DATE_ATOM,
 
-    /*
+    /**
      * Global transformers will take complex types and transform them into simple
      * types.
      */
@@ -18,7 +18,7 @@ return [
         BackedEnum::class => Spatie\LaravelData\Transformers\EnumTransformer::class,
     ],
 
-    /*
+    /**
      * Global casts will cast values into complex types when creating a data
      * object from simple types.
      */
@@ -27,7 +27,7 @@ return [
         BackedEnum::class => Spatie\LaravelData\Casts\EnumCast::class,
     ],
 
-    /*
+    /**
      * Rule inferrers can be configured here. They will automatically add
      * validation rules to properties of a data object based upon
      * the type of the property.
@@ -54,7 +54,7 @@ return [
         Spatie\LaravelData\Normalizers\JsonNormalizer::class,
     ],
 
-    /*
+    /**
      * Data objects can be wrapped into a key like 'data' when used as a resource,
      * this key can be set globally here for all data objects. You can pass in
      * `null` if you want to disable wrapping.
@@ -68,4 +68,23 @@ return [
      * which will only enable the caster locally.
      */
     'var_dumper_caster_mode' => 'development',
+
+    /**
+     * It is possible to skip the PHP reflection analysis of data objects
+     * when running in production. This will speed up the package. You
+     * can configure where data objects are stored and which cache
+     * store should be used.
+     */
+    'structure_caching' => [
+        'directories' => [app_path('Data')],
+        'cache' => [
+            'store' => env('CACHE_DRIVER', 'file'),
+            'prefix' => 'laravel-data',
+        ],
+        'reflection_discovery' => [
+            'enabled' => true,
+            'base_path' => base_path(),
+            'root_namespace' => null,
+        ],
+    ],
 ];
