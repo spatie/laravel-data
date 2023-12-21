@@ -46,6 +46,7 @@ class DataClass
         public readonly bool $wrappable,
         public readonly Collection $attributes,
         public readonly array $dataCollectablePropertyAnnotations,
+        public readonly DataClassNameMapping $outputNameMapping,
     ) {
     }
 
