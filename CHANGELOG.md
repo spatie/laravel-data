@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.11.0 - 2023-12-21
+
+- Add support for data structure caching #622
+
 ## 3.10.1 - 2023-12-04
 
 - Make ValidationPath Stringable
