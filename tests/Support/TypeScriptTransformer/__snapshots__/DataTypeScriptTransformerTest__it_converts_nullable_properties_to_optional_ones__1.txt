@@ -1,4 +1,0 @@
-{
-id?: number | null;
-first_name?: string | null;
-}

@@ -1,9 +1,9 @@
-export type SomeData = {
-collection: {%class Illuminate\Pagination\LengthAwarePaginator%}<{%class Spatie\LaravelData\Tests\Fakes\SimpleData%}>
-collectionWithNull: {%class Illuminate\Pagination\LengthAwarePaginator%}<{%class Spatie\LaravelData\Tests\Fakes\SimpleData%}> | null
-collectionWithNullable: {%class Illuminate\Pagination\LengthAwarePaginator%}<{%class Spatie\LaravelData\Tests\Fakes\SimpleData%}> | null
-optionalCollection?: {%class Illuminate\Pagination\LengthAwarePaginator%}<{%class Spatie\LaravelData\Tests\Fakes\SimpleData%}>
-optionalCollectionWithNullable?: {%class Illuminate\Pagination\LengthAwarePaginator%}<{%class Spatie\LaravelData\Tests\Fakes\SimpleData%}> | null
-lazyCollection?: {%class Illuminate\Pagination\LengthAwarePaginator%}<{%class Spatie\LaravelData\Tests\Fakes\SimpleData%}>
-lazyCollectionWithNullable?: {%class Illuminate\Pagination\LengthAwarePaginator%}<{%class Spatie\LaravelData\Tests\Fakes\SimpleData%}> | null
-};
+{
+collection: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<{url:string | null;label:string;active:boolean;}>;meta:{current_page:number;first_page_url:string;from:number | null;last_page:number;last_page_url:string;next_page_url:string | null;path:string;per_page:number;prev_page_url:string | null;to:number | null;total:number;};};
+collectionWithNull: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<{url:string | null;label:string;active:boolean;}>;meta:{current_page:number;first_page_url:string;from:number | null;last_page:number;last_page_url:string;next_page_url:string | null;path:string;per_page:number;prev_page_url:string | null;to:number | null;total:number;};} | null;
+collectionWithNullable: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<{url:string | null;label:string;active:boolean;}>;meta:{current_page:number;first_page_url:string;from:number | null;last_page:number;last_page_url:string;next_page_url:string | null;path:string;per_page:number;prev_page_url:string | null;to:number | null;total:number;};} | null;
+optionalCollection?: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<{url:string | null;label:string;active:boolean;}>;meta:{current_page:number;first_page_url:string;from:number | null;last_page:number;last_page_url:string;next_page_url:string | null;path:string;per_page:number;prev_page_url:string | null;to:number | null;total:number;};};
+optionalCollectionWithNullable?: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<{url:string | null;label:string;active:boolean;}>;meta:{current_page:number;first_page_url:string;from:number | null;last_page:number;last_page_url:string;next_page_url:string | null;path:string;per_page:number;prev_page_url:string | null;to:number | null;total:number;};} | null;
+lazyCollection?: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<{url:string | null;label:string;active:boolean;}>;meta:{current_page:number;first_page_url:string;from:number | null;last_page:number;last_page_url:string;next_page_url:string | null;path:string;per_page:number;prev_page_url:string | null;to:number | null;total:number;};};
+lazyCollectionWithNullable?: {data:Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;links:Array<{url:string | null;label:string;active:boolean;}>;meta:{current_page:number;first_page_url:string;from:number | null;last_page:number;last_page_url:string;next_page_url:string | null;path:string;per_page:number;prev_page_url:string | null;to:number | null;total:number;};} | null;
+}

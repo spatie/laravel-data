@@ -1,3 +1,0 @@
-{
-some_camel_case_property: string;
-}

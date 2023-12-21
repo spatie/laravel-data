@@ -1,15 +1,15 @@
-export type SomeData = {
-nullable: number | null
-undefineable?: number
-int: number
-bool: boolean
-string: string
-float: number
-array: Array<string>
-lazy?: string
-closureLazy?: string
-simpleData: {%class Spatie\LaravelData\Tests\Fakes\SimpleData%}
-dataCollection: Array<{%class Spatie\LaravelData\Tests\Fakes\SimpleData%}>
-dataCollectionAlternative: Array<{%class Spatie\LaravelData\Tests\Fakes\SimpleData%}>
-dataCollectionWithAttribute: Array<{%class Spatie\LaravelData\Tests\Fakes\SimpleData%}>
-};
+{
+nullable: number | null;
+undefineable?: number;
+int: number;
+bool: boolean;
+string: string;
+float: number;
+array: Array<string>;
+lazy?: string;
+closureLazy: string;
+simpleData: {%Spatie\LaravelData\Tests\Fakes\SimpleData%};
+dataCollection: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
+dataCollectionAlternative: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
+dataCollectionWithAttribute: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
+}

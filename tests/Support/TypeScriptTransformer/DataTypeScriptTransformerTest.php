@@ -19,54 +19,17 @@ use function Spatie\Snapshots\assertMatchesSnapshot as baseAssertMatchesSnapshot
 
 use Spatie\Snapshots\Driver;
 use Spatie\TypeScriptTransformer\Attributes\Optional as TypeScriptOptional;
-use Spatie\TypeScriptTransformer\References\Reference;
-use Spatie\TypeScriptTransformer\Support\TransformationContext;
-use Spatie\TypeScriptTransformer\Support\WritingContext;
-use Spatie\TypeScriptTransformer\Transformed\Transformed;
-use Spatie\TypeScriptTransformer\Transformed\Untransformable;
+use Spatie\TypeScriptTransformer\TypeScriptTransformerConfig;
 
 function assertMatchesSnapshot($actual, Driver $driver = null): void
 {
     baseAssertMatchesSnapshot(str_replace('\\r\\n', '\\n', $actual), $driver);
 }
 
-function transformData(Data $data): string
-{
-    $transformer = app(DataTypeScriptTransformer::class);
-
-    $transformed = $transformer->transform(
-        new ReflectionClass($data),
-        new TransformationContext('SomeData', ['App', 'Data'])
-    );
-
-    return $transformed->typeScriptNode->write(new WritingContext(
-        fn (Reference $reference) => '{%'.$reference->humanFriendlyName().'%}'
-    ));
-}
-
-it('will transform data objects', function () {
-    $transformer = app(DataTypeScriptTransformer::class);
-
-    $transformed = $transformer->transform(
-        new ReflectionClass(SimpleData::class),
-        new TransformationContext('SomeData', ['App', 'Data'])
-    );
-
-    expect($transformed)->toBeInstanceOf(Transformed::class);
-
-    $someClass = new class () {
-    };
-
-    $transformed = $transformer->transform(
-        new ReflectionClass($someClass::class),
-        new TransformationContext('SomeData', ['App', 'Data'])
-    );
-
-    expect($transformed)->toBeInstanceOf(Untransformable::class);
-});
-
 it('can convert a data object to Typescript', function () {
-    $data = new class (null, Optional::create(), 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn () => 'Lazy'), Lazy::closure(fn () => 'Lazy'), SimpleData::from('Simple data'), new DataCollection(SimpleData::class, []), new DataCollection(SimpleData::class, []), new DataCollection(SimpleData::class, [])) extends Data {
+    $config = TypeScriptTransformerConfig::create();
+
+    $data = new class (null, Optional::create(), 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn () => 'Lazy'), Lazy::closure(fn () => 'Lazy'), SimpleData::from('Simple data'), SimpleData::collect([], DataCollection::class), SimpleData::collect([], DataCollection::class), SimpleData::collect([], DataCollection::class)) extends Data {
         public function __construct(
             public null|int $nullable,
             public Optional|int $undefineable,
@@ -89,11 +52,18 @@ it('can convert a data object to Typescript', function () {
         }
     };
 
-    assertMatchesSnapshot(transformData($data));
+    $transformer = new DataTypeScriptTransformer($config);
+
+    $reflection = new ReflectionClass($data);
+
+    expect($transformer->canTransform($reflection))->toBeTrue();
+    assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
 });
 
 it('uses the correct types for data collection of attributes', function () {
-    $collection = new DataCollection(SimpleData::class, []);
+    $config = TypeScriptTransformerConfig::create();
+
+    $collection = SimpleData::collect([], DataCollection::class);
 
     $data = new class ($collection, $collection, $collection, $collection, $collection, $collection, $collection) extends Data {
         public function __construct(
@@ -115,11 +85,18 @@ it('uses the correct types for data collection of attributes', function () {
         }
     };
 
-    assertMatchesSnapshot(transformData($data));
+    $transformer = new DataTypeScriptTransformer($config);
+
+    $reflection = new ReflectionClass($data);
+
+    expect($transformer->canTransform($reflection))->toBeTrue();
+    assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
 });
 
 it('uses the correct types for paginated data collection for attributes ', function () {
-    $collection = new PaginatedDataCollection(SimpleData::class, new LengthAwarePaginator([], 0, 15));
+    $config = TypeScriptTransformerConfig::create();
+
+    $collection = SimpleData::collect(new LengthAwarePaginator([], 0, 15), PaginatedDataCollection::class);
 
     $data = new class ($collection, $collection, $collection, $collection, $collection, $collection, $collection) extends Data {
         public function __construct(
@@ -141,11 +118,18 @@ it('uses the correct types for paginated data collection for attributes ', funct
         }
     };
 
-    assertMatchesSnapshot(transformData($data));
+    $transformer = new DataTypeScriptTransformer($config);
+
+    $reflection = new ReflectionClass($data);
+
+    expect($transformer->canTransform($reflection))->toBeTrue();
+    assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
 });
 
 it('uses the correct types for cursor paginated data collection of attributes', function () {
-    $collection = new CursorPaginatedDataCollection(SimpleData::class, new CursorPaginator([], 15));
+    $config = TypeScriptTransformerConfig::create();
+
+    $collection = SimpleData::collect(new CursorPaginator([], 15), CursorPaginatedDataCollection::class);
 
     $data = new class ($collection, $collection, $collection, $collection, $collection, $collection, $collection) extends Data {
         public function __construct(
@@ -167,10 +151,17 @@ it('uses the correct types for cursor paginated data collection of attributes', 
         }
     };
 
-    assertMatchesSnapshot(transformData($data));
+    $transformer = new DataTypeScriptTransformer($config);
+
+    $reflection = new ReflectionClass($data);
+
+    expect($transformer->canTransform($reflection))->toBeTrue();
+    assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
 });
 
 it('outputs types with properties using their mapped name', function () {
+    $config = TypeScriptTransformerConfig::create();
+
     $data = new class ('Good job Ruben', 'Hi Ruben') extends Data {
         public function __construct(
             #[MapOutputName(SnakeCaseMapper::class)]
@@ -181,10 +172,16 @@ it('outputs types with properties using their mapped name', function () {
         }
     };
 
-    assertMatchesSnapshot(transformData($data));
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass($data);
+
+    expect($transformer->canTransform($reflection))->toBeTrue();
+    assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
 });
 
 it('it respects a TypeScript property optional attribute', function () {
+    $config = TypeScriptTransformerConfig::create();
+
     $data = new class (10, 'Ruben') extends Data {
         public function __construct(
             #[TypeScriptOptional]
@@ -194,10 +191,24 @@ it('it respects a TypeScript property optional attribute', function () {
         }
     };
 
-    assertMatchesSnapshot(transformData($data));
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass($data);
+
+    $this->assertTrue($transformer->canTransform($reflection));
+    $this->assertEquals(
+        <<<TXT
+        {
+        id?: number;
+        name: string;
+        }
+        TXT,
+        $transformer->transform($reflection, 'DataObject')->transformed
+    );
 });
 
 it('it respects a TypeScript class optional attribute', function () {
+    $config = TypeScriptTransformerConfig::create();
+
     #[TypeScriptOptional]
     class DummyTypeScriptOptionalClass extends Data
     {
@@ -206,7 +217,7 @@ it('it respects a TypeScript class optional attribute', function () {
             public string $name,
         ) {
         }
-    }
+    };
 
     $transformer = new DataTypeScriptTransformer($config);
     $reflection = new ReflectionClass(DummyTypeScriptOptionalClass::class);
@@ -221,4 +232,4 @@ it('it respects a TypeScript class optional attribute', function () {
         TXT,
         $transformer->transform($reflection, 'DataObject')->transformed
     );
-})->skip('Should be fixed in TS transformer');
+});
