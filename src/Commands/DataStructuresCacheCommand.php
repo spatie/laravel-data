@@ -12,7 +12,7 @@ use Spatie\LaravelData\Support\DataConfig;
 
 class DataStructuresCacheCommand extends Command
 {
-    protected $signature = 'data:cache-structures';
+    protected $signature = 'data:cache-structures {--show-classes : Show the data classes cached}';
 
     protected $description = 'Cache the internal data structures';
 
@@ -40,6 +40,14 @@ class DataStructuresCacheCommand extends Command
 
         $progressBar->finish();
 
-        $this->components->info('Cached '.count($dataClasses).' data classes!');
+        $this->line(PHP_EOL);
+        $this->line('Cached '.count($dataClasses).' data classes');
+
+        if ($this->option('show-classes')) {
+            $this->table(
+                ['Data Class'],
+                array_map(fn (string $dataClass) => [$dataClass], $dataClasses)
+            );
+        }
     }
 }
