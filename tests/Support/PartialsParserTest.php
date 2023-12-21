@@ -205,7 +205,7 @@ it('can parse directives with mapping', function (array $partials, TreeNode $exp
         public SimpleDataWithMappedOutputName $struct;
     };
 
-    $mapping = app(DataConfig::class)->getDataClass($fakeClass::class)->outputNameMapping->resolve();
+    $mapping = app(DataConfig::class)->getDataClass($fakeClass::class)->outputNameMapping;
 
     expect(app(PartialsParser::class))
         ->execute($partials, $mapping)

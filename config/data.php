@@ -68,4 +68,20 @@ return [
      * which will only enable the caster locally.
      */
     'var_dumper_caster_mode' => 'development',
+
+    /*
+     * The package will cache the reflection of data objects to improve performance.
+     */
+    'structure_caching' => [
+        'directories' => [app_path('data')],
+        'cache' => [
+            'store' => env('CACHE_DRIVER', 'file'),
+            'prefix' => 'laravel-data',
+        ],
+        'reflection_discovery' => [
+            'enabled' => true,
+            'base_path' => base_path(),
+            'root_namespace' => null,
+        ],
+    ],
 ];

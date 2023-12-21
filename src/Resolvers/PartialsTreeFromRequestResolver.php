@@ -33,23 +33,21 @@ class PartialsTreeFromRequestResolver
 
         $dataClass = $this->dataConfig->getDataClass($dataClass);
 
-        $mapping = $dataClass->outputNameMapping->resolve();
-
         $requestedIncludesTree = $this->partialsParser->execute(
             $request->has('include') ? $this->arrayFromRequest($request, 'include') : [],
-            $mapping
+            $dataClass->outputNameMapping
         );
         $requestedExcludesTree = $this->partialsParser->execute(
             $request->has('exclude') ? $this->arrayFromRequest($request, 'exclude') : [],
-            $mapping
+            $dataClass->outputNameMapping
         );
         $requestedOnlyTree = $this->partialsParser->execute(
             $request->has('only') ? $this->arrayFromRequest($request, 'only') : [],
-            $mapping
+            $dataClass->outputNameMapping
         );
         $requestedExceptTree = $this->partialsParser->execute(
             $request->has('except') ? $this->arrayFromRequest($request, 'except') : [],
-            $mapping
+            $dataClass->outputNameMapping
         );
 
         $allowedRequestIncludesTree = $this->allowedPartialsParser->execute('allowedRequestIncludes', $dataClass);
