@@ -83,8 +83,7 @@ it('wont throw an error if a non existing attribute is used on a data class', fu
 
 it('wont create an output name mapping for non mapped properties', function () {
     $mapping = DataClass::create(new ReflectionClass(SimpleData::class))
-        ->outputNameMapping
-        ->resolve();
+        ->outputNameMapping;
 
     expect($mapping)
         ->mapped->toBeEmpty()

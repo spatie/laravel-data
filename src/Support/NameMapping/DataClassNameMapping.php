@@ -31,8 +31,6 @@ class DataClassNameMapping
             return null;
         }
 
-        $outputNameMapping = $dataConfig->getDataClass($dataClass)->outputNameMapping;
-
-        return $outputNameMapping->resolve();
+        return $dataConfig->getDataClass($dataClass)->outputNameMapping;
     }
 }

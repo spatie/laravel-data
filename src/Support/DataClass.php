@@ -17,7 +17,6 @@ use Spatie\LaravelData\Contracts\ValidateableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
-use Spatie\LaravelData\Support\Lazy\CachedLazy;
 use Spatie\LaravelData\Support\NameMapping\DataClassNameMapping;
 
 /**
@@ -25,7 +24,6 @@ use Spatie\LaravelData\Support\NameMapping\DataClassNameMapping;
  * @property  Collection<string, DataProperty> $properties
  * @property  Collection<string, DataMethod> $methods
  * @property  Collection<string, object> $attributes
- * @property CachedLazy<DataClassNameMapping> $outputNameMapping
  */
 class DataClass
 {
@@ -43,7 +41,7 @@ class DataClass
         public readonly bool $validateable,
         public readonly bool $wrappable,
         public readonly Collection $attributes,
-        public readonly CachedLazy $outputNameMapping,
+        public readonly DataClassNameMapping $outputNameMapping,
     ) {
     }
 
@@ -75,7 +73,7 @@ class DataClass
             validateable: $class->implementsInterface(ValidateableData::class),
             wrappable: $class->implementsInterface(WrappableData::class),
             attributes: $attributes,
-            outputNameMapping: new CachedLazy(fn () => self::resolveOutputNameMapping($properties)),
+            outputNameMapping: self::resolveOutputNameMapping($properties),
         );
     }
 
