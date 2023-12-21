@@ -5,8 +5,6 @@ namespace Spatie\LaravelData\Concerns;
 use Exception;
 use Spatie\LaravelData\Contracts\BaseData as BaseDataContract;
 use Spatie\LaravelData\Contracts\BaseDataCollectable as BaseDataCollectableContract;
-use Spatie\LaravelData\Resolvers\TransformedDataCollectionResolver;
-use Spatie\LaravelData\Resolvers\TransformedDataResolver;
 use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
 use Spatie\LaravelData\Support\Transformation\PartialTransformationContext;
