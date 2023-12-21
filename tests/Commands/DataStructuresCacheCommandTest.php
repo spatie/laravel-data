@@ -7,7 +7,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 it('can cache data structures', function () {
     config()->set('data.structure_caching.directories', [
-        __DIR__.'/../Fakes'
+        __DIR__.'/../Fakes',
     ]);
 
     config()->set('data.structure_caching.reflection_discovery.base_path', __DIR__.'/../Fakes');
