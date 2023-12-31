@@ -87,4 +87,15 @@ return [
             'root_namespace' => null,
         ],
     ],
+
+    /**
+     * It is possible to specif the namespace of the created Data Class
+     * using make:data command and also the suffix
+     */
+    'commands' => [
+        'make' => [
+            'namespace' => 'Data',
+            'suffix' => 'Data',
+        ],
+    ],
 ];
