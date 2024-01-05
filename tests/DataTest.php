@@ -43,7 +43,6 @@ use Spatie\LaravelData\Tests\Fakes\CircData;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\EnumData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
-use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\MultiNestedData;

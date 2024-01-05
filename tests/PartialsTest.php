@@ -1217,7 +1217,7 @@ it('partials are always reset when transforming again', function () {
 });
 
 it('can define permanent partials which will always be used', function () {
-    $dataClass = new class(
+    $dataClass = new class (
         Lazy::create(fn () => NestedLazyData::from('Hello World')),
         Lazy::create(fn () => 'Hello World'),
     ) extends Data {
@@ -1256,7 +1256,7 @@ it('can combine multiple partials', function (
     array $except,
     array $expected
 ) {
-    $dataClass = new class(
+    $dataClass = new class (
         Lazy::create(fn () => NestedLazyData::from('Hello World')),
         Lazy::create(fn () => NestedLazyData::collect(['Hello', 'World'])),
         Lazy::create(fn () => SimpleData::from('Hello World')),
@@ -1396,7 +1396,7 @@ it('can set partials on a nested data object and these will be respected', funct
 
     $collection->include('nested.simple');
 
-    $data = new class(Lazy::create(fn () => $collection)) extends Data {
+    $data = new class (Lazy::create(fn () => $collection)) extends Data {
         public function __construct(
             #[DataCollectionOf(\TestMultiLazyNestedDataWithObjectAndCollection::class)]
             public Lazy|DataCollection $collection

@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataClass;

@@ -75,7 +75,7 @@ it('can use the pointer system when ending in a field', function () {
     expect($partial->getFields())->toBe(null);
 });
 
-it('can use the pointer system when ending in an all', function (){
+it('can use the pointer system when ending in an all', function () {
     $partial = new ResolvedPartial([
         new NestedPartialSegment('struct'),
         new AllPartialSegment(),
