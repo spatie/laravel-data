@@ -6,9 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Spatie\LaravelData\Support\DataContainer;
-use Spatie\LaravelData\Support\Partials\Partial;
 use Spatie\LaravelData\Support\Partials\PartialType;
-use Spatie\LaravelData\Support\Partials\ResolvedPartial;
 use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 

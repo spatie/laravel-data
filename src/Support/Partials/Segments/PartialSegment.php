@@ -6,5 +6,4 @@ use Stringable;
 
 abstract class PartialSegment implements Stringable
 {
-
 }

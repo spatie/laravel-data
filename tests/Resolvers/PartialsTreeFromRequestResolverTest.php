@@ -3,7 +3,6 @@
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
 use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\DisabledTreeNode;
 use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;

@@ -95,7 +95,7 @@ class VisibleDataFieldsResolver
             }
 
             if ($value instanceof RelationalLazy || $value instanceof ConditionalLazy) {
-                if(! $value->shouldBeIncluded()){
+                if(! $value->shouldBeIncluded()) {
                     unset($fields[$field]);
                 }
 

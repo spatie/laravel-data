@@ -27,5 +27,6 @@ class ExceptData extends Data
 
         // Ensure cached config is cleared
         app(DataConfig::class)->reset();
-        DataContainer::get()->reset();    }
+        DataContainer::get()->reset();
+    }
 }

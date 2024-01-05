@@ -3,10 +3,6 @@
 use Illuminate\Support\Facades\App;
 use Spatie\LaravelData\Support\Caching\CachedDataConfig;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
-use Spatie\LaravelData\Tests\Fakes\ExceptData;
-use Spatie\LaravelData\Tests\Fakes\LazyData;
-use Spatie\LaravelData\Tests\Fakes\OnlyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 it('can cache data structures', function () {

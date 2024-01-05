@@ -37,14 +37,13 @@ class TransformationContextFactory
 
     public function get(
         BaseData|BaseDataCollectable $data,
-    ): TransformationContext
-    {
+    ): TransformationContext {
         $includedPartials = new SplObjectStorage();
 
         foreach ($this->includedPartials as $include) {
             $resolved = $include->resolve($data);
 
-            if($resolved){
+            if($resolved) {
                 $includedPartials->attach($resolved);
             }
         }
@@ -54,7 +53,7 @@ class TransformationContextFactory
         foreach ($this->excludedPartials as $exclude) {
             $resolved = $exclude->resolve($data);
 
-            if($resolved){
+            if($resolved) {
                 $excludedPartials->attach($resolved);
             }
         }
@@ -64,7 +63,7 @@ class TransformationContextFactory
         foreach ($this->onlyPartials as $only) {
             $resolved = $only->resolve($data);
 
-            if($resolved){
+            if($resolved) {
                 $onlyPartials->attach($resolved);
             }
         }
@@ -74,7 +73,7 @@ class TransformationContextFactory
         foreach ($this->exceptPartials as $except) {
             $resolved = $except->resolve($data);
 
-            if($resolved){
+            if($resolved) {
                 $exceptPartials->attach($resolved);
             }
         }

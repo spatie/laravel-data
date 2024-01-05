@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Partials;
 
-use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Support\DataClass;
 
 enum PartialType

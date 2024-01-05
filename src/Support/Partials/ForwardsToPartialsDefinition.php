@@ -57,7 +57,7 @@ trait ForwardsToPartialsDefinition
     {
         if (is_callable($condition)) {
             $this->getPartialsContainer()->includePartials->attach(Partial::createConditional($include, $condition));
-        } else if ($condition === true) {
+        } elseif ($condition === true) {
             $this->getPartialsContainer()->includePartials->attach(Partial::create($include));
         }
 
@@ -68,7 +68,7 @@ trait ForwardsToPartialsDefinition
     {
         if (is_callable($condition)) {
             $this->getPartialsContainer()->excludePartials->attach(Partial::createConditional($exclude, $condition));
-        } else if ($condition === true) {
+        } elseif ($condition === true) {
             $this->getPartialsContainer()->excludePartials->attach(Partial::create($exclude));
         }
 
@@ -79,7 +79,7 @@ trait ForwardsToPartialsDefinition
     {
         if (is_callable($condition)) {
             $this->getPartialsContainer()->onlyPartials->attach(Partial::createConditional($only, $condition));
-        } else if ($condition === true) {
+        } elseif ($condition === true) {
             $this->getPartialsContainer()->onlyPartials->attach(Partial::create($only));
         }
 
@@ -90,7 +90,7 @@ trait ForwardsToPartialsDefinition
     {
         if (is_callable($condition)) {
             $this->getPartialsContainer()->exceptPartials->attach(Partial::createConditional($except, $condition));
-        } else if ($condition === true) {
+        } elseif ($condition === true) {
             $this->getPartialsContainer()->exceptPartials->attach(Partial::create($except));
         }
 
