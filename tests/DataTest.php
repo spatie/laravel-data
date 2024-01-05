@@ -1409,11 +1409,6 @@ it('can use an array to store data', function () {
         }
     };
 
-    $d = $dataClass::from([
-        'array' => ['A', 'B'],
-        'collection' => ['A', 'B'],
-    ]);
-
     expect($dataClass->include('array.name', 'collection.name')->toArray())->toBe([
         'array' => [
             ['name' => 'A'],

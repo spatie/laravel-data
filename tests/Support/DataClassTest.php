@@ -81,15 +81,6 @@ it('wont throw an error if a non existing attribute is used on a data class', fu
         ->and(ModelWithPhpStormAttributeData::from((new DummyModel())->fill(['id' => 1]))->id)->toEqual(1);
 });
 
-it('wont create an output name mapping for non mapped properties', function () {
-    $mapping = DataClass::create(new ReflectionClass(SimpleData::class))
-        ->outputNameMapping;
-
-    expect($mapping)
-        ->mapped->toBeEmpty()
-        ->mappedDataObjects->toBeEmpty();
-});
-
 it('resolves parent attributes', function () {
     #[MapName(SnakeCaseMapper::class)]
     #[WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-Y')]

@@ -2,18 +2,19 @@
 
 namespace Spatie\LaravelData\Support;
 
+use Spatie\LaravelData\Resolvers\RequestQueryStringPartialsResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataCollectionResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataResolver;
 
 class DataContainer
 {
-    private static self $instance;
+    protected static self $instance;
 
-    private TransformedDataResolver $transformedDataResolver;
+    protected ?TransformedDataResolver $transformedDataResolver = null;
 
-    private TransformedDataCollectionResolver $transformedDataCollectionResolver;
+    protected ?TransformedDataCollectionResolver $transformedDataCollectionResolver = null;
 
-    private PartialsParser $partialsParser;
+    protected ?RequestQueryStringPartialsResolver $requestQueryStringPartialsResolver = null;
 
     private function __construct()
     {
@@ -30,28 +31,23 @@ class DataContainer
 
     public function transformedDataResolver(): TransformedDataResolver
     {
-        if (! isset($this->transformedDataResolver)) {
-            $this->transformedDataResolver = app(TransformedDataResolver::class);
-        }
-
-        return $this->transformedDataResolver;
+        return $this->transformedDataResolver ??= app(TransformedDataResolver::class);
     }
 
     public function transformedDataCollectionResolver(): TransformedDataCollectionResolver
     {
-        if (! isset($this->transformedDataCollectionResolver)) {
-            $this->transformedDataCollectionResolver = app(TransformedDataCollectionResolver::class);
-        }
-
-        return $this->transformedDataCollectionResolver;
+        return $this->transformedDataCollectionResolver ??= app(TransformedDataCollectionResolver::class);
     }
 
-    public function partialsParser(): PartialsParser
+    public function requestQueryStringPartialsResolver(): RequestQueryStringPartialsResolver
     {
-        if (! isset($this->partialsParser)) {
-            $this->partialsParser = app(PartialsParser::class);
-        }
+        return $this->requestQueryStringPartialsResolver ??= app(RequestQueryStringPartialsResolver::class);
+    }
 
-        return $this->partialsParser;
+    public function reset()
+    {
+        $this->transformedDataResolver = null;
+        $this->transformedDataCollectionResolver = null;
+        $this->requestQueryStringPartialsResolver = null;
     }
 }

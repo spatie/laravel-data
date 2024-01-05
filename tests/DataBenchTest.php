@@ -56,7 +56,7 @@ it('can transform collected data', function () {
         fn () => $data->toUserDefinedToArray(),
         name: 'single',
     );
-});
+})->skip('Use PHPBench for now');
 
 function benchSingle(Closure $closure, $times): float
 {

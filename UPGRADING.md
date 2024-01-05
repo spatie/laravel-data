@@ -19,11 +19,13 @@ The following things are required when upgrading:
   - Take a look within the docs what has changed
 - If you were using internal data structures like `DataClass` and `DataProperty` then take a look at what has been changed
 - The `DataCollectableTransformer` and `DataTransformer` were replaced with their appropriate resolvers
+- If you've cached the data structures, be sure to clear the cache
 
 We advise you to take a look at the following things:
 - Take a look within your data objects if `DataCollection`'s, `DataPaginatedCollection`'s and `DataCursorPaginatedCollection`'s can be replaced with regular arrays, Laravel Collections and Paginator
 - Replace `DataCollectionOf` attributes with annotations, providing IDE completion and more info for static analyzers
 - Replace some `extends Data` definitions with `extends Resource` or `extends Dto` for more minimal data objects
+- When using `only` and `except` at the same time on a data object/collection, previously only the except would be executed. From now on, we first execute the except and then the only.
 ## From v2 to v3
 
 Upgrading to laravel data shouldn't take long, we've documented all possible changes just to provide the whole context. You probably won't have to do anything:

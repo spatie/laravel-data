@@ -10,16 +10,10 @@ use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
-use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
-use Spatie\LaravelData\Support\TreeNodes\AllTreeNode;
-use Spatie\LaravelData\Support\TreeNodes\ExcludedTreeNode;
-use Spatie\LaravelData\Support\TreeNodes\PartialTreeNode;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Transformers\ArrayableTransformer;
 use Spatie\LaravelData\Transformers\Transformer;
@@ -27,7 +21,8 @@ use Spatie\LaravelData\Transformers\Transformer;
 class TransformedDataResolver
 {
     public function __construct(
-        protected DataConfig $dataConfig
+        protected DataConfig $dataConfig,
+        protected VisibleDataFieldsResolver $visibleDataFieldsResolver,
     ) {
     }
 
@@ -52,18 +47,14 @@ class TransformedDataResolver
     {
         $payload = [];
 
-        foreach ($this->dataConfig->getDataClass($data::class)->properties as $property) {
+        $dataClass = $this->dataConfig->getDataClass($data::class);
+
+        $visibleFields = $this->visibleDataFieldsResolver->execute($data, $dataClass, $context);
+
+        foreach ($dataClass->properties as $property) {
             $name = $property->name;
 
-            if ($property->hidden) {
-                continue;
-            }
-
-            if ($property->type->isOptional && ! array_key_exists($name, get_object_vars($data))) {
-                continue;
-            }
-
-            if (! $this->shouldIncludeProperty($name, $data->{$name}, $context)) {
+            if (! array_key_exists($name, $visibleFields)) {
                 continue;
             }
 
@@ -71,6 +62,7 @@ class TransformedDataResolver
                 $property,
                 $data->{$name},
                 $context,
+                $visibleFields[$name] ?? null,
             );
 
             if ($context->mapPropertyNames && $property->outputMappedName) {
@@ -83,89 +75,11 @@ class TransformedDataResolver
         return $payload;
     }
 
-    protected function shouldIncludeProperty(
-        string $name,
-        mixed $value,
-        TransformationContext $context
-    ): bool {
-        if ($value instanceof Optional) {
-            return false;
-        }
-
-        if ($this->isPropertyHidden($name, $context)) {
-            return false;
-        }
-
-        if (! $value instanceof Lazy) {
-            return true;
-        }
-
-        if ($value instanceof RelationalLazy || $value instanceof ConditionalLazy) {
-            return $value->shouldBeIncluded();
-        }
-
-        // Lazy excluded checks
-
-        if ($context->partials->lazyExcluded instanceof AllTreeNode) {
-            return false;
-        }
-
-        if ($context->partials->lazyExcluded instanceof PartialTreeNode && $context->partials->lazyExcluded->hasField($name)) {
-            return false;
-        }
-
-        // Lazy included checks
-
-        if ($context->partials->lazyIncluded instanceof AllTreeNode) {
-            return true;
-        }
-
-        if ($value->isDefaultIncluded()) {
-            return true;
-        }
-
-        return $context->partials->lazyIncluded instanceof PartialTreeNode && $context->partials->lazyIncluded->hasField($name);
-    }
-
-    protected function isPropertyHidden(
-        string $name,
-        TransformationContext $context
-    ): bool {
-        if ($context->partials->except instanceof AllTreeNode) {
-            return true;
-        }
-
-        if (
-            $context->partials->except instanceof PartialTreeNode
-            && $context->partials->except->hasField($name)
-            && $context->partials->except->getNested($name) instanceof ExcludedTreeNode
-        ) {
-            return true;
-        }
-
-        if ($context->partials->except instanceof PartialTreeNode) {
-            return false;
-        }
-
-        if ($context->partials->only instanceof AllTreeNode) {
-            return false;
-        }
-
-        if ($context->partials->only instanceof PartialTreeNode && $context->partials->only->hasField($name)) {
-            return false;
-        }
-
-        if ($context->partials->only instanceof PartialTreeNode || $context->partials->only instanceof ExcludedTreeNode) {
-            return true;
-        }
-
-        return false;
-    }
-
     protected function resolvePropertyValue(
         DataProperty $property,
         mixed $value,
-        TransformationContext $context,
+        TransformationContext $currentContext,
+        ?TransformationContext $fieldContext
     ): mixed {
         if ($value instanceof Lazy) {
             $value = $value->resolve();
@@ -175,52 +89,52 @@ class TransformedDataResolver
             return null;
         }
 
-        if ($transformer = $this->resolveTransformerForValue($property, $value, $context)) {
+        if ($transformer = $this->resolveTransformerForValue($property, $value, $currentContext)) {
             return $transformer->transform($property, $value);
         }
 
         if (is_array($value) && ! $property->type->kind->isDataCollectable()) {
-            return $this->resolvePotentialPartialArray($value, $context->next($property->name));
+            return $this->resolvePotentialPartialArray($value, $fieldContext);
         }
 
         if (
             $value instanceof BaseDataCollectable
             && $value instanceof TransformableData
-            && $context->transformValues
+            && $currentContext->transformValues
         ) {
-            $wrapExecutionType = match ($context->wrapExecutionType) {
+            $wrapExecutionType = match ($currentContext->wrapExecutionType) {
                 WrapExecutionType::Enabled => WrapExecutionType::Enabled,
                 WrapExecutionType::Disabled => WrapExecutionType::Disabled,
                 WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled
             };
 
             return $value->transform(
-                $context->next($property->name)->setWrapExecutionType($wrapExecutionType)
+                $fieldContext->setWrapExecutionType($wrapExecutionType)
             );
         }
 
         if (
             $value instanceof BaseData
             && $value instanceof TransformableData
-            && $context->transformValues
+            && $currentContext->transformValues
         ) {
-            $wrapExecutionType = match ($context->wrapExecutionType) {
+            $wrapExecutionType = match ($currentContext->wrapExecutionType) {
                 WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
                 WrapExecutionType::Disabled => WrapExecutionType::Disabled,
                 WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled
             };
 
             return $value->transform(
-                $context->next($property->name)->setWrapExecutionType($wrapExecutionType)
+                $fieldContext->setWrapExecutionType($wrapExecutionType)
             );
         }
 
         if (
             $property->type->kind->isDataCollectable()
             && is_iterable($value)
-            && $context->transformValues
+            && $currentContext->transformValues
         ) {
-            $wrapExecutionType = match ($context->wrapExecutionType) {
+            $wrapExecutionType = match ($currentContext->wrapExecutionType) {
                 WrapExecutionType::Enabled => WrapExecutionType::Enabled,
                 WrapExecutionType::Disabled => WrapExecutionType::Disabled,
                 WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled
@@ -228,7 +142,7 @@ class TransformedDataResolver
 
             return DataContainer::get()->transformedDataCollectionResolver()->execute(
                 $value,
-                $context->next($property->name)->setWrapExecutionType($wrapExecutionType)
+                $fieldContext->setWrapExecutionType($wrapExecutionType)
             );
         }
 
@@ -237,14 +151,26 @@ class TransformedDataResolver
 
     protected function resolvePotentialPartialArray(
         array $value,
-        TransformationContext $nextContext,
-    ) {
-        if ($nextContext->partials->only instanceof AllTreeNode || $nextContext->partials->only instanceof PartialTreeNode) {
-            return Arr::only($value, $nextContext->partials->only->getFields());
+        TransformationContext $fieldContext,
+    ): array {
+        if ($fieldContext->exceptPartials->count() > 0) {
+            $partials = [];
+
+            foreach ($fieldContext->exceptPartials as $exceptPartial) {
+                array_push($partials, ...$exceptPartial->toLaravel());
+            }
+
+            return Arr::except($value, $partials);
         }
 
-        if ($nextContext->partials->except instanceof AllTreeNode || $nextContext->partials->except instanceof PartialTreeNode) {
-            return Arr::except($value, $nextContext->partials->except->getFields());
+        if ($fieldContext->onlyPartials->count() > 0) {
+            $partials = [];
+
+            foreach ($fieldContext->onlyPartials as $onlyPartial) {
+                array_push($partials, ...$onlyPartial->toLaravel());
+            }
+
+            return Arr::only($value, $partials);
         }
 
         return $value;

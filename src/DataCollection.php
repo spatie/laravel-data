@@ -107,7 +107,7 @@ class DataCollection implements DataCollectable, ArrayAccess
         $data = $this->items->offsetGet($offset);
 
         if ($data instanceof IncludeableDataContract) {
-            $data->getDataContext()->partialsDefinition->merge($this->getPartialsDefinition());
+            $data->getDataContext()->mergePartials($this->getDataContext());
         }
 
         return $data;

@@ -8,6 +8,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Lazy\ClosureLazy;
 use Spatie\LaravelData\Support\Lazy\InertiaLazy;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
@@ -279,13 +280,13 @@ it('always transforms closure lazy into closures for inertia', function () {
 
 
 it('can dynamically include data based upon the request', function () {
-    LazyData::$allowedIncludes = [];
+    LazyData::setAllowedIncludes([]);
 
     $response = LazyData::from('Ruben')->toResponse(request());
 
     expect($response)->getData(true)->toBe([]);
 
-    LazyData::$allowedIncludes = ['name'];
+    LazyData::setAllowedIncludes(['name']);
 
     $includedResponse = LazyData::from('Ruben')->toResponse(request()->merge([
         'include' => 'name',
@@ -296,7 +297,7 @@ it('can dynamically include data based upon the request', function () {
 });
 
 it('can disabled including data dynamically from the request', function () {
-    LazyData::$allowedIncludes = [];
+    LazyData::setAllowedIncludes([]);
 
     $response = LazyData::from('Ruben')->toResponse(request()->merge([
         'include' => 'name',
@@ -304,7 +305,7 @@ it('can disabled including data dynamically from the request', function () {
 
     expect($response->getData(true))->toBe([]);
 
-    LazyData::$allowedIncludes = ['name'];
+    LazyData::setAllowedIncludes(['name']);
 
     $response = LazyData::from('Ruben')->toResponse(request()->merge([
         'include' => 'name',
@@ -312,7 +313,7 @@ it('can disabled including data dynamically from the request', function () {
 
     expect($response->getData(true))->toMatchArray(['name' => 'Ruben']);
 
-    LazyData::$allowedIncludes = null;
+    LazyData::setAllowedIncludes(null);
 
     $response = LazyData::from('Ruben')->toResponse(request()->merge([
         'include' => 'name',
@@ -322,13 +323,13 @@ it('can disabled including data dynamically from the request', function () {
 });
 
 it('can dynamically exclude data based upon the request', function () {
-    DefaultLazyData::$allowedExcludes = [];
+    DefaultLazyData::setAllowedExcludes([]);
 
     $response = DefaultLazyData::from('Ruben')->toResponse(request());
 
     expect($response->getData(true))->toMatchArray(['name' => 'Ruben']);
 
-    DefaultLazyData::$allowedExcludes = ['name'];
+    DefaultLazyData::setAllowedExcludes(['name']);
 
     $excludedResponse = DefaultLazyData::from('Ruben')->toResponse(request()->merge([
         'exclude' => 'name',
@@ -338,7 +339,7 @@ it('can dynamically exclude data based upon the request', function () {
 });
 
 it('can disable excluding data dynamically from the request', function () {
-    DefaultLazyData::$allowedExcludes = [];
+    DefaultLazyData::setAllowedExcludes([]);
 
     $response = DefaultLazyData::from('Ruben')->toResponse(request()->merge([
         'exclude' => 'name',
@@ -346,7 +347,7 @@ it('can disable excluding data dynamically from the request', function () {
 
     expect($response->getData(true))->toMatchArray(['name' => 'Ruben']);
 
-    DefaultLazyData::$allowedExcludes = ['name'];
+    DefaultLazyData::setAllowedExcludes(['name']);
 
     $response = DefaultLazyData::from('Ruben')->toResponse(request()->merge([
         'exclude' => 'name',
@@ -354,7 +355,7 @@ it('can disable excluding data dynamically from the request', function () {
 
     expect($response->getData(true))->toBe([]);
 
-    DefaultLazyData::$allowedExcludes = null;
+    DefaultLazyData::setAllowedExcludes(null);
 
     $response = DefaultLazyData::from('Ruben')->toResponse(request()->merge([
         'exclude' => 'name',
@@ -364,7 +365,7 @@ it('can disable excluding data dynamically from the request', function () {
 });
 
 it('can disable only data dynamically from the request', function () {
-    OnlyData::$allowedOnly = [];
+    OnlyData::setAllowedOnly([]);
 
     $response = OnlyData::from([
         'first_name' => 'Ruben',
@@ -378,7 +379,7 @@ it('can disable only data dynamically from the request', function () {
         'last_name' => 'Van Assche',
     ]);
 
-    OnlyData::$allowedOnly = ['first_name'];
+    OnlyData::setAllowedOnly(['first_name']);
 
     $response = OnlyData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
         'only' => 'first_name',
@@ -388,7 +389,7 @@ it('can disable only data dynamically from the request', function () {
         'first_name' => 'Ruben',
     ]);
 
-    OnlyData::$allowedOnly = null;
+    OnlyData::setAllowedOnly(null);
 
     $response = OnlyData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
         'only' => 'first_name',
@@ -400,7 +401,7 @@ it('can disable only data dynamically from the request', function () {
 });
 
 it('can disable except data dynamically from the request', function () {
-    ExceptData::$allowedExcept = [];
+    ExceptData::setAllowedExcept([]);
 
     $response = ExceptData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
         'except' => 'first_name',
@@ -411,7 +412,7 @@ it('can disable except data dynamically from the request', function () {
         'last_name' => 'Van Assche',
     ]);
 
-    ExceptData::$allowedExcept = ['first_name'];
+    ExceptData::setAllowedExcept(['first_name']);
 
     $response = ExceptData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
         'except' => 'first_name',
@@ -421,7 +422,7 @@ it('can disable except data dynamically from the request', function () {
         'last_name' => 'Van Assche',
     ]);
 
-    ExceptData::$allowedExcept = null;
+    ExceptData::setAllowedExcept(null);
 
     $response = ExceptData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche'])->toResponse(request()->merge([
         'except' => 'first_name',
@@ -519,6 +520,7 @@ it('can conditionally include using class defaults nested', function () {
         ->toArray()
         ->toMatchArray(['enabled' => true, 'nested' => ['string' => 'Hello World']]);
 });
+
 
 it('can conditionally include using class defaults multiple', function () {
     PartialClassConditionalData::setDefinitions(includeDefinitions: [
@@ -878,7 +880,7 @@ it('can conditionally define except using multiple class defaults', function () 
         ]);
 });
 
-test('only has precedence over except', function () {
+test('except has precedence over only', function () {
     $data = new MultiData('Hello', 'World');
 
     expect(
@@ -890,7 +892,7 @@ test('only has precedence over except', function () {
     expect(
         (clone $data)->exceptWhen('first', true)->onlyWhen('first', true)->toArray()
     )->toMatchArray(['second' => 'World']);
-});
+})->skip('We know first perform except and then only, test can be removed');
 
 it('can perform only and except on array properties', function () {
     $data = new class ('Hello World', ['string' => 'Hello World', 'int' => 42]) extends Data {
@@ -944,7 +946,7 @@ it('can fetch lazy properties like regular properties within PHP', function () {
     expect($data->fakeModel->string)->toBe('lazy');
 });
 
-it('has array access and will replicate partialtrees (collection)', function () {
+it('has array access and will replicate partials (collection)', function () {
     $collection = MultiData::collect([
         new MultiData('first', 'second'),
     ], DataCollection::class)->only('second');
@@ -953,7 +955,7 @@ it('has array access and will replicate partialtrees (collection)', function () 
 });
 
 it('can dynamically include data based upon the request (collection)', function () {
-    LazyData::$allowedIncludes = [''];
+    LazyData::setAllowedIncludes(['']);
 
     $response = (new DataCollection(LazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request());
 
@@ -964,7 +966,7 @@ it('can dynamically include data based upon the request (collection)', function 
             [],
         ]);
 
-    LazyData::$allowedIncludes = ['name'];
+    LazyData::setAllowedIncludes(['name']);
 
     $includedResponse = (new DataCollection(LazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'include' => 'name',
@@ -979,7 +981,7 @@ it('can dynamically include data based upon the request (collection)', function 
 });
 
 it('can disable manually including data in the request (collection)', function () {
-    LazyData::$allowedIncludes = [];
+    LazyData::setAllowedIncludes([]);
 
     $response = (new DataCollection(LazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'include' => 'name',
@@ -992,7 +994,7 @@ it('can disable manually including data in the request (collection)', function (
             [],
         ]);
 
-    LazyData::$allowedIncludes = ['name'];
+    LazyData::setAllowedIncludes(['name']);
 
     $response = (new DataCollection(LazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'include' => 'name',
@@ -1005,7 +1007,7 @@ it('can disable manually including data in the request (collection)', function (
             ['name' => 'Brent'],
         ]);
 
-    LazyData::$allowedIncludes = null;
+    LazyData::setAllowedIncludes(null);
 
     $response = (new DataCollection(LazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'include' => 'name',
@@ -1020,7 +1022,7 @@ it('can disable manually including data in the request (collection)', function (
 });
 
 it('can dynamically exclude data based upon the request (collection)', function () {
-    DefaultLazyData::$allowedExcludes = [];
+    DefaultLazyData::setAllowedExcludes([]);
 
     $response = (new DataCollection(DefaultLazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request());
 
@@ -1031,7 +1033,7 @@ it('can dynamically exclude data based upon the request (collection)', function 
             ['name' => 'Brent'],
         ]);
 
-    DefaultLazyData::$allowedExcludes = ['name'];
+    DefaultLazyData::setAllowedExcludes(['name']);
 
     $excludedResponse = (new DataCollection(DefaultLazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'exclude' => 'name',
@@ -1046,7 +1048,7 @@ it('can dynamically exclude data based upon the request (collection)', function 
 });
 
 it('can disable manually excluding data in the request (collection)', function () {
-    DefaultLazyData::$allowedExcludes = [];
+    DefaultLazyData::setAllowedExcludes([]);
 
     $response = (new DataCollection(DefaultLazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'exclude' => 'name',
@@ -1059,7 +1061,7 @@ it('can disable manually excluding data in the request (collection)', function (
             ['name' => 'Brent'],
         ]);
 
-    DefaultLazyData::$allowedExcludes = ['name'];
+    DefaultLazyData::setAllowedExcludes(['name']);
 
     $response = (new DataCollection(DefaultLazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'exclude' => 'name',
@@ -1072,7 +1074,7 @@ it('can disable manually excluding data in the request (collection)', function (
             [],
         ]);
 
-    DefaultLazyData::$allowedExcludes = null;
+    DefaultLazyData::setAllowedExcludes(null);
 
     $response = (new DataCollection(DefaultLazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
         'exclude' => 'name',

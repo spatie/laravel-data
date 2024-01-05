@@ -179,6 +179,8 @@ it('has array access', function () {
 
 
 it('can update data properties withing a collection', function () {
+    LazyData::setAllowedIncludes(null);
+
     $collection = new DataCollection(LazyData::class, [
         LazyData::from('Never gonna give you up!'),
     ]);

@@ -4,10 +4,12 @@ namespace Spatie\LaravelData\Tests\Fakes;
 
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataContainer;
 
 class DefaultLazyData extends Data
 {
-    public static ?array $allowedExcludes;
+    protected static ?array $allowedExcludes = null;
 
     public function __construct(
         public string | Lazy $name
@@ -25,4 +27,12 @@ class DefaultLazyData extends Data
     {
         return self::$allowedExcludes;
     }
+
+    public static function setAllowedExcludes(?array $allowedExcludes): void
+    {
+        self::$allowedExcludes = $allowedExcludes;
+
+        // Ensure cached config is cleared
+        app(DataConfig::class)->reset();
+        DataContainer::get()->reset();    }
 }

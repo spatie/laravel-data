@@ -5,9 +5,10 @@ namespace Spatie\LaravelData\Concerns;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
-use Spatie\LaravelData\Resolvers\PartialsTreeFromRequestResolver;
-use Spatie\LaravelData\Support\Transformation\PartialTransformationContext;
+use Spatie\LaravelData\Support\DataContainer;
+use Spatie\LaravelData\Support\Partials\Partial;
+use Spatie\LaravelData\Support\Partials\PartialType;
+use Spatie\LaravelData\Support\Partials\ResolvedPartial;
 use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
@@ -20,22 +21,51 @@ trait ResponsableData
      */
     public function toResponse($request)
     {
-        $context = TransformationContextFactory::create()
-            ->wrapExecutionType(WrapExecutionType::Enabled)
-            ->get($this)
-            ->mergePartials(
-                PartialTransformationContext::create(
-                    $this,
-                    $this->getDataContext()->partialsDefinition
-                )
-            );
+        $contextFactory = TransformationContextFactory::create()
+            ->wrapExecutionType(WrapExecutionType::Enabled);
 
-        $context = $this instanceof IncludeableDataContract
-            ? $context->mergePartials(resolve(PartialsTreeFromRequestResolver::class)->execute($this, $request))
-            : $context;
+        $includePartials = DataContainer::get()->requestQueryStringPartialsResolver()->execute(
+            $this,
+            $request,
+            PartialType::Include
+        );
+
+        if ($includePartials) {
+            $contextFactory->mergeIncludePartials($includePartials);
+        }
+
+        $excludePartials = DataContainer::get()->requestQueryStringPartialsResolver()->execute(
+            $this,
+            $request,
+            PartialType::Exclude
+        );
+
+        if ($excludePartials) {
+            $contextFactory->mergeExcludePartials($excludePartials);
+        }
+
+        $onlyPartials = DataContainer::get()->requestQueryStringPartialsResolver()->execute(
+            $this,
+            $request,
+            PartialType::Only
+        );
+
+        if ($onlyPartials) {
+            $contextFactory->mergeOnlyPartials($onlyPartials);
+        }
+
+        $exceptPartials = DataContainer::get()->requestQueryStringPartialsResolver()->execute(
+            $this,
+            $request,
+            PartialType::Except
+        );
+
+        if ($exceptPartials) {
+            $contextFactory->mergeExceptPartials($exceptPartials);
+        }
 
         return new JsonResponse(
-            data: $this->transform($context),
+            data: $this->transform($contextFactory->get($this)),
             status: $request->isMethod(Request::METHOD_POST) ? Response::HTTP_CREATED : Response::HTTP_OK,
         );
     }

@@ -3,10 +3,12 @@
 namespace Spatie\LaravelData\Tests\Fakes;
 
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataContainer;
 
 class ExceptData extends Data
 {
-    public static ?array $allowedExcept;
+    protected static ?array $allowedExcept = null;
 
     public function __construct(
         public string $first_name,
@@ -18,4 +20,12 @@ class ExceptData extends Data
     {
         return self::$allowedExcept;
     }
+
+    public static function setAllowedExcept(?array $allowedExcept): void
+    {
+        self::$allowedExcept = $allowedExcept;
+
+        // Ensure cached config is cleared
+        app(DataConfig::class)->reset();
+        DataContainer::get()->reset();    }
 }

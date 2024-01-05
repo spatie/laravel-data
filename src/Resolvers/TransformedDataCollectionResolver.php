@@ -15,6 +15,7 @@ use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Support\Transformation\PartialTransformationContext;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
@@ -39,6 +40,8 @@ class TransformedDataCollectionResolver
         $nestedContext = $context->wrapExecutionType->shouldExecute()
             ? $context->setWrapExecutionType(WrapExecutionType::TemporarilyDisabled)
             : $context;
+
+        // TODO: take into account that a DataCollection, PaginatedDataCollection and CursorPaginatedDataCollection also can have partials
 
         if ($items instanceof DataCollection) {
             return $this->transformItems($items->items(), $wrap, $context, $nestedContext);
@@ -110,12 +113,7 @@ class TransformedDataCollectionResolver
                 return $data;
             }
 
-            $localPartials = PartialTransformationContext::create(
-                $data,
-                $data->getDataContext()->partialsDefinition
-            );
-
-            return app(TransformedDataResolver::class)->execute($data, $context->mergePartials($localPartials));
+            return $data->transform($context);
         };
     }
 }

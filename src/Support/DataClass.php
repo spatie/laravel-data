@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Support;
 
+use Hoa\Compiler\Llk\TreeNode;
 use Illuminate\Support\Collection;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -9,6 +10,7 @@ use ReflectionMethod;
 use ReflectionParameter;
 use ReflectionProperty;
 use Spatie\LaravelData\Contracts\AppendableData;
+use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Contracts\DefaultableData;
 use Spatie\LaravelData\Contracts\IncludeableData;
@@ -17,6 +19,7 @@ use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\ValidateableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
+use Spatie\LaravelData\Resolvers\AllowedRequestPartialsResolver;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
 use Spatie\LaravelData\Support\NameMapping\DataClassNameMapping;
@@ -46,12 +49,19 @@ class DataClass
         public readonly bool $wrappable,
         public readonly Collection $attributes,
         public readonly array $dataCollectablePropertyAnnotations,
-        public readonly DataClassNameMapping $outputNameMapping,
+        public readonly ?array $allowedRequestIncludes,
+        public readonly ?array $allowedRequestExcludes,
+        public readonly ?array $allowedRequestOnly,
+        public readonly ?array $allowedRequestExcept,
+        public readonly array $outputMappedProperties,
     ) {
     }
 
     public static function create(ReflectionClass $class): self
     {
+        /** @var class-string<BaseData> $name */
+        $name = $class->name;
+
         $attributes = static::resolveAttributes($class);
 
         $methods = collect($class->getMethods());
@@ -60,7 +70,7 @@ class DataClass
 
         $dataCollectablePropertyAnnotations = DataCollectableAnnotationReader::create()->getForClass($class);
 
-        if($constructor) {
+        if ($constructor) {
             $dataCollectablePropertyAnnotations = array_merge(
                 $dataCollectablePropertyAnnotations,
                 DataCollectableAnnotationReader::create()->getForMethod($constructor)
@@ -74,6 +84,14 @@ class DataClass
             $dataCollectablePropertyAnnotations,
         );
 
+        $responsable = $class->implementsInterface(ResponsableData::class);
+
+        $outputMappedProperties = $properties
+            ->map(fn (DataProperty $property) => $property->outputMappedName)
+            ->filter()
+            ->flip()
+            ->toArray();
+
         return new self(
             name: $class->name,
             properties: $properties,
@@ -83,14 +101,18 @@ class DataClass
             isAbstract: $class->isAbstract(),
             appendable: $class->implementsInterface(AppendableData::class),
             includeable: $class->implementsInterface(IncludeableData::class),
-            responsable: $class->implementsInterface(ResponsableData::class),
+            responsable: $responsable,
             transformable: $class->implementsInterface(TransformableData::class),
             validateable: $class->implementsInterface(ValidateableData::class),
             defaultable: $class->implementsInterface(DefaultableData::class),
             wrappable: $class->implementsInterface(WrappableData::class),
             attributes: $attributes,
             dataCollectablePropertyAnnotations: $dataCollectablePropertyAnnotations,
-            outputNameMapping: self::resolveOutputNameMapping($properties),
+            allowedRequestIncludes: $responsable ? $name::allowedRequestIncludes() : null,
+            allowedRequestExcludes: $responsable ? $name::allowedRequestExcludes() : null,
+            allowedRequestOnly: $responsable ? $name::allowedRequestOnly() : null,
+            allowedRequestExcept: $responsable ? $name::allowedRequestExcept() : null,
+            outputMappedProperties: $outputMappedProperties,
         );
     }
 
@@ -162,30 +184,6 @@ class DataClass
         return array_merge(
             $class->getDefaultProperties(),
             $values
-        );
-    }
-
-    protected static function resolveOutputNameMapping(
-        Collection $properties,
-    ): DataClassNameMapping {
-        $mapped = [];
-        $mappedDataObjects = [];
-
-        $properties->each(function (DataProperty $dataProperty) use (&$mapped, &$mappedDataObjects) {
-            if ($dataProperty->type->kind->isDataObject() || $dataProperty->type->kind->isDataCollectable()) {
-                $mappedDataObjects[$dataProperty->name] = $dataProperty->type->dataClass;
-            }
-
-            if ($dataProperty->outputMappedName === null) {
-                return;
-            }
-
-            $mapped[$dataProperty->outputMappedName] = $dataProperty->name;
-        });
-
-        return new DataClassNameMapping(
-            $mapped,
-            $mappedDataObjects
         );
     }
 }

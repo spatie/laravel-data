@@ -12,7 +12,7 @@ use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 interface TransformableData extends JsonSerializable, Jsonable, Arrayable, EloquentCastable, ContextableData
 {
     public function transform(
-        null|TransformationContextFactory|TransformationContext $context = null,
+        null|TransformationContextFactory|TransformationContext $transformationContext = null,
     ): array;
 
     public function all(): array;
