@@ -42,6 +42,7 @@ it('will use a cached data config if the cached version is invalid', function ()
 
 it('will load cached data classes', function () {
     $dataClass = DataClass::create(new ReflectionClass(SimpleData::class));
+    $dataClass->prepareForCache();
 
     $mock = Mockery::mock(
         new DataStructureCache(config('data.structure_caching.cache')),

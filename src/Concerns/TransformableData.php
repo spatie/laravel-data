@@ -15,13 +15,11 @@ trait TransformableData
     public function transform(
         null|TransformationContextFactory|TransformationContext $transformationContext = null,
     ): array {
-        if ($transformationContext === null) {
-            $transformationContext = new TransformationContext();
-        }
-
-        if ($transformationContext instanceof TransformationContextFactory) {
-            $transformationContext = $transformationContext->get($this);
-        }
+        $transformationContext = match (true) {
+            $transformationContext instanceof TransformationContext => $transformationContext,
+            $transformationContext instanceof TransformationContextFactory => $transformationContext->get($this),
+            $transformationContext === null => new TransformationContext()
+        };
 
         $resolver = match (true) {
             $this instanceof BaseDataContract => DataContainer::get()->transformedDataResolver(),
@@ -34,25 +32,25 @@ trait TransformableData
         /** @var TransformationContext $transformationContext */
 
         if ($dataContext->includePartials->count() > 0) {
-            $transformationContext->includedPartials->addAll(
+            $transformationContext->mergeIncludedResolvedPartials(
                 $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($this, $dataContext->includePartials)
             );
         }
 
         if ($dataContext->excludePartials->count() > 0) {
-            $transformationContext->excludedPartials->addAll(
+            $transformationContext->mergeExcludedResolvedPartials(
                 $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($this, $dataContext->excludePartials)
             );
         }
 
         if ($dataContext->onlyPartials->count() > 0) {
-            $transformationContext->onlyPartials->addAll(
+            $transformationContext->mergeOnlyResolvedPartials(
                 $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($this, $dataContext->onlyPartials)
             );
         }
 
         if ($dataContext->exceptPartials->count() > 0) {
-            $transformationContext->exceptPartials->addAll(
+            $transformationContext->mergeExceptResolvedPartials(
                 $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($this, $dataContext->exceptPartials)
             );
         }

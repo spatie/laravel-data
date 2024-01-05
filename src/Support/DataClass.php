@@ -17,6 +17,7 @@ use Spatie\LaravelData\Contracts\ResponsableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\ValidateableData;
 use Spatie\LaravelData\Contracts\WrappableData;
+use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
@@ -50,7 +51,8 @@ class DataClass
         public readonly ?array $allowedRequestExcludes,
         public readonly ?array $allowedRequestOnly,
         public readonly ?array $allowedRequestExcept,
-        public readonly array $outputMappedProperties,
+        public DataStructureProperty $outputMappedProperties,
+        public DataStructureProperty $transformationFields
     ) {
     }
 
@@ -83,11 +85,13 @@ class DataClass
 
         $responsable = $class->implementsInterface(ResponsableData::class);
 
-        $outputMappedProperties = $properties
-            ->map(fn (DataProperty $property) => $property->outputMappedName)
-            ->filter()
-            ->flip()
-            ->toArray();
+        $outputMappedProperties = new LazyDataStructureProperty(
+            fn () => $properties
+                ->map(fn (DataProperty $property) => $property->outputMappedName)
+                ->filter()
+                ->flip()
+                ->toArray()
+        );
 
         return new self(
             name: $class->name,
@@ -110,6 +114,7 @@ class DataClass
             allowedRequestOnly: $responsable ? $name::allowedRequestOnly() : null,
             allowedRequestExcept: $responsable ? $name::allowedRequestExcept() : null,
             outputMappedProperties: $outputMappedProperties,
+            transformationFields: static::resolveTransformationFields($properties),
         );
     }
 
@@ -182,5 +187,42 @@ class DataClass
             $class->getDefaultProperties(),
             $values
         );
+    }
+
+    /**
+     * @param Collection<string, DataProperty> $properties
+     *
+     * @return LazyDataStructureProperty<array<string, null|true>>
+     */
+    protected static function resolveTransformationFields(
+        Collection $properties,
+    ): LazyDataStructureProperty {
+        $closure = fn () => $properties
+            ->reject(fn (DataProperty $property): bool => $property->hidden)
+            ->map(function (DataProperty $property): null|true {
+                if (
+                    $property->type->kind->isDataCollectable()
+                    || $property->type->kind->isDataObject()
+                    || ($property->type->kind === DataTypeKind::Default && $property->type->type->acceptsType('array'))
+                ) {
+                    return true;
+                }
+
+                return null;
+            })
+            ->all();
+
+        return new LazyDataStructureProperty($closure);
+    }
+
+    public function prepareForCache(): void
+    {
+        if($this->outputMappedProperties instanceof LazyDataStructureProperty) {
+            $this->outputMappedProperties = $this->outputMappedProperties->toDataStructureProperty();
+        }
+
+        if($this->transformationFields instanceof LazyDataStructureProperty) {
+            $this->transformationFields = $this->transformationFields->toDataStructureProperty();
+        }
     }
 }

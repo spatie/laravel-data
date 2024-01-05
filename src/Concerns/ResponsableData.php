@@ -63,7 +63,7 @@ trait ResponsableData
         }
 
         return new JsonResponse(
-            data: $this->transform($contextFactory->get($this)),
+            data: $this->transform($contextFactory),
             status: $request->isMethod(Request::METHOD_POST) ? Response::HTTP_CREATED : Response::HTTP_OK,
         );
     }

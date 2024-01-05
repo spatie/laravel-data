@@ -12,6 +12,8 @@ class ResolvedPartial implements Stringable
 {
     protected int $segmentCount;
 
+    protected bool $endsInAll;
+
     /**
      * @param array<PartialSegment> $segments
      * @param int $pointer
@@ -21,21 +23,28 @@ class ResolvedPartial implements Stringable
         public int $pointer = 0,
     ) {
         $this->segmentCount = count($segments);
+        $this->endsInAll = $this->segmentCount === 0
+            ? false
+            : $this->segments[$this->segmentCount - 1] instanceof AllPartialSegment;
     }
 
-    public function isUndefined()
+    public function isUndefined(): bool
     {
-        return $this->pointer === $this->segmentCount;
+        return ! $this->endsInAll && $this->pointer >= $this->segmentCount;
     }
 
-    public function isAll()
+    public function isAll(): bool
     {
-        return $this->getCurrentSegment() instanceof AllPartialSegment;
+        return $this->endsInAll && $this->pointer >= $this->segmentCount - 1;
     }
 
     public function getNested(): ?string
     {
         $segment = $this->getCurrentSegment();
+
+        if ($segment === null) {
+            return null;
+        }
 
         if (! $segment instanceof NestedPartialSegment) {
             return null;
@@ -46,7 +55,15 @@ class ResolvedPartial implements Stringable
 
     public function getFields(): ?array
     {
+        if ($this->isUndefined()) {
+            return null;
+        }
+
         $segment = $this->getCurrentSegment();
+
+        if ($segment === null) {
+            return null;
+        }
 
         if (! $segment instanceof FieldsPartialSegment) {
             return null;
@@ -79,7 +96,7 @@ class ResolvedPartial implements Stringable
             if ($segment instanceof FieldsPartialSegment) {
                 $segmentsAsString = count($segments) === 0
                     ? ''
-                    : implode('.', $segments) . '.';
+                    : implode('.', $segments).'.';
 
                 return array_map(
                     fn (string $field) => "{$segmentsAsString}{$field}",
@@ -93,20 +110,14 @@ class ResolvedPartial implements Stringable
 
     public function next(): self
     {
-        if ($this->isUndefined() || $this->isAll()) {
-            return $this;
-        }
-
         $this->pointer++;
 
         return $this;
     }
 
-    public function back(): self
+    public function rollbackWhenRequired(): void
     {
         $this->pointer--;
-
-        return $this;
     }
 
     public function reset(): self
@@ -116,13 +127,13 @@ class ResolvedPartial implements Stringable
         return $this;
     }
 
-    public function getCurrentSegment(): PartialSegment
+    protected function getCurrentSegment(): ?PartialSegment
     {
-        return $this->segments[$this->pointer];
+        return $this->segments[$this->pointer] ?? null;
     }
 
     public function __toString(): string
     {
-        return implode('.', $this->segments) . " (current: {$this->pointer})";
+        return implode('.', $this->segments)." (current: {$this->pointer})";
     }
 }

@@ -1394,33 +1394,6 @@ it('during the serialization process some properties are thrown away', function 
     expect($invaded->_dataContext)->toBeNull();
 });
 
-// TODO: extend tests here
-it('can use an array to store data', function () {
-    $dataClass = new class (
-        [LazyData::from('A'), LazyData::from('B')],
-        collect([LazyData::from('A'), LazyData::from('B')]),
-    ) extends Data {
-        public function __construct(
-            #[DataCollectionOf(SimpleData::class)]
-            public array $array,
-            #[DataCollectionOf(SimpleData::class)]
-            public Collection $collection,
-        ) {
-        }
-    };
-
-    expect($dataClass->include('array.name', 'collection.name')->toArray())->toBe([
-        'array' => [
-            ['name' => 'A'],
-            ['name' => 'B'],
-        ],
-        'collection' => [
-            ['name' => 'A'],
-            ['name' => 'B'],
-        ],
-    ]);
-});
-
 
 it('can set a default value for data object', function () {
     $dataObject = new class ('', '') extends Data {

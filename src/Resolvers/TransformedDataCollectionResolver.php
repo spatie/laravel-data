@@ -39,8 +39,6 @@ class TransformedDataCollectionResolver
             ? $context->setWrapExecutionType(WrapExecutionType::TemporarilyDisabled)
             : $context;
 
-        // TODO: take into account that a DataCollection, PaginatedDataCollection and CursorPaginatedDataCollection also can have partials
-
         if ($items instanceof DataCollection) {
             return $this->transformItems($items->items(), $wrap, $context, $nestedContext);
         }
@@ -83,7 +81,7 @@ class TransformedDataCollectionResolver
         TransformationContext $context,
         TransformationContext $nestedContext,
     ): array {
-        $paginator->through(fn (BaseData $data) => $this->transformationClosure($nestedContext)($data));
+        $paginator = $paginator->through(fn (BaseData $data) => $this->transformationClosure($nestedContext)($data));
 
         if ($context->transformValues === false) {
             return $paginator->all();
@@ -111,7 +109,7 @@ class TransformedDataCollectionResolver
                 return $data;
             }
 
-            return $data->transform($context);
+            return $data->transform(clone $context);
         };
     }
 }

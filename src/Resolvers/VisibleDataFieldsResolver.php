@@ -11,7 +11,6 @@ use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
-use SplObjectStorage;
 
 class VisibleDataFieldsResolver
 {
@@ -27,59 +26,47 @@ class VisibleDataFieldsResolver
     ): array {
         $dataInitializedFields = get_object_vars($data);
 
-        /** @var array<string, TransformationContext|null> $fields */
-        $fields = $dataClass
-            ->properties
-            ->reject(function (DataProperty $property) use (&$dataInitializedFields): bool {
-                if ($property->hidden) {
-                    return true;
-                }
+        $fields = $dataClass->transformationFields->resolve();
 
-                if ($property->type->isOptional && ! array_key_exists($property->name, $dataInitializedFields)) {
-                    return true;
-                }
+        foreach ($fields as $field => $next) {
+            if (! array_key_exists($field, $dataInitializedFields)) {
+                unset($fields[$field]);
 
-                return false;
-            })
-            ->map(function (DataProperty $property) use ($transformationContext): null|TransformationContext {
-                if (
-                    $property->type->kind->isDataCollectable()
-                    || $property->type->kind->isDataObject()
-                    || ($property->type->kind === DataTypeKind::Default && $property->type->type->acceptsType('array'))
-                ) {
-                    return new TransformationContext(
-                        $transformationContext->transformValues,
-                        $transformationContext->mapPropertyNames,
-                        $transformationContext->wrapExecutionType,
-                        new SplObjectStorage(),
-                        new SplObjectStorage(),
-                        new SplObjectStorage(),
-                        new SplObjectStorage(),
-                    );
-                }
+                continue;
+            }
 
-                return null;
-            })->all();
+            if ($next === true) {
+                $fields[$field] = new TransformationContext(
+                    $transformationContext->transformValues,
+                    $transformationContext->mapPropertyNames,
+                    $transformationContext->wrapExecutionType,
+                );
+            }
+        }
 
-        $this->performExcept($fields, $transformationContext);
+        if ($transformationContext->exceptPartials) {
+            $this->performExcept($fields, $transformationContext);
+        }
 
         if (empty($fields)) {
             return [];
         }
 
-        $this->performOnly($fields, $transformationContext);
+        if ($transformationContext->onlyPartials) {
+            $this->performOnly($fields, $transformationContext);
+        }
 
-        $includedFields = $this->resolveIncludedFields(
+        $includedFields = $transformationContext->includedPartials ? $this->resolveIncludedFields(
             $fields,
             $transformationContext,
             $dataClass,
-        );
+        ) : [];
 
-        $excludedFields = $this->resolveExcludedFields(
+        $excludedFields = $transformationContext->excludedPartials ? $this->resolveExcludedFields(
             $fields,
             $transformationContext,
             $dataClass,
-        );
+        ) : [];
 
         foreach ($fields as $field => $fieldTransFormationContext) {
             $value = $data->{$field};
@@ -95,7 +82,7 @@ class VisibleDataFieldsResolver
             }
 
             if ($value instanceof RelationalLazy || $value instanceof ConditionalLazy) {
-                if(! $value->shouldBeIncluded()) {
+                if (! $value->shouldBeIncluded()) {
                     unset($fields[$field]);
                 }
 
@@ -118,6 +105,9 @@ class VisibleDataFieldsResolver
         return $fields;
     }
 
+    /**
+     * @param array<string, TransformationContext|null> $fields
+     */
     protected function performExcept(
         array &$fields,
         TransformationContext $transformationContext
@@ -136,7 +126,7 @@ class VisibleDataFieldsResolver
             }
 
             if ($nested = $exceptPartial->getNested()) {
-                $fields[$nested]->exceptPartials->attach($exceptPartial->next());
+                $fields[$nested]->addExceptResolvedPartial($exceptPartial->next());
 
                 continue;
             }
@@ -151,6 +141,9 @@ class VisibleDataFieldsResolver
         }
     }
 
+    /**
+     * @param array<string, TransformationContext|null> $fields
+     */
     protected function performOnly(
         array &$fields,
         TransformationContext $transformationContext
@@ -166,7 +159,7 @@ class VisibleDataFieldsResolver
             $onlyFields ??= [];
 
             if ($nested = $onlyPartial->getNested()) {
-                $fields[$nested]->onlyPartials->attach($onlyPartial->next());
+                $fields[$nested]->addOnlyResolvedPartial($onlyPartial->next());
                 $onlyFields[] = $nested;
 
                 continue;
@@ -190,13 +183,15 @@ class VisibleDataFieldsResolver
         }
     }
 
+    /**
+     * @param array<string, TransformationContext|null> $fields
+     */
     protected function resolveIncludedFields(
-        array $fields,
+        array &$fields,
         TransformationContext $transformationContext,
         DataClass $dataClass
     ): array {
         $includedFields = [];
-
 
         foreach ($transformationContext->includedPartials as $includedPartial) {
             if ($includedPartial->isUndefined()) {
@@ -206,15 +201,20 @@ class VisibleDataFieldsResolver
             if ($includedPartial->isAll()) {
                 $includedFields = $dataClass
                     ->properties
-                    ->filter(fn (DataProperty $property) => $property->type->lazyType !== null)
+                    ->filter(fn (DataProperty $property) => $property->type->lazyType !== null && array_key_exists($property->name, $fields))
                     ->keys()
                     ->all();
+
+                foreach ($includedFields as $includedField) {
+                    // can be null when field is a non data object/collectable or array
+                    $fields[$includedField]?->addIncludedResolvedPartial($includedPartial->next());
+                }
 
                 break;
             }
 
             if ($nested = $includedPartial->getNested()) {
-                $fields[$nested]->includedPartials->attach($includedPartial->next());
+                $fields[$nested]->addIncludedResolvedPartial($includedPartial->next());
                 $includedFields[] = $nested;
 
                 continue;
@@ -228,8 +228,11 @@ class VisibleDataFieldsResolver
         return $includedFields;
     }
 
+    /**
+     * @param array<string, TransformationContext|null> $fields
+     */
     protected function resolveExcludedFields(
-        array $fields,
+        array &$fields,
         TransformationContext $transformationContext,
         DataClass $dataClass
     ): array {
@@ -243,15 +246,19 @@ class VisibleDataFieldsResolver
             if ($excludedPartial->isAll()) {
                 $excludedFields = $dataClass
                     ->properties
-                    ->filter(fn (DataProperty $property) => $property->type->lazyType !== null)
+                    ->filter(fn (DataProperty $property) => $property->type->lazyType !== null && array_key_exists($property->name, $fields))
                     ->keys()
                     ->all();
+
+                foreach ($excludedFields as $excludedField) {
+                    $fields[$excludedField]?->addExcludedResolvedPartial($excludedPartial->next());
+                }
 
                 break;
             }
 
             if ($nested = $excludedPartial->getNested()) {
-                $fields[$nested]->excludedPartials->attach($excludedPartial->next());
+                $fields[$nested]->addExcludedResolvedPartial($excludedPartial->next());
                 $excludedFields[] = $nested;
 
                 continue;

@@ -19,62 +19,78 @@ class TransformationContextFactory
     }
 
     /**
-     * @param SplObjectStorage<Partial> $includedPartials
-     * @param SplObjectStorage<Partial> $excludedPartials
-     * @param SplObjectStorage<Partial> $onlyPartials
-     * @param SplObjectStorage<Partial> $exceptPartials
+     * @param ?SplObjectStorage<Partial> $includedPartials
+     * @param ?SplObjectStorage<Partial> $excludedPartials
+     * @param ?SplObjectStorage<Partial> $onlyPartials
+     * @param ?SplObjectStorage<Partial> $exceptPartials
      */
     protected function __construct(
         public bool $transformValues = true,
         public bool $mapPropertyNames = true,
         public WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
-        public SplObjectStorage $includedPartials = new SplObjectStorage(),
-        public SplObjectStorage $excludedPartials = new SplObjectStorage(),
-        public SplObjectStorage $onlyPartials = new SplObjectStorage(),
-        public SplObjectStorage $exceptPartials = new SplObjectStorage(),
+        public ?SplObjectStorage $includedPartials = null,
+        public ?SplObjectStorage $excludedPartials = null,
+        public ?SplObjectStorage $onlyPartials = null,
+        public ?SplObjectStorage $exceptPartials = null,
     ) {
     }
 
     public function get(
         BaseData|BaseDataCollectable $data,
     ): TransformationContext {
-        $includedPartials = new SplObjectStorage();
+        $includedPartials = null;
 
-        foreach ($this->includedPartials as $include) {
-            $resolved = $include->resolve($data);
+        if ($this->includedPartials) {
+            $includedPartials = new SplObjectStorage();
 
-            if($resolved) {
-                $includedPartials->attach($resolved);
+            foreach ($this->includedPartials as $include) {
+                $resolved = $include->resolve($data);
+
+                if ($resolved) {
+                    $includedPartials->attach($resolved);
+                }
             }
         }
 
-        $excludedPartials = new SplObjectStorage();
+        $excludedPartials = null;
 
-        foreach ($this->excludedPartials as $exclude) {
-            $resolved = $exclude->resolve($data);
+        if ($this->excludedPartials) {
+            $excludedPartials = new SplObjectStorage();
 
-            if($resolved) {
-                $excludedPartials->attach($resolved);
+            foreach ($this->excludedPartials as $exclude) {
+                $resolved = $exclude->resolve($data);
+
+                if ($resolved) {
+                    $excludedPartials->attach($resolved);
+                }
             }
         }
 
-        $onlyPartials = new SplObjectStorage();
+        $onlyPartials = null;
 
-        foreach ($this->onlyPartials as $only) {
-            $resolved = $only->resolve($data);
+        if ($this->onlyPartials) {
+            $onlyPartials = new SplObjectStorage();
 
-            if($resolved) {
-                $onlyPartials->attach($resolved);
+            foreach ($this->onlyPartials as $only) {
+                $resolved = $only->resolve($data);
+
+                if ($resolved) {
+                    $onlyPartials->attach($resolved);
+                }
             }
         }
 
-        $exceptPartials = new SplObjectStorage();
+        $exceptPartials = null;
 
-        foreach ($this->exceptPartials as $except) {
-            $resolved = $except->resolve($data);
+        if ($this->exceptPartials) {
+            $exceptPartials = new SplObjectStorage();
 
-            if($resolved) {
-                $exceptPartials->attach($resolved);
+            foreach ($this->exceptPartials as $except) {
+                $resolved = $except->resolve($data);
+
+                if ($resolved) {
+                    $exceptPartials->attach($resolved);
+                }
             }
         }
 
@@ -112,6 +128,10 @@ class TransformationContextFactory
 
     public function addIncludePartial(Partial ...$partial): static
     {
+        if ($this->includedPartials === null) {
+            $this->includedPartials = new SplObjectStorage();
+        }
+
         foreach ($partial as $include) {
             $this->includedPartials->attach($include);
         }
@@ -121,6 +141,10 @@ class TransformationContextFactory
 
     public function addExcludePartial(Partial ...$partial): static
     {
+        if ($this->excludedPartials === null) {
+            $this->excludedPartials = new SplObjectStorage();
+        }
+
         foreach ($partial as $exclude) {
             $this->excludedPartials->attach($exclude);
         }
@@ -130,6 +154,10 @@ class TransformationContextFactory
 
     public function addOnlyPartial(Partial ...$partial): static
     {
+        if ($this->onlyPartials === null) {
+            $this->onlyPartials = new SplObjectStorage();
+        }
+
         foreach ($partial as $only) {
             $this->onlyPartials->attach($only);
         }
@@ -139,6 +167,10 @@ class TransformationContextFactory
 
     public function addExceptPartial(Partial ...$partial): static
     {
+        if ($this->exceptPartials === null) {
+            $this->exceptPartials = new SplObjectStorage();
+        }
+
         foreach ($partial as $except) {
             $this->exceptPartials->attach($except);
         }
@@ -151,6 +183,10 @@ class TransformationContextFactory
      */
     public function mergeIncludePartials(SplObjectStorage $partials): static
     {
+        if ($this->includedPartials === null) {
+            $this->includedPartials = new SplObjectStorage();
+        }
+
         $this->includedPartials->addAll($partials);
 
         return $this;
@@ -161,6 +197,10 @@ class TransformationContextFactory
      */
     public function mergeExcludePartials(SplObjectStorage $partials): static
     {
+        if ($this->excludedPartials === null) {
+            $this->excludedPartials = new SplObjectStorage();
+        }
+
         $this->excludedPartials->addAll($partials);
 
         return $this;
@@ -171,6 +211,10 @@ class TransformationContextFactory
      */
     public function mergeOnlyPartials(SplObjectStorage $partials): static
     {
+        if ($this->onlyPartials === null) {
+            $this->onlyPartials = new SplObjectStorage();
+        }
+
         $this->onlyPartials->addAll($partials);
 
         return $this;
@@ -181,6 +225,10 @@ class TransformationContextFactory
      */
     public function mergeExceptPartials(SplObjectStorage $partials): static
     {
+        if ($this->exceptPartials === null) {
+            $this->exceptPartials = new SplObjectStorage();
+        }
+
         $this->exceptPartials->addAll($partials);
 
         return $this;

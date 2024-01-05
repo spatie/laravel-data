@@ -879,20 +879,6 @@ it('can conditionally define except using multiple class defaults', function () 
         ]);
 });
 
-test('except has precedence over only', function () {
-    $data = new MultiData('Hello', 'World');
-
-    expect(
-        (clone $data)->onlyWhen('first', true)
-            ->exceptWhen('first', true)
-            ->toArray()
-    )->toMatchArray(['second' => 'World']);
-
-    expect(
-        (clone $data)->exceptWhen('first', true)->onlyWhen('first', true)->toArray()
-    )->toMatchArray(['second' => 'World']);
-})->skip('We know first perform except and then only, test can be removed');
-
 it('can perform only and except on array properties', function () {
     $data = new class ('Hello World', ['string' => 'Hello World', 'int' => 42]) extends Data {
         public function __construct(
@@ -1087,37 +1073,35 @@ it('can disable manually excluding data in the request (collection)', function (
         ]);
 });
 
-it('can work with the different types of lazy data collections', function (
-    Data $dataClass,
-    Closure $itemsClosure
-) {
-    $data = $dataClass::from([
-        'lazyCollection' => $itemsClosure([
-            SimpleData::from('A'),
-            SimpleData::from('B'),
-        ]),
+it('can work with lazy array data collections', function () {
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(SimpleData::class)]
+        public Lazy|array $lazyCollection;
 
-        'nestedLazyCollection' => $itemsClosure([
-            NestedLazyData::from('C'),
-            NestedLazyData::from('D'),
-        ]),
+        #[DataCollectionOf(NestedLazyData::class)]
+        public Lazy|array $nestedLazyCollection;
+    };
+
+    $dataClass->lazyCollection = Lazy::create(fn () => [
+        SimpleData::from('A'),
+        SimpleData::from('B'),
     ]);
 
-    expect($data->toArray())->toMatchArray([]);
+    $dataClass->nestedLazyCollection = Lazy::create(fn () => [
+        NestedLazyData::from('C'),
+        NestedLazyData::from('D'),
+    ]);
 
-    expect($data->include('lazyCollection')->toArray())->toMatchArray([
+    expect($dataClass->toArray())->toMatchArray([]);
+
+    expect($dataClass->include('lazyCollection')->toArray())->toMatchArray([
         'lazyCollection' => [
             ['string' => 'A'],
             ['string' => 'B'],
         ],
-
-        'nestedLazyCollection' => [
-            [],
-            [],
-        ],
     ]);
 
-    expect($data->include('lazyCollection', 'nestedLazyCollection.simple')->toArray())->toMatchArray([
+    expect($dataClass->include('lazyCollection', 'nestedLazyCollection.simple')->toArray())->toMatchArray([
         'lazyCollection' => [
             ['string' => 'A'],
             ['string' => 'B'],
@@ -1128,40 +1112,90 @@ it('can work with the different types of lazy data collections', function (
             ['simple' => ['string' => 'D']],
         ],
     ]);
-})->with(function () {
-    yield 'array' => [
-        fn () => new class () extends Data {
-            #[DataCollectionOf(SimpleData::class)]
-            public Lazy|array $lazyCollection;
+});
 
-            #[DataCollectionOf(NestedLazyData::class)]
-            public Lazy|array $nestedLazyCollection;
-        },
-        fn () => fn (array $items) => $items,
-    ];
+it('can work with lazy laravel data collections', function () {
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(SimpleData::class)]
+        public Lazy|Collection $lazyCollection;
 
-    yield 'collection' => [
-        fn () => new class () extends Data {
-            #[DataCollectionOf(SimpleData::class)]
-            public Lazy|Collection $lazyCollection;
+        #[DataCollectionOf(NestedLazyData::class)]
+        public Lazy|Collection $nestedLazyCollection;
+    };
 
-            #[DataCollectionOf(NestedLazyData::class)]
-            public Lazy|Collection $nestedLazyCollection;
-        },
-        fn () => fn (array $items) => $items,
-    ];
+    $dataClass->lazyCollection = Lazy::create(fn () => collect([
+        SimpleData::from('A'),
+        SimpleData::from('B'),
+    ]));
 
-    yield 'paginator' => [
-        fn () => new class () extends Data {
-            #[DataCollectionOf(SimpleData::class)]
-            public Lazy|LengthAwarePaginator $lazyCollection;
+    $dataClass->nestedLazyCollection = Lazy::create(fn () => collect([
+        NestedLazyData::from('C'),
+        NestedLazyData::from('D'),
+    ]));
 
-            #[DataCollectionOf(NestedLazyData::class)]
-            public Lazy|LengthAwarePaginator $nestedLazyCollection;
-        },
-        fn () => fn (array $items) => new LengthAwarePaginator($items, count($items), 15),
-    ];
-})->skip('Impelemnt further');
+    expect($dataClass->toArray())->toMatchArray([]);
+
+    expect($dataClass->include('lazyCollection')->toArray())->toMatchArray([
+        'lazyCollection' => [
+            ['string' => 'A'],
+            ['string' => 'B'],
+        ],
+    ]);
+
+    expect($dataClass->include('lazyCollection', 'nestedLazyCollection.simple')->toArray())->toMatchArray([
+        'lazyCollection' => [
+            ['string' => 'A'],
+            ['string' => 'B'],
+        ],
+
+        'nestedLazyCollection' => [
+            ['simple' => ['string' => 'C']],
+            ['simple' => ['string' => 'D']],
+        ],
+    ]);
+});
+
+it('can work with lazy laravel data paginators', function () {
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(SimpleData::class)]
+        public Lazy|Collection $lazyCollection;
+
+        #[DataCollectionOf(NestedLazyData::class)]
+        public Lazy|Collection $nestedLazyCollection;
+    };
+
+    $dataClass->lazyCollection = Lazy::create(fn () => new LengthAwarePaginator([
+        SimpleData::from('A'),
+        SimpleData::from('B'),
+    ], total: 15, perPage: 15));
+
+    $dataClass->nestedLazyCollection = Lazy::create(fn () => new LengthAwarePaginator([
+        NestedLazyData::from('C'),
+        NestedLazyData::from('D'),
+    ], total: 15, perPage: 15));
+
+    expect($dataClass->toArray())->toMatchArray([]);
+
+
+    $array = $dataClass->include('lazyCollection')->toArray();
+
+    expect($array['lazyCollection']['data'])->toMatchArray([
+        ['string' => 'A'],
+        ['string' => 'B'],
+    ]);
+    expect($array)->not()->toHaveKey('nestedLazyCollection');
+
+    $array = $dataClass->include('lazyCollection', 'nestedLazyCollection.simple')->toArray();
+
+    expect($array['lazyCollection']['data'])->toMatchArray([
+        ['string' => 'A'],
+        ['string' => 'B'],
+    ]);
+    expect($array['nestedLazyCollection']['data'])->toMatchArray([
+        ['simple' => ['string' => 'C']],
+        ['simple' => ['string' => 'D']],
+    ]);
+});
 
 it('partials are always reset when transforming again', function () {
     $dataClass = new class (Lazy::create(fn () => NestedLazyData::from('Hello World'))) extends Data {
@@ -1170,11 +1204,6 @@ it('partials are always reset when transforming again', function () {
         ) {
         }
     };
-
-    dd($dataClass->include('nested')->exclude()->toArray());
-    // ['nested' => ['simple' => ['string' => 'Hello World']],]
-    $dataClass->toArray();
-    // ['nested' => ['simple' => ['string' => 'Hello World']],]
 
     expect($dataClass->include('nested.simple')->toArray())->toBe([
         'nested' => ['simple' => ['string' => 'Hello World']],
@@ -1185,8 +1214,228 @@ it('partials are always reset when transforming again', function () {
     ]);
 
     expect($dataClass->include()->toArray())->toBeEmpty();
-})->skip('Add a reset partials method');
+});
+
+it('can define permanent partials which will always be used', function () {
+    $dataClass = new class(
+        Lazy::create(fn () => NestedLazyData::from('Hello World')),
+        Lazy::create(fn () => 'Hello World'),
+    ) extends Data {
+        public function __construct(
+            public Lazy|NestedLazyData $nested,
+            public Lazy|string $string,
+        ) {
+        }
+
+        protected function includeProperties(): array
+        {
+            return [
+                'nested.simple',
+            ];
+        }
+    };
+
+    expect($dataClass->toArray())->toBe([
+        'nested' => ['simple' => ['string' => 'Hello World']],
+    ]);
+
+    expect($dataClass->include('string')->toArray())->toBe([
+        'nested' => ['simple' => ['string' => 'Hello World']],
+        'string' => 'Hello World',
+    ]);
+
+    expect($dataClass->toArray())->toBe([
+        'nested' => ['simple' => ['string' => 'Hello World']],
+    ]);
+});
+
+it('can combine multiple partials', function (
+    array $include,
+    array $exclude,
+    array $only,
+    array $except,
+    array $expected
+) {
+    $dataClass = new class(
+        Lazy::create(fn () => NestedLazyData::from('Hello World')),
+        Lazy::create(fn () => NestedLazyData::collect(['Hello', 'World'])),
+        Lazy::create(fn () => SimpleData::from('Hello World')),
+        Lazy::create(fn () => MultiLazyData::from('Hello', 'World', 42)),
+        Lazy::create(fn () => 'Hello World')->defaultIncluded(),
+    ) extends Data {
+        public function __construct(
+            public Lazy|NestedLazyData $nested,
+            #[DataCollectionOf(NestedLazyData::class)]
+            public Lazy|array $collection,
+            public Lazy|SimpleData $simple,
+            public Lazy|MultiLazyData $multi,
+            public Lazy|string $string,
+        ) {
+        }
+    };
+
+    $array = $dataClass->include(...$include)->exclude(...$exclude)->only(...$only)->except(...$except)->toArray();
+
+    expect($array)->toMatchArray($expected);
+})->with(function () {
+    yield 'no includes' => [
+        'include' => [],
+        'exclude' => [],
+        'only' => [],
+        'except' => [],
+        'expected' => [
+            'string' => 'Hello World',
+        ],
+    ];
+
+    yield 'include and exclude' => [
+        'include' => ['simple'],
+        'exclude' => ['string'],
+        'only' => [],
+        'except' => [],
+        'expected' => [
+            'simple' => ['string' => 'Hello World'],
+        ],
+    ];
+
+    yield 'combined include' => [
+        'include' => ['multi.*', 'simple', 'collection.*'],
+        'exclude' => [],
+        'only' => [],
+        'except' => [],
+        'expected' => [
+            'collection' => [
+                ['simple' => ['string' => 'Hello']],
+                ['simple' => ['string' => 'World']],
+            ],
+            'simple' => ['string' => 'Hello World'],
+            'multi' => [
+                'artist' => 'Hello',
+                'name' => 'World',
+                'year' => 42,
+            ],
+            'string' => 'Hello World',
+        ],
+    ];
+
+    yield 'included similar paths' => [
+        'include' => ['multi.artist', 'multi.name'],
+        'exclude' => [],
+        'only' => [],
+        'except' => [],
+        'expected' => [
+            'multi' => [
+                'artist' => 'Hello',
+                'name' => 'World',
+            ],
+            'string' => 'Hello World',
+        ],
+    ];
+
+    yield 'include all' => [
+        'include' => ['*'],
+        'exclude' => [],
+        'only' => [],
+        'except' => [],
+        'expected' => [
+            'collection' => [
+                ['simple' => ['string' => 'Hello']],
+                ['simple' => ['string' => 'World']],
+            ],
+            'simple' => ['string' => 'Hello World'],
+            'multi' => [
+                'artist' => 'Hello',
+                'name' => 'World',
+                'year' => 42,
+            ],
+            'string' => 'Hello World',
+        ],
+    ];
+
+    yield 'except and only' => [
+        'include' => ['multi.*'],
+        'exclude' => [],
+        'only' => ['multi.{artist,name}'],
+        'except' => ['multi.year'],
+        'expected' => [
+            'multi' => [
+                'artist' => 'Hello',
+                'name' => 'World',
+            ],
+        ],
+    ];
+});
 
 it('can set partials on a nested data object and these will be respected', function () {
+    class TestMultiLazyNestedDataWithObjectAndCollection extends Data
+    {
+        public function __construct(
+            public Lazy|NestedLazyData $nested,
+            #[DataCollectionOf(NestedLazyData::class)]
+            public Lazy|array $nestedCollection,
+        ) {
+        }
+    }
 
-})->skip('Impelemnt');
+    $collection = new DataCollection(\TestMultiLazyNestedDataWithObjectAndCollection::class, [
+        new \TestMultiLazyNestedDataWithObjectAndCollection(
+            NestedLazyData::from('A'),
+            [
+                NestedLazyData::from('B1')->include('simple'),
+                NestedLazyData::from('B2'),
+            ],
+        ),
+        new \TestMultiLazyNestedDataWithObjectAndCollection(
+            NestedLazyData::from('C'),
+            [
+                NestedLazyData::from('D1'),
+                NestedLazyData::from('D2')->include('simple.string'),
+            ],
+        ),
+    ]);
+
+    $collection->include('nested.simple');
+
+    $data = new class(Lazy::create(fn () => $collection)) extends Data {
+        public function __construct(
+            #[DataCollectionOf(\TestMultiLazyNestedDataWithObjectAndCollection::class)]
+            public Lazy|DataCollection $collection
+        ) {
+        }
+    };
+
+    expect($data->include('collection')->toArray())->toMatchArray([
+        'collection' => [
+            [
+                'nested' => [
+                    'simple' => [
+                        'string' => 'A',
+                    ],
+                ],
+                'nestedCollection' => [
+                    [
+                        'simple' => [
+                            'string' => 'B1',
+                        ],
+                    ],
+                    [],
+                ],
+            ],
+            [
+                'nested' => [
+                    'simple' => [
+                        'string' => 'C',
+                    ],
+                ],
+                'nestedCollection' => [
+                    [],
+                    [
+                        'simple' => [
+                            'string' => 'D2',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ]);
+});

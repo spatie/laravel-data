@@ -108,9 +108,13 @@ class TransformedDataResolver
                 WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled
             };
 
-            return $value->transform(
-                $fieldContext->setWrapExecutionType($wrapExecutionType)
-            );
+            $context = clone $fieldContext->setWrapExecutionType($wrapExecutionType);
+
+            $transformed = $value->transform($context);
+
+            $context->rollBackPartialsWhenRequired();
+
+            return $transformed;
         }
 
         if (
@@ -124,9 +128,13 @@ class TransformedDataResolver
                 WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled
             };
 
-            return $value->transform(
-                $fieldContext->setWrapExecutionType($wrapExecutionType)
-            );
+            $context = clone $fieldContext->setWrapExecutionType($wrapExecutionType);
+
+            $transformed = $value->transform($context);
+
+            $context->rollBackPartialsWhenRequired();
+
+            return $transformed;
         }
 
         if (
@@ -153,7 +161,7 @@ class TransformedDataResolver
         array $value,
         TransformationContext $fieldContext,
     ): array {
-        if ($fieldContext->exceptPartials->count() > 0) {
+        if ($fieldContext->exceptPartials && $fieldContext->exceptPartials->count() > 0) {
             $partials = [];
 
             foreach ($fieldContext->exceptPartials as $exceptPartial) {
@@ -163,7 +171,7 @@ class TransformedDataResolver
             return Arr::except($value, $partials);
         }
 
-        if ($fieldContext->onlyPartials->count() > 0) {
+        if ($fieldContext->onlyPartials && $fieldContext->onlyPartials->count() > 0) {
             $partials = [];
 
             foreach ($fieldContext->onlyPartials as $onlyPartial) {

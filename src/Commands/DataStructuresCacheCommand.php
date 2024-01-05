@@ -30,10 +30,12 @@ class DataStructuresCacheCommand extends Command
 
         $progressBar = $this->output->createProgressBar(count($dataClasses));
 
-        foreach ($dataClasses as $dataClass) {
-            $dataStructureCache->storeDataClass(
-                DataClass::create(new ReflectionClass($dataClass))
-            );
+        foreach ($dataClasses as $dataClassString) {
+            $dataClass = DataClass::create(new ReflectionClass($dataClassString));
+
+            $dataClass->prepareForCache();
+
+            $dataStructureCache->storeDataClass($dataClass);
 
             $progressBar->advance();
         }
