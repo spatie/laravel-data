@@ -35,24 +35,26 @@ class TransformedDataCollectionResolver
             ? $items->getWrap()
             : new Wrap(WrapType::UseGlobal);
 
-        $nestedContext = $context->wrapExecutionType->shouldExecute()
-            ? (clone $context)->setWrapExecutionType(WrapExecutionType::TemporarilyDisabled)
+        $executeWrap = $context->wrapExecutionType->shouldExecute();
+
+        $nestedContext = $executeWrap
+            ? $context->setWrapExecutionType(WrapExecutionType::TemporarilyDisabled)
             : $context;
 
         if ($items instanceof DataCollection) {
-            return $this->transformItems($items->items(), $wrap, $context, $nestedContext);
+            return $this->transformItems($items->items(), $wrap, $executeWrap, $nestedContext);
         }
 
         if ($items instanceof Enumerable || is_array($items)) {
-            return $this->transformItems($items, $wrap, $context, $nestedContext);
+            return $this->transformItems($items, $wrap, $executeWrap, $nestedContext);
         }
 
         if ($items instanceof PaginatedDataCollection || $items instanceof CursorPaginatedDataCollection) {
-            return $this->transformPaginator($items->items(), $wrap, $context, $nestedContext);
+            return $this->transformPaginator($items->items(), $wrap, $nestedContext);
         }
 
         if ($items instanceof Paginator || $items instanceof CursorPaginator) {
-            return $this->transformPaginator($items, $wrap, $context, $nestedContext);
+            return $this->transformPaginator($items, $wrap, $nestedContext);
         }
 
         throw new Exception("Cannot transform collection");
@@ -61,7 +63,7 @@ class TransformedDataCollectionResolver
     protected function transformItems(
         Enumerable|array $items,
         Wrap $wrap,
-        TransformationContext $context,
+        bool $executeWrap,
         TransformationContext $nestedContext,
     ): array {
         $collection = [];
@@ -70,7 +72,7 @@ class TransformedDataCollectionResolver
             $collection[$key] = $this->transformationClosure($nestedContext)($value);
         }
 
-        return $context->wrapExecutionType->shouldExecute()
+        return $executeWrap
             ? $wrap->wrap($collection)
             : $collection;
     }
@@ -78,12 +80,11 @@ class TransformedDataCollectionResolver
     protected function transformPaginator(
         Paginator|CursorPaginator $paginator,
         Wrap $wrap,
-        TransformationContext $context,
         TransformationContext $nestedContext,
     ): array {
         $paginator = $paginator->through(fn (BaseData $data) => $this->transformationClosure($nestedContext)($data));
 
-        if ($context->transformValues === false) {
+        if ($nestedContext->transformValues === false) {
             return $paginator->all();
         }
 
@@ -102,14 +103,14 @@ class TransformedDataCollectionResolver
     }
 
     protected function transformationClosure(
-        TransformationContext $context,
+        TransformationContext $nestedContext,
     ): Closure {
-        return function (BaseData $data) use ($context) {
-            if (! $data instanceof TransformableData || ! $context->transformValues) {
+        return function (BaseData $data) use ($nestedContext) {
+            if (! $data instanceof TransformableData || ! $nestedContext->transformValues) {
                 return $data;
             }
 
-            return $data->transform(clone $context);
+            return $data->transform(clone $nestedContext);
         };
     }
 }
