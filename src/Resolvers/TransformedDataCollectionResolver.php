@@ -36,7 +36,7 @@ class TransformedDataCollectionResolver
             : new Wrap(WrapType::UseGlobal);
 
         $nestedContext = $context->wrapExecutionType->shouldExecute()
-            ? $context->setWrapExecutionType(WrapExecutionType::TemporarilyDisabled)
+            ? (clone $context)->setWrapExecutionType(WrapExecutionType::TemporarilyDisabled)
             : $context;
 
         if ($items instanceof DataCollection) {

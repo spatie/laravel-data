@@ -962,7 +962,7 @@ it('can magically create a data object', function () {
         ->and($dataClass::from(new EnumData(DummyBackedEnum::FOO)))->toEqual(new $dataClass('data', '{"enum":"foo"}'));
 });
 
-it('can wrap data objects', function () {
+it('can wrap data objects by method call', function () {
     expect(
         SimpleData::from('Hello World')
             ->wrap('wrap')

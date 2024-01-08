@@ -25,17 +25,9 @@ class TransformationContext implements Stringable
 
     public function setWrapExecutionType(WrapExecutionType $wrapExecutionType): self
     {
-        // Todo: remove and run directly on object
+        $this->wrapExecutionType = $wrapExecutionType;
 
-        return new self(
-            $this->transformValues,
-            $this->mapPropertyNames,
-            $wrapExecutionType,
-            $this->includedPartials,
-            $this->excludedPartials,
-            $this->onlyPartials,
-            $this->exceptPartials,
-        );
+        return $this;
     }
 
     public function addIncludedResolvedPartial(ResolvedPartial ...$resolvedPartials): void
@@ -166,7 +158,7 @@ class TransformationContext implements Stringable
 
     public function __toString(): string
     {
-        $output = 'Transformation Context '.spl_object_id($this).PHP_EOL;
+        $output = 'Transformation Context ('.spl_object_id($this).')'.PHP_EOL;
 
         $output .= "- wrapExecutionType: {$this->wrapExecutionType->name}".PHP_EOL;
 
@@ -179,31 +171,19 @@ class TransformationContext implements Stringable
         }
 
         if ($this->includedPartials !== null && $this->includedPartials->count() > 0) {
-            $output .= "- includedPartials:".PHP_EOL;
-            foreach ($this->includedPartials as $includedPartial) {
-                $output .= "  - {$includedPartial}".PHP_EOL;
-            }
+            $output .= $this->includedPartials;
         }
 
         if ($this->excludedPartials !== null && $this->excludedPartials->count() > 0) {
-            $output .= "- excludedPartials:".PHP_EOL;
-            foreach ($this->excludedPartials as $excludedPartial) {
-                $output .= "  - {$excludedPartial}".PHP_EOL;
-            }
+            $output .= $this->excludedPartials;
         }
 
         if ($this->onlyPartials !== null && $this->onlyPartials->count() > 0) {
-            $output .= "- onlyPartials:".PHP_EOL;
-            foreach ($this->onlyPartials as $onlyPartial) {
-                $output .= "  - {$onlyPartial}".PHP_EOL;
-            }
+            $output .= $this->onlyPartials;
         }
 
         if ($this->exceptPartials !== null && $this->exceptPartials->count() > 0) {
-            $output .= "- exceptPartials:".PHP_EOL;
-            foreach ($this->exceptPartials as $exceptPartial) {
-                $output .= "  - {$exceptPartial}".PHP_EOL;
-            }
+            $output .= $this->exceptPartials;
         }
 
         return $output;
