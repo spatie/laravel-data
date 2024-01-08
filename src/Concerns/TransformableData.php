@@ -29,27 +29,25 @@ trait TransformableData
 
         $dataContext = $this->getDataContext();
 
-        /** @var TransformationContext $transformationContext */
-
-        if ($dataContext->includePartials->count() > 0) {
+        if ($dataContext->includePartials && $dataContext->includePartials->count() > 0) {
             $transformationContext->mergeIncludedResolvedPartials(
                 $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($this, $dataContext->includePartials)
             );
         }
 
-        if ($dataContext->excludePartials->count() > 0) {
+        if ($dataContext->excludePartials && $dataContext->excludePartials->count() > 0) {
             $transformationContext->mergeExcludedResolvedPartials(
                 $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($this, $dataContext->excludePartials)
             );
         }
 
-        if ($dataContext->onlyPartials->count() > 0) {
+        if ($dataContext->onlyPartials && $dataContext->onlyPartials->count() > 0) {
             $transformationContext->mergeOnlyResolvedPartials(
                 $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($this, $dataContext->onlyPartials)
             );
         }
 
-        if ($dataContext->exceptPartials->count() > 0) {
+        if ($dataContext->exceptPartials && $dataContext->exceptPartials->count() > 0) {
             $transformationContext->mergeExceptResolvedPartials(
                 $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($this, $dataContext->exceptPartials)
             );

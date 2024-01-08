@@ -8,12 +8,12 @@ use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Partials\Partial;
+use Spatie\LaravelData\Support\Partials\PartialsCollection;
 use Spatie\LaravelData\Support\Partials\PartialType;
 use Spatie\LaravelData\Support\Partials\Segments\AllPartialSegment;
 use Spatie\LaravelData\Support\Partials\Segments\FieldsPartialSegment;
 use Spatie\LaravelData\Support\Partials\Segments\NestedPartialSegment;
 use Spatie\LaravelData\Support\Partials\Segments\PartialSegment;
-use SplObjectStorage;
 use TypeError;
 
 class RequestQueryStringPartialsResolver
@@ -27,7 +27,7 @@ class RequestQueryStringPartialsResolver
         BaseData|BaseDataCollectable $data,
         Request $request,
         PartialType $type
-    ): ?SplObjectStorage {
+    ): ?PartialsCollection {
         $parameter = $type->getRequestParameterName();
 
         if (! $request->has($parameter)) {
@@ -40,7 +40,7 @@ class RequestQueryStringPartialsResolver
             default => throw new TypeError('Invalid type of data')
         });
 
-        $partials = new SplObjectStorage();
+        $partials = new PartialsCollection();
 
         $partialStrings = is_array($request->get($parameter))
             ? $request->get($parameter)

@@ -3,24 +3,25 @@
 namespace Spatie\LaravelData\Support\Partials;
 
 use Closure;
-use SplObjectStorage;
 
 trait ForwardsToPartialsDefinition
 {
     /**
      * @return object{
-     *     includePartials: SplObjectStorage<Partial>,
-     *     excludePartials: SplObjectStorage<Partial>,
-     *     onlyPartials: SplObjectStorage<Partial>,
-     *     exceptPartials: SplObjectStorage<Partial>,
+     *     includePartials: ?PartialsCollection,
+     *     excludePartials: ?PartialsCollection,
+     *     onlyPartials: ?PartialsCollection,
+     *     exceptPartials: ?PartialsCollection,
      * }
      */
     abstract protected function getPartialsContainer(): object;
 
     public function include(string ...$includes): static
     {
+        $partialsCollection = $this->getPartialsContainer()->includePartials ??= new PartialsCollection();
+
         foreach ($includes as $include) {
-            $this->getPartialsContainer()->includePartials->attach(Partial::create($include));
+            $partialsCollection->attach(Partial::create($include));
         }
 
         return $this;
@@ -28,8 +29,10 @@ trait ForwardsToPartialsDefinition
 
     public function exclude(string ...$excludes): static
     {
+        $partialsCollection = $this->getPartialsContainer()->excludePartials ??= new PartialsCollection();
+
         foreach ($excludes as $exclude) {
-            $this->getPartialsContainer()->excludePartials->attach(Partial::create($exclude));
+            $partialsCollection->attach(Partial::create($exclude));
         }
 
         return $this;
@@ -37,8 +40,10 @@ trait ForwardsToPartialsDefinition
 
     public function only(string ...$only): static
     {
+        $partialsCollection = $this->getPartialsContainer()->onlyPartials ??= new PartialsCollection();
+
         foreach ($only as $onlyDefinition) {
-            $this->getPartialsContainer()->onlyPartials->attach(Partial::create($onlyDefinition));
+            $partialsCollection->attach(Partial::create($onlyDefinition));
         }
 
         return $this;
@@ -46,8 +51,10 @@ trait ForwardsToPartialsDefinition
 
     public function except(string ...$except): static
     {
+        $partialsCollection = $this->getPartialsContainer()->exceptPartials ??= new PartialsCollection();
+
         foreach ($except as $exceptDefinition) {
-            $this->getPartialsContainer()->exceptPartials->attach(Partial::create($exceptDefinition));
+            $partialsCollection->attach(Partial::create($exceptDefinition));
         }
 
         return $this;
@@ -55,10 +62,12 @@ trait ForwardsToPartialsDefinition
 
     public function includeWhen(string $include, bool|Closure $condition): static
     {
+        $partialsCollection = $this->getPartialsContainer()->includePartials ??= new PartialsCollection();
+
         if (is_callable($condition)) {
-            $this->getPartialsContainer()->includePartials->attach(Partial::createConditional($include, $condition));
+            $partialsCollection->attach(Partial::createConditional($include, $condition));
         } elseif ($condition === true) {
-            $this->getPartialsContainer()->includePartials->attach(Partial::create($include));
+            $partialsCollection->attach(Partial::create($include));
         }
 
         return $this;
@@ -66,10 +75,12 @@ trait ForwardsToPartialsDefinition
 
     public function excludeWhen(string $exclude, bool|Closure $condition): static
     {
+        $partialsCollection = $this->getPartialsContainer()->excludePartials ??= new PartialsCollection();
+
         if (is_callable($condition)) {
-            $this->getPartialsContainer()->excludePartials->attach(Partial::createConditional($exclude, $condition));
+            $partialsCollection->attach(Partial::createConditional($exclude, $condition));
         } elseif ($condition === true) {
-            $this->getPartialsContainer()->excludePartials->attach(Partial::create($exclude));
+            $partialsCollection->attach(Partial::create($exclude));
         }
 
         return $this;
@@ -77,10 +88,12 @@ trait ForwardsToPartialsDefinition
 
     public function onlyWhen(string $only, bool|Closure $condition): static
     {
+        $partialsCollection = $this->getPartialsContainer()->onlyPartials ??= new PartialsCollection();
+
         if (is_callable($condition)) {
-            $this->getPartialsContainer()->onlyPartials->attach(Partial::createConditional($only, $condition));
+            $partialsCollection->attach(Partial::createConditional($only, $condition));
         } elseif ($condition === true) {
-            $this->getPartialsContainer()->onlyPartials->attach(Partial::create($only));
+            $partialsCollection->attach(Partial::create($only));
         }
 
         return $this;
@@ -88,10 +101,12 @@ trait ForwardsToPartialsDefinition
 
     public function exceptWhen(string $except, bool|Closure $condition): static
     {
+        $partialsCollection = $this->getPartialsContainer()->exceptPartials ??= new PartialsCollection();
+
         if (is_callable($condition)) {
-            $this->getPartialsContainer()->exceptPartials->attach(Partial::createConditional($except, $condition));
+            $partialsCollection->attach(Partial::createConditional($except, $condition));
         } elseif ($condition === true) {
-            $this->getPartialsContainer()->exceptPartials->attach(Partial::create($except));
+            $partialsCollection->attach(Partial::create($except));
         }
 
         return $this;

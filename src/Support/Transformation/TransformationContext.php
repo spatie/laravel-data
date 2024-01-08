@@ -3,26 +3,23 @@
 namespace Spatie\LaravelData\Support\Transformation;
 
 use Spatie\LaravelData\Support\Partials\ResolvedPartial;
+use Spatie\LaravelData\Support\Partials\ResolvedPartialsCollection;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
-use SplObjectStorage;
 use Stringable;
 
 class TransformationContext implements Stringable
 {
     /**
-     * @param null|SplObjectStorage<ResolvedPartial> $includedPartials for internal use only
-     * @param null|SplObjectStorage<ResolvedPartial> $excludedPartials for internal use only
-     * @param null|SplObjectStorage<ResolvedPartial> $onlyPartials     for internal use only
-     * @param null|SplObjectStorage<ResolvedPartial> $exceptPartials   for internal use only
+     * @note Do not add extra partials here
      */
     public function __construct(
         public bool $transformValues = true,
         public bool $mapPropertyNames = true,
         public WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
-        public ?SplObjectStorage $includedPartials = null,
-        public ?SplObjectStorage $excludedPartials = null,
-        public ?SplObjectStorage $onlyPartials = null,
-        public ?SplObjectStorage $exceptPartials = null,
+        public ?ResolvedPartialsCollection $includedPartials = null,
+        public ?ResolvedPartialsCollection $excludedPartials = null,
+        public ?ResolvedPartialsCollection $onlyPartials = null,
+        public ?ResolvedPartialsCollection $exceptPartials = null,
     ) {
     }
 
@@ -44,7 +41,7 @@ class TransformationContext implements Stringable
     public function addIncludedResolvedPartial(ResolvedPartial ...$resolvedPartials): void
     {
         if ($this->includedPartials === null) {
-            $this->includedPartials = new SplObjectStorage();
+            $this->includedPartials = new ResolvedPartialsCollection();
         }
 
         foreach ($resolvedPartials as $resolvedPartial) {
@@ -55,7 +52,7 @@ class TransformationContext implements Stringable
     public function addExcludedResolvedPartial(ResolvedPartial ...$resolvedPartials): void
     {
         if ($this->excludedPartials === null) {
-            $this->excludedPartials = new SplObjectStorage();
+            $this->excludedPartials = new ResolvedPartialsCollection();
         }
 
         foreach ($resolvedPartials as $resolvedPartial) {
@@ -66,7 +63,7 @@ class TransformationContext implements Stringable
     public function addOnlyResolvedPartial(ResolvedPartial ...$resolvedPartials): void
     {
         if ($this->onlyPartials === null) {
-            $this->onlyPartials = new SplObjectStorage();
+            $this->onlyPartials = new ResolvedPartialsCollection();
         }
 
         foreach ($resolvedPartials as $resolvedPartial) {
@@ -77,7 +74,7 @@ class TransformationContext implements Stringable
     public function addExceptResolvedPartial(ResolvedPartial ...$resolvedPartials): void
     {
         if ($this->exceptPartials === null) {
-            $this->exceptPartials = new SplObjectStorage();
+            $this->exceptPartials = new ResolvedPartialsCollection();
         }
 
         foreach ($resolvedPartials as $resolvedPartial) {
@@ -85,49 +82,37 @@ class TransformationContext implements Stringable
         }
     }
 
-    /**
-     * @param SplObjectStorage<ResolvedPartial> $partials
-     */
-    public function mergeIncludedResolvedPartials(SplObjectStorage $partials): void
+    public function mergeIncludedResolvedPartials(ResolvedPartialsCollection $partials): void
     {
         if ($this->includedPartials === null) {
-            $this->includedPartials = new SplObjectStorage();
+            $this->includedPartials = new ResolvedPartialsCollection();
         }
 
         $this->includedPartials->addAll($partials);
     }
 
-    /**
-     * @param SplObjectStorage<ResolvedPartial> $partials
-     */
-    public function mergeExcludedResolvedPartials(SplObjectStorage $partials): void
+    public function mergeExcludedResolvedPartials(ResolvedPartialsCollection $partials): void
     {
         if ($this->excludedPartials === null) {
-            $this->excludedPartials = new SplObjectStorage();
+            $this->excludedPartials = new ResolvedPartialsCollection();
         }
 
         $this->excludedPartials->addAll($partials);
     }
 
-    /**
-     * @param SplObjectStorage<ResolvedPartial> $partials
-     */
-    public function mergeOnlyResolvedPartials(SplObjectStorage $partials): void
+    public function mergeOnlyResolvedPartials(ResolvedPartialsCollection $partials): void
     {
         if ($this->onlyPartials === null) {
-            $this->onlyPartials = new SplObjectStorage();
+            $this->onlyPartials = new ResolvedPartialsCollection();
         }
 
         $this->onlyPartials->addAll($partials);
     }
 
-    /**
-     * @param SplObjectStorage<ResolvedPartial> $partials
-     */
-    public function mergeExceptResolvedPartials(SplObjectStorage $partials): void
+    public function mergeExceptResolvedPartials(ResolvedPartialsCollection $partials): void
     {
         if ($this->exceptPartials === null) {
-            $this->exceptPartials = new SplObjectStorage();
+            $this->exceptPartials = new ResolvedPartialsCollection();
         }
 
         $this->exceptPartials->addAll($partials);

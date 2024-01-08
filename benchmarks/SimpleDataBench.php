@@ -69,9 +69,9 @@ class SimpleDataBench
         $this->data->toArray();
     }
 
-//    #[Revs(500), Iterations(5), BeforeMethods('setup')]
-//    public function benchDataManualTransformation()
-//    {
-//        $this->data->toUserDefinedToArray();
-//    }
+    #[Revs(5000), Iterations(5), BeforeMethods('setup')]
+    public function benchDataManualTransformation()
+    {
+        $this->data->toUserDefinedToArray();
+    }
 }

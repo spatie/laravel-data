@@ -10,6 +10,7 @@ use PhpBench\Benchmark\Metadata\Annotations\Subject;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\LaravelDataServiceProvider;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\MultiNestedData;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
@@ -29,6 +30,14 @@ class DataBench
         return [
             LaravelDataServiceProvider::class,
         ];
+    }
+
+    public function setup()
+    {
+        app(DataConfig::class)->getDataClass(ComplicatedData::class);
+        app(DataConfig::class)->getDataClass(SimpleData::class);
+        app(DataConfig::class)->getDataClass(MultiNestedData::class);
+        app(DataConfig::class)->getDataClass(NestedData::class);
     }
 
     #[Revs(500), Iterations(2)]
