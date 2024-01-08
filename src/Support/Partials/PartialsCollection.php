@@ -9,5 +9,4 @@ use SplObjectStorage;
  */
 class PartialsCollection extends SplObjectStorage
 {
-
 }

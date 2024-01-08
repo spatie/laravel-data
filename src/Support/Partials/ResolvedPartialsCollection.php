@@ -10,7 +10,6 @@ use Stringable;
  */
 class ResolvedPartialsCollection extends SplObjectStorage implements Stringable
 {
-
     public function __toString(): string
     {
         $output = "- excludedPartials:".PHP_EOL;
