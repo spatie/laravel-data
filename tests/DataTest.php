@@ -33,6 +33,8 @@ use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Transformation\TransformationContext;
 use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastable;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
@@ -56,8 +58,8 @@ use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
 use Spatie\LaravelData\Tests\Fakes\UlarData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
+use Spatie\LaravelData\Transformers\Transformer;
 use Spatie\LaravelData\WithData;
-
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can create a resource', function () {
@@ -1527,3 +1529,28 @@ it('throws a readable exception message when the constructor fails', function (
     yield 'no params' => [[], 'Could not create `Spatie\LaravelData\Tests\Fakes\MultiData`: the constructor requires 2 parameters, 0 given. Parameters missing: first, second.'],
     yield 'one param' => [['first' => 'First'], 'Could not create `Spatie\LaravelData\Tests\Fakes\MultiData`: the constructor requires 2 parameters, 1 given. Parameters given: first. Parameters missing: second.'],
 ]);
+
+it('is possible to add extra global transformers when transforming using context', function () {
+    $dataClass = new class extends Data {
+        public DateTime $dateTime;
+    };
+
+    $data = $dataClass::from([
+        'dateTime' => new DateTime(),
+    ]);
+
+    $customTransformer = new class implements Transformer {
+        public function transform(DataProperty $property, mixed $value, TransformationContext $context): string
+        {
+            return "Custom transformed date";
+        }
+    };
+
+    $transformed = $data->transform(
+        TransformationContextFactory::create()->transformer(DateTimeInterface::class, $customTransformer)
+    );
+
+    expect($transformed)->toBe([
+        'dateTime' => 'Custom transformed date',
+    ]);
+});

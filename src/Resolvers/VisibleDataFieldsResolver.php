@@ -39,6 +39,7 @@ class VisibleDataFieldsResolver
                     $transformationContext->transformValues,
                     $transformationContext->mapPropertyNames,
                     $transformationContext->wrapExecutionType,
+                    $transformationContext->transformers,
                 );
             }
         }

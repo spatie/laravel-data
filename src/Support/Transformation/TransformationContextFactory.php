@@ -9,6 +9,7 @@ use Spatie\LaravelData\Support\Partials\Partial;
 use Spatie\LaravelData\Support\Partials\PartialsCollection;
 use Spatie\LaravelData\Support\Partials\ResolvedPartialsCollection;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
+use Spatie\LaravelData\Transformers\Transformer;
 
 class TransformationContextFactory
 {
@@ -23,6 +24,7 @@ class TransformationContextFactory
         public bool $transformValues = true,
         public bool $mapPropertyNames = true,
         public WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
+        public ?GlobalTransformersCollection $transformers = null,
         public ?PartialsCollection $includedPartials = null,
         public ?PartialsCollection $excludedPartials = null,
         public ?PartialsCollection $onlyPartials = null,
@@ -93,6 +95,7 @@ class TransformationContextFactory
             $this->transformValues,
             $this->mapPropertyNames,
             $this->wrapExecutionType,
+            $this->transformers,
             $includedPartials,
             $excludedPartials,
             $onlyPartials,
@@ -117,6 +120,17 @@ class TransformationContextFactory
     public function wrapExecutionType(WrapExecutionType $wrapExecutionType): static
     {
         $this->wrapExecutionType = $wrapExecutionType;
+
+        return $this;
+    }
+
+    public function transformer(string $transformable, Transformer $transformer): static
+    {
+        if ($this->transformers === null) {
+            $this->transformers = new GlobalTransformersCollection();
+        }
+
+        $this->transformers->add($transformable, $transformer);
 
         return $this;
     }

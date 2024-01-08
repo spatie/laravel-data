@@ -16,6 +16,7 @@ class TransformationContext implements Stringable
         public bool $transformValues = true,
         public bool $mapPropertyNames = true,
         public WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
+        public ?GlobalTransformersCollection $transformers = null,
         public ?ResolvedPartialsCollection $includedPartials = null,
         public ?ResolvedPartialsCollection $excludedPartials = null,
         public ?ResolvedPartialsCollection $onlyPartials = null,

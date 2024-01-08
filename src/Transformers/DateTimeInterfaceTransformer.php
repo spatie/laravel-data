@@ -2,9 +2,11 @@
 
 namespace Spatie\LaravelData\Transformers;
 
+use DateTimeInterface;
 use DateTimeZone;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Transformation\TransformationContext;
 
 class DateTimeInterfaceTransformer implements Transformer
 {
@@ -17,9 +19,9 @@ class DateTimeInterfaceTransformer implements Transformer
         [$this->format] = Arr::wrap($format ?? config('data.date_format'));
     }
 
-    public function transform(DataProperty $property, mixed $value): string
+    public function transform(DataProperty $property, mixed $value, TransformationContext $context): string
     {
-        /** @var \DateTimeInterface $value */
+        /** @var DateTimeInterface $value */
         if ($this->setTimeZone) {
             $value = (clone $value)->setTimezone(new DateTimeZone($this->setTimeZone));
         }

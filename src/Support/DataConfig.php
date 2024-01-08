@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Support;
 use ReflectionClass;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Support\Transformation\GlobalTransformersCollection;
 use Spatie\LaravelData\Transformers\Transformer;
 
 class DataConfig
@@ -12,8 +13,7 @@ class DataConfig
     /** @var array<string, \Spatie\LaravelData\Support\DataClass> */
     protected array $dataClasses = [];
 
-    /** @var array<string, \Spatie\LaravelData\Transformers\Transformer> */
-    protected array $transformers = [];
+    public GlobalTransformersCollection $transformers;
 
     /** @var array<string, \Spatie\LaravelData\Casts\Cast> */
     protected array $casts = [];
@@ -33,8 +33,10 @@ class DataConfig
             $config['rule_inferrers'] ?? []
         );
 
+        $this->transformers = new GlobalTransformersCollection();
+
         foreach ($config['transformers'] ?? [] as $transformable => $transformer) {
-            $this->transformers[ltrim($transformable, ' \\')] = app($transformer);
+            $this->transformers->add($transformable, app($transformer));
         }
 
         foreach ($config['casts'] ?? [] as $castable => $cast) {
@@ -69,25 +71,6 @@ class DataConfig
                 if ($cast = $this->casts[$type] ?? null) {
                     return $cast;
                 }
-            }
-        }
-
-        return null;
-    }
-
-    public function findGlobalTransformerForValue(mixed $value): ?Transformer
-    {
-        if (gettype($value) !== 'object') {
-            return null;
-        }
-
-        foreach ($this->transformers as $transformable => $transformer) {
-            if ($value::class === $transformable) {
-                return $transformer;
-            }
-
-            if (is_a($value::class, $transformable, true)) {
-                return $transformer;
             }
         }
 

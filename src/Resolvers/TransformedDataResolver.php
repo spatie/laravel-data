@@ -94,7 +94,7 @@ class TransformedDataResolver
         }
 
         if ($transformer = $this->resolveTransformerForValue($property, $value, $currentContext)) {
-            return $transformer->transform($property, $value);
+            return $transformer->transform($property, $value, $currentContext);
         }
 
         if (is_array($value) && ! $property->type->kind->isDataCollectable()) {
@@ -197,7 +197,15 @@ class TransformedDataResolver
             return null;
         }
 
-        $transformer = $property->transformer ?? $this->dataConfig->findGlobalTransformerForValue($value);
+        $transformer = $property->transformer;
+
+        if ($transformer === null && $context->transformers) {
+            $transformer = $context->transformers->findTransformerForValue($value);
+        }
+
+        if ($transformer === null) {
+            $transformer = $this->dataConfig->transformers->findTransformerForValue($value);
+        }
 
         $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
             && $property->type->kind !== DataTypeKind::Default;
