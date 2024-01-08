@@ -21,14 +21,6 @@ enum DataTypeKind
 
     public function isDataCollectable(): bool
     {
-        return in_array($this, [
-            self::DataCollection,
-            self::DataPaginatedCollection,
-            self::DataCursorPaginatedCollection,
-            self::Array,
-            self::Enumerable,
-            self::Paginator,
-            self::CursorPaginator,
-        ]);
+        return $this !== self::Default && $this !== self::DataObject;
     }
 }

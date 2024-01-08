@@ -15,6 +15,7 @@ use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\MultiNestedData;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use function Amp\Iterator\toArray;
 
 class DataBench
 {
@@ -34,10 +35,10 @@ class DataBench
 
     public function setup()
     {
-        app(DataConfig::class)->getDataClass(ComplicatedData::class);
-        app(DataConfig::class)->getDataClass(SimpleData::class);
-        app(DataConfig::class)->getDataClass(MultiNestedData::class);
-        app(DataConfig::class)->getDataClass(NestedData::class);
+        app(DataConfig::class)->getDataClass(ComplicatedData::class)->prepareForCache();
+        app(DataConfig::class)->getDataClass(SimpleData::class)->prepareForCache();
+        app(DataConfig::class)->getDataClass(MultiNestedData::class)->prepareForCache();
+        app(DataConfig::class)->getDataClass(NestedData::class)->prepareForCache();
     }
 
     #[Revs(500), Iterations(2)]
@@ -138,8 +139,8 @@ class DataBench
             )
         )->all();
 
-        $collection = ComplicatedData::collect($collection, DataCollection::class);
+        $dataCollection = (new DataCollection(ComplicatedData::class, $collection));
 
-        $collection->toArray();
+        $dataCollection->toArray();
     }
 }

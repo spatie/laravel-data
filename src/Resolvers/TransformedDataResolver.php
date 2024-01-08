@@ -10,6 +10,7 @@ use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Support\DataProperty;
@@ -30,7 +31,9 @@ class TransformedDataResolver
         BaseData&TransformableData $data,
         TransformationContext $context,
     ): array {
-        $transformed = $this->transform($data, $context);
+        $dataClass = $this->dataConfig->getDataClass($data::class);
+
+        $transformed = $this->transform($data, $context, $dataClass);
 
         if ($data instanceof WrappableData && $context->wrapExecutionType->shouldExecute()) {
             $transformed = $data->getWrap()->wrap($transformed);
@@ -43,11 +46,12 @@ class TransformedDataResolver
         return $transformed;
     }
 
-    private function transform(BaseData&TransformableData $data, TransformationContext $context): array
-    {
+    private function transform(
+        BaseData&TransformableData $data,
+        TransformationContext $context,
+        DataClass $dataClass,
+    ): array {
         $payload = [];
-
-        $dataClass = $this->dataConfig->getDataClass($data::class);
 
         $visibleFields = $this->visibleDataFieldsResolver->execute($data, $dataClass, $context);
 
