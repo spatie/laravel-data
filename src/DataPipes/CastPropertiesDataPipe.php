@@ -52,7 +52,7 @@ class CastPropertiesDataPipe implements DataPipe
             return $cast->cast($property, $value, $castContext);
         }
 
-        if ($cast = $this->dataConfig->findGlobalCastForProperty($property)) {
+        if ($cast = $this->dataConfig->globalCasts()->findCastForValue($property)) {
             return $cast->cast($property, $value, $castContext);
         }
 

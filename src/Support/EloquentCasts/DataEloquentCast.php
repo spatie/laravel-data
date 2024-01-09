@@ -35,7 +35,7 @@ class DataEloquentCast implements CastsAttributes
 
         if ($this->isAbstractClassCast()) {
             /** @var class-string<BaseData> $dataClass */
-            $dataClass = $this->dataConfig->morphMap->getMorphedDataClass($payload['type']) ?? $payload['type'];
+            $dataClass = $this->dataConfig->morphMap()->getMorphedDataClass($payload['type']) ?? $payload['type'];
 
             return $dataClass::from($payload['data']);
         }
@@ -65,7 +65,7 @@ class DataEloquentCast implements CastsAttributes
 
         if ($isAbstractClassCast) {
             return json_encode([
-                'type' => $this->dataConfig->morphMap->getDataClassAlias($value::class) ?? $value::class,
+                'type' => $this->dataConfig->morphMap()->getDataClassAlias($value::class) ?? $value::class,
                 'data' => json_decode($value->toJson(), associative: true, flags: JSON_THROW_ON_ERROR),
             ]);
         }

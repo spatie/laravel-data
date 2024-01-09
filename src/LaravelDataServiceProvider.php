@@ -31,7 +31,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
         $this->app->singleton(
             DataConfig::class,
-            fn () => $this->app->make(DataStructureCache::class)->getConfig() ?? new DataConfig(config('data'))
+            fn () => $this->app->make(DataStructureCache::class)->getConfig() ?? DataConfig::createFromConfig(config('data'))
         );
 
         /** @psalm-suppress UndefinedInterfaceMethod */

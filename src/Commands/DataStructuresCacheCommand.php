@@ -24,7 +24,7 @@ class DataStructuresCacheCommand extends Command
 
         $dataClasses = DataClassFinder::fromConfig(config('data.structure_caching'))->classes();
 
-        $cachedDataConfig = CachedDataConfig::initialize($dataConfig);
+        $cachedDataConfig = CachedDataConfig::createFromConfig(config('data'));
 
         $dataStructureCache->storeConfig($cachedDataConfig);
 

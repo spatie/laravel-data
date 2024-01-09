@@ -270,7 +270,7 @@ class DataValidationRulesResolver
             $path
         );
 
-        foreach ($this->dataConfig->getRuleInferrers() as $inferrer) {
+        foreach ($this->dataConfig->ruleInferrers() as $inferrer) {
             $inferrer->handle($property, $rules, $context);
         }
 

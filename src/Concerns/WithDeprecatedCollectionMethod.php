@@ -11,6 +11,11 @@ use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
 
+/**
+ * @property class-string<DataCollection> $_collectionClass
+ * @property class-string<PaginatedDataCollection> $_paginatedCollectionClass
+ * @property class-string<CursorPaginatedDataCollection> $_cursorPaginatedCollectionClass
+ */
 trait WithDeprecatedCollectionMethod
 {
     /** @deprecated */
@@ -19,20 +24,20 @@ trait WithDeprecatedCollectionMethod
         if ($items instanceof Paginator || $items instanceof AbstractPaginator) {
             return static::collect(
                 $items,
-                property_exists(static::class, '_paginatedCollectionClass') ? static::$_paginatedCollectionClass : PaginatedDataCollection::class
+                static::$_paginatedCollectionClass ?? PaginatedDataCollection::class
             );
         }
 
         if ($items instanceof AbstractCursorPaginator || $items instanceof CursorPaginator) {
             return static::collect(
                 $items,
-                property_exists(static::class, '_cursorPaginatedCollectionClass') ? static::$_cursorPaginatedCollectionClass : CursorPaginatedDataCollection::class
+                static::$_cursorPaginatedCollectionClass ?? CursorPaginatedDataCollection::class
             );
         }
 
         return static::collect(
             $items,
-            property_exists(static::class, '_collectionClass') ? static::$_collectionClass : DataCollection::class
+            static::$_collectionClass ?? DataCollection::class
         );
     }
 }

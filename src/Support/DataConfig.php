@@ -3,83 +3,88 @@
 namespace Spatie\LaravelData\Support;
 
 use ReflectionClass;
-use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\RuleInferrers\RuleInferrer;
+use Spatie\LaravelData\Support\Casting\GlobalCastsCollection;
 use Spatie\LaravelData\Support\Transformation\GlobalTransformersCollection;
-use Spatie\LaravelData\Transformers\Transformer;
 
 class DataConfig
 {
-    /** @var array<string, \Spatie\LaravelData\Support\DataClass> */
-    protected array $dataClasses = [];
-
-    public GlobalTransformersCollection $transformers;
-
-    /** @var array<string, \Spatie\LaravelData\Casts\Cast> */
-    protected array $casts = [];
-
-    /** @var array<string, \Spatie\LaravelData\Support\ResolvedDataPipeline> */
-    protected array $resolvedDataPipelines = [];
-
-    /** @var \Spatie\LaravelData\RuleInferrers\RuleInferrer[] */
-    protected array $ruleInferrers;
-
-    public readonly DataClassMorphMap $morphMap;
-
-    public function __construct(array $config)
+    public static function createFromConfig(array $config): static
     {
-        $this->ruleInferrers = array_map(
+        $dataClasses = [];
+
+        $ruleInferrers = array_map(
             fn (string $ruleInferrerClass) => app($ruleInferrerClass),
             $config['rule_inferrers'] ?? []
         );
 
-        $this->transformers = new GlobalTransformersCollection();
+        $transformers = new GlobalTransformersCollection();
 
         foreach ($config['transformers'] ?? [] as $transformable => $transformer) {
-            $this->transformers->add($transformable, app($transformer));
+            $transformers->add($transformable, app($transformer));
         }
+
+        $casts = new GlobalCastsCollection();
 
         foreach ($config['casts'] ?? [] as $castable => $cast) {
-            $this->casts[ltrim($castable, ' \\')] = app($cast);
+            $casts->add($castable, app($cast));
         }
 
-        $this->morphMap = new DataClassMorphMap();
+        $morphMap = new DataClassMorphMap();
+
+        return new static(
+            $transformers,
+            $casts,
+            $ruleInferrers,
+            $morphMap,
+            $dataClasses,
+        );
+    }
+
+    /**
+     * @param array<string, DataClass> $dataClasses
+     * @param array<string, ResolvedDataPipeline> $resolvedDataPipelines
+     * @param RuleInferrer[] $ruleInferrers
+     */
+    public function __construct(
+        protected readonly GlobalTransformersCollection $transformers = new GlobalTransformersCollection(),
+        protected readonly GlobalCastsCollection $casts = new GlobalCastsCollection(),
+        protected readonly array $ruleInferrers = [],
+        protected readonly DataClassMorphMap $morphMap = new DataClassMorphMap(),
+        protected array $dataClasses = [],
+        protected array $resolvedDataPipelines = [],
+    ) {
     }
 
     public function getDataClass(string $class): DataClass
     {
-        if (array_key_exists($class, $this->dataClasses)) {
-            return $this->dataClasses[$class];
-        }
-
-        return $this->dataClasses[$class] = DataClass::create(new ReflectionClass($class));
+        return $this->dataClasses[$class] ??= DataClass::create(new ReflectionClass($class));
     }
 
     public function getResolvedDataPipeline(string $class): ResolvedDataPipeline
     {
-        if (array_key_exists($class, $this->resolvedDataPipelines)) {
-            return $this->resolvedDataPipelines[$class];
-        }
-
-        return $this->resolvedDataPipelines[$class] = $class::pipeline()->resolve();
+        return $this->resolvedDataPipelines[$class] ??= $class::pipeline()->resolve();
     }
 
-    public function findGlobalCastForProperty(DataProperty $property): ?Cast
+    public function globalTransformers(): GlobalTransformersCollection
     {
-        foreach ($property->type->type->getAcceptedTypes() as $acceptedType => $baseTypes) {
-            foreach ([$acceptedType, ...$baseTypes] as $type) {
-                if ($cast = $this->casts[$type] ?? null) {
-                    return $cast;
-                }
-            }
-        }
-
-        return null;
+        return $this->transformers;
     }
 
-    public function getRuleInferrers(): array
+    public function globalCasts(): GlobalCastsCollection
+    {
+        return $this->casts;
+    }
+
+    public function ruleInferrers(): array
     {
         return $this->ruleInferrers;
+    }
+
+    public function morphMap(): DataClassMorphMap
+    {
+        return $this->morphMap;
     }
 
     /**

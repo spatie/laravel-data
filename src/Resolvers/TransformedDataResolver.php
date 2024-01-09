@@ -204,7 +204,7 @@ class TransformedDataResolver
         }
 
         if ($transformer === null) {
-            $transformer = $this->dataConfig->transformers->findTransformerForValue($value);
+            $transformer = $this->dataConfig->globalTransformers()->findTransformerForValue($value);
         }
 
         $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
