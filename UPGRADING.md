@@ -6,6 +6,7 @@ Because there are many breaking changes an upgrade is not that easy. There are m
 
 The following things are required when upgrading:
 
+- Laravel 10 is now required
 - Start by going through your code and replace all static `SomeData::collection($items)` method calls with `SomeData::collect($items, DataCollection::class)`
   - Use `DataPaginatedCollection::class` when you're expecting a paginated collection
   - Use `DataCursorPaginatedCollection::class` when you're expecting a cursor paginated collection
