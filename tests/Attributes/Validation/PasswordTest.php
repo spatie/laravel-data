@@ -24,7 +24,7 @@ test(
             'min' => 42,
         ],
     ];
-//
+    //
     yield 'unconfigured' => [
         'setDefaults' => fn () => ValidationPath::create(),
         'expectedConfig' => [

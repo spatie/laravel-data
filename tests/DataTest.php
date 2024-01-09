@@ -64,6 +64,7 @@ use Spatie\LaravelData\Tests\Fakes\UlarData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\Transformers\Transformer;
 use Spatie\LaravelData\WithData;
+
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can create a resource', function () {
@@ -1568,7 +1569,7 @@ it('can use data as an DTO', function () {
         ->not()->toHaveMethods(['toArray', 'toJson', 'toResponse', 'all', 'include', 'exclude', 'only', 'except', 'transform', 'with', 'jsonSerialize'])
         ->and($dto->string)->toEqual('Hello World');
 
-    expect(fn() =>  SimpleDto::validate(['string' => null]))->toThrow(ValidationException::class);
+    expect(fn () => SimpleDto::validate(['string' => null]))->toThrow(ValidationException::class);
 });
 
 it('can use data as an Resource', function () {
@@ -1581,6 +1582,6 @@ it('can use data as an Resource', function () {
         ->and($resource->string)->toEqual('Hello World');
 
     expect($resource)->not()->toHaveMethods([
-        'validate'
+        'validate',
     ]);
 });
