@@ -19,21 +19,21 @@ test(
     }
 )->with(function () {
     yield 'min length set to 42' => [
-        'setDefaults' => fn () => fn () => ValidationPassword::defaults(fn () => ValidationPassword::min(42)),
+        'setDefaults' => fn () => ValidationPassword::defaults(fn () => ValidationPassword::min(42)),
         'expectedConfig' => [
             'min' => 42,
         ],
     ];
-
+//
     yield 'unconfigured' => [
-        'setDefaults' => fn () => fn () => ValidationPath::create(),
+        'setDefaults' => fn () => ValidationPath::create(),
         'expectedConfig' => [
             'min' => 8,
         ],
     ];
 
     yield 'uncompromised' => [
-        'setDefaults' => fn () => fn () => ValidationPassword::defaults(fn () => ValidationPassword::min(69)->uncompromised(7)),
+        'setDefaults' => fn () => ValidationPassword::defaults(fn () => ValidationPassword::min(69)->uncompromised(7)),
         'expectedConfig' => [
             'min' => 69,
             'uncompromised' => true,

@@ -29,10 +29,12 @@ use Spatie\LaravelData\Concerns\WrappableData;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Dto;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Resource;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
 use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
@@ -53,6 +55,8 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithWrap;
+use Spatie\LaravelData\Tests\Fakes\SimpleDto;
+use Spatie\LaravelData\Tests\Fakes\SimpleResource;
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataCollectionTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\ConfidentialDataTransformer;
 use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
@@ -60,7 +64,6 @@ use Spatie\LaravelData\Tests\Fakes\UlarData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\Transformers\Transformer;
 use Spatie\LaravelData\WithData;
-
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can create a resource', function () {
@@ -1553,5 +1556,31 @@ it('is possible to add extra global transformers when transforming using context
 
     expect($transformed)->toBe([
         'dateTime' => 'Custom transformed date',
+    ]);
+});
+
+it('can use data as an DTO', function () {
+    $dto = SimpleDto::from('Hello World');
+
+    expect($dto)->toBeInstanceOf(SimpleDto::class)
+        ->toBeInstanceOf(Dto::class)
+        ->not()->toBeInstanceOf(Data::class)
+        ->not()->toHaveMethods(['toArray', 'toJson', 'toResponse', 'all', 'include', 'exclude', 'only', 'except', 'transform', 'with', 'jsonSerialize'])
+        ->and($dto->string)->toEqual('Hello World');
+
+    expect(fn() =>  SimpleDto::validate(['string' => null]))->toThrow(ValidationException::class);
+});
+
+it('can use data as an Resource', function () {
+    $resource = SimpleResource::from('Hello World');
+
+    expect($resource)->toBeInstanceOf(SimpleResource::class)
+        ->toBeInstanceOf(Resource::class)
+        ->not()->toBeInstanceOf(Data::class)
+        ->toHaveMethods(['toArray', 'toJson', 'toResponse', 'all', 'include', 'exclude', 'only', 'except', 'transform', 'with', 'jsonSerialize'])
+        ->and($resource->string)->toEqual('Hello World');
+
+    expect($resource)->not()->toHaveMethods([
+        'validate'
     ]);
 });
