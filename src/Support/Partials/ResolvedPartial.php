@@ -75,7 +75,7 @@ class ResolvedPartial implements Stringable
     /** @return string[] */
     public function toLaravel(): array
     {
-        /** @var array<string> $partials */
+        /** @var array<string> $segments */
         $segments = [];
 
         for ($i = $this->pointer; $i < $this->segmentCount; $i++) {

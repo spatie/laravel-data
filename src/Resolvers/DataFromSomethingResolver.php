@@ -9,6 +9,9 @@ use Spatie\LaravelData\Enums\CustomCreationMethodType;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
 
+/**
+ * @template TData of BaseData
+ */
 class DataFromSomethingResolver
 {
     public function __construct(
@@ -33,6 +36,11 @@ class DataFromSomethingResolver
         return $this;
     }
 
+    /**
+     * @param class-string<TData> $class
+     *
+     * @return TData
+     */
     public function execute(string $class, mixed ...$payloads): BaseData
     {
         if ($data = $this->createFromCustomCreationMethod($class, $payloads)) {

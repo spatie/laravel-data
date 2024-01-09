@@ -37,7 +37,6 @@ class RequestQueryStringPartialsResolver
         $dataClass = $this->dataConfig->getDataClass(match (true) {
             $data instanceof BaseData => $data::class,
             $data instanceof BaseDataCollectable => $data->getDataClass(),
-            default => throw new TypeError('Invalid type of data')
         });
 
         $partials = new PartialsCollection();

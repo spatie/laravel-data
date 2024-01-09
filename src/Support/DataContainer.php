@@ -23,7 +23,7 @@ class DataContainer
     public static function get(): DataContainer
     {
         if (! isset(static::$instance)) {
-            static::$instance = new static();
+            static::$instance = new self();
         }
 
         return static::$instance;

@@ -17,6 +17,7 @@ use Spatie\LaravelData\Contracts\ResponsableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\ValidateableData;
 use Spatie\LaravelData\Contracts\WrappableData;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
@@ -58,7 +59,7 @@ class DataClass
 
     public static function create(ReflectionClass $class): self
     {
-        /** @var class-string<BaseData> $name */
+        /** @var class-string<Data> $name */
         $name = $class->name;
 
         $attributes = static::resolveAttributes($class);
@@ -192,7 +193,7 @@ class DataClass
     /**
      * @param Collection<string, DataProperty> $properties
      *
-     * @return LazyDataStructureProperty<array<string, null|true>>
+     * @return LazyDataStructureProperty<array<string, null|bool>>
      */
     protected static function resolveTransformationFields(
         Collection $properties,

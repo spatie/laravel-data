@@ -111,7 +111,7 @@ class DataTypeScriptTransformer extends DtoTransformer
             DataTypeKind::DataCollection, DataTypeKind::Array, DataTypeKind::Enumerable => $this->defaultCollectionType($dataProperty->type->dataClass),
             DataTypeKind::Paginator, DataTypeKind::DataPaginatedCollection => $this->paginatedCollectionType($dataProperty->type->dataClass),
             DataTypeKind::CursorPaginator, DataTypeKind::DataCursorPaginatedCollection => $this->cursorPaginatedCollectionType($dataProperty->type->dataClass),
-            null => throw new RuntimeException('Cannot end up here since the type is dataCollectable')
+            default => throw new RuntimeException('Cannot end up here since the type is dataCollectable')
         };
 
         if ($dataProperty->type->isNullable()) {

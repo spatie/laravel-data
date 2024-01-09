@@ -6,7 +6,7 @@ use SplObjectStorage;
 use Stringable;
 
 /**
- * @extends SplObjectStorage<ResolvedPartial>
+ * @extends SplObjectStorage<ResolvedPartial, null>
  */
 class ResolvedPartialsCollection extends SplObjectStorage implements Stringable
 {

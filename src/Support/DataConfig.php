@@ -62,6 +62,9 @@ class DataConfig
         return $this->dataClasses[$class] ??= DataClass::create(new ReflectionClass($class));
     }
 
+    /**
+     * @param class-string<BaseData> $class
+     */
     public function getResolvedDataPipeline(string $class): ResolvedDataPipeline
     {
         return $this->resolvedDataPipelines[$class] ??= $class::pipeline()->resolve();
