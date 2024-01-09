@@ -199,7 +199,7 @@ class DataClass
     ): LazyDataStructureProperty {
         $closure = fn () => $properties
             ->reject(fn (DataProperty $property): bool => $property->hidden)
-            ->map(function (DataProperty $property): null|true {
+            ->map(function (DataProperty $property): null|bool {
                 if (
                     $property->type->kind->isDataCollectable()
                     || $property->type->kind->isDataObject()
