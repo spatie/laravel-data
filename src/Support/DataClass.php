@@ -9,7 +9,6 @@ use ReflectionMethod;
 use ReflectionParameter;
 use ReflectionProperty;
 use Spatie\LaravelData\Contracts\AppendableData;
-use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Contracts\DefaultableData;
 use Spatie\LaravelData\Contracts\IncludeableData;

@@ -14,7 +14,6 @@ use Spatie\LaravelData\Support\Partials\Segments\AllPartialSegment;
 use Spatie\LaravelData\Support\Partials\Segments\FieldsPartialSegment;
 use Spatie\LaravelData\Support\Partials\Segments\NestedPartialSegment;
 use Spatie\LaravelData\Support\Partials\Segments\PartialSegment;
-use TypeError;
 
 class RequestQueryStringPartialsResolver
 {
