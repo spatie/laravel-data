@@ -48,10 +48,10 @@ class DataConfig
      * @param RuleInferrer[] $ruleInferrers
      */
     public function __construct(
-        protected readonly GlobalTransformersCollection $transformers = new GlobalTransformersCollection(),
-        protected readonly GlobalCastsCollection $casts = new GlobalCastsCollection(),
-        protected readonly array $ruleInferrers = [],
-        protected readonly DataClassMorphMap $morphMap = new DataClassMorphMap(),
+        public readonly GlobalTransformersCollection $transformers = new GlobalTransformersCollection(),
+        public readonly GlobalCastsCollection $casts = new GlobalCastsCollection(),
+        public readonly array $ruleInferrers = [],
+        public readonly DataClassMorphMap $morphMap = new DataClassMorphMap(),
         protected array $dataClasses = [],
         protected array $resolvedDataPipelines = [],
     ) {
@@ -65,26 +65,6 @@ class DataConfig
     public function getResolvedDataPipeline(string $class): ResolvedDataPipeline
     {
         return $this->resolvedDataPipelines[$class] ??= $class::pipeline()->resolve();
-    }
-
-    public function globalTransformers(): GlobalTransformersCollection
-    {
-        return $this->transformers;
-    }
-
-    public function globalCasts(): GlobalCastsCollection
-    {
-        return $this->casts;
-    }
-
-    public function ruleInferrers(): array
-    {
-        return $this->ruleInferrers;
-    }
-
-    public function morphMap(): DataClassMorphMap
-    {
-        return $this->morphMap;
     }
 
     /**

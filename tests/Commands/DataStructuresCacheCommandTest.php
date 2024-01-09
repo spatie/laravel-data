@@ -23,7 +23,7 @@ it('can cache data structures', function () {
     $config = app(DataConfig::class);
 
     expect($config)->toBeInstanceOf(CachedDataConfig::class);
-    expect($config->ruleInferrers())->toHaveCount(count(config('data.rule_inferrers')));
+    expect($config->ruleInferrers)->toHaveCount(count(config('data.rule_inferrers')));
     expect(invade($config)->transformers)->toHaveCount(count(config('data.transformers')));
     expect(invade($config)->casts)->toHaveCount(count(config('data.casts')));
 });
