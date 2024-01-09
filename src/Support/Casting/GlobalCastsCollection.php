@@ -6,10 +6,9 @@ use ArrayIterator;
 use IteratorAggregate;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Support\DataProperty;
-use Spatie\LaravelData\Transformers\Transformer;
 use Traversable;
 
-class GlobalCastsCollection  implements IteratorAggregate
+class GlobalCastsCollection implements IteratorAggregate
 {
     /**
      * @param array<string, Cast> $casts

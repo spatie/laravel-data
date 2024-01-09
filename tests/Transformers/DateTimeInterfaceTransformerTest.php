@@ -10,7 +10,7 @@ use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 it('can transform dates', function () {
     $transformer = new DateTimeInterfaceTransformer();
 
-    $class = new class () extends Data{
+    $class = new class () extends Data {
         public Carbon $carbon;
 
         public CarbonImmutable $carbonImmutable;
@@ -56,7 +56,7 @@ it('can transform dates', function () {
 it('can transform dates with an alternative format', function () {
     $transformer = new DateTimeInterfaceTransformer(format: 'd-m-Y');
 
-    $class = new class () extends Data{
+    $class = new class () extends Data {
         public Carbon $carbon;
 
         public CarbonImmutable $carbonImmutable;

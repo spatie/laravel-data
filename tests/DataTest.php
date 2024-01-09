@@ -60,6 +60,7 @@ use Spatie\LaravelData\Tests\Fakes\UlarData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\Transformers\Transformer;
 use Spatie\LaravelData\WithData;
+
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can create a resource', function () {
@@ -1531,7 +1532,7 @@ it('throws a readable exception message when the constructor fails', function (
 ]);
 
 it('is possible to add extra global transformers when transforming using context', function () {
-    $dataClass = new class extends Data {
+    $dataClass = new class () extends Data {
         public DateTime $dateTime;
     };
 
@@ -1539,7 +1540,7 @@ it('is possible to add extra global transformers when transforming using context
         'dateTime' => new DateTime(),
     ]);
 
-    $customTransformer = new class implements Transformer {
+    $customTransformer = new class () implements Transformer {
         public function transform(DataProperty $property, mixed $value, TransformationContext $context): string
         {
             return "Custom transformed date";
