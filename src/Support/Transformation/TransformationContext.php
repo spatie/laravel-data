@@ -2,6 +2,9 @@
 
 namespace Spatie\LaravelData\Support\Transformation;
 
+use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Support\Partials\ResolvedPartial;
 use Spatie\LaravelData\Support\Partials\ResolvedPartialsCollection;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
@@ -136,6 +139,41 @@ class TransformationContext implements Stringable
                 $exceptPartial->rollbackWhenRequired();
             }
         }
+    }
+
+    /**
+     * @param IncludeableData&(BaseData|BaseDataCollectable) $data
+     */
+    public function mergePartialsFromDataContext(
+        IncludeableData $data
+    ): self {
+        $dataContext = $data->getDataContext();
+
+        if ($dataContext->includePartials && $dataContext->includePartials->count() > 0) {
+            $this->mergeIncludedResolvedPartials(
+                $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($data, $dataContext->includePartials)
+            );
+        }
+
+        if ($dataContext->excludePartials && $dataContext->excludePartials->count() > 0) {
+            $this->mergeExcludedResolvedPartials(
+                $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($data, $dataContext->excludePartials)
+            );
+        }
+
+        if ($dataContext->onlyPartials && $dataContext->onlyPartials->count() > 0) {
+            $this->mergeOnlyResolvedPartials(
+                $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($data, $dataContext->onlyPartials)
+            );
+        }
+
+        if ($dataContext->exceptPartials && $dataContext->exceptPartials->count() > 0) {
+            $this->mergeExceptResolvedPartials(
+                $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($data, $dataContext->exceptPartials)
+            );
+        }
+
+        return $this;
     }
 
     public function __clone(): void

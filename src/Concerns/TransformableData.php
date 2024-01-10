@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Concerns;
 use Exception;
 use Spatie\LaravelData\Contracts\BaseData as BaseDataContract;
 use Spatie\LaravelData\Contracts\BaseDataCollectable as BaseDataCollectableContract;
+use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
@@ -27,30 +28,8 @@ trait TransformableData
             default => throw new Exception('Cannot transform data object')
         };
 
-        $dataContext = $this->getDataContext();
-
-        if ($dataContext->includePartials && $dataContext->includePartials->count() > 0) {
-            $transformationContext->mergeIncludedResolvedPartials(
-                $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($this, $dataContext->includePartials)
-            );
-        }
-
-        if ($dataContext->excludePartials && $dataContext->excludePartials->count() > 0) {
-            $transformationContext->mergeExcludedResolvedPartials(
-                $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($this, $dataContext->excludePartials)
-            );
-        }
-
-        if ($dataContext->onlyPartials && $dataContext->onlyPartials->count() > 0) {
-            $transformationContext->mergeOnlyResolvedPartials(
-                $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($this, $dataContext->onlyPartials)
-            );
-        }
-
-        if ($dataContext->exceptPartials && $dataContext->exceptPartials->count() > 0) {
-            $transformationContext->mergeExceptResolvedPartials(
-                $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($this, $dataContext->exceptPartials)
-            );
+        if ($this instanceof IncludeableDataContract) {
+            $transformationContext->mergePartialsFromDataContext($this);
         }
 
         return $resolver->execute($this, $transformationContext);
