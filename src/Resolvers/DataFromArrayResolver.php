@@ -13,12 +13,20 @@ use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;
 
+/**
+ * @template TData of BaseData
+ */
 class DataFromArrayResolver
 {
     public function __construct(protected DataConfig $dataConfig)
     {
     }
 
+    /**
+     * @param class-string<TData> $class
+     *
+     * @return TData
+     */
     public function execute(string $class, Collection $properties): BaseData
     {
         $dataClass = $this->dataConfig->getDataClass($class);

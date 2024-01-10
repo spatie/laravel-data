@@ -4,13 +4,18 @@ namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
 
 class DefaultValuesDataPipe implements DataPipe
 {
-    public function handle(mixed $payload, DataClass $class, Collection $properties): Collection
-    {
+    public function handle(
+        mixed $payload,
+        DataClass $class,
+        Collection $properties,
+        CreationContext $creationContext
+    ): Collection {
         $dataDefaults = $class->defaultable
             ? app()->call([$class->name, 'defaults'])
             : [];

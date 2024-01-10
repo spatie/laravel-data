@@ -80,12 +80,4 @@ class DataPipeline
             $this->dataConfig->getDataClass($this->classString)
         );
     }
-
-    /** @deprecated */
-    public function execute(): Collection
-    {
-        return $this->dataConfig
-            ->getResolvedDataPipeline($this->classString)
-            ->execute($this->value);
-    }
 }

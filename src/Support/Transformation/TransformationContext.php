@@ -13,7 +13,7 @@ use Stringable;
 class TransformationContext implements Stringable
 {
     /**
-     * @note Do not add extra partials here
+     * @note Do not add extra partials here manually
      */
     public function __construct(
         public bool $transformValues = true,

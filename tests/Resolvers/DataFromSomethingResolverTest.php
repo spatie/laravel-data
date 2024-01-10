@@ -4,6 +4,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
+use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Tests\Fakes\DataWithMultipleArgumentCreationMethod;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
@@ -102,7 +103,7 @@ it('can create data without custom creation methods', function () {
     };
 
     expect(
-        $data::withoutMagicalCreationFrom(['hash_id' => 1, 'name' => 'Taylor'])
+        $data::factory()->withoutMagicalCreation()->from(['hash_id' => 1, 'name' => 'Taylor'])
     )->toEqual(new $data(null, 'Taylor'));
 
     expect($data::from(['hash_id' => 1, 'name' => 'Taylor']))
@@ -128,10 +129,18 @@ it('can create data ignoring certain magical methods', function () {
     }
 
     expect(
-        app(DataFromSomethingResolver::class)->ignoreMagicalMethods('fromArray')->execute(DummyA::class, ['hash_id' => 1, 'name' => 'Taylor'])
+        app(DataFromSomethingResolver::class)->execute(
+            DummyA::class,
+            CreationContextFactory::createFromConfig(DummyA::class)->ignoreMagicalMethod('fromArray')->get(),
+            ['hash_id' => 1, 'name' => 'Taylor']
+        )
     )->toEqual(new DummyA(null, 'Taylor'));
 
     expect(
-        app(DataFromSomethingResolver::class)->execute(DummyA::class, ['hash_id' => 1, 'name' => 'Taylor'])
+        app(DataFromSomethingResolver::class)->execute(
+            DummyA::class,
+            CreationContextFactory::createFromConfig(DummyA::class)->get(),
+            ['hash_id' => 1, 'name' => 'Taylor']
+        )
     )->toEqual(new DummyA(1, 'Taylor'));
 });

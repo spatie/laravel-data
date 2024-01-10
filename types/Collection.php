@@ -53,3 +53,4 @@ assertType(PaginatedDataCollection::class.'<(int|string), '.SimpleData::class.'>
 
 $collection = SimpleData::collect(FakeModel::query()->paginate(), CursorPaginatedDataCollection::class);
 assertType(CursorPaginatedDataCollection::class.'<(int|string), '.SimpleData::class.'>', $collection);
+

@@ -2,6 +2,8 @@
 
 namespace Spatie\LaravelData\Support;
 
+use Spatie\LaravelData\Resolvers\DataCollectableFromSomethingResolver;
+use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\RequestQueryStringPartialsResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataCollectionResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataResolver;
@@ -15,6 +17,10 @@ class DataContainer
     protected ?TransformedDataCollectionResolver $transformedDataCollectionResolver = null;
 
     protected ?RequestQueryStringPartialsResolver $requestQueryStringPartialsResolver = null;
+
+    protected ?DataFromSomethingResolver $dataFromSomethingResolver = null;
+
+    protected ?DataCollectableFromSomethingResolver $dataCollectableFromSomethingResolver = null;
 
     private function __construct()
     {
@@ -44,10 +50,22 @@ class DataContainer
         return $this->requestQueryStringPartialsResolver ??= app(RequestQueryStringPartialsResolver::class);
     }
 
+    public function dataFromSomethingResolver(): DataFromSomethingResolver
+    {
+        return $this->dataFromSomethingResolver ??= app(DataFromSomethingResolver::class);
+    }
+
+    public function dataCollectableFromSomethingResolver(): DataCollectableFromSomethingResolver
+    {
+        return $this->dataCollectableFromSomethingResolver ??= app(DataCollectableFromSomethingResolver::class);
+    }
+
     public function reset()
     {
         $this->transformedDataResolver = null;
         $this->transformedDataCollectionResolver = null;
         $this->requestQueryStringPartialsResolver = null;
+        $this->dataFromSomethingResolver = null;
+        $this->dataCollectableFromSomethingResolver = null;
     }
 }

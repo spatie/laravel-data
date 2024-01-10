@@ -11,6 +11,7 @@ use ReflectionProperty;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Contracts\DefaultableData;
+use Spatie\LaravelData\Contracts\EmptyData;
 use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Contracts\ResponsableData;
 use Spatie\LaravelData\Contracts\TransformableData;
@@ -45,6 +46,7 @@ class DataClass
         public readonly bool $validateable,
         public readonly bool $defaultable,
         public readonly bool $wrappable,
+        public readonly bool $emptyData,
         public readonly Collection $attributes,
         public readonly array $dataCollectablePropertyAnnotations,
         public readonly ?array $allowedRequestIncludes,
@@ -107,6 +109,7 @@ class DataClass
             validateable: $class->implementsInterface(ValidateableData::class),
             defaultable: $class->implementsInterface(DefaultableData::class),
             wrappable: $class->implementsInterface(WrappableData::class),
+            emptyData: $class->implementsInterface(EmptyData::class),
             attributes: $attributes,
             dataCollectablePropertyAnnotations: $dataCollectablePropertyAnnotations,
             allowedRequestIncludes: $responsable ? $name::allowedRequestIncludes() : null,

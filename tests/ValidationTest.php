@@ -12,10 +12,6 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\Rules\In as LaravelIn;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
-
-use function Pest\Laravel\mock;
-use function PHPUnit\Framework\assertFalse;
-
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
@@ -38,17 +34,7 @@ use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\DataPipeline;
-use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
-use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
-use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
-use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
-use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
-use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
-use Spatie\LaravelData\Normalizers\ArrayNormalizer;
-use Spatie\LaravelData\Normalizers\ModelNormalizer;
-use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
@@ -69,6 +55,8 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\Fakes\Support\FakeInjectable;
 use Spatie\LaravelData\Tests\Fakes\ValidationAttributes\PassThroughCustomValidationAttribute;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
+use function Pest\Laravel\mock;
+use function PHPUnit\Framework\assertFalse;
 
 it('can validate a string', function () {
     $dataClass = new class () extends Data {
@@ -2099,29 +2087,8 @@ it('can validate a payload for a data object and create one using a magic from m
 
 it('can validate non-requests payloads', function () {
     $dataClass = new class () extends Data {
-        public static bool $validateAllTypes = false;
-
         #[In('Hello World')]
         public string $string;
-
-        public static function pipeline(): DataPipeline
-        {
-            return DataPipeline::create()
-                ->into(static::class)
-                ->normalizer(ModelNormalizer::class)
-                ->normalizer(ArrayableNormalizer::class)
-                ->normalizer(ObjectNormalizer::class)
-                ->normalizer(ArrayNormalizer::class)
-                ->through(AuthorizedDataPipe::class)
-                ->through(
-                    self::$validateAllTypes
-                        ? ValidatePropertiesDataPipe::allTypes()
-                        : ValidatePropertiesDataPipe::onlyRequests()
-                )
-                ->through(MapPropertiesDataPipe::class)
-                ->through(DefaultValuesDataPipe::class)
-                ->through(CastPropertiesDataPipe::class);
-        }
     };
 
     $data = $dataClass::from([
@@ -2131,11 +2098,7 @@ it('can validate non-requests payloads', function () {
     expect($data)->toBeInstanceOf(Data::class)
         ->string->toEqual('nowp');
 
-    app(DataConfig::class)->reset();
-
-    $dataClass::$validateAllTypes = true;
-
-    $data = $dataClass::from([
+    $data = $dataClass::factory()->alwaysValidate()->from([
         'string' => 'nowp',
     ]);
 })->throws(ValidationException::class);

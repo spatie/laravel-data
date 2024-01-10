@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\DataPipes;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
@@ -16,8 +17,12 @@ class CastPropertiesDataPipe implements DataPipe
     ) {
     }
 
-    public function handle(mixed $payload, DataClass $class, Collection $properties): Collection
-    {
+    public function handle(
+        mixed $payload,
+        DataClass $class,
+        Collection $properties,
+        CreationContext $creationContext
+    ): Collection {
         $castContext = $properties->all();
 
         foreach ($properties as $name => $value) {
@@ -31,7 +36,7 @@ class CastPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            $properties[$name] = $this->cast($dataProperty, $value, $castContext);
+            $properties[$name] = $this->cast($dataProperty, $value, $castContext, $creationContext);
         }
 
         return $properties;
@@ -41,6 +46,7 @@ class CastPropertiesDataPipe implements DataPipe
         DataProperty $property,
         mixed $value,
         array $castContext,
+        CreationContext $creationContext
     ): mixed {
         $shouldCast = $this->shouldBeCasted($property, $value);
 
@@ -52,16 +58,20 @@ class CastPropertiesDataPipe implements DataPipe
             return $cast->cast($property, $value, $castContext);
         }
 
+        if ($cast = $creationContext->casts?->findCastForValue($property)) {
+            return $cast->cast($property, $value, $castContext);
+        }
+
         if ($cast = $this->dataConfig->casts->findCastForValue($property)) {
             return $cast->cast($property, $value, $castContext);
         }
 
-        if ($property->type->kind->isDataObject()) {
-            return $property->type->dataClass::from($value);
+        if ($property->type->kind->isDataObject() && $property->type->dataClass) {
+            return $property->type->dataClass::factory($creationContext)->from($value);
         }
 
         if ($property->type->kind->isDataCollectable()) {
-            return $property->type->dataClass::collect($value, $property->type->dataCollectableClass);
+            return $property->type->dataClass::factory($creationContext)->collect($value, $property->type->dataCollectableClass);
         }
 
         return $value;

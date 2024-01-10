@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Tests\TestSupport;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\ValidationRuleParser;
 
+use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use function PHPUnit\Framework\assertTrue;
 
 use Spatie\LaravelData\Data;
@@ -163,7 +164,7 @@ class DataValidationAsserter
             ->through(MapPropertiesDataPipe::class)
             ->through(ValidatePropertiesDataPipe::class)
             ->resolve()
-            ->execute($payload);
+            ->execute($payload, CreationContextFactory::createFromConfig($this->dataClass)->get());
 
         return $properties->all();
     }

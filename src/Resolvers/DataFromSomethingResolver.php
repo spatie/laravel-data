@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\DataMethod;
 
 /**
  * @template TData of BaseData
@@ -17,23 +17,7 @@ class DataFromSomethingResolver
     public function __construct(
         protected DataConfig $dataConfig,
         protected DataFromArrayResolver $dataFromArrayResolver,
-        protected bool $withoutMagicalCreation = false,
-        protected array $ignoredMagicalMethods = [],
     ) {
-    }
-
-    public function withoutMagicalCreation(bool $withoutMagicalCreation = true): self
-    {
-        $this->withoutMagicalCreation = $withoutMagicalCreation;
-
-        return $this;
-    }
-
-    public function ignoreMagicalMethods(string ...$methods): self
-    {
-        array_push($this->ignoredMagicalMethods, ...$methods);
-
-        return $this;
     }
 
     /**
@@ -41,9 +25,12 @@ class DataFromSomethingResolver
      *
      * @return TData
      */
-    public function execute(string $class, mixed ...$payloads): BaseData
-    {
-        if ($data = $this->createFromCustomCreationMethod($class, $payloads)) {
+    public function execute(
+        string $class,
+        CreationContext $creationContext,
+        mixed ...$payloads
+    ): BaseData {
+        if ($data = $this->createFromCustomCreationMethod($class, $creationContext, $payloads)) {
             return $data;
         }
 
@@ -52,7 +39,7 @@ class DataFromSomethingResolver
         $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
 
         foreach ($payloads as $payload) {
-            foreach ($pipeline->execute($payload) as $key => $value) {
+            foreach ($pipeline->execute($payload, $creationContext) as $key => $value) {
                 $properties[$key] = $value;
             }
         }
@@ -60,24 +47,30 @@ class DataFromSomethingResolver
         return $this->dataFromArrayResolver->execute($class, $properties);
     }
 
-    protected function createFromCustomCreationMethod(string $class, array $payloads): ?BaseData
-    {
-        if ($this->withoutMagicalCreation) {
+    protected function createFromCustomCreationMethod(
+        string $class,
+        CreationContext $creationContext,
+        array $payloads
+    ): ?BaseData {
+        if ($creationContext->withoutMagicalCreation) {
             return null;
         }
 
-        /** @var Collection<\Spatie\LaravelData\Support\DataMethod> $customCreationMethods */
         $customCreationMethods = $this->dataConfig
             ->getDataClass($class)
-            ->methods
-            ->filter(
-                fn (DataMethod $method) => $method->customCreationMethodType === CustomCreationMethodType::Object
-                && ! in_array($method->name, $this->ignoredMagicalMethods)
-            );
+            ->methods;
 
         $methodName = null;
 
         foreach ($customCreationMethods as $customCreationMethod) {
+            if (
+                $customCreationMethod->customCreationMethodType === CustomCreationMethodType::Object
+                && $creationContext->ignoredMagicalMethods !== null
+                && in_array($customCreationMethod->name, $creationContext->ignoredMagicalMethods)
+            ) {
+                continue;
+            }
+
             if ($customCreationMethod->accepts(...$payloads)) {
                 $methodName = $customCreationMethod->name;
 
@@ -93,7 +86,7 @@ class DataFromSomethingResolver
 
         foreach ($payloads as $payload) {
             if ($payload instanceof Request) {
-                $pipeline->execute($payload);
+                $pipeline->execute($payload, $creationContext);
             }
         }
 

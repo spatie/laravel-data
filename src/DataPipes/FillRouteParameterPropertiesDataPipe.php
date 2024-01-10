@@ -7,13 +7,18 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\FromRouteParameter;
 use Spatie\LaravelData\Attributes\FromRouteParameterProperty;
 use Spatie\LaravelData\Exceptions\CannotFillFromRouteParameterPropertyUsingScalarValue;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
 
 class FillRouteParameterPropertiesDataPipe implements DataPipe
 {
-    public function handle(mixed $payload, DataClass $class, Collection $properties): Collection
-    {
+    public function handle(
+        mixed $payload,
+        DataClass $class,
+        Collection $properties,
+        CreationContext $creationContext
+    ): Collection {
         if (! $payload instanceof Request) {
             return $properties;
         }

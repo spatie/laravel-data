@@ -1585,3 +1585,4 @@ it('can use data as an Resource', function () {
         'validate',
     ]);
 });
+

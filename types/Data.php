@@ -2,6 +2,7 @@
 
 /** @noinspection PhpExpressionResultUnusedInspection */
 
+use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDto;
 use Spatie\LaravelData\Tests\Fakes\SimpleResource;

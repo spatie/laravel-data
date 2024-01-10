@@ -6,11 +6,10 @@ use Illuminate\Contracts\Pagination\CursorPaginator as CursorPaginatorContract;
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
-use Illuminate\Pagination\CursorPaginator;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\LazyCollection;
+use Spatie\LaravelData\Contracts\BaseData as BaseDataContract;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataPipeline;
@@ -23,6 +22,8 @@ use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Resolvers\DataCollectableFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
+use Spatie\LaravelData\Support\Creation\CreationContext;
+use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 
@@ -43,38 +44,25 @@ trait BaseData
         return null;
     }
 
-    public static function from(mixed ...$payloads): static
+    public static function from(mixed ...$payloads): BaseDataContract
     {
-        return app(DataFromSomethingResolver::class)->execute(
-            static::class,
-            ...$payloads
-        );
-    }
-
-    public static function withoutMagicalCreationFrom(mixed ...$payloads): static
-    {
-        return app(DataFromSomethingResolver::class)->withoutMagicalCreation()->execute(
-            static::class,
-            ...$payloads
-        );
+        return static::factory()->from(...$payloads);
     }
 
     public static function collect(mixed $items, ?string $into = null): array|DataCollection|PaginatedDataCollection|CursorPaginatedDataCollection|Enumerable|AbstractPaginator|PaginatorContract|AbstractCursorPaginator|CursorPaginatorContract|LazyCollection|Collection
     {
-        return app(DataCollectableFromSomethingResolver::class)->execute(
-            static::class,
-            $items,
-            $into
-        );
+        return static::factory()->collect($items, $into);
     }
 
-    public static function withoutMagicalCreationCollect(mixed $items, ?string $into = null): array|DataCollection|PaginatedDataCollection|CursorPaginatedDataCollection|Enumerable|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator
+    public static function factory(?CreationContext $creationContext = null): CreationContextFactory|CreationContext
     {
-        return app(DataCollectableFromSomethingResolver::class)->withoutMagicalCreation()->execute(
-            static::class,
-            $items,
-            $into
-        );
+        if ($creationContext) {
+            $creationContext->dataClass = static::class;
+
+            return $creationContext;
+        }
+
+        return CreationContextFactory::createFromConfig(static::class);
     }
 
     public static function normalizers(): array
@@ -101,7 +89,7 @@ trait BaseData
 
     public function getMorphClass(): string
     {
-        /** @var class-string<\Spatie\LaravelData\Contracts\BaseData> $class */
+        /** @var class-string<BaseDataContract> $class */
         $class = static::class;
 
         return app(DataConfig::class)->morphMap->getDataClassAlias($class) ?? $class;

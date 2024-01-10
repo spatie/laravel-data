@@ -17,6 +17,7 @@ use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Exceptions\CannotCreateDataCollectable;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\Creation\CollectableMetaData;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Support\Types\PartialType;
@@ -26,27 +27,12 @@ class DataCollectableFromSomethingResolver
     public function __construct(
         protected DataConfig $dataConfig,
         protected DataFromSomethingResolver $dataFromSomethingResolver,
-        protected bool $withoutMagicalCreation = false,
-        protected array $ignoredMagicalMethods = [],
     ) {
-    }
-
-    public function withoutMagicalCreation(bool $withoutMagicalCreation = true): self
-    {
-        $this->withoutMagicalCreation = $withoutMagicalCreation;
-
-        return $this;
-    }
-
-    public function ignoreMagicalMethods(string ...$methods): self
-    {
-        array_push($this->ignoredMagicalMethods, ...$methods);
-
-        return $this;
     }
 
     public function execute(
         string $dataClass,
+        CreationContext $creationContext,
         mixed $items,
         ?string $into = null,
     ): array|DataCollection|PaginatedDataCollection|CursorPaginatedDataCollection|Enumerable|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator {
@@ -54,7 +40,7 @@ class DataCollectableFromSomethingResolver
             ? PartialType::createFromTypeString($into)
             : PartialType::createFromValue($items);
 
-        $collectable = $this->createFromCustomCreationMethod($dataClass, $items, $into);
+        $collectable = $this->createFromCustomCreationMethod($dataClass, $creationContext, $items, $into);
 
         if ($collectable) {
             return $collectable;
@@ -64,7 +50,7 @@ class DataCollectableFromSomethingResolver
 
         $collectableMetaData = CollectableMetaData::fromOther($items);
 
-        $normalizedItems = $this->normalizeItems($items, $dataClass);
+        $normalizedItems = $this->normalizeItems($items, $dataClass, $creationContext);
 
         return match ($intoDataTypeKind) {
             DataTypeKind::Array => $this->normalizeToArray($normalizedItems),
@@ -80,10 +66,11 @@ class DataCollectableFromSomethingResolver
 
     protected function createFromCustomCreationMethod(
         string $dataClass,
+        CreationContext $creationContext,
         mixed $items,
         ?string $into,
     ): null|array|DataCollection|PaginatedDataCollection|CursorPaginatedDataCollection|Enumerable|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator {
-        if ($this->withoutMagicalCreation) {
+        if ($creationContext->withoutMagicalCreation) {
             return null;
         }
 
@@ -106,7 +93,7 @@ class DataCollectableFromSomethingResolver
 
         if ($method !== null) {
             return $dataClass::{$method->name}(
-                array_map($this->itemsToDataClosure($dataClass), $items)
+                array_map($this->itemsToDataClosure($dataClass, $creationContext), $items)
             );
         }
 
@@ -116,6 +103,7 @@ class DataCollectableFromSomethingResolver
     protected function normalizeItems(
         mixed $items,
         string $dataClass,
+        CreationContext $creationContext,
     ): array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator {
         if ($items instanceof PaginatedDataCollection
             || $items instanceof CursorPaginatedDataCollection
@@ -128,7 +116,7 @@ class DataCollectableFromSomethingResolver
             || $items instanceof AbstractPaginator
             || $items instanceof CursorPaginator
             || $items instanceof AbstractCursorPaginator) {
-            return $items->through($this->itemsToDataClosure($dataClass));
+            return $items->through($this->itemsToDataClosure($dataClass, $creationContext));
         }
 
         if ($items instanceof Enumerable) {
@@ -137,7 +125,7 @@ class DataCollectableFromSomethingResolver
 
         if (is_array($items)) {
             return array_map(
-                $this->itemsToDataClosure($dataClass),
+                $this->itemsToDataClosure($dataClass, $creationContext),
                 $items
             );
         }
@@ -187,8 +175,10 @@ class DataCollectableFromSomethingResolver
         );
     }
 
-    protected function itemsToDataClosure(string $dataClass): Closure
-    {
-        return fn (mixed $data) => $data instanceof $dataClass ? $data : $dataClass::from($data);
+    protected function itemsToDataClosure(
+        string $dataClass,
+        CreationContext $creationContext
+    ): Closure {
+        return fn (mixed $data) => $data instanceof $dataClass ? $data : $dataClass::factory($creationContext)->from($data);
     }
 }

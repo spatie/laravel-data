@@ -47,7 +47,9 @@ class EmptyDataResolver
             return [];
         }
 
-        if ($property->type->kind->isDataObject()) {
+        if ($property->type->kind->isDataObject()
+            && $this->dataConfig->getDataClass($property->type->dataClass)->emptyData
+        ) {
             return $property->type->dataClass::empty();
         }
 

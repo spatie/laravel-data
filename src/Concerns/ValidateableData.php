@@ -49,9 +49,9 @@ trait ValidateableData
 
     public static function validateAndCreate(Arrayable|array $payload): static
     {
-        static::validate($payload);
-
-        return static::from($payload);
+        return static::factory()
+            ->alwaysValidate()
+            ->from($payload);
     }
 
     public static function withValidator(Validator $validator): void
