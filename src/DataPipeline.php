@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData;
 
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\DataPipes\DataPipe;
 use Spatie\LaravelData\Normalizers\Normalizer;
 use Spatie\LaravelData\Support\DataConfig;

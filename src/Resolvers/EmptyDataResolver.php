@@ -52,7 +52,7 @@ class EmptyDataResolver
         if ($propertyType->kind->isDataObject()
             && $this->dataConfig->getDataClass($propertyType->dataClass)->emptyData
         ) {
-            /** @var class-string<EmptyData> $dataClass  */
+            /** @var class-string<EmptyData> $dataClass */
             $dataClass = $propertyType->dataClass;
 
             return $dataClass::empty();

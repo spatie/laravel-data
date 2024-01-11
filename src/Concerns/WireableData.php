@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Concerns;
 
-use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 
 trait WireableData
