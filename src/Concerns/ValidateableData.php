@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Concerns;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
-use Spatie\LaravelData\Contracts\ValidateableData as ValidateableDataContract;
 use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
 use Spatie\LaravelData\Support\Validation\DataRules;

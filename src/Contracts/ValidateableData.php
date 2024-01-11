@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Contracts;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Validation\Validator;
-use Spatie\LaravelData\Contracts\ValidateableData as ValidateableDataContract;
 
 interface ValidateableData
 {
