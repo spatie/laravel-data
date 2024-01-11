@@ -19,6 +19,9 @@ The following things are required when upgrading:
 - If you were calling the transform method on a data object, a `TransformationContextFactory` or `TransformationContext` is now the only parameter you can pass
   - Take a look within the docs what has changed
 - If you have implemented a custom `Transformer`, update the `transform` method signature with the new `TransformationContext` parameter
+- If you have implemented a custom `Cast`
+  - The `$castContext` parameter is renamed to `$properties` and changed it type from `array` to  `collection`
+  - A new `$creationContext` parameter is added of type `CreationContext`
 - If you have implemented a custom DataPipe, update the `handle` method signature with the new `TransformationContext` parameter
 - If you manually created `ValidatePropertiesDataPipe` using the `allTypes` parameter, please now use the creation context for this
 - The `withoutMagicalCreationFrom` method was removed from data in favour for creation by factory

@@ -42,7 +42,7 @@ trait BaseData
         return null;
     }
 
-    public static function from(mixed ...$payloads): BaseDataContract
+    public static function from(mixed ...$payloads): static
     {
         return static::factory()->from(...$payloads);
     }

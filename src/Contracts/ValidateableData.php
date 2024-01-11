@@ -13,7 +13,7 @@ interface ValidateableData
     /**
      * @return static
      */
-    public static function validateAndCreate(Arrayable|array $payload): ValidateableDataContract;
+    public static function validateAndCreate(Arrayable|array $payload): static;
 
     public static function withValidator(Validator $validator): void;
 }

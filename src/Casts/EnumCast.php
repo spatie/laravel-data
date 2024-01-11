@@ -3,7 +3,9 @@
 namespace Spatie\LaravelData\Casts;
 
 use BackedEnum;
+use Illuminate\Support\Collection;
 use Spatie\LaravelData\Exceptions\CannotCastEnum;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;
 use Throwable;
 
@@ -14,7 +16,7 @@ class EnumCast implements Cast
     ) {
     }
 
-    public function cast(DataProperty $property, mixed $value, array $context): BackedEnum | Uncastable
+    public function cast(DataProperty $property, mixed $value, Collection $properties, CreationContext $context): BackedEnum | Uncastable
     {
         $type = $this->type ?? $property->type->type->findAcceptedTypeForBaseType(BackedEnum::class);
 

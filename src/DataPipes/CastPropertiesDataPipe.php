@@ -23,8 +23,6 @@ class CastPropertiesDataPipe implements DataPipe
         Collection $properties,
         CreationContext $creationContext
     ): Collection {
-        $castContext = $properties->all();
-
         foreach ($properties as $name => $value) {
             $dataProperty = $class->properties->first(fn (DataProperty $dataProperty) => $dataProperty->name === $name);
 
@@ -36,7 +34,7 @@ class CastPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            $properties[$name] = $this->cast($dataProperty, $value, $castContext, $creationContext);
+            $properties[$name] = $this->cast($dataProperty, $value, $properties, $creationContext);
         }
 
         return $properties;
@@ -45,7 +43,7 @@ class CastPropertiesDataPipe implements DataPipe
     protected function cast(
         DataProperty $property,
         mixed $value,
-        array $castContext,
+        Collection $properties,
         CreationContext $creationContext
     ): mixed {
         $shouldCast = $this->shouldBeCasted($property, $value);
@@ -55,15 +53,15 @@ class CastPropertiesDataPipe implements DataPipe
         }
 
         if ($cast = $property->cast) {
-            return $cast->cast($property, $value, $castContext);
+            return $cast->cast($property, $value, $properties, $creationContext);
         }
 
         if ($cast = $creationContext->casts?->findCastForValue($property)) {
-            return $cast->cast($property, $value, $castContext);
+            return $cast->cast($property, $value, $properties, $creationContext);
         }
 
         if ($cast = $this->dataConfig->casts->findCastForValue($property)) {
-            return $cast->cast($property, $value, $castContext);
+            return $cast->cast($property, $value, $properties, $creationContext);
         }
 
         if ($property->type->kind->isDataObject() && $property->type->dataClass) {

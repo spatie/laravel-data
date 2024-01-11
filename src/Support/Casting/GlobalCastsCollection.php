@@ -24,6 +24,13 @@ class GlobalCastsCollection implements IteratorAggregate
 
         return $this;
     }
+    
+    public function merge(self $casts): self
+    {
+        $this->casts = array_merge($this->casts, $casts->casts);
+
+        return $this;
+    }
 
     public function findCastForValue(DataProperty $property): ?Cast
     {

@@ -48,7 +48,7 @@ trait ValidateableData
         return $validator->validated();
     }
 
-    public static function validateAndCreate(Arrayable|array $payload): ValidateableDataContract
+    public static function validateAndCreate(Arrayable|array $payload): static
     {
         return static::factory()
             ->alwaysValidate()

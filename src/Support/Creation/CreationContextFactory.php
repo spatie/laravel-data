@@ -125,6 +125,20 @@ class CreationContextFactory
         return $this;
     }
 
+    public function withCastCollection(
+        GlobalCastsCollection $casts,
+    ): self {
+        if ($this->casts === null) {
+            $this->casts = $casts;
+
+            return $this;
+        }
+
+        $this->casts->merge($casts);
+
+        return $this;
+    }
+
     public function get(): CreationContext
     {
         return new CreationContext(

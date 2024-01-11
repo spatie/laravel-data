@@ -31,7 +31,7 @@ interface BaseData
     /**
      * @return static
      */
-    public static function from(mixed ...$payloads): BaseDataContract;
+    public static function from(mixed ...$payloads): static;
 
     /**
      * @param Collection<TKey, TValue>|EloquentCollection<TKey, TValue>|LazyCollection<TKey, TValue>|Enumerable|array<TKey, TValue>|AbstractPaginator|PaginatorContract|AbstractCursorPaginator|CursorPaginatorContract|DataCollection<TKey, TValue> $items

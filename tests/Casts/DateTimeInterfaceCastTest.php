@@ -5,6 +5,7 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonTimeZone;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Casts\Uncastable;
+use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\DataProperty;
 
 it('can cast date times', function () {
@@ -24,7 +25,8 @@ it('can cast date times', function () {
         $caster->cast(
             DataProperty::create(new ReflectionProperty($class, 'carbon')),
             '19-05-1994 00:00:00',
-            []
+            collect(),
+            CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(new Carbon('19-05-1994 00:00:00'));
 
@@ -32,7 +34,8 @@ it('can cast date times', function () {
         $caster->cast(
             DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')),
             '19-05-1994 00:00:00',
-            []
+            collect(),
+            CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(new CarbonImmutable('19-05-1994 00:00:00'));
 
@@ -40,7 +43,8 @@ it('can cast date times', function () {
         $caster->cast(
             DataProperty::create(new ReflectionProperty($class, 'dateTime')),
             '19-05-1994 00:00:00',
-            []
+            collect(),
+            CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(new DateTime('19-05-1994 00:00:00'));
 
@@ -48,7 +52,8 @@ it('can cast date times', function () {
         $caster->cast(
             DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')),
             '19-05-1994 00:00:00',
-            []
+            collect(),
+            CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(new DateTimeImmutable('19-05-1994 00:00:00'));
 });
@@ -64,7 +69,8 @@ it('fails when it cannot cast a date into the correct format', function () {
         $caster->cast(
             DataProperty::create(new ReflectionProperty($class, 'carbon')),
             '19-05-1994',
-            []
+            collect(),
+            CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(new DateTime('19-05-1994 00:00:00'));
 })->throws(Exception::class);
@@ -80,7 +86,8 @@ it('fails with other types', function () {
         $caster->cast(
             DataProperty::create(new ReflectionProperty($class, 'int')),
             '1994-05-16 12:20:00',
-            []
+            collect(),
+            CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(Uncastable::create());
 });
@@ -101,34 +108,38 @@ it('can set an alternative timezone', function () {
     expect($caster->cast(
         DataProperty::create(new ReflectionProperty($class, 'carbon')),
         '19-05-1994 00:00:00',
-        []
+        collect(),
+        CreationContextFactory::createFromConfig($class::class)->get()
     ))
-    ->format('Y-m-d H:i:s')->toEqual('1994-05-19 02:00:00')
-    ->getTimezone()->toEqual(CarbonTimeZone::create('Europe/Brussels'));
+        ->format('Y-m-d H:i:s')->toEqual('1994-05-19 02:00:00')
+        ->getTimezone()->toEqual(CarbonTimeZone::create('Europe/Brussels'));
 
     expect($caster->cast(
         DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')),
         '19-05-1994 00:00:00',
-        []
+        collect(),
+        CreationContextFactory::createFromConfig($class::class)->get()
     ))
-    ->format('Y-m-d H:i:s')->toEqual('1994-05-19 02:00:00')
-    ->getTimezone()->toEqual(CarbonTimeZone::create('Europe/Brussels'));
+        ->format('Y-m-d H:i:s')->toEqual('1994-05-19 02:00:00')
+        ->getTimezone()->toEqual(CarbonTimeZone::create('Europe/Brussels'));
 
     expect($caster->cast(
         DataProperty::create(new ReflectionProperty($class, 'dateTime')),
         '19-05-1994 00:00:00',
-        []
+        collect(),
+        CreationContextFactory::createFromConfig($class::class)->get()
     ))
-    ->format('Y-m-d H:i:s')->toEqual('1994-05-19 02:00:00')
-    ->getTimezone()->toEqual(new DateTimeZone('Europe/Brussels'));
+        ->format('Y-m-d H:i:s')->toEqual('1994-05-19 02:00:00')
+        ->getTimezone()->toEqual(new DateTimeZone('Europe/Brussels'));
 
     expect($caster->cast(
         DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')),
         '19-05-1994 00:00:00',
-        []
+        collect(),
+        CreationContextFactory::createFromConfig($class::class)->get()
     ))
-    ->format('Y-m-d H:i:s')->toEqual('1994-05-19 02:00:00')
-    ->getTimezone()->toEqual(new DateTimeZone('Europe/Brussels'));
+        ->format('Y-m-d H:i:s')->toEqual('1994-05-19 02:00:00')
+        ->getTimezone()->toEqual(new DateTimeZone('Europe/Brussels'));
 });
 
 it('can cast date times with a timezone', function () {
@@ -147,32 +158,36 @@ it('can cast date times with a timezone', function () {
     expect($caster->cast(
         DataProperty::create(new ReflectionProperty($class, 'carbon')),
         '19-05-1994 00:00:00',
-        []
+        collect(),
+        CreationContextFactory::createFromConfig($class::class)->get()
     ))
-    ->format('Y-m-d H:i:s')->toEqual('1994-05-19 00:00:00')
-    ->getTimezone()->toEqual(CarbonTimeZone::create('Europe/Brussels'));
+        ->format('Y-m-d H:i:s')->toEqual('1994-05-19 00:00:00')
+        ->getTimezone()->toEqual(CarbonTimeZone::create('Europe/Brussels'));
 
     expect($caster->cast(
         DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')),
         '19-05-1994 00:00:00',
-        []
+        collect(),
+        CreationContextFactory::createFromConfig($class::class)->get()
     ))
-    ->format('Y-m-d H:i:s')->toEqual('1994-05-19 00:00:00')
-    ->getTimezone()->toEqual(CarbonTimeZone::create('Europe/Brussels'));
+        ->format('Y-m-d H:i:s')->toEqual('1994-05-19 00:00:00')
+        ->getTimezone()->toEqual(CarbonTimeZone::create('Europe/Brussels'));
 
     expect($caster->cast(
         DataProperty::create(new ReflectionProperty($class, 'dateTime')),
         '19-05-1994 00:00:00',
-        []
+        collect(),
+        CreationContextFactory::createFromConfig($class::class)->get()
     ))
-    ->format('Y-m-d H:i:s')->toEqual('1994-05-19 00:00:00')
-    ->getTimezone()->toEqual(new DateTimeZone('Europe/Brussels'));
+        ->format('Y-m-d H:i:s')->toEqual('1994-05-19 00:00:00')
+        ->getTimezone()->toEqual(new DateTimeZone('Europe/Brussels'));
 
     expect($caster->cast(
         DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')),
         '19-05-1994 00:00:00',
-        []
+        collect(),
+        CreationContextFactory::createFromConfig($class::class)->get()
     ))
-    ->format('Y-m-d H:i:s')->toEqual('1994-05-19 00:00:00')
-    ->getTimezone()->toEqual(new DateTimeZone('Europe/Brussels'));
+        ->format('Y-m-d H:i:s')->toEqual('1994-05-19 00:00:00')
+        ->getTimezone()->toEqual(new DateTimeZone('Europe/Brussels'));
 });

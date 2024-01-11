@@ -917,7 +917,7 @@ it('can use context in casts based upon the properties of the data object', func
     ]);
 
     expect($data)->casted
-        ->toEqual('json:+{"nested":"Hello","string":"world","casted":"json:"}');
+        ->toEqual('json:+{"nested":{"string":"Hello"},"string":"world","casted":"json:"}');
 });
 
 it('will transform native enums', function () {
