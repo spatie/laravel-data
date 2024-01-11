@@ -4,12 +4,16 @@ namespace Spatie\LaravelData\Contracts;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Validation\Validator;
+use Spatie\LaravelData\Contracts\ValidateableData as ValidateableDataContract;
 
 interface ValidateableData
 {
     public static function validate(Arrayable|array $payload): Arrayable|array;
 
-    public static function validateAndCreate(Arrayable|array $payload): static;
+    /**
+     * @return static
+     */
+    public static function validateAndCreate(Arrayable|array $payload): ValidateableDataContract;
 
     public static function withValidator(Validator $validator): void;
 }

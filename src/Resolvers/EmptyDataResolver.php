@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
+use Spatie\LaravelData\Concerns\EmptyData;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
@@ -35,29 +36,33 @@ class EmptyDataResolver
 
     protected function getValueForProperty(DataProperty $property): mixed
     {
-        if ($property->type->isMixed()) {
+        $propertyType = $property->type;
+        if ($propertyType->isMixed()) {
             return null;
         }
 
-        if ($property->type->type instanceof MultiType && $property->type->type->acceptedTypesCount() > 1) {
+        if ($propertyType->type instanceof MultiType && $propertyType->type->acceptedTypesCount() > 1) {
             throw DataPropertyCanOnlyHaveOneType::create($property);
         }
 
-        if ($property->type->type->acceptsType('array')) {
+        if ($propertyType->type->acceptsType('array')) {
             return [];
         }
 
-        if ($property->type->kind->isDataObject()
-            && $this->dataConfig->getDataClass($property->type->dataClass)->emptyData
+        if ($propertyType->kind->isDataObject()
+            && $this->dataConfig->getDataClass($propertyType->dataClass)->emptyData
         ) {
-            return $property->type->dataClass::empty();
+            /** @var class-string<EmptyData> $dataClass  */
+            $dataClass = $propertyType->dataClass;
+
+            return $dataClass::empty();
         }
 
-        if ($property->type->kind->isDataCollectable()) {
+        if ($propertyType->kind->isDataCollectable()) {
             return [];
         }
 
-        if ($property->type->type->findAcceptedTypeForBaseType(Traversable::class) !== null) {
+        if ($propertyType->type->findAcceptedTypeForBaseType(Traversable::class) !== null) {
             return [];
         }
 

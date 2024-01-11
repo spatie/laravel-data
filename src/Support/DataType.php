@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support;
 
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\EmptyData;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Support\Types\Type;
 
