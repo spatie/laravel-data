@@ -217,7 +217,7 @@ You can also use the values of the data object in such condition:
 AlbumData::from(Album::first())->includeWhen('songs', fn(AlbumData $data) => count($data->songs) > 0);
 AlbumData::from(Album::first())->excludeWhen('songs', fn(AlbumData $data) => count($data->songs) > 0);
 AlbumData::from(Album::first())->onlyWhen('songs', fn(AlbumData $data) => count($data->songs) > 0);
-AlbumData::from(Album::first())->except('songs', fn(AlbumData $data) => count($data->songs) > 0);
+AlbumData::from(Album::first())->exceptWhen('songs', fn(AlbumData $data) => count($data->songs) > 0);
 ```
 
 In some cases you may want to define an include on a class level by implementing a method:
