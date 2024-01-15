@@ -3,8 +3,10 @@
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonTimeZone;
+use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Casts\Uncastable;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\DataProperty;
 
@@ -190,4 +192,19 @@ it('can cast date times with a timezone', function () {
     ))
         ->format('Y-m-d H:i:s')->toEqual('1994-05-19 00:00:00')
         ->getTimezone()->toEqual(new DateTimeZone('Europe/Brussels'));
+});
+
+it('can define multiple date formats to be used', function () {
+    $data = new class () extends Data {
+        public function __construct(
+            #[WithCast(DateTimeInterfaceCast::class, ['Y-m-d\TH:i:sP', 'Y-m-d H:i:s'])]
+            public ?DateTime $date = null
+        ) {
+        }
+    };
+
+    expect($data::from(['date' => '2022-05-16T14:37:56+00:00']))->toArray()
+        ->toMatchArray(['date' => '2022-05-16T14:37:56+00:00'])
+        ->and($data::from(['date' => '2022-05-16 17:00:00']))->toArray()
+        ->toMatchArray(['date' => '2022-05-16T17:00:00+00:00']);
 });

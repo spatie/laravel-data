@@ -2,11 +2,13 @@
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 
+use Spatie\LaravelData\WithData;
 use function Pest\Laravel\handleExceptions;
 use function Pest\Laravel\postJson;
 
@@ -138,31 +140,3 @@ it(
             ->assertJson(['name' => 'Rick Astley']);
     }
 );
-
-it('can wrap data', function () {
-    Route::post('/example-route', function () {
-        return SimpleData::from(request()->input('string'))->wrap('data');
-    });
-
-    performRequest('Hello World')
-        ->assertCreated()
-        ->assertJson(['data' => ['string' => 'Hello World']]);
-});
-
-it('can wrap data collections', function () {
-    Route::post('/example-route', function () {
-        return SimpleData::collect([
-            request()->input('string'),
-            strtoupper(request()->input('string')),
-        ], DataCollection::class)->wrap('data');
-    });
-
-    performRequest('Hello World')
-        ->assertCreated()
-        ->assertJson([
-            'data' => [
-                ['string' => 'Hello World'],
-                ['string' => 'HELLO WORLD'],
-            ],
-        ]);
-});

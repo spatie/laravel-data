@@ -20,7 +20,7 @@ use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
 use Spatie\LaravelData\Contracts\TransformableData as TransformableDataContract;
 use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 
-class Resource implements BaseDataContract, AppendableDataContract, IncludeableDataContract, ResponsableDataContract, TransformableDataContract, WrappableDataContract, EmptyDataContract, DefaultDataContract
+class Resource implements BaseDataContract, AppendableDataContract, IncludeableDataContract, ResponsableDataContract, TransformableDataContract, WrappableDataContract, EmptyDataContract
 {
     use BaseData;
     use AppendableData;
@@ -30,5 +30,4 @@ class Resource implements BaseDataContract, AppendableDataContract, IncludeableD
     use WrappableData;
     use EmptyData;
     use ContextableData;
-    use DefaultableData;
 }

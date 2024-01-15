@@ -16,20 +16,10 @@ class DefaultValuesDataPipe implements DataPipe
         Collection $properties,
         CreationContext $creationContext
     ): Collection {
-        $dataDefaults = $class->defaultable
-            ? app()->call([$class->name, 'defaults'])
-            : [];
-
         $class
             ->properties
             ->filter(fn (DataProperty $property) => ! $properties->has($property->name))
-            ->each(function (DataProperty $property) use ($dataDefaults, &$properties) {
-                if (array_key_exists($property->name, $dataDefaults)) {
-                    $properties[$property->name] = $dataDefaults[$property->name];
-
-                    return;
-                }
-
+            ->each(function (DataProperty $property) use (&$properties) {
                 if ($property->hasDefaultValue) {
                     $properties[$property->name] = $property->defaultValue;
 

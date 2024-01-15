@@ -13,7 +13,6 @@ use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\ContextableData;
 use Spatie\LaravelData\Contracts\DataObject;
-use Spatie\LaravelData\Contracts\DefaultableData;
 use Spatie\LaravelData\Contracts\EmptyData;
 use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Contracts\ResponsableData;
@@ -594,7 +593,6 @@ it(
                 AppendableData::class,
                 ContextableData::class,
                 BaseData::class,
-                DefaultableData::class,
                 IncludeableData::class,
                 ResponsableData::class,
                 TransformableData::class,

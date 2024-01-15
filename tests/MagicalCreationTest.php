@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelData\Data;

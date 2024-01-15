@@ -25,5 +25,4 @@ abstract class Data implements DataObject
     use BaseData;
     use EmptyData;
     use ContextableData;
-    use DefaultableData;
 }
