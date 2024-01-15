@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Contracts;
 
 use Illuminate\Contracts\Support\Responsable;
-use Symfony\Component\HttpFoundation\Response;
 
 interface ResponsableData extends TransformableData, Responsable
 {
