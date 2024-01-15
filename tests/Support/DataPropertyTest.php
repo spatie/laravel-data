@@ -6,12 +6,14 @@ use Spatie\LaravelData\Attributes\Hidden;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithCastAndTransformer;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Tests\Fakes\CastTransformers\FakeCastTransformer;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
@@ -51,6 +53,16 @@ it('can get the transformer attribute with arguments', function () {
     });
 
     expect($helper->transformer)->toEqual(new DateTimeInterfaceTransformer('d-m-y'));
+});
+
+it('can get the cast with transformer attribute', function () {
+    $helper = resolveHelper(new class () {
+        #[WithCastAndTransformer(FakeCastTransformer::class)]
+        public SimpleData $property;
+    });
+
+    expect($helper->transformer)->toEqual(new FakeCastTransformer());
+    expect($helper->cast)->toEqual(new FakeCastTransformer());
 });
 
 it('can get the mapped input name', function () {

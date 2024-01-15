@@ -8,6 +8,7 @@ use ReflectionProperty;
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\GetsCast;
 use Spatie\LaravelData\Attributes\Hidden;
+use Spatie\LaravelData\Attributes\WithCastAndTransformer;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\Cast;
@@ -89,7 +90,7 @@ class DataProperty
             hasDefaultValue: $property->isPromoted() ? $hasDefaultValue : $property->hasDefaultValue(),
             defaultValue: $property->isPromoted() ? $defaultValue : $property->getDefaultValue(),
             cast: $attributes->first(fn (object $attribute) => $attribute instanceof GetsCast)?->get(),
-            transformer: $attributes->first(fn (object $attribute) => $attribute instanceof WithTransformer)?->get(),
+            transformer: $attributes->first(fn (object $attribute) => $attribute instanceof WithTransformer || $attribute instanceof WithCastAndTransformer)?->get(),
             inputMappedName: $inputMappedName,
             outputMappedName: $outputMappedName,
             attributes: $attributes,

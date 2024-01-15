@@ -12,11 +12,6 @@ use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 trait ResponsableData
 {
-    /**
-     * @param \Illuminate\Http\Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
     public function toResponse($request)
     {
         $contextFactory = TransformationContextFactory::create()

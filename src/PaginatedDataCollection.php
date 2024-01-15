@@ -48,9 +48,11 @@ class PaginatedDataCollection implements DataCollectable
     }
 
     /**
-     * @param Closure(TValue, TKey): TValue $through
+     * @template TOtherValue
      *
-     * @return static
+     * @param Closure(TValue, TKey): TOtherValue $through
+     *
+     * @return static<TKey, TOtherValue>
      */
     public function through(Closure $through): static
     {
