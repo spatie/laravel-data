@@ -3,21 +3,13 @@
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
-use Spatie\LaravelData\Concerns\WithDeprecatedCollectionMethod;
-use Spatie\LaravelData\Contracts\DeprecatedData as DeprecatedDataContract;
-use Spatie\LaravelData\CursorPaginatedDataCollection;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\Collections\CustomCollection;
-use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
-use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
-use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can filter a collection', function () {
@@ -284,4 +276,3 @@ it('can use a custom collection extended from collection to collect a collection
     expect($collection[0])->toBeInstanceOf(SimpleData::class);
     expect($collection[1])->toBeInstanceOf(SimpleData::class);
 });
-

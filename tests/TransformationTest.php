@@ -25,6 +25,7 @@ use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
 use Spatie\LaravelData\Tests\Fakes\UlarData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 use Spatie\LaravelData\Transformers\Transformer;
+
 use function Spatie\Snapshots\assertMatchesJsonSnapshot;
 
 it('can transform a data object', function () {

@@ -51,7 +51,7 @@ it('can execute excepts', function (
     array $expectedVisibleFields,
     array $expectedTransformed
 ) {
-    $dataClass = new class() extends Data {
+    $dataClass = new class () extends Data {
         /**
          * @param array<SimpleData> $collection
          */

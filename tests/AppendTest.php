@@ -83,4 +83,3 @@ test('when using additional method and with method the additional method will be
         'alt_name' => 'I m Freek from additional',
     ]);
 });
-
