@@ -8,6 +8,7 @@ use Spatie\LaravelData\DataCollection;
 /**
  * @template TKey of array-key
  * @template TValue
+ * @template TMapValue
  *
  * @implements \ArrayAccess<TKey, TValue>
  * @implements  DataCollectable<TValue>
@@ -15,7 +16,7 @@ use Spatie\LaravelData\DataCollection;
 trait EnumerableMethods
 {
     /**
-     * @param callable(TValue, TKey): TValue $through
+     * @param callable(TValue, TKey): TMapValue $through
      *
      * @return static
      */
@@ -29,7 +30,7 @@ trait EnumerableMethods
     }
 
     /**
-     * @param callable(TValue, TKey): TValue $map
+     * @param callable(TValue, TKey): TMapValue $map
      *
      * @return static
      */
