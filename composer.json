@@ -43,13 +43,12 @@
     },
     "autoload" : {
         "psr-4" : {
-            "Spatie\\LaravelData\\" : "src",
-            "Spatie\\LaravelData\\Database\\Factories\\" : "database/factories"
+            "Spatie\\LaravelData\\" : "src/"
         }
     },
     "autoload-dev" : {
         "psr-4" : {
-            "Spatie\\LaravelData\\Tests\\" : "tests"
+            "Spatie\\LaravelData\\Tests\\" : "tests/"
         }
     },
     "scripts" : {

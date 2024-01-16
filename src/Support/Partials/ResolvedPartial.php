@@ -108,6 +108,14 @@ class ResolvedPartial implements Stringable
         return [implode('.', $segments)];
     }
 
+    public function toArray(): array
+    {
+        return [
+            'segments' => $this->segments,
+            'pointer' => $this->pointer,
+        ];
+    }
+
     public function next(): self
     {
         $this->pointer++;

@@ -176,6 +176,20 @@ class TransformationContext implements Stringable
         return $this;
     }
 
+    public function toArray(): array
+    {
+        return [
+            'transformValues' => $this->transformValues,
+            'mapPropertyNames' => $this->mapPropertyNames,
+            'wrapExecutionType' => $this->wrapExecutionType,
+            'transformers' => $this->transformers !== null ? iterator_to_array($this->transformers) : null,
+            'includedPartials' => $this->includedPartials?->toArray(),
+            'excludedPartials' => $this->excludedPartials?->toArray(),
+            'onlyPartials' => $this->onlyPartials?->toArray(),
+            'exceptPartials' => $this->exceptPartials?->toArray(),
+        ];
+    }
+
     public function __clone(): void
     {
         if ($this->includedPartials !== null) {

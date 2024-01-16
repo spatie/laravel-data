@@ -15,6 +15,9 @@ use ReflectionProperty;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
 
+/**
+ * @note To myself, always use the fully qualified class names in pest tests when using anonymous classes
+ */
 class DataCollectableAnnotationReader
 {
     /** @var array<string, Context> */
@@ -219,7 +222,6 @@ class DataCollectableAnnotationReader
 
         return ltrim((string) $type, '\\');
     }
-
 
     protected function getContext(ReflectionProperty|ReflectionClass|ReflectionMethod $reflection): Context
     {

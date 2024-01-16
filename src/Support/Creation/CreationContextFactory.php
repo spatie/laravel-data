@@ -55,6 +55,19 @@ class CreationContextFactory
         );
     }
 
+    public static function createFromContext(
+        CreationContext $context
+    ) {
+        return new self(
+            dataClass: $context->dataClass,
+            validationType: $context->validationType,
+            mapPropertyNames: $context->mapPropertyNames,
+            withoutMagicalCreation: $context->withoutMagicalCreation,
+            ignoredMagicalMethods: $context->ignoredMagicalMethods,
+            casts: $context->casts,
+        );
+    }
+
     public function validationType(ValidationType $validationType): self
     {
         $this->validationType = $validationType;
@@ -112,7 +125,7 @@ class CreationContextFactory
      */
     public function withCast(
         string $castable,
-        Cast|string $cast,
+        Cast | string $cast,
     ): self {
         $cast = is_string($cast) ? app($cast) : $cast;
 
@@ -174,7 +187,7 @@ class CreationContextFactory
     public function collect(
         mixed $items,
         ?string $into = null
-    ): array|DataCollection|PaginatedDataCollection|CursorPaginatedDataCollection|Enumerable|AbstractPaginator|PaginatorContract|AbstractCursorPaginator|CursorPaginatorContract|LazyCollection|Collection {
+    ): array | DataCollection | PaginatedDataCollection | CursorPaginatedDataCollection | Enumerable | AbstractPaginator | PaginatorContract | AbstractCursorPaginator | CursorPaginatorContract | LazyCollection | Collection {
         return DataContainer::get()->dataCollectableFromSomethingResolver()->execute(
             $this->dataClass,
             $this->get(),

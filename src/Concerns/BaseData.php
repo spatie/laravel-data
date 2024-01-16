@@ -95,10 +95,12 @@ trait BaseData
 
     public function __sleep(): array
     {
-        return app(DataConfig::class)->getDataClass(static::class)
+        $dataClass = app(DataConfig::class)->getDataClass(static::class);
+
+        return $dataClass
             ->properties
             ->map(fn (DataProperty $property) => $property->name)
-            ->push('_additional')
+            ->when($dataClass->appendable, fn(Collection $properties) => $properties->push('_additional'))
             ->toArray();
     }
 }

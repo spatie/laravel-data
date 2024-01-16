@@ -71,22 +71,27 @@ class CollectionAnnotationsData
     public array $propertyT;
 
     /**
-     * @param \Spatie\LaravelData\Tests\Fakes\SimpleData[]|null $propertyA
-     * @param null|\Spatie\LaravelData\Tests\Fakes\SimpleData[] $propertyB
-     * @param  ?\Spatie\LaravelData\Tests\Fakes\SimpleData[] $propertyC
-     * @param ?\Spatie\LaravelData\Tests\Fakes\SimpleData[] $propertyD
-     * @param \Spatie\LaravelData\DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData> $propertyE
-     * @param ?\Spatie\LaravelData\DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData> $propertyF
-     * @param SimpleData[] $propertyG
+     * @param \Spatie\LaravelData\Tests\Fakes\SimpleData[]|null $paramA
+     * @param null|\Spatie\LaravelData\Tests\Fakes\SimpleData[] $paramB
+     * @param  ?\Spatie\LaravelData\Tests\Fakes\SimpleData[] $paramC
+     * @param ?\Spatie\LaravelData\Tests\Fakes\SimpleData[] $paramD
+     * @param \Spatie\LaravelData\DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData> $paramE
+     * @param ?\Spatie\LaravelData\DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData> $paramF
+     * @param SimpleData[] $paramG
+     * @param array<SimpleData> $paramH
+     * @param array<int,SimpleData> $paramJ
+     * @param array<int, SimpleData> $paramI
      */
     public function method(
-        array $propertyA,
-        ?array $propertyB,
-        ?array $propertyC,
-        array $propertyD,
-        DataCollection $propertyE,
-        ?DataCollection $propertyF,
-        array $propertyG,
+        array $paramA,
+        ?array $paramB,
+        ?array $paramC,
+        array $paramD,
+        DataCollection $paramE,
+        ?DataCollection $paramF,
+        array $paramG,
+        array $paramJ,
+        array $paramI,
     ) {
 
     }

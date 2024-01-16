@@ -101,12 +101,15 @@ it('can get data class for a data collection by method annotation', function () 
     $annotations = app(DataCollectableAnnotationReader::class)->getForMethod(new ReflectionMethod(CollectionAnnotationsData::class, 'method'));
 
     expect($annotations)->toEqualCanonicalizing([
-        new DataCollectableAnnotation(SimpleData::class, property: 'propertyA'),
-        new DataCollectableAnnotation(SimpleData::class, property: 'propertyB'),
-        new DataCollectableAnnotation(SimpleData::class, property: 'propertyC'),
-        new DataCollectableAnnotation(SimpleData::class, property: 'propertyD'),
-        new DataCollectableAnnotation(SimpleData::class, property: 'propertyE'),
-        new DataCollectableAnnotation(SimpleData::class, property: 'propertyF'),
-        new DataCollectableAnnotation(SimpleData::class, property: 'propertyG'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'paramA'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'paramB'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'paramC'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'paramD'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'paramE'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'paramF'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'paramG'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'paramH'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'paramJ'),
+        new DataCollectableAnnotation(SimpleData::class, property: 'paramI'),
     ]);
 });

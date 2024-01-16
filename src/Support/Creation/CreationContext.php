@@ -29,11 +29,11 @@ class CreationContext
      */
     public function __construct(
         public string $dataClass,
-        public ValidationType $validationType,
-        public bool $mapPropertyNames,
-        public bool $withoutMagicalCreation,
-        public ?array $ignoredMagicalMethods,
-        public ?GlobalCastsCollection $casts,
+        public readonly ValidationType $validationType,
+        public readonly bool $mapPropertyNames,
+        public readonly bool $withoutMagicalCreation,
+        public readonly ?array $ignoredMagicalMethods,
+        public readonly ?GlobalCastsCollection $casts,
     ) {
     }
 
