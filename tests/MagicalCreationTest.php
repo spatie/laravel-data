@@ -189,7 +189,7 @@ it('can create data ignoring certain magical methods', function () {
 });
 
 it('can inject the creation context when using a magical method', function () {
-    $dataClass = new class extends Data {
+    $dataClass = new class () extends Data {
         public function __construct(
             public string $string = 'something'
         ) {
@@ -303,7 +303,7 @@ it('can disable magically collecting data', function () {
     expect($dataClass::factory()->withoutMagicalCreation()->collect([
         ['string' => 'a'],
         ['string' => 'b'],
-        ['string' => 'c']
+        ['string' => 'c'],
     ]))
         ->toBeArray()
         ->toEqual([
@@ -332,7 +332,7 @@ it('can disable specific magic collecting data methods', function () {
     expect($dataClass::factory()->ignoreMagicalMethod('collectArray')->collect([
         ['string' => 'a'],
         ['string' => 'b'],
-        ['string' => 'c']
+        ['string' => 'c'],
     ]))
         ->toBeArray()
         ->toEqual([
@@ -342,11 +342,11 @@ it('can disable specific magic collecting data methods', function () {
         ]);
 });
 
-it('can inject the creation context when collecting data with a magical method', function (){
+it('can inject the creation context when collecting data with a magical method', function () {
     $dataClass = new class ('') extends SimpleData {
         public static function collectArray(array $items, CreationContext $context): array
         {
-            return array_map(fn(SimpleData $data) => new SimpleData($data->string . ' ' . $context->dataClass), $items);
+            return array_map(fn (SimpleData $data) => new SimpleData($data->string . ' ' . $context->dataClass), $items);
         }
     };
 

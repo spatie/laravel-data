@@ -100,7 +100,7 @@ trait BaseData
         return $dataClass
             ->properties
             ->map(fn (DataProperty $property) => $property->name)
-            ->when($dataClass->appendable, fn(Collection $properties) => $properties->push('_additional'))
+            ->when($dataClass->appendable, fn (Collection $properties) => $properties->push('_additional'))
             ->toArray();
     }
 }
