@@ -22,26 +22,26 @@ trait ContextableData
                 default => new Wrap(WrapType::UseGlobal),
             };
 
-            $includedPartials = null;
-            $excludedPartials = null;
+            $includePartials = null;
+            $excludePartials = null;
             $onlyPartials = null;
             $exceptPartials = null;
 
             if ($this instanceof IncludeableDataContract) {
                 if (! empty($this->includeProperties())) {
-                    $includedPartials = new PartialsCollection();
+                    $includePartials = new PartialsCollection();
                 }
 
                 foreach ($this->includeProperties() as $key => $value) {
-                    $includedPartials->attach(Partial::fromMethodDefinedKeyAndValue($key, $value));
+                    $includePartials->attach(Partial::fromMethodDefinedKeyAndValue($key, $value));
                 }
 
                 if (! empty($this->excludeProperties())) {
-                    $excludedPartials = new PartialsCollection();
+                    $excludePartials = new PartialsCollection();
                 }
 
                 foreach ($this->excludeProperties() as $key => $value) {
-                    $excludedPartials->attach(Partial::fromMethodDefinedKeyAndValue($key, $value));
+                    $excludePartials->attach(Partial::fromMethodDefinedKeyAndValue($key, $value));
                 }
 
                 if (! empty($this->onlyProperties())) {
@@ -62,8 +62,8 @@ trait ContextableData
             }
 
             return $this->_dataContext = new DataContext(
-                $includedPartials,
-                $excludedPartials,
+                $includePartials,
+                $excludePartials,
                 $onlyPartials,
                 $exceptPartials,
                 $this instanceof WrappableDataContract ? $wrap : new Wrap(WrapType::UseGlobal),

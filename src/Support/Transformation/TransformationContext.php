@@ -20,8 +20,8 @@ class TransformationContext implements Stringable
         public bool $mapPropertyNames = true,
         public WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
         public ?GlobalTransformersCollection $transformers = null,
-        public ?ResolvedPartialsCollection $includedPartials = null,
-        public ?ResolvedPartialsCollection $excludedPartials = null,
+        public ?ResolvedPartialsCollection $includePartials = null,
+        public ?ResolvedPartialsCollection $excludePartials = null,
         public ?ResolvedPartialsCollection $onlyPartials = null,
         public ?ResolvedPartialsCollection $exceptPartials = null,
     ) {
@@ -36,23 +36,23 @@ class TransformationContext implements Stringable
 
     public function addIncludedResolvedPartial(ResolvedPartial ...$resolvedPartials): void
     {
-        if ($this->includedPartials === null) {
-            $this->includedPartials = new ResolvedPartialsCollection();
+        if ($this->includePartials === null) {
+            $this->includePartials = new ResolvedPartialsCollection();
         }
 
         foreach ($resolvedPartials as $resolvedPartial) {
-            $this->includedPartials->attach($resolvedPartial);
+            $this->includePartials->attach($resolvedPartial);
         }
     }
 
     public function addExcludedResolvedPartial(ResolvedPartial ...$resolvedPartials): void
     {
-        if ($this->excludedPartials === null) {
-            $this->excludedPartials = new ResolvedPartialsCollection();
+        if ($this->excludePartials === null) {
+            $this->excludePartials = new ResolvedPartialsCollection();
         }
 
         foreach ($resolvedPartials as $resolvedPartial) {
-            $this->excludedPartials->attach($resolvedPartial);
+            $this->excludePartials->attach($resolvedPartial);
         }
     }
 
@@ -80,20 +80,20 @@ class TransformationContext implements Stringable
 
     public function mergeIncludedResolvedPartials(ResolvedPartialsCollection $partials): void
     {
-        if ($this->includedPartials === null) {
-            $this->includedPartials = new ResolvedPartialsCollection();
+        if ($this->includePartials === null) {
+            $this->includePartials = new ResolvedPartialsCollection();
         }
 
-        $this->includedPartials->addAll($partials);
+        $this->includePartials->addAll($partials);
     }
 
     public function mergeExcludedResolvedPartials(ResolvedPartialsCollection $partials): void
     {
-        if ($this->excludedPartials === null) {
-            $this->excludedPartials = new ResolvedPartialsCollection();
+        if ($this->excludePartials === null) {
+            $this->excludePartials = new ResolvedPartialsCollection();
         }
 
-        $this->excludedPartials->addAll($partials);
+        $this->excludePartials->addAll($partials);
     }
 
     public function mergeOnlyResolvedPartials(ResolvedPartialsCollection $partials): void
@@ -116,15 +116,15 @@ class TransformationContext implements Stringable
 
     public function rollBackPartialsWhenRequired(): void
     {
-        if ($this->includedPartials !== null) {
-            foreach ($this->includedPartials as $includedPartial) {
+        if ($this->includePartials !== null) {
+            foreach ($this->includePartials as $includedPartial) {
                 $includedPartial->rollbackWhenRequired();
             }
         }
 
-        if ($this->excludedPartials !== null) {
-            foreach ($this->excludedPartials as $excludedPartial) {
-                $excludedPartial->rollbackWhenRequired();
+        if ($this->excludePartials !== null) {
+            foreach ($this->excludePartials as $excludePartial) {
+                $excludePartial->rollbackWhenRequired();
             }
         }
 
@@ -183,8 +183,8 @@ class TransformationContext implements Stringable
             'mapPropertyNames' => $this->mapPropertyNames,
             'wrapExecutionType' => $this->wrapExecutionType,
             'transformers' => $this->transformers !== null ? iterator_to_array($this->transformers) : null,
-            'includedPartials' => $this->includedPartials?->toArray(),
-            'excludedPartials' => $this->excludedPartials?->toArray(),
+            'includePartials' => $this->includePartials?->toArray(),
+            'excludePartials' => $this->excludePartials?->toArray(),
             'onlyPartials' => $this->onlyPartials?->toArray(),
             'exceptPartials' => $this->exceptPartials?->toArray(),
         ];
@@ -192,12 +192,12 @@ class TransformationContext implements Stringable
 
     public function __clone(): void
     {
-        if ($this->includedPartials !== null) {
-            $this->includedPartials = clone $this->includedPartials;
+        if ($this->includePartials !== null) {
+            $this->includePartials = clone $this->includePartials;
         }
 
-        if ($this->excludedPartials !== null) {
-            $this->excludedPartials = clone $this->excludedPartials;
+        if ($this->excludePartials !== null) {
+            $this->excludePartials = clone $this->excludePartials;
         }
 
         if ($this->onlyPartials !== null) {
@@ -223,12 +223,12 @@ class TransformationContext implements Stringable
             $output .= "- mapPropertyNames: true".PHP_EOL;
         }
 
-        if ($this->includedPartials !== null && $this->includedPartials->count() > 0) {
-            $output .= $this->includedPartials;
+        if ($this->includePartials !== null && $this->includePartials->count() > 0) {
+            $output .= $this->includePartials;
         }
 
-        if ($this->excludedPartials !== null && $this->excludedPartials->count() > 0) {
-            $output .= $this->excludedPartials;
+        if ($this->excludePartials !== null && $this->excludePartials->count() > 0) {
+            $output .= $this->excludePartials;
         }
 
         if ($this->onlyPartials !== null && $this->onlyPartials->count() > 0) {

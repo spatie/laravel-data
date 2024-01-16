@@ -56,13 +56,13 @@ class VisibleDataFieldsResolver
             $this->performOnly($fields, $transformationContext);
         }
 
-        $includedFields = $transformationContext->includedPartials ? $this->resolveIncludedFields(
+        $includedFields = $transformationContext->includePartials ? $this->resolveIncludedFields(
             $fields,
             $transformationContext,
             $dataClass,
         ) : [];
 
-        $excludedFields = $transformationContext->excludedPartials ? $this->resolveExcludedFields(
+        $excludedFields = $transformationContext->excludePartials ? $this->resolveExcludedFields(
             $fields,
             $transformationContext,
             $dataClass,
@@ -193,7 +193,7 @@ class VisibleDataFieldsResolver
     ): array {
         $includedFields = [];
 
-        foreach ($transformationContext->includedPartials as $includedPartial) {
+        foreach ($transformationContext->includePartials as $includedPartial) {
             if ($includedPartial->isUndefined()) {
                 continue;
             }
@@ -238,12 +238,12 @@ class VisibleDataFieldsResolver
     ): array {
         $excludedFields = [];
 
-        foreach ($transformationContext->excludedPartials as $excludedPartial) {
-            if ($excludedPartial->isUndefined()) {
+        foreach ($transformationContext->excludePartials as $excludePartial) {
+            if ($excludePartial->isUndefined()) {
                 continue;
             }
 
-            if ($excludedPartial->isAll()) {
+            if ($excludePartial->isAll()) {
                 $excludedFields = $dataClass
                     ->properties
                     ->filter(fn (DataProperty $property) => $property->type->lazyType !== null && array_key_exists($property->name, $fields))
@@ -251,20 +251,19 @@ class VisibleDataFieldsResolver
                     ->all();
 
                 foreach ($excludedFields as $excludedField) {
-                    $fields[$excludedField]?->addExcludedResolvedPartial($excludedPartial->next());
+                    $fields[$excludedField]?->addExcludedResolvedPartial($excludePartial->next());
                 }
 
                 break;
             }
 
-            if ($nested = $excludedPartial->getNested()) {
-                $fields[$nested]->addExcludedResolvedPartial($excludedPartial->next());
-                $excludedFields[] = $nested;
+            if ($nested = $excludePartial->getNested()) {
+                $fields[$nested]->addExcludedResolvedPartial($excludePartial->next());
 
                 continue;
             }
 
-            if ($selectedFields = $excludedPartial->getFields()) {
+            if ($selectedFields = $excludePartial->getFields()) {
                 array_push($excludedFields, ...$selectedFields);
             }
         }

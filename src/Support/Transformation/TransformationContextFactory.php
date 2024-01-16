@@ -25,8 +25,8 @@ class TransformationContextFactory
         public bool $mapPropertyNames = true,
         public WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
         public ?GlobalTransformersCollection $transformers = null,
-        public ?PartialsCollection $includedPartials = null,
-        public ?PartialsCollection $excludedPartials = null,
+        public ?PartialsCollection $includePartials = null,
+        public ?PartialsCollection $excludePartials = null,
         public ?PartialsCollection $onlyPartials = null,
         public ?PartialsCollection $exceptPartials = null,
     ) {
@@ -35,30 +35,30 @@ class TransformationContextFactory
     public function get(
         BaseData|BaseDataCollectable $data,
     ): TransformationContext {
-        $includedPartials = null;
+        $includePartials = null;
 
-        if ($this->includedPartials) {
-            $includedPartials = new ResolvedPartialsCollection();
+        if ($this->includePartials) {
+            $includePartials = new ResolvedPartialsCollection();
 
-            foreach ($this->includedPartials as $include) {
+            foreach ($this->includePartials as $include) {
                 $resolved = $include->resolve($data);
 
                 if ($resolved) {
-                    $includedPartials->attach($resolved);
+                    $includePartials->attach($resolved);
                 }
             }
         }
 
-        $excludedPartials = null;
+        $excludePartials = null;
 
-        if ($this->excludedPartials) {
-            $excludedPartials = new ResolvedPartialsCollection();
+        if ($this->excludePartials) {
+            $excludePartials = new ResolvedPartialsCollection();
 
-            foreach ($this->excludedPartials as $exclude) {
+            foreach ($this->excludePartials as $exclude) {
                 $resolved = $exclude->resolve($data);
 
                 if ($resolved) {
-                    $excludedPartials->attach($resolved);
+                    $excludePartials->attach($resolved);
                 }
             }
         }
@@ -96,8 +96,8 @@ class TransformationContextFactory
             $this->mapPropertyNames,
             $this->wrapExecutionType,
             $this->transformers,
-            $includedPartials,
-            $excludedPartials,
+            $includePartials,
+            $excludePartials,
             $onlyPartials,
             $exceptPartials,
         );
@@ -137,12 +137,12 @@ class TransformationContextFactory
 
     public function addIncludePartial(Partial ...$partial): static
     {
-        if ($this->includedPartials === null) {
-            $this->includedPartials = new PartialsCollection();
+        if ($this->includePartials === null) {
+            $this->includePartials = new PartialsCollection();
         }
 
         foreach ($partial as $include) {
-            $this->includedPartials->attach($include);
+            $this->includePartials->attach($include);
         }
 
         return $this;
@@ -150,12 +150,12 @@ class TransformationContextFactory
 
     public function addExcludePartial(Partial ...$partial): static
     {
-        if ($this->excludedPartials === null) {
-            $this->excludedPartials = new PartialsCollection();
+        if ($this->excludePartials === null) {
+            $this->excludePartials = new PartialsCollection();
         }
 
         foreach ($partial as $exclude) {
-            $this->excludedPartials->attach($exclude);
+            $this->excludePartials->attach($exclude);
         }
 
         return $this;
@@ -189,22 +189,22 @@ class TransformationContextFactory
 
     public function mergeIncludePartials(PartialsCollection $partials): static
     {
-        if ($this->includedPartials === null) {
-            $this->includedPartials = new PartialsCollection();
+        if ($this->includePartials === null) {
+            $this->includePartials = new PartialsCollection();
         }
 
-        $this->includedPartials->addAll($partials);
+        $this->includePartials->addAll($partials);
 
         return $this;
     }
 
     public function mergeExcludePartials(PartialsCollection $partials): static
     {
-        if ($this->excludedPartials === null) {
-            $this->excludedPartials = new PartialsCollection();
+        if ($this->excludePartials === null) {
+            $this->excludePartials = new PartialsCollection();
         }
 
-        $this->excludedPartials->addAll($partials);
+        $this->excludePartials->addAll($partials);
 
         return $this;
     }

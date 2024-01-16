@@ -10,6 +10,7 @@ use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataContainer;
@@ -68,6 +69,10 @@ class TransformedDataResolver
                 $context,
                 $visibleFields[$name] ?? null,
             );
+
+            if($value instanceof Optional){
+                continue;
+            }
 
             if ($context->mapPropertyNames && $property->outputMappedName) {
                 $name = $property->outputMappedName;
