@@ -70,7 +70,7 @@ class TransformedDataResolver
                 $visibleFields[$name] ?? null,
             );
 
-            if($value instanceof Optional){
+            if($value instanceof Optional) {
                 continue;
             }
 

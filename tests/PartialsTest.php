@@ -2,23 +2,16 @@
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
-use Spatie\LaravelData\Optional;
-use Spatie\LaravelData\Support\Lazy\ClosureLazy;
-use Spatie\LaravelData\Support\Lazy\InertiaLazy;
 use Spatie\LaravelData\Tests\Fakes\CircData;
 use Spatie\LaravelData\Tests\Fakes\DefaultLazyData;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\ExceptData;
-use Spatie\LaravelData\Tests\Fakes\FakeModelData;
-use Spatie\LaravelData\Tests\Fakes\FakeNestedModelData;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
-use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
@@ -1301,4 +1294,3 @@ it('handles circular dependencies', function () {
 
     // Not really a test with expectation, we just want to check we don't end up in an infinite loop
 });
-
