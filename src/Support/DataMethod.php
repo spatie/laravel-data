@@ -105,6 +105,10 @@ class DataMethod
             ? $this->parameters
             : $this->parameters->mapWithKeys(fn (DataParameter|DataProperty $parameter) => [$parameter->name => $parameter]);
 
+        $parameters = $parameters->reject(
+            fn (DataParameter|DataProperty $parameter) => $parameter instanceof DataParameter &&  $parameter->isCreationContext
+        );
+
         if (count($input) > $parameters->count()) {
             return false;
         }

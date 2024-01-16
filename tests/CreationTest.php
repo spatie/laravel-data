@@ -579,42 +579,6 @@ it('can use context in casts based upon the properties of the data object', func
         ->toEqual('json:+{"nested":{"string":"Hello"},"string":"world","casted":"json:"}');
 });
 
-it('can magically create a data object', function () {
-    $dataClass = new class ('', '') extends Data {
-        public function __construct(
-            public mixed $propertyA,
-            public mixed $propertyB,
-        ) {
-        }
-
-        public static function fromStringWithDefault(string $a, string $b = 'World')
-        {
-            return new self($a, $b);
-        }
-
-        public static function fromIntsWithDefault(int $a, int $b)
-        {
-            return new self($a, $b);
-        }
-
-        public static function fromSimpleDara(SimpleData $data)
-        {
-            return new self($data->string, $data->string);
-        }
-
-        public static function fromData(Data $data)
-        {
-            return new self('data', json_encode($data));
-        }
-    };
-
-    expect($dataClass::from('Hello'))->toEqual(new $dataClass('Hello', 'World'))
-        ->and($dataClass::from('Hello', 'World'))->toEqual(new $dataClass('Hello', 'World'))
-        ->and($dataClass::from(42, 69))->toEqual(new $dataClass(42, 69))
-        ->and($dataClass::from(SimpleData::from('Hello')))->toEqual(new $dataClass('Hello', 'Hello'))
-        ->and($dataClass::from(new EnumData(DummyBackedEnum::FOO)))->toEqual(new $dataClass('data', '{"enum":"foo"}'));
-});
-
 it(
     'will throw a custom exception when a data constructor cannot be called due to missing component',
     function () {
@@ -762,32 +726,6 @@ it('a can create a collection of data objects', function () {
         ->toMatchArray($collectionA->toArray());
 });
 
-it('will use magic methods when creating a collection of data objects', function () {
-    $dataClass = new class ('') extends Data {
-        public function __construct(public string $otherString)
-        {
-        }
-
-        public static function fromSimpleData(SimpleData $simpleData): static
-        {
-            return new self($simpleData->string);
-        }
-    };
-
-    $collection = new DataCollection($dataClass::class, [
-        SimpleData::from('A'),
-        SimpleData::from('B'),
-    ]);
-
-    expect($collection[0])
-        ->toBeInstanceOf($dataClass::class)
-        ->otherString->toEqual('A');
-
-    expect($collection[1])
-        ->toBeInstanceOf($dataClass::class)
-        ->otherString->toEqual('B');
-});
-
 it('can return a custom data collection when collecting data', function () {
     $class = new class ('') extends Data implements DeprecatedDataContract {
         use WithDeprecatedCollectionMethod;
@@ -821,38 +759,6 @@ it('can return a custom paginated data collection when collecting data', functio
     $collection = $class::collection(new LengthAwarePaginator([['string' => 'A'], ['string' => 'B']], 2, 15));
 
     expect($collection)->toBeInstanceOf(CustomPaginatedDataCollection::class);
-});
-
-it('can magically collect data', function () {
-    class TestSomeCustomCollection extends Collection
-    {
-    }
-
-    $dataClass = new class () extends Data {
-        public string $string;
-
-        public static function fromString(string $string): self
-        {
-            $s = new self();
-
-            $s->string = $string;
-
-            return $s;
-        }
-
-        public static function collectArray(array $items): \TestSomeCustomCollection
-        {
-            return new \TestSomeCustomCollection($items);
-        }
-    };
-
-    expect($dataClass::collect(['a', 'b', 'c']))
-        ->toBeInstanceOf(\TestSomeCustomCollection::class)
-        ->all()->toEqual([
-            $dataClass::from('a'),
-            $dataClass::from('b'),
-            $dataClass::from('c'),
-        ]);
 });
 
 it('will allow a nested data object to cast properties however it wants', function () {

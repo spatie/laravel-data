@@ -78,8 +78,17 @@ class DataCollectableFromSomethingResolver
         $method = $this->dataConfig
             ->getDataClass($dataClass)
             ->methods
-            ->filter(function (DataMethod $method) use ($into, $items) {
-                if ($method->customCreationMethodType !== CustomCreationMethodType::Collection) {
+            ->filter(function (DataMethod $method) use ($creationContext, $into, $items) {
+                if (
+                    $method->customCreationMethodType !== CustomCreationMethodType::Collection
+                ) {
+                    return false;
+                }
+
+                if (
+                    $creationContext->ignoredMagicalMethods !== null
+                    && in_array($method->name, $creationContext->ignoredMagicalMethods)
+                ) {
                     return false;
                 }
 
@@ -87,24 +96,32 @@ class DataCollectableFromSomethingResolver
                     return false;
                 }
 
-                return $method->accepts([$items]);
+                return $method->accepts($items);
             })
             ->first();
 
-        if ($method !== null) {
-            return $dataClass::{$method->name}(
-                array_map($this->itemsToDataClosure($dataClass, $creationContext), $items)
-            );
+        if ($method === null) {
+            return null;
         }
 
-        return null;
+        $payload = [];
+
+        foreach ($method->parameters as $parameter) {
+            if ($parameter->isCreationContext) {
+                $payload[$parameter->name] = $creationContext;
+            } else {
+                $payload[$parameter->name] = $this->normalizeItems($items, $dataClass, $creationContext);
+            }
+        }
+
+        return $dataClass::{$method->name}(...$payload);
     }
 
     protected function normalizeItems(
         mixed $items,
         string $dataClass,
         CreationContext $creationContext,
-    ): array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator {
+    ): array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator|Enumerable {
         if ($items instanceof PaginatedDataCollection
             || $items instanceof CursorPaginatedDataCollection
             || $items instanceof DataCollection
@@ -120,7 +137,7 @@ class DataCollectableFromSomethingResolver
         }
 
         if ($items instanceof Enumerable) {
-            $items = $items->all();
+            return $items->map($this->itemsToDataClosure($dataClass, $creationContext));
         }
 
         if (is_array($items)) {
@@ -134,8 +151,12 @@ class DataCollectableFromSomethingResolver
     }
 
     protected function normalizeToArray(
-        array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator $items,
+        array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator|Enumerable $items,
     ): array {
+        if ($items instanceof Enumerable) {
+            return $items->all();
+        }
+
         return is_array($items)
             ? $items
             : $items->items();

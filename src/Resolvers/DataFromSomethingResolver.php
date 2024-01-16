@@ -60,25 +60,28 @@ class DataFromSomethingResolver
             ->getDataClass($class)
             ->methods;
 
-        $methodName = null;
+        $method = null;
 
         foreach ($customCreationMethods as $customCreationMethod) {
+            if ($customCreationMethod->customCreationMethodType !== CustomCreationMethodType::Object) {
+                continue;
+            }
+
             if (
-                $customCreationMethod->customCreationMethodType === CustomCreationMethodType::Object
-                && $creationContext->ignoredMagicalMethods !== null
+                $creationContext->ignoredMagicalMethods !== null
                 && in_array($customCreationMethod->name, $creationContext->ignoredMagicalMethods)
             ) {
                 continue;
             }
 
             if ($customCreationMethod->accepts(...$payloads)) {
-                $methodName = $customCreationMethod->name;
+                $method = $customCreationMethod;
 
                 break;
             }
         }
 
-        if ($methodName === null) {
+        if ($method === null) {
             return null;
         }
 
@@ -86,9 +89,18 @@ class DataFromSomethingResolver
 
         foreach ($payloads as $payload) {
             if ($payload instanceof Request) {
+                // Solely for the purpose of validation
                 $pipeline->execute($payload, $creationContext);
             }
         }
+
+        foreach ($method->parameters as $index => $parameter) {
+            if ($parameter->isCreationContext) {
+                $payloads[$index] = $creationContext;
+            }
+        }
+
+        $methodName = $method->name;
 
         return $class::$methodName(...$payloads);
     }
