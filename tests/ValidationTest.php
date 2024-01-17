@@ -13,6 +13,7 @@ use Illuminate\Validation\Rules\In as LaravelIn;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
+use Spatie\LaravelData\Support\Creation\ValidationType;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
@@ -2086,24 +2087,6 @@ it('can validate a payload for a data object and create one using a magic from m
     assertFalse(true, 'We should not end up here');
 });
 
-it('can validate non-requests payloads', function () {
-    $dataClass = new class () extends Data {
-        #[In('Hello World')]
-        public string $string;
-    };
-
-    $data = $dataClass::from([
-        'string' => 'nowp',
-    ]);
-
-    expect($data)->toBeInstanceOf(Data::class)
-        ->string->toEqual('nowp');
-
-    $data = $dataClass::factory()->alwaysValidate()->from([
-        'string' => 'nowp',
-    ]);
-})->throws(ValidationException::class);
-
 it('can the validation rules for a data object', function () {
     expect(MultiData::getValidationRules([]))->toEqual([
         'first' => ['required', 'string'],
@@ -2342,7 +2325,7 @@ it('can add a requiring rule on an attribute which will overwrite the optional t
     DataValidationAsserter::for($dataClass)
         ->assertOk(['success' => true, 'id' => 1])
         ->assertErrors(['success' => true]);
-})->skip('V4: The rule inferrers need to be rewritten/removed for this, we need to first add attribute rules and then decide require stuff');
+})->skip('V5: The rule inferrers need to be rewritten/removed for this, we need to first add attribute rules and then decide require stuff');
 
 it('can validate an optional but nonexists attribute', function () {
     $dataClass = new class () extends Data {
@@ -2354,4 +2337,20 @@ it('can validate an optional but nonexists attribute', function () {
     expect($dataClass::from(['property' => null])->toArray())->toBe(['property' => null]);
     expect($dataClass::from(['property' => []])->toArray())->toBe(['property' => []]);
     expect($dataClass::validateAndCreate([])->toArray())->toBe([]);
+});
+
+it('is possible to define the validation type for each data object globally using config', function (){
+    $dataClass = new class () extends Data {
+        #[In('Hello World')]
+        public string $string;
+    };
+
+    expect($dataClass::from(['string' => 'Nowp']))
+        ->toBeInstanceOf(Data::class)
+        ->string->toBe('Nowp');
+
+    config()->set('data.validation_type', ValidationType::Always->value);
+
+    expect(fn() => $dataClass::from(['string' => 'Nowp']))
+        ->toThrow(ValidationException::class);
 });

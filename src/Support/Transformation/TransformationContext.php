@@ -224,18 +224,22 @@ class TransformationContext implements Stringable
         }
 
         if ($this->includePartials !== null && $this->includePartials->count() > 0) {
+            $output .= "- include partials:".PHP_EOL;
             $output .= $this->includePartials;
         }
 
         if ($this->excludePartials !== null && $this->excludePartials->count() > 0) {
+            $output .= "- exclude partials:".PHP_EOL;
             $output .= $this->excludePartials;
         }
 
         if ($this->onlyPartials !== null && $this->onlyPartials->count() > 0) {
+            $output .= "- only partials:".PHP_EOL;
             $output .= $this->onlyPartials;
         }
 
         if ($this->exceptPartials !== null && $this->exceptPartials->count() > 0) {
+            $output .= "- except partials:".PHP_EOL;
             $output .= $this->exceptPartials;
         }
 

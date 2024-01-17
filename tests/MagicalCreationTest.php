@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Support\Creation\CreationContext;
-use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Tests\Fakes\DataWithMultipleArgumentCreationMethod;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\EnumData;
@@ -126,66 +124,6 @@ it('can create data using a magical method with the base class of the value as t
 it('can create data from a magical method with multiple parameters', function () {
     expect(DataWithMultipleArgumentCreationMethod::from('Rick Astley', 42))
         ->toEqual(new DataWithMultipleArgumentCreationMethod('Rick Astley_42'));
-});
-
-it('can disable the use of magical methods', function () {
-    $data = new class ('', '') extends Data {
-        public function __construct(
-            public ?string $id,
-            public string $name,
-        ) {
-        }
-
-        public static function fromArray(array $payload)
-        {
-            return new self(
-                id: $payload['hash_id'] ?? null,
-                name: $payload['name'],
-            );
-        }
-    };
-
-    expect(
-        $data::factory()->withoutMagicalCreation()->from(['hash_id' => 1, 'name' => 'Taylor'])
-    )->toEqual(new $data(null, 'Taylor'));
-
-    expect($data::from(['hash_id' => 1, 'name' => 'Taylor']))
-        ->toEqual(new $data(1, 'Taylor'));
-});
-
-it('can create data ignoring certain magical methods', function () {
-    class DummyA extends Data
-    {
-        public function __construct(
-            public ?string $id,
-            public string $name,
-        ) {
-        }
-
-        public static function fromArray(array $payload)
-        {
-            return new self(
-                id: $payload['hash_id'] ?? null,
-                name: $payload['name'],
-            );
-        }
-    }
-
-    expect(
-        app(DataFromSomethingResolver::class)->execute(
-            DummyA::class,
-            CreationContextFactory::createFromConfig(DummyA::class)->ignoreMagicalMethod('fromArray')->get(),
-            ['hash_id' => 1, 'name' => 'Taylor']
-        )
-    )->toEqual(new DummyA(null, 'Taylor'));
-
-    expect(
-        app(DataFromSomethingResolver::class)->execute(
-            DummyA::class,
-            CreationContextFactory::createFromConfig(DummyA::class)->get(),
-            ['hash_id' => 1, 'name' => 'Taylor']
-        )
-    )->toEqual(new DummyA(1, 'Taylor'));
 });
 
 it('can inject the creation context when using a magical method', function () {

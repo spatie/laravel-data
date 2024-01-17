@@ -34,7 +34,7 @@ class ResolvedPartialsCollection extends SplObjectStorage implements Stringable
 
     public function __toString(): string
     {
-        $output = "- partials:".PHP_EOL;
+        $output = '';
 
         foreach ($this as $partial) {
             $output .= "  - {$partial}".PHP_EOL;

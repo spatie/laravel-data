@@ -6,17 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
-
+use Spatie\LaravelData\Attributes\WithoutValidation;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 use function Pest\Laravel\handleExceptions;
 use function Pest\Laravel\postJson;
 
-use Spatie\LaravelData\Attributes\WithoutValidation;
-
-use Spatie\LaravelData\Data;
-
-
-use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 
 function performRequest(string $string): TestResponse
 {
@@ -58,6 +54,23 @@ it('can returns a 201 response code for POST requests', function () {
         'string' => 'Hello',
     ])
         ->assertCreated()
+        ->assertJson(['string' => 'Hello']);
+});
+
+it('is possible to overwrite the status response code', function () {
+    Route::post('/example-route', function () {
+        return new class(request()->input('string')) extends SimpleData {
+            protected function calculateResponseStatus(Request $request): int
+            {
+                return 301;
+            }
+        };
+    });
+
+    postJson('/example-route', [
+        'string' => 'Hello',
+    ])
+        ->assertStatus(301)
         ->assertJson(['string' => 'Hello']);
 });
 

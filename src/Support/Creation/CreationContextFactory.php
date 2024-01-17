@@ -47,7 +47,6 @@ class CreationContextFactory
         return new self(
             dataClass: $dataClass,
             validationType: ValidationType::from($config['validation_type']),
-            // TODO: maybe also add these to config, we should do the same for transormation so maybe some config cleanup is needed
             mapPropertyNames: true,
             withoutMagicalCreation: false,
             ignoredMagicalMethods: null,

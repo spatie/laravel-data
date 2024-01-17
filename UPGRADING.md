@@ -28,6 +28,7 @@ The following things are required when upgrading:
 - If you were using internal data structures like `DataClass` and `DataProperty` then take a look at what has been changed
 - The `DataCollectableTransformer` and `DataTransformer` were replaced with their appropriate resolvers
 - If you've cached the data structures, be sure to clear the cache
+- In previous versions, when trying to include, exclude, only or except certain data properties that did not exist not exception was thrown. This is now the case, these exceptions can be silenced by setting `ignore_invalid_partials` to true within the config file
 
 We advise you to take a look at the following things:
 - Take a look within your data objects if `DataCollection`'s, `DataPaginatedCollection`'s and `DataCursorPaginatedCollection`'s can be replaced with regular arrays, Laravel Collections and Paginator

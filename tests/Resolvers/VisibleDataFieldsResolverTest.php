@@ -4,6 +4,7 @@ use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Hidden;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Exceptions\CannotPerformPartialOnDataField;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Resolvers\VisibleDataFieldsResolver;
@@ -20,6 +21,7 @@ use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 use Spatie\LaravelData\Tests\Fakes\FakeModelData;
 use Spatie\LaravelData\Tests\Fakes\FakeNestedModelData;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
+use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 function findVisibleFields(
     Data $data,
@@ -229,6 +231,39 @@ it('always transforms closure lazy into closures for inertia', function () {
     };
 
     expect($dataClass::create('Freek')->toArray()['name'])->toBeInstanceOf(Closure::class);
+});
+
+it('will fail gracefully when a nested field does not exist', function () {
+    $dataClass = new class () extends Data {
+        public Lazy|SimpleData $simple;
+
+        public Lazy|string $string;
+
+        public function __construct()
+        {
+            $this->simple = Lazy::create(fn () => new SimpleData('Hello'));
+            $this->string = Lazy::create(fn () => 'World');
+        }
+    };
+
+    expect(fn () => findVisibleFields($dataClass, TransformationContextFactory::create()->include('certainly-not-simple.string')))->toThrow(
+        CannotPerformPartialOnDataField::class
+    );
+
+    expect(fn () => $dataClass->include('certainly-not-simple.string')->toArray())->toThrow(
+        CannotPerformPartialOnDataField::class
+    );
+
+    config()->set('data.ignore_invalid_partials', true);
+
+    expect(findVisibleFields($dataClass, TransformationContextFactory::create()->include('certainly-not-simple.string', 'string')))
+        ->toEqual([
+            'string' => null,
+        ]);
+
+    expect($dataClass->include('certainly-not-simple.string', 'string')->toArray())->toEqual([
+        'string' => 'World',
+    ]);
 });
 
 class VisibleFieldsSingleData extends Data

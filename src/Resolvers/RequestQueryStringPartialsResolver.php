@@ -105,7 +105,7 @@ class RequestQueryStringPartialsResolver
                 );
 
                 if ($nextSegments === null) {
-                    return [$segment];
+                    return [new FieldsPartialSegment([$field])];
                 }
 
                 return [$segment, ...$nextSegments];

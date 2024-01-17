@@ -120,6 +120,15 @@ class Partial implements Stringable
         return null;
     }
 
+    public function toArray(): array
+    {
+        return [
+            'segments' => $this->segments,
+            'permanent' => $this->permanent,
+            'condition' => $this->condition,
+        ];
+    }
+
     public function __toString(): string
     {
         return implode('.', $this->segments);

@@ -21,6 +21,16 @@ enum PartialType
         };
     }
 
+    public function getVerb(): string
+    {
+        return match ($this) {
+            self::Include => 'include',
+            self::Exclude => 'exclude',
+            self::Only => 'only',
+            self::Except => 'except',
+        };
+    }
+
     /**
      * @return string[]|null
      */
