@@ -304,7 +304,7 @@ class VisibleDataFieldsResolver
             throw $exception;
         }
 
-        if(config('data.ignore_invalid_partials')){
+        if(config('data.ignore_invalid_partials')) {
             return;
         }
 

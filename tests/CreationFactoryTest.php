@@ -122,7 +122,7 @@ it('can add a collection of global casts', function () {
         'int' => new MeaningOfLifeCast(),
     ]);
 
-    $dataClass = new class extends Data {
+    $dataClass = new class () extends Data {
         public string $string;
 
         public int $int;
@@ -137,7 +137,7 @@ it('can add a collection of global casts', function () {
     expect($data)->int->toEqual(42);
 });
 
-it('can collect using a factory', function (){
+it('can collect using a factory', function () {
     $collection = SimpleData::factory()->withCast('string', new StringToUpperCast())->collect([
         ['string' => 'Hello World'],
         ['string' => 'Hello You'],

@@ -1153,7 +1153,7 @@ it('will check if partials are valid as request partials', function (
         'expectedResponse' => [
             'collection' => [
                 [],
-                []
+                [],
             ],
         ],
     ];
