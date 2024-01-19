@@ -11,8 +11,8 @@ on:
       - 'phpbench.json'
 
 jobs:
-  phpstan:
-    name: phpstan
+  benchmarks:
+    name: Benchmarks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
