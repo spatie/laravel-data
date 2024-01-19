@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Casts;
 
 use BackedEnum;
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Exceptions\CannotCastEnum;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;

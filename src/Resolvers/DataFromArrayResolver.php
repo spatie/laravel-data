@@ -3,14 +3,12 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use ArgumentCountError;
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\DataProperty;
 
 /**
  * @template TData of BaseData
@@ -37,7 +35,7 @@ class DataFromArrayResolver
                 $property->isPromoted
                 || $property->isReadonly
                 || ! array_key_exists($property->name, $properties)
-            ){
+            ) {
                 continue;
             }
 

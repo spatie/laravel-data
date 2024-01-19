@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Tests\Fakes\Castables;
 
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Casts\Castable;
 use Spatie\LaravelData\Support\Creation\CreationContext;

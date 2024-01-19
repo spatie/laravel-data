@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Tests\Fakes\CastTransformers;
 
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;

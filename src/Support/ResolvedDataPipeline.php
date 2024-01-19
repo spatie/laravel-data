@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support;
 
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 

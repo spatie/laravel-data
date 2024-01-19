@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
 use Spatie\LaravelData\Support\Creation\CreationContext;

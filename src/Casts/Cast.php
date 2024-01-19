@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Casts;
 
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;
 
