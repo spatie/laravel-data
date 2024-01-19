@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Support\Transformation;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Support\Partials\PartialsCollection;
-use Spatie\LaravelData\Support\Partials\ResolvedPartialsCollection;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 
 class DataContext

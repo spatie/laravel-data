@@ -8,7 +8,7 @@ use Stringable;
 /**
  * @extends SplObjectStorage<Partial, null>
  */
-class PartialsCollection extends SplObjectStorage  implements Stringable
+class PartialsCollection extends SplObjectStorage implements Stringable
 {
     public static function create(Partial ...$partials): self
     {

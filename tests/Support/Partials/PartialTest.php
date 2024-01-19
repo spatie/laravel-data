@@ -206,4 +206,3 @@ it('can use the pointer system when ending in an all', function () {
     expect($partial->getNested())->toBe('struct');
     expect($partial->getFields())->toBe(null);
 });
-
