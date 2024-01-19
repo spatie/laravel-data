@@ -181,9 +181,9 @@ it('can deduce an intersection type definition', function () {
 });
 
 it('can deduce a nullable intersection type definition', function () {
-    $type = resolveDataType(new class () {
-        public (DateTime & DateTimeImmutable)|null $property;
-    });
+    $code = '$type = resolveDataType(new class () {public (DateTime & DateTimeImmutable)|null $property;});';
+
+    eval($code); // We support PHP 8.1 which craches on this
 
     expect($type)
         ->isOptional->toBeFalse()
@@ -200,7 +200,7 @@ it('can deduce a nullable intersection type definition', function () {
 
     expect($type->type)
         ->toBeInstanceOf(IntersectionType::class);
-});
+})->skipOnPhp('<8.2');
 
 it('can deduce a mixed type', function () {
     $type = resolveDataType(new class () {
