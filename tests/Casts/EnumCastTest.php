@@ -4,6 +4,7 @@ use Spatie\LaravelData\Casts\EnumCast;
 use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyUnitEnum;
 
@@ -18,7 +19,7 @@ it('can cast enum', function () {
 
     expect(
         $this->caster->cast(
-            DataProperty::create(new ReflectionProperty($class, 'enum')),
+            FakeDataStructureFactory::property($class, 'enum'),
             'foo',
             collect(),
             CreationContextFactory::createFromConfig($class::class)->get()
@@ -33,7 +34,7 @@ it('fails when it cannot cast an enum from value', function () {
 
     expect(
         $this->caster->cast(
-            DataProperty::create(new ReflectionProperty($class, 'enum')),
+            FakeDataStructureFactory::property($class, 'enum'),
             'bar',
             collect(),
             CreationContextFactory::createFromConfig($class::class)->get()
@@ -48,7 +49,7 @@ it('fails when casting an unit enum', function () {
 
     expect(
         $this->caster->cast(
-            DataProperty::create(new ReflectionProperty($class, 'enum')),
+            FakeDataStructureFactory::property($class, 'enum'),
             'foo',
             collect(),
             CreationContextFactory::createFromConfig($class::class)->get()
@@ -63,7 +64,7 @@ it('fails with other types', function () {
 
     expect(
         $this->caster->cast(
-            DataProperty::create(new ReflectionProperty($class, 'int')),
+            FakeDataStructureFactory::property($class, 'int'),
             'foo',
             collect(),
             CreationContextFactory::createFromConfig($class::class)->get(),

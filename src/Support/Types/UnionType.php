@@ -2,14 +2,10 @@
 
 namespace Spatie\LaravelData\Support\Types;
 
-class UnionType extends MultiType
+class UnionType extends CombinationType
 {
     public function acceptsType(string $type): bool
     {
-        if ($this->isMixed) {
-            return true;
-        }
-
         foreach ($this->types as $subType) {
             if ($subType->acceptsType($type)) {
                 return true;

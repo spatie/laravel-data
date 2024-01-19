@@ -5,6 +5,7 @@ use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
+use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 it('can transform dates', function () {
@@ -22,7 +23,7 @@ it('can transform dates', function () {
 
     expect(
         $transformer->transform(
-            DataProperty::create(new ReflectionProperty($class, 'carbon')),
+            FakeDataStructureFactory::property($class, 'carbon'),
             new Carbon('19-05-1994 00:00:00'),
             TransformationContextFactory::create()->get($class)
         )
@@ -30,7 +31,7 @@ it('can transform dates', function () {
 
     expect(
         $transformer->transform(
-            DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')),
+            FakeDataStructureFactory::property($class, 'carbonImmutable'),
             new CarbonImmutable('19-05-1994 00:00:00'),
             TransformationContextFactory::create()->get($class)
         )
@@ -38,7 +39,7 @@ it('can transform dates', function () {
 
     expect(
         $transformer->transform(
-            DataProperty::create(new ReflectionProperty($class, 'dateTime')),
+            FakeDataStructureFactory::property($class, 'dateTime'),
             new DateTime('19-05-1994 00:00:00'),
             TransformationContextFactory::create()->get($class)
         )
@@ -46,7 +47,7 @@ it('can transform dates', function () {
 
     expect(
         $transformer->transform(
-            DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')),
+            FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
             new DateTimeImmutable('19-05-1994 00:00:00'),
             TransformationContextFactory::create()->get($class)
         )
@@ -68,7 +69,7 @@ it('can transform dates with an alternative format', function () {
 
     expect(
         $transformer->transform(
-            DataProperty::create(new ReflectionProperty($class, 'carbon')),
+            FakeDataStructureFactory::property($class, 'carbon'),
             new Carbon('19-05-1994 00:00:00'),
             TransformationContextFactory::create()->get($class)
         )
@@ -76,7 +77,7 @@ it('can transform dates with an alternative format', function () {
 
     expect(
         $transformer->transform(
-            DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')),
+            FakeDataStructureFactory::property($class, 'carbonImmutable'),
             new CarbonImmutable('19-05-1994 00:00:00'),
             TransformationContextFactory::create()->get($class)
         )
@@ -84,7 +85,7 @@ it('can transform dates with an alternative format', function () {
 
     expect(
         $transformer->transform(
-            DataProperty::create(new ReflectionProperty($class, 'dateTime')),
+            FakeDataStructureFactory::property($class, 'dateTime'),
             new DateTime('19-05-1994 00:00:00'),
             TransformationContextFactory::create()->get($class)
         )
@@ -92,7 +93,7 @@ it('can transform dates with an alternative format', function () {
 
     expect(
         $transformer->transform(
-            DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')),
+            FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
             new DateTimeImmutable('19-05-1994 00:00:00'),
             TransformationContextFactory::create()->get($class)
         )
@@ -114,7 +115,7 @@ it('can change the timezone', function () {
 
     expect(
         $transformer->transform(
-            DataProperty::create(new ReflectionProperty($class, 'carbon')),
+            FakeDataStructureFactory::property($class, 'carbon'),
             new Carbon('19-05-1994 00:00:00'),
             TransformationContextFactory::create()->get($class)
         )
@@ -122,7 +123,7 @@ it('can change the timezone', function () {
 
     expect(
         $transformer->transform(
-            DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')),
+            FakeDataStructureFactory::property($class, 'carbonImmutable'),
             new CarbonImmutable('19-05-1994 00:00:00'),
             TransformationContextFactory::create()->get($class)
         )
@@ -130,7 +131,7 @@ it('can change the timezone', function () {
 
     expect(
         $transformer->transform(
-            DataProperty::create(new ReflectionProperty($class, 'dateTime')),
+            FakeDataStructureFactory::property($class, 'dateTime'),
             new DateTime('19-05-1994 00:00:00'),
             TransformationContextFactory::create()->get($class)
         )
@@ -138,7 +139,7 @@ it('can change the timezone', function () {
 
     expect(
         $transformer->transform(
-            DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')),
+            FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
             new DateTimeImmutable('19-05-1994 00:00:00'),
             TransformationContextFactory::create()->get($class)
         )
@@ -156,7 +157,7 @@ it('can transform dates with leading !', function () {
 
     expect(
         $transformer->transform(
-            DataProperty::create(new ReflectionProperty($class, 'carbon')),
+            FakeDataStructureFactory::property($class, 'carbon'),
             Carbon::createFromFormat('!Y-m-d', '1994-05-19'),
             TransformationContextFactory::create()->get($class)
         )

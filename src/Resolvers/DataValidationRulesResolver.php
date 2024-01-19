@@ -103,7 +103,7 @@ class DataValidationRulesResolver
         DataRules $dataRules,
     ): void {
         $isOptionalAndEmpty = $dataProperty->type->isOptional && Arr::has($fullPayload, $propertyPath->get()) === false;
-        $isNullableAndEmpty = $dataProperty->type->isNullable() && Arr::get($fullPayload, $propertyPath->get()) === null;
+        $isNullableAndEmpty = $dataProperty->type->isNullable && Arr::get($fullPayload, $propertyPath->get()) === null;
 
         if ($isOptionalAndEmpty || $isNullableAndEmpty) {
             $this->resolveToplevelRules(

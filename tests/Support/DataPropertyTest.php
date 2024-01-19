@@ -13,6 +13,7 @@ use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Factories\DataPropertyFactory;
 use Spatie\LaravelData\Tests\Fakes\CastTransformers\FakeCastTransformer;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -24,8 +25,9 @@ function resolveHelper(
     mixed $defaultValue = null
 ): DataProperty {
     $reflectionProperty = new ReflectionProperty($class, 'property');
+    $reflectionClass = new ReflectionClass($class);
 
-    return DataProperty::create($reflectionProperty, $hasDefaultValue, $defaultValue);
+    return app(DataPropertyFactory::class)->build($reflectionProperty, $reflectionClass, $hasDefaultValue, $defaultValue);
 }
 
 it('can get the cast attribute with arguments', function () {

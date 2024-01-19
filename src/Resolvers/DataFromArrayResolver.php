@@ -63,7 +63,7 @@ class DataFromArrayResolver
                 }
 
                 if ($property->computed
-                    && $property->type->isNullable()
+                    && $property->type->isNullable
                     && $properties->get($property->name) === null
                 ) {
                     return; // Nullable properties get assigned null by default

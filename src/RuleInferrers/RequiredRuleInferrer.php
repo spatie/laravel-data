@@ -27,7 +27,7 @@ class RequiredRuleInferrer implements RuleInferrer
 
     protected function shouldAddRule(DataProperty $property, PropertyRules $rules): bool
     {
-        if ($property->type->isNullable() || $property->type->isOptional) {
+        if ($property->type->isNullable || $property->type->isOptional) {
             return false;
         }
 

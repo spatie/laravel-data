@@ -59,7 +59,7 @@ class DataConfig
 
     public function getDataClass(string $class): DataClass
     {
-        return $this->dataClasses[$class] ??= DataClass::create(new ReflectionClass($class));
+        return $this->dataClasses[$class] ??= DataContainer::get()->dataClassFactory()->build(new ReflectionClass($class));
     }
 
     /**

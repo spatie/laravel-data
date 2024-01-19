@@ -7,6 +7,8 @@ use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\RequestQueryStringPartialsResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataCollectionResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataResolver;
+use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
+use Spatie\LaravelData\Support\Factories\DataClassFactory;
 
 class DataContainer
 {
@@ -21,6 +23,8 @@ class DataContainer
     protected ?DataFromSomethingResolver $dataFromSomethingResolver = null;
 
     protected ?DataCollectableFromSomethingResolver $dataCollectableFromSomethingResolver = null;
+
+    protected ?DataClassFactory $dataClassFactory = null;
 
     private function __construct()
     {
@@ -60,6 +64,11 @@ class DataContainer
         return $this->dataCollectableFromSomethingResolver ??= app(DataCollectableFromSomethingResolver::class);
     }
 
+    public function dataClassFactory(): DataClassFactory
+    {
+        return $this->dataClassFactory ??= app(DataClassFactory::class);
+    }
+
     public function reset()
     {
         $this->transformedDataResolver = null;
@@ -67,5 +76,6 @@ class DataContainer
         $this->requestQueryStringPartialsResolver = null;
         $this->dataFromSomethingResolver = null;
         $this->dataCollectableFromSomethingResolver = null;
+        $this->dataClassFactory = null;
     }
 }

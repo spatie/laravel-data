@@ -114,7 +114,7 @@ class DataTypeScriptTransformer extends DtoTransformer
             default => throw new RuntimeException('Cannot end up here since the type is dataCollectable')
         };
 
-        if ($dataProperty->type->isNullable()) {
+        if ($dataProperty->type->isNullable) {
             return new Nullable($collectionType);
         }
 

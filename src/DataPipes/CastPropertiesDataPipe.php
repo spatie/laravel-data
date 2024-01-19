@@ -85,6 +85,6 @@ class CastPropertiesDataPipe implements DataPipe
             return true; // Transform everything to data objects
         }
 
-        return $property->type->type->acceptsValue($value) === false;
+        return $property->type->acceptsValue($value) === false;
     }
 }

@@ -9,6 +9,7 @@ use Spatie\LaravelData\Support\Caching\DataClassFinder;
 use Spatie\LaravelData\Support\Caching\DataStructureCache;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\Factories\DataClassFactory;
 
 class DataStructuresCacheCommand extends Command
 {
@@ -18,7 +19,7 @@ class DataStructuresCacheCommand extends Command
 
     public function handle(
         DataStructureCache $dataStructureCache,
-        DataConfig $dataConfig
+        DataClassFactory $dataClassFactory,
     ): void {
         $this->components->info('Caching data structures...');
 
@@ -31,7 +32,7 @@ class DataStructuresCacheCommand extends Command
         $progressBar = $this->output->createProgressBar(count($dataClasses));
 
         foreach ($dataClasses as $dataClassString) {
-            $dataClass = DataClass::create(new ReflectionClass($dataClassString));
+            $dataClass = $dataClassFactory->build(new ReflectionClass($dataClassString));
 
             $dataClass->prepareForCache();
 

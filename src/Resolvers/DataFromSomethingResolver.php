@@ -95,7 +95,7 @@ class DataFromSomethingResolver
         }
 
         foreach ($method->parameters as $index => $parameter) {
-            if ($parameter->isCreationContext) {
+            if ($parameter->type->type->isCreationContext()) {
                 $payloads[$index] = $creationContext;
             }
         }

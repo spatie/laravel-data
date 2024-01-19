@@ -5,9 +5,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
-use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Tests\Fakes\DataWithMultipleArgumentCreationMethod;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
@@ -21,9 +21,9 @@ it('can create a data method from a constructor', function () {
         }
     };
 
-    $method = DataMethod::createConstructor(
+    $method = FakeDataStructureFactory::constructor(
         new ReflectionMethod($class, '__construct'),
-        collect(['promotedProperty' => DataProperty::create(new ReflectionProperty($class, 'promotedProperty'))])
+        collect(['promotedProperty' => FakeDataStructureFactory::property($class, 'promotedProperty')]),
     );
 
     expect($method)
@@ -44,7 +44,7 @@ it('can create a data method from a magic method', function () {
         }
     };
 
-    $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod($class, 'fromString'));
 
     expect($method)
         ->name->toEqual('fromString')
@@ -63,7 +63,7 @@ it('can create a data method from a magic collect method', function () {
         }
     };
 
-    $method = DataMethod::create(new ReflectionMethod($class, 'collectArray'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod($class, 'collectArray'));
 
     expect($method)
         ->name->toEqual('collectArray')
@@ -74,9 +74,7 @@ it('can create a data method from a magic collect method', function () {
         ->and($method->parameters[0])->toBeInstanceOf(DataParameter::class);
 
     expect($method->returnType)
-        ->isNullable->toBeFalse()
-        ->isMixed->toBeFalse()
-        ->getAcceptedTypes()->toBe(['array' => []]);
+        ->type->getAcceptedTypes()->toBe(['array' => []]);
 });
 
 it('can create a data method from a magic collect method with nullable return type', function () {
@@ -87,15 +85,13 @@ it('can create a data method from a magic collect method with nullable return ty
         }
     };
 
-    $method = DataMethod::create(new ReflectionMethod($class, 'collectArray'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod($class, 'collectArray'));
 
     expect($method)
         ->customCreationMethodType->toBe(CustomCreationMethodType::Collection);
 
     expect($method->returnType)
-        ->isNullable->toBeTrue()
-        ->isMixed->toBeFalse()
-        ->getAcceptedTypes()->toBe(['array' => []]);
+        ->type->getAcceptedTypes()->toBe(['array' => []]);
 });
 
 it('will not create a magical collection method when no return type specified', function () {
@@ -106,15 +102,12 @@ it('will not create a magical collection method when no return type specified', 
         }
     };
 
-    $method = DataMethod::create(new ReflectionMethod($class, 'collectArray'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod($class, 'collectArray'));
 
     expect($method)
         ->customCreationMethodType->toBe(CustomCreationMethodType::None);
 
-    expect($method->returnType)
-        ->isNullable->toBeTrue()
-        ->isMixed->toBeTrue()
-        ->getAcceptedTypes()->toBe([]);
+    expect($method->returnType)->toBeNull();
 });
 
 it('correctly accepts single values as magic creation method', function () {
@@ -125,7 +118,7 @@ it('correctly accepts single values as magic creation method', function () {
         }
     };
 
-    $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod($class, 'fromString'));
 
     expect($method)
         ->accepts('Hello')->toBeTrue()
@@ -140,13 +133,13 @@ it('correctly accepts single inherited values as magic creation method', functio
         }
     };
 
-    $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod($class, 'fromString'));
 
     expect($method->accepts(new SimpleData('Hello')))->toBeTrue();
 });
 
 it('correctly accepts multiple values as magic creation method', function () {
-    $method = DataMethod::create(new ReflectionMethod(DataWithMultipleArgumentCreationMethod::class, 'fromMultiple'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod(DataWithMultipleArgumentCreationMethod::class, 'fromMultiple'));
 
     expect($method)
         ->accepts('Hello', 42)->toBeTrue()
@@ -165,7 +158,7 @@ it('correctly accepts mixed values as magic creation method', function () {
         }
     };
 
-    $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod($class, 'fromString'));
 
     expect($method)
         ->accepts(new SimpleData('Hello'))->toBeTrue()
@@ -180,7 +173,7 @@ it('correctly accepts values with defaults as magic creation method', function (
         }
     };
 
-    $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod($class, 'fromString'));
 
     expect($method)
         ->accepts('Hello')->toBeTrue()
@@ -196,7 +189,7 @@ it('needs a correct amount of parameters as magic creation method', function () 
         }
     };
 
-    $method = DataMethod::create(new ReflectionMethod($class, 'fromString'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod($class, 'fromString'));
 
     expect($method)
         ->accepts('Hello')->toBeTrue()
@@ -213,7 +206,7 @@ it('can check if a magical method can return the exact type', function () {
         }
     };
 
-    $method = DataMethod::create(new ReflectionMethod($class, 'collectCollection'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod($class, 'collectCollection'));
 
     expect($method->returns(Collection::class))->toBeTrue();
 });
@@ -226,7 +219,7 @@ it('can check if a magical method can return the sub type', function () {
         }
     };
 
-    $method = DataMethod::create(new ReflectionMethod($class, 'collectCollection'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod($class, 'collectCollection'));
 
     expect($method->returns(EloquentCollection::class))->toBeTrue();
 });
@@ -239,7 +232,7 @@ it('can check if a magical method can return a built in type', function () {
         }
     };
 
-    $method = DataMethod::create(new ReflectionMethod($class, 'collectCollectionToArray'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod($class, 'collectCollectionToArray'));
 
     expect($method->returns('array'))->toBeTrue();
 });
@@ -253,7 +246,7 @@ it('can check if a magical method cannot return a parent type', function () {
         }
     };
 
-    $method = DataMethod::create(new ReflectionMethod($class, 'collectCollection'));
+    $method = FakeDataStructureFactory::method(new ReflectionMethod($class, 'collectCollection'));
 
     expect($method->returns(Enumerable::class))->toBeFalse();
 });

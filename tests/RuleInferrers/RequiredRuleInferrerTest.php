@@ -17,6 +17,7 @@ use Spatie\LaravelData\Support\Validation\PropertyRules;
 use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
+use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 /**
@@ -24,7 +25,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
  */
 function getProperty(object $class)
 {
-    $dataClass = DataClass::create(new ReflectionClass($class));
+    $dataClass = FakeDataStructureFactory::class($class);
 
     return $dataClass->properties->first();
 }

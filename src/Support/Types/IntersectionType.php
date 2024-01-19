@@ -2,14 +2,10 @@
 
 namespace Spatie\LaravelData\Support\Types;
 
-class IntersectionType extends MultiType
+class IntersectionType extends CombinationType
 {
     public function acceptsType(string $type): bool
     {
-        if ($this->isMixed) {
-            return true;
-        }
-
         foreach ($this->types as $subType) {
             if (! $subType->acceptsType($type)) {
                 return false;

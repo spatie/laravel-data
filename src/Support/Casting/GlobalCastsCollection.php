@@ -34,7 +34,7 @@ class GlobalCastsCollection implements IteratorAggregate
 
     public function findCastForValue(DataProperty $property): ?Cast
     {
-        foreach ($property->type->type->getAcceptedTypes() as $acceptedType => $baseTypes) {
+        foreach ($property->type->getAcceptedTypes() as $acceptedType => $baseTypes) {
             foreach ([$acceptedType, ...$baseTypes] as $type) {
                 if ($cast = $this->casts[$type] ?? null) {
                     return $cast;

@@ -16,6 +16,7 @@ use Spatie\LaravelData\Mappers\NameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotation;
 use Spatie\LaravelData\Support\Factories\DataTypeFactory;
+use Spatie\LaravelData\Support\Factories\OldDataTypeFactory;
 use Spatie\LaravelData\Transformers\Transformer;
 
 /**
@@ -40,60 +41,5 @@ class DataProperty
         public readonly ?string $outputMappedName,
         public readonly Collection $attributes,
     ) {
-    }
-
-    public static function create(
-        ReflectionProperty $property,
-        bool $hasDefaultValue = false,
-        mixed $defaultValue = null,
-        ?NameMapper $classInputNameMapper = null,
-        ?NameMapper $classOutputNameMapper = null,
-        ?DataCollectableAnnotation $classDefinedDataCollectableAnnotation = null,
-    ): self {
-        $attributes = collect($property->getAttributes())
-            ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
-            ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
-
-        $mappers = NameMappersResolver::create()->execute($attributes);
-
-        $inputMappedName = match (true) {
-            $mappers['inputNameMapper'] !== null => $mappers['inputNameMapper']->map($property->name),
-            $classInputNameMapper !== null => $classInputNameMapper->map($property->name),
-            default => null,
-        };
-
-        $outputMappedName = match (true) {
-            $mappers['outputNameMapper'] !== null => $mappers['outputNameMapper']->map($property->name),
-            $classOutputNameMapper !== null => $classOutputNameMapper->map($property->name),
-            default => null,
-        };
-
-        $computed = $attributes->contains(
-            fn (object $attribute) => $attribute instanceof Computed
-        );
-
-        $hidden = $attributes->contains(
-            fn (object $attribute) => $attribute instanceof Hidden
-        );
-
-        return new self(
-            name: $property->name,
-            className: $property->class,
-            type: DataTypeFactory::create()->build($property, $classDefinedDataCollectableAnnotation),
-            validate: ! $attributes->contains(
-                fn (object $attribute) => $attribute instanceof WithoutValidation
-            ) && ! $computed,
-            computed: $computed,
-            hidden: $hidden,
-            isPromoted: $property->isPromoted(),
-            isReadonly: $property->isReadOnly(),
-            hasDefaultValue: $property->isPromoted() ? $hasDefaultValue : $property->hasDefaultValue(),
-            defaultValue: $property->isPromoted() ? $defaultValue : $property->getDefaultValue(),
-            cast: $attributes->first(fn (object $attribute) => $attribute instanceof GetsCast)?->get(),
-            transformer: $attributes->first(fn (object $attribute) => $attribute instanceof WithTransformer || $attribute instanceof WithCastAndTransformer)?->get(),
-            inputMappedName: $inputMappedName,
-            outputMappedName: $outputMappedName,
-            attributes: $attributes,
-        );
     }
 }

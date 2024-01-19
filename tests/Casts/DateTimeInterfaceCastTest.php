@@ -9,6 +9,7 @@ use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 
 it('can cast date times', function () {
     $caster = new DateTimeInterfaceCast('d-m-Y H:i:s');
@@ -23,9 +24,10 @@ it('can cast date times', function () {
         public DateTimeImmutable $dateTimeImmutable;
     };
 
+
     expect(
         $caster->cast(
-            DataProperty::create(new ReflectionProperty($class, 'carbon')),
+            FakeDataStructureFactory::property($class, 'carbon'),
             '19-05-1994 00:00:00',
             collect(),
             CreationContextFactory::createFromConfig($class::class)->get()
@@ -34,7 +36,7 @@ it('can cast date times', function () {
 
     expect(
         $caster->cast(
-            DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')),
+            FakeDataStructureFactory::property($class, 'carbonImmutable'),
             '19-05-1994 00:00:00',
             collect(),
             CreationContextFactory::createFromConfig($class::class)->get()
@@ -43,7 +45,7 @@ it('can cast date times', function () {
 
     expect(
         $caster->cast(
-            DataProperty::create(new ReflectionProperty($class, 'dateTime')),
+            FakeDataStructureFactory::property($class, 'dateTime'),
             '19-05-1994 00:00:00',
             collect(),
             CreationContextFactory::createFromConfig($class::class)->get()
@@ -52,7 +54,7 @@ it('can cast date times', function () {
 
     expect(
         $caster->cast(
-            DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')),
+            FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
             '19-05-1994 00:00:00',
             collect(),
             CreationContextFactory::createFromConfig($class::class)->get()
@@ -69,7 +71,7 @@ it('fails when it cannot cast a date into the correct format', function () {
 
     expect(
         $caster->cast(
-            DataProperty::create(new ReflectionProperty($class, 'carbon')),
+            FakeDataStructureFactory::property($class, 'carbon'),
             '19-05-1994',
             collect(),
             CreationContextFactory::createFromConfig($class::class)->get()
@@ -86,7 +88,7 @@ it('fails with other types', function () {
 
     expect(
         $caster->cast(
-            DataProperty::create(new ReflectionProperty($class, 'int')),
+            FakeDataStructureFactory::property($class, 'int'),
             '1994-05-16 12:20:00',
             collect(),
             CreationContextFactory::createFromConfig($class::class)->get()
@@ -108,7 +110,7 @@ it('can set an alternative timezone', function () {
     };
 
     expect($caster->cast(
-        DataProperty::create(new ReflectionProperty($class, 'carbon')),
+        FakeDataStructureFactory::property($class, 'carbon'),
         '19-05-1994 00:00:00',
         collect(),
         CreationContextFactory::createFromConfig($class::class)->get()
@@ -117,7 +119,7 @@ it('can set an alternative timezone', function () {
         ->getTimezone()->toEqual(CarbonTimeZone::create('Europe/Brussels'));
 
     expect($caster->cast(
-        DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')),
+        FakeDataStructureFactory::property($class, 'carbonImmutable'),
         '19-05-1994 00:00:00',
         collect(),
         CreationContextFactory::createFromConfig($class::class)->get()
@@ -126,7 +128,7 @@ it('can set an alternative timezone', function () {
         ->getTimezone()->toEqual(CarbonTimeZone::create('Europe/Brussels'));
 
     expect($caster->cast(
-        DataProperty::create(new ReflectionProperty($class, 'dateTime')),
+        FakeDataStructureFactory::property($class, 'dateTime'),
         '19-05-1994 00:00:00',
         collect(),
         CreationContextFactory::createFromConfig($class::class)->get()
@@ -135,7 +137,7 @@ it('can set an alternative timezone', function () {
         ->getTimezone()->toEqual(new DateTimeZone('Europe/Brussels'));
 
     expect($caster->cast(
-        DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')),
+        FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
         '19-05-1994 00:00:00',
         collect(),
         CreationContextFactory::createFromConfig($class::class)->get()
@@ -158,7 +160,7 @@ it('can cast date times with a timezone', function () {
     };
 
     expect($caster->cast(
-        DataProperty::create(new ReflectionProperty($class, 'carbon')),
+        FakeDataStructureFactory::property($class, 'carbon'),
         '19-05-1994 00:00:00',
         collect(),
         CreationContextFactory::createFromConfig($class::class)->get()
@@ -167,7 +169,7 @@ it('can cast date times with a timezone', function () {
         ->getTimezone()->toEqual(CarbonTimeZone::create('Europe/Brussels'));
 
     expect($caster->cast(
-        DataProperty::create(new ReflectionProperty($class, 'carbonImmutable')),
+        FakeDataStructureFactory::property($class, 'carbonImmutable'),
         '19-05-1994 00:00:00',
         collect(),
         CreationContextFactory::createFromConfig($class::class)->get()
@@ -176,7 +178,7 @@ it('can cast date times with a timezone', function () {
         ->getTimezone()->toEqual(CarbonTimeZone::create('Europe/Brussels'));
 
     expect($caster->cast(
-        DataProperty::create(new ReflectionProperty($class, 'dateTime')),
+        FakeDataStructureFactory::property($class, 'dateTime'),
         '19-05-1994 00:00:00',
         collect(),
         CreationContextFactory::createFromConfig($class::class)->get()
@@ -185,7 +187,7 @@ it('can cast date times with a timezone', function () {
         ->getTimezone()->toEqual(new DateTimeZone('Europe/Brussels'));
 
     expect($caster->cast(
-        DataProperty::create(new ReflectionProperty($class, 'dateTimeImmutable')),
+        FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
         '19-05-1994 00:00:00',
         collect(),
         CreationContextFactory::createFromConfig($class::class)->get()
