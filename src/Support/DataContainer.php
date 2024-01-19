@@ -7,7 +7,6 @@ use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\RequestQueryStringPartialsResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataCollectionResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataResolver;
-use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
 use Spatie\LaravelData\Support\Factories\DataClassFactory;
 
 class DataContainer

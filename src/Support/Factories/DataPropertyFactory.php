@@ -59,8 +59,8 @@ class DataPropertyFactory
         );
 
         $validate = ! $attributes->contains(
-                fn (object $attribute) => $attribute instanceof WithoutValidation
-            ) && ! $computed;
+            fn (object $attribute) => $attribute instanceof WithoutValidation
+        ) && ! $computed;
 
         return new DataProperty(
             name: $reflectionProperty->name,

@@ -7,8 +7,6 @@ use ReflectionClass;
 use Spatie\LaravelData\Support\Caching\CachedDataConfig;
 use Spatie\LaravelData\Support\Caching\DataClassFinder;
 use Spatie\LaravelData\Support\Caching\DataStructureCache;
-use Spatie\LaravelData\Support\DataClass;
-use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Factories\DataClassFactory;
 
 class DataStructuresCacheCommand extends Command

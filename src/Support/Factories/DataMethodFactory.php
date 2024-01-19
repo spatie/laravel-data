@@ -8,10 +8,7 @@ use ReflectionMethod;
 use ReflectionParameter;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
 use Spatie\LaravelData\Support\DataMethod;
-use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataReturnType;
-use Spatie\LaravelData\Support\DataType;
-use Spatie\LaravelData\Support\OldTypes\UndefinedOldType;
 
 class DataMethodFactory
 {

@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Support;
 
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
-use Spatie\LaravelData\Support\OldTypes\OldType;
 
 /**
  * @property Collection<DataParameter> $parameters

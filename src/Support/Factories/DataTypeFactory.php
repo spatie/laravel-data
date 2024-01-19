@@ -20,7 +20,6 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotation;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
 use Spatie\LaravelData\Support\DataType;
-use Spatie\LaravelData\Support\Factories\Concerns\RequiresTypeInformation;
 use Spatie\LaravelData\Support\Lazy\ClosureLazy;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\DefaultLazy;
@@ -305,7 +304,7 @@ class DataTypeFactory
                 continue;
             }
 
-            /** @var ReflectionNamedType  $reflectionSubType */
+            /** @var ReflectionNamedType $reflectionSubType */
 
             $name = $reflectionSubType->getName();
 

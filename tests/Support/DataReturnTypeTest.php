@@ -14,14 +14,11 @@ use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Contracts\ResponsableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Support\DataReturnType;
 use Spatie\LaravelData\Support\Factories\DataReturnTypeFactory;
 use Spatie\LaravelData\Support\Types\NamedType;
-use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
-use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 class TestReturnTypeSubject
@@ -57,7 +54,7 @@ it('can determine the return type from reflection', function (
     expect($factory->buildFromNamedType($typeName))->toEqual($expected);
 
     expect($factory->buildFromValue($value))->toEqual($expected);
-})->with(function (){
+})->with(function () {
     yield 'array' => [
         'methodName' => 'array',
         'typeName' => 'array',
@@ -110,7 +107,7 @@ it('can determine the return type from reflection', function (
                 TransformableData::class,
                 ResponsableData::class,
                 BaseDataCollectable::class,
-                Responsable::class
+                Responsable::class,
 
             ], DataTypeKind::DataCollection, null, null),
             kind: DataTypeKind::DataCollection,

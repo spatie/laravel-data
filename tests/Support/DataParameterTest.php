@@ -3,9 +3,7 @@
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
-use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataType;
-use Spatie\LaravelData\Support\OldTypes\OldType;
 use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 

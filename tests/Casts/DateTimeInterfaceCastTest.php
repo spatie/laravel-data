@@ -8,7 +8,6 @@ use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
-use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 
 it('can cast date times', function () {

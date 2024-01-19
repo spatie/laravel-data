@@ -45,8 +45,7 @@ class FakeDataStructureFactory
 
     public static function method(
         ReflectionMethod $method,
-    ): DataMethod
-    {
+    ): DataMethod {
         $factory = static::$methodFactory ??= app(DataMethodFactory::class);
 
         return $factory->build($method, $method->getDeclaringClass());
@@ -55,8 +54,7 @@ class FakeDataStructureFactory
     public static function constructor(
         ReflectionMethod $method,
         Collection $properties
-    ): DataMethod
-    {
+    ): DataMethod {
         $factory = static::$methodFactory ??= app(DataMethodFactory::class);
 
         return $factory->buildConstructor($method, $method->getDeclaringClass(), $properties);
