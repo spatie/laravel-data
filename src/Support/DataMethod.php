@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
 
 /**
- * @property Collection<DataParameter> $parameters
+ * @property Collection<DataParameter|DataProperty> $parameters
  */
 class DataMethod
 {
@@ -22,20 +22,31 @@ class DataMethod
 
     public function accepts(mixed ...$input): bool
     {
-        /** @var Collection<array-key, \Spatie\LaravelData\Support\DataParameter|\Spatie\LaravelData\Support\DataProperty> $parameters */
-        $parameters = array_is_list($input)
-            ? $this->parameters
-            : $this->parameters->mapWithKeys(fn (DataParameter|DataProperty $parameter) => [$parameter->name => $parameter]);
+        $requiredParameterCount = 0;
 
-        $parameters = $parameters->reject(
-            fn (DataParameter|DataProperty $parameter) => $parameter instanceof DataParameter && $parameter->type->type->isCreationContext()
-        );
+        foreach ($this->parameters as $parameter) {
+            if ($parameter->type->type->isCreationContext()) {
+                continue;
+            }
 
-        if (count($input) > $parameters->count()) {
+            $requiredParameterCount++;
+        }
+
+        if (count($input) > $requiredParameterCount) {
             return false;
         }
 
-        foreach ($parameters as $index => $parameter) {
+        $useNameAsIndex = ! array_is_list($input);
+
+        foreach ($this->parameters as $index => $parameter) {
+            if ($parameter->type->type->isCreationContext()) {
+                continue;
+            }
+
+            if ($useNameAsIndex) {
+                $index = $parameter->name;
+            }
+
             $parameterProvided = array_key_exists($index, $input);
 
             if (! $parameterProvided && $parameter->hasDefaultValue === false) {
@@ -59,6 +70,7 @@ class DataMethod
             ) {
                 return false;
             }
+
         }
 
         return true;
