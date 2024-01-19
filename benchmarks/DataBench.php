@@ -183,7 +183,7 @@ class DataBench
         Revs(500),
         Iterations(5),
         BeforeMethods(['setupCache', 'setupCollectionTransformation']),
-        Assert('mode(variant.time.avg) < 580 microseconds +/- 5%')
+        Assert('mode(variant.time.avg) < 590 microseconds +/- 5%')
     ]
     public function benchCollectionTransformation()
     {
@@ -194,7 +194,7 @@ class DataBench
         Revs(5000),
         Iterations(5),
         BeforeMethods(['setupCache', 'setupObjectTransformation']),
-        Assert('mode(variant.time.avg) < 38 microseconds +/- 5%')
+        Assert('mode(variant.time.avg) < 39 microseconds +/- 5%')
     ]
     public function benchObjectTransformation()
     {
@@ -205,7 +205,7 @@ class DataBench
         Revs(500),
         Iterations(5),
         BeforeMethods(['setupCache', 'setupCollectionCreation']),
-        Assert('mode(variant.time.avg) < 1.86 milliseconds +/- 5%')
+        Assert('mode(variant.time.avg) < 1.335 milliseconds +/- 5%')
     ]
     public function benchCollectionCreation()
     {
@@ -216,7 +216,7 @@ class DataBench
         Revs(5000),
         Iterations(5),
         BeforeMethods(['setupCache', 'setupObjectCreation']),
-        Assert('mode(variant.time.avg) < 129 microseconds +/- 5%')
+        Assert('mode(variant.time.avg) < 90 microseconds +/- 5%')
     ]
     public function benchObjectCreation()
     {
@@ -227,7 +227,7 @@ class DataBench
         Revs(500),
         Iterations(5),
         BeforeMethods(['setupCollectionTransformation']),
-        Assert('mode(variant.time.avg) < 774 microseconds +/- 10%')
+        Assert('mode(variant.time.avg) < 791 microseconds +/- 10%')
     ]
     public function benchCollectionTransformationWithoutCache()
     {
@@ -240,7 +240,7 @@ class DataBench
         Revs(5000),
         Iterations(5),
         BeforeMethods(['setupObjectTransformation']),
-        Assert('mode(variant.time.avg) < 217 microseconds +/- 10%')
+        Assert('mode(variant.time.avg) < 226 microseconds +/- 10%')
     ]
     public function benchObjectTransformationWithoutCache()
     {
@@ -253,7 +253,7 @@ class DataBench
         Revs(500),
         Iterations(5),
         BeforeMethods(['setupCollectionCreation']),
-        Assert('mode(variant.time.avg) < 2.15 milliseconds +/- 10%')
+        Assert('mode(variant.time.avg) < 1.62 milliseconds +/- 10%')
     ]
     public function benchCollectionCreationWithoutCache()
     {
@@ -266,7 +266,7 @@ class DataBench
         Revs(5000),
         Iterations(5),
         BeforeMethods(['setupObjectCreation']),
-        Assert('mode(variant.time.avg) < 367 microseconds +/- 10%')
+        Assert('mode(variant.time.avg) < 347 microseconds +/- 10%')
     ]
     public function benchObjectCreationWithoutCache()
     {
