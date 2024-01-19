@@ -11,7 +11,7 @@ use Spatie\LaravelData\Transformers\Transformer;
 
 class FakeCastTransformer implements Cast, Transformer
 {
-    public function cast(DataProperty $property, mixed $value, Collection $properties, CreationContext $context): mixed
+    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): mixed
     {
         return $value;
     }

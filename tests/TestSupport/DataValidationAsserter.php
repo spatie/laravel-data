@@ -167,6 +167,6 @@ class DataValidationAsserter
             ->resolve()
             ->execute($payload, CreationContextFactory::createFromConfig($this->dataClass)->get());
 
-        return $properties->all();
+        return $properties;
     }
 }

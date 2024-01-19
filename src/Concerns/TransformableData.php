@@ -24,7 +24,7 @@ trait TransformableData
 
         $resolver = match (true) {
             $this instanceof BaseDataContract => DataContainer::get()->transformedDataResolver(),
-            $this instanceof BaseDataCollectableContract => DataContainer::get()->transformedDataCollectionResolver(),
+            $this instanceof BaseDataCollectableContract => DataContainer::get()->transformedDataCollectableResolver(),
             default => throw new Exception('Cannot transform data object')
         };
 

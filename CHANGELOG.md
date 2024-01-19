@@ -10,9 +10,11 @@ All notable changes to `laravel-data` will be documented in this file.
 - Addition of collect method
 - Removal of collection method
 - Add support for using Laravel Model attributes as data properties
-- Add support for class defined defaults
 - Allow creating data objects using `from` without parameters
 - Add support for a Dto and Resource object
+- Added contexts to the creation and transformation process
+- Allow creating a data object or collection using a factory
+- Speed up the process of creating and transforming data objects
 
 ## 3.11.0 - 2023-12-21
 

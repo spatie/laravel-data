@@ -9,7 +9,7 @@ use Spatie\LaravelData\Support\DataProperty;
 
 class MeaningOfLifeCast implements Cast
 {
-    public function cast(DataProperty $property, mixed $value, Collection $properties, CreationContext $context): int
+    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): int
     {
         return 42;
     }

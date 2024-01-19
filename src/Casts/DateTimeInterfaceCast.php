@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Casts;
 
 use DateTimeInterface;
 use DateTimeZone;
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Exceptions\CannotCastDate;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;
@@ -19,7 +18,7 @@ class DateTimeInterfaceCast implements Cast
     ) {
     }
 
-    public function cast(DataProperty $property, mixed $value, Collection $properties, CreationContext $context): DateTimeInterface|Uncastable
+    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): DateTimeInterface|Uncastable
     {
         $formats = collect($this->format ?? config('data.date_format'));
 

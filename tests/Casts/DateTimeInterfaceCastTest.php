@@ -28,7 +28,7 @@ it('can cast date times', function () {
         $caster->cast(
             FakeDataStructureFactory::property($class, 'carbon'),
             '19-05-1994 00:00:00',
-            collect(),
+            [],
             CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(new Carbon('19-05-1994 00:00:00'));
@@ -37,7 +37,7 @@ it('can cast date times', function () {
         $caster->cast(
             FakeDataStructureFactory::property($class, 'carbonImmutable'),
             '19-05-1994 00:00:00',
-            collect(),
+            [],
             CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(new CarbonImmutable('19-05-1994 00:00:00'));
@@ -46,7 +46,7 @@ it('can cast date times', function () {
         $caster->cast(
             FakeDataStructureFactory::property($class, 'dateTime'),
             '19-05-1994 00:00:00',
-            collect(),
+            [],
             CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(new DateTime('19-05-1994 00:00:00'));
@@ -55,7 +55,7 @@ it('can cast date times', function () {
         $caster->cast(
             FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
             '19-05-1994 00:00:00',
-            collect(),
+            [],
             CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(new DateTimeImmutable('19-05-1994 00:00:00'));
@@ -72,7 +72,7 @@ it('fails when it cannot cast a date into the correct format', function () {
         $caster->cast(
             FakeDataStructureFactory::property($class, 'carbon'),
             '19-05-1994',
-            collect(),
+            [],
             CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(new DateTime('19-05-1994 00:00:00'));
@@ -89,7 +89,7 @@ it('fails with other types', function () {
         $caster->cast(
             FakeDataStructureFactory::property($class, 'int'),
             '1994-05-16 12:20:00',
-            collect(),
+            [],
             CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(Uncastable::create());
@@ -111,7 +111,7 @@ it('can set an alternative timezone', function () {
     expect($caster->cast(
         FakeDataStructureFactory::property($class, 'carbon'),
         '19-05-1994 00:00:00',
-        collect(),
+        [],
         CreationContextFactory::createFromConfig($class::class)->get()
     ))
         ->format('Y-m-d H:i:s')->toEqual('1994-05-19 02:00:00')
@@ -120,7 +120,7 @@ it('can set an alternative timezone', function () {
     expect($caster->cast(
         FakeDataStructureFactory::property($class, 'carbonImmutable'),
         '19-05-1994 00:00:00',
-        collect(),
+        [],
         CreationContextFactory::createFromConfig($class::class)->get()
     ))
         ->format('Y-m-d H:i:s')->toEqual('1994-05-19 02:00:00')
@@ -129,7 +129,7 @@ it('can set an alternative timezone', function () {
     expect($caster->cast(
         FakeDataStructureFactory::property($class, 'dateTime'),
         '19-05-1994 00:00:00',
-        collect(),
+        [],
         CreationContextFactory::createFromConfig($class::class)->get()
     ))
         ->format('Y-m-d H:i:s')->toEqual('1994-05-19 02:00:00')
@@ -138,7 +138,7 @@ it('can set an alternative timezone', function () {
     expect($caster->cast(
         FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
         '19-05-1994 00:00:00',
-        collect(),
+        [],
         CreationContextFactory::createFromConfig($class::class)->get()
     ))
         ->format('Y-m-d H:i:s')->toEqual('1994-05-19 02:00:00')
@@ -161,7 +161,7 @@ it('can cast date times with a timezone', function () {
     expect($caster->cast(
         FakeDataStructureFactory::property($class, 'carbon'),
         '19-05-1994 00:00:00',
-        collect(),
+        [],
         CreationContextFactory::createFromConfig($class::class)->get()
     ))
         ->format('Y-m-d H:i:s')->toEqual('1994-05-19 00:00:00')
@@ -170,7 +170,7 @@ it('can cast date times with a timezone', function () {
     expect($caster->cast(
         FakeDataStructureFactory::property($class, 'carbonImmutable'),
         '19-05-1994 00:00:00',
-        collect(),
+        [],
         CreationContextFactory::createFromConfig($class::class)->get()
     ))
         ->format('Y-m-d H:i:s')->toEqual('1994-05-19 00:00:00')
@@ -179,7 +179,7 @@ it('can cast date times with a timezone', function () {
     expect($caster->cast(
         FakeDataStructureFactory::property($class, 'dateTime'),
         '19-05-1994 00:00:00',
-        collect(),
+        [],
         CreationContextFactory::createFromConfig($class::class)->get()
     ))
         ->format('Y-m-d H:i:s')->toEqual('1994-05-19 00:00:00')
@@ -188,7 +188,7 @@ it('can cast date times with a timezone', function () {
     expect($caster->cast(
         FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
         '19-05-1994 00:00:00',
-        collect(),
+        [],
         CreationContextFactory::createFromConfig($class::class)->get()
     ))
         ->format('Y-m-d H:i:s')->toEqual('1994-05-19 00:00:00')

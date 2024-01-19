@@ -16,7 +16,7 @@ class EnumCast implements Cast
     ) {
     }
 
-    public function cast(DataProperty $property, mixed $value, Collection $properties, CreationContext $context): BackedEnum | Uncastable
+    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): BackedEnum | Uncastable
     {
         $type = $this->type ?? $property->type->type->findAcceptedTypeForBaseType(BackedEnum::class);
 

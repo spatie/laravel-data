@@ -20,7 +20,7 @@ it('can cast enum', function () {
         $this->caster->cast(
             FakeDataStructureFactory::property($class, 'enum'),
             'foo',
-            collect(),
+            [],
             CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(DummyBackedEnum::FOO);
@@ -35,7 +35,7 @@ it('fails when it cannot cast an enum from value', function () {
         $this->caster->cast(
             FakeDataStructureFactory::property($class, 'enum'),
             'bar',
-            collect(),
+            [],
             CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(DummyBackedEnum::FOO);
@@ -50,7 +50,7 @@ it('fails when casting an unit enum', function () {
         $this->caster->cast(
             FakeDataStructureFactory::property($class, 'enum'),
             'foo',
-            collect(),
+            [],
             CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(Uncastable::create());
@@ -65,7 +65,7 @@ it('fails with other types', function () {
         $this->caster->cast(
             FakeDataStructureFactory::property($class, 'int'),
             'foo',
-            collect(),
+            [],
             CreationContextFactory::createFromConfig($class::class)->get(),
         )
     )

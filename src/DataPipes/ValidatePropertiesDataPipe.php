@@ -13,9 +13,9 @@ class ValidatePropertiesDataPipe implements DataPipe
     public function handle(
         mixed $payload,
         DataClass $class,
-        Collection $properties,
+        array $properties,
         CreationContext $creationContext
-    ): Collection {
+    ): array {
         if ($creationContext->validationType === ValidationType::Disabled) {
             return $properties;
         }

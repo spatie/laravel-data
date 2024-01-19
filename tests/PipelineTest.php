@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataPipeline;
@@ -37,9 +38,9 @@ it('can restructure payload before entering the pipeline', function () {
         ) {
         }
 
-        public static function prepareForPipeline(Collection $properties): Collection
+        public static function prepareForPipeline(array $properties): array
         {
-            $properties->put('address', $properties->only(['line_1', 'city', 'state', 'zipcode'])->join(','));
+            $properties['address'] = implode(',', Arr::only($properties, ['line_1', 'city', 'state', 'zipcode']));
 
             return $properties;
         }

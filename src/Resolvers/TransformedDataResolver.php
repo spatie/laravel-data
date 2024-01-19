@@ -161,7 +161,7 @@ class TransformedDataResolver
                 WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled
             };
 
-            return DataContainer::get()->transformedDataCollectionResolver()->execute(
+            return DataContainer::get()->transformedDataCollectableResolver()->execute(
                 $value,
                 $fieldContext->setWrapExecutionType($wrapExecutionType)
             );

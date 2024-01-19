@@ -13,9 +13,9 @@ class AuthorizedDataPipe implements DataPipe
     public function handle(
         mixed $payload,
         DataClass $class,
-        Collection $properties,
+        array $properties,
         CreationContext $creationContext
-    ): Collection {
+    ): array {
         if (! $payload instanceof Request) {
             return $properties;
         }

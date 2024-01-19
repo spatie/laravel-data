@@ -34,7 +34,7 @@ class DataFromSomethingResolver
             return $data;
         }
 
-        $properties = new Collection();
+        $properties = [];
 
         $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
 

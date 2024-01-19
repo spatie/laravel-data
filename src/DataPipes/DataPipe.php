@@ -11,15 +11,15 @@ interface DataPipe
     /**
      * @param mixed $payload
      * @param DataClass $class
-     * @param Collection<string, mixed> $properties
+     * @param array<array-key, mixed> $properties
      * @param CreationContext $creationContext
      *
-     * @return Collection
+     * @return array<array-key, mixed>
      */
     public function handle(
         mixed $payload,
         DataClass $class,
-        Collection $properties,
+        array $properties,
         CreationContext $creationContext
-    ): Collection;
+    ): array;
 }

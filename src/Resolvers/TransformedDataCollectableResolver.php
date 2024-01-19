@@ -20,7 +20,7 @@ use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Support\Wrapping\WrapType;
 
-class TransformedDataCollectionResolver
+class TransformedDataCollectableResolver
 {
     public function __construct(
         protected DataConfig $dataConfig

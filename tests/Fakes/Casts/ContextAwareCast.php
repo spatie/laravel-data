@@ -9,8 +9,8 @@ use Spatie\LaravelData\Support\DataProperty;
 
 class ContextAwareCast implements Cast
 {
-    public function cast(DataProperty $property, mixed $value, Collection $properties, CreationContext $context): mixed
+    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): mixed
     {
-        return $value . '+' . $properties->toJson();
+        return $value . '+' . json_encode($properties);
     }
 }

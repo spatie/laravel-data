@@ -80,7 +80,7 @@ trait BaseData
             ->through(CastPropertiesDataPipe::class);
     }
 
-    public static function prepareForPipeline(Collection $properties): Collection
+    public static function prepareForPipeline(array $properties): array
     {
         return $properties;
     }

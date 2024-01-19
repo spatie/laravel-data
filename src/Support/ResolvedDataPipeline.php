@@ -19,7 +19,7 @@ class ResolvedDataPipeline
     ) {
     }
 
-    public function execute(mixed $value, CreationContext $creationContext): Collection
+    public function execute(mixed $value, CreationContext $creationContext): array
     {
         $properties = null;
 
@@ -34,8 +34,6 @@ class ResolvedDataPipeline
         if ($properties === null) {
             throw CannotCreateData::noNormalizerFound($this->dataClass->name, $value);
         }
-
-        $properties = collect($properties);
 
         $properties = ($this->dataClass->name)::prepareForPipeline($properties);
 

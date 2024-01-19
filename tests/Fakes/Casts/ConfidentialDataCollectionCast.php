@@ -10,7 +10,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 class ConfidentialDataCollectionCast implements Cast
 {
-    public function cast(DataProperty $property, mixed $value, Collection $properties, CreationContext $context): array
+    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): array
     {
         return array_map(fn () => SimpleData::from('CONFIDENTIAL'), $value);
     }

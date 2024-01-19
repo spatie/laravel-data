@@ -48,7 +48,7 @@ interface BaseData
 
     public static function normalizers(): array;
 
-    public static function prepareForPipeline(Collection $properties): Collection;
+    public static function prepareForPipeline(array $properties): array;
 
     public static function pipeline(): DataPipeline;
 

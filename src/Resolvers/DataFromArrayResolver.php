@@ -26,47 +26,48 @@ class DataFromArrayResolver
      *
      * @return TData
      */
-    public function execute(string $class, Collection $properties): BaseData
+    public function execute(string $class, array $properties): BaseData
     {
         $dataClass = $this->dataConfig->getDataClass($class);
 
         $data = $this->createData($dataClass, $properties);
 
-        $dataClass
-            ->properties
-            ->reject(
-                fn (DataProperty $property) => $property->isPromoted
-                    || $property->isReadonly
-                    || ! $properties->has($property->name)
-            )
-            ->each(function (DataProperty $property) use ($properties, $data) {
-                if ($property->type->isOptional
-                    && isset($data->{$property->name})
-                    && $properties->get($property->name) instanceof Optional
-                ) {
-                    return;
-                }
+        foreach ($dataClass->properties as $property) {
+            if(
+                $property->isPromoted
+                || $property->isReadonly
+                || ! array_key_exists($property->name, $properties)
+            ){
+                continue;
+            }
 
-                if ($property->computed
-                    && $property->type->isNullable
-                    && $properties->get($property->name) === null
-                ) {
-                    return; // Nullable properties get assigned null by default
-                }
+            if ($property->type->isOptional
+                && isset($data->{$property->name})
+                && $properties[$property->name] instanceof Optional
+            ) {
+                continue;
+            }
 
-                if ($property->computed) {
-                    throw CannotSetComputedValue::create($property);
-                }
+            if ($property->computed
+                && $property->type->isNullable
+                && $properties[$property->name] === null
+            ) {
+                continue; // Nullable properties get assigned null by default
+            }
 
-                $data->{$property->name} = $properties->get($property->name);
-            });
+            if ($property->computed) {
+                throw CannotSetComputedValue::create($property);
+            }
+
+            $data->{$property->name} = $properties[$property->name];
+        }
 
         return $data;
     }
 
     protected function createData(
         DataClass $dataClass,
-        Collection $properties,
+        array $properties,
     ) {
         $constructorParameters = $dataClass->constructorMethod?->parameters;
 
@@ -77,8 +78,8 @@ class DataFromArrayResolver
         $parameters = [];
 
         foreach ($constructorParameters as $parameter) {
-            if ($properties->has($parameter->name)) {
-                $parameters[$parameter->name] = $properties->get($parameter->name);
+            if (array_key_exists($parameter->name, $properties)) {
+                $parameters[$parameter->name] = $properties[$parameter->name];
 
                 continue;
             }

@@ -20,9 +20,9 @@ class CastPropertiesDataPipe implements DataPipe
     public function handle(
         mixed $payload,
         DataClass $class,
-        Collection $properties,
+        array $properties,
         CreationContext $creationContext
-    ): Collection {
+    ): array {
         foreach ($properties as $name => $value) {
             $dataProperty = $class->properties->first(fn (DataProperty $dataProperty) => $dataProperty->name === $name);
 
@@ -43,7 +43,7 @@ class CastPropertiesDataPipe implements DataPipe
     protected function cast(
         DataProperty $property,
         mixed $value,
-        Collection $properties,
+        array $properties,
         CreationContext $creationContext
     ): mixed {
         $shouldCast = $this->shouldBeCasted($property, $value);

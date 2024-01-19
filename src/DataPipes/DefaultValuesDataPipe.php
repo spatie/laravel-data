@@ -12,11 +12,11 @@ class DefaultValuesDataPipe implements DataPipe
     public function handle(
         mixed $payload,
         DataClass $class,
-        Collection $properties,
+        array $properties,
         CreationContext $creationContext
-    ): Collection {
+    ): array {
         foreach ($class->properties as $name => $property) {
-            if($properties->has($name)) {
+            if(array_key_exists($name, $properties)) {
                 continue;
             }
 
