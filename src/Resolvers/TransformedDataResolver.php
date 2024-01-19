@@ -106,6 +106,10 @@ class TransformedDataResolver
             return $this->resolvePotentialPartialArray($value, $fieldContext);
         }
 
+        if($property->type->kind === DataTypeKind::Default) {
+            return $value; // Done for performance reasons
+        }
+
         if (
             $value instanceof BaseDataCollectable
             && $value instanceof TransformableData
