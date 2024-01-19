@@ -3,7 +3,7 @@
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Orchestra\Testbench\Concerns\CreatesApplication;
-use PhpBench\Attributes\AfterMethods;
+use PhpBench\Attributes\Assert;
 use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\Iterations;
 use PhpBench\Attributes\Revs;
@@ -12,7 +12,6 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\LaravelDataServiceProvider;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -115,7 +114,7 @@ class DataBench
     {
         $this->collectionPayload = Collection::times(
             15,
-            fn() => [
+            fn () => [
                 'withoutType' => 42,
                 'int' => 42,
                 'bool' => true,
@@ -180,31 +179,56 @@ class DataBench
         ];
     }
 
-    #[Revs(500), Iterations(5), BeforeMethods(['setupCache', 'setupCollectionTransformation'])]
+    #[
+        Revs(500),
+        Iterations(5),
+        BeforeMethods(['setupCache', 'setupCollectionTransformation']),
+        Assert('mode(variant.time.avg) < 580 microseconds +/- 5%')
+    ]
     public function benchCollectionTransformation()
     {
         $this->collection->toArray();
     }
 
-    #[Revs(5000), Iterations(5), BeforeMethods(['setupCache', 'setupObjectTransformation'])]
+    #[
+        Revs(5000),
+        Iterations(5),
+        BeforeMethods(['setupCache', 'setupObjectTransformation']),
+        Assert('mode(variant.time.avg) < 38 microseconds +/- 5%')
+    ]
     public function benchObjectTransformation()
     {
         $this->object->toArray();
     }
 
-    #[Revs(500), Iterations(5), BeforeMethods(['setupCache', 'setupCollectionCreation'])]
+    #[
+        Revs(500),
+        Iterations(5),
+        BeforeMethods(['setupCache', 'setupCollectionCreation']),
+        Assert('mode(variant.time.avg) < 1.86 milliseconds +/- 5%')
+    ]
     public function benchCollectionCreation()
     {
         ComplicatedData::collect($this->collectionPayload, DataCollection::class);
     }
 
-    #[Revs(5000), Iterations(5), BeforeMethods(['setupCache', 'setupObjectCreation'])]
+    #[
+        Revs(5000),
+        Iterations(5),
+        BeforeMethods(['setupCache', 'setupObjectCreation']),
+        Assert('mode(variant.time.avg) < 129 microseconds +/- 5%')
+    ]
     public function benchObjectCreation()
     {
         ComplicatedData::from($this->objectPayload);
     }
 
-    #[Revs(500), Iterations(5), BeforeMethods(['setupCollectionTransformation'])]
+    #[
+        Revs(500),
+        Iterations(5),
+        BeforeMethods(['setupCollectionTransformation']),
+        Assert('mode(variant.time.avg) < 774 microseconds +/- 10%')
+    ]
     public function benchCollectionTransformationWithoutCache()
     {
         $this->collection->toArray();
@@ -212,7 +236,12 @@ class DataBench
         $this->dataConfig->reset();
     }
 
-    #[Revs(5000), Iterations(5), BeforeMethods(['setupObjectTransformation'])]
+    #[
+        Revs(5000),
+        Iterations(5),
+        BeforeMethods(['setupObjectTransformation']),
+        Assert('mode(variant.time.avg) < 217 microseconds +/- 10%')
+    ]
     public function benchObjectTransformationWithoutCache()
     {
         $this->object->toArray();
@@ -220,7 +249,12 @@ class DataBench
         $this->dataConfig->reset();
     }
 
-    #[Revs(500), Iterations(5), BeforeMethods(['setupCollectionCreation'])]
+    #[
+        Revs(500),
+        Iterations(5),
+        BeforeMethods(['setupCollectionCreation']),
+        Assert('mode(variant.time.avg) < 2.15 milliseconds +/- 10%')
+    ]
     public function benchCollectionCreationWithoutCache()
     {
         ComplicatedData::collect($this->collectionPayload, DataCollection::class);
@@ -228,7 +262,12 @@ class DataBench
         $this->dataConfig->reset();
     }
 
-    #[Revs(5000), Iterations(5), BeforeMethods(['setupObjectCreation'])]
+    #[
+        Revs(5000),
+        Iterations(5),
+        BeforeMethods(['setupObjectCreation']),
+        Assert('mode(variant.time.avg) < 367 microseconds +/- 10%')
+    ]
     public function benchObjectCreationWithoutCache()
     {
         ComplicatedData::from($this->objectPayload);
