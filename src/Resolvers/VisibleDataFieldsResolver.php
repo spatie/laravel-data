@@ -131,7 +131,7 @@ class VisibleDataFieldsResolver
 
             if ($nested = $exceptPartial->getNested()) {
                 try {
-                    $fields[$nested]->addExceptResolvedPartial($exceptPartial->next());
+                    $fields[$nested]->addExceptPartial($exceptPartial->next());
                 } catch (ErrorException $exception) {
                     $this->handleNonExistingNestedField($exception, PartialType::Except, $nested, $dataClass, $transformationContext);
                 }
@@ -169,7 +169,7 @@ class VisibleDataFieldsResolver
 
             if ($nested = $onlyPartial->getNested()) {
                 try {
-                    $fields[$nested]->addOnlyResolvedPartial($onlyPartial->next());
+                    $fields[$nested]->addOnlyPartial($onlyPartial->next());
                     $onlyFields[] = $nested;
                 } catch (ErrorException $exception) {
                     $this->handleNonExistingNestedField($exception, PartialType::Only, $nested, $dataClass, $transformationContext);
@@ -220,7 +220,7 @@ class VisibleDataFieldsResolver
 
                 foreach ($includedFields as $includedField) {
                     // can be null when field is a non data object/collectable or array
-                    $fields[$includedField]?->addIncludedResolvedPartial($includedPartial->next());
+                    $fields[$includedField]?->addIncludedPartial($includedPartial->next());
                 }
 
                 break;
@@ -228,7 +228,7 @@ class VisibleDataFieldsResolver
 
             if ($nested = $includedPartial->getNested()) {
                 try {
-                    $fields[$nested]->addIncludedResolvedPartial($includedPartial->next());
+                    $fields[$nested]->addIncludedPartial($includedPartial->next());
                     $includedFields[] = $nested;
                 } catch (ErrorException $exception) {
                     $this->handleNonExistingNestedField($exception, PartialType::Include, $nested, $dataClass, $transformationContext);
@@ -268,7 +268,7 @@ class VisibleDataFieldsResolver
                     ->all();
 
                 foreach ($excludedFields as $excludedField) {
-                    $fields[$excludedField]?->addExcludedResolvedPartial($excludePartial->next());
+                    $fields[$excludedField]?->addExcludedPartial($excludePartial->next());
                 }
 
                 break;
@@ -276,7 +276,7 @@ class VisibleDataFieldsResolver
 
             if ($nested = $excludePartial->getNested()) {
                 try {
-                    $fields[$nested]->addExcludedResolvedPartial($excludePartial->next());
+                    $fields[$nested]->addExcludedPartial($excludePartial->next());
                 } catch (ErrorException $exception) {
                     $this->handleNonExistingNestedField($exception, PartialType::Exclude, $nested, $dataClass, $transformationContext);
                 }

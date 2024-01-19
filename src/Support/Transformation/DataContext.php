@@ -48,16 +48,16 @@ class DataContext
         return $this;
     }
 
-    public function getResolvedPartialsAndRemoveTemporaryOnes(
+    public function getRequiredPartialsAndRemoveTemporaryOnes(
         BaseData|BaseDataCollectable $data,
         PartialsCollection $partials,
-    ): ResolvedPartialsCollection {
-        $resolvedPartials = new ResolvedPartialsCollection();
+    ): PartialsCollection {
+        $requiredPartials = new PartialsCollection();
         $partialsToDetach = new PartialsCollection();
 
         foreach ($partials as $partial) {
-            if ($resolved = $partial->resolve($data)) {
-                $resolvedPartials->attach($resolved);
+            if ($partial->isRequired($data)) {
+                $requiredPartials->attach($partial->reset());
             }
 
             if (! $partial->permanent) {
@@ -67,6 +67,6 @@ class DataContext
 
         $partials->removeAll($partialsToDetach);
 
-        return $resolvedPartials;
+        return $requiredPartials;
     }
 }

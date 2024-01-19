@@ -5,6 +5,8 @@ namespace Spatie\LaravelData\Support\Transformation;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\IncludeableData;
+use Spatie\LaravelData\Support\Partials\Partial;
+use Spatie\LaravelData\Support\Partials\PartialsCollection;
 use Spatie\LaravelData\Support\Partials\ResolvedPartial;
 use Spatie\LaravelData\Support\Partials\ResolvedPartialsCollection;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
@@ -20,10 +22,10 @@ class TransformationContext implements Stringable
         public bool $mapPropertyNames = true,
         public WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
         public ?GlobalTransformersCollection $transformers = null,
-        public ?ResolvedPartialsCollection $includePartials = null,
-        public ?ResolvedPartialsCollection $excludePartials = null,
-        public ?ResolvedPartialsCollection $onlyPartials = null,
-        public ?ResolvedPartialsCollection $exceptPartials = null,
+        public ?PartialsCollection $includePartials = null,
+        public ?PartialsCollection $excludePartials = null,
+        public ?PartialsCollection $onlyPartials = null,
+        public ?PartialsCollection $exceptPartials = null,
     ) {
     }
 
@@ -34,81 +36,81 @@ class TransformationContext implements Stringable
         return $this;
     }
 
-    public function addIncludedResolvedPartial(ResolvedPartial ...$resolvedPartials): void
+    public function addIncludedPartial(Partial ...$partials): void
     {
         if ($this->includePartials === null) {
-            $this->includePartials = new ResolvedPartialsCollection();
+            $this->includePartials = new PartialsCollection();
         }
 
-        foreach ($resolvedPartials as $resolvedPartial) {
-            $this->includePartials->attach($resolvedPartial);
+        foreach ($partials as $partial) {
+            $this->includePartials->attach($partial);
         }
     }
 
-    public function addExcludedResolvedPartial(ResolvedPartial ...$resolvedPartials): void
+    public function addExcludedPartial(Partial ...$partials): void
     {
         if ($this->excludePartials === null) {
-            $this->excludePartials = new ResolvedPartialsCollection();
+            $this->excludePartials = new PartialsCollection();
         }
 
-        foreach ($resolvedPartials as $resolvedPartial) {
-            $this->excludePartials->attach($resolvedPartial);
+        foreach ($partials as $partial) {
+            $this->excludePartials->attach($partial);
         }
     }
 
-    public function addOnlyResolvedPartial(ResolvedPartial ...$resolvedPartials): void
+    public function addOnlyPartial(Partial ...$partials): void
     {
         if ($this->onlyPartials === null) {
-            $this->onlyPartials = new ResolvedPartialsCollection();
+            $this->onlyPartials = new PartialsCollection();
         }
 
-        foreach ($resolvedPartials as $resolvedPartial) {
-            $this->onlyPartials->attach($resolvedPartial);
+        foreach ($partials as $partial) {
+            $this->onlyPartials->attach($partial);
         }
     }
 
-    public function addExceptResolvedPartial(ResolvedPartial ...$resolvedPartials): void
+    public function addExceptPartial(Partial ...$partials): void
     {
         if ($this->exceptPartials === null) {
-            $this->exceptPartials = new ResolvedPartialsCollection();
+            $this->exceptPartials = new PartialsCollection();
         }
 
-        foreach ($resolvedPartials as $resolvedPartial) {
-            $this->exceptPartials->attach($resolvedPartial);
+        foreach ($partials as $partial) {
+            $this->exceptPartials->attach($partial);
         }
     }
 
-    public function mergeIncludedResolvedPartials(ResolvedPartialsCollection $partials): void
+    public function mergeIncludedPartials(PartialsCollection $partials): void
     {
         if ($this->includePartials === null) {
-            $this->includePartials = new ResolvedPartialsCollection();
+            $this->includePartials = new PartialsCollection();
         }
 
         $this->includePartials->addAll($partials);
     }
 
-    public function mergeExcludedResolvedPartials(ResolvedPartialsCollection $partials): void
+    public function mergeExcludedPartials(PartialsCollection $partials): void
     {
         if ($this->excludePartials === null) {
-            $this->excludePartials = new ResolvedPartialsCollection();
+            $this->excludePartials = new PartialsCollection();
         }
 
         $this->excludePartials->addAll($partials);
     }
 
-    public function mergeOnlyResolvedPartials(ResolvedPartialsCollection $partials): void
+    public function mergeOnlyPartials(PartialsCollection $partials): void
     {
         if ($this->onlyPartials === null) {
-            $this->onlyPartials = new ResolvedPartialsCollection();
+            $this->onlyPartials = new PartialsCollection();
         }
 
         $this->onlyPartials->addAll($partials);
     }
 
-    public function mergeExceptResolvedPartials(ResolvedPartialsCollection $partials): void
+    public function mergeExceptPartials(PartialsCollection $partials): void
     {
         if ($this->exceptPartials === null) {
-            $this->exceptPartials = new ResolvedPartialsCollection();
+            $this->exceptPartials = new PartialsCollection();
         }
 
         $this->exceptPartials->addAll($partials);
@@ -150,26 +152,26 @@ class TransformationContext implements Stringable
         $dataContext = $data->getDataContext();
 
         if ($dataContext->includePartials && $dataContext->includePartials->count() > 0) {
-            $this->mergeIncludedResolvedPartials(
-                $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($data, $dataContext->includePartials)
+            $this->mergeIncludedPartials(
+                $dataContext->getRequiredPartialsAndRemoveTemporaryOnes($data, $dataContext->includePartials)
             );
         }
 
         if ($dataContext->excludePartials && $dataContext->excludePartials->count() > 0) {
-            $this->mergeExcludedResolvedPartials(
-                $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($data, $dataContext->excludePartials)
+            $this->mergeExcludedPartials(
+                $dataContext->getRequiredPartialsAndRemoveTemporaryOnes($data, $dataContext->excludePartials)
             );
         }
 
         if ($dataContext->onlyPartials && $dataContext->onlyPartials->count() > 0) {
-            $this->mergeOnlyResolvedPartials(
-                $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($data, $dataContext->onlyPartials)
+            $this->mergeOnlyPartials(
+                $dataContext->getRequiredPartialsAndRemoveTemporaryOnes($data, $dataContext->onlyPartials)
             );
         }
 
         if ($dataContext->exceptPartials && $dataContext->exceptPartials->count() > 0) {
-            $this->mergeExceptResolvedPartials(
-                $dataContext->getResolvedPartialsAndRemoveTemporaryOnes($data, $dataContext->exceptPartials)
+            $this->mergeExceptPartials(
+                $dataContext->getRequiredPartialsAndRemoveTemporaryOnes($data, $dataContext->exceptPartials)
             );
         }
 

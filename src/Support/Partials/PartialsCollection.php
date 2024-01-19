@@ -3,11 +3,12 @@
 namespace Spatie\LaravelData\Support\Partials;
 
 use SplObjectStorage;
+use Stringable;
 
 /**
  * @extends SplObjectStorage<Partial, null>
  */
-class PartialsCollection extends SplObjectStorage
+class PartialsCollection extends SplObjectStorage  implements Stringable
 {
     public static function create(Partial ...$partials): self
     {
@@ -26,6 +27,17 @@ class PartialsCollection extends SplObjectStorage
 
         foreach ($this as $partial) {
             $output[] = $partial->toArray();
+        }
+
+        return $output;
+    }
+
+    public function __toString(): string
+    {
+        $output = '';
+
+        foreach ($this as $partial) {
+            $output .= "  - {$partial}".PHP_EOL;
         }
 
         return $output;

@@ -38,13 +38,11 @@ class TransformationContextFactory
         $includePartials = null;
 
         if ($this->includePartials) {
-            $includePartials = new ResolvedPartialsCollection();
+            $includePartials = new PartialsCollection();
 
             foreach ($this->includePartials as $include) {
-                $resolved = $include->resolve($data);
-
-                if ($resolved) {
-                    $includePartials->attach($resolved);
+                if ($include->isRequired($data)) {
+                    $includePartials->attach($include->reset());
                 }
             }
         }
@@ -52,13 +50,11 @@ class TransformationContextFactory
         $excludePartials = null;
 
         if ($this->excludePartials) {
-            $excludePartials = new ResolvedPartialsCollection();
+            $excludePartials = new PartialsCollection();
 
             foreach ($this->excludePartials as $exclude) {
-                $resolved = $exclude->resolve($data);
-
-                if ($resolved) {
-                    $excludePartials->attach($resolved);
+                if ($exclude->isRequired($data)) {
+                    $excludePartials->attach($exclude->reset());
                 }
             }
         }
@@ -66,13 +62,11 @@ class TransformationContextFactory
         $onlyPartials = null;
 
         if ($this->onlyPartials) {
-            $onlyPartials = new ResolvedPartialsCollection();
+            $onlyPartials = new PartialsCollection();
 
             foreach ($this->onlyPartials as $only) {
-                $resolved = $only->resolve($data);
-
-                if ($resolved) {
-                    $onlyPartials->attach($resolved);
+                if ($only->isRequired($data)) {
+                    $onlyPartials->attach($only->reset());
                 }
             }
         }
@@ -80,13 +74,11 @@ class TransformationContextFactory
         $exceptPartials = null;
 
         if ($this->exceptPartials) {
-            $exceptPartials = new ResolvedPartialsCollection();
+            $exceptPartials = new PartialsCollection();
 
             foreach ($this->exceptPartials as $except) {
-                $resolved = $except->resolve($data);
-
-                if ($resolved) {
-                    $exceptPartials->attach($resolved);
+                if ($except->isRequired($data)) {
+                    $exceptPartials->attach($except->reset());
                 }
             }
         }

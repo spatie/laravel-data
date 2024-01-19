@@ -56,7 +56,7 @@
         "test" : "./vendor/bin/pest --no-coverage",
         "test-coverage" : "vendor/bin/pest --coverage-html coverage",
         "format" : "vendor/bin/php-cs-fixer fix --allow-risky=yes",
-        "benchmark" : "vendor/bin/phpbench run  --report=default",
+        "benchmark" : "vendor/bin/phpbench run",
         "benchmark-profiled" : "vendor/bin/phpbench "
     },
     "config" : {

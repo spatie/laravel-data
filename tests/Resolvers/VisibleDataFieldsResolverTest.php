@@ -11,8 +11,8 @@ use Spatie\LaravelData\Resolvers\VisibleDataFieldsResolver;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Lazy\ClosureLazy;
 use Spatie\LaravelData\Support\Lazy\InertiaLazy;
-use Spatie\LaravelData\Support\Partials\ResolvedPartial;
-use Spatie\LaravelData\Support\Partials\ResolvedPartialsCollection;
+use Spatie\LaravelData\Support\Partials\Partial;
+use Spatie\LaravelData\Support\Partials\PartialsCollection;
 use Spatie\LaravelData\Support\Partials\Segments\AllPartialSegment;
 use Spatie\LaravelData\Support\Partials\Segments\FieldsPartialSegment;
 use Spatie\LaravelData\Support\Partials\Segments\NestedPartialSegment;
@@ -396,8 +396,8 @@ it('can execute excepts', function (
             ->except('nested.a'),
         'fields' => [
             'nested' => new TransformationContext(
-                exceptPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a'])], 1)
+                exceptPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a'])], pointer: 1)
                 ),
             ),
         ],
@@ -414,8 +414,8 @@ it('can execute excepts', function (
             ->except('nested.{a,b}'),
         'fields' => [
             'nested' => new TransformationContext(
-                exceptPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a', 'b'])], 1)
+                exceptPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a', 'b'])], pointer: 1)
                 ),
             ),
         ],
@@ -430,8 +430,8 @@ it('can execute excepts', function (
             ->except('nested.*'),
         'fields' => [
             'nested' => new TransformationContext(
-                exceptPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new AllPartialSegment()], 1)
+                exceptPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
@@ -446,8 +446,8 @@ it('can execute excepts', function (
             ->except('collection.string'),
         'fields' => [
             'collection' => new TransformationContext(
-                exceptPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], 1)
+                exceptPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
         ],
@@ -465,8 +465,8 @@ it('can execute excepts', function (
             ->except('collection.{string,int}'),
         'fields' => [
             'collection' => new TransformationContext(
-                exceptPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], 1)
+                exceptPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], pointer: 1)
                 ),
             ),
         ],
@@ -484,8 +484,8 @@ it('can execute excepts', function (
             ->except('collection.*'),
         'fields' => [
             'collection' => new TransformationContext(
-                exceptPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new AllPartialSegment()], 1)
+                exceptPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
@@ -504,18 +504,18 @@ it('can execute excepts', function (
             ->except('nested.a.string'),
         'fields' => [
             'single' => new TransformationContext(
-                exceptPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('single'), new FieldsPartialSegment(['string'])], 1)
+                exceptPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('single'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
             'collection' => new TransformationContext(
-                exceptPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], 1)
+                exceptPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
             'nested' => new TransformationContext(
-                exceptPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], 1)
+                exceptPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
         ],
@@ -605,8 +605,8 @@ it("can execute only's", function (
             ->only('nested.a'),
         'fields' => [
             'nested' => new TransformationContext(
-                onlyPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a'])], 1)
+                onlyPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a'])], pointer: 1)
                 ),
             ),
         ],
@@ -622,8 +622,8 @@ it("can execute only's", function (
             ->only('nested.{a,b}'),
         'fields' => [
             'nested' => new TransformationContext(
-                onlyPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a', 'b'])], 1)
+                onlyPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a', 'b'])], pointer: 1)
                 ),
             ),
         ],
@@ -640,8 +640,8 @@ it("can execute only's", function (
             ->only('nested.*'),
         'fields' => [
             'nested' => new TransformationContext(
-                onlyPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new AllPartialSegment()], 1)
+                onlyPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
@@ -658,8 +658,8 @@ it("can execute only's", function (
             ->only('collection.string'),
         'fields' => [
             'collection' => new TransformationContext(
-                onlyPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], 1)
+                onlyPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
         ],
@@ -676,8 +676,8 @@ it("can execute only's", function (
             ->only('collection.{string,int}'),
         'fields' => [
             'collection' => new TransformationContext(
-                onlyPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], 1)
+                onlyPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], pointer: 1)
                 ),
             ),
         ],
@@ -694,8 +694,8 @@ it("can execute only's", function (
             ->only('collection.*'),
         'fields' => [
             'collection' => new TransformationContext(
-                onlyPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new AllPartialSegment()], 1)
+                onlyPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
@@ -715,18 +715,18 @@ it("can execute only's", function (
         'fields' => [
             'string' => null,
             'single' => new TransformationContext(
-                onlyPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('single'), new FieldsPartialSegment(['string'])], 1)
+                onlyPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('single'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
             'collection' => new TransformationContext(
-                onlyPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], 1)
+                onlyPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
             'nested' => new TransformationContext(
-                onlyPartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], 1)
+                onlyPartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
         ],
@@ -852,20 +852,20 @@ it('can execute includes', function (
             ->include('*'),
         'fields' => [
             'single' => new TransformationContext(
-                includePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new AllPartialSegment()], 3)
+                includePartials: PartialsCollection::create(
+                    new Partial([new AllPartialSegment()], pointer: 3)
                 ),
             ),
             'int' => null,
             'string' => null,
             'nested' => new TransformationContext(
-                includePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new AllPartialSegment()], 3)
+                includePartials: PartialsCollection::create(
+                    new Partial([new AllPartialSegment()], pointer: 3)
                 ),
             ),
             'collection' => new TransformationContext(
-                includePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new AllPartialSegment()], 3)
+                includePartials: PartialsCollection::create(
+                    new Partial([new AllPartialSegment()], pointer: 3)
                 ),
             ),
         ],
@@ -890,8 +890,8 @@ it('can execute includes', function (
             ->include('nested.a'),
         'fields' => [
             'nested' => new TransformationContext(
-                includePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a'])], 1)
+                includePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a'])], pointer: 1)
                 ),
             ),
         ],
@@ -908,8 +908,8 @@ it('can execute includes', function (
             ->include('nested.{a,b}'),
         'fields' => [
             'nested' => new TransformationContext(
-                includePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a', 'b'])], 1)
+                includePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a', 'b'])], pointer: 1)
                 ),
             ),
         ],
@@ -927,8 +927,8 @@ it('can execute includes', function (
             ->include('nested.*'),
         'fields' => [
             'nested' => new TransformationContext(
-                includePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new AllPartialSegment()], 1)
+                includePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
@@ -946,9 +946,9 @@ it('can execute includes', function (
             ->include('nested.a.string', 'nested.b.int'),
         'fields' => [
             'nested' => new TransformationContext(
-                includePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], 1),
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new NestedPartialSegment('b'), new FieldsPartialSegment(['int'])], 1)
+                includePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], pointer: 1),
+                    new Partial([new NestedPartialSegment('nested'), new NestedPartialSegment('b'), new FieldsPartialSegment(['int'])], pointer: 1)
                 ),
             ),
         ],
@@ -966,8 +966,8 @@ it('can execute includes', function (
             ->include('collection.string'),
         'fields' => [
             'collection' => new TransformationContext(
-                includePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], 1)
+                includePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
         ],
@@ -985,8 +985,8 @@ it('can execute includes', function (
             ->include('collection.{string,int}'),
         'fields' => [
             'collection' => new TransformationContext(
-                includePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], 1)
+                includePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], pointer: 1)
                 ),
             ),
         ],
@@ -1004,8 +1004,8 @@ it('can execute includes', function (
             ->include('collection.*'),
         'fields' => [
             'collection' => new TransformationContext(
-                includePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new AllPartialSegment()], 1)
+                includePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
@@ -1025,18 +1025,18 @@ it('can execute includes', function (
         'fields' => [
             'string' => null,
             'single' => new TransformationContext(
-                includePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('single'), new FieldsPartialSegment(['string'])], 1)
+                includePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('single'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
             'collection' => new TransformationContext(
-                includePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], 1)
+                includePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
             'nested' => new TransformationContext(
-                includePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], 1)
+                includePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
         ],
@@ -1125,8 +1125,8 @@ it('can execute excludes', function (
             ->exclude('nested.a'),
         'fields' => [
             'nested' => new TransformationContext(
-                excludePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a'])], 1)
+                excludePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a'])], pointer: 1)
                 ),
             ),
         ],
@@ -1143,8 +1143,8 @@ it('can execute excludes', function (
             ->exclude('nested.{a,b}'),
         'fields' => [
             'nested' => new TransformationContext(
-                excludePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a', 'b'])], 1)
+                excludePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a', 'b'])], pointer: 1)
                 ),
             ),
         ],
@@ -1159,8 +1159,8 @@ it('can execute excludes', function (
             ->exclude('nested.*'),
         'fields' => [
             'nested' => new TransformationContext(
-                excludePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new AllPartialSegment()], 1)
+                excludePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
@@ -1175,9 +1175,9 @@ it('can execute excludes', function (
             ->exclude('nested.a.string', 'nested.b.int'),
         'fields' => [
             'nested' => new TransformationContext(
-                excludePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], 1),
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new NestedPartialSegment('b'), new FieldsPartialSegment(['int'])], 1)
+                excludePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], pointer: 1),
+                    new Partial([new NestedPartialSegment('nested'), new NestedPartialSegment('b'), new FieldsPartialSegment(['int'])], pointer: 1)
                 ),
             ),
         ],
@@ -1195,8 +1195,8 @@ it('can execute excludes', function (
             ->exclude('collection.string'),
         'fields' => [
             'collection' => new TransformationContext(
-                excludePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], 1)
+                excludePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
         ],
@@ -1214,8 +1214,8 @@ it('can execute excludes', function (
             ->exclude('collection.{string,int}'),
         'fields' => [
             'collection' => new TransformationContext(
-                excludePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], 1)
+                excludePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], pointer: 1)
                 ),
             ),
         ],
@@ -1233,8 +1233,8 @@ it('can execute excludes', function (
             ->exclude('collection.*'),
         'fields' => [
             'collection' => new TransformationContext(
-                excludePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new AllPartialSegment()], 1)
+                excludePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
@@ -1253,18 +1253,18 @@ it('can execute excludes', function (
             ->exclude('nested.a.string'),
         'fields' => [
             'single' => new TransformationContext(
-                excludePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('single'), new FieldsPartialSegment(['string'])], 1)
+                excludePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('single'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
             'collection' => new TransformationContext(
-                excludePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], 1)
+                excludePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
             'nested' => new TransformationContext(
-                excludePartials: ResolvedPartialsCollection::create(
-                    new ResolvedPartial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], 1)
+                excludePartials: PartialsCollection::create(
+                    new Partial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
             'int' => null,
@@ -1304,34 +1304,34 @@ it('can combine all the partials', function () {
 
     $expectedVisibleFields = [
         'single' => new TransformationContext(
-            excludePartials: ResolvedPartialsCollection::create(
-                new ResolvedPartial([new NestedPartialSegment('single'), new FieldsPartialSegment(['int'])], 1)
+            excludePartials: PartialsCollection::create(
+                new Partial([new NestedPartialSegment('single'), new FieldsPartialSegment(['int'])], pointer: 1)
             ),
-            onlyPartials: ResolvedPartialsCollection::create(
-                new ResolvedPartial([new NestedPartialSegment('single'), new AllPartialSegment()], 1)
+            onlyPartials: PartialsCollection::create(
+                new Partial([new NestedPartialSegment('single'), new AllPartialSegment()], pointer: 1)
             ),
         ),
         'nested' => new TransformationContext(
-            includePartials: ResolvedPartialsCollection::create(
-                new ResolvedPartial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], 1),
-                new ResolvedPartial([new NestedPartialSegment('nested'), new NestedPartialSegment('b'), new AllPartialSegment()], 1)
+            includePartials: PartialsCollection::create(
+                new Partial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], pointer: 1),
+                new Partial([new NestedPartialSegment('nested'), new NestedPartialSegment('b'), new AllPartialSegment()], pointer: 1)
             ),
-            onlyPartials: ResolvedPartialsCollection::create(
-                new ResolvedPartial([new NestedPartialSegment('nested'), new AllPartialSegment()], 1)
+            onlyPartials: PartialsCollection::create(
+                new Partial([new NestedPartialSegment('nested'), new AllPartialSegment()], pointer: 1)
             ),
-            exceptPartials: ResolvedPartialsCollection::create(
-                new ResolvedPartial([new NestedPartialSegment('nested'), new NestedPartialSegment('b'), new FieldsPartialSegment(['int'])], 1)
+            exceptPartials: PartialsCollection::create(
+                new Partial([new NestedPartialSegment('nested'), new NestedPartialSegment('b'), new FieldsPartialSegment(['int'])], pointer: 1)
             ),
         ),
         'collection' => new TransformationContext(
-            includePartials: ResolvedPartialsCollection::create(
-                new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], 1)
+            includePartials: PartialsCollection::create(
+                new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], pointer: 1)
             ),
-            onlyPartials: ResolvedPartialsCollection::create(
-                new ResolvedPartial([new NestedPartialSegment('collection'), new AllPartialSegment()], 1)
+            onlyPartials: PartialsCollection::create(
+                new Partial([new NestedPartialSegment('collection'), new AllPartialSegment()], pointer: 1)
             ),
-            exceptPartials: ResolvedPartialsCollection::create(
-                new ResolvedPartial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['int'])], 1)
+            exceptPartials: PartialsCollection::create(
+                new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['int'])], pointer: 1)
             ),
         ),
     ];
