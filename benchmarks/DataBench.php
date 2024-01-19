@@ -3,27 +3,38 @@
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Orchestra\Testbench\Concerns\CreatesApplication;
+use PhpBench\Attributes\AfterMethods;
 use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\Iterations;
 use PhpBench\Attributes\Revs;
-use PhpBench\Benchmark\Metadata\Annotations\Subject;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\LaravelDataServiceProvider;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
-use Spatie\LaravelData\Tests\Fakes\MultiNestedData;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use function Amp\Iterator\toArray;
 
 class DataBench
 {
     use CreatesApplication;
 
+    protected DataCollection $collection;
+
+    protected Data $object;
+
+    protected array $collectionPayload;
+
+    protected array $objectPayload;
+
+    private DataConfig $dataConfig;
+
     public function __construct()
     {
         $this->createApplication();
+        $this->dataConfig = app(DataConfig::class);
     }
 
     protected function getPackageProviders($app)
@@ -33,46 +44,76 @@ class DataBench
         ];
     }
 
-    public function setup()
+    public function setupCache()
     {
-        app(DataConfig::class)->getDataClass(ComplicatedData::class)->prepareForCache();
-        app(DataConfig::class)->getDataClass(SimpleData::class)->prepareForCache();
-        app(DataConfig::class)->getDataClass(MultiNestedData::class)->prepareForCache();
-        app(DataConfig::class)->getDataClass(NestedData::class)->prepareForCache();
+        $this->dataConfig->getDataClass(ComplicatedData::class)->prepareForCache();
+        $this->dataConfig->getDataClass(SimpleData::class)->prepareForCache();
+        $this->dataConfig->getDataClass(NestedData::class)->prepareForCache();
     }
 
-    #[Revs(500), Iterations(2)]
-    public function benchDataCreation()
+    public function setupCollectionTransformation()
     {
-        MultiNestedData::from([
-            'nested' => ['simple' => 'Hello'],
-            'nestedCollection' => [
-                ['simple' => 'I'],
-                ['simple' => 'am'],
-                ['simple' => 'groot'],
-            ],
-        ]);
+        $collection = Collection::times(
+            15,
+            fn () => new ComplicatedData(
+                42,
+                42,
+                true,
+                3.14,
+                'Hello World',
+                [1, 1, 2, 3, 5, 8],
+                null,
+                Optional::create(),
+                42,
+                CarbonImmutable::create(1994, 05, 16),
+                new DateTime('1994-05-16T12:00:00+01:00'),
+                new SimpleData('hello'),
+                new DataCollection(NestedData::class, [
+                    new NestedData(new SimpleData('I')),
+                    new NestedData(new SimpleData('am')),
+                    new NestedData(new SimpleData('groot')),
+                ]),
+                [
+                    new NestedData(new SimpleData('I')),
+                    new NestedData(new SimpleData('am')),
+                    new NestedData(new SimpleData('groot')),
+                ],
+            ));
+
+        $this->collection = new DataCollection(ComplicatedData::class, $collection);
     }
 
-    #[Revs(500), Iterations(2)]
-    public function benchDataTransformation()
+    public function setupObjectTransformation()
     {
-        $data = new MultiNestedData(
-            new NestedData(new SimpleData('Hello')),
+        $this->object = new ComplicatedData(
+            42,
+            42,
+            true,
+            3.14,
+            'Hello World',
+            [1, 1, 2, 3, 5, 8],
+            null,
+            Optional::create(),
+            42,
+            CarbonImmutable::create(1994, 05, 16),
+            new DateTime('1994-05-16T12:00:00+01:00'),
+            new SimpleData('hello'),
+            new DataCollection(NestedData::class, [
+                new NestedData(new SimpleData('I')),
+                new NestedData(new SimpleData('am')),
+                new NestedData(new SimpleData('groot')),
+            ]),
             [
                 new NestedData(new SimpleData('I')),
                 new NestedData(new SimpleData('am')),
                 new NestedData(new SimpleData('groot')),
-            ]
+            ],
         );
-
-        $data->toArray();
     }
 
-    #[Revs(500), Iterations(2)]
-    public function benchDataCollectionCreation()
+    public function setupCollectionCreation()
     {
-        $collection = Collection::times(
+        $this->collectionPayload = Collection::times(
             15,
             fn() => [
                 'withoutType' => 42,
@@ -104,43 +145,94 @@ class DataBench
                 ],
             ]
         )->all();
-
-        ComplicatedData::collect($collection, DataCollection::class);
     }
 
-    #[Revs(500), Iterations(2)]
-    public function benchDataCollectionTransformation()
+    public function setupObjectCreation()
     {
-        $collection = Collection::times(
-            15,
-            fn() => new ComplicatedData(
-                42,
-                42,
-                true,
-                3.14,
-                'Hello World',
-                [1, 1, 2, 3, 5, 8],
-                null,
-                Optional::create(),
-                42,
-                CarbonImmutable::create(1994,05,16),
-                new DateTime('1994-05-16T12:00:00+01:00'),
-                new SimpleData('hello'),
-                new DataCollection(NestedData::class, [
-                    new NestedData(new SimpleData('I')),
-                    new NestedData(new SimpleData('am')),
-                    new NestedData(new SimpleData('groot')),
-                ]),
-                [
-                    new NestedData(new SimpleData('I')),
-                    new NestedData(new SimpleData('am')),
-                    new NestedData(new SimpleData('groot')),
-                ],
-            )
-        )->all();
+        $this->objectPayload = [
+            'withoutType' => 42,
+            'int' => 42,
+            'bool' => true,
+            'float' => 3.14,
+            'string' => 'Hello world',
+            'array' => [1, 1, 2, 3, 5, 8],
+            'nullable' => null,
+            'mixed' => 42,
+            'explicitCast' => '16-06-1994',
+            'defaultCast' => '1994-05-16T12:00:00+01:00',
+            'nestedData' => [
+                'string' => 'hello',
+            ],
+            'nestedCollection' => [
+                ['string' => 'never'],
+                ['string' => 'gonna'],
+                ['string' => 'give'],
+                ['string' => 'you'],
+                ['string' => 'up'],
+            ],
+            'nestedArray' => [
+                ['string' => 'never'],
+                ['string' => 'gonna'],
+                ['string' => 'give'],
+                ['string' => 'you'],
+                ['string' => 'up'],
+            ],
+        ];
+    }
 
-        $dataCollection = (new DataCollection(ComplicatedData::class, $collection));
+    #[Revs(500), Iterations(5), BeforeMethods(['setupCache', 'setupCollectionTransformation'])]
+    public function benchCollectionTransformation()
+    {
+        $this->collection->toArray();
+    }
 
-        $dataCollection->toArray();
+    #[Revs(5000), Iterations(5), BeforeMethods(['setupCache', 'setupObjectTransformation'])]
+    public function benchObjectTransformation()
+    {
+        $this->object->toArray();
+    }
+
+    #[Revs(500), Iterations(5), BeforeMethods(['setupCache', 'setupCollectionCreation'])]
+    public function benchCollectionCreation()
+    {
+        ComplicatedData::collect($this->collectionPayload, DataCollection::class);
+    }
+
+    #[Revs(5000), Iterations(5), BeforeMethods(['setupCache', 'setupObjectCreation'])]
+    public function benchObjectCreation()
+    {
+        ComplicatedData::from($this->objectPayload);
+    }
+
+    #[Revs(500), Iterations(5), BeforeMethods(['setupCollectionTransformation'])]
+    public function benchCollectionTransformationWithoutCache()
+    {
+        $this->collection->toArray();
+
+        $this->dataConfig->reset();
+    }
+
+    #[Revs(5000), Iterations(5), BeforeMethods(['setupObjectTransformation'])]
+    public function benchObjectTransformationWithoutCache()
+    {
+        $this->object->toArray();
+
+        $this->dataConfig->reset();
+    }
+
+    #[Revs(500), Iterations(5), BeforeMethods(['setupCollectionCreation'])]
+    public function benchCollectionCreationWithoutCache()
+    {
+        ComplicatedData::collect($this->collectionPayload, DataCollection::class);
+
+        $this->dataConfig->reset();
+    }
+
+    #[Revs(5000), Iterations(5), BeforeMethods(['setupObjectCreation'])]
+    public function benchObjectCreationWithoutCache()
+    {
+        ComplicatedData::from($this->objectPayload);
+
+        $this->dataConfig->reset();
     }
 }
