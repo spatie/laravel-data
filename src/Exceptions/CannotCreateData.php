@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Exceptions;
 
 use Exception;
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;

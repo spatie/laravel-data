@@ -10,7 +10,6 @@ use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
-use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;
 
 /**
