@@ -24,9 +24,11 @@ class CannotCreateData extends Exception
 
     public static function constructorMissingParameters(
         DataClass $dataClass,
-        Collection $parameters,
+        array $parameters,
         Throwable $previous,
     ): self {
+        $parameters = collect($parameters);
+
         $message = "Could not create `{$dataClass->name}`: the constructor requires {$dataClass->constructorMethod->parameters->count()} parameters, {$parameters->count()} given.";
 
 

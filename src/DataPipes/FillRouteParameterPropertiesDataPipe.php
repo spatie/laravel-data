@@ -65,6 +65,5 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
         }
 
         return data_get($parameter, $attribute->property ?? $dataProperty->name);
-        ;
     }
 }

@@ -16,28 +16,29 @@ class DefaultValuesDataPipe implements DataPipe
         Collection $properties,
         CreationContext $creationContext
     ): Collection {
-        $class
-            ->properties
-            ->filter(fn (DataProperty $property) => ! $properties->has($property->name))
-            ->each(function (DataProperty $property) use (&$properties) {
-                if ($property->hasDefaultValue) {
-                    $properties[$property->name] = $property->defaultValue;
+        foreach ($class->properties as $name => $property) {
+            if($properties->has($name)) {
+                continue;
+            }
 
-                    return;
-                }
+            if ($property->hasDefaultValue) {
+                $properties[$name] = $property->defaultValue;
 
-                if ($property->type->isOptional) {
-                    $properties[$property->name] = Optional::create();
+                continue;
+            }
 
-                    return;
-                }
+            if ($property->type->isOptional) {
+                $properties[$name] = Optional::create();
 
-                if ($property->type->isNullable) {
-                    $properties[$property->name] = null;
+                continue;
+            }
 
-                    return;
-                }
-            });
+            if ($property->type->isNullable) {
+                $properties[$name] = null;
+
+                continue;
+            }
+        }
 
         return $properties;
     }

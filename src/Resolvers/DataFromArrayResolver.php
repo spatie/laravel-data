@@ -31,21 +31,7 @@ class DataFromArrayResolver
     {
         $dataClass = $this->dataConfig->getDataClass($class);
 
-        $constructorParameters = $dataClass->constructorMethod?->parameters ?? collect();
-
-        $data = $constructorParameters
-            ->mapWithKeys(function (DataParameter|DataProperty $parameter) use ($properties) {
-                if ($properties->has($parameter->name)) {
-                    return [$parameter->name => $properties->get($parameter->name)];
-                }
-
-                if (! $parameter->isPromoted && $parameter->hasDefaultValue) {
-                    return [$parameter->name => $parameter->defaultValue];
-                }
-
-                return [];
-            })
-            ->pipe(fn (Collection $parameters) => $this->createData($dataClass, $parameters));
+        $data = $this->createData($dataClass, $properties);
 
         $dataClass
             ->properties
@@ -81,8 +67,28 @@ class DataFromArrayResolver
 
     protected function createData(
         DataClass $dataClass,
-        Collection $parameters,
+        Collection $properties,
     ) {
+        $constructorParameters = $dataClass->constructorMethod?->parameters;
+
+        if ($constructorParameters === null) {
+            return new $dataClass->name();
+        }
+
+        $parameters = [];
+
+        foreach ($constructorParameters as $parameter) {
+            if ($properties->has($parameter->name)) {
+                $parameters[$parameter->name] = $properties->get($parameter->name);
+
+                continue;
+            }
+
+            if (! $parameter->isPromoted && $parameter->hasDefaultValue) {
+                $parameters[$parameter->name] = $parameter->defaultValue;
+            }
+        }
+
         try {
             return new $dataClass->name(...$parameters);
         } catch (ArgumentCountError $error) {
