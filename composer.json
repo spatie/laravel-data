@@ -31,7 +31,7 @@
         "nette/php-generator": "^3.5",
         "nunomaduro/larastan": "^2.0",
         "orchestra/testbench": "^8.0",
-        "pestphp/pest": "^2.0",
+        "pestphp/pest": "^2.31",
         "pestphp/pest-plugin-laravel": "^2.0",
         "phpbench/phpbench": "^1.2",
         "phpstan/extension-installer": "^1.1",
