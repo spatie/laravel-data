@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\PartialsParser;
 use Spatie\LaravelData\Support\PartialTrees;
 
@@ -29,36 +30,36 @@ trait IncludeableData
         return $this;
     }
 
-    public function include(string ...$includes): static
+    public function include(string|array ...$includes): static
     {
-        foreach ($includes as $include) {
+        foreach (Arr::flatten($includes) as $include) {
             $this->_includes[$include] = true;
         }
 
         return $this;
     }
 
-    public function exclude(string ...$excludes): static
+    public function exclude(string|array ...$excludes): static
     {
-        foreach ($excludes as $exclude) {
+        foreach (Arr::flatten($excludes) as $exclude) {
             $this->_excludes[$exclude] = true;
         }
 
         return $this;
     }
 
-    public function only(string ...$only): static
+    public function only(string|array ...$only): static
     {
-        foreach ($only as $onlyDefinition) {
+        foreach (Arr::flatten($only) as $onlyDefinition) {
             $this->_only[$onlyDefinition] = true;
         }
 
         return $this;
     }
 
-    public function except(string ...$except): static
+    public function except(string|array ...$except): static
     {
-        foreach ($except as $exceptDefinition) {
+        foreach (Arr::flatten($except) as $exceptDefinition) {
             $this->_except[$exceptDefinition] = true;
         }
 
