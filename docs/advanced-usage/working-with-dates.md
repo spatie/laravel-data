@@ -10,6 +10,9 @@ default date format can be set:
     'date_format' => DATE_ATOM,
 ```
 
+> [!TIP]
+> You can read more about date formats in the [PHP Documentation - The DateTimeInterface interface](https://www.php.net/manual/en/class.datetimeinterface.php)
+
 Now when using the `DateTimeInterfaceCast` or `DateTimeInterfaceTransformer` the format defined will be used
 
 ```php
