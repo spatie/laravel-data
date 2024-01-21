@@ -244,7 +244,9 @@ class DataType implements Countable
         $attributes = $reflection->getAttributes(DataCollectionOf::class);
 
         if (! empty($attributes)) {
-            return $attributes[0]->getArguments()[0];
+            $attributeArgumentKey = array_key_first($attributes[0]->getArguments());
+
+            return $attributes[0]->getArguments()[$attributeArgumentKey];
         }
 
         if ($reflection instanceof ReflectionParameter) {
