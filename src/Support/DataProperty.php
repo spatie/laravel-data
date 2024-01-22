@@ -14,7 +14,7 @@ class DataProperty
     public function __construct(
         public readonly string $name,
         public readonly string $className,
-        public readonly DataType $type,
+        public readonly DataPropertyType $type,
         public readonly bool $validate,
         public readonly bool $computed,
         public readonly bool $hidden,

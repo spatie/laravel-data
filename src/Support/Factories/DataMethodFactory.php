@@ -8,7 +8,7 @@ use ReflectionMethod;
 use ReflectionParameter;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
 use Spatie\LaravelData\Support\DataMethod;
-use Spatie\LaravelData\Support\DataReturnType;
+use Spatie\LaravelData\Support\DataType;
 
 class DataMethodFactory
 {
@@ -24,7 +24,7 @@ class DataMethodFactory
         ReflectionClass $reflectionClass,
     ): DataMethod {
         $returnType = $reflectionMethod->getReturnType()
-            ? $this->returnTypeFactory->build($reflectionMethod->getReturnType())
+            ? $this->returnTypeFactory->build($reflectionMethod, $reflectionClass)
             : null;
 
         return new DataMethod(
@@ -71,7 +71,7 @@ class DataMethodFactory
 
     protected function resolveCustomCreationMethodType(
         ReflectionMethod $method,
-        ?DataReturnType $returnType,
+        ?DataType $returnType,
     ): CustomCreationMethodType {
         if (! $method->isStatic()
             || ! $method->isPublic()
@@ -86,7 +86,7 @@ class DataMethodFactory
             return CustomCreationMethodType::Object;
         }
 
-        if (str_starts_with($method->name, 'collect') && $returnType?->kind->isDataCollectable()) {
+        if (str_starts_with($method->name, 'collect') && $returnType) {
             return CustomCreationMethodType::Collection;
         }
 

@@ -79,12 +79,4 @@ class FakeDataStructureFactory
 
         return $factory->build($parameter, $parameter->getDeclaringClass());
     }
-
-    public static function returnType(
-        ReflectionMethod $method,
-    ): ?DataType {
-        $factory = static::$returnTypeFactory ??= app(DataReturnTypeFactory::class);
-
-        return $factory->build($method->getReturnType());
-    }
 }

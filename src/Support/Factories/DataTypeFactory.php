@@ -19,6 +19,7 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotation;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
+use Spatie\LaravelData\Support\DataPropertyType;
 use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Support\Lazy\ClosureLazy;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
@@ -30,7 +31,6 @@ use Spatie\LaravelData\Support\Types\NamedType;
 use Spatie\LaravelData\Support\Types\Storage\AcceptedTypesStorage;
 use Spatie\LaravelData\Support\Types\Type;
 use Spatie\LaravelData\Support\Types\UnionType;
-use TypeError;
 
 class DataTypeFactory
 {
@@ -39,33 +39,23 @@ class DataTypeFactory
     ) {
     }
 
-    public function build(
+    public function buildProperty(
         ?ReflectionType $reflectionType,
-        ReflectionClass|string $reflectionClass,
+        ReflectionClass|string $class,
         ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
         ?Collection $attributes = null,
         ?DataCollectableAnnotation $classDefinedDataCollectableAnnotation = null,
-    ): DataType {
-        $properties = match (true) {
-            $reflectionType === null => $this->inferPropertiesForNoneType(),
-            $reflectionType instanceof ReflectionNamedType => $this->inferPropertiesForSingleType(
-                $reflectionType,
-                $reflectionClass,
-                $typeable,
-                $attributes,
-                $classDefinedDataCollectableAnnotation
-            ),
-            $reflectionType instanceof ReflectionUnionType || $reflectionType instanceof ReflectionIntersectionType => $this->inferPropertiesForCombinationType(
-                $reflectionType,
-                $reflectionClass,
-                $typeable,
-                $attributes,
-                $classDefinedDataCollectableAnnotation
-            ),
-            default => throw new TypeError('Invalid reflection type')
-        };
+    ): DataPropertyType {
+        $properties = $this->infer(
+            reflectionType: $reflectionType,
+            class: $class,
+            typeable: $typeable,
+            attributes: $attributes,
+            classDefinedDataCollectableAnnotation: $classDefinedDataCollectableAnnotation,
+            inferForProperty: true,
+        );
 
-        return new DataType(
+        return new DataPropertyType(
             type: $properties['type'],
             isOptional: $properties['isOptional'],
             isNullable: $reflectionType?->allowsNull() ?? true,
@@ -75,6 +65,100 @@ class DataTypeFactory
             dataClass: $properties['dataClass'],
             dataCollectableClass: $properties['dataCollectableClass'],
         );
+    }
+
+    public function build(
+        ?ReflectionType $reflectionType,
+        ReflectionClass|string $class,
+        ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
+    ): DataType {
+        $properties = $this->infer(
+            reflectionType: $reflectionType,
+            class: $class,
+            typeable: $typeable,
+            attributes: null,
+            classDefinedDataCollectableAnnotation: null,
+            inferForProperty: false,
+        );
+
+        return new DataType(
+            type: $properties['type'],
+            isNullable: $reflectionType?->allowsNull() ?? true,
+            isMixed: $properties['isMixed'],
+            kind: $properties['kind'],
+        );
+    }
+
+    public function buildFromString(
+        string $type,
+        ReflectionClass|string $class,
+        bool $isBuiltIn,
+        bool $isNullable = false,
+    ): DataType {
+        $properties = $this->inferPropertiesForNamedType(
+            name: $type,
+            builtIn: $isBuiltIn,
+            class: $class,
+            typeable: $type,
+            attributes: null,
+            classDefinedDataCollectableAnnotation: null,
+            inferForProperty: false,
+        );
+
+        return new DataType(
+            type: $properties['type'],
+            isNullable: $isNullable,
+            isMixed: $properties['isMixed'],
+            kind: $properties['kind'],
+        );
+    }
+
+    /**
+     * @return array{
+     *      type: Type,
+     *      isMixed: bool,
+     *      lazyType: ?string,
+     *      isOptional: bool,
+     *      kind: DataTypeKind,
+     *      dataClass: ?string,
+     *      dataCollectableClass: ?string
+     *  }
+     */
+    protected function infer(
+        ?ReflectionType $reflectionType,
+        ReflectionClass|string $class,
+        ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
+        ?Collection $attributes,
+        ?DataCollectableAnnotation $classDefinedDataCollectableAnnotation,
+        bool $inferForProperty,
+    ): array {
+        if ($reflectionType === null) {
+            return $this->inferPropertiesForNoneType();
+        }
+
+        if ($reflectionType instanceof ReflectionNamedType) {
+            return $this->inferPropertiesForSingleType(
+                $reflectionType,
+                $class,
+                $typeable,
+                $attributes,
+                $classDefinedDataCollectableAnnotation,
+                $inferForProperty,
+            );
+        }
+
+        if ($reflectionType instanceof ReflectionUnionType || $reflectionType instanceof ReflectionIntersectionType) {
+            return $this->inferPropertiesForCombinationType(
+                $reflectionType,
+                $class,
+                $typeable,
+                $attributes,
+                $classDefinedDataCollectableAnnotation,
+                $inferForProperty,
+            );
+        }
+
+        throw new Exception('Invalid reflected type');
     }
 
     /**
@@ -120,23 +204,24 @@ class DataTypeFactory
      *      dataClass: ?string,
      *      dataCollectableClass: ?string
      *  }
-     *
      */
     protected function inferPropertiesForSingleType(
         ReflectionNamedType $reflectionType,
-        ReflectionClass|string $reflectionClass,
+        ReflectionClass|string $class,
         ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
         ?Collection $attributes,
         ?DataCollectableAnnotation $classDefinedDataCollectableAnnotation,
+        bool $inferForProperty,
     ): array {
         return [
             ...$this->inferPropertiesForNamedType(
                 $reflectionType->getName(),
                 $reflectionType->isBuiltin(),
-                $reflectionClass,
+                $class,
                 $typeable,
                 $attributes,
-                $classDefinedDataCollectableAnnotation
+                $classDefinedDataCollectableAnnotation,
+                $inferForProperty,
             ),
             'isOptional' => false,
             'lazyType' => null,
@@ -155,20 +240,21 @@ class DataTypeFactory
     protected function inferPropertiesForNamedType(
         string $name,
         bool $builtIn,
-        ReflectionClass|string $reflectionClass,
+        ReflectionClass|string $class,
         ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
         ?Collection $attributes,
         ?DataCollectableAnnotation $classDefinedDataCollectableAnnotation,
+        bool $inferForProperty,
     ): array {
         if ($name === 'self' || $name === 'static') {
-            $name = is_string($reflectionClass) ? $reflectionClass : $reflectionClass->getName();
+            $name = is_string($class) ? $class : $class->getName();
         }
 
         $isMixed = $name === 'mixed';
 
         ['acceptedTypes' => $acceptedTypes, 'kind' => $kind] = AcceptedTypesStorage::getAcceptedTypesAndKind($name);
 
-        if ($kind === DataTypeKind::Default) {
+        if ($kind === DataTypeKind::Default || ($inferForProperty === false && $kind->isDataCollectable())) {
             return [
                 'type' => new NamedType(
                     name: $name,
@@ -232,7 +318,7 @@ class DataTypeFactory
             ];
         }
 
-        if (in_array($kind, [DataTypeKind::Array, DataTypeKind::Paginator, DataTypeKind::CursorPaginator, DataTypeKind::Enumerable])) {
+        if (in_array($kind, [DataTypeKind::DataArray, DataTypeKind::DataPaginator, DataTypeKind::DataCursorPaginator, DataTypeKind::DataEnumerable])) {
             return [
                 'type' => new NamedType(
                     name: $name,
@@ -266,10 +352,11 @@ class DataTypeFactory
      */
     protected function inferPropertiesForCombinationType(
         ReflectionUnionType|ReflectionIntersectionType $reflectionType,
-        ReflectionClass|string $reflectionClass,
+        ReflectionClass|string $class,
         ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
         ?Collection $attributes,
         ?DataCollectableAnnotation $classDefinedDataCollectableAnnotation,
+        bool $inferForProperty,
     ): array {
         $isMixed = false;
         $isOptional = false;
@@ -285,10 +372,11 @@ class DataTypeFactory
             if ($reflectionSubType::class === ReflectionUnionType::class || $reflectionSubType::class === ReflectionIntersectionType::class) {
                 $properties = $this->inferPropertiesForCombinationType(
                     $reflectionSubType,
-                    $reflectionClass,
+                    $class,
                     $typeable,
                     $attributes,
-                    $classDefinedDataCollectableAnnotation
+                    $classDefinedDataCollectableAnnotation,
+                    $inferForProperty
                 );
 
                 $isMixed = $isMixed || $properties['isMixed'];
@@ -305,7 +393,6 @@ class DataTypeFactory
             }
 
             /** @var ReflectionNamedType $reflectionSubType */
-
             $name = $reflectionSubType->getName();
 
             if ($name === Optional::class) {
@@ -318,7 +405,7 @@ class DataTypeFactory
                 continue;
             }
 
-            if (in_array($name, [Lazy::class, DefaultLazy::class, ClosureLazy::class, ConditionalLazy::class, RelationalLazy::class, InertiaLazy::class])) {
+            if ($inferForProperty && in_array($name, [Lazy::class, DefaultLazy::class, ClosureLazy::class, ConditionalLazy::class, RelationalLazy::class, InertiaLazy::class])) {
                 $lazyType = $name;
 
                 continue;
@@ -327,10 +414,11 @@ class DataTypeFactory
             $properties = $this->inferPropertiesForNamedType(
                 $reflectionSubType->getName(),
                 $reflectionSubType->isBuiltin(),
-                $reflectionClass,
+                $class,
                 $typeable,
                 $attributes,
-                $classDefinedDataCollectableAnnotation
+                $classDefinedDataCollectableAnnotation,
+                $inferForProperty
             );
 
             $isMixed = $isMixed || $properties['isMixed'];

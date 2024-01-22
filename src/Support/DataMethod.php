@@ -16,7 +16,7 @@ class DataMethod
         public readonly bool $isStatic,
         public readonly bool $isPublic,
         public readonly CustomCreationMethodType $customCreationMethodType,
-        public readonly ?DataReturnType $returnType,
+        public readonly ?DataType $returnType,
     ) {
     }
 

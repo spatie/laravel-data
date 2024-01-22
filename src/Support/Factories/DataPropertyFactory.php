@@ -65,7 +65,7 @@ class DataPropertyFactory
         return new DataProperty(
             name: $reflectionProperty->name,
             className: $reflectionProperty->class,
-            type: $this->typeFactory->build(
+            type: $this->typeFactory->buildProperty(
                 $reflectionProperty->getType(),
                 $reflectionClass,
                 $reflectionProperty,

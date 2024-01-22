@@ -9,10 +9,10 @@ enum DataTypeKind
     case DataCollection;
     case DataPaginatedCollection;
     case DataCursorPaginatedCollection;
-    case Array;
-    case Enumerable;
-    case Paginator;
-    case CursorPaginator;
+    case DataArray;
+    case DataEnumerable;
+    case DataPaginator;
+    case DataCursorPaginator;
 
     public function isDataObject(): bool
     {

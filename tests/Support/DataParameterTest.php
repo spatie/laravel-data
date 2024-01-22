@@ -3,6 +3,7 @@
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
+use Spatie\LaravelData\Support\DataPropertyType;
 use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -28,6 +29,8 @@ it('can create a data parameter', function () {
         ->hasDefaultValue->toBeFalse()
         ->defaultValue->toBeNull()
         ->type->toBeInstanceOf(DataType::class)
+        ->type->type->name->toBe('string')
+        ->type->isNullable->toBeFalse()
         ->type->type->isCreationContext()->toBeFalse();
 
     $reflection = new ReflectionParameter([$class::class, '__construct'], 'withoutType');
@@ -39,6 +42,8 @@ it('can create a data parameter', function () {
         ->hasDefaultValue->toBeFalse()
         ->defaultValue->toBeNull()
         ->type->toBeInstanceOf(DataType::class)
+        ->type->isMixed->toBeTrue()
+        ->type->isNullable->toBeTrue()
         ->type->type->isCreationContext()->toBeFalse();
 
     $reflection = new ReflectionParameter([$class::class, '__construct'], 'property');
@@ -50,6 +55,8 @@ it('can create a data parameter', function () {
         ->hasDefaultValue->toBeFalse()
         ->defaultValue->toBeNull()
         ->type->toBeInstanceOf(DataType::class)
+        ->type->type->name->toBe('string')
+        ->type->isNullable->toBeFalse()
         ->type->type->isCreationContext()->toBeFalse();
 
     $reflection = new ReflectionParameter([$class::class, '__construct'], 'creationContext');
@@ -61,6 +68,8 @@ it('can create a data parameter', function () {
         ->hasDefaultValue->toBeFalse()
         ->defaultValue->toBeNull()
         ->type->toBeInstanceOf(DataType::class)
+        ->type->type->name->toBe(CreationContext::class)
+        ->type->isNullable->toBeFalse()
         ->type->type->isCreationContext()->toBeTrue();
 
     $reflection = new ReflectionParameter([$class::class, '__construct'], 'propertyWithDefault');
@@ -72,5 +81,7 @@ it('can create a data parameter', function () {
         ->hasDefaultValue->toBeTrue()
         ->defaultValue->toEqual('hello')
         ->type->toBeInstanceOf(DataType::class)
+        ->type->type->name->toBe('string')
+        ->type->isNullable->toBeFalse()
         ->type->type->isCreationContext()->toBeFalse();
 });

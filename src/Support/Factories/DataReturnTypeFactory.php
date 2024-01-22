@@ -2,52 +2,68 @@
 
 namespace Spatie\LaravelData\Support\Factories;
 
+use ReflectionClass;
+use ReflectionMethod;
 use ReflectionNamedType;
-use ReflectionType;
-use Spatie\LaravelData\Support\DataReturnType;
-use Spatie\LaravelData\Support\Types\NamedType;
-use Spatie\LaravelData\Support\Types\Storage\AcceptedTypesStorage;
-use TypeError;
+use Spatie\LaravelData\Support\DataType;
 
 class DataReturnTypeFactory
 {
-    /** @var array<string, DataReturnType> */
+    /** @var array<string, DataType> */
     public static array $store = [];
 
-    public function build(ReflectionType $type): DataReturnType
-    {
-        if (! $type instanceof ReflectionNamedType) {
-            throw new TypeError('At the moment return types can only be of one type');
-        }
-
-        return $this->buildFromNamedType($type->getName());
+    public function __construct(
+        protected DataTypeFactory $typeFactory
+    ) {
     }
 
-    public function buildFromNamedType(string $name): DataReturnType
+    public function build(ReflectionMethod $type, ReflectionClass|string $class): ?DataType
     {
-        if (array_key_exists($name, self::$store)) {
-            return self::$store[$name];
+        if (! $type->hasReturnType()) {
+            return null;
+        }
+
+        $returnType = $type->getReturnType();
+
+        if ($returnType instanceof ReflectionNamedType) {
+            return $this->buildFromNamedType($returnType->getName(), $class, $returnType->allowsNull());
+        }
+
+        return $this->typeFactory->build($returnType, $class, $returnType);
+    }
+
+    public function buildFromNamedType(
+        string $name,
+        ReflectionClass|string $class,
+        bool $nullable,
+    ): DataType {
+        $storedName = $name.($nullable ? '?' : '');
+
+        if (array_key_exists($storedName, self::$store)) {
+            return self::$store[$storedName];
         }
 
         $builtIn = in_array($name, ['array', 'bool', 'float', 'int', 'string', 'mixed', 'null']);
 
-        ['acceptedTypes' => $acceptedTypes, 'kind' => $kind] = AcceptedTypesStorage::getAcceptedTypesAndKind($name);
-
-        return static::$store[$name] = new DataReturnType(
-            type: new NamedType(
-                name: $name,
-                builtIn: $builtIn,
-                acceptedTypes: $acceptedTypes,
-                kind: $kind,
-                dataClass: null,
-                dataCollectableClass: null,
-            ),
-            kind: $kind,
+        $dataType = $this->typeFactory->buildFromString(
+            $name,
+            $class,
+            $builtIn,
+            $nullable
         );
+
+        if ($name !== 'static' && $name !== 'self') {
+            self::$store[$storedName] = $dataType;
+        }
+
+        return $dataType;
     }
 
-    public function buildFromValue(mixed $value): DataReturnType
-    {
-        return self::buildFromNamedType(get_debug_type($value));
+    public function buildFromValue(
+        mixed $value,
+        ReflectionClass|string $class,
+        bool $nullable,
+    ): DataType {
+        return self::buildFromNamedType(get_debug_type($value), $class, $nullable);
     }
 }
