@@ -24,15 +24,22 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
-        $this->app->singleton(
-            DataStructureCache::class,
-            fn () => new DataStructureCache(config('data.structure_caching.cache'))
-        );
+        if (config('data.structure_caching.enabled')) {
+            $this->app->singleton(
+                DataStructureCache::class,
+                fn () => new DataStructureCache(config('data.structure_caching.cache'))
+            );
 
-        $this->app->singleton(
-            DataConfig::class,
-            fn () => $this->app->make(DataStructureCache::class)->getConfig() ?? new DataConfig(config('data'))
-        );
+            $this->app->singleton(
+                DataConfig::class,
+                fn () => $this->app->make(DataStructureCache::class)->getConfig() ?? new DataConfig(config('data'))
+            );
+        } else {
+            $this->app->singleton(
+                DataConfig::class,
+                fn () => new DataConfig(config('data'))
+            );
+        }
 
         /** @psalm-suppress UndefinedInterfaceMethod */
         $this->app->beforeResolving(BaseData::class, function ($class, $parameters, $app) {
