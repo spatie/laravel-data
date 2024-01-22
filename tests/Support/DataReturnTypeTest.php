@@ -16,7 +16,6 @@ use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Enums\DataTypeKind;
-use Spatie\LaravelData\Support\DataReturnType;
 use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Support\Factories\DataReturnTypeFactory;
 use Spatie\LaravelData\Support\Types\NamedType;
@@ -127,7 +126,7 @@ it('can determine the return type from reflection', function (
     ];
 });
 
-it('will store return types in the factory as a caching mechanism', function (){
+it('will store return types in the factory as a caching mechanism', function () {
     $factory = app(DataReturnTypeFactory::class);
 
     $reflection = new ReflectionMethod(\TestReturnTypeSubject::class, 'array');
@@ -139,7 +138,7 @@ it('will store return types in the factory as a caching mechanism', function (){
     expect(spl_object_id($firstBuild))->toBe(spl_object_id($secondBuild));
 });
 
-it('will cache nullable and non nullable return types separately', function (){
+it('will cache nullable and non nullable return types separately', function () {
     $factory = app(DataReturnTypeFactory::class);
 
     $firstReflection = new ReflectionMethod(\TestReturnTypeSubject::class, 'array');

@@ -5,7 +5,6 @@ namespace Spatie\LaravelData;
 use ArrayAccess;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
-use Illuminate\Support\LazyCollection;
 use Spatie\LaravelData\Concerns\BaseDataCollectable;
 use Spatie\LaravelData\Concerns\ContextableData;
 use Spatie\LaravelData\Concerns\EnumerableMethods;

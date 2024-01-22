@@ -1132,7 +1132,7 @@ it('can deduce the types of lazy', function () {
     expect($type)->lazyType->toBe(RelationalLazy::class);
 });
 
-it('will mark an array, collection and paginators as a default type kind when no data collection was specified', function (){
+it('will mark an array, collection and paginators as a default type kind when no data collection was specified', function () {
     $type = resolveDataType(new class () {
         public array $property;
     });

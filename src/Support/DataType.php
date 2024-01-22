@@ -12,8 +12,7 @@ class DataType
         public readonly bool $isNullable,
         public readonly bool $isMixed,
         public readonly DataTypeKind $kind,
-    )
-    {
+    ) {
     }
 
     public function findAcceptedTypeForBaseType(string $class): ?string
