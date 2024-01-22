@@ -6,9 +6,6 @@ use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\Types\Type;
 
-/**
- * @template T of Type
- */
 class DataType
 {
     /**
