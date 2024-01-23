@@ -16,7 +16,6 @@ use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
-use Spatie\LaravelData\Support\Casting\GlobalCastsCollection;
 use Spatie\LaravelData\Support\DataContainer;
 
 /**

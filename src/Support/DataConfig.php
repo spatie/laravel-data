@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Support;
 use ReflectionClass;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\RuleInferrers\RuleInferrer;
-use Spatie\LaravelData\Support\Casting\GlobalCastsCollection;
+use Spatie\LaravelData\Support\Creation\GlobalCastsCollection;
 use Spatie\LaravelData\Support\Transformation\GlobalTransformersCollection;
 
 class DataConfig

@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelData\Support\Casting;
+namespace Spatie\LaravelData\Support\Creation;
 
 use ArrayIterator;
 use IteratorAggregate;

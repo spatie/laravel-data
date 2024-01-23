@@ -128,19 +128,3 @@ class DataObject extends Data
     }
 }
 ```
-
-You can also make all the properties of a data object optional in TypeScript like this:
-
-```php
-class DataObject extends Data
-{
-    #[TypeScriptOptional]
-    public function __construct(
-        public int $id,
-        public string $someString,
-        public Optional|string $optional,
-    )
-    {
-    }
-}
-```

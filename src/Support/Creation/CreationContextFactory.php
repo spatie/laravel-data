@@ -17,7 +17,6 @@ use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
-use Spatie\LaravelData\Support\Casting\GlobalCastsCollection;
 use Spatie\LaravelData\Support\DataContainer;
 
 /**
@@ -32,7 +31,7 @@ class CreationContextFactory
         public string $dataClass,
         public ValidationStrategy $validationStrategy,
         public bool $mapPropertyNames,
-        public bool $withoutMagicalCreation,
+        public bool $disableMagicalCreation,
         public ?array $ignoredMagicalMethods,
         public ?GlobalCastsCollection $casts,
     ) {
@@ -48,22 +47,9 @@ class CreationContextFactory
             dataClass: $dataClass,
             validationStrategy: ValidationStrategy::from($config['validation_strategy']),
             mapPropertyNames: true,
-            withoutMagicalCreation: false,
+            disableMagicalCreation: false,
             ignoredMagicalMethods: null,
             casts: null,
-        );
-    }
-
-    public static function createFromContext(
-        CreationContext $context
-    ) {
-        return new self(
-            dataClass: $context->dataClass,
-            validationStrategy: $context->validationStrategy,
-            mapPropertyNames: $context->mapPropertyNames,
-            withoutMagicalCreation: $context->withoutMagicalCreation,
-            ignoredMagicalMethods: $context->ignoredMagicalMethods,
-            casts: $context->casts,
         );
     }
 
@@ -95,6 +81,13 @@ class CreationContextFactory
         return $this;
     }
 
+    public function withPropertyNameMapping(bool $withPropertyNameMapping = true): self
+    {
+        $this->mapPropertyNames = $withPropertyNameMapping;
+
+        return $this;
+    }
+
     public function withoutPropertyNameMapping(bool $withoutPropertyNameMapping = true): self
     {
         $this->mapPropertyNames = ! $withoutPropertyNameMapping;
@@ -104,7 +97,14 @@ class CreationContextFactory
 
     public function withoutMagicalCreation(bool $withoutMagicalCreation = true): self
     {
-        $this->withoutMagicalCreation = $withoutMagicalCreation;
+        $this->disableMagicalCreation = $withoutMagicalCreation;
+
+        return $this;
+    }
+
+    public function withMagicalCreation(bool $withMagicalCreation = true): self
+    {
+        $this->disableMagicalCreation = ! $withMagicalCreation;
 
         return $this;
     }
@@ -157,7 +157,7 @@ class CreationContextFactory
             dataClass: $this->dataClass,
             validationStrategy: $this->validationStrategy,
             mapPropertyNames: $this->mapPropertyNames,
-            withoutMagicalCreation: $this->withoutMagicalCreation,
+            withoutMagicalCreation: $this->disableMagicalCreation,
             ignoredMagicalMethods: $this->ignoredMagicalMethods,
             casts: $this->casts,
         );

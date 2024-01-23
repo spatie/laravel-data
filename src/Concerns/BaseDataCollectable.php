@@ -24,7 +24,7 @@ trait BaseDataCollectable
     public function getIterator(): ArrayIterator
     {
         /** @var array<TValue> $data */
-        $data = $this->transform(TransformationContextFactory::create()->transformValues(false));
+        $data = $this->transform(TransformationContextFactory::create()->withValueTransformation(false));
 
         return new ArrayIterator($data);
     }

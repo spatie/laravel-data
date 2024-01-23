@@ -5,7 +5,7 @@ use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\Validation\In;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Support\Casting\GlobalCastsCollection;
+use Spatie\LaravelData\Support\Creation\GlobalCastsCollection;
 use Spatie\LaravelData\Tests\Fakes\Casts\MeaningOfLifeCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;

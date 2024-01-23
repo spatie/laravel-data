@@ -27,7 +27,7 @@ class GlobalTransformersCollection implements IteratorAggregate
     public function findTransformerForValue(mixed $value): ?Transformer
     {
         if (gettype($value) !== 'object') {
-            return null;
+            return $this->transformers[get_debug_type($value)] ?? null;
         }
 
         foreach ($this->transformers as $transformable => $transformer) {

@@ -311,7 +311,7 @@ it('is possible to add extra global transformers when transforming using context
     };
 
     $transformed = $data->transform(
-        TransformationContextFactory::create()->transformer(DateTimeInterface::class, $customTransformer)
+        TransformationContextFactory::create()->withTransformer(DateTimeInterface::class, $customTransformer)
     );
 
     expect($transformed)->toBe([

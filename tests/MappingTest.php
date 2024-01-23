@@ -94,7 +94,7 @@ it('can transform the data object without mapping', function () {
         }
     };
 
-    expect($data)->transform(TransformationContextFactory::create()->mapPropertyNames(false))
+    expect($data)->transform(TransformationContextFactory::create()->withPropertyNameMapping(false))
         ->toMatchArray([
             'camelName' => 'Freek',
         ]);

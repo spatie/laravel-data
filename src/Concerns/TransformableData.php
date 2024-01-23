@@ -37,7 +37,7 @@ trait TransformableData
 
     public function all(): array
     {
-        return $this->transform(TransformationContextFactory::create()->transformValues(false));
+        return $this->transform(TransformationContextFactory::create()->withValueTransformation(false));
     }
 
     public function toArray(): array

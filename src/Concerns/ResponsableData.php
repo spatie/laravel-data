@@ -15,7 +15,7 @@ trait ResponsableData
     public function toResponse($request)
     {
         $contextFactory = TransformationContextFactory::create()
-            ->wrapExecutionType(WrapExecutionType::Enabled);
+            ->withWrapExecutionType(WrapExecutionType::Enabled);
 
         $includePartials = DataContainer::get()->requestQueryStringPartialsResolver()->execute(
             $this,

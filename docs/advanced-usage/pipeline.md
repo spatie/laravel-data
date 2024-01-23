@@ -14,6 +14,7 @@ By default, the pipeline exists of the following pipes:
 
 - **AuthorizedDataPipe** checks if the user is authorized to perform the request
 - **MapPropertiesDataPipe** maps the names of properties
+- **FillRouteParameterPropertiesDataPipe** fills property values from route parameters
 - **ValidatePropertiesDataPipe** validates the properties
 - **DefaultValuesDataPipe** adds default values for properties when they are not set
 - **CastPropertiesDataPipe** casts the values of properties
@@ -35,6 +36,7 @@ class SongData extends Data
             ->into(static::class)
             ->through(AuthorizedDataPipe::class)
             ->through(MapPropertiesDataPipe::class)
+            ->through(FillRouteParameterPropertiesDataPipe::class)
             ->through(ValidatePropertiesDataPipe::class)
             ->through(DefaultValuesDataPipe::class)
             ->through(CastPropertiesDataPipe::class);
@@ -42,12 +44,12 @@ class SongData extends Data
 }
 ```
 
-Each pipe implements the `DataPipe` interface and should return a `Collection` of properties:
+Each pipe implements the `DataPipe` interface and should return an `array` of properties:
 
 ```php
 interface DataPipe
 {
-    public function handle(mixed $payload, DataClass $class, Collection $properties): Collection;
+    public function handle(mixed $payload, DataClass $class, array $properties, CreationContext $creationContext): array;
 }
 ```
 
@@ -57,6 +59,13 @@ The `handle` method has several arguments:
 - **class** the `DataClass` object for the data
   object [more info](/docs/laravel-data/v4/advanced-usage/internal-structures)
 - **properties** the key-value properties which will be used to construct the data object
+- **creationContext** the context in which the data object is being created you'll find the following info here:
+  - **dataClass** the data class which is being created
+  - **validationStrategy** the validation strategy which is being used
+  - **mapPropertyNames** whether property names should be mapped
+  - **withoutMagicalCreation** whether to use the magical creation methods or not
+  - **ignoredMagicalMethods** the magical methods which are ignored
+  - **casts** a collection of global casts
 
 When using a magic creation methods, the pipeline is not being used (since you manually overwrite how a data object is
 constructed). Only when you pass in a request object a minimal version of the pipeline is used to authorize and validate

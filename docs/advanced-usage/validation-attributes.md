@@ -1,6 +1,6 @@
 ---
 title: Validation attributes
-weight: 16
+weight: 14
 ---
 
 These are all the validation attributes currently available in laravel-data.

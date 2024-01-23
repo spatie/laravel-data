@@ -94,86 +94,64 @@ class TransformationContextFactory
         );
     }
 
-    public function transformValues(bool $transformValues = true): static
+    public function withValueTransformation(bool $transformValues = true): static
     {
         $this->transformValues = $transformValues;
 
         return $this;
     }
 
-    public function mapPropertyNames(bool $mapPropertyNames = true): static
+    public function withoutValueTransformation(bool $withoutValueTransformation = true): static
+    {
+        $this->transformValues = ! $withoutValueTransformation;
+
+        return $this;
+    }
+
+    public function withPropertyNameMapping(bool $mapPropertyNames = true): static
     {
         $this->mapPropertyNames = $mapPropertyNames;
 
         return $this;
     }
 
-    public function wrapExecutionType(WrapExecutionType $wrapExecutionType): static
+    public function withoutPropertyNameMapping(bool $withoutPropertyNameMapping = true): static
+    {
+        $this->mapPropertyNames = ! $withoutPropertyNameMapping;
+
+        return $this;
+    }
+
+    public function withWrapExecutionType(WrapExecutionType $wrapExecutionType): static
     {
         $this->wrapExecutionType = $wrapExecutionType;
 
         return $this;
     }
 
-    public function transformer(string $transformable, Transformer $transformer): static
+    public function withoutWrapping(): static
     {
+        $this->wrapExecutionType = WrapExecutionType::Disabled;
+
+        return $this;
+    }
+
+    public function withWrapping(): static
+    {
+        $this->wrapExecutionType = WrapExecutionType::Enabled;
+
+        return $this;
+    }
+
+    public function withTransformer(string $transformable, Transformer|string $transformer): static
+    {
+        $transformer = is_string($transformer) ? app($transformer) : $transformer;
+
         if ($this->transformers === null) {
             $this->transformers = new GlobalTransformersCollection();
         }
 
         $this->transformers->add($transformable, $transformer);
-
-        return $this;
-    }
-
-    public function addIncludePartial(Partial ...$partial): static
-    {
-        if ($this->includePartials === null) {
-            $this->includePartials = new PartialsCollection();
-        }
-
-        foreach ($partial as $include) {
-            $this->includePartials->attach($include);
-        }
-
-        return $this;
-    }
-
-    public function addExcludePartial(Partial ...$partial): static
-    {
-        if ($this->excludePartials === null) {
-            $this->excludePartials = new PartialsCollection();
-        }
-
-        foreach ($partial as $exclude) {
-            $this->excludePartials->attach($exclude);
-        }
-
-        return $this;
-    }
-
-    public function addOnlyPartial(Partial ...$partial): static
-    {
-        if ($this->onlyPartials === null) {
-            $this->onlyPartials = new PartialsCollection();
-        }
-
-        foreach ($partial as $only) {
-            $this->onlyPartials->attach($only);
-        }
-
-        return $this;
-    }
-
-    public function addExceptPartial(Partial ...$partial): static
-    {
-        if ($this->exceptPartials === null) {
-            $this->exceptPartials = new PartialsCollection();
-        }
-
-        foreach ($partial as $except) {
-            $this->exceptPartials->attach($except);
-        }
 
         return $this;
     }

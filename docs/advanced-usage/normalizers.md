@@ -20,6 +20,10 @@ By default, there are five normalizers for each data object:
 - **ArrayNormalizer** will cast arrays
 - **JsonNormalizer** will cast json strings
 
+A sixth normalizer can be optionally enabled:
+
+- **FormRequestNormalizer** will normalize a form request by calling the `validated` method
+
 Normalizers can be globally configured in `config/data.php`, and can be configured on a specific data object by overriding the `normalizers` method.
 
 ```php

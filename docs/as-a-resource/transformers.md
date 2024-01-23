@@ -101,7 +101,7 @@ It is possible to disable the transformation of values, which will make the `tra
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
 
 ArtistData::from($artist)->transform(
-    TransformationContext::create()->withoutTransformingValues()
+    TransformationContextFactory::create()->transformValues(false)
 );
 ```
 
@@ -118,7 +118,7 @@ The [mapping of property names](/docs/laravel-data/v4/as-a-resource/mapping-prop
 
 ```php
 ArtistData::from($artist)->transform(
-    TransformationContext::create()->mapPropertyNames(false)
+    TransformationContextFactory::create()->mapPropertyNames(false)
 );
 ```
 
@@ -128,7 +128,7 @@ It is possible to enable [wrapping](/docs/laravel-data/v4/as-a-resource/wrapping
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 ArtistData::from($artist)->transform(
-    TransformationContext::create()->wrapExecutionType(WrapExecutionType::Enabled)
+    TransformationContextFactory::create()->wrapExecutionType(WrapExecutionType::Enabled)
 );
 ```
 
