@@ -106,11 +106,6 @@ parameters:
 			path: src/PaginatedDataCollection.php
 
 		-
-			message: "#^Dead catch \\- ArgumentCountError is never thrown in the try block\\.$#"
-			count: 1
-			path: src/Resolvers/DataFromArrayResolver.php
-
-		-
 			message: "#^PHPDoc tag @var for variable \\$dataClass has invalid type Spatie\\\\LaravelData\\\\Concerns\\\\EmptyData\\.$#"
 			count: 1
 			path: src/Resolvers/EmptyDataResolver.php
