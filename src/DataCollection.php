@@ -17,7 +17,6 @@ use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\WrappableData;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable as BaseDataCollectableContract;
-use Spatie\LaravelData\Contracts\DataCollectable;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
 use Spatie\LaravelData\Contracts\TransformableData as TransformableDataContract;

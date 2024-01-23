@@ -13,7 +13,6 @@ use Spatie\LaravelData\Concerns\ValidateableData;
 use Spatie\LaravelData\Concerns\WrappableData;
 use Spatie\LaravelData\Contracts\AppendableData as AppendableDataContract;
 use Spatie\LaravelData\Contracts\BaseData as BaseDataContract;
-use Spatie\LaravelData\Contracts\DataObject;
 use Spatie\LaravelData\Contracts\EmptyData as EmptyDataContract;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;

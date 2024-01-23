@@ -5,7 +5,6 @@ use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
-use Spatie\LaravelData\Contracts\DataCollectable;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Support\DataType;
