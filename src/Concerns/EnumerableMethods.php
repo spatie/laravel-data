@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Concerns;
 
-use Spatie\LaravelData\Contracts\DataCollectable;
 use Spatie\LaravelData\DataCollection;
 
 /**
@@ -10,7 +9,6 @@ use Spatie\LaravelData\DataCollection;
  * @template TValue
  *
  * @implements \ArrayAccess<TKey, TValue>
- * @implements  DataCollectable<TValue>
  */
 trait EnumerableMethods
 {

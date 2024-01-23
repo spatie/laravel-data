@@ -22,7 +22,7 @@ use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
 use Spatie\LaravelData\DataPipes\FillRouteParameterPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
 
-class Resource implements BaseDataContract, AppendableDataContract, IncludeableDataContract, ResponsableDataContract, TransformableDataContract, WrappableDataContract, EmptyDataContract
+class Resource implements BaseDataContract, AppendableDataContract, IncludeableDataContract, TransformableDataContract, ResponsableDataContract, WrappableDataContract, EmptyDataContract
 {
     use BaseData;
     use AppendableData;

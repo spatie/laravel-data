@@ -3,8 +3,11 @@
 namespace Spatie\LaravelData;
 
 use ArrayAccess;
+use Countable;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
+use IteratorAggregate;
 use Spatie\LaravelData\Concerns\BaseDataCollectable;
 use Spatie\LaravelData\Concerns\ContextableData;
 use Spatie\LaravelData\Concerns\EnumerableMethods;
@@ -13,8 +16,12 @@ use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\WrappableData;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\BaseDataCollectable as BaseDataCollectableContract;
 use Spatie\LaravelData\Contracts\DataCollectable;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
+use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
+use Spatie\LaravelData\Contracts\TransformableData as TransformableDataContract;
+use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\InvalidDataCollectionOperation;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
@@ -24,9 +31,9 @@ use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
  * @template TValue
  *
  * @implements \ArrayAccess<TKey, TValue>
- * @implements  DataCollectable<TKey, TValue>
+ * @implements  IteratorAggregate<TKey, TValue>
  */
-class DataCollection implements DataCollectable, ArrayAccess
+class DataCollection implements Responsable, BaseDataCollectableContract, TransformableDataContract, ResponsableDataContract, IncludeableDataContract, WrappableDataContract, IteratorAggregate, Countable, ArrayAccess
 {
     /** @use \Spatie\LaravelData\Concerns\BaseDataCollectable<TKey, TValue> */
     use BaseDataCollectable;

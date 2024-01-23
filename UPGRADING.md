@@ -161,6 +161,10 @@ object, these have now been removed. Instead, you should use the new DataContext
 
 If you were using the `DataCollectableTransformer` or `DataTransformer` then please use the `TransformedDataCollectableResolver` and `TransformedDataResolver` instead.
 
+**Removal of `DataObject` and `DataCollectable` (Likelihood Of Impact: Low)**
+
+If you were using the `DataObject` or `DataCollectable` interfaces then please replace the interfaces based upon the `Data` and `DataCollection` interfaces to your preference.
+
 **Some advice with this new version of laravel-data**
 
 We advise you to take a look at the following things:

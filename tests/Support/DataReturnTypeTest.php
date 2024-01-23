@@ -1,19 +1,11 @@
 <?php
 
-use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
-use Spatie\LaravelData\Contracts\BaseDataCollectable;
-use Spatie\LaravelData\Contracts\ContextableData;
 use Spatie\LaravelData\Contracts\DataCollectable;
-use Spatie\LaravelData\Contracts\IncludeableData;
-use Spatie\LaravelData\Contracts\ResponsableData;
-use Spatie\LaravelData\Contracts\TransformableData;
-use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Support\DataType;
@@ -101,23 +93,21 @@ it('can determine the return type from reflection', function (
         'value' => new DataCollection(SimpleData::class, []),
         new DataType(
             type: new NamedType(DataCollection::class, false, [
-                DataCollectable::class,
-                ArrayAccess::class,
-                Traversable::class,
-                ContextableData::class,
-                Castable::class,
-                Arrayable::class,
-                Jsonable::class,
-                JsonSerializable::class,
-                Countable::class,
+                Illuminate\Contracts\Support\Responsable::class,
+                Spatie\LaravelData\Contracts\BaseDataCollectable::class,
+                Spatie\LaravelData\Contracts\TransformableData::class,
+                Spatie\LaravelData\Contracts\ResponsableData::class,
+                Spatie\LaravelData\Contracts\IncludeableData::class,
+                Spatie\LaravelData\Contracts\WrappableData::class,
                 IteratorAggregate::class,
-                WrappableData::class,
-                IncludeableData::class,
-                TransformableData::class,
-                ResponsableData::class,
-                BaseDataCollectable::class,
-                Responsable::class,
-
+                Countable::class,
+                ArrayAccess::class,
+                Illuminate\Contracts\Database\Eloquent\Castable::class,
+                Illuminate\Contracts\Support\Arrayable::class,
+                Illuminate\Contracts\Support\Jsonable::class,
+                JsonSerializable::class,
+                Spatie\LaravelData\Contracts\ContextableData::class,
+                Traversable::class,
             ], DataTypeKind::DataCollection, null, null),
             isNullable: false,
             isMixed: false,

@@ -744,7 +744,6 @@ it(
                 Jsonable::class,
                 Responsable::class,
                 Arrayable::class,
-                DataObject::class,
                 AppendableData::class,
                 ContextableData::class,
                 BaseData::class,

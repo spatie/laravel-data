@@ -22,6 +22,7 @@ use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\DataStructureProperty;
 use Spatie\LaravelData\Support\LazyDataStructureProperty;
 
 class DataClassFactory
@@ -91,10 +92,10 @@ class DataClassFactory
             emptyData: $reflectionClass->implementsInterface(EmptyData::class),
             attributes: $attributes,
             dataCollectablePropertyAnnotations: $dataCollectablePropertyAnnotations,
-            allowedRequestIncludes: $responsable ? $name::allowedRequestIncludes() : null,
-            allowedRequestExcludes: $responsable ? $name::allowedRequestExcludes() : null,
-            allowedRequestOnly: $responsable ? $name::allowedRequestOnly() : null,
-            allowedRequestExcept: $responsable ? $name::allowedRequestExcept() : null,
+            allowedRequestIncludes: new LazyDataStructureProperty(fn(): ?array => $responsable ? $name::allowedRequestIncludes() : null),
+            allowedRequestExcludes: new LazyDataStructureProperty(fn(): ?array => $responsable ? $name::allowedRequestExcludes() : null),
+            allowedRequestOnly: new LazyDataStructureProperty(fn(): ?array => $responsable ? $name::allowedRequestOnly() : null),
+            allowedRequestExcept: new LazyDataStructureProperty(fn(): ?array => $responsable ? $name::allowedRequestExcept() : null),
             outputMappedProperties: $outputMappedProperties,
             transformationFields: static::resolveTransformationFields($properties),
         );

@@ -25,3 +25,36 @@ The following parameters are provided:
     - **transformers** a collection of transformers that can be used to transform values
 
 In the end, the transformer should return a transformed value.
+
+## Combining transformers and casts
+
+You can transformers and casts in one class:
+
+```php
+class ToUpperCastAndTransformer implements Cast, Transformer
+{
+    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): string
+    {
+        return strtoupper($value);
+    }
+    
+    public function transform(DataProperty $property, mixed $value, TransformationContext $context): string
+    {
+        return strtoupper($value);
+    }
+}
+```
+
+Within your data object, you can use the `WithCastAndTransform` attribute to use the cast and transformer:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[WithCastAndTransform(SomeCastAndTransformer::class)]
+        public string $artist,
+    ) {
+    }
+}
+```

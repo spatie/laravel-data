@@ -37,10 +37,10 @@ enum PartialType
     public function getAllowedPartials(DataClass $dataClass): ?array
     {
         return match ($this) {
-            self::Include => $dataClass->allowedRequestIncludes,
-            self::Exclude => $dataClass->allowedRequestExcludes,
-            self::Only => $dataClass->allowedRequestOnly,
-            self::Except => $dataClass->allowedRequestExcept,
+            self::Include => $dataClass->allowedRequestIncludes->resolve(),
+            self::Exclude => $dataClass->allowedRequestExcludes->resolve(),
+            self::Only => $dataClass->allowedRequestOnly->resolve(),
+            self::Except => $dataClass->allowedRequestExcept->resolve(),
         };
     }
 }

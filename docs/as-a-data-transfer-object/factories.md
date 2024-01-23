@@ -71,3 +71,27 @@ SongData::factory()->withCast('string', StringToUpperCast::class)->from(['title'
 These casts will not replace the other global casts defined in the `data.php` config file, they will though run before
 the other global casts. You define them just like you would define them in the config file, the first parameter is the
 type of the property that should be cast and the second parameter is the cast class.
+
+## Using the creation context
+
+Internally the package uses a creation context to create data objects. The factory allows you to use this context manually, but when using the from method it will be used automatically.
+
+It is possible to inject the creation context into a magical method by adding it as a parameter:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        public string $artist,
+    ) {
+    }
+    
+    public static function fromModel(Song $song, CreationContext $context): self
+    {
+        // Do something with the context
+    }
+}
+```
+
+You can read more about creation contexts [here](/docs/laravel-data/v4/advanced-usage/pipeline.md).

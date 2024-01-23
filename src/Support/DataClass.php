@@ -3,10 +3,9 @@
 namespace Spatie\LaravelData\Support;
 
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Contracts\DataObject;
 
 /**
- * @property  class-string<DataObject> $name
+ * @property  class-string $name
  * @property  Collection<string, DataProperty> $properties
  * @property  Collection<string, DataMethod> $methods
  * @property  Collection<string, object> $attributes
@@ -30,10 +29,10 @@ class DataClass
         public readonly bool $emptyData,
         public readonly Collection $attributes,
         public readonly array $dataCollectablePropertyAnnotations,
-        public readonly ?array $allowedRequestIncludes,
-        public readonly ?array $allowedRequestExcludes,
-        public readonly ?array $allowedRequestOnly,
-        public readonly ?array $allowedRequestExcept,
+        public DataStructureProperty $allowedRequestIncludes,
+        public DataStructureProperty $allowedRequestExcludes,
+        public DataStructureProperty $allowedRequestOnly,
+        public DataStructureProperty $allowedRequestExcept,
         public DataStructureProperty $outputMappedProperties,
         public DataStructureProperty $transformationFields
     ) {
@@ -41,12 +40,21 @@ class DataClass
 
     public function prepareForCache(): void
     {
-        if($this->outputMappedProperties instanceof LazyDataStructureProperty) {
-            $this->outputMappedProperties = $this->outputMappedProperties->toDataStructureProperty();
-        }
+        $properties = [
+            'allowedRequestIncludes',
+            'allowedRequestExcludes',
+            'allowedRequestOnly',
+            'allowedRequestExcept',
+            'outputMappedProperties',
+            'transformationFields',
+        ];
 
-        if($this->transformationFields instanceof LazyDataStructureProperty) {
-            $this->transformationFields = $this->transformationFields->toDataStructureProperty();
+        foreach ($properties as $propertyName) {
+            $property = $this->$propertyName;
+
+            if ($property instanceof LazyDataStructureProperty) {
+                $this->$propertyName = $property->toDataStructureProperty();
+            }
         }
     }
 }

@@ -83,3 +83,36 @@ class Email implements Castable
   }
 }
 ```
+
+## Combining casts and transformers
+
+You can combine casts and transformers in one class:
+
+```php
+class ToUpperCastAndTransformer implements Cast, Transformer
+{
+    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): string
+    {
+        return strtoupper($value);
+    }
+    
+    public function transform(DataProperty $property, mixed $value, TransformationContext $context): string
+    {
+        return strtoupper($value);
+    }
+}
+```
+
+Within your data object, you can use the `WithCastAndTransform` attribute to use the cast and transformer:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[WithCastAndTransform(SomeCastAndTransformer::class)]
+        public string $artist,
+    ) {
+    }
+}
+```

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\BaseData;
@@ -10,7 +11,15 @@ use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\ValidateableData;
 use Spatie\LaravelData\Concerns\WrappableData;
+use Spatie\LaravelData\Contracts\AppendableData as AppendableDataContract;
+use Spatie\LaravelData\Contracts\BaseData as BaseDataContract;
 use Spatie\LaravelData\Contracts\DataObject;
+use Spatie\LaravelData\Contracts\EmptyData as EmptyDataContract;
+use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
+use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
+use Spatie\LaravelData\Contracts\TransformableData as TransformableDataContract;
+use Spatie\LaravelData\Contracts\ValidateableData as ValidateableDataContract;
+use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Dto;
 use Spatie\LaravelData\Resource;
@@ -21,7 +30,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleResource;
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('also works by using traits and interfaces, skipping the base data class', function () {
-    $data = new class ('') implements DataObject {
+    $data = new class ('') implements Responsable, AppendableDataContract, BaseDataContract, TransformableDataContract, IncludeableDataContract, ResponsableDataContract, ValidateableDataContract, WrappableDataContract, EmptyDataContract {
         use ResponsableData;
         use IncludeableData;
         use AppendableData;
