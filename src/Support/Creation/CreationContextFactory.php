@@ -157,7 +157,7 @@ class CreationContextFactory
             dataClass: $this->dataClass,
             validationStrategy: $this->validationStrategy,
             mapPropertyNames: $this->mapPropertyNames,
-            withoutMagicalCreation: $this->disableMagicalCreation,
+            disableMagicalCreation: $this->disableMagicalCreation,
             ignoredMagicalMethods: $this->ignoredMagicalMethods,
             casts: $this->casts,
         );

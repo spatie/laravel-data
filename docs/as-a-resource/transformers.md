@@ -101,7 +101,7 @@ It is possible to disable the transformation of values, which will make the `tra
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
 
 ArtistData::from($artist)->transform(
-    TransformationContextFactory::create()->transformValues(false)
+    TransformationContextFactory::create()->withoutValueTransformation()
 );
 ```
 
@@ -118,7 +118,7 @@ The [mapping of property names](/docs/laravel-data/v4/as-a-resource/mapping-prop
 
 ```php
 ArtistData::from($artist)->transform(
-    TransformationContextFactory::create()->mapPropertyNames(false)
+    TransformationContextFactory::create()->withoutPropertyNameMapping()
 );
 ```
 
@@ -128,7 +128,7 @@ It is possible to enable [wrapping](/docs/laravel-data/v4/as-a-resource/wrapping
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 ArtistData::from($artist)->transform(
-    TransformationContextFactory::create()->wrapExecutionType(WrapExecutionType::Enabled)
+    TransformationContextFactory::create()->withWrapping()
 );
 ```
 
@@ -142,3 +142,15 @@ Outputting the following array:
     ],
 ]
 ```
+
+You can also add additional global transformers as such:
+
+```php
+ArtistData::from($artist)->transform(
+    TransformationContextFactory::create()->withGlobalTransformer(
+        'string', 
+        StringToUpperTransformer::class
+    )
+);
+```
+

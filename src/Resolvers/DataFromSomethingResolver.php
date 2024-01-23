@@ -51,7 +51,7 @@ class DataFromSomethingResolver
         CreationContext $creationContext,
         array $payloads
     ): ?BaseData {
-        if ($creationContext->withoutMagicalCreation) {
+        if ($creationContext->disableMagicalCreation) {
             return null;
         }
 

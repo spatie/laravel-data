@@ -63,7 +63,7 @@ The `handle` method has several arguments:
   - **dataClass** the data class which is being created
   - **validationStrategy** the validation strategy which is being used
   - **mapPropertyNames** whether property names should be mapped
-  - **withoutMagicalCreation** whether to use the magical creation methods or not
+  - **disableMagicalCreation** whether to use the magical creation methods or not
   - **ignoredMagicalMethods** the magical methods which are ignored
   - **casts** a collection of global casts
 

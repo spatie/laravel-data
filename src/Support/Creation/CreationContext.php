@@ -30,7 +30,7 @@ class CreationContext
         public string $dataClass,
         public readonly ValidationStrategy $validationStrategy,
         public readonly bool $mapPropertyNames,
-        public readonly bool $withoutMagicalCreation,
+        public readonly bool $disableMagicalCreation,
         public readonly ?array $ignoredMagicalMethods,
         public readonly ?GlobalCastsCollection $casts,
     ) {

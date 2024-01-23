@@ -74,7 +74,7 @@ class DataCollectableFromSomethingResolver
         mixed $items,
         ?string $into,
     ): null|array|DataCollection|PaginatedDataCollection|CursorPaginatedDataCollection|Enumerable|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator {
-        if ($creationContext->withoutMagicalCreation) {
+        if ($creationContext->disableMagicalCreation) {
             return null;
         }
 
