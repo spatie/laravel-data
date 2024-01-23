@@ -1,6 +1,5 @@
 <?php
 
-use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
 use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;

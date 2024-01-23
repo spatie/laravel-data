@@ -98,8 +98,7 @@ it('is possible to add a cast', function () {
         SimpleData::class
     )->withCast('string', StringToUpperCast::class);
 
-    $dataClass = new class extends Data
-    {
+    $dataClass = new class () extends Data {
         public string $string;
     };
 
@@ -110,15 +109,14 @@ it('is possible to add a cast', function () {
         ->findCastForValue($dataProperty)->toBeInstanceOf(StringToUpperCast::class);
 });
 
-it('is possible to add a cast collection', function (){
+it('is possible to add a cast collection', function () {
     $context = CreationContextFactory::createFromConfig(SimpleData::class)
         ->withCast(\Illuminate\Support\Stringable::class, StringToUpperCast::class)
         ->withCastCollection(new GlobalCastsCollection([
-            'string' => new StringToUpperCast()
+            'string' => new StringToUpperCast(),
         ]));
 
-    $dataClass = new class extends Data
-    {
+    $dataClass = new class () extends Data {
         public string $string;
     };
 
