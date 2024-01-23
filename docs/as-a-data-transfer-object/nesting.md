@@ -115,11 +115,11 @@ The same is true for Laravel collections, but be sure to use two generic paramet
 
 ```php
 use App\Data\SongData;
-use \Illuminate\Support\Collection;
+use Illuminate\Support\Collection;
 
 class AlbumData extends Data
 {    
-    /** @var Collection<SongData> */
+    /** @var Collection<int, SongData> */
     public Collection $songs;
 }
 ```
@@ -139,29 +139,3 @@ class AlbumData extends Data
 ```
 
 This was the old way to define the type of data objects that will be stored within a collection. It is still supported, but we recommend using the annotation.
-
-### Creating a data object with collection
-
-You can create a data object with a collection of data object just like you would create a data object with a nested data object:
-
-```php
-new AlbumData(
-    'Never gonna give you up',
-    [
-        new SongData('Never gonna give you up', 'Rick Astley'),
-        new SongData('Giving up on love', 'Rick Astley'),
-    ]
-);
-```
-
-Or use the magical creation which will automatically create the data objects for you and also works with collections:
-
-```php
-AlbumData::from([
-    'title' => 'Never Gonna Give You Up',
-    'songs' => [
-        ['title' => 'Never Gonna Give You Up', 'artist' => 'Rick Astley'],
-        ['title' => 'Giving Up on Love', 'artist' => 'Rick Astley'],
-    ]
-]);
-```

@@ -3,7 +3,7 @@ title: Computed values
 weight: 8
 ---
 
-Earlier we saw how default values can be set for a data object, the same approach can be used to set computed values, although slightly different:
+Earlier we saw how default values can be set for a data object, sometimes you want to set a default value based on other properties. For example, you might want to set a `full_name` property based on a `first_name` and `last_name` property. You can do this by using a computed property:
 
 ```php
 use Spatie\LaravelData\Attributes\Computed;
@@ -27,6 +27,8 @@ You can now do the following:
 ```php
 SongData::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche']);
 ```
+
+Please notice: the computed property won't be reevaluated when its dependencies change. If you want to update a computed property, you'll have to create a new object.
 
 Again there are a few conditions for this approach:
 

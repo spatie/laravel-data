@@ -93,7 +93,7 @@ return [
      * method. By default, only when a request is passed the data is being validated. This
      * behaviour can be changed to always validate or to completely disable validation.
      */
-    'validation_type' => \Spatie\LaravelData\Support\Creation\ValidationType::OnlyRequests->value,
+    'validation_strategy' => \Spatie\LaravelData\Support\Creation\ValidationStrategy::OnlyRequests->value,
 
     /**
      * When using an invalid include, exclude, only or except partial, the package will

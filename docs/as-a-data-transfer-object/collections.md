@@ -101,6 +101,31 @@ There are a few requirements for this to work:
 - The method cannot be called **collect**
 - A **return type** must be defined
 
+## Creating a data object with collection
+
+You can create a data object with a collection of data object just like you would create a data object with a nested data object:
+
+```php
+use App\Data\SongData;
+use Illuminate\Support\Collection;
+
+class AlbumData extends Data
+{    
+    /** @var Collection<int, SongData> */
+    public Collection $songs;
+}
+
+AlbumData::from([
+    'title' => 'Never Gonna Give You Up',
+    'songs' => [
+        ['title' => 'Never Gonna Give You Up', 'artist' => 'Rick Astley'],
+        ['title' => 'Giving Up on Love', 'artist' => 'Rick Astley'],
+    ]
+]);
+```
+
+Since the collection type here is a `Collection`, the package will automatically convert the array into a collection of data objects.
+
 ## DataCollection's, PaginatedDataCollection's and CursorPaginatedCollection's
 
 The package also provides a few collection classes which can be used to create collections of data objects, it was a requirement to use these classes in the past versions of the package when nesting data objects collections in data objects. This is no longer the case and there are still valid use cases for them.

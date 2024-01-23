@@ -14,6 +14,6 @@ interface Transformer
 }
 ```
 
-The value that should be transformed is given, and a `DataProperty` object which represents the property for which the value is transformed. You can read more about the internal structures of the package [here](/docs/laravel-data/v3/advanced-usage/internal-structures).
+The value that should be transformed is given, and a `DataProperty` object which represents the property for which the value is transformed. You can read more about the internal structures of the package [here](/docs/laravel-data/v4/advanced-usage/internal-structures).
 
 In the end, the transformer should return a transformed value. Please note that the given value of a transformer can never be `null`.

@@ -60,3 +60,7 @@ Now the validation rules will look like this:
     'last_name' => ['required', 'string'],
 ]
 ```
+
+## Skipping validation for all properties
+
+By using [data factories](/docs/laravel-data/v4/as-a-data-transfer-object/factories.md) or setting the `validation_strategy` in the `data.php` config you can skip validation for all properties of a data class.

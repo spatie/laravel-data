@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Support\Creation\CreationContext;
-use Spatie\LaravelData\Support\Creation\ValidationType;
+use Spatie\LaravelData\Support\Creation\ValidationStrategy;
 use Spatie\LaravelData\Support\DataClass;
 
 class ValidatePropertiesDataPipe implements DataPipe
@@ -15,11 +15,11 @@ class ValidatePropertiesDataPipe implements DataPipe
         array $properties,
         CreationContext $creationContext
     ): array {
-        if ($creationContext->validationType === ValidationType::Disabled) {
+        if ($creationContext->validationStrategy === ValidationStrategy::Disabled) {
             return $properties;
         }
 
-        if ($creationContext->validationType === ValidationType::OnlyRequests && ! $payload instanceof Request) {
+        if ($creationContext->validationStrategy === ValidationStrategy::OnlyRequests && ! $payload instanceof Request) {
             return $properties;
         }
 

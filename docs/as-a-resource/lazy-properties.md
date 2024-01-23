@@ -1,6 +1,6 @@
 ---
 title: Including and excluding properties
-weight: 2
+weight: 6
 ---
 
 Sometimes you don't want all the properties included when transforming a data object to an array, for example:

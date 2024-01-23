@@ -30,7 +30,7 @@ class CreationContextFactory
      */
     public function __construct(
         public string $dataClass,
-        public ValidationType $validationType,
+        public ValidationStrategy $validationStrategy,
         public bool $mapPropertyNames,
         public bool $withoutMagicalCreation,
         public ?array $ignoredMagicalMethods,
@@ -46,7 +46,7 @@ class CreationContextFactory
 
         return new self(
             dataClass: $dataClass,
-            validationType: ValidationType::from($config['validation_type']),
+            validationStrategy: ValidationStrategy::from($config['validation_strategy']),
             mapPropertyNames: true,
             withoutMagicalCreation: false,
             ignoredMagicalMethods: null,
@@ -59,7 +59,7 @@ class CreationContextFactory
     ) {
         return new self(
             dataClass: $context->dataClass,
-            validationType: $context->validationType,
+            validationStrategy: $context->validationStrategy,
             mapPropertyNames: $context->mapPropertyNames,
             withoutMagicalCreation: $context->withoutMagicalCreation,
             ignoredMagicalMethods: $context->ignoredMagicalMethods,
@@ -67,30 +67,30 @@ class CreationContextFactory
         );
     }
 
-    public function validationType(ValidationType $validationType): self
+    public function validationStrategy(ValidationStrategy $validationStrategy): self
     {
-        $this->validationType = $validationType;
+        $this->validationStrategy = $validationStrategy;
 
         return $this;
     }
 
-    public function disableValidation(): self
+    public function withoutValidation(): self
     {
-        $this->validationType = ValidationType::Disabled;
+        $this->validationStrategy = ValidationStrategy::Disabled;
 
         return $this;
     }
 
     public function onlyValidateRequests(): self
     {
-        $this->validationType = ValidationType::OnlyRequests;
+        $this->validationStrategy = ValidationStrategy::OnlyRequests;
 
         return $this;
     }
 
     public function alwaysValidate(): self
     {
-        $this->validationType = ValidationType::Always;
+        $this->validationStrategy = ValidationStrategy::Always;
 
         return $this;
     }
@@ -155,7 +155,7 @@ class CreationContextFactory
     {
         return new CreationContext(
             dataClass: $this->dataClass,
-            validationType: $this->validationType,
+            validationStrategy: $this->validationStrategy,
             mapPropertyNames: $this->mapPropertyNames,
             withoutMagicalCreation: $this->withoutMagicalCreation,
             ignoredMagicalMethods: $this->ignoredMagicalMethods,

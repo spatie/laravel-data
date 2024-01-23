@@ -41,7 +41,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
-use Spatie\LaravelData\Support\Creation\ValidationType;
+use Spatie\LaravelData\Support\Creation\ValidationStrategy;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
@@ -2340,7 +2340,7 @@ it('can validate an optional but nonexists attribute', function () {
     expect($dataClass::validateAndCreate([])->toArray())->toBe([]);
 });
 
-it('is possible to define the validation type for each data object globally using config', function () {
+it('is possible to define the validation strategy for each data object globally using config', function () {
     $dataClass = new class () extends Data {
         #[In('Hello World')]
         public string $string;
@@ -2350,7 +2350,7 @@ it('is possible to define the validation type for each data object globally usin
         ->toBeInstanceOf(Data::class)
         ->string->toBe('Nowp');
 
-    config()->set('data.validation_type', ValidationType::Always->value);
+    config()->set('data.validation_strategy', ValidationStrategy::Always->value);
 
     expect(fn () => $dataClass::from(['string' => 'Nowp']))
         ->toThrow(ValidationException::class);

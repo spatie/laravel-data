@@ -29,7 +29,7 @@ class CreationContext
      */
     public function __construct(
         public string $dataClass,
-        public readonly ValidationType $validationType,
+        public readonly ValidationStrategy $validationStrategy,
         public readonly bool $mapPropertyNames,
         public readonly bool $withoutMagicalCreation,
         public readonly ?array $ignoredMagicalMethods,

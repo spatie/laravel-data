@@ -3,7 +3,7 @@ title: Introduction
 weight: 1
 ---
 
-Laravel data allows you to create data objects from all sorts of data. One of the most common ways to create a data object is from a request and the data from a request cannot always be trusted.
+Laravel data, allows you to create data objects from all sorts of data. One of the most common ways to create a data object is from a request and the data from a request cannot always be trusted.
 
 That's why it is possible to validate the data before creating the data object. You can validate requests but also arrays and other structures.
 
@@ -13,7 +13,7 @@ The package will try to automatically infer validation rules from the data objec
 
 Validation is probably one of the coolest features of this package, but it is also the most complex one. We'll try to make it as straightforward as possible to validate data but in the end the Laravel validator was not written to be used in this way. So there are some limitations and quirks you should be aware of.
 
-In some cases it might be easier to just create a custom request class with validation rules and then call `toArray` on the request to create a data object than trying to validate the data with this package.
+In a few cases it might be easier to just create a custom request class with validation rules and then call `toArray` on the request to create a data object than trying to validate the data with this package.
 
 ## When does validation happen?
 
@@ -41,6 +41,22 @@ SongData::validateAndCreate(
     ['title' => 'Never gonna give you up', 'artist' => 'Rick Astley']
 ); // returns a SongData object
 ```
+
+### Validate everything
+
+It is possible to validate all payloads injected or passed to the `from` method by setting the `validation_strategy` config option to `Always`:
+
+```php
+'validation_strategy' => \Spatie\LaravelData\Support\Creation\ValidationStrategy::Always->value,
+```
+
+Completely disabling validation can be done by setting the `validation_strategy` config option to `Disabled`:
+
+```php
+'validation_strategy' => \Spatie\LaravelData\Support\Creation\ValidationStrategy::Disabled->value,
+```
+
+If you require a more fine-grained control over when validation should happen, you can use [data factories](/docs/laravel-data/v4//as-a-data-transfer-object/factories.md) to manually specify the validation strategy.
 
 ## A quick glance at the validation functionality
 
@@ -71,7 +87,7 @@ The package will generate the following validation rules:
 ]
 ```
 
-The package follows an algorithm to infer rules from the data object, you can read more about it [here](/docs/laravel-data/v3/validation/auto-rule-inferring).
+The package follows an algorithm to infer rules from the data object, you can read more about it [here](/docs/laravel-data/v4/validation/auto-rule-inferring).
 
 ### Validation attributes
 
@@ -91,7 +107,7 @@ class SongData extends Data
 
 When you provide an artist with a length of more than 20 characters, the validation will fail.
 
-There's a complete [chapter](/docs/laravel-data/v3/validation/using-attributes) dedicated to validation attributes.
+There's a complete [chapter](/docs/laravel-data/v4/validation/using-attributes) dedicated to validation attributes.
 
 ### Manual rules
 
@@ -116,7 +132,7 @@ class SongData extends Data
 }
 ```
 
-You can read more about manual rules in its [dedicated chapter](/docs/laravel-data/v3/validation/manual-rules).
+You can read more about manual rules in its [dedicated chapter](/docs/laravel-data/v4/validation/manual-rules).
 
 ### Using the container
 
@@ -131,7 +147,7 @@ If the request contains data that is not compatible with the data object, a vali
 
 ### Working with the validator
 
-We provide a few points where you can hook into the validation process. You can read more about it in the [dedicated chapter](/docs/laravel-data/v3/validation/working-with-the-validator).
+We provide a few points where you can hook into the validation process. You can read more about it in the [dedicated chapter](/docs/laravel-data/v4/validation/working-with-the-validator).
 
 It is for example to:
 
@@ -191,7 +207,7 @@ The validation rules for this class will be:
 ]
 ```
 
-There are a few quirky things to keep in mind when working with nested data objects, you can read all about it [here](/docs/laravel-data/v3/validation/nesting-data).
+There are a few quirky things to keep in mind when working with nested data objects, you can read all about it [here](/docs/laravel-data/v4/validation/nesting-data).
 
 ## Validation of nested data collections
 
@@ -225,7 +241,7 @@ In this case the validation rules for `AlbumData` would look like this:
 ]
 ```
 
-More info about nested data collections can be found [here](/docs/laravel-data/v3/validation/nesting-data).
+More info about nested data collections can be found [here](/docs/laravel-data/v4/validation/nesting-data).
 
 ## Default values
 

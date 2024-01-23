@@ -1,6 +1,6 @@
 ---
 title: Transforming data
-weight: 4
+weight: 7
 ---
 
 Each property of a data object should be transformed into a usable type to communicate via JSON.
@@ -43,7 +43,7 @@ class ArtistData extends Data{
 
 Next to a `DateTimeInterfaceTransformer` the package also ships with an `ArrayableTransformer` that transforms an `Arrayable` object to an array.
 
-It is possible to create transformers for your specific types. You can find more info [here](/docs/laravel-data/v3/advanced-usage/creating-a-transformer).
+It is possible to create transformers for your specific types. You can find more info [here](/docs/laravel-data/v4/advanced-usage/creating-a-transformer).
 
 ## Global transformers
 

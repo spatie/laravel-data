@@ -57,4 +57,4 @@ By default, five rule inferrers are enabled:
     - A `array` type will add the `array` rule
 - **AttributesRuleInferrer** will make sure that rule attributes we described above will also add their rules
 
-It is possible to write your rule inferrers. You can find more information [here](/docs/laravel-data/v3/advanced-usage/creating-a-rule-inferrer).
+It is possible to write your rule inferrers. You can find more information [here](/docs/laravel-data/v4/advanced-usage/creating-a-rule-inferrer).

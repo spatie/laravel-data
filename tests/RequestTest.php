@@ -15,13 +15,6 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 
-function performRequest(string $string): TestResponse
-{
-    return postJson('/example-route', [
-        'string' => $string,
-    ]);
-}
-
 beforeEach(function () {
     handleExceptions([
         AuthenticationException::class,

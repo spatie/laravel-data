@@ -15,7 +15,7 @@ return Inertia::render('Song', SongsData::from($song));
 
 ## Lazy properties
 
-This package supports [lazy](https://spatie.be/docs/laravel-data/v3/as-a-resource/lazy-properties) properties, which can be manually included or excluded.
+This package supports [lazy](https://spatie.be/docs/laravel-data/v4/as-a-resource/lazy-properties) properties, which can be manually included or excluded.
 
 Inertia has a similar concept called [lazy data evaluation](https://inertiajs.com/partial-reloads#lazy-data-evaluation), where some properties wrapped in a closure only get evaluated and included in the response when explicitly asked.
 

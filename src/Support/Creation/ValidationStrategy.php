@@ -2,7 +2,7 @@
 
 namespace Spatie\LaravelData\Support\Creation;
 
-enum ValidationType: string
+enum ValidationStrategy: string
 {
     case Always = 'always';
     case OnlyRequests = 'only_requests';

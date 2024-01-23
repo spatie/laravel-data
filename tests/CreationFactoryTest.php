@@ -92,7 +92,7 @@ it('can disable the validation request payloads', function () {
     expect(fn () => $dataClass::factory()->from($request))
         ->toThrow(ValidationException::class);
 
-    expect($dataClass::factory()->disableValidation()->from($request))
+    expect($dataClass::factory()->withoutValidation()->from($request))
         ->toBeInstanceOf(Data::class)
         ->string->toEqual('nowp');
 });

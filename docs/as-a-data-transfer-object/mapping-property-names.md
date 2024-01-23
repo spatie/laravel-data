@@ -20,7 +20,7 @@ class ContractData extends Data
 Creating the data object can now be done as such:
 
 ```php
-SongData::from(['name' => 'Rick Astley', 'record_company' => 'RCA Records']);
+ContractData::from(['name' => 'Rick Astley', 'record_company' => 'RCA Records']);
 ```
 
 Changing all property names in a data object to snake_case in the data the object is created from can be done as such:
@@ -37,7 +37,7 @@ class ContractData extends Data
 }
 ```
 
-You can also use the `MapName` attribute when you want to combine input (see [transforming data objects](https://spatie.be/docs/laravel-data/v3/as-a-resource/from-data-to-resource#mapping-property-names)) and output property name mapping:
+You can also use the `MapName` attribute when you want to combine input (see [transforming data objects](/docs/laravel-data/v4/as-a-resource/from-data-to-resource#mapping-property-names)) and output property name mapping:
 
 ```php
 #[MapName(SnakeCaseMapper::class)]

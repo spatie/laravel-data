@@ -1,12 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Testing\TestResponse;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Tests\Fakes\MultiNestedData;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithWrap;
+use function Pest\Laravel\postJson;
+
+function performRequest(string $string): TestResponse
+{
+    return postJson('/example-route', [
+        'string' => $string,
+    ]);
+}
 
 it('can wrap data objects by method call', function () {
     expect(
@@ -231,3 +240,4 @@ it('will wrap responses which are data collections', function () {
             ],
         ]);
 });
+

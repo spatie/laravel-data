@@ -118,4 +118,4 @@ Tip: we can also remove the `EnumCast` since the package will automatically cast
 
 ## Creating your own casts
 
-It is possible to create your casts. You can read more about this in the [advanced chapter](/docs/laravel-data/v3/advanced-usage/creating-a-cast).
+It is possible to create your casts. You can read more about this in the [advanced chapter](/docs/laravel-data/v4/advanced-usage/creating-a-cast).

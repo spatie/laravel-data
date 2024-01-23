@@ -45,7 +45,8 @@ class SongData extends Data
     ) {
     }
     
-    public static function fromTitle(string $title): static{
+    public static function fromTitle(string $title): static
+    {
         return new self($title, Optional::create());
     }
 }
