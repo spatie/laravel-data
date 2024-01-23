@@ -170,7 +170,25 @@ SongData::empty([
 ]);
 ```
 
- ## Response status code
+## Response status code
 
 When a resource is being returned from a controller, the status code of the response will automatically be set to `201 CREATED` when Laravel data detects that the request's method is `POST`.  In all other cases, `200 OK` will be returned.
 
+## Resource classes
+
+To make it a bit more clear that a data object is a resource, you can use the `Resource` class instead of the `Data` class:
+
+```php
+use Spatie\LaravelData\Resource;
+
+class SongResource extends Resource
+{
+    public function __construct(
+        public string $title,
+        public string $artist,
+    ) {
+    }
+}
+```
+
+These resource classes have as an advantage that they won't validate data or check authorization, They are only used to transform data which makes them a bit faster.

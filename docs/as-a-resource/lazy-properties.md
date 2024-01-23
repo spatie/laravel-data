@@ -8,10 +8,12 @@ Sometimes you don't want all the properties included when transforming a data ob
 ```php
 class AlbumData extends Data
 {
+    /**
+    * @param Collection<int, SongData> $songs
+    */
     public function __construct(
         public string $title,
-        #[DataCollectionOf(SongData::class)]
-        public DataCollection $songs,
+        public Collection $songs,
     ) {
     }
 }
@@ -22,10 +24,12 @@ This will always output a collection of songs, which can become quite large. Wit
 ```php
 class AlbumData extends Data
 {
+    /**
+    * @param Lazy|Collection<int, SongData> $songs
+    */
     public function __construct(
         public string $title,
-        #[DataCollectionOf(SongData::class)]
-        public Lazy|DataCollection $songs,
+        public Lazy|Collection $songs,
     ) {
     }
     
@@ -33,7 +37,7 @@ class AlbumData extends Data
     {
         return new self(
             $album->title,
-            Lazy::create(fn() => SongData::collection($album->songs))
+            Lazy::create(fn() => SongData::collect($album->songs))
         );
     }
 }
@@ -47,15 +51,15 @@ Now when we transform the data object as such:
 AlbumData::from(Album::first())->toArray();
 ```
 
-We get the following JSON:
+We get the following array:
 
-```json
-{
-    "name": "Together Forever"
-}
+```php
+[
+    'title' => 'Together Forever',
+]
 ```
 
-As you can see, the `songs` property is missing in the JSON output. Here's how you can include it.
+As you can see, the `songs` property is missing in the array output. Here's how you can include it.
 
 ```php
 AlbumData::from(Album::first())->include('songs');
@@ -63,7 +67,7 @@ AlbumData::from(Album::first())->include('songs');
 
 ## Including lazy properties
 
-Properties will only be included when the `include` method is called on the data object with the property's name.
+Lazy properties will only be included when the `include` method is called on the data object with the property's name.
 
 It is also possible to nest these includes. For example, let's update the `SongData` class and make all of its properties lazy:
 
@@ -138,7 +142,7 @@ return UserData::from(Auth::user())->include('favorite_song.name');
 You can include lazy properties in different ways:
 
 ```php
-Lazy::create(fn() => SongData::collection($album->songs));
+Lazy::create(fn() => SongData::collect($album->songs));
 ```
 
 With a basic `Lazy` property, you must explicitly include it when the data object is transformed.
@@ -146,7 +150,7 @@ With a basic `Lazy` property, you must explicitly include it when the data objec
 Sometimes you only want to include a property when a specific condition is true. This can be done with conditional lazy properties:
 
 ```php
-Lazy::when(fn() => $this->is_admin, fn() => SongData::collection($album->songs));
+Lazy::when(fn() => $this->is_admin, fn() => SongData::collect($album->songs));
 ```
 
 The property will only be included when the `is_admin` property of the data object is true. It is not possible to include the property later on with the `include` method when a condition is not accepted.
@@ -156,7 +160,7 @@ The property will only be included when the `is_admin` property of the data obje
 You can also only include a lazy property when a particular relation is loaded on the model as such:
 
 ```php
-Lazy::whenLoaded('songs', $album, fn() => SongData::collection($album->songs));
+Lazy::whenLoaded('songs', $album, fn() => SongData::collect($album->songs));
 ```
 
 Now the property will only be included when the song's relation is loaded on the model.
@@ -166,7 +170,7 @@ Now the property will only be included when the song's relation is loaded on the
 It is possible to mark a lazy property as included by default:
 
 ```php
-Lazy::create(fn() => SongData::collection($album->songs))->defaultIncluded();
+Lazy::create(fn() => SongData::collect($album->songs))->defaultIncluded();
 ```
 
 The property will now always be included when the data object is transformed. You can explicitly exclude properties that were default included as such:
@@ -225,10 +229,12 @@ In some cases you may want to define an include on a class level by implementing
 ```php
 class AlbumData extends Data
 {
+    /**
+    * @param Lazy|Collection<SongData> $songs
+    */
     public function __construct(
         public string $title,
-        #[DataCollectionOf(SongData::class)]
-        public Lazy|DataCollection $songs,
+        public Lazy|Collection $songs,
     ) {
     }
     
@@ -246,10 +252,12 @@ It is even possible to include nested properties:
 ```php
 class AlbumData extends Data
 {
+    /**
+    * @param Lazy|Collection<SongData> $songs
+    */
     public function __construct(
         public string $title,
-        #[DataCollectionOf(SongData::class)]
-        public Lazy|DataCollection $songs,
+        public Lazy|Collection $songs,
     ) {
     }
     
@@ -378,3 +386,52 @@ It is also possible to run exclude, except and only operations on a data object:
 - You can define **except** in `allowedRequestExcept` and use the `except` key in your query string
 - You can define **only** in `allowedRequestOnly` and use the `only` key in your query string
 
+## Mutability
+
+Adding includes/excludes/only/except to a data object will only affect the data object (and its nested chain) once:
+
+```php
+AlbumData::from(Album::first())->include('songs')->toArray(); // will include songs
+AlbumData::from(Album::first())->toArray(); // will not include songs
+```
+
+If you want to add includes/excludes/only/except to a data object and its nested chain that will be used for all future transformations, you can define them in their respective *properties methods:
+
+```php
+class AlbumData extends Data
+{
+    /**
+    * @param Lazy|Collection<SongData> $songs
+    */
+    public function __construct(
+        public string $title,
+        public Lazy|Collection $songs,
+    ) {
+    }
+    
+    public function includeProperties(): array
+    {
+        return [
+            'songs'
+        ];
+    }
+}
+```
+
+Or use the permanent methods:
+
+```php
+AlbumData::from(Album::first())->includePermanently('songs');
+AlbumData::from(Album::first())->excludePermanently('songs');
+AlbumData::from(Album::first())->onlyPermanently('songs');
+AlbumData::from(Album::first())->exceptPermanently('songs');
+```
+
+When using conditional a includes/excludes/only/except, you can set the permanent flag:
+
+```php
+AlbumData::from(Album::first())->includeWhen('songs', fn(AlbumData $data) => count($data->songs) > 0, permanent: true);
+AlbumData::from(Album::first())->excludeWhen('songs', fn(AlbumData $data) => count($data->songs) > 0, permanent: true);
+AlbumData::from(Album::first())->onlyWhen('songs', fn(AlbumData $data) => count($data->songs) > 0), permanent: true);
+AlbumData::from(Album::first())->except('songs', fn(AlbumData $data) => count($data->songs) > 0, permanent: true);
+```

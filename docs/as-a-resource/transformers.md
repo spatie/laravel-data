@@ -3,11 +3,11 @@ title: Transforming data
 weight: 7
 ---
 
-Each property of a data object should be transformed into a usable type to communicate via JSON.
+Transformers allow you to transform complex types to simple types. This is useful when you want to transform a data object to an array or JSON.
 
 No complex transformations are required for the default types (string, bool, int, float, enum and array), but special types like `Carbon` or a Laravel Model will need extra attention.
 
-Transformers are simple classes that will convert a complex type to something simple like a `string` or `int`. For example, we can transform a `Carbon` object to `16-05-1994`, `16-05-1994T00:00:00+00` or something completely different.
+Transformers are simple classes that will convert a such complex types to something simple like a `string` or `int`. For example, we can transform a `Carbon` object to `16-05-1994`, `16-05-1994T00:00:00+00` or something completely different.
 
 There are two ways you can define transformers: locally and globally.
 
@@ -80,16 +80,65 @@ ArtistData::from($artist)->all();
 
 ## Getting a data object (on steroids)
 
-Internally the package uses the `transform` method for operations like `toArray`, `all`, `toJson` and so on. This method is highly configurable:
+Internally the package uses the `transform` method for operations like `toArray`, `all`, `toJson` and so on. This method is highly configurable, when calling it without any arguments it will behave like the `toArray` method:
 
 ```php
+ArtistData::from($artist)->transform();
+```
+
+Producing the following result:
+
+```php
+[
+    'name' => 'Rick Astley',
+    'birth_date' => '06-02-1966',
+]
+```
+
+It is possible to disable the transformation of values, which will make the `transform` method behave like the `all` method:
+
+```php
+use Spatie\LaravelData\Support\Transformation\TransformationContext;
+
 ArtistData::from($artist)->transform(
-    bool $transformValues = true,
-    WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
-    bool $mapPropertyNames = true,
+    TransformationContext::create()->withoutTransformingValues()
 );
 ```
 
-- **$transformValues** when enabled transformers will be used to transform properties, also data objects and collections will be transformed
-- **$wrapExecutionType** allows you to set if wrapping is `Enabled` or `Disabled`
-- **$mapPropertyNames** uses defined mappers to rename properties when enabled
+Outputting the following array:
+
+```php
+[
+    'name' => 'Rick Astley',
+    'birth_date' => Carbon::parse('06-02-1966'),
+]
+```
+
+The [mapping of property names](/docs/laravel-data/v4/as-a-resource/mapping-property-names) can also be disabled:
+
+```php
+ArtistData::from($artist)->transform(
+    TransformationContext::create()->mapPropertyNames(false)
+);
+```
+
+It is possible to enable [wrapping](/docs/laravel-data/v4/as-a-resource/wrapping-data) the data object:
+
+```php
+use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
+
+ArtistData::from($artist)->transform(
+    TransformationContext::create()->wrapExecutionType(WrapExecutionType::Enabled)
+);
+```
+
+Outputting the following array:
+
+```php
+[
+    'data' => [
+        'name' => 'Rick Astley',
+        'birth_date' => '06-02-1966',
+    ],
+]
+```

@@ -1,5 +1,5 @@
 ---
-title: Creating a data object 
+title: Creating a data object
 weight: 1
 ---
 
@@ -52,7 +52,8 @@ Data can also be created from JSON strings:
 SongData::from('{"title" : "Never Gonna Give You Up","artist" : "Rick Astley"}');
 ```
 
-Although the PHP 8.0 constructor properties look great in data objects, it is perfectly valid to use regular properties without a constructor like so:
+Although the PHP 8.0 constructor properties look great in data objects, it is perfectly valid to use regular properties
+without a constructor like so:
 
 ```php
 class SongData extends Data
@@ -160,7 +161,8 @@ will try to create itself from the following types:
 - An *Arrayable* by calling `toArray` on it
 - An *array*
 
-This list can be extended using extra normalizers, find more about it [here](https://spatie.be/docs/laravel-data/v4/advanced-usage/normalizers).
+This list can be extended using extra normalizers, find more about
+it [here](https://spatie.be/docs/laravel-data/v4/advanced-usage/normalizers).
 
 When a data object cannot be created using magical methods or the default methods, a `CannotCreateData`
 exception will be thrown.
@@ -187,4 +189,26 @@ SongData::withoutMagicalCreationFrom($song);
 
 ## Advanced creation using factories
 
-It is possible to configure how a data object is created, whether it will be validated, which casts to use and more. You can read more about it [here](/docs/laravel-data/v4/advanced-usage/factories).
+It is possible to configure how a data object is created, whether it will be validated, which casts to use and more. You
+can read more about it [here](/docs/laravel-data/v4/advanced-usage/factories).
+
+## DTO classes
+
+The default `Data` class from which you extend your data objects is a multi versatile class, it packs a lot of
+functionality. But sometimes you just want a simple DTO class. You can use the `Dto` class for this:
+
+```php
+class SongData extends Dto
+{
+    public function __construct(
+        public string $title,
+        public string $artist,
+    ) {
+    }
+}
+```
+
+The `Dto` class is a data class in its most basic form. It can br created from anything using magical methods, can
+validate payloads before creating the data object and can be created using factories. But it doesn't have any of the
+other functionality that the `Data` class has.
+

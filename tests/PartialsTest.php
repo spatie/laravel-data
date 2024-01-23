@@ -978,6 +978,66 @@ it('can define permanent partials which will always be used', function () {
     ]);
 });
 
+it('can define permanent partials using function call', function (
+    Data $data,
+    Closure $temporaryPartial,
+    Closure $permanentPartial,
+    array $expectedFullPayload,
+    array $expectedPartialPayload
+) {
+    $data = $temporaryPartial($data);
+
+    expect($data->toArray())->toBe($expectedPartialPayload);
+    expect($data->toArray())->toBe($expectedFullPayload);
+
+    $data = $permanentPartial($data);
+
+    expect($data->toArray())->toBe($expectedPartialPayload);
+    expect($data->toArray())->toBe($expectedPartialPayload);
+})->with(function (){
+    yield [
+        'data' => new LazyData(
+            Lazy::create(fn () => 'Rick Astley'),
+        ),
+        'temporaryPartial' => fn(LazyData $data) => $data->include('name'),
+        'permanentPartial' => fn(LazyData $data) => $data->includePermanently('name'),
+        'expectedFullPayload' => [],
+        'expectedPartialPayload' => ['name' => 'Rick Astley'],
+    ];
+
+    yield [
+        'data' => new LazyData(
+            Lazy::create(fn () => 'Rick Astley')->defaultIncluded(),
+        ),
+        'temporaryPartial' => fn(LazyData $data) => $data->exclude('name'),
+        'permanentPartial' => fn(LazyData $data) => $data->excludePermanently('name'),
+        'expectedFullPayload' => ['name' => 'Rick Astley'],
+        'expectedPartialPayload' => [],
+    ];
+
+    yield [
+        'data' => new MultiData(
+            'Rick Astley',
+            'Never gonna give you up',
+        ),
+        'temporaryPartial' => fn(MultiData $data) => $data->only('first'),
+        'permanentPartial' => fn(MultiData $data) => $data->onlyPermanently('first'),
+        'expectedFullPayload' => ['first' => 'Rick Astley', 'second' => 'Never gonna give you up'],
+        'expectedPartialPayload' => ['first' => 'Rick Astley'],
+    ];
+
+    yield [
+        'data' => new MultiData(
+            'Rick Astley',
+            'Never gonna give you up',
+        ),
+        'temporaryPartial' => fn(MultiData $data) => $data->except('first'),
+        'permanentPartial' => fn(MultiData $data) => $data->exceptPermanently('first'),
+        'expectedFullPayload' => ['first' => 'Rick Astley', 'second' => 'Never gonna give you up'],
+        'expectedPartialPayload' => ['second' => 'Never gonna give you up'],
+    ];
+});
+
 it('can set partials on a nested data object and these will be respected', function () {
     class TestMultiLazyNestedDataWithObjectAndCollection extends Data
     {

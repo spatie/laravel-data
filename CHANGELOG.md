@@ -15,11 +15,13 @@ All notable changes to `laravel-data` will be documented in this file.
 - Added contexts to the creation and transformation process
 - Allow creating a data object or collection using a factory
 - Speed up the process of creating and transforming data objects
+- Add support for BNF syntax
 - Rewritten docs
 
 **Some more "internal" changes**
 
 - Restructured tests for the future we have ahead
+- The Type system was completely rewritten, allowing for a better performance and more flexibility in the future
 - Benchmarks added to make data even faster
 
 ## 3.11.0 - 2023-12-21

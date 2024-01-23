@@ -41,7 +41,7 @@ class AcceptedTypesStorage
     /** @return string[] */
     protected static function resolveAcceptedTypes(string $name): array
     {
-        if (! class_exists($name)) {
+        if (! class_exists($name) && ! interface_exists($name)) {
             return [];
         }
 

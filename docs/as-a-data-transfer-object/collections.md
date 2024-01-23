@@ -232,9 +232,9 @@ SongData::collect(Song::all(), DataCollection::class)->first(); // SongData obje
 In previous versions of the package it was possible to use the `collection` method to create a collection of data objects:
 
 ```php
-SongData::collection(Song::all()); // returns a DataCollection of SongData objects
-SongData::collection(Song::paginate()); // returns a PaginatedDataCollection of SongData objects
-SongData::collection(Song::cursorPaginate()); // returns a CursorPaginatedCollection of SongData objects
+SongData::collect(Song::all()); // returns a DataCollection of SongData objects
+SongData::collect(Song::paginate()); // returns a PaginatedDataCollection of SongData objects
+SongData::collect(Song::cursorPaginate()); // returns a CursorPaginatedCollection of SongData objects
 ```
 
 This method was removed with version v4 of the package in favor for the more powerful `collect` method. The `collection` method can still be used by using the `WithDeprecatedCollectionMethod` trait:

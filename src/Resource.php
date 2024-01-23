@@ -17,6 +17,12 @@ use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
 use Spatie\LaravelData\Contracts\TransformableData as TransformableDataContract;
 use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
+use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
+use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
+use Spatie\LaravelData\DataPipes\FillRouteParameterPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 
 class Resource implements BaseDataContract, AppendableDataContract, IncludeableDataContract, ResponsableDataContract, TransformableDataContract, WrappableDataContract, EmptyDataContract
 {
@@ -28,4 +34,14 @@ class Resource implements BaseDataContract, AppendableDataContract, IncludeableD
     use WrappableData;
     use EmptyData;
     use ContextableData;
+
+    public static function pipeline(): DataPipeline
+    {
+        return DataPipeline::create()
+            ->into(static::class)
+            ->through(MapPropertiesDataPipe::class)
+            ->through(FillRouteParameterPropertiesDataPipe::class)
+            ->through(DefaultValuesDataPipe::class)
+            ->through(CastPropertiesDataPipe::class);
+    }
 }
