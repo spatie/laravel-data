@@ -4,7 +4,6 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 
 use function Pest\Laravel\handleExceptions;

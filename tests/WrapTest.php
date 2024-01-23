@@ -2,13 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
+
+use function Pest\Laravel\postJson;
+
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Tests\Fakes\MultiNestedData;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithWrap;
-use function Pest\Laravel\postJson;
 
 function performRequest(string $string): TestResponse
 {
@@ -240,4 +242,3 @@ it('will wrap responses which are data collections', function () {
             ],
         ]);
 });
-

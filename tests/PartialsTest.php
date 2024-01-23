@@ -994,13 +994,13 @@ it('can define permanent partials using function call', function (
 
     expect($data->toArray())->toBe($expectedPartialPayload);
     expect($data->toArray())->toBe($expectedPartialPayload);
-})->with(function (){
+})->with(function () {
     yield [
         'data' => new LazyData(
             Lazy::create(fn () => 'Rick Astley'),
         ),
-        'temporaryPartial' => fn(LazyData $data) => $data->include('name'),
-        'permanentPartial' => fn(LazyData $data) => $data->includePermanently('name'),
+        'temporaryPartial' => fn (LazyData $data) => $data->include('name'),
+        'permanentPartial' => fn (LazyData $data) => $data->includePermanently('name'),
         'expectedFullPayload' => [],
         'expectedPartialPayload' => ['name' => 'Rick Astley'],
     ];
@@ -1009,8 +1009,8 @@ it('can define permanent partials using function call', function (
         'data' => new LazyData(
             Lazy::create(fn () => 'Rick Astley')->defaultIncluded(),
         ),
-        'temporaryPartial' => fn(LazyData $data) => $data->exclude('name'),
-        'permanentPartial' => fn(LazyData $data) => $data->excludePermanently('name'),
+        'temporaryPartial' => fn (LazyData $data) => $data->exclude('name'),
+        'permanentPartial' => fn (LazyData $data) => $data->excludePermanently('name'),
         'expectedFullPayload' => ['name' => 'Rick Astley'],
         'expectedPartialPayload' => [],
     ];
@@ -1020,8 +1020,8 @@ it('can define permanent partials using function call', function (
             'Rick Astley',
             'Never gonna give you up',
         ),
-        'temporaryPartial' => fn(MultiData $data) => $data->only('first'),
-        'permanentPartial' => fn(MultiData $data) => $data->onlyPermanently('first'),
+        'temporaryPartial' => fn (MultiData $data) => $data->only('first'),
+        'permanentPartial' => fn (MultiData $data) => $data->onlyPermanently('first'),
         'expectedFullPayload' => ['first' => 'Rick Astley', 'second' => 'Never gonna give you up'],
         'expectedPartialPayload' => ['first' => 'Rick Astley'],
     ];
@@ -1031,8 +1031,8 @@ it('can define permanent partials using function call', function (
             'Rick Astley',
             'Never gonna give you up',
         ),
-        'temporaryPartial' => fn(MultiData $data) => $data->except('first'),
-        'permanentPartial' => fn(MultiData $data) => $data->exceptPermanently('first'),
+        'temporaryPartial' => fn (MultiData $data) => $data->except('first'),
+        'permanentPartial' => fn (MultiData $data) => $data->exceptPermanently('first'),
         'expectedFullPayload' => ['first' => 'Rick Astley', 'second' => 'Never gonna give you up'],
         'expectedPartialPayload' => ['second' => 'Never gonna give you up'],
     ];
