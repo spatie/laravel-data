@@ -3,10 +3,16 @@
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
+use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\Creation\CreationContext;
+use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataWithMultipleArgumentCreationMethod;
 use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\EnumData;
@@ -195,6 +201,16 @@ it('can magically collect data', function () {
         {
             return $items->all();
         }
+
+        public static function collectPaginator(LengthAwarePaginator $items): CursorPaginator
+        {
+            return new CursorPaginator($items->all(), $items->perPage());
+        }
+
+        public static function collectCursorPaginator(CursorPaginator $items): LengthAwarePaginator
+        {
+            return new LengthAwarePaginator($items->all(), $items->count(), $items->perPage());
+        }
     };
 
     expect($dataClass::collect(['a', 'b', 'c']))
@@ -220,6 +236,12 @@ it('can magically collect data', function () {
             $dataClass::from('b'),
             $dataClass::from('c'),
         ]);
+
+    expect($dataClass::collect(new LengthAwarePaginator(['a', 'b', 'c'], 3, 15)))
+        ->toBeInstanceOf(CursorPaginator::class);
+
+    expect($dataClass::collect(new CursorPaginator(['a', 'b', 'c'], 15)))
+        ->toBeInstanceOf(LengthAwarePaginator::class);
 });
 
 it('can disable magically collecting data', function () {
@@ -284,15 +306,128 @@ it('can inject the creation context when collecting data with a magical method',
     $dataClass = new class ('') extends SimpleData {
         public static function collectArray(array $items, CreationContext $context): array
         {
-            return array_map(fn (SimpleData $data) => new SimpleData($data->string . ' ' . $context->dataClass), $items);
+            return array_map(fn (SimpleData $data) => new SimpleData($data->string.' '.$context->dataClass), $items);
         }
     };
 
     expect($dataClass::collect(['a', 'b', 'c']))
         ->toBeArray()
         ->toEqual([
-            SimpleData::from('a ' . $dataClass::class),
-            SimpleData::from('b ' . $dataClass::class),
-            SimpleData::from('c ' . $dataClass::class),
+            SimpleData::from('a '.$dataClass::class),
+            SimpleData::from('b '.$dataClass::class),
+            SimpleData::from('c '.$dataClass::class),
         ]);
+});
+
+it('can use a string to collect data into', function (
+    string $into,
+    array|object $expected,
+) {
+    expect(SimpleData::collect(['A', 'B'], $into))->toEqual($expected);
+})->with(function(){
+    yield 'array' => [
+        'array',
+        fn() => [
+            SimpleData::from('A'),
+            SimpleData::from('B'),
+        ],
+    ];
+
+    yield 'laravel collection' => [
+        Collection::class,
+        fn() => collect([
+            SimpleData::from('A'),
+            SimpleData::from('B'),
+        ]),
+    ];
+
+    yield 'laravel lazy collection' => [
+        LazyCollection::class,
+        fn() =>new LazyCollection([
+            SimpleData::from('A'),
+            SimpleData::from('B'),
+        ]),
+    ];
+
+    yield 'data collection' => [
+        DataCollection::class,
+        fn() => new DataCollection(SimpleData::class, [
+            SimpleData::from('A'),
+            SimpleData::from('B'),
+        ]),
+    ];
+
+    yield 'data paginated collection' => [
+        PaginatedDataCollection::class,
+        fn() => new PaginatedDataCollection(SimpleData::class,new LengthAwarePaginator( [
+            SimpleData::from('A'),
+            SimpleData::from('B'),
+        ], 2, 15)),
+    ];
+
+    yield 'data cursor paginated collection' => [
+        CursorPaginatedDataCollection::class,
+        fn() => new CursorPaginatedDataCollection(SimpleData::class,new CursorPaginator( [
+            SimpleData::from('A'),
+            SimpleData::from('B'),
+        ], 15)),
+    ];
+
+    yield 'paginator' => [
+        LengthAwarePaginator::class,
+        fn() => new LengthAwarePaginator([
+            SimpleData::from('A'),
+            SimpleData::from('B'),
+        ], 2, 15),
+    ];
+
+    yield 'cursor paginator' => [
+        CursorPaginator::class,
+        fn() => new CursorPaginator([
+            SimpleData::from('A'),
+            SimpleData::from('B'),
+        ], 15),
+    ];
+
+    yield 'custom data collection' => [
+        CustomDataCollection::class,
+        fn() => new CustomDataCollection(SimpleData::class, [
+            SimpleData::from('A'),
+            SimpleData::from('B'),
+        ]),
+    ];
+});
+
+it('can specifically select the correct collect method using an into return type', function () {
+    $dataClass = new class ('') extends SimpleData {
+        public static function collectArray(array $items): array
+        {
+            return array_map(
+                fn (SimpleData $data) => new SimpleData(strtoupper($data->string)),
+                $items
+            );
+        }
+
+        public static function collectCollection(array $items): Collection
+        {
+            return collect(array_map(
+                fn (SimpleData $data) => new SimpleData(strtolower($data->string)),
+                $items
+            ));
+        }
+    };
+
+    expect($dataClass::collect(['Hello', 'World'], 'array'))
+        ->toBeArray()
+        ->toEqual([SimpleData::from('HELLO'), SimpleData::from('WORLD')]);
+
+    expect($dataClass::collect(['Hello', 'World'], Collection::class))
+        ->toBeInstanceOf(Collection::class)
+        ->all()->toEqual([SimpleData::from('hello'), SimpleData::from('world')]);
+});
+
+it('can only collect arrays/collections/paginators', function () {
+    $storage = new SplObjectStorage();
+
+    expect(fn () => SimpleData::collect($storage))->toThrow(Exception::class, 'Unable to normalize items');
 });

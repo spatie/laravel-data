@@ -10,6 +10,7 @@ use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Support\Factories\DataReturnTypeFactory;
 use Spatie\LaravelData\Support\Types\NamedType;
+use Spatie\LaravelData\Support\Types\UnionType;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 class TestReturnTypeSubject
@@ -33,13 +34,23 @@ class TestReturnTypeSubject
     {
 
     }
+
+    public function union(): array|Collection
+    {
+
+    }
+
+    public function none()
+    {
+
+    }
 }
 
 it('can determine the return type from reflection', function (
     string $methodName,
     string $typeName,
     mixed $value,
-    DataType $expected
+    ?DataType $expected
 ) {
     $factory = app(DataReturnTypeFactory::class);
 
@@ -113,6 +124,43 @@ it('can determine the return type from reflection', function (
             kind: DataTypeKind::DataCollection,
         ),
     ];
+});
+
+it('will return null when a method does not have a return type', function (){
+    $factory = app(DataReturnTypeFactory::class);
+
+    $reflection = new ReflectionMethod(\TestReturnTypeSubject::class, 'none');
+
+    expect($factory->build($reflection, TestReturnTypeSubject::class))->toBeNull();
+});
+
+it('can handle union types', function (){
+    $factory = app(DataReturnTypeFactory::class);
+
+    $reflection = new ReflectionMethod(\TestReturnTypeSubject::class, 'union');
+
+    expect($factory->build($reflection, TestReturnTypeSubject::class))->toEqual(
+        new DataType(
+            type: new UnionType([
+                new NamedType(Collection::class, false, [
+                    ArrayAccess::class,
+                    CanBeEscapedWhenCastToString::class,
+                    Enumerable::class,
+                    Traversable::class,
+                    Stringable::class,
+                    JsonSerializable::class,
+                    Jsonable::class,
+                    IteratorAggregate::class,
+                    Countable::class,
+                    Arrayable::class,
+                ], DataTypeKind::DataEnumerable, null, null),
+                new NamedType('array', true, [], DataTypeKind::DataArray, null, null),
+            ]),
+            isNullable: false,
+            isMixed: false,
+            kind: DataTypeKind::DataEnumerable, // in the future this should be an array ...
+        ),
+    );
 });
 
 it('will store return types in the factory as a caching mechanism', function () {

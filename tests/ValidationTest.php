@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
@@ -712,6 +713,7 @@ it('will validate a collection', function () {
         ->assertOk(['collection' => []])
         ->assertErrors(['collection' => null])
         ->assertErrors([])
+        ->assertErrors(['collection' => ['strings', 'here', 'instead', 'of', 'arrays']])
         ->assertErrors([
             'collection' => [
                 ['other_string' => 'Hello World'],
@@ -1983,6 +1985,44 @@ it('can resolve validation dependencies for redirect url', function () {
     DataValidationAsserter::for($data)->assertRedirect(
         payload: ['name' => null],
         redirect: '/never-given-up'
+    );
+});
+
+it('can manually set the redirect route', function () {
+    Route::get('/never-given-up', fn () => 'Never gonna give you up')->name('never-given-up');
+
+    $data = new class () extends Data {
+        public string $name;
+
+        public static function redirectRoute(): string
+        {
+            return 'never-given-up';
+        }
+    };
+
+    DataValidationAsserter::for($data)->assertRedirect(
+        payload: ['name' => null],
+        redirect: 'http://localhost/never-given-up'
+    );
+});
+
+it('can resolve validation dependencies for redirect route', function () {
+    FakeInjectable::setup('Rick Astley');
+
+    Route::get('/never-given-up', fn () => 'Never gonna give you up')->name('never-given-up');
+
+    $data = new class () extends Data {
+        public string $name;
+
+        public static function redirectRoute(FakeInjectable $injectable): string
+        {
+            return $injectable->value === 'Rick Astley' ? 'never-given-up' : 'given-up';
+        }
+    };
+
+    DataValidationAsserter::for($data)->assertRedirect(
+        payload: ['name' => null],
+        redirect: 'http://localhost/never-given-up'
     );
 });
 

@@ -1296,6 +1296,46 @@ it('will check if partials are valid as request partials', function (
         'expectedPartials' => null,
         'expectedResponse' => [],
     ];
+
+    yield 'with invalid partial definition' => [
+        'lazyDataAllowedIncludes' => null,
+        'dataAllowedIncludes' => null,
+        'includes' => '',
+        'expectedPartials' => PartialsCollection::create(),
+        'expectedResponse' => [],
+    ];
+
+    yield 'with non existing field' => [
+        'lazyDataAllowedIncludes' => [],
+        'dataAllowedIncludes' => [],
+        'includes' => 'non-existing',
+        'expectedPartials' => PartialsCollection::create(),
+        'expectedResponse' => [],
+    ];
+
+    yield 'with non existing nested field' => [
+        'lazyDataAllowedIncludes' => [],
+        'dataAllowedIncludes' => [],
+        'includes' => 'non-existing.still-non-existing',
+        'expectedPartials' => PartialsCollection::create(),
+        'expectedResponse' => [],
+    ];
+
+    yield 'with non allowed nested field' => [
+        'lazyDataAllowedIncludes' => [],
+        'dataAllowedIncludes' => [],
+        'includes' => 'nested.name',
+        'expectedPartials' => PartialsCollection::create(),
+        'expectedResponse' => [],
+    ];
+
+    yield 'with non allowed nested all' => [
+        'lazyDataAllowedIncludes' => [],
+        'dataAllowedIncludes' => [],
+        'includes' => 'nested.*',
+        'expectedPartials' => PartialsCollection::create(),
+        'expectedResponse' => [],
+    ];
 });
 
 it('can combine request and manual includes', function () {

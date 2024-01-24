@@ -75,7 +75,7 @@ class RequestQueryStringPartialsResolver
     ): ?array {
         $allowed = $type->getAllowedPartials($dataClass);
 
-        $segment = $partialSegments[0];
+        $segment = $partialSegments[0] ?? null;
 
         if ($segment instanceof AllPartialSegment) {
             if ($allowed === null || $allowed === ['*']) {

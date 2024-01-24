@@ -52,10 +52,6 @@ class DataCollectableFromSomethingResolver
 
         $normalizedItems = $this->normalizeItems($items, $dataClass, $creationContext);
 
-        if(! $intoType->type instanceof NamedType) {
-            throw new Exception('Cannot collect into a union or intersection type');
-        }
-
         return match ($intoType->kind) {
             DataTypeKind::DataArray => $this->normalizeToArray($normalizedItems),
             DataTypeKind::DataEnumerable => new $intoType->type->name($this->normalizeToArray($normalizedItems)),

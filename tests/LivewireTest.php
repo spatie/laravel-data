@@ -16,4 +16,6 @@ it('works with livewire', function () {
     $data = $class::fromLivewire(['name' => 'Freek']);
 
     expect($data)->toEqual(new $class('Freek'));
+
+    expect($data->toLivewire())->toEqual(['name' => 'Freek']);
 });

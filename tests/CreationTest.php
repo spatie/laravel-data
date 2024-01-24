@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Attributes\Computed;
@@ -25,6 +26,7 @@ use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
+use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomCursorPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\EnumData;
@@ -183,6 +185,7 @@ it('allows casting of enums', function () {
 });
 
 it('can optionally create data', function () {
+    expect(SimpleData::optional())->toBeNull();
     expect(SimpleData::optional(null))->toBeNull();
     expect(new SimpleData('Hello world'))->toEqual(
         SimpleData::optional(['string' => 'Hello world'])
@@ -758,6 +761,22 @@ it('can return a custom paginated data collection when collecting data', functio
     $collection = $class::collection(new LengthAwarePaginator([['string' => 'A'], ['string' => 'B']], 2, 15));
 
     expect($collection)->toBeInstanceOf(CustomPaginatedDataCollection::class);
+});
+
+it('can return a custom cursor paginated data collection when collecting data', function () {
+    $class = new class ('') extends Data implements DeprecatedDataContract {
+        use WithDeprecatedCollectionMethod;
+
+        protected static string $_cursorPaginatedCollectionClass = CustomCursorPaginatedDataCollection::class;
+
+        public function __construct(public string $string)
+        {
+        }
+    };
+
+    $collection = $class::collection(new CursorPaginator([['string' => 'A'], ['string' => 'B']], 2));
+
+    expect($collection)->toBeInstanceOf(CustomCursorPaginatedDataCollection::class);
 });
 
 it('will allow a nested data object to cast properties however it wants', function () {

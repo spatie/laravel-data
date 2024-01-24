@@ -51,6 +51,4 @@ interface BaseData
     public static function prepareForPipeline(array $properties): array;
 
     public static function pipeline(): DataPipeline;
-
-    public function getMorphClass(): string;
 }

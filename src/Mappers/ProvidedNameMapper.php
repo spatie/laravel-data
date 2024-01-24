@@ -12,9 +12,4 @@ class ProvidedNameMapper implements NameMapper
     {
         return $this->name;
     }
-
-    public function inverse(): NameMapper
-    {
-        return $this;
-    }
 }

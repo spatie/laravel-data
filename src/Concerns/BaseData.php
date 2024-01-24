@@ -85,14 +85,6 @@ trait BaseData
         return $properties;
     }
 
-    public function getMorphClass(): string
-    {
-        /** @var class-string<BaseDataContract> $class */
-        $class = static::class;
-
-        return app(DataConfig::class)->morphMap->getDataClassAlias($class) ?? $class;
-    }
-
     public function __sleep(): array
     {
         $dataClass = app(DataConfig::class)->getDataClass(static::class);

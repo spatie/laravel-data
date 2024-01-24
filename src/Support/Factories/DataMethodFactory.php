@@ -73,15 +73,6 @@ class DataMethodFactory
         ReflectionMethod $method,
         ?DataType $returnType,
     ): CustomCreationMethodType {
-        if (! $method->isStatic()
-            || ! $method->isPublic()
-            || $method->name === 'from'
-            || $method->name === 'collect'
-            || $method->name === 'collection'
-        ) {
-            return CustomCreationMethodType::None;
-        }
-
         if (str_starts_with($method->name, 'from')) {
             return CustomCreationMethodType::Object;
         }

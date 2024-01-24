@@ -2,9 +2,13 @@
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
+use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Mappers\CamelCaseMapper;
+use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
+use Spatie\LaravelData\Mappers\StudlyCaseMapper;
 use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -312,3 +316,39 @@ it('can use one attribute on the class to map properties when creating', functio
             'But not too expensive!',
         ]));
 });
+
+it('has a mappers built in', function (){
+    $data  = new class extends Data
+    {
+        #[MapName(CamelCaseMapper::class)]
+        public string $camel_case = 'camelCase';
+
+        #[MapName(SnakeCaseMapper::class)]
+        public string $snakeCase = 'snake_case';
+
+        #[MapName(StudlyCaseMapper::class)]
+        public string $studly_case = 'StudlyCase';
+
+        #[MapName(new ProvidedNameMapper('i_provided'))]
+        public string $provided = 'provided';
+    };
+
+    expect($data->toArray())->toEqual([
+        'camelCase' => 'camelCase',
+        'snake_case' => 'snake_case',
+        'StudlyCase' => 'StudlyCase',
+        'i_provided' => 'provided',
+    ]);
+
+    expect($data::from([
+        'camelCase' => 'camelCase',
+        'snake_case' => 'snake_case',
+        'StudlyCase' => 'StudlyCase',
+        'i_provided' => 'provided',
+    ]))
+        ->camel_case->toBe('camelCase')
+        ->snakeCase->toBe('snake_case')
+        ->studly_case->toBe('StudlyCase')
+        ->provided->toBe('provided');
+});
+

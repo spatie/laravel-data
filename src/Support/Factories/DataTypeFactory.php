@@ -42,7 +42,7 @@ class DataTypeFactory
     public function buildProperty(
         ?ReflectionType $reflectionType,
         ReflectionClass|string $class,
-        ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
+        ReflectionProperty|ReflectionParameter|string $typeable,
         ?Collection $attributes = null,
         ?DataCollectableAnnotation $classDefinedDataCollectableAnnotation = null,
     ): DataPropertyType {
@@ -70,7 +70,7 @@ class DataTypeFactory
     public function build(
         ?ReflectionType $reflectionType,
         ReflectionClass|string $class,
-        ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
+        ReflectionProperty|ReflectionParameter|string $typeable,
     ): DataType {
         $properties = $this->infer(
             reflectionType: $reflectionType,

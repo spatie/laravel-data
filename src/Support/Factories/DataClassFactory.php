@@ -121,7 +121,10 @@ class DataClassFactory
     ): Collection {
         return collect($reflectionClass->getMethods())
             ->filter(fn (ReflectionMethod $reflectionMethod) => str_starts_with($reflectionMethod->name, 'from') || str_starts_with($reflectionMethod->name, 'collect'))
-            ->reject(fn (ReflectionMethod $reflectionMethod) => in_array($reflectionMethod->name, ['from', 'collect', 'collection']))
+            ->reject(fn (ReflectionMethod $reflectionMethod) => in_array($reflectionMethod->name, ['from', 'collect', 'collection'])
+                || $reflectionMethod->isStatic() === false
+                || $reflectionMethod->isPublic() === false
+            )
             ->mapWithKeys(
                 fn (ReflectionMethod $reflectionMethod) => [$reflectionMethod->name => $this->methodFactory->build($reflectionMethod, $reflectionClass)],
             );

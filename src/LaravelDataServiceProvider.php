@@ -34,12 +34,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
             fn () => $this->app->make(DataStructureCache::class)->getConfig() ?? DataConfig::createFromConfig(config('data'))
         );
 
-        /** @psalm-suppress UndefinedInterfaceMethod */
         $this->app->beforeResolving(BaseData::class, function ($class, $parameters, $app) {
-            if ($app->has($class)) {
-                return;
-            }
-
             $app->bind(
                 $class,
                 fn ($container) => $class::from($container['request'])

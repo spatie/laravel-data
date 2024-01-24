@@ -23,11 +23,6 @@ class DataCollectableAnnotationReader
     /** @var array<string, Context> */
     protected static array $contexts = [];
 
-    public static function create(): self
-    {
-        return new self();
-    }
-
     /** @return array<string, DataCollectableAnnotation> */
     public function getForClass(ReflectionClass $class): array
     {
@@ -166,46 +161,6 @@ class DataCollectableAnnotationReader
         $class = $this->resolveFcqn($reflection, $class);
 
         if (is_subclass_of($class, BaseData::class)) {
-            return $class;
-        }
-
-        return null;
-    }
-
-    protected function resolveCollectionClass(
-        ReflectionProperty|ReflectionClass|ReflectionMethod $reflection,
-        string $class
-    ): ?string {
-        if (str_contains($class, '|')) {
-            foreach (explode('|', $class) as $explodedClass) {
-                if ($foundClass = $this->resolveCollectionClass($reflection, $explodedClass)) {
-                    return $foundClass;
-                }
-            }
-
-            return null;
-        }
-
-        if ($class === 'array') {
-            return $class;
-        }
-
-        $class = ltrim($class, '\\');
-
-        if (is_a($class, BaseDataCollectable::class, true)
-            || is_a($class, Enumerable::class, true)
-            || is_a($class, AbstractPaginator::class, true)
-            || is_a($class, CursorPaginator::class, true)
-        ) {
-            return $class;
-        }
-
-        $class = $this->resolveFcqn($reflection, $class);
-
-        if (is_a($class, BaseDataCollectable::class, true)
-            || is_a($class, Enumerable::class, true)
-            || is_a($class, AbstractPaginator::class, true)
-            || is_a($class, CursorPaginator::class, true)) {
             return $class;
         }
 
