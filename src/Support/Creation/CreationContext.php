@@ -25,9 +25,12 @@ class CreationContext
 {
     /**
      * @param class-string<TData> $dataClass
+     * @param array<string|int> $currentPath
      */
     public function __construct(
         public string $dataClass,
+        public array $mappedProperties,
+        public array $currentPath,
         public readonly ValidationStrategy $validationStrategy,
         public readonly bool $mapPropertyNames,
         public readonly bool $disableMagicalCreation,
@@ -66,5 +69,25 @@ class CreationContext
             $items,
             $into
         );
+    }
+
+    /** @internal */
+    public function next(
+        string $dataClass,
+        string|int $path,
+    ): self {
+        $this->dataClass = $dataClass;
+
+        array_push($this->currentPath, $path);
+
+        return $this;
+    }
+
+    /** @internal */
+    public function previous(): self
+    {
+        array_pop($this->currentPath);
+
+        return $this;
     }
 }

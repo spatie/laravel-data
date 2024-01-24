@@ -2395,3 +2395,23 @@ it('is possible to define the validation strategy for each data object globally 
     expect(fn () => $dataClass::from(['string' => 'Nowp']))
         ->toThrow(ValidationException::class);
 });
+
+it('handles validation problem B', function (){
+    #[MapInputName(SnakeCaseMapper::class)]
+    class CheerPointTeamRequest extends Data
+    {
+        public function __construct(
+            #[Required]
+            public readonly int $matchId,
+
+            #[Required]
+            public readonly int $teamId,
+        ) {
+        }
+    }
+
+    $data = CheerPointTeamRequest::factory()->alwaysValidate()->from([
+        'match_id' => 1,
+        'team_id' => 2,
+    ]);
+});

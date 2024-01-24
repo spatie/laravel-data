@@ -155,6 +155,8 @@ class CreationContextFactory
     {
         return new CreationContext(
             dataClass: $this->dataClass,
+            mappedProperties: [],
+            currentPath: [],
             validationStrategy: $this->validationStrategy,
             mapPropertyNames: $this->mapPropertyNames,
             disableMagicalCreation: $this->disableMagicalCreation,

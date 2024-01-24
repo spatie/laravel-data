@@ -141,10 +141,13 @@ class DataCollectableFromSomethingResolver
         }
 
         if (is_array($items)) {
-            return array_map(
-                $this->itemsToDataClosure($dataClass, $creationContext),
-                $items
-            );
+            $payload = [];
+
+            foreach ($items as $index => $item) {
+                $payload[$index] = $this->itemsToDataClosure($dataClass, $creationContext)($item, $index);
+            }
+
+            return $payload;
         }
 
         throw new Exception('Unable to normalize items');
@@ -200,6 +203,18 @@ class DataCollectableFromSomethingResolver
         string $dataClass,
         CreationContext $creationContext
     ): Closure {
-        return fn (mixed $data) => $data instanceof $dataClass ? $data : $dataClass::factory($creationContext)->from($data);
+        return function (mixed $data, int|string $index) use ($dataClass, $creationContext) {
+            if ($data instanceof $dataClass) {
+                return $data;
+            }
+
+            $creationContext->next($dataClass, $index);
+
+            $data = $creationContext->from($data);
+
+            $creationContext->previous();
+
+            return $data;
+        };
     }
 }

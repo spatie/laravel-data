@@ -44,7 +44,7 @@ interface BaseData
      *
      * @return ($creationContext is null ? CreationContextFactory<static> : CreationContext<static>)
      */
-    public static function factory(?CreationContext $creationContext = null): CreationContextFactory|CreationContext;
+    public static function factory(): CreationContextFactory;
 
     public static function normalizers(): array;
 

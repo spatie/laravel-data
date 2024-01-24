@@ -51,14 +51,8 @@ trait BaseData
         return static::factory()->collect($items, $into);
     }
 
-    public static function factory(?CreationContext $creationContext = null): CreationContextFactory|CreationContext
+    public static function factory(): CreationContextFactory
     {
-        if ($creationContext) {
-            $creationContext->dataClass = static::class;
-
-            return $creationContext;
-        }
-
         return CreationContextFactory::createFromConfig(static::class);
     }
 
