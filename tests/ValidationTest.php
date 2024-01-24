@@ -14,6 +14,10 @@ use Illuminate\Validation\Rules\In as LaravelIn;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
+use Spatie\LaravelData\Attributes\Validation\ExcludeIf;
+use Spatie\LaravelData\RuleInferrers\RuleInferrer;
+use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Validation\PropertyRules;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
@@ -1052,7 +1056,7 @@ it('can nest data in collections using relative rule generation', function () {
                 ],
             ]
         );
-})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+});
 
 it('supports required without validation for optional collections', function () {
     $dataClass = new class () extends Data {
@@ -1154,7 +1158,7 @@ it('can nest data in classes inside collections using relative rule generation',
             'collection.0.nested.string' => [__('validation.email', ['attribute' => 'collection.0.nested.string'])],
             'collection.2.nested.string' => [__('validation.email', ['attribute' => 'collection.2.nested.string'])],
         ]);
-})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+});
 
 it('can nest data in deep collections using relative rule generation', function () {
     class ValidationTestDeepNestedDataWithContextOverwrittenRules extends Data
@@ -1255,7 +1259,7 @@ it('can nest data in deep collections using relative rule generation', function 
             'collection.1.string' => [__('validation.email', ['attribute' => 'collection.1.string'])],
             'collection.1.items.0.deep_string' => [__('validation.email', ['attribute' => 'collection.1.items.0.deep string'])],
         ]);
-})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+});
 
 it('can nest data using relative rule generation', function () {
     $dataClass = new class () extends Data {
@@ -1276,7 +1280,7 @@ it('can nest data using relative rule generation', function () {
             'nested.validate_as_email' => ['boolean', 'required'],
         ], $payload)
         ->assertErrors($payload);
-})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+});
 
 it('correctly_injects_context_in_the_rules_method', function () {
     class NestedClassJ extends Data
@@ -1436,7 +1440,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
             'nested.collection.0.collection' => ['present', 'array'],
             'nested.collection.0.collection.0.property' => ['required', 'string'],
         ], $payload);
-})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+});
 
 it('will merge overwritten rules on inherited data objects', function () {
     $data = new class () extends Data {
@@ -1459,7 +1463,7 @@ it('will merge overwritten rules on inherited data objects', function () {
         'collection' => ['present', 'array'],
         'collection.0.string' => ['string', 'required', 'min:10', 'max:100'],
     ], $payload)->assertErrors($payload);
-})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+});
 
 it('will reduce attribute rules to Laravel rules in the end', function () {
     $dataClass = new class () extends Data {

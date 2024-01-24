@@ -119,6 +119,36 @@ Previously when trying to include, exclude, only or except certain data properti
 continued working. From now on an exception will be thrown, these exceptions can be silenced by
 setting `ignore_invalid_partials` to `true` within the config file
 
+**Validated payloads (Likelihood Of Impact: Medium)**
+
+Previously when validating data, the data object was being created from the payload provided, not the validated payload.
+
+This payload can differ once you start using `exclude` rules which will exclude certain properties after validation.
+
+Be sure that these properties are now typed as `Optional` since they can be missing from the payload.
+
+```php
+// v3
+
+class SomeData extends Data {
+    #[ExcludeIf('excludeProperty', true)]
+    public string $property;
+    public bool $excludeProperty;
+} 
+// Providing ['property' => 'something', 'excludeProperty' => true] will result in both fields set
+
+// v4
+
+class SomeData extends Data {
+    #[ExcludeIf('excludeProperty', true)]
+    public string|Optional $property;
+    public bool $excludeProperty;
+}
+// Providing ['property' => 'something', 'excludeProperty' => true] will result in only the excludeProperty field set, the property field will be optional
+```
+
+Also notice, nested data objects will use the `required` rule, Laravel validation will not include the nested array in the validated payload when this array is empty.
+
 **Internal data structure changes (Likelihood Of Impact: Low)**
 
 If you use internal data structures like `DataClass` and `DataProperty` then take a look at these classes, a lot as
@@ -136,7 +166,7 @@ look what has changed:
 
 **ValidatePropertiesDataPipe (Likelihood Of Impact: Low)**
 
-If you've used the `ValidatePropertiesDataPipe::allTypes` parameter to validate all types, then please use the new
+If you've used the `ValidatePropertiesDataPipe::allTypes` parameter to validate all types, then please use Spatie\LaravelData\Attributes\Validation\ExcludeIf;use Spatie\LaravelData\Optional;use the new
 context when creating a data object to enable this or update your `data.php` config file with the new default.
 
 **Removal of `withoutMagicalCreationFrom` (Likelihood Of Impact: Low)**

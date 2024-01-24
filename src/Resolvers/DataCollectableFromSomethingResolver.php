@@ -37,15 +37,16 @@ class DataCollectableFromSomethingResolver
         mixed $items,
         ?string $into = null,
     ): array|DataCollection|PaginatedDataCollection|CursorPaginatedDataCollection|Enumerable|AbstractPaginator|Paginator|AbstractCursorPaginator|CursorPaginator {
-        $intoType = $into !== null
-            ? $this->dataReturnTypeFactory->buildFromNamedType($into, $dataClass, nullable: false)
-            : $this->dataReturnTypeFactory->buildFromValue($items, $dataClass, nullable: false);
-
         $collectable = $this->createFromCustomCreationMethod($dataClass, $creationContext, $items, $into);
 
         if ($collectable) {
             return $collectable;
         }
+
+        /** @var NamedType $intoType */
+        $intoType = $into !== null
+            ? $this->dataReturnTypeFactory->buildFromNamedType($into, $dataClass, nullable: false)->type
+            : $this->dataReturnTypeFactory->buildFromValue($items, $dataClass, nullable: false)->type;
 
         $collectableMetaData = CollectableMetaData::fromOther($items);
 
@@ -53,13 +54,13 @@ class DataCollectableFromSomethingResolver
 
         return match ($intoType->kind) {
             DataTypeKind::DataArray => $this->normalizeToArray($normalizedItems),
-            DataTypeKind::DataEnumerable => new $intoType->type->name($this->normalizeToArray($normalizedItems)),
-            DataTypeKind::DataCollection => new $intoType->type->name($dataClass, $this->normalizeToArray($normalizedItems)),
-            DataTypeKind::DataPaginatedCollection => new $intoType->type->name($dataClass, $this->normalizeToPaginator($normalizedItems, $collectableMetaData)),
-            DataTypeKind::DataCursorPaginatedCollection => new $intoType->type->name($dataClass, $this->normalizeToCursorPaginator($normalizedItems, $collectableMetaData)),
+            DataTypeKind::DataEnumerable => new $intoType->name($this->normalizeToArray($normalizedItems)),
+            DataTypeKind::DataCollection => new $intoType->name($dataClass, $this->normalizeToArray($normalizedItems)),
+            DataTypeKind::DataPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToPaginator($normalizedItems, $collectableMetaData)),
+            DataTypeKind::DataCursorPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToCursorPaginator($normalizedItems, $collectableMetaData)),
             DataTypeKind::DataPaginator => $this->normalizeToPaginator($normalizedItems, $collectableMetaData),
             DataTypeKind::DataCursorPaginator => $this->normalizeToCursorPaginator($normalizedItems, $collectableMetaData),
-            default => throw CannotCreateDataCollectable::create(get_debug_type($items), $intoType->type->name)
+            default => throw CannotCreateDataCollectable::create(get_debug_type($items), $intoType->name)
         };
     }
 
