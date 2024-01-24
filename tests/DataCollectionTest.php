@@ -128,6 +128,17 @@ it('is iteratable', function () {
     expect($letters)->toMatchArray(['A', 'B', 'C', 'D']);
 });
 
+it('can add items', function () {
+    $collection = SimpleData::collection([
+        'A', 'B', 'C',
+    ]);
+
+    $collection->push('D', 'E');
+
+    expect($collection)->toHaveCount(5);
+    expect($collection[3])->toEqual(SimpleData::from('D')->withPartialTrees(new PartialTrees()));
+});
+
 it('has array access', function () {
     $collection = SimpleData::collection([
         'A', 'B', SimpleData::from('C'), SimpleData::from('D'),

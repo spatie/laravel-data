@@ -78,6 +78,20 @@ class DataCollection implements DataCollectable, ArrayAccess
     }
 
     /**
+     * @param TValue ...$values
+     *
+     * @return static
+     */
+    public function push(...$values): static
+    {
+        foreach ($values as $value) {
+            $this[] = $value;
+        }
+
+        return $this;
+    }
+
+    /**
      * @param TKey $offset
      *
      * @return bool
