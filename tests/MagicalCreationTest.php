@@ -324,10 +324,10 @@ it('can use a string to collect data into', function (
     array|object $expected,
 ) {
     expect(SimpleData::collect(['A', 'B'], $into))->toEqual($expected);
-})->with(function(){
+})->with(function () {
     yield 'array' => [
         'array',
-        fn() => [
+        fn () => [
             SimpleData::from('A'),
             SimpleData::from('B'),
         ],
@@ -335,7 +335,7 @@ it('can use a string to collect data into', function (
 
     yield 'laravel collection' => [
         Collection::class,
-        fn() => collect([
+        fn () => collect([
             SimpleData::from('A'),
             SimpleData::from('B'),
         ]),
@@ -343,7 +343,7 @@ it('can use a string to collect data into', function (
 
     yield 'laravel lazy collection' => [
         LazyCollection::class,
-        fn() =>new LazyCollection([
+        fn () => new LazyCollection([
             SimpleData::from('A'),
             SimpleData::from('B'),
         ]),
@@ -351,7 +351,7 @@ it('can use a string to collect data into', function (
 
     yield 'data collection' => [
         DataCollection::class,
-        fn() => new DataCollection(SimpleData::class, [
+        fn () => new DataCollection(SimpleData::class, [
             SimpleData::from('A'),
             SimpleData::from('B'),
         ]),
@@ -359,7 +359,7 @@ it('can use a string to collect data into', function (
 
     yield 'data paginated collection' => [
         PaginatedDataCollection::class,
-        fn() => new PaginatedDataCollection(SimpleData::class,new LengthAwarePaginator( [
+        fn () => new PaginatedDataCollection(SimpleData::class, new LengthAwarePaginator([
             SimpleData::from('A'),
             SimpleData::from('B'),
         ], 2, 15)),
@@ -367,7 +367,7 @@ it('can use a string to collect data into', function (
 
     yield 'data cursor paginated collection' => [
         CursorPaginatedDataCollection::class,
-        fn() => new CursorPaginatedDataCollection(SimpleData::class,new CursorPaginator( [
+        fn () => new CursorPaginatedDataCollection(SimpleData::class, new CursorPaginator([
             SimpleData::from('A'),
             SimpleData::from('B'),
         ], 15)),
@@ -375,7 +375,7 @@ it('can use a string to collect data into', function (
 
     yield 'paginator' => [
         LengthAwarePaginator::class,
-        fn() => new LengthAwarePaginator([
+        fn () => new LengthAwarePaginator([
             SimpleData::from('A'),
             SimpleData::from('B'),
         ], 2, 15),
@@ -383,7 +383,7 @@ it('can use a string to collect data into', function (
 
     yield 'cursor paginator' => [
         CursorPaginator::class,
-        fn() => new CursorPaginator([
+        fn () => new CursorPaginator([
             SimpleData::from('A'),
             SimpleData::from('B'),
         ], 15),
@@ -391,7 +391,7 @@ it('can use a string to collect data into', function (
 
     yield 'custom data collection' => [
         CustomDataCollection::class,
-        fn() => new CustomDataCollection(SimpleData::class, [
+        fn () => new CustomDataCollection(SimpleData::class, [
             SimpleData::from('A'),
             SimpleData::from('B'),
         ]),

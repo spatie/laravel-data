@@ -26,7 +26,6 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDto;
 use Spatie\LaravelData\Tests\Fakes\SimpleResource;
 
-use Symfony\Component\VarDumper\VarDumper;
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('also works by using traits and interfaces, skipping the base data class', function () {

@@ -126,7 +126,7 @@ it('can determine the return type from reflection', function (
     ];
 });
 
-it('will return null when a method does not have a return type', function (){
+it('will return null when a method does not have a return type', function () {
     $factory = app(DataReturnTypeFactory::class);
 
     $reflection = new ReflectionMethod(\TestReturnTypeSubject::class, 'none');
@@ -134,7 +134,7 @@ it('will return null when a method does not have a return type', function (){
     expect($factory->build($reflection, TestReturnTypeSubject::class))->toBeNull();
 });
 
-it('can handle union types', function (){
+it('can handle union types', function () {
     $factory = app(DataReturnTypeFactory::class);
 
     $reflection = new ReflectionMethod(\TestReturnTypeSubject::class, 'union');

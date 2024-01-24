@@ -317,9 +317,8 @@ it('can use one attribute on the class to map properties when creating', functio
         ]));
 });
 
-it('has a mappers built in', function (){
-    $data  = new class extends Data
-    {
+it('has a mappers built in', function () {
+    $data = new class () extends Data {
         #[MapName(CamelCaseMapper::class)]
         public string $camel_case = 'camelCase';
 
@@ -351,4 +350,3 @@ it('has a mappers built in', function (){
         ->studly_case->toBe('StudlyCase')
         ->provided->toBe('provided');
 });
-

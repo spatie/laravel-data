@@ -21,7 +21,6 @@ use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Support\Factories\DataReturnTypeFactory;
-use Spatie\LaravelData\Support\Types\NamedType;
 
 class DataCollectableFromSomethingResolver
 {
