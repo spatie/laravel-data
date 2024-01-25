@@ -2396,7 +2396,7 @@ it('is possible to define the validation strategy for each data object globally 
         ->toThrow(ValidationException::class);
 });
 
-it('handles validation with mapped attributes', function (){
+it('handles validation with mapped attributes', function () {
     #[MapInputName(SnakeCaseMapper::class)]
     class TestValidationWithClassMappedAttribute extends Data
     {
