@@ -9,8 +9,7 @@ class UnserializeCast implements Cast
 {
     public function __construct(
         private bool $failSilently = false,
-    )
-    {
+    ) {
     }
 
     public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): mixed
@@ -23,7 +22,7 @@ class UnserializeCast implements Cast
         try {
             return unserialize($value);
         } catch (\Throwable $e) {
-            if($this->failSilently){
+            if($this->failSilently) {
                 return Uncastable::create();
             }
 

@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Transformers;
 
-use App\Support\Models\Model;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
 

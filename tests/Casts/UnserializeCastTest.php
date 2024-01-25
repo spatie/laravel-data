@@ -1,6 +1,5 @@
 <?php
 
-use Spatie\LaravelData\Casts\EnumCast;
 use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Casts\UnserializeCast;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
@@ -26,7 +25,7 @@ it('will unserialize an object', function () {
     )->toEqual(DummyBackedEnum::FOO);
 });
 
-it('will throw an exception when the unserialization fails', function (){
+it('will throw an exception when the unserialization fails', function () {
     $class = new class () {
         public DummyBackedEnum $enum;
     };
@@ -34,7 +33,7 @@ it('will throw an exception when the unserialization fails', function (){
     $cast = new UnserializeCast();
 
     expect(
-        fn() => $cast->cast(
+        fn () => $cast->cast(
             FakeDataStructureFactory::property($class, 'enum'),
             'foo',
             [],
@@ -43,7 +42,7 @@ it('will throw an exception when the unserialization fails', function (){
     )->toThrow(ErrorException::class);
 });
 
-it('can fail silently', function (){
+it('can fail silently', function () {
     $class = new class () {
         public DummyBackedEnum $enum;
     };
