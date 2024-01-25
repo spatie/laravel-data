@@ -19,8 +19,10 @@ class DataValidatorResolver
     }
 
     /** @param class-string<ValidateableData&BaseData> $dataClass */
-    public function execute(string $dataClass, Arrayable|array $payload): Validator
-    {
+    public function execute(
+        string $dataClass,
+        Arrayable|array $payload,
+    ): Validator {
         $payload = $payload instanceof Arrayable ? $payload->toArray() : $payload;
 
         $rules = $this->dataValidationRulesResolver->execute(

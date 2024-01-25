@@ -31,7 +31,7 @@ class CreationContext
         public string $dataClass,
         public array $mappedProperties,
         public array $currentPath,
-        public readonly ValidationStrategy $validationStrategy,
+        public ValidationStrategy $validationStrategy,
         public readonly bool $mapPropertyNames,
         public readonly bool $disableMagicalCreation,
         public readonly ?array $ignoredMagicalMethods,

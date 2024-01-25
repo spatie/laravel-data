@@ -73,7 +73,7 @@ public function cast(DataProperty $property, mixed $value, array $properties, Cr
 
 **The transform method (Likelihood Of Impact: Medium)**
 
-The transform method singature was changed to use a factory pattern instead of paramaters:
+The transform method signature was changed to use a factory pattern instead of parameters:
 
 ```php
 // v3
@@ -194,6 +194,10 @@ If you were using the `DataCollectableTransformer` or `DataTransformer` then ple
 **Removal of `DataObject` and `DataCollectable` (Likelihood Of Impact: Low)**
 
 If you were using the `DataObject` or `DataCollectable` interfaces then please replace the interfaces based upon the `Data` and `DataCollection` interfaces to your preference.
+
+**ValidationPath changes (Likelihood Of Impact: Low)**
+
+If you were manually constructing a `ValidationPath` then please make sure to use an array instead of a string or null for the root level.
 
 **Some advice with this new version of laravel-data**
 

@@ -85,7 +85,7 @@ class DataValidationAsserter
             $this->dataClass,
             $this->pipePayload($payload),
             ValidationPath::create(),
-            DataRules::create()
+            DataRules::create(),
         );
 
         $parser = new ValidationRuleParser($payload);

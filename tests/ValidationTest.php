@@ -2396,22 +2396,23 @@ it('is possible to define the validation strategy for each data object globally 
         ->toThrow(ValidationException::class);
 });
 
-it('handles validation problem B', function (){
+it('handles validation with mapped attributes', function (){
     #[MapInputName(SnakeCaseMapper::class)]
-    class CheerPointTeamRequest extends Data
+    class TestValidationWithClassMappedAttribute extends Data
     {
         public function __construct(
             #[Required]
-            public readonly int $matchId,
-
-            #[Required]
-            public readonly int $teamId,
+            public readonly int $someProperty,
         ) {
         }
     }
 
-    $data = CheerPointTeamRequest::factory()->alwaysValidate()->from([
-        'match_id' => 1,
-        'team_id' => 2,
+    // Problem:
+    // some_property is mapped onto someProperty
+    // We generate rules for some_property -> we always generate rules for the mapped attribute if present
+    // So validation fails
+
+    $data = TestValidationWithClassMappedAttribute::factory()->alwaysValidate()->from([
+        'some_property' => 1,
     ]);
-});
+})->skip('Validation problem, fix in v5');

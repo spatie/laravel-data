@@ -15,7 +15,9 @@ class ValidatePropertiesDataPipe implements DataPipe
         array $properties,
         CreationContext $creationContext
     ): array {
-        if ($creationContext->validationStrategy === ValidationStrategy::Disabled) {
+        if ($creationContext->validationStrategy === ValidationStrategy::Disabled
+            || $creationContext->validationStrategy === ValidationStrategy::AlreadyRan
+        ) {
             return $properties;
         }
 
@@ -23,6 +25,10 @@ class ValidatePropertiesDataPipe implements DataPipe
             return $properties;
         }
 
-        return ($class->name)::validate($properties);
+        ($class->name)::validate($properties);
+
+        $creationContext->validationStrategy = ValidationStrategy::AlreadyRan;
+
+        return $properties;
     }
 }

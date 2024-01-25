@@ -31,7 +31,7 @@ class DataValidationRulesResolver
         string $class,
         array $fullPayload,
         ValidationPath $path,
-        DataRules $dataRules,
+        DataRules $dataRules
     ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
 

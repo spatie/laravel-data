@@ -4,9 +4,12 @@ namespace Spatie\LaravelData\Support;
 
 use Spatie\LaravelData\Resolvers\DataCollectableFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
+use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
+use Spatie\LaravelData\Resolvers\DataValidatorResolver;
 use Spatie\LaravelData\Resolvers\RequestQueryStringPartialsResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataCollectableResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataResolver;
+use Spatie\LaravelData\Resolvers\ValidatedPayloadResolver;
 use Spatie\LaravelData\Support\Factories\DataClassFactory;
 
 class DataContainer
@@ -22,6 +25,10 @@ class DataContainer
     protected ?DataFromSomethingResolver $dataFromSomethingResolver = null;
 
     protected ?DataCollectableFromSomethingResolver $dataCollectableFromSomethingResolver = null;
+
+    protected ?DataValidatorResolver $dataValidatorResolver = null;
+
+    protected ?ValidatedPayloadResolver $validatedPayloadResolver = null;
 
     protected ?DataClassFactory $dataClassFactory = null;
 
@@ -56,6 +63,16 @@ class DataContainer
     public function dataFromSomethingResolver(): DataFromSomethingResolver
     {
         return $this->dataFromSomethingResolver ??= app(DataFromSomethingResolver::class);
+    }
+
+    public function dataValidatorResolver(): DataValidatorResolver
+    {
+        return $this->dataValidatorResolver ??= app(DataValidatorResolver::class);
+    }
+
+    public function validatedPayloadResolver(): ValidatedPayloadResolver
+    {
+        return $this->validatedPayloadResolver ??= app(ValidatedPayloadResolver::class);
     }
 
     public function dataCollectableFromSomethingResolver(): DataCollectableFromSomethingResolver

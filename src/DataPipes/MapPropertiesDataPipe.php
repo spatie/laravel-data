@@ -29,6 +29,7 @@ class MapPropertiesDataPipe implements DataPipe
             }
 
             $properties[$dataProperty->name] = Arr::get($properties, $dataProperty->inputMappedName);
+//            Arr::forget($properties, $dataProperty->inputMappedName);
 
             $this->addPropertyMappingToCreationContext(
                 $creationContext,
