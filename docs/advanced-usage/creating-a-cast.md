@@ -37,6 +37,7 @@ You may want to allow your application's value objects to define their own custo
 
 ```php
 class ForgotPasswordRequest extends Data
+{
     public function __construct(
         #[WithCastable(Email::class)]
         public Email $email,
@@ -49,6 +50,7 @@ When using `Castable` classes, you may still provide arguments in the `WithCasta
 
 ```php
 class DuplicateEmailCheck extends Data
+{
     public function __construct(
         #[WithCastable(Email::class, normalize: true)]
         public Email $email,
