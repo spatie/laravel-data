@@ -152,7 +152,7 @@ it('can collect using a factory', function () {
 });
 
 
-it('is possible to pass another creationContext to a factory as base', function (){
+it('is possible to pass another creationContext to a factory as base', function () {
     $baseCreationContext = CreationContextFactory::createFromConfig(SimpleData::class)
         ->alwaysValidate()
         ->get();
