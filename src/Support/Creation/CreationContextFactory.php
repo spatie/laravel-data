@@ -53,10 +53,11 @@ class CreationContextFactory
     }
 
     public static function createFromCreationContext(
-        CreationContext $creationContext
+        string $dataClass,
+        CreationContext $creationContext,
     ): self {
         return new self(
-            dataClass: $creationContext->dataClass,
+            dataClass: $dataClass,
             validationStrategy: $creationContext->validationStrategy,
             mapPropertyNames: $creationContext->mapPropertyNames,
             disableMagicalCreation: $creationContext->disableMagicalCreation,
