@@ -13,9 +13,6 @@ use function PHPStan\Testing\assertType;
 $factory = SimpleData::factory();
 assertType(CreationContextFactory::class.'<'.SimpleData::class.'>', $factory);
 
-$factory = SimpleDto::factory(CreationContextFactory::createFromConfig(SimpleData::class)->get());
-assertType(CreationContext::class.'<'.SimpleDto::class.'>' , $factory); // From SimpleData to SimpleDto
-
 // Data
 
 $data = SimpleData::factory()->from('Hello World');

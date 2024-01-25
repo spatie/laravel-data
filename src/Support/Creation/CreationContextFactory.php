@@ -20,7 +20,7 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataContainer;
 
 /**
- * @template TData of BaseData
+ * @template TData
  */
 class CreationContextFactory
 {
@@ -168,7 +168,7 @@ class CreationContextFactory
     /**
      * @return TData
      */
-    public function from(mixed ...$payloads): BaseData
+    public function from(mixed ...$payloads)
     {
         return DataContainer::get()->dataFromSomethingResolver()->execute(
             $this->dataClass,

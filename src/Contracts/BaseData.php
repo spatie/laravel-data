@@ -20,11 +20,15 @@ use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 
 /**
- * @template TValue
+ * @template TData
+ * @template TValue of mixed
  * @template TKey of array-key
  */
 interface BaseData
 {
+    /**
+     * @return static|null
+     */
     public static function optional(mixed ...$payloads): ?static;
 
     /**
@@ -40,9 +44,7 @@ interface BaseData
     public static function collect(mixed $items, ?string $into = null): array|DataCollection|PaginatedDataCollection|CursorPaginatedDataCollection|Enumerable|AbstractPaginator|PaginatorContract|AbstractCursorPaginator|CursorPaginatorContract|LazyCollection|Collection;
 
     /**
-     * @param CreationContext<static>|null $creationContext
-     *
-     * @return ($creationContext is null ? CreationContextFactory<static> : CreationContext<static>)
+     * @return CreationContextFactory<static>
      */
     public static function factory(): CreationContextFactory;
 
