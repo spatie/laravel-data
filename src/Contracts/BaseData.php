@@ -16,6 +16,7 @@ use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\PaginatedDataCollection;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 
 /**
@@ -45,7 +46,7 @@ interface BaseData
     /**
      * @return CreationContextFactory<static>
      */
-    public static function factory(): CreationContextFactory;
+    public static function factory(?CreationContext $creationContext = null): CreationContextFactory;
 
     public static function normalizers(): array;
 

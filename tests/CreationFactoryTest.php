@@ -5,7 +5,9 @@ use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\Validation\In;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\Creation\GlobalCastsCollection;
+use Spatie\LaravelData\Support\Creation\ValidationStrategy;
 use Spatie\LaravelData\Tests\Fakes\Casts\MeaningOfLifeCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -147,4 +149,15 @@ it('can collect using a factory', function () {
         ->toHaveCount(2)
         ->first()->string->toEqual('HELLO WORLD')
         ->last()->string->toEqual('HELLO YOU');
+});
+
+
+it('is possible to pass another creationContext to a factory as base', function (){
+    $baseCreationContext = CreationContextFactory::createFromConfig(SimpleData::class)
+        ->alwaysValidate()
+        ->get();
+
+    $creationContext = SimpleData::factory($baseCreationContext)->get();
+
+    expect($creationContext->validationStrategy)->toBe(ValidationStrategy::Always);
 });

@@ -19,6 +19,7 @@ use Spatie\LaravelData\DataPipes\FillRouteParameterPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\PaginatedDataCollection;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
@@ -50,8 +51,12 @@ trait BaseData
         return static::factory()->collect($items, $into);
     }
 
-    public static function factory(): CreationContextFactory
+    public static function factory(?CreationContext $creationContext = null): CreationContextFactory
     {
+        if ($creationContext) {
+            return CreationContextFactory::createFromCreationContext($creationContext);
+        }
+
         return CreationContextFactory::createFromConfig(static::class);
     }
 

@@ -52,6 +52,19 @@ class CreationContextFactory
         );
     }
 
+    public static function createFromCreationContext(
+        CreationContext $creationContext
+    ): self {
+        return new self(
+            dataClass: $creationContext->dataClass,
+            validationStrategy: $creationContext->validationStrategy,
+            mapPropertyNames: $creationContext->mapPropertyNames,
+            disableMagicalCreation: $creationContext->disableMagicalCreation,
+            ignoredMagicalMethods: $creationContext->ignoredMagicalMethods,
+            casts: $creationContext->casts,
+        );
+    }
+
     public function validationStrategy(ValidationStrategy $validationStrategy): self
     {
         $this->validationStrategy = $validationStrategy;
@@ -123,7 +136,7 @@ class CreationContextFactory
      */
     public function withCast(
         string $castable,
-        Cast | string $cast,
+        Cast|string $cast,
     ): self {
         $cast = is_string($cast) ? app($cast) : $cast;
 
@@ -187,7 +200,7 @@ class CreationContextFactory
     public function collect(
         mixed $items,
         ?string $into = null
-    ): array | DataCollection | PaginatedDataCollection | CursorPaginatedDataCollection | Enumerable | AbstractPaginator | PaginatorContract | AbstractCursorPaginator | CursorPaginatorContract | LazyCollection | Collection {
+    ): array|DataCollection|PaginatedDataCollection|CursorPaginatedDataCollection|Enumerable|AbstractPaginator|PaginatorContract|AbstractCursorPaginator|CursorPaginatorContract|LazyCollection|Collection {
         return DataContainer::get()->dataCollectableFromSomethingResolver()->execute(
             $this->dataClass,
             $this->get(),
