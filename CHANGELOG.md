@@ -12,10 +12,12 @@ All notable changes to `laravel-data` will be documented in this file.
 - Add support for using Laravel Model attributes as data properties
 - Allow creating data objects using `from` without parameters
 - Add support for a Dto and Resource object
+- It is now a lot easier to validate all the payloads added to laravel-data
 - Added contexts to the creation and transformation process
 - Allow creating a data object or collection using a factory
 - Speed up the process of creating and transforming data objects
 - Add support for BNF syntax
+- Laravel 10 requirement
 - Rewritten docs
 
 **Some more "internal" changes**
