@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataConfig;
 
@@ -33,12 +34,25 @@ class DataFromSomethingResolver
             return $data;
         }
 
-        $properties = [];
-
         $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
+
+        $payloadCount = count($payloads);
+
+        if ($payloadCount === 0 || $payloadCount === 1) {
+            return $this->dataFromArrayResolver->execute(
+                $class,
+                $pipeline->execute($payloads[0] ?? [], $creationContext)
+            );
+        }
+
+        $properties = [];
 
         foreach ($payloads as $payload) {
             foreach ($pipeline->execute($payload, $creationContext) as $key => $value) {
+                if (array_key_exists($key, $properties) && ($value === null || $value instanceof Optional)) {
+                    continue;
+                }
+
                 $properties[$key] = $value;
             }
         }

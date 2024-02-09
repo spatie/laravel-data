@@ -831,3 +831,46 @@ it('will allow a nested collection object to cast properties however it wants', 
             ModelData::collect([['id' => 10], ['id' => 20]], DataCollection::class)
         );
 });
+
+it('will ignore null or optional values, which are set by default in multiple payloads', function () {
+    $dataClass = new class extends Data {
+        public string $string;
+
+        public ?string $nullable;
+
+        public Optional|string $optional;
+    };
+
+    $data = $dataClass::from(
+        ['string' => 'string'],
+        ['nullable' => 'nullable'],
+        ['optional' => 'optional']
+    );
+
+    expect($data)
+        ->string->toEqual('string')
+        ->nullable->toEqual('nullable')
+        ->optional->toEqual('optional');
+
+    $data = $dataClass::from(
+        ['optional' => 'optional'],
+        ['string' => 'string'],
+        ['nullable' => 'nullable'],
+    );
+
+    expect($data)
+        ->string->toEqual('string')
+        ->nullable->toEqual('nullable')
+        ->optional->toEqual('optional');
+
+    $data = $dataClass::from(
+        ['nullable' => 'nullable'],
+        ['optional' => 'optional'],
+        ['string' => 'string'],
+    );
+
+    expect($data)
+        ->string->toEqual('string')
+        ->nullable->toEqual('nullable')
+        ->optional->toEqual('optional');
+});
