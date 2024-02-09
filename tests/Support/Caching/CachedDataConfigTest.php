@@ -87,7 +87,7 @@ it('will load cached data classes', function () {
         ->name->toBe(SimpleData::class);
 });
 
-it('can disable caching', function (){
+it('can disable caching', function () {
     config()->set('data.structure_caching.enabled', false);
 
     Cache::expects('get')->once();
@@ -97,7 +97,7 @@ it('can disable caching', function (){
     cache()->get('something-just-to-test-the-mock');
 });
 
-it('will not cache when unit testing', function (){
+it('will not cache when unit testing', function () {
     Cache::expects('get')->once();
 
     SimpleData::from('Hello world');
