@@ -20,29 +20,29 @@ class BuiltInTypesRuleInferrer implements RuleInferrer
         PropertyRules $rules,
         ValidationContext $context,
     ): PropertyRules {
-        if ($property->type->acceptsType('int')) {
+        if ($property->type->type->acceptsType('int')) {
             $rules->add(new Numeric());
         }
 
-        if ($property->type->acceptsType('string')) {
+        if ($property->type->type->acceptsType('string')) {
             $rules->add(new StringType());
         }
 
-        if ($property->type->acceptsType('bool')) {
+        if ($property->type->type->acceptsType('bool')) {
             $rules->removeType(RequiringRule::class);
 
             $rules->add(new BooleanType());
         }
 
-        if ($property->type->acceptsType('float')) {
+        if ($property->type->type->acceptsType('float')) {
             $rules->add(new Numeric());
         }
 
-        if ($property->type->acceptsType('array')) {
+        if ($property->type->type->acceptsType('array')) {
             $rules->add(new ArrayType());
         }
 
-        if ($enumClass = $property->type->findAcceptedTypeForBaseType(BackedEnum::class)) {
+        if ($enumClass = $property->type->type->findAcceptedTypeForBaseType(BackedEnum::class)) {
             $rules->add(new Enum($enumClass));
         }
 

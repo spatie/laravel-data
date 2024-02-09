@@ -14,6 +14,15 @@ class MultiLazyData extends Data
     ) {
     }
 
+    public static function fromMultiple(string $artist, string $name, int $year): static
+    {
+        return new self(
+            Lazy::create(fn () => $artist),
+            Lazy::create(fn () => $name),
+            Lazy::create(fn () => $year),
+        );
+    }
+
     public static function fromDto(DummyDto $dto)
     {
         return new self(

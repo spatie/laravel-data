@@ -1,6 +1,6 @@
 ---
 title: Wrapping
-weight: 3
+weight: 5
 ---
 
 By default, when a data object is transformed into JSON in your controller it looks like this:
@@ -61,7 +61,7 @@ Or you can set a global wrap key inside the `data.php` config file:
 Collections can be wrapped just like data objects:
 
 ```php
-SongData::collection(Song::all())->wrap('data');
+SongData::collect(Song::all())->wrap('data');
 ```
 
 The JSON will now look like this:
@@ -84,7 +84,7 @@ The JSON will now look like this:
 It is possible to set the data key in paginated collections:
 
 ```php
-SongData::collection(Song::paginate())->wrap('paginated_data');
+SongData::collect(Song::paginate())->wrap('paginated_data');
 ```
 
 Which will let the JSON look like this:
@@ -160,7 +160,7 @@ UserData::from(User::first())->wrap('data');
 A data collection inside a data object WILL get wrapped when a wrapping key is set:
 
 ```php
-use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\DataCollectionOf;use Spatie\LaravelData\DataCollection;
 
 class AlbumData extends Data
 {
@@ -175,7 +175,7 @@ class AlbumData extends Data
     {
         return new self(
             $album->title,
-            SongData::collection($album->songs)->wrap('data')
+            SongData::collect($album->songs, DataCollection::class)->wrap('data')
         );
     }
 }

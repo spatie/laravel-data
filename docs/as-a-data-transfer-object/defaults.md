@@ -1,6 +1,6 @@
 ---
 title: Default values
-weight: 6
+weight: 7
 ---
 
 There are a few ways to define default values for a data object. Since a data object is just a regular PHP class, you can use the constructor to set default values:
@@ -51,4 +51,4 @@ There are a few conditions for this approach:
 
 - You must always use a sole property, a property within the constructor definition won't work
 - The optional type is technically not required, but it's a good idea to use it otherwise the validation won't work
-- Validation won't be performed on the default value, so make sure it's valid
+- Validation won't be performed on the default value, so make sure it is valid

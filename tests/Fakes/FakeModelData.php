@@ -16,6 +16,8 @@ class FakeModelData extends Data
         public CarbonImmutable $date,
         #[DataCollectionOf(FakeNestedModelData::class)]
         public Optional|null|DataCollection $fake_nested_models,
+        public string $accessor,
+        public string $old_accessor,
     ) {
     }
 }

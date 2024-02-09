@@ -2,37 +2,41 @@
 
 namespace Spatie\LaravelData\DataPipes;
 
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataClass;
-use Spatie\LaravelData\Support\DataProperty;
 
 class DefaultValuesDataPipe implements DataPipe
 {
-    public function handle(mixed $payload, DataClass $class, Collection $properties): Collection
-    {
-        $class
-            ->properties
-            ->filter(fn (DataProperty $property) => ! $properties->has($property->name))
-            ->each(function (DataProperty $property) use (&$properties) {
-                if ($property->hasDefaultValue) {
-                    $properties[$property->name] = $property->defaultValue;
+    public function handle(
+        mixed $payload,
+        DataClass $class,
+        array $properties,
+        CreationContext $creationContext
+    ): array {
+        foreach ($class->properties as $name => $property) {
+            if(array_key_exists($name, $properties)) {
+                continue;
+            }
 
-                    return;
-                }
+            if ($property->hasDefaultValue) {
+                $properties[$name] = $property->defaultValue;
 
-                if ($property->type->isOptional) {
-                    $properties[$property->name] = Optional::create();
+                continue;
+            }
 
-                    return;
-                }
+            if ($property->type->isOptional) {
+                $properties[$name] = Optional::create();
 
-                if ($property->type->isNullable) {
-                    $properties[$property->name] = null;
+                continue;
+            }
 
-                    return;
-                }
-            });
+            if ($property->type->isNullable) {
+                $properties[$name] = null;
+
+                continue;
+            }
+        }
 
         return $properties;
     }

@@ -23,9 +23,15 @@ class UserData extends Data
      public static function allowedRequestExcept(): ?array
      {
          return [
-             'song' // Use the original name when defining includes, excludes, excepts and only
+             'song', // Use the original name when defining includes, excludes, excepts and only
          ];
      }
+     
+     public function rules(ValidContext $context): array {
+        return  [
+            'song' => 'required', // Use the original name when defining validation rules
+        ];
+    }
 
     // ...
  }
@@ -44,10 +50,18 @@ When adding an include, exclude, except or only:
 
 ```php
  UserData::from(User::first())->except('song'); // Always use the original name here
- ```
+```
 
 Within a request query, you can use the mapped or original name:
 
 ```
 https://spatie.be/my-account?except[]=favorite_song 
 ```
+
+When validating a data object or getting rules for a data object, always use payloads use the original name:
+
+```php
+UserData::validate($payload)
+UserData::getValidationRules($payload)
+```
+

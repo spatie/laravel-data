@@ -54,7 +54,7 @@ within the `data.php` config file:
 
 Now when casting a date, a valid format will be searched. When none can be found, an exception is thrown.
 
-When a transformers hasn't explicitly stated it's format, the first format within the array is used.
+When a transformers hasn't explicitly stated its format, the first format within the array is used.
 
 ## Casting dates in a different time zone
 

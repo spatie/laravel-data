@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData;
 
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\DataPipes\DataPipe;
 use Spatie\LaravelData\Normalizers\Normalizer;
 use Spatie\LaravelData\Support\DataConfig;
@@ -79,13 +78,5 @@ class DataPipeline
             $pipes,
             $this->dataConfig->getDataClass($this->classString)
         );
-    }
-
-    /** @deprecated */
-    public function execute(): Collection
-    {
-        return $this->dataConfig
-            ->getResolvedDataPipeline($this->classString)
-            ->execute($this->value);
     }
 }

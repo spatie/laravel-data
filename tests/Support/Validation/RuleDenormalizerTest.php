@@ -26,7 +26,7 @@ use Spatie\LaravelData\Tests\Fakes\Rules\CustomLaravelRule;
 it('can denormalize rules', function ($rule, $expected, $path = null) {
     $denormalizer = new RuleDenormalizer();
 
-    expect($denormalizer->execute($rule, $path ?? new ValidationPath(null)))->toEqual($expected);
+    expect($denormalizer->execute($rule, $path ?? ValidationPath::create(null)))->toEqual($expected);
 })->with([
     'string rule' => ['string', ['string']],
     'multi rule string' => ['string|required', ['string', 'required']],
@@ -47,7 +47,7 @@ it('can denormalize rules', function ($rule, $expected, $path = null) {
     'array parameter' => [new EndsWith(['test', DummyBackedEnum::BOO]), ['ends_with:test,boo']],
     'date parameter' => [new After(CarbonImmutable::create(2020, 05, 16, 12, tz: new CarbonTimeZone('Europe/Brussels'))), ['after:2020-05-16T12:00:00+02:00']],
     'field root reference parameter' => [new ExcludeWithout(new FieldReference('field')), ['exclude_without:field']],
-    'field nested reference parameter' => [new ExcludeWithout(new FieldReference('field')), ['exclude_without:nested.field'], new ValidationPath('nested')],
+    'field nested reference parameter' => [new ExcludeWithout(new FieldReference('field')), ['exclude_without:nested.field'], ValidationPath::create('nested')],
 ]);
 
 it('can denormalize rules with route parameter references', function () {
@@ -57,7 +57,7 @@ it('can denormalize rules with route parameter references', function () {
 
     $denormalizer = new RuleDenormalizer();
 
-    expect($denormalizer->execute(new Min(new RouteParameterReference('parameter')), new ValidationPath(null)))->toEqual([
+    expect($denormalizer->execute(new Min(new RouteParameterReference('parameter')), ValidationPath::create(null)))->toEqual([
         'min:69',
     ]);
 });

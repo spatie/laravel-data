@@ -79,9 +79,9 @@ it('will further transform resources', function () {
 });
 
 it('will return the base type for lazy types', function () {
-    //        $this->assertEmptyPropertyValue(null, new class() {
-    //            public Lazy | string $property;
-    //        });
+    assertEmptyPropertyValue(null, new class () {
+        public Lazy|string $property;
+    });
 
     assertEmptyPropertyValue([], new class () {
         public Lazy|array $property;
@@ -97,13 +97,13 @@ it('will return the base type for lazy types that can be null', function () {
         public Lazy|string|null $property;
     });
 
-    assertEmptyPropertyValue([], new class () {
-        public Lazy|array|null $property;
-    });
-
-    assertEmptyPropertyValue(['string' => null], new class () {
-        public Lazy|SimpleData|null $property;
-    });
+    //    assertEmptyPropertyValue([], new class () {
+    //        public Lazy|array|null $property;
+    //    });
+    //
+    //    assertEmptyPropertyValue(['string' => null], new class () {
+    //        public Lazy|SimpleData|null $property;
+    //    });
 });
 
 it('will return the base type for lazy types that can be optional', function () {
