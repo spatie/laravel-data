@@ -75,11 +75,15 @@ parameters:
 			count: 1
 			path: src/Data.php
 
-
 		-
 			message: "#^PHPDoc tag @return with type Spatie\\\\LaravelData\\\\DataCollection\\<int, TValue\\> is not subtype of native type static\\(Spatie\\\\LaravelData\\\\DataCollection\\<TKey of \\(int\\|string\\), TValue\\>\\)\\.$#"
 			count: 1
 			path: src/DataCollection.php
+
+		-
+			message: "#^Consider using bind method instead or pass a closure\\.$#"
+			count: 2
+			path: src/LaravelDataServiceProvider.php
 
 		-
 			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Pagination\\\\Paginator\\:\\:count\\(\\)\\.$#"
