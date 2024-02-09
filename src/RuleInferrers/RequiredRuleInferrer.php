@@ -31,7 +31,7 @@ class RequiredRuleInferrer implements RuleInferrer
             return false;
         }
 
-        if ($property->type->isDataCollectable && $rules->hasType(Present::class)) {
+        if ($property->type->kind->isDataCollectable() && $rules->hasType(Present::class)) {
             return false;
         }
 

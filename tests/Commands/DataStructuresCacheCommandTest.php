@@ -2,10 +2,20 @@
 
 use Illuminate\Support\Facades\App;
 use Spatie\LaravelData\Support\Caching\CachedDataConfig;
+use Spatie\LaravelData\Support\Caching\DataStructureCache;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 it('can cache data structures', function () {
+    // Ensure we cache
+    App::forgetInstance(DataConfig::class);
+    app()->singleton(
+        DataConfig::class,
+        function () {
+            return app()->make(DataStructureCache::class)->getConfig() ?? DataConfig::createFromConfig(config('data'));
+        }
+    );
+
     config()->set('data.structure_caching.directories', [
         __DIR__.'/../Fakes',
     ]);
@@ -23,7 +33,7 @@ it('can cache data structures', function () {
     $config = app(DataConfig::class);
 
     expect($config)->toBeInstanceOf(CachedDataConfig::class);
-    expect($config->getRuleInferrers())->toHaveCount(count(config('data.rule_inferrers')));
+    expect($config->ruleInferrers)->toHaveCount(count(config('data.rule_inferrers')));
     expect(invade($config)->transformers)->toHaveCount(count(config('data.transformers')));
     expect(invade($config)->casts)->toHaveCount(count(config('data.casts')));
 });

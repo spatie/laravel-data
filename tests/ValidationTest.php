@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
@@ -17,7 +18,9 @@ use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+
 use Spatie\LaravelData\Attributes\MapInputName;
+
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Bail;
@@ -31,6 +34,7 @@ use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\RequiredIf;
+use Spatie\LaravelData\Attributes\Validation\RequiredUnless;
 use Spatie\LaravelData\Attributes\Validation\RequiredWith;
 use Spatie\LaravelData\Attributes\Validation\RequiredWithout;
 use Spatie\LaravelData\Attributes\Validation\StringType;
@@ -38,19 +42,9 @@ use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
-use Spatie\LaravelData\DataPipeline;
-use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
-use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
-use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
-use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
-use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
-use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
-use Spatie\LaravelData\Normalizers\ArrayNormalizer;
-use Spatie\LaravelData\Normalizers\ModelNormalizer;
-use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 use Spatie\LaravelData\Optional;
-use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\Creation\ValidationStrategy;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
@@ -282,6 +276,19 @@ it('will never add extra require rules when not required', function () {
         'property' => ['string', 'required_with:other'],
     ]);
 });
+
+it('is possible to have multiple required rules', function () {
+    DataValidationAsserter::for(new class () extends Data {
+        #[RequiredUnless('is_required', false), RequiredWith('make_required')]
+        public string $property;
+        public string $make_required;
+        public bool $is_required;
+    })->assertRules([
+        'property' => ['string', 'required_unless:is_required', 'required_with:make_required'],
+        'make_required' => ['required', 'string'],
+        'is_required' => ['boolean'],
+    ]);
+})->skip('Add a new ruleinferrer to rule them all and make these cases better');
 
 it('it will take care of mapping', function () {
     DataValidationAsserter::for(new class () extends Data {
@@ -721,6 +728,7 @@ it('will validate a collection', function () {
         ->assertOk(['collection' => []])
         ->assertErrors(['collection' => null])
         ->assertErrors([])
+        ->assertErrors(['collection' => ['strings', 'here', 'instead', 'of', 'arrays']])
         ->assertErrors([
             'collection' => [
                 ['other_string' => 'Hello World'],
@@ -1059,7 +1067,7 @@ it('can nest data in collections using relative rule generation', function () {
                 ],
             ]
         );
-})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+});
 
 it('supports required without validation for optional collections', function () {
     $dataClass = new class () extends Data {
@@ -1161,7 +1169,7 @@ it('can nest data in classes inside collections using relative rule generation',
             'collection.0.nested.string' => [__('validation.email', ['attribute' => 'collection.0.nested.string'])],
             'collection.2.nested.string' => [__('validation.email', ['attribute' => 'collection.2.nested.string'])],
         ]);
-})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+});
 
 it('can nest data in deep collections using relative rule generation', function () {
     class ValidationTestDeepNestedDataWithContextOverwrittenRules extends Data
@@ -1262,7 +1270,7 @@ it('can nest data in deep collections using relative rule generation', function 
             'collection.1.string' => [__('validation.email', ['attribute' => 'collection.1.string'])],
             'collection.1.items.0.deep_string' => [__('validation.email', ['attribute' => 'collection.1.items.0.deep string'])],
         ]);
-})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+});
 
 it('can nest data using relative rule generation', function () {
     $dataClass = new class () extends Data {
@@ -1283,7 +1291,7 @@ it('can nest data using relative rule generation', function () {
             'nested.validate_as_email' => ['boolean', 'required'],
         ], $payload)
         ->assertErrors($payload);
-})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+});
 
 it('correctly_injects_context_in_the_rules_method', function () {
     class NestedClassJ extends Data
@@ -1443,7 +1451,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
             'nested.collection.0.collection' => ['present', 'array'],
             'nested.collection.0.collection.0.property' => ['required', 'string'],
         ], $payload);
-})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+});
 
 it('will merge overwritten rules on inherited data objects', function () {
     $data = new class () extends Data {
@@ -1466,7 +1474,7 @@ it('will merge overwritten rules on inherited data objects', function () {
         'collection' => ['present', 'array'],
         'collection.0.string' => ['string', 'required', 'min:10', 'max:100'],
     ], $payload)->assertErrors($payload);
-})->skip(version_compare(Application::VERSION, '9.0', '<'), 'Laravel too old');
+});
 
 it('will reduce attribute rules to Laravel rules in the end', function () {
     $dataClass = new class () extends Data {
@@ -1995,6 +2003,44 @@ it('can resolve validation dependencies for redirect url', function () {
     );
 });
 
+it('can manually set the redirect route', function () {
+    Route::get('/never-given-up', fn () => 'Never gonna give you up')->name('never-given-up');
+
+    $data = new class () extends Data {
+        public string $name;
+
+        public static function redirectRoute(): string
+        {
+            return 'never-given-up';
+        }
+    };
+
+    DataValidationAsserter::for($data)->assertRedirect(
+        payload: ['name' => null],
+        redirect: 'http://localhost/never-given-up'
+    );
+});
+
+it('can resolve validation dependencies for redirect route', function () {
+    FakeInjectable::setup('Rick Astley');
+
+    Route::get('/never-given-up', fn () => 'Never gonna give you up')->name('never-given-up');
+
+    $data = new class () extends Data {
+        public string $name;
+
+        public static function redirectRoute(FakeInjectable $injectable): string
+        {
+            return $injectable->value === 'Rick Astley' ? 'never-given-up' : 'given-up';
+        }
+    };
+
+    DataValidationAsserter::for($data)->assertRedirect(
+        payload: ['name' => null],
+        redirect: 'http://localhost/never-given-up'
+    );
+});
+
 it('can manually specify the validator', function () {
     $dataClass = new class () extends Data {
         public string $property;
@@ -2096,49 +2142,6 @@ it('can validate a payload for a data object and create one using a magic from m
 
     assertFalse(true, 'We should not end up here');
 });
-
-it('can validate non-requests payloads', function () {
-    $dataClass = new class () extends Data {
-        public static bool $validateAllTypes = false;
-
-        #[In('Hello World')]
-        public string $string;
-
-        public static function pipeline(): DataPipeline
-        {
-            return DataPipeline::create()
-                ->into(static::class)
-                ->normalizer(ModelNormalizer::class)
-                ->normalizer(ArrayableNormalizer::class)
-                ->normalizer(ObjectNormalizer::class)
-                ->normalizer(ArrayNormalizer::class)
-                ->through(AuthorizedDataPipe::class)
-                ->through(
-                    self::$validateAllTypes
-                        ? ValidatePropertiesDataPipe::allTypes()
-                        : ValidatePropertiesDataPipe::onlyRequests()
-                )
-                ->through(MapPropertiesDataPipe::class)
-                ->through(DefaultValuesDataPipe::class)
-                ->through(CastPropertiesDataPipe::class);
-        }
-    };
-
-    $data = $dataClass::from([
-        'string' => 'nowp',
-    ]);
-
-    expect($data)->toBeInstanceOf(Data::class)
-        ->string->toEqual('nowp');
-
-    app(DataConfig::class)->reset();
-
-    $dataClass::$validateAllTypes = true;
-
-    $data = $dataClass::from([
-        'string' => 'nowp',
-    ]);
-})->throws(ValidationException::class);
 
 it('can the validation rules for a data object', function () {
     expect(MultiData::getValidationRules([]))->toEqual([
@@ -2378,7 +2381,7 @@ it('can add a requiring rule on an attribute which will overwrite the optional t
     DataValidationAsserter::for($dataClass)
         ->assertOk(['success' => true, 'id' => 1])
         ->assertErrors(['success' => true]);
-})->skip('V4: The rule inferrers need to be rewritten/removed for this, we need to first add attribute rules and then decide require stuff');
+})->skip('V5: The rule inferrers need to be rewritten/removed for this, we need to first add attribute rules and then decide require stuff');
 
 it('can validate an optional but nonexists attribute', function () {
     $dataClass = new class () extends Data {
@@ -2391,3 +2394,40 @@ it('can validate an optional but nonexists attribute', function () {
     expect($dataClass::from(['property' => []])->toArray())->toBe(['property' => []]);
     expect($dataClass::validateAndCreate([])->toArray())->toBe([]);
 });
+
+it('is possible to define the validation strategy for each data object globally using config', function () {
+    $dataClass = new class () extends Data {
+        #[In('Hello World')]
+        public string $string;
+    };
+
+    expect($dataClass::from(['string' => 'Nowp']))
+        ->toBeInstanceOf(Data::class)
+        ->string->toBe('Nowp');
+
+    config()->set('data.validation_strategy', ValidationStrategy::Always->value);
+
+    expect(fn () => $dataClass::from(['string' => 'Nowp']))
+        ->toThrow(ValidationException::class);
+});
+
+it('handles validation with mapped attributes', function () {
+    #[MapInputName(SnakeCaseMapper::class)]
+    class TestValidationWithClassMappedAttribute extends Data
+    {
+        public function __construct(
+            #[Required]
+            public readonly int $someProperty,
+        ) {
+        }
+    }
+
+    // Problem:
+    // some_property is mapped onto someProperty
+    // We generate rules for some_property -> we always generate rules for the mapped attribute if present
+    // So validation fails
+
+    $data = TestValidationWithClassMappedAttribute::factory()->alwaysValidate()->from([
+        'some_property' => 1,
+    ]);
+})->skip('Validation problem, fix in v5');

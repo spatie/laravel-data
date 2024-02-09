@@ -3,13 +3,21 @@
 namespace Spatie\LaravelData;
 
 use Closure;
+use Countable;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\CursorPaginator;
+use IteratorAggregate;
 use Spatie\LaravelData\Concerns\BaseDataCollectable;
+use Spatie\LaravelData\Concerns\ContextableData;
 use Spatie\LaravelData\Concerns\IncludeableData;
 use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\WrappableData;
-use Spatie\LaravelData\Contracts\DataCollectable;
+use Spatie\LaravelData\Contracts\BaseDataCollectable as BaseDataCollectableContract;
+use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
+use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
+use Spatie\LaravelData\Contracts\TransformableData as TransformableDataContract;
+use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Exceptions\PaginatedCollectionIsAlwaysWrapped;
 use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
@@ -18,9 +26,9 @@ use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
  * @template TKey of array-key
  * @template TValue
  *
- * @implements  DataCollectable<TKey, TValue>
+ * @implements  IteratorAggregate<TKey, TValue>
  */
-class CursorPaginatedDataCollection implements DataCollectable
+class CursorPaginatedDataCollection implements Responsable, BaseDataCollectableContract, TransformableDataContract, ResponsableDataContract, IncludeableDataContract, WrappableDataContract, IteratorAggregate, Countable
 {
     use ResponsableData;
     use IncludeableData;
@@ -29,6 +37,7 @@ class CursorPaginatedDataCollection implements DataCollectable
 
     /** @use \Spatie\LaravelData\Concerns\BaseDataCollectable<TKey, TValue> */
     use BaseDataCollectable;
+    use ContextableData;
 
     /** @var CursorPaginator<TValue> */
     protected CursorPaginator $items;
@@ -47,9 +56,11 @@ class CursorPaginatedDataCollection implements DataCollectable
     }
 
     /**
-     * @param Closure(TValue, TKey): TValue $through
+     * @template TOtherValue
      *
-     * @return static
+     * @param Closure(TValue, TKey): TOtherValue $through
+     *
+     * @return static<TKey, TOtherValue>
      */
     public function through(Closure $through): static
     {

@@ -2,8 +2,8 @@
 
 namespace Spatie\LaravelData\Support;
 
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 
 class ResolvedDataPipeline
 {
@@ -18,7 +18,7 @@ class ResolvedDataPipeline
     ) {
     }
 
-    public function execute(mixed $value): Collection
+    public function execute(mixed $value, CreationContext $creationContext): array
     {
         $properties = null;
 
@@ -34,12 +34,10 @@ class ResolvedDataPipeline
             throw CannotCreateData::noNormalizerFound($this->dataClass->name, $value);
         }
 
-        $properties = collect($properties);
-
         $properties = ($this->dataClass->name)::prepareForPipeline($properties);
 
         foreach ($this->pipes as $pipe) {
-            $piped = $pipe->handle($value, $this->dataClass, $properties);
+            $piped = $pipe->handle($value, $this->dataClass, $properties, $creationContext);
 
             $properties = $piped;
         }

@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
+
 return [
     /**
      * The package will use this format when working with dates. If this option
@@ -25,6 +28,7 @@ return [
     'casts' => [
         DateTimeInterface::class => Spatie\LaravelData\Casts\DateTimeInterfaceCast::class,
         BackedEnum::class => Spatie\LaravelData\Casts\EnumCast::class,
+        Enumerable::class => Spatie\LaravelData\Casts\EnumerableCast::class,
     ],
 
     /**
@@ -76,6 +80,7 @@ return [
      * store should be used.
      */
     'structure_caching' => [
+        'enabled' => true,
         'directories' => [app_path('Data')],
         'cache' => [
             'store' => env('CACHE_DRIVER', 'file'),
@@ -87,4 +92,17 @@ return [
             'root_namespace' => null,
         ],
     ],
+
+    /**
+     * A data object can be validated when created using a factory or when calling the from
+     * method. By default, only when a request is passed the data is being validated. This
+     * behaviour can be changed to always validate or to completely disable validation.
+     */
+    'validation_strategy' => \Spatie\LaravelData\Support\Creation\ValidationStrategy::OnlyRequests->value,
+
+    /**
+     * When using an invalid include, exclude, only or except partial, the package will
+     * throw an
+     */
+    'ignore_invalid_partials' => false,
 ];

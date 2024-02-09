@@ -7,8 +7,7 @@ use ReflectionClass;
 use Spatie\LaravelData\Support\Caching\CachedDataConfig;
 use Spatie\LaravelData\Support\Caching\DataClassFinder;
 use Spatie\LaravelData\Support\Caching\DataStructureCache;
-use Spatie\LaravelData\Support\DataClass;
-use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\Factories\DataClassFactory;
 
 class DataStructuresCacheCommand extends Command
 {
@@ -18,22 +17,30 @@ class DataStructuresCacheCommand extends Command
 
     public function handle(
         DataStructureCache $dataStructureCache,
-        DataConfig $dataConfig
+        DataClassFactory $dataClassFactory,
     ): void {
+        if(config('data.structure_caching.enabled') === false) {
+            $this->error('Data structure caching is not enabled');
+
+            return;
+        }
+
         $this->components->info('Caching data structures...');
 
         $dataClasses = DataClassFinder::fromConfig(config('data.structure_caching'))->classes();
 
-        $cachedDataConfig = CachedDataConfig::initialize($dataConfig);
+        $cachedDataConfig = CachedDataConfig::createFromConfig(config('data'));
 
         $dataStructureCache->storeConfig($cachedDataConfig);
 
         $progressBar = $this->output->createProgressBar(count($dataClasses));
 
-        foreach ($dataClasses as $dataClass) {
-            $dataStructureCache->storeDataClass(
-                DataClass::create(new ReflectionClass($dataClass))
-            );
+        foreach ($dataClasses as $dataClassString) {
+            $dataClass = $dataClassFactory->build(new ReflectionClass($dataClassString));
+
+            $dataClass->prepareForCache();
+
+            $dataStructureCache->storeDataClass($dataClass);
 
             $progressBar->advance();
         }

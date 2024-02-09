@@ -3,17 +3,21 @@
 namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\FromRouteParameter;
 use Spatie\LaravelData\Attributes\FromRouteParameterProperty;
 use Spatie\LaravelData\Exceptions\CannotFillFromRouteParameterPropertyUsingScalarValue;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
 
 class FillRouteParameterPropertiesDataPipe implements DataPipe
 {
-    public function handle(mixed $payload, DataClass $class, Collection $properties): Collection
-    {
+    public function handle(
+        mixed $payload,
+        DataClass $class,
+        array $properties,
+        CreationContext $creationContext
+    ): array {
         if (! $payload instanceof Request) {
             return $properties;
         }
@@ -27,7 +31,7 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            if (! $attribute->replaceWhenPresentInBody && $properties->has($dataProperty->name)) {
+            if (! $attribute->replaceWhenPresentInBody && array_key_exists($dataProperty->name, $properties)) {
                 continue;
             }
 
@@ -37,10 +41,7 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            $properties->put(
-                $dataProperty->name,
-                $this->resolveValue($dataProperty, $attribute, $parameter)
-            );
+            $properties[$dataProperty->name] = $this->resolveValue($dataProperty, $attribute, $parameter);
         }
 
         return $properties;
@@ -60,6 +61,5 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
         }
 
         return data_get($parameter, $attribute->property ?? $dataProperty->name);
-        ;
     }
 }

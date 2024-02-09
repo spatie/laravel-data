@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
@@ -27,8 +28,7 @@ class DataValidationMessagesAndAttributesResolver
             $propertyPath = $path->property($dataProperty->inputMappedName ?? $dataProperty->name);
 
             if (
-                $dataProperty->type->isDataObject === false
-                && $dataProperty->type->isDataCollectable === false
+                $dataProperty->type->kind === DataTypeKind::Default
                 && $dataProperty->validate === false
             ) {
                 continue;
@@ -38,7 +38,7 @@ class DataValidationMessagesAndAttributesResolver
                 continue;
             }
 
-            if ($dataProperty->type->isDataObject) {
+            if ($dataProperty->type->kind->isDataObject()) {
                 $nested = $this->execute(
                     $dataProperty->type->dataClass,
                     $fullPayload,
@@ -51,7 +51,7 @@ class DataValidationMessagesAndAttributesResolver
                 continue;
             }
 
-            if ($dataProperty->type->isDataCollectable) {
+            if ($dataProperty->type->kind->isDataCollectable()) {
                 $collected = $this->execute(
                     $dataProperty->type->dataClass,
                     $fullPayload,

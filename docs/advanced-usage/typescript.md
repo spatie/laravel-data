@@ -71,7 +71,7 @@ If you're using the `DtoTransformer` provided by the package, then be sure to pu
 Annotate each data object that you want to transform to Typescript with a `/** @typescript */` annotation or
 a `#[TypeScript]` attribute.
 
-To [generate the typescript file](https://spatie.be/docs/typescript-transformer/v3/laravel/executing-the-transform-command)
+To [generate the typescript file](https://spatie.be/docs/typescript-transformer/v4/laravel/executing-the-transform-command)
 , run this command:
 
 ```php
@@ -120,22 +120,6 @@ class DataObject extends Data
 {
     public function __construct(
         #[TypeScriptOptional]
-        public int $id,
-        public string $someString,
-        public Optional|string $optional,
-    )
-    {
-    }
-}
-```
-
-You can also make all the properties of a data object optional in TypeScript like this:
-
-```php
-class DataObject extends Data
-{
-    #[TypeScriptOptional]
-    public function __construct(
         public int $id,
         public string $someString,
         public Optional|string $optional,

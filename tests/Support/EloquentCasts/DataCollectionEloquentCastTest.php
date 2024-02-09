@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\DB;
 
 use function Pest\Laravel\assertDatabaseHas;
 
+use Spatie\LaravelData\DataCollection;
+
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCustomCollectionCasts;
@@ -17,10 +19,10 @@ beforeEach(function () {
 
 it('can save a data collection', function () {
     DummyModelWithCasts::create([
-        'data_collection' => SimpleData::collection([
-            new SimpleData('Hello'),
-            new SimpleData('World'),
-        ]),
+        'data_collection' => SimpleData::collect([
+            'Hello',
+            'World',
+        ], DataCollection::class),
     ]);
 
     assertDatabaseHas(DummyModelWithCasts::class, [
@@ -74,7 +76,7 @@ it('can load a data object', function () {
     /** @var \Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts $model */
     $model = DummyModelWithCasts::first();
 
-    expect($model->data_collection)->toEqual(SimpleData::collection([
+    expect($model->data_collection)->toEqual(new DataCollection(SimpleData::class, [
         new SimpleData('Hello'),
         new SimpleData('World'),
     ]));

@@ -1,9 +1,0 @@
-{
-collection: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
-collectionWithNull: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}> | null;
-collectionWithNullable: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}> | null;
-optionalCollection?: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
-optionalCollectionWithNullable?: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}> | null;
-lazyCollection?: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
-lazyCollectionWithNullable?: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}> | null;
-}

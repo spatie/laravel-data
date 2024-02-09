@@ -3,33 +3,31 @@
 namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Spatie\LaravelData\Support\Creation\CreationContext;
+use Spatie\LaravelData\Support\Creation\ValidationStrategy;
 use Spatie\LaravelData\Support\DataClass;
 
 class ValidatePropertiesDataPipe implements DataPipe
 {
-    public function __construct(
-        protected bool $allTypes = false,
-    ) {
-    }
+    public function handle(
+        mixed $payload,
+        DataClass $class,
+        array $properties,
+        CreationContext $creationContext
+    ): array {
+        if ($creationContext->validationStrategy === ValidationStrategy::Disabled
+            || $creationContext->validationStrategy === ValidationStrategy::AlreadyRan
+        ) {
+            return $properties;
+        }
 
-    public static function onlyRequests(): self
-    {
-        return new self(false);
-    }
-
-    public static function allTypes(): self
-    {
-        return new self(true);
-    }
-
-    public function handle(mixed $payload, DataClass $class, Collection $properties): Collection
-    {
-        if (! $payload instanceof Request && $this->allTypes === false) {
+        if ($creationContext->validationStrategy === ValidationStrategy::OnlyRequests && ! $payload instanceof Request) {
             return $properties;
         }
 
         ($class->name)::validate($properties);
+
+        $creationContext->validationStrategy = ValidationStrategy::AlreadyRan;
 
         return $properties;
     }

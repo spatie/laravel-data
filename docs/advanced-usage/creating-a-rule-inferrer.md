@@ -1,6 +1,6 @@
 ---
 title: Creating a rule inferrer
-weight: 10
+weight: 8
 ---
 
 Rule inferrers will try to infer validation rules for properties within a data object.
@@ -10,11 +10,17 @@ A rule inferrer can be created by implementing the `RuleInferrer` interface:
 ```php
 interface RuleInferrer
 {
-    public function handle(DataProperty $property, RulesCollection $rules): array;
+    public function handle(DataProperty $property, PropertyRules $rules, ValidationContext $context): PropertyRules;
 }
 ```
 
-A collection of previous inferred rules is given, and a `DataProperty` object which represents the property for which the value is transformed. You can read more about the internal structures of the package [here](/docs/laravel-data/v3/advanced-usage/internal-structures).
+A collection of previous inferred rules is given, and a `DataProperty` object which represents the property for which the value is transformed. You can read more about the internal structures of the package [here](/docs/laravel-data/v4/advanced-usage/internal-structures).
+
+The `ValidationContext` is also injected, this contains the following info:
+
+- **payload** the current payload respective to the data object which is being validated
+- **fullPayload** the full payload which is being validated
+- **validationPath** the path from the full payload to the current payload
 
 The `RulesCollection` contains all the rules for the property represented as `ValidationRule` objects.
 

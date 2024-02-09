@@ -66,14 +66,15 @@ parameters:
 			path: src/Casts/DateTimeInterfaceCast.php
 
 		-
-			message: "#^Method Spatie\\\\LaravelData\\\\Data\\:\\:from\\(\\) should return static\\(Spatie\\\\LaravelData\\\\Data\\) but returns Spatie\\\\LaravelData\\\\Contracts\\\\BaseData\\.$#"
+			message: "#^PHPDoc tag @return with type Spatie\\\\LaravelData\\\\CursorPaginatedDataCollection\\<TKey of \\(int\\|string\\), TOtherValue\\> is incompatible with native type static\\(Spatie\\\\LaravelData\\\\CursorPaginatedDataCollection\\<TKey of \\(int\\|string\\), TValue\\>\\)\\.$#"
+			count: 1
+			path: src/CursorPaginatedDataCollection.php
+
+		-
+			message: "#^Instanceof between \\*NEVER\\* and Spatie\\\\LaravelData\\\\Contracts\\\\BaseDataCollectable will always evaluate to false\\.$#"
 			count: 1
 			path: src/Data.php
 
-		-
-			message: "#^Method Spatie\\\\LaravelData\\\\Data\\:\\:withoutMagicalCreationFrom\\(\\) should return static\\(Spatie\\\\LaravelData\\\\Data\\) but returns Spatie\\\\LaravelData\\\\Contracts\\\\BaseData\\.$#"
-			count: 1
-			path: src/Data.php
 
 		-
 			message: "#^PHPDoc tag @return with type Spatie\\\\LaravelData\\\\DataCollection\\<int, TValue\\> is not subtype of native type static\\(Spatie\\\\LaravelData\\\\DataCollection\\<TKey of \\(int\\|string\\), TValue\\>\\)\\.$#"
@@ -91,19 +92,29 @@ parameters:
 			path: src/PaginatedDataCollection.php
 
 		-
-			message: "#^Dead catch \\- ArgumentCountError is never thrown in the try block\\.$#"
+			message: "#^PHPDoc tag @return with type Spatie\\\\LaravelData\\\\PaginatedDataCollection\\<TKey of \\(int\\|string\\), TOtherValue\\> is incompatible with native type static\\(Spatie\\\\LaravelData\\\\PaginatedDataCollection\\<TKey of \\(int\\|string\\), TValue\\>\\)\\.$#"
 			count: 1
-			path: src/Resolvers/DataFromArrayResolver.php
+			path: src/PaginatedDataCollection.php
 
 		-
-			message: "#^Call to an undefined method ReflectionType\\:\\:getName\\(\\)\\.$#"
+			message: "#^PHPDoc tag @var for variable \\$dataClass has invalid type Spatie\\\\LaravelData\\\\Concerns\\\\EmptyData\\.$#"
 			count: 1
-			path: src/Support/DataType.php
+			path: src/Resolvers/EmptyDataResolver.php
 
 		-
-			message: "#^Parameter \\#1 \\$reflection of method Spatie\\\\LaravelData\\\\Support\\\\DataType\\:\\:resolveDataCollectableType\\(\\) expects ReflectionNamedType, ReflectionType given\\.$#"
+			message: "#^Instanceof between \\*NEVER\\* and Spatie\\\\LaravelData\\\\Contracts\\\\BaseDataCollectable will always evaluate to false\\.$#"
 			count: 1
-			path: src/Support/DataType.php
+			path: src/Resource.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: src/Support/DataConfig.php
+
+		-
+			message: "#^Parameter \\#1 \\$storage of method SplObjectStorage\\<Spatie\\\\LaravelData\\\\Support\\\\Partials\\\\Partial,null\\>\\:\\:removeAll\\(\\) expects SplObjectStorage\\<object, mixed\\>, Spatie\\\\LaravelData\\\\Support\\\\Partials\\\\PartialsCollection given\\.$#"
+			count: 1
+			path: src/Support/Transformation/DataContext.php
 
 		-
 			message: "#^Call to an undefined method DateTimeInterface\\:\\:setTimezone\\(\\)\\.$#"

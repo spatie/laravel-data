@@ -1,14 +1,29 @@
 <?php
 
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Mockery\MockInterface;
 use Spatie\LaravelData\Support\Caching\CachedDataConfig;
 use Spatie\LaravelData\Support\Caching\DataStructureCache;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
+function ensureDataWillBeCached()
+{
+    App::forgetInstance(DataConfig::class);
+    app()->singleton(
+        DataConfig::class,
+        function () {
+            return app()->make(DataStructureCache::class)->getConfig() ?? DataConfig::createFromConfig(config('data'));
+        }
+    );
+}
+
 it('will use a cached data config if available', function () {
+    ensureDataWillBeCached();
+
     $cache = app(DataStructureCache::class);
 
     $cachedDataConfig = new CachedDataConfig();
@@ -21,12 +36,16 @@ it('will use a cached data config if available', function () {
 });
 
 it('will use a non cached config when a cached version is not available', function () {
+    ensureDataWillBeCached();
+
     $config = app(DataConfig::class);
 
     expect($config)->toBeInstanceOf(DataConfig::class);
 });
 
 it('will use a cached data config if the cached version is invalid', function () {
+    ensureDataWillBeCached();
+
     ['store' => $store, 'prefix' => $prefix] = config('data.structure_caching.cache');
 
     cache()->store($store)->forever("{$prefix}.config", serialize(new CachedDataConfig()));
@@ -41,7 +60,10 @@ it('will use a cached data config if the cached version is invalid', function ()
 });
 
 it('will load cached data classes', function () {
-    $dataClass = DataClass::create(new ReflectionClass(SimpleData::class));
+    ensureDataWillBeCached();
+
+    $dataClass = FakeDataStructureFactory::class(SimpleData::class);
+    $dataClass->prepareForCache();
 
     $mock = Mockery::mock(
         new DataStructureCache(config('data.structure_caching.cache')),
@@ -63,4 +85,22 @@ it('will load cached data classes', function () {
     expect($cachedDataClass)
         ->toBeInstanceOf(DataClass::class)
         ->name->toBe(SimpleData::class);
+});
+
+it('can disable caching', function () {
+    config()->set('data.structure_caching.enabled', false);
+
+    Cache::expects('get')->once();
+
+    SimpleData::from('Hello world');
+
+    cache()->get('something-just-to-test-the-mock');
+});
+
+it('will not cache when unit testing', function () {
+    Cache::expects('get')->once();
+
+    SimpleData::from('Hello world');
+
+    cache()->get('something-just-to-test-the-mock');
 });
