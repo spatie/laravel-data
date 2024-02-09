@@ -31,7 +31,13 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
         $this->app->singleton(
             DataConfig::class,
-            fn () => $this->app->make(DataStructureCache::class)->getConfig() ?? DataConfig::createFromConfig(config('data'))
+            function () {
+                if (! config('data.structure_caching.enabled')) {
+                    return DataConfig::createFromConfig(config('data'));
+                }
+
+                return $this->app->make(DataStructureCache::class)->getConfig() ?? DataConfig::createFromConfig(config('data'));
+            }
         );
 
         $this->app->beforeResolving(BaseData::class, function ($class, $parameters, $app) {

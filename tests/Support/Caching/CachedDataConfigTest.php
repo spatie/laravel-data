@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Mockery\MockInterface;
 use Spatie\LaravelData\Support\Caching\CachedDataConfig;
 use Spatie\LaravelData\Support\Caching\DataStructureCache;
@@ -65,4 +66,14 @@ it('will load cached data classes', function () {
     expect($cachedDataClass)
         ->toBeInstanceOf(DataClass::class)
         ->name->toBe(SimpleData::class);
+});
+
+it('can disable caching', function (){
+    config()->set('data.structure_caching.enabled', false);
+
+    Cache::expects('get')->once();
+
+    $data = SimpleData::from('Hello world');
+
+    cache()->get('something-just-to-test-the-mock');
 });

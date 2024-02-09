@@ -19,6 +19,12 @@ class DataStructuresCacheCommand extends Command
         DataStructureCache $dataStructureCache,
         DataClassFactory $dataClassFactory,
     ): void {
+        if(config('data.structure_caching.enabled') === false){
+            $this->error('Data structure caching is not enabled');
+
+            return;
+        }
+
         $this->components->info('Caching data structures...');
 
         $dataClasses = DataClassFinder::fromConfig(config('data.structure_caching'))->classes();
