@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Exceptions;
 
 use Exception;
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataParameter;
 use Spatie\LaravelData\Support\DataProperty;
@@ -24,9 +23,11 @@ class CannotCreateData extends Exception
 
     public static function constructorMissingParameters(
         DataClass $dataClass,
-        Collection $parameters,
+        array $parameters,
         Throwable $previous,
     ): self {
+        $parameters = collect($parameters);
+
         $message = "Could not create `{$dataClass->name}`: the constructor requires {$dataClass->constructorMethod->parameters->count()} parameters, {$parameters->count()} given.";
 
 

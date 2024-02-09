@@ -2,6 +2,30 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.0.0
+
+- Allow arrays, Collections, Paginators, ... to be used as DataCollections
+- Add support for magically creating data collections
+- Rewritten transformation system with respect to includeable properties
+- Addition of collect method
+- Removal of collection method
+- Add support for using Laravel Model attributes as data properties
+- Allow creating data objects using `from` without parameters
+- Add support for a Dto and Resource object
+- It is now a lot easier to validate all the payloads added to laravel-data
+- Added contexts to the creation and transformation process
+- Allow creating a data object or collection using a factory
+- Speed up the process of creating and transforming data objects
+- Add support for BNF syntax
+- Laravel 10 requirement
+- Rewritten docs
+
+**Some more "internal" changes**
+
+- Restructured tests for the future we have ahead
+- The Type system was completely rewritten, allowing for a better performance and more flexibility in the future
+- Benchmarks added to make data even faster
+
 ## 3.11.0 - 2023-12-21
 
 - Add support for data structure caching #622

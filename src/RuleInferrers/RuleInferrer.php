@@ -8,9 +8,5 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 interface RuleInferrer
 {
-    public function handle(
-        DataProperty $property,
-        PropertyRules $rules,
-        ValidationContext $context,
-    ): PropertyRules;
+    public function handle(DataProperty $property, PropertyRules $rules, ValidationContext $context): PropertyRules;
 }

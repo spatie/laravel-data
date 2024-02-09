@@ -1,6 +1,6 @@
 ---
 title: Creating a cast
-weight: 8
+weight: 6
 ---
 
 Casts take simple values and cast them into complex types. For example, `16-05-1994T00:00:00+00` could be cast into a `Carbon` object with the same date.
@@ -10,15 +10,24 @@ A cast implements the following interface:
 ```php
 interface Cast
 {
-    public function cast(DataProperty $property, mixed $value, array $context): mixed;
+    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): mixed;
 }
 ```
 
-The value that should be cast is given, and a `DataProperty` object which represents the property for which the value is cast. You can read more about the internal structures of the package [here](/docs/laravel-data/v3/advanced-usage/internal-structures).
+A cast receives the following:
 
-Within the `context` array the complete payload is given.
+- **property** a `DataProperty` object which represents the property for which the value is cast. You can read more about the internal structures of the package [here](/docs/laravel-data/v4/advanced-usage/internal-structures)
+- **value** the value that should be cast
+- **properties** an array of the current properties that will be used to create the data object
+- **creationContext** the context in which the data object is being created you'll find the following info here:
+    - **dataClass** the data class which is being created
+    - **validationStrategy** the validation strategy which is being used
+    - **mapPropertyNames** whether property names should be mapped
+    - **disableMagicalCreation** whether to use the magical creation methods or not
+    - **ignoredMagicalMethods** the magical methods which are ignored
+    - **casts** a collection of global casts
 
-In the end, the cast should return a casted value. Please note that the given value of a cast can never be `null`.
+In the end, the cast should return a casted value.
 
 When the cast is unable to cast the value, an `Uncastable` object should be returned.
 
@@ -74,5 +83,38 @@ class Email implements Castable
         }
     };
   }
+}
+```
+
+## Combining casts and transformers
+
+You can combine casts and transformers in one class:
+
+```php
+class ToUpperCastAndTransformer implements Cast, Transformer
+{
+    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): string
+    {
+        return strtoupper($value);
+    }
+    
+    public function transform(DataProperty $property, mixed $value, TransformationContext $context): string
+    {
+        return strtoupper($value);
+    }
+}
+```
+
+Within your data object, you can use the `WithCastAndTransform` attribute to use the cast and transformer:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[WithCastAndTransform(SomeCastAndTransformer::class)]
+        public string $artist,
+    ) {
+    }
 }
 ```

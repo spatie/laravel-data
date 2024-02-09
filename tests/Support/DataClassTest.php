@@ -6,15 +6,15 @@ use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
-use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataMethod;
+use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 it('keeps track of a global map from attribute', function () {
-    $dataClass = DataClass::create(new ReflectionClass(DataWithMapper::class));
+    $dataClass = FakeDataStructureFactory::class(DataWithMapper::class);
 
     expect($dataClass->properties->get('casedProperty')->inputMappedName)
         ->toEqual('cased_property')
@@ -23,7 +23,7 @@ it('keeps track of a global map from attribute', function () {
 });
 
 it('will provide information about special methods', function () {
-    $class = DataClass::create(new ReflectionClass(SimpleData::class));
+    $class = FakeDataStructureFactory::class(SimpleData::class);
 
     expect($class->methods)->toHaveKey('fromString')
         ->and($class->methods->get('fromString'))
@@ -31,7 +31,7 @@ it('will provide information about special methods', function () {
 });
 
 it('will provide information about the constructor', function () {
-    $class = DataClass::create(new ReflectionClass(SimpleData::class));
+    $class = FakeDataStructureFactory::class(SimpleData::class);
 
     expect($class->constructorMethod)
         ->not->toBeNull()
@@ -52,7 +52,7 @@ it('will populate defaults to properties when they exist ', function () {
     };
 
     /** @var \Spatie\LaravelData\Support\DataProperty[] $properties */
-    $properties = DataClass::create(new ReflectionClass($dataClass::class))->properties->values();
+    $properties = FakeDataStructureFactory::class($dataClass::class)->properties->values();
 
     expect($properties[0])
         ->name->toEqual('property')
@@ -76,18 +76,9 @@ it('will populate defaults to properties when they exist ', function () {
 it('wont throw an error if a non existing attribute is used on a data class', function () {
     expect(PhpStormClassAttributeData::from(['property' => 'hello'])->property)->toEqual('hello')
         ->and(NonExistingAttributeData::from(['property' => 'hello'])->property)->toEqual('hello')
-        ->and(PhpStormClassAttributeData::from((object)['property' => 'hello'])->property)->toEqual('hello')
+        ->and(PhpStormClassAttributeData::from((object) ['property' => 'hello'])->property)->toEqual('hello')
         ->and(PhpStormClassAttributeData::from('{"property": "hello"}')->property)->toEqual('hello')
         ->and(ModelWithPhpStormAttributeData::from((new DummyModel())->fill(['id' => 1]))->id)->toEqual(1);
-});
-
-it('wont create an output name mapping for non mapped properties', function () {
-    $mapping = DataClass::create(new ReflectionClass(SimpleData::class))
-        ->outputNameMapping;
-
-    expect($mapping)
-        ->mapped->toBeEmpty()
-        ->mappedDataObjects->toBeEmpty();
 });
 
 it('resolves parent attributes', function () {
@@ -106,7 +97,7 @@ it('resolves parent attributes', function () {
         }
     }
 
-    $dataClass = DataClass::create(new ReflectionClass(TestRecursiveAttributesChildData::class));
+    $dataClass = FakeDataStructureFactory::class(TestRecursiveAttributesChildData::class);
 
     expect($dataClass->attributes)
         ->toHaveCount(3)

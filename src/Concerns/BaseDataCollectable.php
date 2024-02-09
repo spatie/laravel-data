@@ -3,8 +3,8 @@
 namespace Spatie\LaravelData\Concerns;
 
 use ArrayIterator;
-use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
-use Spatie\LaravelData\Transformers\DataCollectableTransformer;
+use Spatie\LaravelData\Support\Transformation\DataContext;
+use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 
 /**
  * @template TKey of array-key
@@ -12,6 +12,8 @@ use Spatie\LaravelData\Transformers\DataCollectableTransformer;
  */
 trait BaseDataCollectable
 {
+    protected ?DataContext $_dataContext = null;
+
     /** @return class-string<TValue> */
     public function getDataClass(): string
     {
@@ -22,7 +24,7 @@ trait BaseDataCollectable
     public function getIterator(): ArrayIterator
     {
         /** @var array<TValue> $data */
-        $data = $this->transform(transformValues: false);
+        $data = $this->transform(TransformationContextFactory::create()->withValueTransformation(false));
 
         return new ArrayIterator($data);
     }
@@ -30,27 +32,6 @@ trait BaseDataCollectable
     public function count(): int
     {
         return $this->items->count();
-    }
-
-    /**
-     * @return array<array|TValue>
-     */
-    public function transform(
-        bool $transformValues = true,
-        WrapExecutionType $wrapExecutionType = WrapExecutionType::Disabled,
-        bool $mapPropertyNames = true,
-    ): array {
-        $transformer = new DataCollectableTransformer(
-            $this->dataClass,
-            $transformValues,
-            $wrapExecutionType,
-            $mapPropertyNames,
-            $this->getPartialTrees(),
-            $this->items,
-            $this->getWrap(),
-        );
-
-        return $transformer->transform();
     }
 
     public function __sleep(): array

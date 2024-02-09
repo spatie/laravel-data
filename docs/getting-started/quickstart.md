@@ -5,7 +5,7 @@ weight: 1
 
 In this quickstart, we'll guide you through the most important functionalities of the package and how to use them.
 
-First, you should [install the package](/docs/laravel-data/v3/installation-setup).
+First, you should [install the package](/docs/laravel-data/v4/installation-setup).
 
 We will create a blog with different posts, so let's start with the `PostData` object. A post has a title, some content, a status and a date when it was published:
 
@@ -189,7 +189,7 @@ As you can see, we're missing the `date` rule on the `published_at` property. By
 - `array` when a property type is `array`
 - `enum:*` when a property type is a native enum
 
-You can read more about the process of automated rule generation [here](/docs/laravel-data/v3/as-a-data-transfer-object/request-to-data-object#content-automatically-inferring-rules-for-properties-1).
+You can read more about the process of automated rule generation [here](/docs/laravel-data/v4/as-a-data-transfer-object/request-to-data-object#content-automatically-inferring-rules-for-properties-1).
 
 We can easily add the date rule by using an attribute to our data object:
 
@@ -232,7 +232,7 @@ array:4 [
 ]
 ```
 
-There are [tons](/docs/laravel-data/v3/advanced-usage/validation-attributes) of validation rule attributes you can add to data properties. There's still much more you can do with validating data objects. Read more about it [here](/docs/laravel-data/v3/as-a-data-transfer-object/request-to-data-object#validating-a-request).
+There are [tons](/docs/laravel-data/v4/advanced-usage/validation-attributes) of validation rule attributes you can add to data properties. There's still much more you can do with validating data objects. Read more about it [here](/docs/laravel-data/v4/as-a-data-transfer-object/request-to-data-object#validating-a-request).
 
 Tip: By default, when creating a data object in a non request context, no validation is executed:
 
@@ -275,7 +275,7 @@ It is possible to define casts within the `data.php` config file. By default, th
 
 This code means that if a class property is of type `DateTime`, `Carbon`, `CarbonImmutable`, ... it will be automatically cast.
 
-You can create your own casts; read more about it [here](/docs/laravel-data/v3/advanced-usage/creating-a-cast).
+You can create your own casts; read more about it [here](/docs/laravel-data/v4/advanced-usage/creating-a-cast).
 
 ### Local casts
 
@@ -310,7 +310,7 @@ use Str;
 
 class ImageCast implements Cast
 {
-    public function cast(DataProperty $property, mixed $value, array $context): Image
+        public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): Image
     {
         // Scenario A
         if ($value instanceof UploadedFile) {
@@ -356,7 +356,7 @@ class PostData extends Data
 }
 ```
 
-You can read more about casting [here](/docs/laravel-data/v3/as-a-data-transfer-object/casts).
+You can read more about casting [here](/docs/laravel-data/v4/as-a-data-transfer-object/casts).
 
 ## Customizing the creation of a data object
 
@@ -406,44 +406,54 @@ class PostData extends Data
 ```
 
 Magic creation methods allow you to create data objects from any type by passing them to the `from` method of a data
-object, you can read more about it [here](/laravel-data/v3/as-a-data-transfer-object/creating-a-data-object#magical-creation).
+object, you can read more about it [here](/laravel-data/v4/as-a-data-transfer-object/creating-a-data-object#magical-creation).
 
 It can be convenient to transform more complex models than our `Post` into data objects because you can decide how a model
 would be mapped onto a data object.
 
-## Nesting data objects and collections
+## Nesting data objects and arrays of data objects
 
-Now that we have a fully functional post-data object. We're going to create a new data object, `AuthorData`, that will store the name of an author and a collection of posts the author wrote:
+Now that we have a fully functional post-data object. We're going to create a new data object, `AuthorData`, that will store the name of an author and an array of posts the author wrote:
 
 ```php
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 
 class AuthorData extends Data
 {
+    /**
+    * @param array<int, PostData> $posts
+    */
     public function __construct(
         public string $name,
-        #[DataCollectionOf(PostData::class)]
-        public DataCollection $posts
+        public array $posts
     ) {
     }
 }
 ```
 
-Instead of using an array to store all the posts, we use a `DataCollection .`This will be very useful later on! The package always needs to know what type of data is stored in a `DataCollection`, so we use the `DataCollectionOf` attribute to tell it is a collection of `PostData` objects.
+Notice that we've typed the `$posts` property as an array of `PostData` objects using a docblock.  This will be very useful later on! The package always needs to know what type of data objects are stored in an array. Off course, when you're storing other types then data objects this is not required but recommended.
 
 We can now create an author object as such:
 
 ```php
 new AuthorData(
     'Ruben Van Assche',
-    PostData::collection([
-        new PostData('Hello laravel-data', 'This is an introduction post for the new package,' PostStatus::draft, null, null),
-        new PostData('What is a data object', 'How does it work?', PostStatus::draft, null, null),
+    PostData::collect([
+        [
+            'title' => 'Hello laravel-data',
+            'content' => 'This is an introduction post for the new package',
+            'status' => PostStatus::draft,
+        ],
+        [
+            'title' => 'What is a data object',
+            'content' => 'How does it work',
+            'status' => PostStatus::published,
+        ],
     ])
 );
 ```
 
-As you can see, the `collection` method can create a new `DataCollection` of the `PostData` object.
+As you can see, the `collect` method can create an array of the `PostData` objects.
 
 But there's another way; thankfully, our `from` method makes this process even more straightforward:
 
@@ -465,9 +475,7 @@ AuthorData::from([
 ]);
 ```
 
-The data object is smart enough to convert an array of posts into a data collection of post data. Mapping data coming from the front end was never that easy!
-
-You can do a lot more with data collections. Read more about it [here](/docs/laravel-data/v3/as-a-data-transfer-object/collections).
+The data object is smart enough to convert an array of posts into an array of post data. Mapping data coming from the front end was never that easy!
 
 ### Nesting objects
 
@@ -674,12 +682,12 @@ This `DateTimeInterfaceTransformer` is registered in the `data.php` config file 
 ],
 ```
 
-Rember the image object we created earlier; we stored a file size and filename in the object. But that could be more useful; let's provide the URL to the file when transforming the object. Just like casts, transformers also can be local. Let's implement one for `Image`:
+Remember the image object we created earlier; we stored a file size and filename in the object. But that could be more useful; let's provide the URL to the file when transforming the object. Just like casts, transformers also can be local. Let's implement one for `Image`:
 
 ```php
 class ImageTransformer implements Transformer
 {
-    public function transform(DataProperty $property, mixed $value): string
+    public function transform(DataProperty $property, mixed $value, TransformationContext $context): string
     {
         if (! $value instanceof Image) {
             throw new Exception("Not an image");
@@ -739,7 +747,7 @@ Which leads to the following JSON:
 }
 ```
 
-You can read more about transformers [here](/docs/laravel-data/v3/as-a-resource/transformers).
+You can read more about transformers [here](/docs/laravel-data/v4/as-a-resource/transformers).
 
 ## Generating a blueprint
 
@@ -842,10 +850,12 @@ This functionality can be achieved with lazy properties. Lazy properties are onl
 ```php
 class AuthorData extends Data
 {
+    /**
+    * @param Collection<PostData>|Lazy $posts
+    */
     public function __construct(
         public string $name,
-        #[DataCollectionOf(PostData::class)]
-        public DataCollection|Lazy $posts
+        public Collection|Lazy $posts
     ) {
     }
 
@@ -853,7 +863,7 @@ class AuthorData extends Data
     {
         return new self(
             $author->name,
-            Lazy::create(fn() => PostData::collection($author->posts))
+            Lazy::create(fn() => PostData::collect($author->posts))
         );
     }
 }
@@ -1005,19 +1015,19 @@ You can do quite a lot with lazy properties like including them:
 - when they are requested in the URL query
 - by default, with an option to exclude them
 
-And a lot more. You can read all about it [here](/docs/laravel-data/v3/as-a-resource/lazy-properties).
+And a lot more. You can read all about it [here](/docs/laravel-data/v4/as-a-resource/lazy-properties).
 
 ## Conclusion
 
 So that's it, a quick overview of this package. We barely scratched the surface of what's possible with the package. There's still a lot more you can do with data objects like:
 
-- [casting](/docs/laravel-data/v3/advanced-usage/eloquent-casting) them into Eloquent models
-- [transforming](/docs/laravel-data/v3/advanced-usage/typescript) the structure to typescript
-- [working](/docs/laravel-data/v3/as-a-data-transfer-object/collections) with `DataCollections`
-- [optional properties](/docs/laravel-data/v3/as-a-data-transfer-object/optional-properties) not always required when creating a data object
-- [wrapping](/docs/laravel-data/v3/as-a-resource/wrapping) transformed data into keys
-- [mapping](/docs/laravel-data/v3/as-a-data-transfer-object/creating-a-data-object#content-mapping-property-names) property names when creating or transforming a data object
-- [appending](/docs/laravel-data/v3/as-a-resource/from-data-to-resource#content-appending-properties) extra data
-- [including](/docs/laravel-data/v3/as-a-resource/lazy-properties#content-using-query-strings) properties using the URL query string
-- [inertia](https://spatie.be/docs/laravel-data/v3/advanced-usage/use-with-inertia) support for lazy properties
+- [casting](/docs/laravel-data/v4/advanced-usage/eloquent-casting) them into Eloquent models
+- [transforming](/docs/laravel-data/v4/advanced-usage/typescript) the structure to typescript
+- [working](/docs/laravel-data/v4/as-a-data-transfer-object/collections) with `DataCollections`
+- [optional properties](/docs/laravel-data/v4/as-a-data-transfer-object/optional-properties) not always required when creating a data object
+- [wrapping](/docs/laravel-data/v4/as-a-resource/wrapping) transformed data into keys
+- [mapping](/docs/laravel-data/v4/as-a-data-transfer-object/mapping-property-names) property names when creating or transforming a data object
+- [appending](/docs/laravel-data/v4/as-a-resource/from-data-to-resource#content-appending-properties) extra data
+- [including](/docs/laravel-data/v4/as-a-resource/lazy-properties#content-using-query-strings) properties using the URL query string
+- [inertia](https://spatie.be/docs/laravel-data/v4/advanced-usage/use-with-inertia) support for lazy properties
 - and so much more ... you'll find all the information here in the docs

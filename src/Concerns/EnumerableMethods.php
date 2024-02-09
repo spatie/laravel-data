@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Concerns;
 
-use Spatie\LaravelData\Contracts\DataCollectable;
 use Spatie\LaravelData\DataCollection;
 
 /**
@@ -10,11 +9,12 @@ use Spatie\LaravelData\DataCollection;
  * @template TValue
  *
  * @implements \ArrayAccess<TKey, TValue>
- * @implements  DataCollectable<TValue>
  */
 trait EnumerableMethods
 {
     /**
+     * @deprecated In v5, use a regular Laravel collection instead
+     *
      * @param callable(TValue, TKey): TValue $through
      *
      * @return static
@@ -29,6 +29,8 @@ trait EnumerableMethods
     }
 
     /**
+     * @deprecated In v5, use a regular Laravel collection instead
+     *
      * @param callable(TValue, TKey): TValue $map
      *
      * @return static
@@ -39,6 +41,8 @@ trait EnumerableMethods
     }
 
     /**
+     * @deprecated In v5, use a regular Laravel collection instead
+     *
      * @param callable(TValue): bool $filter
      *
      * @return static
@@ -53,6 +57,8 @@ trait EnumerableMethods
     }
 
     /**
+     * @deprecated In v5, use a regular Laravel collection instead
+     *
      * @param callable(TValue): bool $filter
      *
      * @return static
@@ -67,6 +73,8 @@ trait EnumerableMethods
     }
 
     /**
+     * @deprecated In v5, use a regular Laravel collection instead
+     *
      * @template            TFirstDefault
      *
      * @param null|         (callable(TValue,TKey): bool) $callback
@@ -80,6 +88,8 @@ trait EnumerableMethods
     }
 
     /**
+     * @deprecated In v5, use a regular Laravel collection instead
+     *
      * @template            TLastDefault
      *
      * @param null|         (callable(TValue,TKey): bool) $callback
@@ -93,6 +103,8 @@ trait EnumerableMethods
     }
 
     /**
+     * @deprecated In v5, use a regular Laravel collection instead
+     *
      * @param callable(TValue, TKey): mixed $callback
      *
      * @return static
@@ -105,6 +117,8 @@ trait EnumerableMethods
     }
 
     /**
+     * @deprecated In v5, use a regular Laravel collection instead
+     *
      * @return static<int, TValue>
      */
     public function values(): static
@@ -116,6 +130,9 @@ trait EnumerableMethods
         return $cloned;
     }
 
+    /**
+     * @deprecated In v5, use a regular Laravel collection instead
+     */
     public function where(string $key, mixed $operator = null, mixed $value = null): static
     {
         $cloned = clone $this;
@@ -126,6 +143,8 @@ trait EnumerableMethods
     }
 
     /**
+     * @deprecated In v5, use a regular Laravel collection instead
+     *
      * @template TReduceInitial
      * @template TReduceReturnType
      *
@@ -140,6 +159,8 @@ trait EnumerableMethods
     }
 
     /**
+     * @deprecated In v5, use a regular Laravel collection instead
+     *
      * @param  (callable(TValue, TKey): bool)|string|null  $key
      * @param mixed $operator
      * @param mixed $value
@@ -155,6 +176,8 @@ trait EnumerableMethods
     }
 
     /**
+     *
+     *
      * @param DataCollection $collection
      *
      * @return static

@@ -3,14 +3,14 @@
 namespace Spatie\LaravelData\Tests\Fakes\Casts;
 
 use Spatie\LaravelData\Casts\Cast;
-use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 class ConfidentialDataCollectionCast implements Cast
 {
-    public function cast(DataProperty $property, mixed $value, array $context): DataCollection
+    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): array
     {
-        return SimpleData::collection(array_map(fn () => SimpleData::from('CONFIDENTIAL'), $value));
+        return array_map(fn () => SimpleData::from('CONFIDENTIAL'), $value);
     }
 }
