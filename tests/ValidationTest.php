@@ -14,6 +14,7 @@ use Illuminate\Validation\Rules\In as LaravelIn;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
+use Spatie\LaravelData\Attributes\Validation\RequiredUnless;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
@@ -274,6 +275,19 @@ it('will never add extra require rules when not required', function () {
         'property' => ['string', 'required_with:other'],
     ]);
 });
+
+it('is possible to have multiple required rules', function () {
+    DataValidationAsserter::for(new class () extends Data {
+        #[RequiredUnless('is_required', false), RequiredWith('make_required')]
+        public string $property;
+        public string $make_required;
+        public bool $is_required;
+    })->assertRules([
+        'property' => ['string', 'required_unless:is_required', 'required_with:make_required'],
+        'make_required' => ['required', 'string'],
+        'is_required' => ['boolean'],
+    ]);
+})->skip('Add a new ruleinferrer to rule them all and make these cases better');
 
 it('it will take care of mapping', function () {
     DataValidationAsserter::for(new class () extends Data {

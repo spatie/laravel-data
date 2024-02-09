@@ -2,16 +2,16 @@
 
 namespace Spatie\LaravelData\Support\Validation;
 
-use Illuminate\Support\Collection;
+use Illuminate\Support\Arr;
 
 class PropertyRules
 {
-    /** @var Collection<\Spatie\LaravelData\Support\Validation\ValidationRule> */
-    protected Collection $rules;
-
-    public function __construct()
-    {
-        $this->rules = new Collection();
+    /**
+     * @param array<int, ValidationRule> $rules
+     */
+    public function __construct(
+        protected array $rules = []
+    ) {
     }
 
     public static function create(ValidationRule ...$rules): self
@@ -22,7 +22,8 @@ class PropertyRules
     public function add(ValidationRule ...$rules): static
     {
         $this->removeType(...$rules);
-        $this->rules->push(...$rules);
+
+        array_push($this->rules, ...$rules);
 
         return $this;
     }
@@ -30,37 +31,46 @@ class PropertyRules
     public function prepend(ValidationRule ...$rules): static
     {
         $this->removeType(...$rules);
-        $this->rules->prepend(...$rules);
+
+        $this->rules = Arr::prepend($this->rules, ...$rules);
 
         return $this;
     }
 
     public function removeType(string|ValidationRule ...$classes): static
     {
-        $this->rules = $this->rules->reject(function (ValidationRule $rule) use ($classes) {
+        foreach ($this->rules as $i => $rule) {
             foreach ($classes as $class) {
                 if ($class instanceof RequiringRule && $rule instanceof RequiringRule) {
-                    return true;
+                    unset($this->rules[$i]);
+                    continue 2;
                 }
 
                 if ($rule instanceof $class) {
-                    return true;
+                    unset($this->rules[$i]);
+                    continue 2;
                 }
             }
+        }
 
-            return false;
-        })->values();
+        $this->rules = array_values($this->rules);
 
         return $this;
     }
 
     public function hasType(string $class): bool
     {
-        return $this->rules->contains(fn (ValidationRule $rule) => $rule instanceof $class);
+        foreach ($this->rules as $rule) {
+            if ($rule instanceof $class) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function all(): array
     {
-        return $this->rules->all();
+        return $this->rules;
     }
 }
