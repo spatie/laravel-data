@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.0.1 - 2024-02-09
+
+Laravel-data 4.0.0 was released 5 hours ago, time for an update!
+
+- Add support for a collection cast
+- Make sure we check wether a value is Uncastable
+- Fix issue where creating a data object from multiple payloads wasn't always consistent
+- Allow disabling cache
+- Refactor `PropertyRules`
+- Fix issue where install on windows was impossible
+- Fix types for map and through (#640)
+
 ## 4.0.0
 
 - Allow arrays, Collections, Paginators, ... to be used as DataCollections
