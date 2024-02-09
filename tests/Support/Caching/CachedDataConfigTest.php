@@ -10,7 +10,20 @@ use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
+function ensureDataWillBeCached()
+{
+    App::forgetInstance(DataConfig::class);
+    app()->singleton(
+        DataConfig::class,
+        function () {
+            return app()->make(DataStructureCache::class)->getConfig() ?? DataConfig::createFromConfig(config('data'));
+        }
+    );
+}
+
 it('will use a cached data config if available', function () {
+    ensureDataWillBeCached();
+
     $cache = app(DataStructureCache::class);
 
     $cachedDataConfig = new CachedDataConfig();
@@ -23,12 +36,16 @@ it('will use a cached data config if available', function () {
 });
 
 it('will use a non cached config when a cached version is not available', function () {
+    ensureDataWillBeCached();
+
     $config = app(DataConfig::class);
 
     expect($config)->toBeInstanceOf(DataConfig::class);
 });
 
 it('will use a cached data config if the cached version is invalid', function () {
+    ensureDataWillBeCached();
+
     ['store' => $store, 'prefix' => $prefix] = config('data.structure_caching.cache');
 
     cache()->store($store)->forever("{$prefix}.config", serialize(new CachedDataConfig()));
@@ -43,6 +60,8 @@ it('will use a cached data config if the cached version is invalid', function ()
 });
 
 it('will load cached data classes', function () {
+    ensureDataWillBeCached();
+
     $dataClass = FakeDataStructureFactory::class(SimpleData::class);
     $dataClass->prepareForCache();
 
@@ -73,7 +92,15 @@ it('can disable caching', function (){
 
     Cache::expects('get')->once();
 
-    $data = SimpleData::from('Hello world');
+    SimpleData::from('Hello world');
+
+    cache()->get('something-just-to-test-the-mock');
+});
+
+it('will not cache when unit testing', function (){
+    Cache::expects('get')->once();
+
+    SimpleData::from('Hello world');
 
     cache()->get('something-just-to-test-the-mock');
 });

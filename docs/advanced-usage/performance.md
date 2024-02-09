@@ -62,4 +62,16 @@ When using reflection discovery, the base directory and root namespace can be co
 ],
 ```
 
+The caching mechanism can be disabled by setting the `enabled` option to `false`:
+
+```php
+'structure_caching' => [
+    'enabled' => false,
+],
+```
+
 You can read more about reflection discovery [here](https://github.com/spatie/php-structure-discoverer#parsers).
+
+## Testing
+
+When running tests, the cache is automatically disabled. This ensures that the analysis results are always up-to-date during development and testing. And that the cache won't interfere with your caching mocks.

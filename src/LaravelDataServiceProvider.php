@@ -32,7 +32,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
         $this->app->singleton(
             DataConfig::class,
             function () {
-                if (! config('data.structure_caching.enabled')) {
+                if (config('data.structure_caching.enabled') || $this->app->runningUnitTests()) {
                     return DataConfig::createFromConfig(config('data'));
                 }
 

@@ -2,10 +2,20 @@
 
 use Illuminate\Support\Facades\App;
 use Spatie\LaravelData\Support\Caching\CachedDataConfig;
+use Spatie\LaravelData\Support\Caching\DataStructureCache;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 it('can cache data structures', function () {
+    // Ensure we cache
+    App::forgetInstance(DataConfig::class);
+    app()->singleton(
+        DataConfig::class,
+        function () {
+            return app()->make(DataStructureCache::class)->getConfig() ?? DataConfig::createFromConfig(config('data'));
+        }
+    );
+
     config()->set('data.structure_caching.directories', [
         __DIR__.'/../Fakes',
     ]);
