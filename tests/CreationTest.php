@@ -833,7 +833,7 @@ it('will allow a nested collection object to cast properties however it wants', 
 });
 
 it('will ignore null or optional values, which are set by default in multiple payloads', function () {
-    $dataClass = new class extends Data {
+    $dataClass = new class () extends Data {
         public string $string;
 
         public ?string $nullable;

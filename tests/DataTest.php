@@ -25,6 +25,7 @@ use Spatie\LaravelData\Resource;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDto;
 use Spatie\LaravelData\Tests\Fakes\SimpleResource;
+
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('also works by using traits and interfaces, skipping the base data class', function () {

@@ -55,8 +55,9 @@ it('will default to a collection when no clear type is specified', function () {
 });
 
 it('will never intervene with data collections', function () {
-    class TestDataCollectionCastWithDataCollectable extends Data {
-        /** @var Collection<SimpleData>  */
+    class TestDataCollectionCastWithDataCollectable extends Data
+    {
+        /** @var Collection<SimpleData> */
         public Collection $collection;
     }
 
