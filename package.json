@@ -1,6 +1,9 @@
 {
-    "devDependencies" : {
-        "husky" : "^8.0.3",
-        "lint-staged" : "^15.2.0"
-    }
+  "devDependencies": {
+    "husky": "^9.0.10",
+    "lint-staged": "^15.2.0"
+  },
+  "scripts": {
+      "postinstall": "husky"
+  }
 }
