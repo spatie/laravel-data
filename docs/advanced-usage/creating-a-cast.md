@@ -31,6 +31,10 @@ In the end, the cast should return a casted value.
 
 When the cast is unable to cast the value, an `Uncastable` object should be returned.
 
+## Null
+
+A cast like a transformer never receives a `null` value, this is because the package will always keep a `null` value as `null` because we don't want to create values out of thin air. If you want to replace a `null` value, then use a magic method.
+
 ## Castables
 
 You may want to allow your application's value objects to define their own custom casting logic. Instead of attaching the custom cast class to your object, you may alternatively attach a value object class that implements the `Spatie\LaravelData\Casts\Castable` interface:
