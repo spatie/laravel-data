@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\BaseData;
