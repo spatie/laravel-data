@@ -43,11 +43,13 @@ class PropertyRules
             foreach ($classes as $class) {
                 if ($class instanceof RequiringRule && $rule instanceof RequiringRule) {
                     unset($this->rules[$i]);
+
                     continue 2;
                 }
 
                 if ($rule instanceof $class) {
                     unset($this->rules[$i]);
+
                     continue 2;
                 }
             }
