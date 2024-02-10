@@ -94,4 +94,4 @@ class SongData extends Data
 }
 ```
 
-You can read more about creation contexts [here](/docs/laravel-data/v4/advanced-usage/pipeline.md).
+You can read more about creation contexts [here](/docs/laravel-data/v4/advanced-usage/pipeline).
