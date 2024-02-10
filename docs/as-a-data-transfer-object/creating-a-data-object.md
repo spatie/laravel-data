@@ -190,7 +190,7 @@ SongData::withoutMagicalCreationFrom($song);
 ## Advanced creation using factories
 
 It is possible to configure how a data object is created, whether it will be validated, which casts to use and more. You
-can read more about it [here](/docs/laravel-data/v4/advanced-usage/factories).
+can read more about it [here](/docs/laravel-data/v4/as-a-data-transfer-object/factories).
 
 ## DTO classes
 
