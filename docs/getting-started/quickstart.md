@@ -72,7 +72,7 @@ class Post extends Model
 
     protected $casts = [
         'status' => PostStatus::class,
-        'published_at' => 'datetime_immutable',
+        'published_at' => 'immutable_datetime',
     ];
 }
 ```
