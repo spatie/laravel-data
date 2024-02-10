@@ -1005,7 +1005,7 @@ So that's it, a quick overview of this package. We barely scratched the surface 
 - [optional properties](/docs/laravel-data/v4/as-a-data-transfer-object/optional-properties) not always required when creating a data object
 - [wrapping](/docs/laravel-data/v4/as-a-resource/wrapping) transformed data into keys
 - [mapping](/docs/laravel-data/v4/as-a-data-transfer-object/mapping-property-names) property names when creating or transforming a data object
-- [appending](/docs/laravel-data/v4/as-a-resource/from-data-to-resource#content-appending-properties) extra data
+- [appending](/docs/laravel-data/v4/as-a-resource/appending-properties) extra data
 - [including](/docs/laravel-data/v4/as-a-resource/lazy-properties#content-using-query-strings) properties using the URL query string
 - [inertia](https://spatie.be/docs/laravel-data/v4/advanced-usage/use-with-inertia) support for lazy properties
 - and so much more ... you'll find all the information here in the docs
