@@ -928,6 +928,7 @@ class PostData extends Data
         public string|Lazy $content,
         public PostStatus|Lazy $status,
         #[WithoutValidation]
+        #[WithCast(ImageCast::class)]
         #[WithTransformer(ImageTransformer::class)]
         public ImageData|Lazy|null $image,
         #[Date]
