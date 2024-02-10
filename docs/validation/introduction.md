@@ -56,7 +56,7 @@ Completely disabling validation can be done by setting the `validation_strategy`
 'validation_strategy' => \Spatie\LaravelData\Support\Creation\ValidationStrategy::Disabled->value,
 ```
 
-If you require a more fine-grained control over when validation should happen, you can use [data factories](/docs/laravel-data/v4//as-a-data-transfer-object/factories.md) to manually specify the validation strategy.
+If you require a more fine-grained control over when validation should happen, you can use [data factories](/docs/laravel-data/v4/as-a-data-transfer-object/factories) to manually specify the validation strategy.
 
 ## A quick glance at the validation functionality
 
