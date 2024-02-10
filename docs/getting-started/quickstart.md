@@ -918,7 +918,7 @@ Which will result in this JSON:
 }
 ```
 
-Let's take this one step further. What if we want to only to include the title of each post? We can do this by making all the other properties within the post data object also lazy:
+Let's take this one step further. What if we want to only include the title of each post? We can do this by making all the other properties within the post data object also lazy:
 
 ```php
 class PostData extends Data
