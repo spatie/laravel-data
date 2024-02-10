@@ -926,29 +926,6 @@ class PostData extends Data
     public function __construct(
         public string|Lazy $title,
         public string|Lazy $content,
-        #[WithCast(PostStatusCast::class)]
-        public PostStatus|Lazy $status,
-        #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'd-M')]
-        public CarbonImmutable|Lazy|null $published_at
-    ) {
-    }
-
-    public static function fromModel(Post $post): PostData
-    {
-        return new self(
-            Lazy::create(fn() => $post->title),
-            Lazy::create(fn() => $post->content),
-            Lazy::create(fn() => $post->status),
-            Lazy::create(fn() => $post->published_at)
-        );
-    }
-}
-
-class PostData extends Data
-{
-    public function __construct(
-        public string|Lazy $title,
-        public string|Lazy $content,
         public PostStatus|Lazy $status,
         #[WithoutValidation]
         #[WithTransformer(ImageTransformer::class)]
