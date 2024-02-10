@@ -26,7 +26,7 @@ class PostData extends Data
 
 Extending your data objects from the base `Data` object is the only requirement for using the package. We add the requirements for a post as public properties.
 
-The `PostStatus` is an native enum:
+The `PostStatus` is a native enum:
 
 ```php
 enum PostStatus: string
