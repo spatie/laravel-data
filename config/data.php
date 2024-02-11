@@ -102,7 +102,7 @@ return [
 
     /**
      * When using an invalid include, exclude, only or except partial, the package will
-     * throw an
+     * throw an exception. You can disable this behaviour by setting this option to true.
      */
     'ignore_invalid_partials' => false,
 ];
