@@ -10,9 +10,9 @@ eloquent model to create a data object like this:
 SongData::from(Song::findOrFail($id));
 ```
 
-A `Normalizer` will take a payload like a model and will transform it into an array so it can be used in the pipeline (see further).
+A `Normalizer` will take a payload like a model and will transform it into an array, so it can be used in the pipeline (see further).
 
-By default, there are five normalizers for each data object:
+By default, there are five normalizers:
 
 - **ModelNormalizer** will cast eloquent models
 - **ArrayableNormalizer** will cast `Arrayable`'s
@@ -63,4 +63,6 @@ class ArrayableNormalizer implements Normalizer
 }
 ```
 
-Normalizers are executed the order as they are defined in the `normalize` method. The first normalizer not returning null will be used to normalize the payload. Magical creation methods always have precedence on normalizers.
+Normalizers are executed the same order as they are defined in the `normalize` method.
+The first normalizer not returning null will be used to normalize the payload.
+Magical creation methods always have precedence over normalizers.
