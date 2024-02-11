@@ -53,15 +53,18 @@ class CastPropertiesDataPipe implements DataPipe
             return $value;
         }
 
-        if ($casted = $this->tryCast($property->cast, $property, $value, $properties, $creationContext)) {
+        $casted = $this->tryCast($property->cast, $property, $value, $properties, $creationContext);
+        if ($casted !== null) {
             return $casted;
         }
 
-        if ($casted = $this->tryCast($creationContext->casts?->findCastForValue($property), $property, $value, $properties, $creationContext)) {
+        $casted = $this->tryCast($creationContext->casts?->findCastForValue($property), $property, $value, $properties, $creationContext);
+        if ($casted !== null) {
             return $casted;
         }
 
-        if ($casted = $this->tryCast($this->dataConfig->casts->findCastForValue($property), $property, $value, $properties, $creationContext)) {
+        $casted = $this->tryCast($this->dataConfig->casts->findCastForValue($property), $property, $value, $properties, $creationContext);
+        if ($casted !== null) {
             return $casted;
         }
 
