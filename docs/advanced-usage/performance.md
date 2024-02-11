@@ -40,7 +40,7 @@ To find the data classes within your application, we're using the [php-structure
 ],
 ```
 
-Structure discoverer uses reflection (enabled by default) or a PHP parser to find the data objects. You can disable the reflection based discovery and thus use the PHP parser discovery as such:
+Structure discoverer uses reflection (enabled by default) or a PHP parser to find the data objects. You can disable the reflection-based discovery and thus use the PHP parser discovery as such:
 
 ```php
 'structure_caching' => [
