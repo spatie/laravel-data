@@ -42,7 +42,7 @@ Here, the `$artist` property will be filled with the `artist` route parameter va
 
 The `FromRouteParameterProperty` attribute allows filling properties with values from route parameter properties. The main difference from `FromRouteParameter` is that the former uses the full route parameter value, while `FromRouteParameterProperty` uses a single property from the route parameter.  
 
-In the example below we're using route model binding. `{song}` represents an instance of the `Song` model. `FromRouteParameterProperty` automatically attempts to fill the `SongData` `$id` property from `$song->id`.
+In the example below, we're using route model binding. `{song}` represents an instance of the `Song` model. `FromRouteParameterProperty` automatically attempts to fill the `SongData` `$id` property from `$song->id`.
 
 ```php
 Route::patch('/songs/{song}', [SongController::class, 'update']);
@@ -70,7 +70,7 @@ class SongData extends Data {
 
 ### Nested property mapping
 
-Nested properties ar supported as well. Here, we fill `$singerName` from `$artist->leadSinger->name`: 
+Nested properties are supported as well. Here, we fill `$singerName` from `$artist->leadSinger->name`: 
 
 ```php
 Route::patch('/artists/{artist}/songs/{song}', [SongController::class, 'update']);
