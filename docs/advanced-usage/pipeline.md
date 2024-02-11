@@ -91,9 +91,9 @@ class Song extends Data
         public SongMetadata $metadata,
     ) {}
     
-    public static function prepareForPipeline(Collection $properties) : Collection
+    public static function prepareForPipeline(array $properties): array
     {
-        $properties->put('metadata', $properties->only(['release_year', 'producer']));
+        $properties['metadata'] = Arr::only($properties, ['release_year', 'producer']);
         
         return $properties;
     }
