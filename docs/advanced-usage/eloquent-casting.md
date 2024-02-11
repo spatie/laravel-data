@@ -4,7 +4,7 @@ weight: 1
 ---
 
 Since data objects can be created from arrays and be easily transformed into arrays back again, they are excellent to be used
-with [Eloquent casts](https://laravel.com/docs/8.x/eloquent-mutators#custom-casts):
+with [Eloquent casts](https://laravel.com/docs/eloquent-mutators#custom-casts):
 
 ```php
 class Song extends Model
