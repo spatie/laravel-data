@@ -41,6 +41,10 @@ class LaravelDataServiceProvider extends PackageServiceProvider
         );
 
         $this->app->beforeResolving(BaseData::class, function ($class, $parameters, $app) {
+            if ($app->has($class)) {
+                return;
+            }
+            
             $app->bind(
                 $class,
                 fn ($container) => $class::from($container['request'])
