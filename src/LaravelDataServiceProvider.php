@@ -44,7 +44,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
             if ($app->has($class)) {
                 return;
             }
-            
+
             $app->bind(
                 $class,
                 fn ($container) => $class::from($container['request'])
