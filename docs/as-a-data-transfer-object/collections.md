@@ -129,9 +129,7 @@ Since the collection type here is a `Collection`, the package will automatically
 
 ## DataCollection's, PaginatedDataCollection's and CursorPaginatedCollection's
 
-The package also provides a few collection classes which can be used to create collections of data objects.
-It was a requirement to use these classes in the past versions of the package when nesting data objects collections in data objects.
-This is no longer the case, but there are still valid use cases for them.
+The package also provides a few collection classes which can be used to create collections of data objects. It was a requirement to use these classes in the past versions of the package when nesting data objects collections in data objects. This is no longer the case, but there are still valid use cases for them.
 
 You can create a DataCollection like this:
 
