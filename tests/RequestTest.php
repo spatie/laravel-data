@@ -21,7 +21,7 @@ beforeEach(function () {
         ValidationException::class,
     ]);
 
-    Route::post('/example-route', function (Sim $data) {
+    Route::post('/example-route', function (SimpleData $data) {
         return ['given' => $data->string];
     });
 });
@@ -36,6 +36,18 @@ it('can pass validation', function () {
     ])
         ->assertOk()
         ->assertJson(['given' => 'Hello']);
+});
+
+it('can make multiple requests', function () {
+    postJson('/example-route', [
+        'string' => 'Hello',
+    ])
+        ->assertOk();
+
+    postJson('/example-route', [
+        'string' => 'Hello',
+    ])
+        ->assertOk();
 });
 
 it('can returns a 201 response code for POST requests', function () {
