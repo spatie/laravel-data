@@ -14,9 +14,9 @@ jobs:
         stability: [prefer-lowest, prefer-stable]
         include:
           - laravel: 10.*
-            testbench: 8.20
+            testbench: ^8.20
           - laravel: 11.*
-            testbench: 9.0
+            testbench: ^9.0
         exclude:
           - laravel: 11.*
             php: 8.1
