@@ -63,4 +63,4 @@ class ArrayableNormalizer implements Normalizer
 }
 ```
 
-Normalizers are executed the same order as they are defined in the `normalize` method. The first normalizer not returning null will be used to normalize the payload. Magical creation methods always have precedence over normalizers.
+Normalizers are executed in the same order as they are defined in the `normalize` method. The first normalizer not returning null will be used to normalize the payload. Magical creation methods always have precedence over normalizers.
