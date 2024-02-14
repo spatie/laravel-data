@@ -936,3 +936,9 @@ it('can inject a data object in a controller', function () {
     postJson(action(TestControllerDataInjection::class), ['string' => 'Hello World'])->assertOk();
     postJson(action(TestControllerDataInjection::class), ['string' => 'Hello World'])->assertOk(); // caused an infinite loop once
 });
+
+it('can collect null when an output type is defined', function () {
+    expect(SimpleData::collect(null, 'array'))
+        ->toBeArray()
+        ->toBeEmpty();
+});
