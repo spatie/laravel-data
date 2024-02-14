@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.0.2 - 2024-02-14
+
+- Fixes issue where casts could not return `null` or an empty array
+- Prevent out of memory with multiple requests in a test (#665)
+- Allow passing `null` to `collect` and return an empty version of the defined output type
+- Fix templates for Laravel Idea plugin support (#666)
+- Fix an issue where the cache could not be disabled
+
 ## 4.0.1 - 2024-02-09
 
 Laravel-data 4.0.0 was released 5 hours ago, time for an update!
