@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support\Creation;
 
 use ArrayIterator;
+use Generator;
 use IteratorAggregate;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Support\DataProperty;
@@ -32,17 +33,27 @@ class GlobalCastsCollection implements IteratorAggregate
         return $this;
     }
 
+    /**
+     * @deprecated  use `findCastsForValue` instead
+     */
     public function findCastForValue(DataProperty $property): ?Cast
+    {
+        foreach ($this->findCastsForValue($property) as $cast) {
+            return $cast;
+        }
+
+        return null;
+    }
+
+    public function findCastsForValue(DataProperty $property): Generator
     {
         foreach ($property->type->getAcceptedTypes() as $acceptedType => $baseTypes) {
             foreach ([$acceptedType, ...$baseTypes] as $type) {
                 if ($cast = $this->casts[$type] ?? null) {
-                    return $cast;
+                    yield $cast;
                 }
             }
         }
-
-        return null;
     }
 
     public function getIterator(): Traversable
