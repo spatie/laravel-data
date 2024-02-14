@@ -7,7 +7,11 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
+
+use function Pest\Laravel\postJson;
+
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Min;
@@ -916,4 +920,19 @@ it('can loop through multiple casts until the good one is found', function () {
         ->from(['items' => ['not used']]);
 
     expect($data->items)->toEqual(collect(['Well, hello this cast is used!']));
+});
+
+it('can inject a data object in a controller', function () {
+    class TestControllerDataInjection
+    {
+        public function __invoke(SimpleData $data)
+        {
+            return response('ok');
+        }
+    }
+
+    Route::post('test', TestControllerDataInjection::class);
+
+    postJson(action(TestControllerDataInjection::class), ['string' => 'Hello World'])->assertOk();
+    postJson(action(TestControllerDataInjection::class), ['string' => 'Hello World'])->assertOk(); // caused an infinite loop once
 });
