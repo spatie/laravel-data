@@ -37,7 +37,7 @@
         "phpstan/extension-installer": "^1.1",
         "phpunit/phpunit": "^10.0",
         "spatie/invade": "^1.0",
-        "spatie/laravel-typescript-transformer": "^2.6.2",
+        "spatie/laravel-typescript-transformer": "^2.6",
         "spatie/pest-plugin-snapshots": "^2.1",
         "spatie/test-time": "^1.2"
     },
