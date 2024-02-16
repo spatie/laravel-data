@@ -11,27 +11,32 @@ use Spatie\LaravelData\Support\Validation\ValidationPath;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class In extends ObjectValidationAttribute
 {
-    protected BaseIn $rule;
+    protected ?BaseIn $rule = null;
 
-    public function __construct(array|string|BaseIn|RouteParameterReference ...$values)
-    {
-        if (count($values) === 1 && $values[0] instanceof BaseIn) {
-            $this->rule = $values[0];
+    private array $values;
 
-            return;
-        }
-
-        $values = array_map(
-            fn (string|RouteParameterReference $value) => $this->normalizePossibleRouteReferenceParameter($value),
-            Arr::flatten($values)
-        );
-
-        $this->rule = new BaseIn($values);
+    public function __construct(
+        array|string|BaseIn|RouteParameterReference ...$values
+    ) {
+        $this->values = $values;
     }
 
     public function getRule(ValidationPath $path): object|string
     {
-        return $this->rule;
+        if ($this->rule) {
+            return $this->rule;
+        }
+
+        if (count($this->values) === 1 && $this->values[0] instanceof BaseIn) {
+            return $this->rule = $this->values[0];
+        }
+
+        $this->values = array_map(
+            fn (string|RouteParameterReference $value) => $this->normalizePossibleRouteReferenceParameter($value),
+            Arr::flatten($this->values)
+        );
+
+        return  $this->rule = new BaseIn($this->values);
     }
 
     public static function keyword(): string

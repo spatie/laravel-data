@@ -10,13 +10,10 @@ use Spatie\LaravelData\Support\Validation\ValidationPath;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Enum extends ObjectValidationAttribute
 {
-    protected EnumRule $rule;
-
-    public function __construct(string|EnumRule|RouteParameterReference $enum)
-    {
-        $this->rule = $enum instanceof EnumRule
-            ? $enum
-            : new EnumRule((string)$enum);
+    public function __construct(
+        protected string|EnumRule|RouteParameterReference $enum,
+        protected ?EnumRule $rule = null,
+    ) {
     }
 
     public static function keyword(): string
@@ -26,7 +23,13 @@ class Enum extends ObjectValidationAttribute
 
     public function getRule(ValidationPath $path): object|string
     {
-        return $this->rule;
+        if ($this->rule) {
+            return $this->rule;
+        }
+
+        return $this->rule = $this->enum instanceof EnumRule
+            ? $this->enum
+            : new EnumRule((string) $this->enum);
     }
 
     public static function create(string ...$parameters): static

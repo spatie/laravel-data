@@ -44,7 +44,7 @@ it('can map faulty rules')
 
 it('can map Laravel rule objects')
     ->expect(fn () => $this->mapper->execute([new BaseExists('users')]))
-    ->toEqual([new Exists('users')]);
+    ->toEqual([(new Exists(rule: new BaseExists('users')))]);
 
 it('can map a custom Laravel rule objects', function () {
     $rule = new class () implements CustomRuleContract {
