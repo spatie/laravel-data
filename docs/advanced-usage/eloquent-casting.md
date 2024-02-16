@@ -4,7 +4,7 @@ weight: 1
 ---
 
 Since data objects can be created from arrays and be easily transformed into arrays back again, they are excellent to be used
-with [Eloquent casts](https://laravel.com/docs/8.x/eloquent-mutators#custom-casts):
+with [Eloquent casts](https://laravel.com/docs/eloquent-mutators#custom-casts):
 
 ```php
 class Song extends Model
@@ -99,14 +99,14 @@ $cdRecord->config; // CdRecordConfig object
 $vinylRecord->config; // VinylRecordConfig object
 ```
 
-When a data object class is abstract and used as an Eloquent cast then this feature will work out of the box.
+When a data object class is abstract and used as an Eloquent cast, then this feature will work out of the box.
 
-The child data object value of the model will be stored in the database as a JSON string with the class name as the key:
+The child data object value of the model will be stored in the database as a JSON string with the class name and the data object properties:
 
 ```json
 {
     "type": "\\App\\Data\\CdRecordConfig",
-    "value": {
+    "data": {
         "tracks": 12,
         "bytes": 1000
     }
@@ -117,7 +117,7 @@ When retrieving the model, the data object will be instantiated based on the `ty
 
 #### Abstract data class morphs
 
-By default, the `type` key in the JSON string will be the fully qualified class name of the child data object. This can break your application quite easily when you refactor your code. To prevent this, you can add a morph map like with [Eloquent models](https://laravel.com/docs/10.x/eloquent-relationships#polymorphic-relationships). Within your `AppServiceProvivder` you can add the following mapping:
+By default, the `type` key in the JSON string will be the fully qualified class name of the child data object. This can break your application quite easily when you refactor your code. To prevent this, you can add a morph map like with [Eloquent models](https://laravel.com/docs/eloquent-relationships#polymorphic-relationships). Within your `AppServiceProvivder` you can add the following mapping:
 
 ```php
 use Spatie\LaravelData\Support\DataConfig;

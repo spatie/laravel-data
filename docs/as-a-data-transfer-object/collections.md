@@ -101,9 +101,9 @@ There are a few requirements for this to work:
 - The method cannot be called **collect**
 - A **return type** must be defined
 
-## Creating a data object with collection
+## Creating a data object with collections
 
-You can create a data object with a collection of data object just like you would create a data object with a nested data object:
+You can create a data object with a collection of data objects just like you would create a data object with a nested data object:
 
 ```php
 use App\Data\SongData;
@@ -111,6 +111,7 @@ use Illuminate\Support\Collection;
 
 class AlbumData extends Data
 {    
+    public string $title
     /** @var Collection<int, SongData> */
     public Collection $songs;
 }
@@ -128,7 +129,7 @@ Since the collection type here is a `Collection`, the package will automatically
 
 ## DataCollection's, PaginatedDataCollection's and CursorPaginatedCollection's
 
-The package also provides a few collection classes which can be used to create collections of data objects, it was a requirement to use these classes in the past versions of the package when nesting data objects collections in data objects. This is no longer the case and there are still valid use cases for them.
+The package also provides a few collection classes which can be used to create collections of data objects. It was a requirement to use these classes in the past versions of the package when nesting data objects collections in data objects. This is no longer the case, but there are still valid use cases for them.
 
 You can create a DataCollection like this:
 
@@ -168,7 +169,7 @@ class SongController
 }
 ```
 
-In the next chapters of this documentation we'll see that is possible to include or exclude properties from the data objects like this:
+In the next chapters of this documentation, we'll see that it is possible to include or exclude properties from the data objects like this:
 
 ```php
 class SongController
@@ -221,7 +222,7 @@ The `DataCollection` class implements a few of the Laravel collection methods:
 - reduce
 - sole
 
-You can for example get the first item within a collection like this:
+You can, for example, get the first item within a collection like this:
 
 ```php
 SongData::collect(Song::all(), DataCollection::class)->first(); // SongData object
@@ -232,9 +233,9 @@ SongData::collect(Song::all(), DataCollection::class)->first(); // SongData obje
 In previous versions of the package it was possible to use the `collection` method to create a collection of data objects:
 
 ```php
-SongData::collect(Song::all()); // returns a DataCollection of SongData objects
-SongData::collect(Song::paginate()); // returns a PaginatedDataCollection of SongData objects
-SongData::collect(Song::cursorPaginate()); // returns a CursorPaginatedCollection of SongData objects
+SongData::collection(Song::all()); // returns a DataCollection of SongData objects
+SongData::collection(Song::paginate()); // returns a PaginatedDataCollection of SongData objects
+SongData::collection(Song::cursorPaginate()); // returns a CursorPaginatedCollection of SongData objects
 ```
 
 This method was removed with version v4 of the package in favor for the more powerful `collect` method. The `collection` method can still be used by using the `WithDeprecatedCollectionMethod` trait:

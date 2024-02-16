@@ -71,7 +71,7 @@ class SongData extends Data
 {
     public function __construct(
         public string $title,
-        #[RequiredUnless('title', 'Never Gonna Give You Up')]
+        #[RequiredIf('title', 'Never Gonna Give You Up')]
         public string $artist,
     ) {
     }
@@ -109,7 +109,7 @@ class SongData extends Data
 {
     public function __construct(
         public string $title,
-        #[RequiredUnless(new FieldReference('album', fromRoot: true), 'Whenever You Need Somebody')]
+        #[RequiredIf(new FieldReference('album_name', fromRoot: true), 'Whenever You Need Somebody')]
         public string $artist,
     ) {
     }

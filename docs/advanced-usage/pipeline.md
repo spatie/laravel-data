@@ -84,18 +84,19 @@ class SongMetadata
     ) {}
 }
 
-class Song extends Data
+class SongData extends Data
 {
     public function __construct(
         public string $title,
         public SongMetadata $metadata,
     ) {}
     
-    public static function prepareForPipeline(Collection $properties) : Collection
+    public static function prepareForPipeline(array $properties): array
     {
-        $properties->put('metadata', $properties->only(['release_year', 'producer']));
-        
-        return $properties;
+        $collection = collect($properties);
+        $collection->put('metadata', $collection->only(['release_year', 'producer']));
+
+        return $collection->toArray();
     }
 }
 ```
@@ -103,7 +104,7 @@ class Song extends Data
 Now it is possible to create a data object as follows:
 
 ```php
-$song = Song::from([
+$songData = SongData::from([
     'title' => 'Never gonna give you up',
     'release_year' => '1987',
     'producer' => 'Stock Aitken Waterman',
@@ -115,7 +116,7 @@ $song = Song::from([
 Sometimes you want to send your payload first through a certain pipe without creating a whole new pipeline, this can be done as such:
 
 ```php
-class Song extends Data
+class SongData extends Data
 {
     public static function pipeline(): DataPipeline
     {

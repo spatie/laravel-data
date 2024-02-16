@@ -162,7 +162,7 @@ will try to create itself from the following types:
 - An *array*
 
 This list can be extended using extra normalizers, find more about
-it [here](https://spatie.be/docs/laravel-data/v4/advanced-usage/normalizers).
+it [here](/docs/laravel-data/v4/advanced-usage/normalizers).
 
 When a data object cannot be created using magical methods or the default methods, a `CannotCreateData`
 exception will be thrown.
@@ -190,7 +190,7 @@ SongData::withoutMagicalCreationFrom($song);
 ## Advanced creation using factories
 
 It is possible to configure how a data object is created, whether it will be validated, which casts to use and more. You
-can read more about it [here](/docs/laravel-data/v4/advanced-usage/factories).
+can read more about it [here](/docs/laravel-data/v4/as-a-data-transfer-object/factories).
 
 ## DTO classes
 

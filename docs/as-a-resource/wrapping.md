@@ -3,7 +3,7 @@ title: Wrapping
 weight: 5
 ---
 
-By default, when a data object is transformed into JSON in your controller it looks like this:
+By default, when a data object is transformed into JSON in your controller, it looks like this:
 
 ```json
 {
@@ -207,7 +207,7 @@ The JSON will look like this:
 
 ## Disabling wrapping
 
-Whenever a data object is wrapped due to the default wrap method or a global wrap key , it is possible to disable wrapping on a data object/collection:
+Whenever a data object is wrapped due to the default wrap method or a global wrap key, it is possible to disable wrapping on a data object/collection:
 
 ```php
 SongData::from(Song::first())->withoutWrapping();

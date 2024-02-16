@@ -59,7 +59,7 @@ You can now create a data object as such:
 ```php
 $contract = new ContractData(
     name: 'Rick Astley',
-    record_company: 'RCA Records',
+    recordCompany: 'RCA Records',
 );
 ```
 

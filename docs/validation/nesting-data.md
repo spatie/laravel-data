@@ -5,7 +5,7 @@ weight: 6
 
 A data object can contain other data objects or collections of data objects. The package will make sure that also for these data objects validation rules will be generated.
 
-When we again have a look at the data object from the [nesting](/docs/laravel-data/v4/as-a-data-transfer-object/nesting) section:
+Let's take a look again at the data object from the [nesting](/docs/laravel-data/v4/as-a-data-transfer-object/nesting) section:
 
 ```php
 class AlbumData extends Data
@@ -60,7 +60,7 @@ The `NestedRules` class is a Laravel validation rule that will validate each ite
 
 ## Nullable and Optional nested data
 
-If we make the nested data object nullable , the validation rules will change depending on the payload provided:
+If we make the nested data object nullable, the validation rules will change depending on the payload provided:
 
 ```php
 class AlbumData extends Data
@@ -82,7 +82,7 @@ If no value for the nested object key was provided or the value is `null`, the v
 ]
 ```
 
-If however a value was provided (even an empty array), the validation rules will be:
+If, however, a value was provided (even an empty array), the validation rules will be:
 
 ```php
 [
@@ -106,7 +106,7 @@ class AlbumData extends Data
 }
 ```
 
-There's a small difference though compared against nullable, when no value was provided for the nested object key, the validation rules will be:
+There's a small difference compared against nullable, though. When no value was provided for the nested object key, the validation rules will be:
 
 ```php
 [

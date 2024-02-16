@@ -50,13 +50,13 @@ AlbumData::from([
 
 What if you want to nest a collection of data objects within a data object?
 
-That's perfectly possible but there's a small catch, you should always define what kind of data objects will be stored
+That's perfectly possible, but there's a small catch; you should always define what kind of data objects will be stored
 within the collection. This is really important later on to create validation rules for data objects or partially
 transforming data objects.
 
 There are a few different ways to define what kind of data objects will be stored within a collection. You could use an
-annotation for example which has as advantage that your IDE will have better suggestions when working with the data
-object. And as an extra benefit, static analyzers like PHPStan will also be able to detect errors when you're code
+annotation, for example, which has an advantage that your IDE will have better suggestions when working with the data
+object. And as an extra benefit, static analyzers like PHPStan will also be able to detect errors when your code
 is using the wrong types.
 
 A collection of data objects defined by annotation looks like this:

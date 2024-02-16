@@ -58,10 +58,15 @@ Within a request query, you can use the mapped or original name:
 https://spatie.be/my-account?except[]=favorite_song 
 ```
 
-When validating a data object or getting rules for a data object, always use payloads use the original name:
+When validating a data object or getting rules for a data object, always use the original name:
 
 ```php
-UserData::validate($payload)
-UserData::getValidationRules($payload)
+$data = [
+    'favorite_song' => 123,
+    'title' => 'some title',
+];
+
+UserData::validate($data)
+UserData::getValidationRules($data)
 ```
 
