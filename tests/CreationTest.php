@@ -5,13 +5,20 @@ use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
+
+use function Pest\Laravel\postJson;
+
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithCastable;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
+use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Concerns\WithDeprecatedCollectionMethod;
 use Spatie\LaravelData\Contracts\DeprecatedData as DeprecatedDataContract;
 use Spatie\LaravelData\Data;
@@ -25,6 +32,7 @@ use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
+use Spatie\LaravelData\Tests\Fakes\Casts\ValueDefinedCast;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomCursorPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
@@ -873,4 +881,64 @@ it('will ignore null or optional values, which are set by default in multiple pa
         ->string->toEqual('string')
         ->nullable->toEqual('nullable')
         ->optional->toEqual('optional');
+});
+
+it('a cast can return an empty array', function () {
+    $dataclass = new class () extends Data {
+        #[WithCast(ValueDefinedCast::class, value: [])]
+        public array $items;
+    };
+
+    $data = $dataclass::from([
+        'items' => ['does not matter'],
+    ]);
+
+    expect($data->items)->toEqual([]);
+});
+
+it('a cast can return null', function () {
+    $dataclass = new class () extends Data {
+        #[WithCast(ValueDefinedCast::class, value: null)]
+        public ?array $items;
+    };
+
+    $data = $dataclass::from([
+        'items' => ['does not matter'],
+    ]);
+
+    expect($data->items)->toBeNull();
+});
+
+it('can loop through multiple casts until the good one is found', function () {
+    $dataclass = new class () extends Data {
+        public Collection $items;
+    };
+
+    $data = $dataclass::factory()
+        ->withCast(Collection::class, new ValueDefinedCast(Uncastable::create()))
+        ->withCast(Enumerable::class, new ValueDefinedCast(collect(['Well, hello this cast is used!'])))
+        ->from(['items' => ['not used']]);
+
+    expect($data->items)->toEqual(collect(['Well, hello this cast is used!']));
+});
+
+it('can inject a data object in a controller', function () {
+    class TestControllerDataInjection
+    {
+        public function __invoke(SimpleData $data)
+        {
+            return response('ok');
+        }
+    }
+
+    Route::post('test', TestControllerDataInjection::class);
+
+    postJson(action(TestControllerDataInjection::class), ['string' => 'Hello World'])->assertOk();
+    postJson(action(TestControllerDataInjection::class), ['string' => 'Hello World'])->assertOk(); // caused an infinite loop once
+});
+
+it('can collect null when an output type is defined', function () {
+    expect(SimpleData::collect(null, 'array'))
+        ->toBeArray()
+        ->toBeEmpty();
 });

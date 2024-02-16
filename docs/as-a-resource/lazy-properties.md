@@ -224,7 +224,7 @@ AlbumData::from(Album::first())->onlyWhen('songs', fn(AlbumData $data) => count(
 AlbumData::from(Album::first())->exceptWhen('songs', fn(AlbumData $data) => count($data->songs) > 0);
 ```
 
-In some cases you may want to define an include on a class level by implementing a method:
+In some cases, you may want to define an include on a class level by implementing a method:
 
 ```php
 class AlbumData extends Data
@@ -427,7 +427,7 @@ AlbumData::from(Album::first())->onlyPermanently('songs');
 AlbumData::from(Album::first())->exceptPermanently('songs');
 ```
 
-When using conditional a includes/excludes/only/except, you can set the permanent flag:
+When using a conditional includes/excludes/only/except, you can set the permanent flag:
 
 ```php
 AlbumData::from(Album::first())->includeWhen('songs', fn(AlbumData $data) => count($data->songs) > 0, permanent: true);

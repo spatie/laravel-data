@@ -3,7 +3,7 @@ title: Introduction
 weight: 1
 ---
 
-Laravel data, allows you to create data objects from all sorts of data. One of the most common ways to create a data object is from a request and the data from a request cannot always be trusted.
+Laravel data, allows you to create data objects from all sorts of data. One of the most common ways to create a data object is from a request, and the data from a request cannot always be trusted.
 
 That's why it is possible to validate the data before creating the data object. You can validate requests but also arrays and other structures.
 
@@ -11,22 +11,22 @@ The package will try to automatically infer validation rules from the data objec
 
 ### Important notice
 
-Validation is probably one of the coolest features of this package, but it is also the most complex one. We'll try to make it as straightforward as possible to validate data but in the end the Laravel validator was not written to be used in this way. So there are some limitations and quirks you should be aware of.
+Validation is probably one of the coolest features of this package, but it is also the most complex one. We'll try to make it as straightforward as possible to validate data, but in the end, the Laravel validator was not written to be used in this way. So there are some limitations and quirks you should be aware of.
 
 In a few cases it might be easier to just create a custom request class with validation rules and then call `toArray` on the request to create a data object than trying to validate the data with this package.
 
 ## When does validation happen?
 
-Validation will always happen BEFORE a data object is created, once a data object is created it is assumed that the data is valid.
+Validation will always happen BEFORE a data object is created, once a data object is created, it is assumed that the data is valid.
 
-At the moment there isn't a way to validate data objects, so you should implement this logic yourself. We're looking into ways to make this easier in the future.
+At the moment, there isn't a way to validate data objects, so you should implement this logic yourself. We're looking into ways to make this easier in the future.
 
-Validation runs automatically occasionally:
+Validation runs automatically in the following cases:
 
 - When injecting a data object somewhere and the data object gets created from the request
 - When calling the `from` method on a data object with a request
 
-In all other occasions validation won't run automatically. You can always validate the data manually by calling the `validate` method on a data object:
+On all other occasions, validation won't run automatically. You can always validate the data manually by calling the `validate` method on a data object:
 
 ```php
 SongData::validate(
@@ -56,7 +56,7 @@ Completely disabling validation can be done by setting the `validation_strategy`
 'validation_strategy' => \Spatie\LaravelData\Support\Creation\ValidationStrategy::Disabled->value,
 ```
 
-If you require a more fine-grained control over when validation should happen, you can use [data factories](/docs/laravel-data/v4//as-a-data-transfer-object/factories.md) to manually specify the validation strategy.
+If you require a more fine-grained control over when validation should happen, you can use [data factories](/docs/laravel-data/v4/as-a-data-transfer-object/factories) to manually specify the validation strategy.
 
 ## A quick glance at the validation functionality
 
@@ -87,7 +87,7 @@ The package will generate the following validation rules:
 ]
 ```
 
-The package follows an algorithm to infer rules from the data object, you can read more about it [here](/docs/laravel-data/v4/validation/auto-rule-inferring).
+The package follows an algorithm to infer rules from the data object. You can read more about it [here](/docs/laravel-data/v4/validation/auto-rule-inferring).
 
 ### Validation attributes
 
@@ -142,7 +142,7 @@ You can resolve a data object from the container.
 app(SongData::class);
 ```
 
-We resolve a data object from the container, it's properties will already be filled by the values of the request with matching key names.
+We resolve a data object from the container, its properties will already be filled by the values of the request with matching key names.
 If the request contains data that is not compatible with the data object, a validation exception will be thrown.
 
 ### Working with the validator
@@ -154,7 +154,7 @@ It is for example to:
 - overwrite validation messages & attributes
 - overwrite the validator itself
 - overwrite the redirect when validation fails
-- allow to stop validation after a failure
+- allow stopping validation after a failure
 - overwrite the error bag
 
 ### Authorizing a request
@@ -247,7 +247,7 @@ More info about nested data collections can be found [here](/docs/laravel-data/v
 
 When you've set some default values for a data object, the validation rules will only be generated if something else than the default is provided.
 
-For example when we have this data object:
+For example, when we have this data object:
 
 ```php
 class SongData extends Data
@@ -299,7 +299,7 @@ The validation rules for this class will be:
 ]
 ```
 
-There's one small catch, when the validation fails the error message will be for the original property name, not the mapped property name. This is a small quirk we hope to solve as soon as possible. 
+There's one small catch when the validation fails; the error message will be for the original property name, not the mapped property name. This is a small quirk we hope to solve as soon as possible. 
 
 ## Retrieving validation rules for a data object
 
@@ -322,4 +322,4 @@ This will produce the following array with rules:
 
 ### Payload requirement
 
-We suggest always to provide a payload when generating validation rules. Because such a payload is used to determine which rules will be generated and which can be skipped.
+We suggest always providing a payload when generating validation rules. Because such a payload is used to determine which rules will be generated and which can be skipped.

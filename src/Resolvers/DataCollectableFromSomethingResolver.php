@@ -151,6 +151,10 @@ class DataCollectableFromSomethingResolver
             return $payload;
         }
 
+        if($items === null) {
+            return [];
+        }
+
         throw new Exception('Unable to normalize items');
     }
 

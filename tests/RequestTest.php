@@ -21,7 +21,7 @@ beforeEach(function () {
         ValidationException::class,
     ]);
 
-    Route::post('/example-route', function (Sim $data) {
+    Route::post('/example-route', function (SimpleData $data) {
         return ['given' => $data->string];
     });
 });

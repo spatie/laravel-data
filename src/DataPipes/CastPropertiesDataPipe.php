@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\DataPipes;
 
-use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
@@ -53,16 +52,30 @@ class CastPropertiesDataPipe implements DataPipe
             return $value;
         }
 
-        if ($casted = $this->tryCast($property->cast, $property, $value, $properties, $creationContext)) {
-            return $casted;
+        if ($cast = $property->cast) {
+            $casted = $cast->cast($property, $value, $properties, $creationContext);
+
+            if (! $casted instanceof Uncastable) {
+                return $casted;
+            }
         }
 
-        if ($casted = $this->tryCast($creationContext->casts?->findCastForValue($property), $property, $value, $properties, $creationContext)) {
-            return $casted;
+        if ($creationContext->casts) {
+            foreach ($creationContext->casts->findCastsForValue($property) as $cast) {
+                $casted = $cast->cast($property, $value, $properties, $creationContext);
+
+                if (! $casted instanceof Uncastable) {
+                    return $casted;
+                }
+            }
         }
 
-        if ($casted = $this->tryCast($this->dataConfig->casts->findCastForValue($property), $property, $value, $properties, $creationContext)) {
-            return $casted;
+        foreach ($this->dataConfig->casts->findCastsForValue($property) as $cast) {
+            $casted = $cast->cast($property, $value, $properties, $creationContext);
+
+            if (! $casted instanceof Uncastable) {
+                return $casted;
+            }
         }
 
         if (
@@ -77,26 +90,6 @@ class CastPropertiesDataPipe implements DataPipe
         }
 
         return $value;
-    }
-
-    protected function tryCast(
-        ?Cast $cast,
-        DataProperty $property,
-        mixed $value,
-        array $properties,
-        CreationContext $creationContext
-    ): mixed {
-        if ($cast === null) {
-            return null;
-        }
-
-        $casted = $cast->cast($property, $value, $properties, $creationContext);
-
-        if ($casted instanceof Uncastable) {
-            return null;
-        }
-
-        return $casted;
     }
 
     protected function shouldBeCasted(DataProperty $property, mixed $value): bool

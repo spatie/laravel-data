@@ -108,7 +108,7 @@ class SongData extends Data
 
 ## Using context
 
-Sometimes a bit more context is required, in such case a `ValidationContext` parameter can be injected as such:
+Sometimes a bit more context is required, in such a case a `ValidationContext` parameter can be injected as such:
 Additionally, if you need to access the data payload, you can use `$payload` parameter:
 
 ```php
@@ -131,7 +131,7 @@ class SongData extends Data
 ```
 
 By default, the provided payload is the whole request payload provided to the data object. 
-If you want to generate rules in nested data objects then a relative payload can be more useful:
+If you want to generate rules in nested data objects, then a relative payload can be more useful:
 
 ```php
 class AlbumData extends Data
@@ -164,7 +164,7 @@ class SongData extends Data
 }
 ```
 
-When providing such payload:
+When providing such a payload:
 
 ```php
 [

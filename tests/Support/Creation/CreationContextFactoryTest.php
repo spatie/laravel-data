@@ -104,9 +104,10 @@ it('is possible to add a cast', function () {
 
     $dataProperty = app(DataConfig::class)->getDataClass($dataClass::class)->properties['string'];
 
-    expect($context->casts)
-        ->not()->toBeNull()
-        ->findCastForValue($dataProperty)->toBeInstanceOf(StringToUpperCast::class);
+    expect($context->casts)->not()->toBeNull();
+
+    expect(iterator_to_array($context->casts->findCastsForValue($dataProperty))[0])
+        ->toBeInstanceOf(StringToUpperCast::class);
 });
 
 it('is possible to add a cast collection', function () {
@@ -122,7 +123,8 @@ it('is possible to add a cast collection', function () {
 
     $dataProperty = app(DataConfig::class)->getDataClass($dataClass::class)->properties['string'];
 
-    expect($context->casts)
-        ->not()->toBeNull()
-        ->findCastForValue($dataProperty)->toBeInstanceOf(StringToUpperCast::class);
+    expect($context->casts)->not()->toBeNull();
+
+    expect(iterator_to_array($context->casts->findCastsForValue($dataProperty))[0])
+        ->toBeInstanceOf(StringToUpperCast::class);
 });

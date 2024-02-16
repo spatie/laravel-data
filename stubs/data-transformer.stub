@@ -3,11 +3,12 @@
 namespace DummyNamespace;
 
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Transformation\TransformationContext;
 use Spatie\LaravelData\Transformers\Transformer;
 
 class DummyClass implements Transformer
 {
-    public function transform(DataProperty $property, mixed $value): mixed
+    public function transform(DataProperty $property, mixed $value, TransformationContext $context): mixed
     {
         //
     }

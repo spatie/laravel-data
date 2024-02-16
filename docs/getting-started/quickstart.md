@@ -26,7 +26,7 @@ class PostData extends Data
 
 Extending your data objects from the base `Data` object is the only requirement for using the package. We add the requirements for a post as public properties.
 
-The `PostStatus` is an native enum:
+The `PostStatus` is a native enum:
 
 ```php
 enum PostStatus: string
@@ -72,7 +72,7 @@ class Post extends Model
 
     protected $casts = [
         'status' => PostStatus::class,
-        'published_at' => 'datetime_immutable',
+        'published_at' => 'immutable_datetime',
     ];
 }
 ```
@@ -85,7 +85,7 @@ PostData::from(Post::findOrFail($id));
 
 ## Using requests
 
-Let's say we have a Laravel request coming from the front with these properties. Our controller would then validate these properties and then it would store them in a model; this can be done as such:
+Let's say we have a Laravel request coming from the front with these properties. Our controller would then validate these properties, and then it would store them in a model; this can be done as such:
 
 ```php
 class DataController
@@ -918,7 +918,7 @@ Which will result in this JSON:
 }
 ```
 
-Let's take this one step further. What if we want to only to include the title of each post? We can do this by making all the other properties within the post data object also lazy:
+Let's take this one step further. What if we want to only include the title of each post? We can do this by making all the other properties within the post data object also lazy:
 
 ```php
 class PostData extends Data
@@ -926,31 +926,9 @@ class PostData extends Data
     public function __construct(
         public string|Lazy $title,
         public string|Lazy $content,
-        #[WithCast(PostStatusCast::class)]
-        public PostStatus|Lazy $status,
-        #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'd-M')]
-        public CarbonImmutable|Lazy|null $published_at
-    ) {
-    }
-
-    public static function fromModel(Post $post): PostData
-    {
-        return new self(
-            Lazy::create(fn() => $post->title),
-            Lazy::create(fn() => $post->content),
-            Lazy::create(fn() => $post->status),
-            Lazy::create(fn() => $post->published_at)
-        );
-    }
-}
-
-class PostData extends Data
-{
-    public function __construct(
-        public string|Lazy $title,
-        public string|Lazy $content,
         public PostStatus|Lazy $status,
         #[WithoutValidation]
+        #[WithCast(ImageCast::class)]
         #[WithTransformer(ImageTransformer::class)]
         public ImageData|Lazy|null $image,
         #[Date]
@@ -1027,7 +1005,7 @@ So that's it, a quick overview of this package. We barely scratched the surface 
 - [optional properties](/docs/laravel-data/v4/as-a-data-transfer-object/optional-properties) not always required when creating a data object
 - [wrapping](/docs/laravel-data/v4/as-a-resource/wrapping) transformed data into keys
 - [mapping](/docs/laravel-data/v4/as-a-data-transfer-object/mapping-property-names) property names when creating or transforming a data object
-- [appending](/docs/laravel-data/v4/as-a-resource/from-data-to-resource#content-appending-properties) extra data
+- [appending](/docs/laravel-data/v4/as-a-resource/appending-properties) extra data
 - [including](/docs/laravel-data/v4/as-a-resource/lazy-properties#content-using-query-strings) properties using the URL query string
 - [inertia](https://spatie.be/docs/laravel-data/v4/advanced-usage/use-with-inertia) support for lazy properties
 - and so much more ... you'll find all the information here in the docs

@@ -18,24 +18,18 @@ Which will output the following array:
 ]
 ```
 
-You can manually transform a data object to JSON:
-
-```php
-SongData::from(Song::first())->toJson();
-```
-
-Or transform a data object to an array:
-
-```php
-SongData::from(Song::first())->toArray();
-```
-
-By default, calling `toArray` on a data object will transform all properties to an array. This means that nested data objects and collections of data objects  will also be transformed to arrays. Other complex types like `Carbon`, `DateTime`, `Enums`, ... will be transformed into a string. We'll see in the [transformers](/docs/laravel-data/v4/as-a-resource/transformers) section how to configure and customize this behavior.
+By default, calling `toArray` on a data object will recursively transform all properties to an array. This means that nested data objects and collections of data objects will also be transformed to arrays. Other complex types like `Carbon`, `DateTime`, `Enums`, etc... will be transformed into a string. We'll see in the [transformers](/docs/laravel-data/v4/as-a-resource/transformers) section how to configure and customize this behavior.
 
 If you only want to transform a data object to an array without transforming the properties, you can call the `all` method:
 
 ```php
 SongData::from(Song::first())->all();
+```
+
+You can also manually transform a data object to JSON:
+
+```php
+SongData::from(Song::first())->toJson();
 ```
 
 ## Using collections
@@ -129,4 +123,4 @@ class AlbumData extends Data
 }
 ```
 
-As always, don't forget to type collections of data objects by annotation or the `DataCollectionOf` attribute, this is essential to transform these collections correctly.
+As always, remember to type collections of data objects by annotation or the `DataCollectionOf` attribute, this is essential to transform these collections correctly.
