@@ -3,16 +3,19 @@ title: From data to array
 weight: 1
 ---
 
-You can manually transform a data object to JSON:
-
-```php
-SongData::from(Song::first())->toJson();
-```
-
-Or transform a data object to an array:
+A data object can automatically be transformed into an array as such:
 
 ```php
 SongData::from(Song::first())->toArray();
+```
+
+Which will output the following array:
+
+```php
+[
+    'name' => 'Never gonna give you up',
+    'artist' => 'Rick Astley'
+]
 ```
 
 By default, calling `toArray` on a data object will recursively transform all properties to an array. This means that nested data objects and collections of data objects will also be transformed to arrays. Other complex types like `Carbon`, `DateTime`, `Enums`, etc... will be transformed into a string. We'll see in the [transformers](/docs/laravel-data/v4/as-a-resource/transformers) section how to configure and customize this behavior.
@@ -21,6 +24,12 @@ If you only want to transform a data object to an array without transforming the
 
 ```php
 SongData::from(Song::first())->all();
+```
+
+You can also manually transform a data object to JSON:
+
+```php
+SongData::from(Song::first())->toJson();
 ```
 
 ## Using collections
