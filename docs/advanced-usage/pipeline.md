@@ -93,10 +93,9 @@ class SongData extends Data
     
     public static function prepareForPipeline(array $properties): array
     {
-        $collection = collect($properties);
-        $collection->put('metadata', $collection->only(['release_year', 'producer']));
-
-        return $collection->toArray();
+        $properties['metadata'] = Arr::only($properties, ['release_year', 'producer']);
+        
+        return $properties;
     }
 }
 ```
