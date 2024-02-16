@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.1.0 - 2024-02-16
+
+- Fix an issue where the cache was queried too much
+- Move the creation process of object rules from constructor to `getRule` to fix issues with caching and typescript transformer
+- Laravel 11 support
+
 ## 4.0.2 - 2024-02-14
 
 - Fixes issue where casts could not return `null` or an empty array
