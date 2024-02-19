@@ -23,6 +23,7 @@
         "spatie/php-structure-discoverer": "^2.0"
     },
     "require-dev" : {
+        "livewire/livewire" : "^3.0",
         "fakerphp/faker": "^1.14",
         "friendsofphp/php-cs-fixer": "^3.0",
         "inertiajs/inertia-laravel": "dev-master#4508fd1",

@@ -2,11 +2,13 @@
 
 namespace Spatie\LaravelData;
 
+use Livewire\Livewire;
 use Spatie\LaravelData\Commands\DataMakeCommand;
 use Spatie\LaravelData\Commands\DataStructuresCacheCommand;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Support\Caching\DataStructureCache;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\Livewire\LivewireDataSynth;
 use Spatie\LaravelData\Support\VarDumper\VarDumperManager;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -50,6 +52,15 @@ class LaravelDataServiceProvider extends PackageServiceProvider
                 fn ($container) => $class::from($container['request'])
             );
         });
+
+        if(class_exists(Livewire::class)) {
+            $this->registerLivewireSynths();
+        }
+    }
+
+    protected function registerLivewireSynths(): void
+    {
+        Livewire::propertySynthesizer(LivewireDataSynth::class);
     }
 
     public function packageBooted(): void
