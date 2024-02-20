@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.11.1 - 2024-02-20
+
+### What's Changed
+
+* Backport cache fix to v3 by @jameshulse in https://github.com/spatie/laravel-data/pull/671
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/3.11.0...3.11.1
+
 ## 4.1.0 - 2024-02-16
 
 - Fix an issue where the cache was queried too much
