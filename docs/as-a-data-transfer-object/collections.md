@@ -111,7 +111,7 @@ use Illuminate\Support\Collection;
 
 class AlbumData extends Data
 {    
-    public string $title
+    public string $title;
     /** @var Collection<int, SongData> */
     public Collection $songs;
 }
