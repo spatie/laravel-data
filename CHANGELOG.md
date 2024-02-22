@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 3.11.2 - 2024-02-22
+
+- fix: adds environment variable to disable structure caching (#645)
+
 ## 3.11.1 - 2024-02-20
 
 ### What's Changed
