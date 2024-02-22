@@ -76,6 +76,7 @@ return [
      * store should be used.
      */
     'structure_caching' => [
+        'enabled' => env('DATA_STRUCTURE_CACHE_ENABLED', true),
         'directories' => [app_path('Data')],
         'cache' => [
             'store' => env('CACHE_DRIVER', 'file'),

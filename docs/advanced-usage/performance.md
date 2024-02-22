@@ -63,3 +63,5 @@ When using reflection discovery, the base directory and root namespace can be co
 ```
 
 You can read more about reflection discovery [here](https://github.com/spatie/php-structure-discoverer#parsers).
+
+Caching can be disabled e.g. for development or test environments by setting `DATA_STRUCTURE_CACHE_ENABLED=false` in .env
