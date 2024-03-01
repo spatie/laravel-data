@@ -68,4 +68,36 @@ class DataContext
 
         return $requiredPartials;
     }
+
+    public function toSerializedArray(): array
+    {
+        return [
+            'includePartials' => $this->includePartials?->toSerializedArray(),
+            'excludePartials' => $this->excludePartials?->toSerializedArray(),
+            'onlyPartials' => $this->onlyPartials?->toSerializedArray(),
+            'exceptPartials' => $this->exceptPartials?->toSerializedArray(),
+            'wrap' => $this->wrap?->toSerializedArray(),
+        ];
+    }
+
+    public static function fromSerializedArray(array $content): DataContext
+    {
+        return new self(
+            includePartials: $content['includePartials']
+                ? PartialsCollection::fromSerializedArray($content['includePartials'])
+                : null,
+            excludePartials: $content['excludePartials']
+                ? PartialsCollection::fromSerializedArray($content['excludePartials'])
+                : null,
+            onlyPartials: $content['onlyPartials']
+                ? PartialsCollection::fromSerializedArray($content['onlyPartials'])
+                : null,
+            exceptPartials: $content['exceptPartials']
+                ? PartialsCollection::fromSerializedArray($content['exceptPartials'])
+                : null,
+            wrap: $content['wrap']
+                ? Wrap::fromSerializedArray($content['wrap'])
+                : null,
+        );
+    }
 }
