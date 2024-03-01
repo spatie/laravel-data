@@ -53,7 +53,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
             );
         });
 
-        if(class_exists(Livewire::class)) {
+        if(config('data.livewire.enable_synths') && class_exists(Livewire::class)) {
             $this->registerLivewireSynths();
         }
     }

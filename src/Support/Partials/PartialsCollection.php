@@ -32,6 +32,17 @@ class PartialsCollection extends SplObjectStorage implements Stringable
         return $output;
     }
 
+    public function toSerializedArray(): array
+    {
+        $output = [];
+
+        foreach ($this as $partial) {
+            $output[] = $partial->toSerializedArray();
+        }
+
+        return $output;
+    }
+
     public function __toString(): string
     {
         $output = '';
@@ -41,5 +52,15 @@ class PartialsCollection extends SplObjectStorage implements Stringable
         }
 
         return $output;
+    }
+
+    public static function fromSerializedArray(array $collection): PartialsCollection
+    {
+        return self::create(
+            ...array_map(
+                fn (array $partial) => Partial::fromSerializedArray($partial),
+                $collection
+            )
+        );
     }
 }

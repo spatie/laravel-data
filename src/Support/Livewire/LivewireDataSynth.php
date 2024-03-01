@@ -5,36 +5,18 @@ namespace Spatie\LaravelData\Support\Livewire;
 use Livewire\Mechanisms\HandleComponents\ComponentContext;
 use Livewire\Mechanisms\HandleComponents\Synthesizers\Synth;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\ContextableData;
 use Spatie\LaravelData\Contracts\TransformableData;
+use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Lazy\LivewireLostLazy;
+use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 
 class LivewireDataSynth extends Synth
 {
-    // TODO:
-    //
-    // Think about Lazy, we can always send them down?
-    // Or only conditional lazy which are true -> probably a better default
-    // What if we want to create a new data object and don't have the lazyvalue
-    // -> we could create a new LiveWireMissingLazy object, which we then use as the lazy value
-    // -> when resolving it would throw an error saying the value was lost in LiveWire
-    //
-    // Problem with computed properties should be sorted out
-    //
-    // DataCollections synth from the PR
-    //
-    // Do we want livewire as an dependency?
-    //
-    // Update docs
-    //
-    // Can we test this?
-    //
-    // Mapping property names, should we do this?
-
-
     protected DataConfig $dataConfig;
 
-    public static string $key = 'laravel-data-object';
+    public static string $key = 'ldo';
 
     public function __construct(ComponentContext $context, $path)
     {
@@ -43,7 +25,7 @@ class LivewireDataSynth extends Synth
         parent::__construct($context, $path);
     }
 
-    public static function match($target)
+    public static function match($target): bool
     {
         return $target instanceof BaseData && $target instanceof TransformableData;
     }
@@ -59,20 +41,24 @@ class LivewireDataSynth extends Synth
     }
 
     /**
-     * @param BaseData&TransformableData $target
+     * @param BaseData&TransformableData&ContextableData $target
      * @param callable(mixed):mixed $dehydrateChild
      *
      * @return array
      */
     public function dehydrate(
-        BaseData&TransformableData $target,
+        BaseData&TransformableData&ContextableData $target,
         callable $dehydrateChild
     ): array {
         $morph = $this->dataConfig->morphMap->getDataClassAlias($target::class) ?? $target::class;
 
-        $payload = $target->all();
-
-        ray($payload);
+        $payload = $target->transform(
+            TransformationContextFactory::create()
+                ->withPropertyNameMapping(false)
+                ->withoutWrapping()
+                ->withoutPropertyNameMapping()
+                ->withoutValueTransformation()
+        );
 
         foreach ($payload as $key => $value) {
             $payload[$key] = $dehydrateChild($key, $value);
@@ -80,7 +66,7 @@ class LivewireDataSynth extends Synth
 
         return [
             $payload,
-            ['morph' => $morph],
+            ['morph' => $morph, 'context' => encrypt($target->getDataContext())],
         ];
     }
 
@@ -97,6 +83,7 @@ class LivewireDataSynth extends Synth
         callable $hydrateChild
     ): BaseData {
         $morph = $meta['morph'];
+        $context = decrypt($meta['context']);
 
         $dataClass = $this->dataConfig->morphMap->getMorphedDataClass($morph) ?? $morph;
 
@@ -112,8 +99,17 @@ class LivewireDataSynth extends Synth
             $payload[$name] = $hydrateChild($name, $value[$name]);
         }
 
-        return $dataClass::factory()
+        /** @var CreationContextFactory $factory */
+        $factory = $dataClass::factory();
+
+        $data = $factory
+            ->withPropertyNameMapping(false)
             ->ignoreMagicalMethod('fromLivewire')
+            ->withoutValidation()
             ->from($payload);
+
+        $data->setDataContext($context);
+
+        return $data;
     }
 }

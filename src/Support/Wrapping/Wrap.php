@@ -33,4 +33,20 @@ class Wrap
             default => throw new TypeError('Invalid wrap')
         };
     }
+
+    public function toSerializedArray(): array
+    {
+        return [
+            'type' => $this->type->value,
+            'key' => $this->key,
+        ];
+    }
+
+    public static function fromSerializedArray(array $wrap): Wrap
+    {
+        return new Wrap(
+            type: WrapType::from($wrap['type']),
+            key: $wrap['key'] ?? null,
+        );
+    }
 }

@@ -72,4 +72,12 @@ trait ContextableData
 
         return $this->_dataContext;
     }
+
+    public function setDataContext(
+        DataContext $dataContext
+    ): static {
+        $this->_dataContext = $dataContext;
+
+        return $this;
+    }
 }

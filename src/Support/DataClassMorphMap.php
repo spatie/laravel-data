@@ -39,6 +39,9 @@ class DataClassMorphMap
         return $this;
     }
 
+    /**
+     * @return class-string<BaseData>|null
+     */
     public function getMorphedDataClass(string $alias): ?string
     {
         return $this->map[$alias] ?? null;

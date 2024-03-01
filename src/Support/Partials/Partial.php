@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support\Partials;
 
 use Closure;
+use Laravel\SerializableClosure\SerializableClosure;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Support\Partials\Segments\AllPartialSegment;
@@ -234,6 +235,30 @@ class Partial implements Stringable
             'permanent' => $this->permanent,
             'condition' => $this->condition,
         ];
+    }
+
+    public function toSerializedArray(): array
+    {
+        return [
+            'segments' => $this->segments,
+            'permanent' => $this->permanent,
+            'condition' => $this->condition
+                ? serialize(new SerializableClosure($this->condition))
+                : null,
+            'pointer' => $this->pointer,
+        ];
+    }
+
+    public static function fromSerializedArray(array $partial): Partial
+    {
+        return new self(
+            segments: $partial['segments'],
+            permanent: $partial['permanent'],
+            condition: $partial['condition']
+                ? unserialize($partial['condition'])->getClosure()
+                : null,
+            pointer: $partial['pointer'],
+        );
     }
 
     public function __toString(): string

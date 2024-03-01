@@ -2,9 +2,9 @@
 
 namespace Spatie\LaravelData\Support\Wrapping;
 
-enum WrapType
+enum WrapType: string
 {
-    case UseGlobal;
-    case Disabled;
-    case Defined;
+    case UseGlobal = 'use_global';
+    case Disabled = 'disabled';
+    case Defined = 'defined';
 }
