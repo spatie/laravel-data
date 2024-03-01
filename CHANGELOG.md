@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.2.0 - 2024-03-01
+
+### What's Changed
+
+* Add experimental support for Livewire synths @rubenvanassche in https://github.com/spatie/laravel-data/pull/669
+* Add DataCollectionSynth by @edalzell in https://github.com/spatie/laravel-data/pull/591
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.1.0...4.2.0
+
 ## 3.11.2 - 2024-02-22
 
 - fix: adds environment variable to disable structure caching (#645)
