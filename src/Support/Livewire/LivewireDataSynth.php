@@ -41,10 +41,7 @@ class LivewireDataSynth extends Synth
     }
 
     /**
-     * @param BaseData&TransformableData&ContextableData $target
-     * @param callable(mixed):mixed $dehydrateChild
-     *
-     * @return array
+     * @param callable(array-key, mixed):mixed $dehydrateChild
      */
     public function dehydrate(
         BaseData&TransformableData&ContextableData $target,
@@ -71,11 +68,7 @@ class LivewireDataSynth extends Synth
     }
 
     /**
-     * @param mixed $value
-     * @param array $meta
-     * @param callable(mixed):mixed $hydrateChild
-     *
-     * @return BaseData
+     * @param callable(array-key, mixed):mixed $hydrateChild
      */
     public function hydrate(
         array $value,
