@@ -7,9 +7,12 @@ use function Pest\Livewire\livewire;
 
 use Spatie\LaravelData\Concerns\WireableData;
 use Spatie\LaravelData\Data;
+
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Support\Livewire\LivewireDataCollectionSynth;
 use Spatie\LaravelData\Support\Livewire\LivewireDataSynth;
 use Spatie\LaravelData\Tests\Fakes\Livewire\ComputedDataComponent;
+use Spatie\LaravelData\Tests\Fakes\Livewire\DataCollectionComponent;
 use Spatie\LaravelData\Tests\Fakes\Livewire\MappedDataComponent;
 use Spatie\LaravelData\Tests\Fakes\Livewire\NestedDataComponent;
 use Spatie\LaravelData\Tests\Fakes\Livewire\SimpleDataComponent;
@@ -37,6 +40,7 @@ describe('synth tests', function () {
         app()->register(LivewireServiceProvider::class);
 
         Livewire::propertySynthesizer(LivewireDataSynth::class);
+        Livewire::propertySynthesizer(LivewireDataCollectionSynth::class);
     });
 
     it('can initialize a data object', function () {
@@ -91,6 +95,17 @@ describe('synth tests', function () {
             ->assertSee(' ')
             ->set('data.last_name', 'Van Assche')
             ->assertSet('data.last_name', 'Van Assche')
+            ->call('save');
+    });
+
+    it('can use data collections', function () {
+        livewire(DataCollectionComponent::class)
+            ->assertSee('a')
+            ->assertSee('b')
+            ->assertSee('c')
+            ->set('collection.0.string', 'Hello World')
+            ->assertSet('collection.0.string', 'Hello World')
+            ->assertSee('Hello World')
             ->call('save');
     });
 });

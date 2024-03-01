@@ -8,6 +8,7 @@ use Spatie\LaravelData\Commands\DataStructuresCacheCommand;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Support\Caching\DataStructureCache;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\Livewire\LivewireDataCollectionSynth;
 use Spatie\LaravelData\Support\Livewire\LivewireDataSynth;
 use Spatie\LaravelData\Support\VarDumper\VarDumperManager;
 use Spatie\LaravelPackageTools\Package;
@@ -61,6 +62,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
     protected function registerLivewireSynths(): void
     {
         Livewire::propertySynthesizer(LivewireDataSynth::class);
+        Livewire::propertySynthesizer(LivewireDataCollectionSynth::class);
     }
 
     public function packageBooted(): void
