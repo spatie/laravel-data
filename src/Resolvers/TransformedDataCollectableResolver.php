@@ -82,7 +82,7 @@ class TransformedDataCollectableResolver
         Wrap $wrap,
         TransformationContext $nestedContext,
     ): array {
-        $paginator = $paginator->through(fn (BaseData $data) => $this->transformationClosure($nestedContext)($data));
+        $paginator = $paginator->through(fn (array|BaseData $data) => $this->transformationClosure($nestedContext)($data));
 
         if ($nestedContext->transformValues === false) {
             return $paginator->all();
@@ -105,7 +105,7 @@ class TransformedDataCollectableResolver
     protected function transformationClosure(
         TransformationContext $nestedContext,
     ): Closure {
-        return function (BaseData $data) use ($nestedContext) {
+        return function (array|BaseData $data) use ($nestedContext) {
             if (! $data instanceof TransformableData || ! $nestedContext->transformValues) {
                 return $data;
             }
