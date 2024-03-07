@@ -14,29 +14,29 @@ use Spatie\LaravelData\Contracts\BaseData;
 /**
  * @note To myself, always use the fully qualified class names in pest tests when using anonymous classes
  */
-class DataCollectableAnnotationReader
+class DataIterableAnnotationReader
 {
     /** @var array<string, Context> */
     protected static array $contexts = [];
 
-    /** @return array<string, DataCollectableAnnotation> */
+    /** @return array<string, DataIterableAnnotation> */
     public function getForClass(ReflectionClass $class): array
     {
-        return collect($this->get($class))->keyBy(fn (DataCollectableAnnotation $annotation) => $annotation->property)->all();
+        return collect($this->get($class))->keyBy(fn (DataIterableAnnotation $annotation) => $annotation->property)->all();
     }
 
-    public function getForProperty(ReflectionProperty $property): ?DataCollectableAnnotation
+    public function getForProperty(ReflectionProperty $property): ?DataIterableAnnotation
     {
         return Arr::first($this->get($property));
     }
 
-    /** @return array<string, DataCollectableAnnotation> */
+    /** @return array<string, DataIterableAnnotation> */
     public function getForMethod(ReflectionMethod $method): array
     {
-        return collect($this->get($method))->keyBy(fn (DataCollectableAnnotation $annotation) => $annotation->property)->all();
+        return collect($this->get($method))->keyBy(fn (DataIterableAnnotation $annotation) => $annotation->property)->all();
     }
 
-    /** @return DataCollectableAnnotation[] */
+    /** @return DataIterableAnnotation[] */
     protected function get(
         ReflectionProperty|ReflectionClass|ReflectionMethod $reflection
     ): array {
@@ -51,7 +51,7 @@ class DataCollectableAnnotationReader
         $kindPattern = '(?:@property|@var|@param)\s*';
         $fqsenPattern = '[\\\\a-z0-9_\|]+';
         $typesPattern = '[\\\\a-z0-9_\\|\\[\\]]+';
-        $keyPattern = '(?:int|string|\(int\|string\)|array-key)';
+        $keyPattern = '(?<key>int|string|int\|string|string\|int|array-key)';
         $parameterPattern = '\s*\$?(?<parameter>[a-z0-9_]+)?';
 
         preg_match_all(
@@ -61,7 +61,7 @@ class DataCollectableAnnotationReader
         );
 
         preg_match_all(
-            "/{$kindPattern}(?<collectionClass>{$fqsenPattern})<(?:{$keyPattern},\s*)?(?<dataClass>{$fqsenPattern})>{$parameterPattern}/i",
+            "/{$kindPattern}(?<collectionClass>{$fqsenPattern})<(?:{$keyPattern}\s*?,\s*?)?(?<dataClass>{$fqsenPattern})>{$parameterPattern}/i",
             $comment,
             $collectionMatches,
         );
@@ -86,23 +86,19 @@ class DataCollectableAnnotationReader
                 fn (string $type) => str_contains($type, '[]'),
             );
 
-            if(empty($arrayType)) {
+            if (empty($arrayType)) {
                 continue;
             }
 
-            $dataClass = $this->resolveDataClass(
+            $resolvedTuple = $this->resolveDataClass(
                 $reflection,
                 str_replace('[]', '', $arrayType)
             );
 
-            if ($dataClass === null) {
-                continue;
-            }
-
-            $annotations[] = new DataCollectableAnnotation(
-                $dataClass,
-                null,
-                empty($parameter) ? null : $parameter
+            $annotations[] = new DataIterableAnnotation(
+                type: $resolvedTuple['type'],
+                isData: $resolvedTuple['isData'],
+                property: empty($parameter) ? null : $parameter
             );
         }
 
@@ -117,50 +113,83 @@ class DataCollectableAnnotationReader
 
         foreach ($collectionMatches['dataClass'] as $index => $dataClass) {
             $parameter = $collectionMatches['parameter'][$index];
+            $key = $collectionMatches['key'][$index];
 
-            $dataClass = $this->resolveDataClass($reflection, $dataClass);
+            $resolvedTuple = $this->resolveDataClass($reflection, $dataClass);
 
-            if ($dataClass === null) {
-                continue;
-            }
-
-            $annotations[] = new DataCollectableAnnotation(
-                $dataClass,
-                null,
-                empty($parameter) ? null : $parameter
+            $annotations[] = new DataIterableAnnotation(
+                type: $resolvedTuple['type'],
+                isData: $resolvedTuple['isData'],
+                keyType: empty($key) ? 'array-key' : $key,
+                property: empty($parameter) ? null : $parameter
             );
         }
 
         return $annotations;
     }
 
+    /**
+     * @return array{type: string, isData: bool}
+     */
     protected function resolveDataClass(
         ReflectionProperty|ReflectionClass|ReflectionMethod $reflection,
         string $class
-    ): ?string {
+    ): array {
         if (str_contains($class, '|')) {
+            $possibleNonDataType = null;
+
             foreach (explode('|', $class) as $explodedClass) {
-                if ($foundClass = $this->resolveDataClass($reflection, $explodedClass)) {
-                    return $foundClass;
+                $resolvedTuple = $this->resolveDataClass($reflection, $explodedClass);
+
+                if ($resolvedTuple['isData']) {
+                    return $resolvedTuple;
                 }
+
+                $possibleNonDataType = $resolvedTuple['type'];
             }
 
-            return null;
+            return [
+                'type' => $possibleNonDataType,
+                'isData' => false,
+            ];
+        }
+
+        if (in_array($class, ['int', 'string', 'bool', 'float', 'array', 'object', 'callable', 'iterable', 'mixed'])) {
+            return [
+                'type' => $class,
+                'isData' => false,
+            ];
         }
 
         $class = ltrim($class, '\\');
 
         if (is_subclass_of($class, BaseData::class)) {
-            return $class;
+            return [
+                'type' => $class,
+                'isData' => true,
+            ];
+        }
+
+        if (class_exists($class)) {
+            return [
+                'type' => $class,
+                'isData' => false,
+            ];
         }
 
         $class = $this->resolveFcqn($reflection, $class);
 
         if (is_subclass_of($class, BaseData::class)) {
-            return $class;
+            return [
+                'type' => $class,
+                'isData' => true,
+            ];
         }
 
-        return null;
+        return [
+            'type' => $class,
+            'isData' => false,
+        ];
     }
 
     protected function resolveFcqn(

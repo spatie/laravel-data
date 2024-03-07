@@ -2,10 +2,15 @@
 
 namespace Spatie\LaravelData\Enums;
 
+use Exception;
+
 enum DataTypeKind
 {
     case Default;
-    case Iterable;
+    case Array;
+    case Enumerable;
+    case Paginator;
+    case CursorPaginator;
     case DataObject;
     case DataCollection;
     case DataPaginatedCollection;
@@ -22,18 +27,40 @@ enum DataTypeKind
 
     public function isDataCollectable(): bool
     {
-        return $this !== self::Default
-            && $this !== self::Iterable
-            && $this !== self::DataObject;
+        return $this === self::DataCollection
+            || $this === self::DataPaginatedCollection
+            || $this === self::DataCursorPaginatedCollection
+            || $this === self::DataArray
+            || $this === self::DataEnumerable
+            || $this === self::DataPaginator
+            || $this === self::DataCursorPaginator;
     }
 
     public function isDataRelated(): bool
     {
-        return $this !== self::Default && $this !== self::Iterable;
+        return $this->isDataObject() || $this->isDataCollectable();
     }
 
     public function isNonDataRelated(): bool
     {
-        return $this === self::Default || $this === self::Iterable;
+        return $this === self::Default
+            || $this === self::Array
+            || $this === self::Enumerable
+            || $this === self::Paginator
+            || $this === self::CursorPaginator;
+    }
+
+    public function getDataRelatedEquivalent(): self
+    {
+        return match ($this) {
+            self::Array => self::DataArray,
+            self::Enumerable => self::DataEnumerable,
+            self::Paginator => self::DataPaginator,
+            self::CursorPaginator => self::DataCursorPaginator,
+            self::DataCollection => self::DataCollection,
+            self::DataPaginatedCollection => self::DataPaginatedCollection,
+            self::DataCursorPaginatedCollection => self::DataCursorPaginatedCollection,
+            default => throw new Exception("No equivalent for {$this->name}")
+        };
     }
 }

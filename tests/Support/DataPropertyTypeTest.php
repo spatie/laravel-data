@@ -1135,27 +1135,120 @@ it('will mark an array, collection and paginators as an iterable type kind when 
         public array $property;
     });
 
-    expect($type)->kind->toBe(DataTypeKind::Iterable);
+    expect($type)->kind->toBe(DataTypeKind::Array);
 
     $type = resolveDataType(new class () {
         public Collection $property;
     });
 
-    expect($type)->kind->toBe(DataTypeKind::Iterable);
+    expect($type)->kind->toBe(DataTypeKind::Enumerable);
 
     $type = resolveDataType(new class () {
         public LengthAwarePaginator $property;
     });
 
-    expect($type)->kind->toBe(DataTypeKind::Iterable);
+    expect($type)->kind->toBe(DataTypeKind::Paginator);
 
     $type = resolveDataType(new class () {
         public CursorPaginator $property;
     });
 
-    expect($type)->kind->toBe(DataTypeKind::Iterable);
+    expect($type)->kind->toBe(DataTypeKind::CursorPaginator);
 });
 
-it('will mark collections non data iterables as iterable when a type is defined', function () {
 
+it('can annotate iterables using attributes', function () {
+    $type = resolveDataType(new class () {
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection $property;
+    });
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::DataCollection)
+        ->dataClass->toBe(SimpleData::class)
+        ->iterableClass->toBe(DataCollection::class);
+});
+
+it('can annotate iterables using var annotations', function () {
+    $type = resolveDataType(new class () {
+        /** @var array<string> */
+        public array $property;
+    });
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::Array)
+        ->dataClass->toBeNull()
+        ->iterableItemType->toBe('string')
+        ->iterableClass->toBe('array');
+});
+
+it('can annotate iterables using property annotations', function () {
+    /**
+     * @property Collection<string> $property
+     */
+    class TestDataTypeWithClassAnnotatedNonDataProperty
+    {
+        public function __construct(
+            public Collection $property,
+        ) {
+        }
+    }
+
+    $type = resolveDataType(new \TestDataTypeWithClassAnnotatedNonDataProperty(collect([])));
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::Enumerable)
+        ->dataClass->toBeNull()
+        ->iterableClass->toBe(Collection::class)
+        ->iterableItemType->toBe('string');
+});
+
+it('can annotate iterables using constructor parameter annotations', function () {
+    class TestDataTypeWithClassAnnotatedNonDataConstructorParam
+    {
+        /**
+         * @param array<string> $property
+         */
+        public function __construct(
+            public array $property,
+        ) {
+        }
+    }
+
+    $type = resolveDataType(new \TestDataTypeWithClassAnnotatedNonDataConstructorParam([]));
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::Array)
+        ->dataClass->toBeNull()
+        ->iterableClass->toBe('array')
+        ->iterableItemType->toBe('string');
+});
+
+it('can annotate data collection keys using var annotations', function () {
+    $type = resolveDataType(new class () {
+        /** @var array<string, SimpleData> */
+        public array $property;
+    });
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::DataArray)
+        ->dataClass->toBe(SimpleData::class)
+        ->iterableItemType->toBe(SimpleData::class)
+        ->iterableClass->toBe('array')
+        ->iterableKeyType->toBe('string');
+});
+
+
+it('can annotate iterable collection keys using var annotations', function () {
+    $type = resolveDataType(new class () {
+        /** @var array<string, string> */
+        public array $property;
+    });
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::Array)
+        ->dataClass->toBeNull()
+        ->iterableItemType->toBe('string')
+        ->iterableClass->toBe('array')
+        ->iterableKeyType->toBe('string');
 });

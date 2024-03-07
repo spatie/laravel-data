@@ -55,13 +55,13 @@ class AcceptedTypesStorage
     {
         return match (true) {
             in_array(BaseData::class, $acceptedTypes) => DataTypeKind::DataObject,
-            $name === 'array' => DataTypeKind::DataArray,
-            in_array(Enumerable::class, $acceptedTypes) => DataTypeKind::DataEnumerable,
+            $name === 'array' => DataTypeKind::Array,
+            in_array(Enumerable::class, $acceptedTypes) => DataTypeKind::Enumerable,
             in_array(DataCollection::class, $acceptedTypes) || $name === DataCollection::class => DataTypeKind::DataCollection,
             in_array(PaginatedDataCollection::class, $acceptedTypes) || $name === PaginatedDataCollection::class => DataTypeKind::DataPaginatedCollection,
             in_array(CursorPaginatedDataCollection::class, $acceptedTypes) || $name === CursorPaginatedDataCollection::class => DataTypeKind::DataCursorPaginatedCollection,
-            in_array(Paginator::class, $acceptedTypes) || in_array(AbstractPaginator::class, $acceptedTypes) => DataTypeKind::DataPaginator,
-            in_array(CursorPaginator::class, $acceptedTypes) || in_array(AbstractCursorPaginator::class, $acceptedTypes) => DataTypeKind::DataCursorPaginator,
+            in_array(Paginator::class, $acceptedTypes) || in_array(AbstractPaginator::class, $acceptedTypes) => DataTypeKind::Paginator,
+            in_array(CursorPaginator::class, $acceptedTypes) || in_array(AbstractCursorPaginator::class, $acceptedTypes) => DataTypeKind::CursorPaginator,
             default => DataTypeKind::Default,
         };
     }

@@ -26,6 +26,7 @@ class DataPropertyType extends DataType
         public readonly ?string $dataCollectableClass,
         public readonly ?string $iterableClass,
         public readonly ?string $iterableItemType,
+        public readonly ?string $iterableKeyType,
     ) {
         parent::__construct($type, $isNullable, $isMixed, $kind);
     }

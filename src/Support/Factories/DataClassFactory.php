@@ -19,7 +19,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
-use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotationReader;
+use Spatie\LaravelData\Support\Annotations\DataIterableAnnotationReader;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\LazyDataStructureProperty;
@@ -29,7 +29,7 @@ class DataClassFactory
     public function __construct(
         protected DataPropertyFactory $propertyFactory,
         protected DataMethodFactory $methodFactory,
-        protected DataCollectableAnnotationReader $dataCollectableAnnotationReader,
+        protected DataIterableAnnotationReader $iterableAnnotationReader,
     ) {
     }
 
@@ -45,12 +45,12 @@ class DataClassFactory
 
         $constructorReflectionMethod = $methods->first(fn (ReflectionMethod $method) => $method->isConstructor());
 
-        $dataCollectablePropertyAnnotations = $this->dataCollectableAnnotationReader->getForClass($reflectionClass);
+        $dataIterablePropertyAnnotations = $this->iterableAnnotationReader->getForClass($reflectionClass);
 
         if ($constructorReflectionMethod) {
-            $dataCollectablePropertyAnnotations = array_merge(
-                $dataCollectablePropertyAnnotations,
-                $this->dataCollectableAnnotationReader->getForMethod($constructorReflectionMethod)
+            $dataIterablePropertyAnnotations = array_merge(
+                $dataIterablePropertyAnnotations,
+                $this->iterableAnnotationReader->getForMethod($constructorReflectionMethod)
             );
         }
 
@@ -58,7 +58,7 @@ class DataClassFactory
             $reflectionClass,
             $constructorReflectionMethod,
             NameMappersResolver::create(ignoredMappers: [ProvidedNameMapper::class])->execute($attributes),
-            $dataCollectablePropertyAnnotations,
+            $dataIterablePropertyAnnotations,
         );
 
         $responsable = $reflectionClass->implementsInterface(ResponsableData::class);
@@ -90,7 +90,7 @@ class DataClassFactory
             wrappable: $reflectionClass->implementsInterface(WrappableData::class),
             emptyData: $reflectionClass->implementsInterface(EmptyData::class),
             attributes: $attributes,
-            dataCollectablePropertyAnnotations: $dataCollectablePropertyAnnotations,
+            dataIterablePropertyAnnotations: $dataIterablePropertyAnnotations,
             allowedRequestIncludes: new LazyDataStructureProperty(fn (): ?array => $responsable ? $name::allowedRequestIncludes() : null),
             allowedRequestExcludes: new LazyDataStructureProperty(fn (): ?array => $responsable ? $name::allowedRequestExcludes() : null),
             allowedRequestOnly: new LazyDataStructureProperty(fn (): ?array => $responsable ? $name::allowedRequestOnly() : null),
@@ -135,7 +135,7 @@ class DataClassFactory
         ReflectionClass $reflectionClass,
         ?ReflectionMethod $constructorReflectionMethod,
         array $mappers,
-        array $dataCollectablePropertyAnnotations,
+        array $dataIterablePropertyAnnotations,
     ): Collection {
         $defaultValues = $this->resolveDefaultValues($reflectionClass, $constructorReflectionMethod);
 
@@ -150,7 +150,7 @@ class DataClassFactory
                     $defaultValues[$property->getName()] ?? null,
                     $mappers['inputNameMapper'],
                     $mappers['outputNameMapper'],
-                    $dataCollectablePropertyAnnotations[$property->getName()] ?? null,
+                    $dataIterablePropertyAnnotations[$property->getName()] ?? null,
                 ),
             ]);
     }
@@ -190,8 +190,7 @@ class DataClassFactory
                 if (
                     $property->type->kind->isDataCollectable()
                     || $property->type->kind->isDataObject()
-                    || ($property->type->kind === DataTypeKind::Default && $property->type->type->acceptsType('array'))
-                    || $property->type->kind === DataTypeKind::Iterable
+                    || $property->type->kind === DataTypeKind::Array
                 ) {
                     return true;
                 }

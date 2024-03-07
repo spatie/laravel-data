@@ -54,13 +54,13 @@ class DataCollectableFromSomethingResolver
         $normalizedItems = $this->normalizeItems($items, $dataClass, $creationContext);
 
         return match ($intoType->kind) {
-            DataTypeKind::DataArray => $this->normalizeToArray($normalizedItems),
-            DataTypeKind::DataEnumerable => new $intoType->name($this->normalizeToArray($normalizedItems)),
+            DataTypeKind::DataArray, DataTypeKind::Array => $this->normalizeToArray($normalizedItems),
+            DataTypeKind::DataEnumerable, DataTypeKind::Enumerable => new $intoType->name($this->normalizeToArray($normalizedItems)),
             DataTypeKind::DataCollection => new $intoType->name($dataClass, $this->normalizeToArray($normalizedItems)),
             DataTypeKind::DataPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToPaginator($normalizedItems, $collectableMetaData)),
             DataTypeKind::DataCursorPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToCursorPaginator($normalizedItems, $collectableMetaData)),
-            DataTypeKind::DataPaginator => $this->normalizeToPaginator($normalizedItems, $collectableMetaData),
-            DataTypeKind::DataCursorPaginator => $this->normalizeToCursorPaginator($normalizedItems, $collectableMetaData),
+            DataTypeKind::DataPaginator, DataTypeKind::Paginator => $this->normalizeToPaginator($normalizedItems, $collectableMetaData),
+            DataTypeKind::DataCursorPaginator, DataTypeKind::CursorPaginator => $this->normalizeToCursorPaginator($normalizedItems, $collectableMetaData),
             default => throw CannotCreateDataCollectable::create(get_debug_type($items), $intoType->name)
         };
     }
