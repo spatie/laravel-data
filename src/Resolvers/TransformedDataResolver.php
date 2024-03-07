@@ -8,7 +8,6 @@ use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
-use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataClass;
@@ -70,7 +69,7 @@ class TransformedDataResolver
                 $visibleFields[$name] ?? null,
             );
 
-            if($value instanceof Optional) {
+            if ($value instanceof Optional) {
                 continue;
             }
 
@@ -106,7 +105,7 @@ class TransformedDataResolver
             return $this->resolvePotentialPartialArray($value, $fieldContext);
         }
 
-        if($property->type->kind === DataTypeKind::Default) {
+        if ($property->type->kind->isNonDataRelated()) {
             return $value; // Done for performance reasons
         }
 
@@ -217,7 +216,7 @@ class TransformedDataResolver
         }
 
         $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
-            && $property->type->kind !== DataTypeKind::Default;
+            && $property->type->kind->isDataRelated();
 
         if ($shouldUseDefaultDataTransformer) {
             return null;

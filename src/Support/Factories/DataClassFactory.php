@@ -191,6 +191,7 @@ class DataClassFactory
                     $property->type->kind->isDataCollectable()
                     || $property->type->kind->isDataObject()
                     || ($property->type->kind === DataTypeKind::Default && $property->type->type->acceptsType('array'))
+                    || $property->type->kind === DataTypeKind::Iterable
                 ) {
                     return true;
                 }

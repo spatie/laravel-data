@@ -27,6 +27,7 @@ use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastable;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
@@ -47,6 +48,7 @@ use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
+use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
 
 it('can use default types to create data objects', function () {
     $data = ComplicatedData::from([
@@ -941,4 +943,27 @@ it('can collect null when an output type is defined', function () {
     expect(SimpleData::collect(null, 'array'))
         ->toBeArray()
         ->toBeEmpty();
+});
+
+it('will cast array items when a castable type is defined', function () {
+    $dataClass = new class () extends Data {
+        /** @var array<string> */
+        public array $items;
+    };
+
+    /** @var Data $data */
+    $data = $dataClass::factory()
+        ->withCast('string', StringToUpperCast::class)
+        ->from([
+            'items' => ['hello', 'world'],
+        ]);
+
+    expect($data->items)->toBe(['HELLO', 'WORLD']);
+
+    //    $transformed = $data->transform(
+    //        TransformationContextFactory::create()
+    //            ->withTransformer('string', StringToUpperTransformer::class)
+    //    );
+    //
+    //    dd($data, $transformed);
 });

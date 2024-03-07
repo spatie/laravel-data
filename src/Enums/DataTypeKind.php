@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Enums;
 enum DataTypeKind
 {
     case Default;
+    case Iterable;
     case DataObject;
     case DataCollection;
     case DataPaginatedCollection;
@@ -21,6 +22,18 @@ enum DataTypeKind
 
     public function isDataCollectable(): bool
     {
-        return $this !== self::Default && $this !== self::DataObject;
+        return $this !== self::Default
+            && $this !== self::Iterable
+            && $this !== self::DataObject;
+    }
+
+    public function isDataRelated(): bool
+    {
+        return $this !== self::Default && $this !== self::Iterable;
+    }
+
+    public function isNonDataRelated(): bool
+    {
+        return $this === self::Default || $this === self::Iterable;
     }
 }

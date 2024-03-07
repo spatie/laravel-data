@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Arr;
-use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
@@ -28,7 +27,7 @@ class DataValidationMessagesAndAttributesResolver
             $propertyPath = $path->property($dataProperty->inputMappedName ?? $dataProperty->name);
 
             if (
-                $dataProperty->type->kind === DataTypeKind::Default
+                $dataProperty->type->kind->isNonDataRelated()
                 && $dataProperty->validate === false
             ) {
                 continue;

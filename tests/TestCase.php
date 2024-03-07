@@ -14,6 +14,10 @@ class TestCase extends Orchestra
 
         config()->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
 
+        foreach (config('data.features') as $feature => $value) {
+            config()->set("data.features.{$feature}", true);
+        }
+
         Model::unguard();
     }
 
@@ -32,6 +36,6 @@ class TestCase extends Orchestra
 
     protected function defineDatabaseMigrations()
     {
-        $this->loadMigrationsFrom(__DIR__ . '/Migrations');
+        $this->loadMigrationsFrom(__DIR__.'/Migrations');
     }
 }

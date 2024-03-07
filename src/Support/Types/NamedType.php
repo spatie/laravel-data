@@ -19,6 +19,8 @@ class NamedType extends Type
      * @param DataTypeKind $kind
      * @param class-string<BaseData>|null $dataClass
      * @param string|class-string|null $dataCollectableClass
+     * @param string|class-string|null $iterableClass
+     * @param string|class-string|null $iterableItemType
      */
     public function __construct(
         public readonly string $name,
@@ -26,7 +28,10 @@ class NamedType extends Type
         public readonly array $acceptedTypes,
         public readonly DataTypeKind $kind,
         public readonly ?string $dataClass,
+        /** @deprecated Use iterableClass */
         public readonly ?string $dataCollectableClass,
+        public readonly ?string $iterableClass = null,
+        public readonly ?string $iterableItemType = null,
     ) {
         $this->isCastable = in_array(Castable::class, $this->acceptedTypes);
     }

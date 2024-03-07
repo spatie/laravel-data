@@ -64,6 +64,8 @@ class DataTypeFactory
             kind: $properties['kind'],
             dataClass: $properties['dataClass'],
             dataCollectableClass: $properties['dataCollectableClass'],
+            iterableClass: $properties['iterableClass'],
+            iterableItemType: $properties['iterableItemType'],
         );
     }
 
@@ -121,7 +123,9 @@ class DataTypeFactory
      *      isOptional: bool,
      *      kind: DataTypeKind,
      *      dataClass: ?string,
-     *      dataCollectableClass: ?string
+     *      dataCollectableClass: ?string,
+     *      iterableClass: ?string,
+     *      iterableItemType: ?string
      *  }
      */
     protected function infer(
@@ -169,7 +173,9 @@ class DataTypeFactory
      *     isOptional: bool,
      *     kind: DataTypeKind,
      *     dataClass: ?string,
-     *     dataCollectableClass: ?string
+     *     dataCollectableClass: ?string,
+     *     iterableClass: ?string,
+     *     iterableItemType: ?string
      * }
      */
     protected function inferPropertiesForNoneType(): array
@@ -181,6 +187,8 @@ class DataTypeFactory
             kind: DataTypeKind::Default,
             dataClass: null,
             dataCollectableClass: null,
+            iterableClass: null,
+            iterableItemType: null,
         );
 
         return [
@@ -191,6 +199,8 @@ class DataTypeFactory
             'kind' => DataTypeKind::Default,
             'dataClass' => null,
             'dataCollectableClass' => null,
+            'iterableClass' => null,
+            'iterableItemType' => null,
         ];
     }
 
@@ -202,7 +212,9 @@ class DataTypeFactory
      *      isOptional: bool,
      *      kind: DataTypeKind,
      *      dataClass: ?string,
-     *      dataCollectableClass: ?string
+     *      dataCollectableClass: ?string,
+     *      iterableClass: ?string,
+     *      iterableItemType: ?string
      *  }
      */
     protected function inferPropertiesForSingleType(
@@ -234,7 +246,9 @@ class DataTypeFactory
      *      isMixed: bool,
      *      kind: DataTypeKind,
      *      dataClass: ?string,
-     *      dataCollectableClass: ?string
+     *      dataCollectableClass: ?string,
+     *      iterableClass: ?string,
+     *      iterableItemType: ?string
      *  }
      */
     protected function inferPropertiesForNamedType(
@@ -263,11 +277,15 @@ class DataTypeFactory
                     kind: $kind,
                     dataClass: null,
                     dataCollectableClass: null,
+                    iterableClass: null,
+                    iterableItemType: null,
                 ),
                 'isMixed' => $isMixed,
                 'kind' => $kind,
                 'dataClass' => null,
                 'dataCollectableClass' => null,
+                'iterableClass' => null,
+                'iterableItemType' => null,
             ];
         }
 
@@ -280,11 +298,15 @@ class DataTypeFactory
                     kind: $kind,
                     dataClass: $name,
                     dataCollectableClass: null,
+                    iterableClass: null,
+                    iterableItemType: null,
                 ),
                 'isMixed' => $isMixed,
                 'kind' => $kind,
                 'dataClass' => $name,
                 'dataCollectableClass' => null,
+                'iterableClass' => null,
+                'iterableItemType' => null,
             ];
         }
 
@@ -310,28 +332,40 @@ class DataTypeFactory
                     kind: $kind,
                     dataClass: $dataClass,
                     dataCollectableClass: $name,
+                    iterableClass: $name,
+                    iterableItemType: $dataClass,
                 ),
                 'isMixed' => $isMixed,
                 'kind' => $kind,
                 'dataClass' => $dataClass,
                 'dataCollectableClass' => $name,
+                'iterableClass' => $name,
+                'iterableItemType' => $dataClass,
             ];
         }
 
         if (in_array($kind, [DataTypeKind::DataArray, DataTypeKind::DataPaginator, DataTypeKind::DataCursorPaginator, DataTypeKind::DataEnumerable])) {
+            $useIterable = config('data.features.cast_and_transform_iterables');
+
+            $iterableItemType = 'TBD'; // TODO
+
             return [
                 'type' => new NamedType(
                     name: $name,
                     builtIn: $builtIn,
                     acceptedTypes: $acceptedTypes,
-                    kind: DataTypeKind::Default,
+                    kind: $useIterable ? DataTypeKind::Iterable : DataTypeKind::Default,
                     dataClass: null,
                     dataCollectableClass: null,
+                    iterableClass: $name,
+                    iterableItemType: $iterableItemType,
                 ),
                 'isMixed' => $isMixed,
-                'kind' => DataTypeKind::Default,
+                'kind' => $useIterable ? DataTypeKind::Iterable : DataTypeKind::Default,
                 'dataClass' => null,
                 'dataCollectableClass' => null,
+                'iterableClass' => $name,
+                'iterableItemType' => $iterableItemType,
             ];
         }
 
@@ -346,7 +380,9 @@ class DataTypeFactory
      *      isOptional: bool,
      *      kind: DataTypeKind,
      *      dataClass: ?string,
-     *      dataCollectableClass: ?string
+     *      dataCollectableClass: ?string,
+     *      iterableClass: ?string,
+     *      iterableItemType: ?string
      *  }
      *
      */
@@ -365,6 +401,9 @@ class DataTypeFactory
         $kind = null;
         $dataClass = null;
         $dataCollectableClass = null;
+
+        $iterableClass = null;
+        $iterableItemType = null;
 
         $subTypes = [];
 
@@ -386,6 +425,8 @@ class DataTypeFactory
                 $kind ??= $properties['kind'];
                 $dataClass ??= $properties['dataClass'];
                 $dataCollectableClass ??= $properties['dataCollectableClass'];
+                $iterableClass ??= $properties['iterableClass'];
+                $iterableItemType ??= $properties['iterableItemType'];
 
                 $subTypes[] = $properties['type'];
 
@@ -426,6 +467,8 @@ class DataTypeFactory
             $kind ??= $properties['kind'];
             $dataClass ??= $properties['dataClass'];
             $dataCollectableClass ??= $properties['dataCollectableClass'];
+            $iterableClass ??= $properties['iterableClass'];
+            $iterableItemType ??= $properties['iterableItemType'];
 
             $subTypes[] = $properties['type'];
         }
@@ -446,6 +489,8 @@ class DataTypeFactory
             'kind' => $kind,
             'dataClass' => $dataClass,
             'dataCollectableClass' => $dataCollectableClass,
+            'iterableClass' => $iterableClass,
+            'iterableItemType' => $iterableItemType,
         ];
     }
 }

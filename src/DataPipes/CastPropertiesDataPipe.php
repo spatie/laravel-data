@@ -86,7 +86,7 @@ class CastPropertiesDataPipe implements DataPipe
 
             return $property->type->kind->isDataObject()
                 ? $context->from($value)
-                : $context->collect($value, $property->type->dataCollectableClass);
+                : $context->collect($value, $property->type->iterableClass);
         }
 
         return $value;
