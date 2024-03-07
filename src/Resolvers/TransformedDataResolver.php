@@ -101,6 +101,12 @@ class TransformedDataResolver
             return $transformer->transform($property, $value, $currentContext);
         }
 
+        if ($property->type->kind->isNonDataIteratable()
+            && config('data.features.cast_and_transform_iterables')
+        ) {
+            $value = $this->transformIterableItems($property, $value, $currentContext);
+        }
+
         if (is_array($value) && ! $property->type->kind->isDataCollectable()) {
             return $this->resolvePotentialPartialArray($value, $fieldContext);
         }
@@ -167,6 +173,35 @@ class TransformedDataResolver
         }
 
         return $value;
+    }
+
+    protected function transformIterableItems(
+        DataProperty $property,
+        iterable $items,
+        TransformationContext $context,
+    ): iterable {
+        if (! $context->transformValues) {
+            return $items;
+        }
+
+        /** @var Transformer|null $transformer */
+        $transformer = null;
+
+        foreach ($items as $key => $value) {
+            if ($transformer === null) {
+                $transformer = $this->resolveTransformerForValue($property, $value, $context);
+            }
+
+            if ($transformer === null) {
+                return $items;
+            }
+
+            if ($transformer) {
+                $items[$key] = $transformer->transform($property, $value, $context);
+            }
+        }
+
+        return $items;
     }
 
     protected function resolvePotentialPartialArray(

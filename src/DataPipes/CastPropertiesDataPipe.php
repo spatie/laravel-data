@@ -2,7 +2,10 @@
 
 namespace Spatie\LaravelData\DataPipes;
 
+use Illuminate\Support\Enumerable;
+use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Casts\Uncastable;
+use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
@@ -89,6 +92,18 @@ class CastPropertiesDataPipe implements DataPipe
                 : $context->collect($value, $property->type->iterableClass);
         }
 
+        if (
+            $property->type->kind->isNonDataIteratable()
+            && config('data.features.cast_and_transform_iterables', true)
+        ) {
+            return $this->castIterable(
+                $property,
+                $value,
+                $properties,
+                $creationContext
+            );
+        }
+
         return $value;
     }
 
@@ -103,5 +118,94 @@ class CastPropertiesDataPipe implements DataPipe
         }
 
         return $property->type->acceptsValue($value) === false;
+    }
+
+    protected function castIterable(
+        DataProperty $property,
+        mixed $values,
+        array $properties,
+        CreationContext $creationContext
+    ): iterable {
+        if (empty($values)) {
+            return $values;
+        }
+
+        if ($values instanceof Enumerable) {
+            $values = $values->all();
+        }
+
+        if (
+            $property->type->iterableItemType
+        ) {
+            $values = $this->castIterableItems($property, $values, $properties, $creationContext);
+        }
+
+        if ($property->type->kind === DataTypeKind::Array) {
+            return $values;
+        }
+
+        if ($property->type->kind === DataTypeKind::Enumerable) {
+            return new $property->type->iterableClass($values);
+        }
+
+        return $values;
+    }
+
+    private function castIterableItems(
+        DataProperty $property,
+        mixed $values,
+        array $properties,
+        CreationContext $creationContext
+    ): mixed {
+        /** @var Cast $cast */
+        $cast = null;
+
+        $noCastFound = false;
+
+        foreach ($values as $key => $value) {
+            if ($noCastFound) {
+                continue;
+            }
+
+            if ($cast !== null) {
+                $values[$key] = $cast->cast($property, $value, $properties, $creationContext);
+
+                continue;
+            }
+
+            if ($creationContext->casts) {
+                foreach ($creationContext->casts->findCastsForType($property->type->iterableItemType) as $possibleCast) {
+                    $casted = $possibleCast->cast($property, $value, $properties, $creationContext);
+
+                    if (! $casted instanceof Uncastable) {
+                        $cast = $possibleCast;
+                        $values[$key] = $casted;
+
+                        break;
+                    }
+                }
+
+                if ($cast) {
+                    continue;
+                }
+            }
+
+            foreach ($this->dataConfig->casts->findCastsForType($property->type->iterableItemType) as $possibleCast) {
+                $casted = $possibleCast->cast($property, $value, $properties, $creationContext);
+
+                if (! $casted instanceof Uncastable) {
+                    $cast = $possibleCast;
+                    $values[$key] = $casted;
+
+                    break;
+                }
+            }
+
+            if ($cast === null) {
+                $noCastFound = true;
+            }
+        }
+
+        return $values;
     }
 }

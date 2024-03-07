@@ -50,6 +50,14 @@ enum DataTypeKind
             || $this === self::CursorPaginator;
     }
 
+    public function isNonDataIteratable(): bool
+    {
+        return $this === self::Array
+            || $this === self::Enumerable
+            || $this === self::Paginator
+            || $this === self::CursorPaginator;
+    }
+
     public function getDataRelatedEquivalent(): self
     {
         return match ($this) {

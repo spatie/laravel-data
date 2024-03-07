@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -27,13 +28,13 @@ use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
-use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastable;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ValueDefinedCast;
+use Spatie\LaravelData\Tests\Fakes\Collections\CustomCollection;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomCursorPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
@@ -48,7 +49,6 @@ use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
-use Spatie\LaravelData\Tests\Fakes\Transformers\StringToUpperTransformer;
 
 it('can use default types to create data objects', function () {
     $data = ComplicatedData::from([
@@ -945,25 +945,50 @@ it('can collect null when an output type is defined', function () {
         ->toBeEmpty();
 });
 
-it('will cast array items when a castable type is defined', function () {
+it('will cast array items when an iterable type is defined that can be cast', function () {
     $dataClass = new class () extends Data {
         /** @var array<string> */
-        public array $items;
+        public array $array;
+
+        /** @var Collection<int, string> */
+        public Collection $collection;
     };
 
     /** @var Data $data */
     $data = $dataClass::factory()
         ->withCast('string', StringToUpperCast::class)
         ->from([
-            'items' => ['hello', 'world'],
+            'array' => ['hello', 'world'],
+            'collection' => ['this', 'is', 'great'],
         ]);
 
-    expect($data->items)->toBe(['HELLO', 'WORLD']);
+    expect($data->array)->toEqual(['HELLO', 'WORLD']);
+    expect($data->collection)->toEqual(collect(['THIS', 'IS', 'GREAT']));
+});
 
-    //    $transformed = $data->transform(
-    //        TransformationContextFactory::create()
-    //            ->withTransformer('string', StringToUpperTransformer::class)
-    //    );
-    //
-    //    dd($data, $transformed);
+it('will cast values into the correct type', function () {
+    $dataClass = new class () extends Data {
+        public EloquentCollection $collection;
+        public CustomCollection $customCollection;
+
+        public array $array;
+    };
+
+    $data = $dataClass::from([
+        'collection' => ['no', 'models', 'here'],
+        'customCollection' => ['this', 'is', 'great'],
+        'array' => collect(['a', 'collection']),
+    ]);
+
+    expect($data->collection)
+        ->toBeInstanceOf(EloquentCollection::class)
+        ->toEqual(new EloquentCollection(['no', 'models', 'here']));
+
+    expect($data->customCollection)
+        ->toBeInstanceOf(CustomCollection::class)
+        ->toEqual(new CustomCollection(['this', 'is', 'great']));
+
+    expect($data->array)
+        ->toBeArray()
+        ->toEqual(['a', 'collection']);
 });

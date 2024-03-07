@@ -7,6 +7,7 @@ use Generator;
 use IteratorAggregate;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Types\Storage\AcceptedTypesStorage;
 use Traversable;
 
 class GlobalCastsCollection implements IteratorAggregate
@@ -52,6 +53,19 @@ class GlobalCastsCollection implements IteratorAggregate
                 if ($cast = $this->casts[$type] ?? null) {
                     yield $cast;
                 }
+            }
+        }
+    }
+
+    public function findCastsForType(string $type): Generator
+    {
+        if ($cast = $this->casts[$type] ?? null) {
+            yield $cast;
+        }
+
+        foreach (AcceptedTypesStorage::getAcceptedTypes($type) as $acceptedType) {
+            if ($cast = $this->casts[$acceptedType] ?? null) {
+                yield $cast;
             }
         }
     }
