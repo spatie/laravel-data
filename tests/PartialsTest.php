@@ -1389,6 +1389,169 @@ it('handles parsing includes from request in different formats', function (array
     ];
 });
 
+it('handles partials when not transforming values by copying them to lazy nested data objects', function () {
+    $dataClass = new class () extends Data {
+        public Lazy|NestedLazyData $nested;
+
+        public function __construct()
+        {
+            $this->nested = Lazy::create(fn () => NestedLazyData::from('Rick Astley'));
+        }
+    };
+
+    expect($dataClass->include('nested.simple')->toArray())->toMatchArray([
+        'nested' => [
+            'simple' => [
+                'string' => 'Rick Astley',
+            ],
+        ],
+    ]);
+
+    $nested = $dataClass->include('nested.simple')->all()['nested'];
+
+    expect($nested)->toBeInstanceOf(NestedLazyData::class);
+    expect($nested->toArray())->toMatchArray([
+        'simple' => [
+            'string' => 'Rick Astley',
+        ],
+    ]);
+});
+
+it('handles partials when not transforming values by copying them to lazy data collections', function () {
+    $dataClass = new class () extends Data {
+        public Lazy|DataCollection $collection;
+
+        public function __construct()
+        {
+            $this->collection = Lazy::create(fn () => NestedLazyData::collect([
+                'Rick Astley',
+                'Jon Bon Jovi',
+            ], DataCollection::class));
+        }
+    };
+
+    expect($dataClass->include('collection.simple')->toArray())->toMatchArray([
+        'collection' => [
+            [
+                'simple' => [
+                    'string' => 'Rick Astley',
+                ],
+            ],
+            [
+                'simple' => [
+                    'string' => 'Jon Bon Jovi',
+                ],
+            ],
+        ],
+    ]);
+
+    $nested = $dataClass->include('collection.simple')->all()['collection'];
+
+    expect($nested)->toBeInstanceOf(DataCollection::class);
+    expect($nested->toArray())->toMatchArray([
+        [
+            'simple' => [
+                'string' => 'Rick Astley',
+            ],
+        ],
+        [
+            'simple' => [
+                'string' => 'Jon Bon Jovi',
+            ],
+        ],
+    ]);
+});
+
+it('handles partials when not transforming values by copying them to a lazy array of data objects', function () {
+    $dataClass = new class () extends Data {
+        /** @var array<Spatie\LaravelData\Tests\Fakes\NestedLazyData> */
+        public Lazy|array $collection;
+
+        public function __construct()
+        {
+            $this->collection = Lazy::create(fn () => NestedLazyData::collect([
+                'Rick Astley',
+                'Jon Bon Jovi',
+            ]));
+        }
+    };
+
+    //    expect($dataClass->include('collection.simple')->toArray())->toMatchArray([
+    //        'collection' => [
+    //            [
+    //                'simple' => [
+    //                    'string' => 'Rick Astley',
+    //                ],
+    //            ],
+    //            [
+    //                'simple' => [
+    //                    'string' => 'Jon Bon Jovi',
+    //                ],
+    //            ],
+    //        ],
+    //    ]);
+
+    $nested = $dataClass->include('collection.simple')->all()['collection'];
+
+    expect(array_map(fn (NestedLazyData $data) => $data->toArray(), $nested))->toMatchArray([
+        [
+            'simple' => [
+                'string' => 'Rick Astley',
+            ],
+        ],
+        [
+            'simple' => [
+                'string' => 'Jon Bon Jovi',
+            ],
+        ],
+    ]);
+});
+
+it('handles partials when not transforming values by copying them to lazy nested data objects in data collections', function () {
+    $dataClass = new class () extends Data {
+        public DataCollection $collection;
+
+        public function __construct()
+        {
+            $this->collection = NestedLazyData::collect([
+                'Rick Astley',
+                'Jon Bon Jovi',
+            ], DataCollection::class);
+        }
+    };
+
+    expect($dataClass->include('collection.simple')->toArray())->toMatchArray([
+        'collection' => [
+            [
+                'simple' => [
+                    'string' => 'Rick Astley',
+                ],
+            ],
+            [
+                'simple' => [
+                    'string' => 'Jon Bon Jovi',
+                ],
+            ],
+        ],
+    ]);
+
+    $nested = $dataClass->include('collection.simple')->all()['collection'];
+
+    expect($nested)->toBeInstanceOf(DataCollection::class);
+    expect($nested->toArray())->toMatchArray([
+        [
+            'simple' => [
+                'string' => 'Rick Astley',
+            ],
+        ],
+        [
+            'simple' => [
+                'string' => 'Jon Bon Jovi',
+            ],
+        ],
+    ]);
+});
+
 it('handles parsing except from request with mapped output name', function () {
     $dataclass = SimpleDataWithMappedOutputName::from([
         'id' => 1,

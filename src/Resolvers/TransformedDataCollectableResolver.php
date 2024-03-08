@@ -106,7 +106,17 @@ class TransformedDataCollectableResolver
         TransformationContext $nestedContext,
     ): Closure {
         return function (BaseData $data) use ($nestedContext) {
-            if (! $data instanceof TransformableData || ! $nestedContext->transformValues) {
+            if (! $data instanceof TransformableData) {
+                return $data;
+            }
+
+            if ($nestedContext->transformValues === false && $nestedContext->shouldMergeIntoDataContext()) {
+                $data->getDataContext()->mergeTransformationContext($nestedContext);
+
+                return $data;
+            }
+
+            if ($nestedContext->transformValues === false) {
                 return $data;
             }
 

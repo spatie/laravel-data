@@ -14,9 +14,9 @@ use Stringable;
 
 class Partial implements Stringable
 {
-    protected int $segmentCount;
+    public int $segmentCount;
 
-    protected bool $endsInAll;
+    public bool $endsInAll;
 
     /**
      * @param array<int, PartialSegment> $segments

@@ -90,10 +90,12 @@ test('a transformer will never handle a null value', function () {
 });
 
 it('can get the data object without transforming', function () {
+    $lazyData = new SimpleData('Lazy');
+
     $data = new class (
         $dataObject = new SimpleData('Test'),
         $dataCollection = new DataCollection(SimpleData::class, ['A', 'B']),
-        Lazy::create(fn () => new SimpleData('Lazy')),
+        Lazy::create(fn () => $lazyData),
         'Test',
         $transformable = new DateTime('16 may 1994')
     ) extends Data {
@@ -115,10 +117,10 @@ it('can get the data object without transforming', function () {
         'transformable' => $transformable,
     ]);
 
-    expect($data->include('lazy')->all())->toMatchArray([
+    expect($data->include('lazy')->all())->toEqual([
         'data' => $dataObject,
         'dataCollection' => $dataCollection,
-        'lazy' => (new SimpleData('Lazy')),
+        'lazy' => $lazyData,
         'string' => 'Test',
         'transformable' => $transformable,
     ]);
