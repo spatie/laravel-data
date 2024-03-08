@@ -119,3 +119,46 @@ Tip: we can also remove the `EnumCast` since the package will automatically cast
 ## Creating your own casts
 
 It is possible to create your casts. You can read more about this in the [advanced chapter](/docs/laravel-data/v4/advanced-usage/creating-a-cast).
+
+## Casting arrays or collections of non-data types
+
+We've already seen how collections of data can be made of data objects, the same is true for all other types if correctly
+typed.
+
+Let say we have an array of DateTime objects:
+
+```php
+class ReleaseData extends Data
+{
+    public string $title;
+    /** @var array<int, DateTime> */
+    public array $releaseDates;
+}
+```
+
+By enabling the `cast_and_transform_iterables` feature in the `data` config file (this feature will be enabled by default in laravel-data v5):
+
+```php
+'features' => [
+    'cast_and_transform_iterables' => true,
+],
+```
+
+We now can create a `ReleaseData` object with an array of strings which will be cast into an array DateTime objects:
+
+```php
+ReleaseData::from([
+    'title' => 'Never Gonna Give You Up',
+    'releaseDates' => [
+        '1987-07-27T12:00:00Z',
+        '1987-07-28T12:00:00Z',
+        '1987-07-29T12:00:00Z',
+    ],
+]);
+```
+
+For this feature to work, a cast should not only implement the `Cast` interface but also the `IterableItemCast`. The
+signatures of the `cast` and `castIterableItem` methods are exactly the same, but they're called on different times.
+When casting a property like a DateTime from a string, the `cast` method will be used, when transforming an iterable
+property like an arrat or Laravel Collection where the iterable item is typed using an annotation, then each item of the
+provided iterable will trigger a call to the `castIterableItem` method.

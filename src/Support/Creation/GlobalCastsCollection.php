@@ -6,6 +6,7 @@ use ArrayIterator;
 use Generator;
 use IteratorAggregate;
 use Spatie\LaravelData\Casts\Cast;
+use Spatie\LaravelData\Casts\IterableItemCast;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Types\Storage\AcceptedTypesStorage;
 use Traversable;
@@ -14,15 +15,25 @@ class GlobalCastsCollection implements IteratorAggregate
 {
     /**
      * @param array<string, Cast> $casts
+     * @param array<string, IterableItemCast> $iterableItemCasts
      */
     public function __construct(
-        protected array $casts = []
+        protected array $casts = [],
+        protected array $iterableItemCasts = []
     ) {
     }
 
-    public function add(string $castable, Cast $cast): self
+    public function add(string $castable, Cast|IterableItemCast $cast): self
     {
-        $this->casts[ltrim($castable, ' \\')] = $cast;
+        $castable = ltrim($castable, ' \\');
+
+        if($cast instanceof Cast) {
+            $this->casts[$castable] = $cast;
+        }
+
+        if($cast instanceof IterableItemCast) {
+            $this->iterableItemCasts[$castable] = $cast;
+        }
 
         return $this;
     }
@@ -30,6 +41,7 @@ class GlobalCastsCollection implements IteratorAggregate
     public function merge(self $casts): self
     {
         $this->casts = array_merge($this->casts, $casts->casts);
+        $this->iterableItemCasts = array_merge($this->iterableItemCasts, $casts->iterableItemCasts);
 
         return $this;
     }
@@ -57,14 +69,14 @@ class GlobalCastsCollection implements IteratorAggregate
         }
     }
 
-    public function findCastsForType(string $type): Generator
+    public function findCastsForIterableType(string $type): Generator
     {
-        if ($cast = $this->casts[$type] ?? null) {
+        if ($cast = $this->iterableItemCasts[$type] ?? null) {
             yield $cast;
         }
 
         foreach (AcceptedTypesStorage::getAcceptedTypes($type) as $acceptedType) {
-            if ($cast = $this->casts[$acceptedType] ?? null) {
+            if ($cast = $this->iterableItemCasts[$acceptedType] ?? null) {
                 yield $cast;
             }
         }
@@ -72,6 +84,6 @@ class GlobalCastsCollection implements IteratorAggregate
 
     public function getIterator(): Traversable
     {
-        return new ArrayIterator($this->casts);
+        return new ArrayIterator(array_unique(array_merge(array_keys($this->casts), array_keys($this->iterableItemCasts))));
     }
 }

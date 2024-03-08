@@ -3,7 +3,7 @@
 namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Support\Enumerable;
-use Spatie\LaravelData\Casts\Cast;
+use Spatie\LaravelData\Casts\IterableItemCast;
 use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Lazy;
@@ -134,9 +134,7 @@ class CastPropertiesDataPipe implements DataPipe
             $values = $values->all();
         }
 
-        if (
-            $property->type->iterableItemType
-        ) {
+        if ($property->type->iterableItemType) {
             $values = $this->castIterableItems($property, $values, $properties, $creationContext);
         }
 
@@ -157,7 +155,7 @@ class CastPropertiesDataPipe implements DataPipe
         array $properties,
         CreationContext $creationContext
     ): mixed {
-        /** @var Cast $cast */
+        /** @var IterableItemCast $cast */
         $cast = null;
 
         $noCastFound = false;
@@ -168,14 +166,14 @@ class CastPropertiesDataPipe implements DataPipe
             }
 
             if ($cast !== null) {
-                $values[$key] = $cast->cast($property, $value, $properties, $creationContext);
+                $values[$key] = $cast->castIterableItem($property, $value, $properties, $creationContext);
 
                 continue;
             }
 
             if ($creationContext->casts) {
-                foreach ($creationContext->casts->findCastsForType($property->type->iterableItemType) as $possibleCast) {
-                    $casted = $possibleCast->cast($property, $value, $properties, $creationContext);
+                foreach ($creationContext->casts->findCastsForIterableType($property->type->iterableItemType) as $possibleCast) {
+                    $casted = $possibleCast->castIterableItem($property, $value, $properties, $creationContext);
 
                     if (! $casted instanceof Uncastable) {
                         $cast = $possibleCast;
@@ -190,8 +188,8 @@ class CastPropertiesDataPipe implements DataPipe
                 }
             }
 
-            foreach ($this->dataConfig->casts->findCastsForType($property->type->iterableItemType) as $possibleCast) {
-                $casted = $possibleCast->cast($property, $value, $properties, $creationContext);
+            foreach ($this->dataConfig->casts->findCastsForIterableType($property->type->iterableItemType) as $possibleCast) {
+                $casted = $possibleCast->castIterableItem($property, $value, $properties, $creationContext);
 
                 if (! $casted instanceof Uncastable) {
                     $cast = $possibleCast;

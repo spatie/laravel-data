@@ -970,6 +970,9 @@ it('will cast array items when an iterable interface type is defined that can be
     $dataClass = new class () extends Data {
         /** @var array<DateTime> */
         public array $dates;
+
+        /** @var array<Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum> */
+        public array $enums;
     };
 
     /** @var Data $data */
@@ -977,12 +980,24 @@ it('will cast array items when an iterable interface type is defined that can be
         ->withCast('string', StringToUpperCast::class)
         ->from([
             'dates' => [
-                '2022-01-18 12:00:00',
-                '2022-01-19 12:00:00',
+                '2022-01-18T12:00:00Z',
+                '2022-01-19T12:00:00Z',
+            ],
+            'enums' => [
+                'boo',
+                'foo',
             ],
         ]);
 
-    dd($data);
+    expect($data->dates)->toEqual([
+        DateTime::createFromFormat(DATE_ATOM, '2022-01-18T12:00:00Z'),
+        DateTime::createFromFormat(DATE_ATOM, '2022-01-19T12:00:00Z'),
+    ]);
+
+    expect($data->enums)->toEqual([
+        DummyBackedEnum::BOO,
+        DummyBackedEnum::FOO,
+    ]);
 });
 
 it('will cast iterables into the correct type', function () {

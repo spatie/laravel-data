@@ -126,23 +126,3 @@ it('can use data as an Resource', function () {
         'validate',
     ]);
 });
-
-it('bla', function () {
-    class ReleaseData extends Data
-    {
-        public string $title;
-        /** @var array<int, DateTime> */
-        public array $releaseDates;
-    }
-
-    $d = ReleaseData::from([
-        'title' => 'Never Gonna Give You Up',
-        'releaseDates' => [
-            '1987-07-27 12:00:00',
-            '1987-07-28 12:00:00',
-            '1987-07-29 12:00:00',
-        ],
-    ]);
-
-    dd($d);
-});
