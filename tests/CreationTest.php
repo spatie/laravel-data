@@ -964,7 +964,7 @@ it('will cast array items when an iterable type is defined that can be cast', fu
 
     expect($data->array)->toEqual(['HELLO', 'WORLD']);
     expect($data->collection)->toEqual(collect(['THIS', 'IS', 'GREAT']));
-});
+})->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
 
 it('will cast array items when an iterable interface type is defined that can be cast', function () {
     $dataClass = new class () extends Data {
@@ -998,7 +998,7 @@ it('will cast array items when an iterable interface type is defined that can be
         DummyBackedEnum::BOO,
         DummyBackedEnum::FOO,
     ]);
-});
+})->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
 
 it('will cast iterables into the correct type', function () {
     $dataClass = new class () extends Data {
@@ -1025,4 +1025,4 @@ it('will cast iterables into the correct type', function () {
     expect($data->array)
         ->toBeArray()
         ->toEqual(['a', 'collection']);
-});
+})->skip(fn () => config('data.features.cast_and_transform_iterables') === false);

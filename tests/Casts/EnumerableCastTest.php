@@ -2,7 +2,9 @@
 
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Enumerable;
 use Illuminate\Support\LazyCollection;
+use Spatie\LaravelData\Casts\EnumerableCast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
@@ -11,9 +13,11 @@ it('will not cast an object which is already a collection', function () {
         public Collection $collection;
     };
 
-    $data = $dataClass::from([
-        'collection' => collect(['a', 'b']),
-    ]);
+    $data = $dataClass::factory()
+        ->withCast(Enumerable::class, EnumerableCast::class)
+        ->from([
+            'collection' => collect(['a', 'b']),
+        ]);
 
     expect($data->collection)->toEqual(collect(['a', 'b']));
 });
@@ -23,9 +27,11 @@ it('will cast an array to collection', function () {
         public Collection $collection;
     };
 
-    $data = $dataClass::from([
-        'collection' => ['a', 'b'],
-    ]);
+    $data = $dataClass::factory()
+        ->withCast(Enumerable::class, EnumerableCast::class)
+        ->from([
+            'collection' => ['a', 'b'],
+        ]);
 
     expect($data->collection)->toEqual(collect(['a', 'b']));
 });
@@ -35,9 +41,11 @@ it('will cast an array to the specified collection type', function () {
         public LazyCollection $collection;
     };
 
-    $data = $dataClass::from([
-        'collection' => ['a', 'b'],
-    ]);
+    $data = $dataClass::factory()
+        ->withCast(Enumerable::class, EnumerableCast::class)
+        ->from([
+            'collection' => ['a', 'b'],
+        ]);
 
     expect($data->collection)->toEqual(new LazyCollection(['a', 'b']));
 });
@@ -47,9 +55,11 @@ it('will default to a collection when no clear type is specified', function () {
         public Collection|array $collection;
     };
 
-    $data = $dataClass::from([
-        'collection' => ['a', 'b'],
-    ]);
+    $data = $dataClass::factory()
+        ->withCast(Enumerable::class, EnumerableCast::class)
+        ->from([
+            'collection' => ['a', 'b'],
+        ]);
 
     expect($data->collection)->toEqual(collect(['a', 'b']));
 });
@@ -61,9 +71,11 @@ it('will never intervene with data collections', function () {
         public Collection $collection;
     }
 
-    $data = TestDataCollectionCastWithDataCollectable::from([
-        'collection' => ['a', 'b'],
-    ]);
+    $data = TestDataCollectionCastWithDataCollectable::factory()
+        ->withCast(Enumerable::class, EnumerableCast::class)
+        ->from([
+            'collection' => ['a', 'b'],
+        ]);
 
     expect($data->collection)->toEqual(collect([
         SimpleData::fromString('a'),

@@ -383,4 +383,4 @@ it('can transform a typed iterable with a custom transformer', function () {
     );
 
     expect($transformed)->toBe(['array' => ['A', 'B', 'C']]);
-});
+})->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
