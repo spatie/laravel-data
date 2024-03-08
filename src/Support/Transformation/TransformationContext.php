@@ -176,7 +176,7 @@ class TransformationContext implements Stringable
         return $this;
     }
 
-    public function shouldMergeIntoDataContext(): bool
+    public function hasPartials(): bool
     {
         if ($this->includePartials !== null && $this->includePartials->count() > 0) {
             return true;

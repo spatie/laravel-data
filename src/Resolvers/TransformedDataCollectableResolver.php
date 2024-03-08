@@ -110,7 +110,7 @@ class TransformedDataCollectableResolver
                 return $data;
             }
 
-            if ($nestedContext->transformValues === false && $nestedContext->shouldMergeIntoDataContext()) {
+            if ($nestedContext->transformValues === false && $nestedContext->hasPartials()) {
                 $data->getDataContext()->mergeTransformationContext($nestedContext);
 
                 return $data;

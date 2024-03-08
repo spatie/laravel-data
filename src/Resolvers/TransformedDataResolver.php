@@ -145,13 +145,13 @@ class TransformedDataResolver
 
         $context = clone $fieldContext->setWrapExecutionType($wrapExecutionType);
 
-        if ($context->transformValues === false && $context->shouldMergeIntoDataContext() === false) {
+        if ($context->transformValues === false && $context->hasPartials()) {
+            $value->getDataContext()->mergeTransformationContext($context);
+
             return $value;
         }
 
         if ($context->transformValues === false) {
-            $value->getDataContext()->mergeTransformationContext($context);
-
             return $value;
         }
 
