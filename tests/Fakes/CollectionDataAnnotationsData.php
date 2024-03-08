@@ -8,14 +8,14 @@ use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\DataCollection;
 
 /**
- * @property DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData> $propertyO
- * @property \Spatie\LaravelData\Tests\Fakes\SimpleData[] $propertyP
- * @property DataCollection<SimpleData> $propertyQ
- * @property array<\Spatie\LaravelData\Tests\Fakes\SimpleData> $propertyR
- * @property \Spatie\LaravelData\Tests\Fakes\SimpleData[] $propertyS
- * @property array<SimpleData> $propertyT
+ * @property DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData> $propertyN
+ * @property \Spatie\LaravelData\Tests\Fakes\SimpleData[] $propertyO
+ * @property DataCollection<SimpleData> $propertyP
+ * @property array<\Spatie\LaravelData\Tests\Fakes\SimpleData> $propertyQ
+ * @property \Spatie\LaravelData\Tests\Fakes\SimpleData[] $propertyR
+ * @property array<SimpleData> $propertyS
  */
-class CollectionAnnotationsData
+class CollectionDataAnnotationsData
 {
     /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */
     public array $propertyA;
@@ -44,31 +44,28 @@ class CollectionAnnotationsData
     /** @var SimpleData */
     public DataCollection $propertyI; // FAIL
 
-    /** @var \Spatie\LaravelData\Lazy[] */
-    public array $propertyJ; // Fail
-
-    public DataCollection $propertyK;
+    public DataCollection $propertyJ;
 
     /** @var array<\Spatie\LaravelData\Tests\Fakes\SimpleData> */
-    public array $propertyL;
+    public array $propertyK;
 
     /** @var LengthAwarePaginator<\Spatie\LaravelData\Tests\Fakes\SimpleData> */
-    public LengthAwarePaginator $propertyM;
+    public LengthAwarePaginator $propertyL;
 
     /** @var \Illuminate\Support\Collection<\Spatie\LaravelData\Tests\Fakes\SimpleData> */
-    public Collection $propertyN;
+    public Collection $propertyM;
+
+    public DataCollection $propertyN;
 
     public DataCollection $propertyO;
 
     public DataCollection $propertyP;
 
-    public DataCollection $propertyQ;
+    public array $propertyQ;
 
     public array $propertyR;
 
     public array $propertyS;
-
-    public array $propertyT;
 
     /**
      * @param \Spatie\LaravelData\Tests\Fakes\SimpleData[]|null $paramA

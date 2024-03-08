@@ -8,17 +8,30 @@ use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;
 use Throwable;
 
-class EnumCast implements Cast
+class EnumCast implements Cast, IterableItemCast
 {
     public function __construct(
         protected ?string $type = null
     ) {
     }
 
-    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): BackedEnum | Uncastable
+    public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): BackedEnum|Uncastable
     {
-        $type = $this->type ?? $property->type->type->findAcceptedTypeForBaseType(BackedEnum::class);
+        return $this->castValue(
+            $this->type ?? $property->type->type->findAcceptedTypeForBaseType(BackedEnum::class),
+            $value
+        );
+    }
 
+    public function castIterableItem(DataProperty $property, mixed $value, array $properties, CreationContext $context): BackedEnum|Uncastable
+    {
+        return $this->castValue($property->type->iterableItemType, $value);
+    }
+
+    protected function castValue(
+        ?string $type,
+        mixed $value
+    ): BackedEnum|Uncastable {
         if ($type === null) {
             return Uncastable::create();
         }

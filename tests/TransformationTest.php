@@ -370,3 +370,17 @@ it('can transform a data collection into JSON', function () {
         ->toEqual($collection->toJson())
         ->toEqual(json_encode($collection));
 });
+
+it('can transform a typed iterable with a custom transformer', function () {
+    $dataClass = new class () extends Data {
+        /** @var array<string> */
+        public array $array;
+    };
+
+    $transformed = $dataClass::from(['array' => ['a', 'b', 'c']])->transform(
+        TransformationContextFactory::create()
+            ->withTransformer('string', StringToUpperTransformer::class)
+    );
+
+    expect($transformed)->toBe(['array' => ['A', 'B', 'C']]);
+})->skip(fn () => config('data.features.cast_and_transform_iterables') === false);

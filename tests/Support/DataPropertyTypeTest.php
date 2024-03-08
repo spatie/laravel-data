@@ -59,7 +59,7 @@ it('can deduce a type without definition', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
+        ->iterableClass->toBeNull()
         ->getAcceptedTypes()->toBe([]);
 
     expect($type->type)
@@ -68,7 +68,7 @@ it('can deduce a type without definition', function () {
         ->builtIn->toBeTrue()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull();
+        ->iterableClass->toBeNull();
 });
 
 it('can deduce a type with definition', function () {
@@ -83,7 +83,7 @@ it('can deduce a type with definition', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
+        ->iterableClass->toBeNull()
         ->getAcceptedTypes()->toHaveKeys(['string']);
 
     expect($type->type)
@@ -92,7 +92,7 @@ it('can deduce a type with definition', function () {
         ->builtIn->toBeTrue()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull();
+        ->iterableClass->toBeNull();
 });
 
 it('can deduce a nullable type with definition', function () {
@@ -116,7 +116,7 @@ it('can deduce a nullable type with definition', function () {
         ->builtIn->toBeTrue()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull();
+        ->iterableClass->toBeNull();
 });
 
 it('can deduce a union type definition', function () {
@@ -131,7 +131,7 @@ it('can deduce a union type definition', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
+        ->iterableClass->toBeNull()
         ->getAcceptedTypes()->toHaveKeys(['string', 'int']);
 
     expect($type->type)
@@ -150,7 +150,7 @@ it('can deduce a nullable union type definition', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
+        ->iterableClass->toBeNull()
         ->getAcceptedTypes()->toHaveKeys(['string', 'int']);
 
     expect($type->type)
@@ -169,7 +169,7 @@ it('can deduce an intersection type definition', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
+        ->iterableClass->toBeNull()
         ->getAcceptedTypes()->toHaveKeys([
             DateTime::class,
             DateTimeImmutable::class,
@@ -182,7 +182,7 @@ it('can deduce an intersection type definition', function () {
 it('can deduce a nullable intersection type definition', function () {
     $code = '$type = resolveDataType(new class () {public (DateTime & DateTimeImmutable)|null $property;});';
 
-    eval($code); // We support PHP 8.1 which craches on this
+    eval($code); // We support PHP 8.1 which crashes on this
 
     expect($type)
         ->isOptional->toBeFalse()
@@ -191,7 +191,7 @@ it('can deduce a nullable intersection type definition', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
+        ->iterableClass->toBeNull()
         ->getAcceptedTypes()->toHaveKeys([
             DateTime::class,
             DateTimeImmutable::class,
@@ -213,7 +213,7 @@ it('can deduce a mixed type', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
+        ->iterableClass->toBeNull()
         ->getAcceptedTypes()->toBeEmpty();
 
     expect($type->type)
@@ -222,7 +222,7 @@ it('can deduce a mixed type', function () {
         ->builtIn->toBeTrue()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull();
+        ->iterableClass->toBeNull();
 });
 
 it('can deduce a lazy type', function () {
@@ -237,7 +237,7 @@ it('can deduce a lazy type', function () {
         ->lazyType->toBe(Lazy::class)
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
+        ->iterableClass->toBeNull()
         ->getAcceptedTypes()->toHaveKeys(['string']);
 
 
@@ -247,7 +247,7 @@ it('can deduce a lazy type', function () {
         ->builtIn->toBeTrue()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull();
+        ->iterableClass->toBeNull();
 });
 
 it('can deduce an optional type', function () {
@@ -262,7 +262,7 @@ it('can deduce an optional type', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull()
+        ->iterableClass->toBeNull()
         ->getAcceptedTypes()->toHaveKeys(['string']);
 
     expect($type->type)
@@ -271,7 +271,7 @@ it('can deduce an optional type', function () {
         ->builtIn->toBeTrue()
         ->kind->toBe(DataTypeKind::Default)
         ->dataClass->toBeNull()
-        ->dataCollectableClass->toBeNull();
+        ->iterableClass->toBeNull();
 });
 
 it('can deduce a data type', function () {
@@ -286,7 +286,7 @@ it('can deduce a data type', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::DataObject)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBeNull()
+        ->iterableClass->toBeNull()
         ->getAcceptedTypes()->toHaveKeys([SimpleData::class]);
 
     expect($type->type)
@@ -295,7 +295,7 @@ it('can deduce a data type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataObject)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBeNull();
+        ->iterableClass->toBeNull();
 });
 
 it('can deduce a data union type', function () {
@@ -310,7 +310,7 @@ it('can deduce a data union type', function () {
         ->lazyType->toBe(Lazy::class)
         ->kind->toBe(DataTypeKind::DataObject)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBeNull()
+        ->iterableClass->toBeNull()
         ->getAcceptedTypes()->toHaveKeys([SimpleData::class]);
 
     expect($type->type)
@@ -319,7 +319,7 @@ it('can deduce a data union type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataObject)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBeNull();
+        ->iterableClass->toBeNull();
 });
 
 it('can deduce a data collection type', function () {
@@ -335,7 +335,7 @@ it('can deduce a data collection type', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::DataCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(DataCollection::class)
+        ->iterableClass->toBe(DataCollection::class)
         ->getAcceptedTypes()->toHaveKeys([DataCollection::class]);
 
     expect($type->type)
@@ -344,7 +344,7 @@ it('can deduce a data collection type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(DataCollection::class);
+        ->iterableClass->toBe(DataCollection::class);
 });
 
 it('can deduce a data collection union type', function () {
@@ -360,7 +360,7 @@ it('can deduce a data collection union type', function () {
         ->lazyType->toBe(Lazy::class)
         ->kind->toBe(DataTypeKind::DataCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(DataCollection::class)
+        ->iterableClass->toBe(DataCollection::class)
         ->getAcceptedTypes()->toHaveKeys([DataCollection::class]);
 
     expect($type->type)
@@ -369,7 +369,7 @@ it('can deduce a data collection union type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(DataCollection::class);
+        ->iterableClass->toBe(DataCollection::class);
 });
 
 it('can deduce a paginated data collection type', function () {
@@ -385,7 +385,7 @@ it('can deduce a paginated data collection type', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::DataPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(PaginatedDataCollection::class)
+        ->iterableClass->toBe(PaginatedDataCollection::class)
         ->getAcceptedTypes()->toHaveKeys([PaginatedDataCollection::class]);
 
     expect($type->type)
@@ -394,7 +394,7 @@ it('can deduce a paginated data collection type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(PaginatedDataCollection::class);
+        ->iterableClass->toBe(PaginatedDataCollection::class);
 });
 
 it('can deduce a paginated data collection union type', function () {
@@ -410,7 +410,7 @@ it('can deduce a paginated data collection union type', function () {
         ->lazyType->toBe(Lazy::class)
         ->kind->toBe(DataTypeKind::DataPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(PaginatedDataCollection::class)
+        ->iterableClass->toBe(PaginatedDataCollection::class)
         ->getAcceptedTypes()->toHaveKeys([PaginatedDataCollection::class]);
 
     expect($type->type)
@@ -419,7 +419,7 @@ it('can deduce a paginated data collection union type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(PaginatedDataCollection::class);
+        ->iterableClass->toBe(PaginatedDataCollection::class);
 });
 
 it('can deduce a cursor paginated data collection type', function () {
@@ -435,7 +435,7 @@ it('can deduce a cursor paginated data collection type', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::DataCursorPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(CursorPaginatedDataCollection::class)
+        ->iterableClass->toBe(CursorPaginatedDataCollection::class)
         ->getAcceptedTypes()->toHaveKeys([CursorPaginatedDataCollection::class]);
 
     expect($type->type)
@@ -444,7 +444,7 @@ it('can deduce a cursor paginated data collection type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCursorPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(CursorPaginatedDataCollection::class);
+        ->iterableClass->toBe(CursorPaginatedDataCollection::class);
 });
 
 it('can deduce a cursor paginated data collection union type', function () {
@@ -460,7 +460,7 @@ it('can deduce a cursor paginated data collection union type', function () {
         ->lazyType->toBe(Lazy::class)
         ->kind->toBe(DataTypeKind::DataCursorPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(CursorPaginatedDataCollection::class)
+        ->iterableClass->toBe(CursorPaginatedDataCollection::class)
         ->getAcceptedTypes()->toHaveKeys([CursorPaginatedDataCollection::class]);
 
     expect($type->type)
@@ -469,7 +469,7 @@ it('can deduce a cursor paginated data collection union type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCursorPaginatedCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(CursorPaginatedDataCollection::class);
+        ->iterableClass->toBe(CursorPaginatedDataCollection::class);
 });
 
 it('can deduce an array data collection type', function () {
@@ -485,7 +485,7 @@ it('can deduce an array data collection type', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::DataArray)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe('array')
+        ->iterableClass->toBe('array')
         ->getAcceptedTypes()->toHaveKeys(['array']);
 
     expect($type->type)
@@ -494,7 +494,7 @@ it('can deduce an array data collection type', function () {
         ->builtIn->toBeTrue()
         ->kind->toBe(DataTypeKind::DataArray)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe('array');
+        ->iterableClass->toBe('array');
 });
 
 it('can deduce an array data collection union type', function () {
@@ -510,7 +510,7 @@ it('can deduce an array data collection union type', function () {
         ->lazyType->toBe(Lazy::class)
         ->kind->toBe(DataTypeKind::DataArray)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe('array')
+        ->iterableClass->toBe('array')
         ->getAcceptedTypes()->toHaveKeys(['array']);
 
     expect($type->type)
@@ -519,7 +519,7 @@ it('can deduce an array data collection union type', function () {
         ->builtIn->toBeTrue()
         ->kind->toBe(DataTypeKind::DataArray)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe('array');
+        ->iterableClass->toBe('array');
 });
 
 it('can deduce an enumerable data collection type', function () {
@@ -535,7 +535,7 @@ it('can deduce an enumerable data collection type', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::DataEnumerable)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(Collection::class)
+        ->iterableClass->toBe(Collection::class)
         ->getAcceptedTypes()->toHaveKeys([Collection::class]);
 
     expect($type->type)
@@ -544,7 +544,7 @@ it('can deduce an enumerable data collection type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataEnumerable)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(Collection::class);
+        ->iterableClass->toBe(Collection::class);
 });
 
 it('can deduce an enumerable data collection union type', function () {
@@ -560,7 +560,7 @@ it('can deduce an enumerable data collection union type', function () {
         ->lazyType->toBe(Lazy::class)
         ->kind->toBe(DataTypeKind::DataEnumerable)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(Collection::class)
+        ->iterableClass->toBe(Collection::class)
         ->getAcceptedTypes()->toHaveKeys([Collection::class]);
 
     expect($type->type)
@@ -569,7 +569,7 @@ it('can deduce an enumerable data collection union type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataEnumerable)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(Collection::class);
+        ->iterableClass->toBe(Collection::class);
 });
 
 it('can deduce a paginator data collection type', function () {
@@ -585,7 +585,7 @@ it('can deduce a paginator data collection type', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::DataPaginator)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(LengthAwarePaginator::class)
+        ->iterableClass->toBe(LengthAwarePaginator::class)
         ->getAcceptedTypes()->toHaveKeys([LengthAwarePaginator::class]);
 
     expect($type->type)
@@ -594,7 +594,7 @@ it('can deduce a paginator data collection type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataPaginator)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(LengthAwarePaginator::class);
+        ->iterableClass->toBe(LengthAwarePaginator::class);
 });
 
 it('can deduce a paginator data collection union type', function () {
@@ -610,7 +610,7 @@ it('can deduce a paginator data collection union type', function () {
         ->lazyType->toBe(Lazy::class)
         ->kind->toBe(DataTypeKind::DataPaginator)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(LengthAwarePaginator::class)
+        ->iterableClass->toBe(LengthAwarePaginator::class)
         ->getAcceptedTypes()->toHaveKeys([LengthAwarePaginator::class]);
 
     expect($type->type)
@@ -619,7 +619,7 @@ it('can deduce a paginator data collection union type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataPaginator)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(LengthAwarePaginator::class);
+        ->iterableClass->toBe(LengthAwarePaginator::class);
 });
 
 it('can deduce a cursor paginator data collection type', function () {
@@ -635,7 +635,7 @@ it('can deduce a cursor paginator data collection type', function () {
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::DataCursorPaginator)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(CursorPaginator::class)
+        ->iterableClass->toBe(CursorPaginator::class)
         ->getAcceptedTypes()->toHaveKeys([CursorPaginator::class]);
 
     expect($type->type)
@@ -644,7 +644,7 @@ it('can deduce a cursor paginator data collection type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCursorPaginator)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(CursorPaginator::class);
+        ->iterableClass->toBe(CursorPaginator::class);
 });
 
 it('can deduce a cursor paginator data collection union type', function () {
@@ -660,7 +660,7 @@ it('can deduce a cursor paginator data collection union type', function () {
         ->lazyType->toBe(Lazy::class)
         ->kind->toBe(DataTypeKind::DataCursorPaginator)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(CursorPaginator::class)
+        ->iterableClass->toBe(CursorPaginator::class)
         ->getAcceptedTypes()->toHaveKeys([CursorPaginator::class]);
 
     expect($type->type)
@@ -669,7 +669,7 @@ it('can deduce a cursor paginator data collection union type', function () {
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataCursorPaginator)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(CursorPaginator::class);
+        ->iterableClass->toBe(CursorPaginator::class);
 });
 
 it('cannot have multiple data types', function () {
@@ -1043,7 +1043,7 @@ it('can annotate data collections using attributes', function () {
     expect($type)
         ->kind->toBe(DataTypeKind::DataCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(DataCollection::class);
+        ->iterableClass->toBe(DataCollection::class);
 });
 
 it('can annotate data collections using var annotations', function () {
@@ -1055,7 +1055,7 @@ it('can annotate data collections using var annotations', function () {
     expect($type)
         ->kind->toBe(DataTypeKind::DataCollection)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe(DataCollection::class);
+        ->iterableClass->toBe(DataCollection::class);
 });
 
 it('can annotate data collections using property annotations', function () {
@@ -1075,7 +1075,7 @@ it('can annotate data collections using property annotations', function () {
     expect($type)
         ->kind->toBe(DataTypeKind::DataArray)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe('array');
+        ->iterableClass->toBe('array');
 });
 
 it('can annotate data collections using constructor parameter annotations', function () {
@@ -1095,7 +1095,7 @@ it('can annotate data collections using constructor parameter annotations', func
     expect($type)
         ->kind->toBe(DataTypeKind::DataArray)
         ->dataClass->toBe(SimpleData::class)
-        ->dataCollectableClass->toBe('array');
+        ->iterableClass->toBe('array');
 });
 
 it('can deduce the types of lazy', function () {
@@ -1130,28 +1130,125 @@ it('can deduce the types of lazy', function () {
     expect($type)->lazyType->toBe(RelationalLazy::class);
 });
 
-it('will mark an array, collection and paginators as a default type kind when no data collection was specified', function () {
+it('will mark an array, collection and paginators as an iterable type kind when no data collection was specified', function () {
     $type = resolveDataType(new class () {
         public array $property;
     });
 
-    expect($type)->kind->toBe(DataTypeKind::Default);
+    expect($type)->kind->toBe(DataTypeKind::Array);
 
     $type = resolveDataType(new class () {
         public Collection $property;
     });
 
-    expect($type)->kind->toBe(DataTypeKind::Default);
+    expect($type)->kind->toBe(DataTypeKind::Enumerable);
 
     $type = resolveDataType(new class () {
         public LengthAwarePaginator $property;
     });
 
-    expect($type)->kind->toBe(DataTypeKind::Default);
+    expect($type)->kind->toBe(DataTypeKind::Paginator);
 
     $type = resolveDataType(new class () {
         public CursorPaginator $property;
     });
 
-    expect($type)->kind->toBe(DataTypeKind::Default);
+    expect($type)->kind->toBe(DataTypeKind::CursorPaginator);
+});
+
+
+it('can annotate iterables using attributes', function () {
+    $type = resolveDataType(new class () {
+        #[DataCollectionOf(SimpleData::class)]
+        public DataCollection $property;
+    });
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::DataCollection)
+        ->dataClass->toBe(SimpleData::class)
+        ->iterableClass->toBe(DataCollection::class);
+});
+
+it('can annotate iterables using var annotations', function () {
+    $type = resolveDataType(new class () {
+        /** @var array<string> */
+        public array $property;
+    });
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::Array)
+        ->dataClass->toBeNull()
+        ->iterableItemType->toBe('string')
+        ->iterableClass->toBe('array');
+});
+
+it('can annotate iterables using property annotations', function () {
+    /**
+     * @property Collection<string> $property
+     */
+    class TestDataTypeWithClassAnnotatedNonDataProperty
+    {
+        public function __construct(
+            public Collection $property,
+        ) {
+        }
+    }
+
+    $type = resolveDataType(new \TestDataTypeWithClassAnnotatedNonDataProperty(collect([])));
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::Enumerable)
+        ->dataClass->toBeNull()
+        ->iterableClass->toBe(Collection::class)
+        ->iterableItemType->toBe('string');
+});
+
+it('can annotate iterables using constructor parameter annotations', function () {
+    class TestDataTypeWithClassAnnotatedNonDataConstructorParam
+    {
+        /**
+         * @param array<string> $property
+         */
+        public function __construct(
+            public array $property,
+        ) {
+        }
+    }
+
+    $type = resolveDataType(new \TestDataTypeWithClassAnnotatedNonDataConstructorParam([]));
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::Array)
+        ->dataClass->toBeNull()
+        ->iterableClass->toBe('array')
+        ->iterableItemType->toBe('string');
+});
+
+it('can annotate data collection keys using var annotations', function () {
+    $type = resolveDataType(new class () {
+        /** @var array<string, SimpleData> */
+        public array $property;
+    });
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::DataArray)
+        ->dataClass->toBe(SimpleData::class)
+        ->iterableItemType->toBe(SimpleData::class)
+        ->iterableClass->toBe('array')
+        ->iterableKeyType->toBe('string');
+});
+
+
+it('can annotate iterable collection keys using var annotations', function () {
+    $type = resolveDataType(new class () {
+        /** @var array<string, string> */
+        public array $property;
+    });
+
+    expect($type)
+        ->kind->toBe(DataTypeKind::Array)
+        ->dataClass->toBeNull()
+        ->iterableItemType->toBe('string')
+        ->iterableClass->toBe('array')
+        ->iterableKeyType->toBe('string');
 });

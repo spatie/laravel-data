@@ -2,11 +2,12 @@
 
 namespace Spatie\LaravelData\Support\Annotations;
 
-class DataCollectableAnnotation
+class DataIterableAnnotation
 {
     public function __construct(
-        public string $dataClass,
-        public ?string $collectionClass = null,
+        public string $type,
+        public bool $isData,
+        public string $keyType = 'array-key',
         public ?string $property = null,
     ) {
     }

@@ -67,10 +67,10 @@ it('can determine the return type from reflection', function (
         'typeName' => 'array',
         'value' => [],
         new DataType(
-            type: new NamedType('array', true, [], DataTypeKind::DataArray, null, null),
+            type: new NamedType('array', true, [], DataTypeKind::Array, null, null, 'array', null, null),
             isNullable: false,
             isMixed: false,
-            kind: DataTypeKind::DataArray,
+            kind: DataTypeKind::Array,
         ),
     ];
 
@@ -90,10 +90,10 @@ it('can determine the return type from reflection', function (
                 IteratorAggregate::class,
                 Countable::class,
                 Arrayable::class,
-            ], DataTypeKind::DataEnumerable, null, null),
+            ], DataTypeKind::Enumerable, null, null, Collection::class, null, null),
             isNullable: false,
             isMixed: false,
-            kind: DataTypeKind::DataEnumerable,
+            kind: DataTypeKind::Enumerable,
         ),
     ];
 
@@ -142,23 +142,43 @@ it('can handle union types', function () {
     expect($factory->build($reflection, TestReturnTypeSubject::class))->toEqual(
         new DataType(
             type: new UnionType([
-                new NamedType(Collection::class, false, [
-                    ArrayAccess::class,
-                    CanBeEscapedWhenCastToString::class,
-                    Enumerable::class,
-                    Traversable::class,
-                    Stringable::class,
-                    JsonSerializable::class,
-                    Jsonable::class,
-                    IteratorAggregate::class,
-                    Countable::class,
-                    Arrayable::class,
-                ], DataTypeKind::DataEnumerable, null, null),
-                new NamedType('array', true, [], DataTypeKind::DataArray, null, null),
+                new NamedType(
+                    Collection::class,
+                    false,
+                    [
+                        ArrayAccess::class,
+                        CanBeEscapedWhenCastToString::class,
+                        Enumerable::class,
+                        Traversable::class,
+                        Stringable::class,
+                        JsonSerializable::class,
+                        Jsonable::class,
+                        IteratorAggregate::class,
+                        Countable::class,
+                        Arrayable::class,
+                    ],
+                    DataTypeKind::Enumerable,
+                    null,
+                    null,
+                    Collection::class,
+                    null,
+                    null,
+                ),
+                new NamedType(
+                    'array',
+                    true,
+                    [],
+                    DataTypeKind::Array,
+                    null,
+                    null,
+                    'array',
+                    null,
+                    null,
+                ),
             ]),
             isNullable: false,
             isMixed: false,
-            kind: DataTypeKind::DataEnumerable, // in the future this should be an array ...
+            kind: DataTypeKind::Enumerable, // in the future this should be an array ...
         ),
     );
 });

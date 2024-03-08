@@ -13,7 +13,7 @@ use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Mappers\NameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
-use Spatie\LaravelData\Support\Annotations\DataCollectableAnnotation;
+use Spatie\LaravelData\Support\Annotations\DataIterableAnnotation;
 use Spatie\LaravelData\Support\DataProperty;
 
 class DataPropertyFactory
@@ -30,7 +30,7 @@ class DataPropertyFactory
         mixed $defaultValue = null,
         ?NameMapper $classInputNameMapper = null,
         ?NameMapper $classOutputNameMapper = null,
-        ?DataCollectableAnnotation $classDefinedDataCollectableAnnotation = null,
+        ?DataIterableAnnotation $classDefinedDataIterableAnnotation = null,
     ): DataProperty {
         $attributes = collect($reflectionProperty->getAttributes())
             ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
@@ -70,7 +70,7 @@ class DataPropertyFactory
                 $reflectionClass,
                 $reflectionProperty,
                 $attributes,
-                $classDefinedDataCollectableAnnotation
+                $classDefinedDataIterableAnnotation
             ),
             validate: $validate,
             computed: $computed,

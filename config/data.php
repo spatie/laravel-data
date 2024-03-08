@@ -11,6 +11,15 @@ return [
     'date_format' => DATE_ATOM,
 
     /**
+     * It is possible to enable certain features of the package, these would otherwise
+     * be breaking changes, and thus they are disabled by default. In the next major
+     * version of the package, these features will be enabled by default.
+     */
+    'features' => [
+        'cast_and_transform_iterables' => false,
+    ],
+
+    /**
      * Global transformers will take complex types and transform them into simple
      * types.
      */
@@ -27,7 +36,7 @@ return [
     'casts' => [
         DateTimeInterface::class => Spatie\LaravelData\Casts\DateTimeInterfaceCast::class,
         BackedEnum::class => Spatie\LaravelData\Casts\EnumCast::class,
-        Enumerable::class => Spatie\LaravelData\Casts\EnumerableCast::class,
+//        Enumerable::class => Spatie\LaravelData\Casts\EnumerableCast::class,
     ],
 
     /**

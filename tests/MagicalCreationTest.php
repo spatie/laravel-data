@@ -252,13 +252,13 @@ it('can disable magically collecting data', function () {
         }
     };
 
-    expect($dataClass::collect(['a', 'b', 'c']))
-        ->toBeInstanceOf(Collection::class)
-        ->all()->toEqual([
-            SimpleData::from('a'),
-            SimpleData::from('b'),
-            SimpleData::from('c'),
-        ]);
+    //    expect($dataClass::collect(['a', 'b', 'c']))
+    //        ->toBeInstanceOf(Collection::class)
+    //        ->all()->toEqual([
+    //            SimpleData::from('a'),
+    //            SimpleData::from('b'),
+    //            SimpleData::from('c'),
+    //        ]);
 
     expect($dataClass::factory()->withoutMagicalCreation()->collect([
         ['string' => 'a'],

@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -33,6 +34,7 @@ use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ValueDefinedCast;
+use Spatie\LaravelData\Tests\Fakes\Collections\CustomCollection;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomCursorPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
@@ -942,3 +944,85 @@ it('can collect null when an output type is defined', function () {
         ->toBeArray()
         ->toBeEmpty();
 });
+
+it('will cast array items when an iterable type is defined that can be cast', function () {
+    $dataClass = new class () extends Data {
+        /** @var array<string> */
+        public array $array;
+
+        /** @var Collection<int, string> */
+        public Collection $collection;
+    };
+
+    /** @var Data $data */
+    $data = $dataClass::factory()
+        ->withCast('string', StringToUpperCast::class)
+        ->from([
+            'array' => ['hello', 'world'],
+            'collection' => ['this', 'is', 'great'],
+        ]);
+
+    expect($data->array)->toEqual(['HELLO', 'WORLD']);
+    expect($data->collection)->toEqual(collect(['THIS', 'IS', 'GREAT']));
+})->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
+
+it('will cast array items when an iterable interface type is defined that can be cast', function () {
+    $dataClass = new class () extends Data {
+        /** @var array<DateTime> */
+        public array $dates;
+
+        /** @var array<Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum> */
+        public array $enums;
+    };
+
+    /** @var Data $data */
+    $data = $dataClass::factory()
+        ->withCast('string', StringToUpperCast::class)
+        ->from([
+            'dates' => [
+                '2022-01-18T12:00:00Z',
+                '2022-01-19T12:00:00Z',
+            ],
+            'enums' => [
+                'boo',
+                'foo',
+            ],
+        ]);
+
+    expect($data->dates)->toEqual([
+        DateTime::createFromFormat(DATE_ATOM, '2022-01-18T12:00:00Z'),
+        DateTime::createFromFormat(DATE_ATOM, '2022-01-19T12:00:00Z'),
+    ]);
+
+    expect($data->enums)->toEqual([
+        DummyBackedEnum::BOO,
+        DummyBackedEnum::FOO,
+    ]);
+})->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
+
+it('will cast iterables into the correct type', function () {
+    $dataClass = new class () extends Data {
+        public EloquentCollection $collection;
+        public CustomCollection $customCollection;
+
+        public array $array;
+    };
+
+    $data = $dataClass::from([
+        'collection' => ['no', 'models', 'here'],
+        'customCollection' => ['this', 'is', 'great'],
+        'array' => collect(['a', 'collection']),
+    ]);
+
+    expect($data->collection)
+        ->toBeInstanceOf(EloquentCollection::class)
+        ->toEqual(new EloquentCollection(['no', 'models', 'here']));
+
+    expect($data->customCollection)
+        ->toBeInstanceOf(CustomCollection::class)
+        ->toEqual(new CustomCollection(['this', 'is', 'great']));
+
+    expect($data->array)
+        ->toBeArray()
+        ->toEqual(['a', 'collection']);
+})->skip(fn () => config('data.features.cast_and_transform_iterables') === false);

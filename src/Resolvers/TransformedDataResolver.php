@@ -8,7 +8,6 @@ use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
-use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataClass;
@@ -70,7 +69,7 @@ class TransformedDataResolver
                 $visibleFields[$name] ?? null,
             );
 
-            if($value instanceof Optional) {
+            if ($value instanceof Optional) {
                 continue;
             }
 
@@ -102,11 +101,17 @@ class TransformedDataResolver
             return $transformer->transform($property, $value, $currentContext);
         }
 
+        if ($property->type->kind->isNonDataIteratable()
+            && config('data.features.cast_and_transform_iterables')
+        ) {
+            $value = $this->transformIterableItems($property, $value, $currentContext);
+        }
+
         if (is_array($value) && ! $property->type->kind->isDataCollectable()) {
             return $this->resolvePotentialPartialArray($value, $fieldContext);
         }
 
-        if($property->type->kind === DataTypeKind::Default) {
+        if ($property->type->kind->isNonDataRelated()) {
             return $value; // Done for performance reasons
         }
 
@@ -170,6 +175,35 @@ class TransformedDataResolver
         return $value;
     }
 
+    protected function transformIterableItems(
+        DataProperty $property,
+        iterable $items,
+        TransformationContext $context,
+    ): iterable {
+        if (! $context->transformValues) {
+            return $items;
+        }
+
+        /** @var Transformer|null $transformer */
+        $transformer = null;
+
+        foreach ($items as $key => $value) {
+            if ($transformer === null) {
+                $transformer = $this->resolveTransformerForValue($property, $value, $context);
+            }
+
+            if ($transformer === null) {
+                return $items;
+            }
+
+            if ($transformer) {
+                $items[$key] = $transformer->transform($property, $value, $context);
+            }
+        }
+
+        return $items;
+    }
+
     protected function resolvePotentialPartialArray(
         array $value,
         TransformationContext $fieldContext,
@@ -217,7 +251,7 @@ class TransformedDataResolver
         }
 
         $shouldUseDefaultDataTransformer = $transformer instanceof ArrayableTransformer
-            && $property->type->kind !== DataTypeKind::Default;
+            && $property->type->kind->isDataRelated();
 
         if ($shouldUseDefaultDataTransformer) {
             return null;

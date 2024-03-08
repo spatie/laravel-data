@@ -90,6 +90,19 @@ class Email implements Castable
 }
 ```
 
+## Casting iterable values
+
+We saw earlier that you can cast all sorts of values in an array or Collection which are not data objects, for this to work, you should implement the `IterableItemCast` interface:
+
+```php
+interface IterableItemCast
+{
+    public function castIterableItem(DataProperty $property, mixed $value, array $properties, CreationContext $context): mixed;
+}
+```
+
+The `castIterableItem` method is called for each item in an array or Collection when being cast, you can check the `iterableItemType` property of `DataPorperty->Type` to get the type the items should be transformed into.
+
 ## Combining casts and transformers
 
 You can combine casts and transformers in one class:
