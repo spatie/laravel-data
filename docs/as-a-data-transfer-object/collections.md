@@ -127,6 +127,42 @@ AlbumData::from([
 
 Since the collection type here is a `Collection`, the package will automatically convert the array into a collection of data objects.
 
+### Creating a data object with an array or collection of other types
+
+We've already seen how collections of data can be made of data objects, the same is true for other types if correctly typed.
+
+Let say we have an array of DateTime objects:
+
+```php
+class ReleaseData extends Data
+{
+    public string $title;
+    /** @var array<int, DateTime> */
+    public array $releaseDates;
+}
+```
+
+By enabling the `cast_and_transform_iterables` feature in the `data` config file:
+
+```php
+'features' => [
+    'cast_and_transform_iterables' => true,
+],
+```
+
+We now can create a `ReleaseData` object with an array of strings which will be casted into DateTime objects:
+
+```php
+ReleaseData::from([
+    'title' => 'Never Gonna Give You Up',
+    'releaseDates' => [
+        '1987-07-27',
+        '1987-07-28',
+        '1987-07-29',
+    ]
+]);
+```
+
 ## DataCollection's, PaginatedDataCollection's and CursorPaginatedCollection's
 
 The package also provides a few collection classes which can be used to create collections of data objects. It was a requirement to use these classes in the past versions of the package when nesting data objects collections in data objects. This is no longer the case, but there are still valid use cases for them.

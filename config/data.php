@@ -36,7 +36,7 @@ return [
     'casts' => [
         DateTimeInterface::class => Spatie\LaravelData\Casts\DateTimeInterfaceCast::class,
         BackedEnum::class => Spatie\LaravelData\Casts\EnumCast::class,
-        Enumerable::class => Spatie\LaravelData\Casts\EnumerableCast::class,
+//        Enumerable::class => Spatie\LaravelData\Casts\EnumerableCast::class,
     ],
 
     /**

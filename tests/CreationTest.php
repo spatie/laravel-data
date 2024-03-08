@@ -966,7 +966,26 @@ it('will cast array items when an iterable type is defined that can be cast', fu
     expect($data->collection)->toEqual(collect(['THIS', 'IS', 'GREAT']));
 });
 
-it('will cast values into the correct type', function () {
+it('will cast array items when an iterable interface type is defined that can be cast', function () {
+    $dataClass = new class () extends Data {
+        /** @var array<DateTime> */
+        public array $dates;
+    };
+
+    /** @var Data $data */
+    $data = $dataClass::factory()
+        ->withCast('string', StringToUpperCast::class)
+        ->from([
+            'dates' => [
+                '2022-01-18 12:00:00',
+                '2022-01-19 12:00:00',
+            ],
+        ]);
+
+    dd($data);
+});
+
+it('will cast iterables into the correct type', function () {
     $dataClass = new class () extends Data {
         public EloquentCollection $collection;
         public CustomCollection $customCollection;
