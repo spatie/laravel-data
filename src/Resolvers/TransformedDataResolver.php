@@ -5,7 +5,6 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Lazy;
@@ -115,64 +114,71 @@ class TransformedDataResolver
             return $value; // Done for performance reasons
         }
 
-        if (
-            $value instanceof BaseDataCollectable
-            && $value instanceof TransformableData
-            && $currentContext->transformValues
-        ) {
+        if ($value instanceof TransformableData) {
+            return $this->transformDataOrDataCollection($value, $currentContext, $fieldContext);
+        }
+
+        if ($property->type->kind->isDataCollectable() && is_iterable($value)) {
             $wrapExecutionType = match ($currentContext->wrapExecutionType) {
                 WrapExecutionType::Enabled => WrapExecutionType::Enabled,
                 WrapExecutionType::Disabled => WrapExecutionType::Disabled,
                 WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled
             };
 
-            $context = clone $fieldContext->setWrapExecutionType($wrapExecutionType);
-
-            $transformed = $value->transform($context);
-
-            $context->rollBackPartialsWhenRequired();
-
-            return $transformed;
-        }
-
-        if (
-            $value instanceof BaseData
-            && $value instanceof TransformableData
-            && $currentContext->transformValues
-        ) {
-            $wrapExecutionType = match ($currentContext->wrapExecutionType) {
-                WrapExecutionType::Enabled => WrapExecutionType::TemporarilyDisabled,
-                WrapExecutionType::Disabled => WrapExecutionType::Disabled,
-                WrapExecutionType::TemporarilyDisabled => WrapExecutionType::TemporarilyDisabled
-            };
-
-            $context = clone $fieldContext->setWrapExecutionType($wrapExecutionType);
-
-            $transformed = $value->transform($context);
-
-            $context->rollBackPartialsWhenRequired();
-
-            return $transformed;
-        }
-
-        if (
-            $property->type->kind->isDataCollectable()
-            && is_iterable($value)
-            && $currentContext->transformValues
-        ) {
-            $wrapExecutionType = match ($currentContext->wrapExecutionType) {
-                WrapExecutionType::Enabled => WrapExecutionType::Enabled,
-                WrapExecutionType::Disabled => WrapExecutionType::Disabled,
-                WrapExecutionType::TemporarilyDisabled => WrapExecutionType::Enabled
-            };
+            $fieldContext = $fieldContext->setWrapExecutionType($wrapExecutionType);
 
             return DataContainer::get()->transformedDataCollectableResolver()->execute(
                 $value,
-                $fieldContext->setWrapExecutionType($wrapExecutionType)
+                $fieldContext
             );
         }
 
         return $value;
+    }
+
+    protected function transformDataOrDataCollection(
+        mixed $value,
+        TransformationContext $currentContext,
+        ?TransformationContext $fieldContext
+    ): mixed {
+        $wrapExecutionType = $this->resolveWrapExecutionType($value, $currentContext);
+
+        $context = clone $fieldContext->setWrapExecutionType($wrapExecutionType);
+
+        if ($context->transformValues === false && $context->hasPartials()) {
+            $value->getDataContext()->mergeTransformationContext($context);
+
+            return $value;
+        }
+
+        if ($context->transformValues === false) {
+            return $value;
+        }
+
+        $transformed = $value->transform($context);
+
+        $context->rollBackPartialsWhenRequired();
+
+        return $transformed;
+    }
+
+    protected function resolveWrapExecutionType(
+        TransformableData $value,
+        TransformationContext $currentContext,
+    ): WrapExecutionType {
+        if ($currentContext->wrapExecutionType === WrapExecutionType::Disabled) {
+            return WrapExecutionType::Disabled;
+        }
+
+        if ($value instanceof BaseData) {
+            return WrapExecutionType::TemporarilyDisabled;
+        }
+
+        if ($currentContext->wrapExecutionType === WrapExecutionType::Enabled) {
+            return WrapExecutionType::Enabled;
+        }
+
+        return WrapExecutionType::TemporarilyDisabled;
     }
 
     protected function transformIterableItems(

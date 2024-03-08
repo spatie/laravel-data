@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Support;
 use Spatie\LaravelData\Resolvers\DataCollectableFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\DataFromSomethingResolver;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
+use Spatie\LaravelData\Resolvers\DecoupledPartialResolver;
 use Spatie\LaravelData\Resolvers\RequestQueryStringPartialsResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataCollectableResolver;
 use Spatie\LaravelData\Resolvers\TransformedDataResolver;
@@ -30,6 +31,8 @@ class DataContainer
     protected ?ValidatedPayloadResolver $validatedPayloadResolver = null;
 
     protected ?DataClassFactory $dataClassFactory = null;
+
+    protected ?DecoupledPartialResolver $decoupledPartialResolver = null;
 
     private function __construct()
     {
@@ -84,6 +87,11 @@ class DataContainer
         return $this->dataClassFactory ??= app(DataClassFactory::class);
     }
 
+    public function decoupledPartialResolver(): DecoupledPartialResolver
+    {
+        return $this->decoupledPartialResolver ??= app(DecoupledPartialResolver::class);
+    }
+
     public function reset()
     {
         $this->transformedDataResolver = null;
@@ -92,5 +100,6 @@ class DataContainer
         $this->dataFromSomethingResolver = null;
         $this->dataCollectableFromSomethingResolver = null;
         $this->dataClassFactory = null;
+        $this->decoupledPartialResolver = null;
     }
 }

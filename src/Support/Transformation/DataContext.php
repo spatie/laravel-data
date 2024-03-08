@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Support\Transformation;
 
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Support\Partials\PartialsCollection;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 
@@ -42,6 +43,62 @@ class DataContext
             $this->exceptPartials ??= new PartialsCollection();
 
             $this->exceptPartials->addAll($dataContext->exceptPartials);
+        }
+
+        return $this;
+    }
+
+    public function mergeTransformationContext(
+        TransformationContext $context,
+    ): self {
+        $decoupledPartialResolver = DataContainer::get()->decoupledPartialResolver();
+
+        if ($context->includePartials) {
+            $this->includePartials ??= new PartialsCollection();
+
+            foreach ($context->includePartials as $partial) {
+                $partial = $decoupledPartialResolver->execute($partial);
+
+                if($partial !== null) {
+                    $this->includePartials->attach($partial);
+                }
+            }
+        }
+
+        if ($context->excludePartials) {
+            $this->excludePartials ??= new PartialsCollection();
+
+            foreach ($context->excludePartials as $partial) {
+                $partial = $decoupledPartialResolver->execute($partial);
+
+                if($partial !== null) {
+                    $this->excludePartials->attach($partial);
+                }
+            }
+        }
+
+        if ($context->onlyPartials) {
+            $this->onlyPartials ??= new PartialsCollection();
+
+            foreach ($context->onlyPartials as $partial) {
+                $partial = $decoupledPartialResolver->execute($partial);
+
+                if($partial !== null) {
+                    $this->onlyPartials->attach($partial);
+                }
+            }
+        }
+
+        if ($context->exceptPartials) {
+            $this->exceptPartials ??= new PartialsCollection();
+
+            foreach ($context->exceptPartials as $partial) {
+                $partial = $decoupledPartialResolver->execute($partial);
+
+                if($partial !== null) {
+                    $this->exceptPartials->attach($partial);
+                }
+            }
         }
 
         return $this;

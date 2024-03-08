@@ -176,6 +176,27 @@ class TransformationContext implements Stringable
         return $this;
     }
 
+    public function hasPartials(): bool
+    {
+        if ($this->includePartials !== null && $this->includePartials->count() > 0) {
+            return true;
+        }
+
+        if ($this->excludePartials !== null && $this->excludePartials->count() > 0) {
+            return true;
+        }
+
+        if ($this->onlyPartials !== null && $this->onlyPartials->count() > 0) {
+            return true;
+        }
+
+        if ($this->exceptPartials !== null && $this->exceptPartials->count() > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function toArray(): array
     {
         return [
