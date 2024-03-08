@@ -134,6 +134,10 @@ class CastPropertiesDataPipe implements DataPipe
             $values = $values->all();
         }
 
+        if (! is_array($values)) {
+            return $values;
+        }
+
         if ($property->type->iterableItemType) {
             $values = $this->castIterableItems($property, $values, $properties, $creationContext);
         }
@@ -149,59 +153,45 @@ class CastPropertiesDataPipe implements DataPipe
         return $values;
     }
 
-    private function castIterableItems(
+    protected function castIterableItems(
         DataProperty $property,
-        mixed $values,
+        array $values,
         array $properties,
         CreationContext $creationContext
     ): mixed {
         /** @var IterableItemCast $cast */
         $cast = null;
 
-        $noCastFound = false;
+        $firstItem = $values[array_key_first($values)];
 
-        foreach ($values as $key => $value) {
-            if ($noCastFound) {
-                continue;
-            }
-
-            if ($cast !== null) {
-                $values[$key] = $cast->castIterableItem($property, $value, $properties, $creationContext);
-
-                continue;
-            }
-
-            if ($creationContext->casts) {
-                foreach ($creationContext->casts->findCastsForIterableType($property->type->iterableItemType) as $possibleCast) {
-                    $casted = $possibleCast->castIterableItem($property, $value, $properties, $creationContext);
-
-                    if (! $casted instanceof Uncastable) {
-                        $cast = $possibleCast;
-                        $values[$key] = $casted;
-
-                        break;
-                    }
-                }
-
-                if ($cast) {
-                    continue;
-                }
-            }
-
-            foreach ($this->dataConfig->casts->findCastsForIterableType($property->type->iterableItemType) as $possibleCast) {
-                $casted = $possibleCast->castIterableItem($property, $value, $properties, $creationContext);
+        if ($creationContext->casts) {
+            foreach ($creationContext->casts->findCastsForIterableType($property->type->iterableItemType) as $possibleCast) {
+                $casted = $possibleCast->castIterableItem($property, $firstItem, $properties, $creationContext);
 
                 if (! $casted instanceof Uncastable) {
                     $cast = $possibleCast;
-                    $values[$key] = $casted;
 
                     break;
                 }
             }
+        }
 
-            if ($cast === null) {
-                $noCastFound = true;
+        foreach ($this->dataConfig->casts->findCastsForIterableType($property->type->iterableItemType) as $possibleCast) {
+            $casted = $possibleCast->castIterableItem($property, $firstItem, $properties, $creationContext);
+
+            if (! $casted instanceof Uncastable) {
+                $cast = $possibleCast;
+
+                break;
             }
+        }
+
+        if ($cast === null) {
+            return $values;
+        }
+
+        foreach ($values as $key => $value) {
+            $values[$key] = $cast->castIterableItem($property, $value, $properties, $creationContext);
         }
 
         return $values;
