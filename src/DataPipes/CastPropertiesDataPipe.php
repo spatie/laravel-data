@@ -158,7 +158,7 @@ class CastPropertiesDataPipe implements DataPipe
         array $values,
         array $properties,
         CreationContext $creationContext
-    ): mixed {
+    ): array {
         /** @var IterableItemCast $cast */
         $cast = null;
 
