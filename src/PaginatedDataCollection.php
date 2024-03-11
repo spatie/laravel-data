@@ -55,11 +55,9 @@ class PaginatedDataCollection implements Responsable, BaseDataCollectableContrac
     }
 
     /**
-     * @template TOtherValue
+     * @param Closure(TValue, TKey): TValue $through
      *
-     * @param Closure(TValue, TKey): TOtherValue $through
-     *
-     * @return static<TKey, TOtherValue>
+     * @return static<TKey, TValue>
      */
     public function through(Closure $through): static
     {
