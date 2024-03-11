@@ -386,3 +386,17 @@ it('can transform a typed iterable with a custom transformer', function () {
 
     expect($transformed)->toBe(['array' => ['A', 'B', 'C']]);
 })->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
+
+it('does not transform a typed iterable with a custom transformer when a union type is used with a non-iterable value', function () {
+    $dataClass = new class () extends Data {
+        /** @var string|array<string> */
+        public string|array $array;
+    };
+
+    $transformed = $dataClass::from(['array' => 'a'])->transform(
+        TransformationContextFactory::create()
+            ->withTransformer('string', StringToUpperTransformer::class)
+    );
+
+    expect($transformed)->toBe(['array' => 'A']);
+})->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
