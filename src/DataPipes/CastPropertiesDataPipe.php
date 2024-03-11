@@ -93,8 +93,9 @@ class CastPropertiesDataPipe implements DataPipe
         }
 
         if (
-            $property->type->kind->isNonDataIteratable()
-            && config('data.features.cast_and_transform_iterables', true)
+            config('data.features.cast_and_transform_iterables', true)
+            && $property->type->kind->isNonDataIteratable()
+            && is_iterable($value)
         ) {
             return $this->castIterable(
                 $property,
