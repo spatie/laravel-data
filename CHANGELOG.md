@@ -2,6 +2,20 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.3.0 - 2024-03-11
+
+### What's Changed
+
+* Update wrapping.md to clarify collections and paginated collections case by @santigarcor in https://github.com/spatie/laravel-data/pull/675
+* Feature/cast and transformer iterables by @rubenvanassche in https://github.com/spatie/laravel-data/pull/686
+* Add support for passing on partials when not transforming values by @rubenvanassche in https://github.com/spatie/laravel-data/pull/688
+* chore(deps): bump ramsey/composer-install from 2 to 3 by @dependabot in https://github.com/spatie/laravel-data/pull/678
+* Allow data context to be set to null by @sebastiandedeyne in https://github.com/spatie/laravel-data/pull/691
+* Fix iterable casts when there's a global and local cast specified by @sebastiandedeyne in https://github.com/spatie/laravel-data/pull/690
+* Fix iterable values with union types by @sebastiandedeyne in https://github.com/spatie/laravel-data/pull/692
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.2.0...4.3.0
+
 ## 4.2.0 - 2024-03-01
 
 ### What's Changed
