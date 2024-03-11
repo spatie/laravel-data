@@ -74,7 +74,7 @@ trait ContextableData
     }
 
     public function setDataContext(
-        DataContext $dataContext
+        ?DataContext $dataContext
     ): static {
         $this->_dataContext = $dataContext;
 
