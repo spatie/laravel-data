@@ -11,10 +11,10 @@ use Illuminate\Support\Enumerable;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
-use Spatie\LaravelData\Tests\Fakes\Casts\MeaningOfLifeCast;
 use function Pest\Laravel\postJson;
 
 use Spatie\LaravelData\Attributes\Computed;
+
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\WithCast;
@@ -33,6 +33,7 @@ use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastable;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
+use Spatie\LaravelData\Tests\Fakes\Casts\MeaningOfLifeCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ValueDefinedCast;
 use Spatie\LaravelData\Tests\Fakes\Collections\CustomCollection;

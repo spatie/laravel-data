@@ -192,7 +192,7 @@ class CastPropertiesDataPipe implements DataPipe
         foreach ($this->dataConfig->casts->findCastsForIterableType($property->type->iterableItemType) as $possibleCast) {
             $casted = $possibleCast->castIterableItem($property, $firstItem, $properties, $creationContext);
 
-            if (!$casted instanceof Uncastable) {
+            if (! $casted instanceof Uncastable) {
                 return $possibleCast;
             }
         }
