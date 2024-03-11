@@ -14,6 +14,7 @@ use Illuminate\Validation\ValidationException;
 use function Pest\Laravel\postJson;
 
 use Spatie\LaravelData\Attributes\Computed;
+
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\WithCast;
@@ -32,6 +33,7 @@ use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastable;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ContextAwareCast;
+use Spatie\LaravelData\Tests\Fakes\Casts\MeaningOfLifeCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\StringToUpperCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ValueDefinedCast;
 use Spatie\LaravelData\Tests\Fakes\Collections\CustomCollection;
@@ -946,6 +948,31 @@ it('can collect null when an output type is defined', function () {
 });
 
 it('will cast array items when an iterable type is defined that can be cast', function () {
+    $dataClass = new class () extends Data {
+        /** @var array<string> */
+        public array $array;
+
+        /** @var Collection<int, string> */
+        public Collection $collection;
+    };
+
+    /** @var Data $data */
+    $data = $dataClass::factory()
+        ->withCast('string', StringToUpperCast::class)
+        ->from([
+            'array' => ['hello', 'world'],
+            'collection' => ['this', 'is', 'great'],
+        ]);
+
+    expect($data->array)->toEqual(['HELLO', 'WORLD']);
+    expect($data->collection)->toEqual(collect(['THIS', 'IS', 'GREAT']));
+})->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
+
+it('will cast array items when an iterable type is defined and prefer it over a global cast', function () {
+    config()->set('data.casts', [
+        'string' => MeaningOfLifeCast::class,
+    ]);
+
     $dataClass = new class () extends Data {
         /** @var array<string> */
         public array $array;
