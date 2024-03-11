@@ -35,7 +35,7 @@ To find the data classes within your application, we're using the [php-structure
 ```php
 'structure_caching' => [
     'directories' => [
-        'app',
+        app_path('Data'),
     ],
 ],
 ```
@@ -46,6 +46,17 @@ Structure discoverer uses reflection (enabled by default) or a PHP parser to fin
 'structure_caching' => [
     'reflection_discovery' => [
         'enabled' => false,
+    ],
+],
+```
+
+Since we cannot depend on reflection, we need to tell the parser what data objects are exactly and where to find them. This can be done by adding the laravel-data directory to the config directories:
+
+```php
+'structure_caching' => [
+    'directories' => [
+        app_path('Data'),
+        base_path('vendor/spatie/laravel-data/src'),
     ],
 ],
 ```
