@@ -86,6 +86,11 @@ return [
      * when running in production. This will speed up the package. You
      * can configure where data objects are stored and which cache
      * store should be used.
+     *
+     * Structures are cached forever as they'll become stale when your
+     * application is deployed with changes. You can set a duration
+     * in seconds if you want the cache to clear after a certain
+     * timeframe.
      */
     'structure_caching' => [
         'enabled' => true,
@@ -93,6 +98,7 @@ return [
         'cache' => [
             'store' => env('CACHE_DRIVER', 'file'),
             'prefix' => 'laravel-data',
+            'duration' => null,
         ],
         'reflection_discovery' => [
             'enabled' => true,

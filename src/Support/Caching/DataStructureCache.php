@@ -12,44 +12,46 @@ class DataStructureCache
 
     private string $prefix;
 
+    private ?int $duration;
+
     public function __construct(
         protected array $cacheConfig,
     ) {
         $this->store = cache()->store($this->cacheConfig['store'])?->getStore();
         $this->prefix = $this->cacheConfig['prefix'] ? "{$this->cacheConfig['prefix']}." : '';
+        $this->duration = $this->cacheConfig['duration'];
     }
 
     public function getConfig(): ?CachedDataConfig
     {
-        $serialized = $this->store->get("{$this->prefix}config");
+        /** @var ?CachedDataConfig $cachedConfig */
+        $cachedConfig = $this->get('config');
 
-        if ($serialized === null) {
-            return null;
-        }
-
-        try {
-            /** @var CachedDataConfig $cachedConfig */
-            $cachedConfig = unserialize($serialized);
-
+        if ($cachedConfig) {
             $cachedConfig->setCache($this);
-
-            return $cachedConfig;
-        } catch (Throwable) {
-            return null;
         }
+
+        return $cachedConfig;
     }
 
     public function storeConfig(CachedDataConfig $config): void
     {
-        $this->store->forever(
-            "{$this->prefix}config",
-            serialize($config),
-        );
+        $this->set('config', $config);
     }
 
     public function getDataClass(string $className): ?DataClass
     {
-        $serialized = $this->store->get("{$this->prefix}data-class.{$className}");
+        return $this->get("data-class.{$className}");
+    }
+
+    public function storeDataClass(DataClass $dataClass): void
+    {
+        $this->set("data-class.{$dataClass->name}", $dataClass);
+    }
+
+    private function get(string $key): mixed
+    {
+        $serialized = $this->store->get($this->prefix . $key);
 
         if ($serialized === null) {
             return null;
@@ -62,11 +64,12 @@ class DataStructureCache
         }
     }
 
-    public function storeDataClass(DataClass $dataClass): void
+    private function set(string $key, mixed $value): void
     {
-        $this->store->forever(
-            "{$this->prefix}data-class.{$dataClass->name}",
-            serialize($dataClass),
-        );
+        if (is_null($this->duration)) {
+            $this->store->forever($this->prefix . $key, serialize($value));
+        } else {
+            $this->store->put($this->prefix . $key, serialize($value), $this->duration);
+        }
     }
 }
