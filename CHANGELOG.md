@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.3.2 - 2024-03-12
+
+### What's Changed
+
+* Provide fallbacks for config values by @sebastiandedeyne in https://github.com/spatie/laravel-data/pull/695
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.3.1...4.3.2
+
 ## 4.3.1 - 2024-03-12
 
 ### What's Changed
