@@ -213,8 +213,12 @@ class TransformedDataResolver
 
     protected function resolvePotentialPartialArray(
         array $value,
-        TransformationContext $fieldContext,
+        ?TransformationContext $fieldContext,
     ): array {
+        if($fieldContext === null) {
+            return $value;
+        }
+
         if ($fieldContext->exceptPartials && $fieldContext->exceptPartials->count() > 0) {
             $partials = [];
 
