@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.3.1 - 2024-03-12
+
+### What's Changed
+
+* Support duration in cache configuration by @sebastiandedeyne in https://github.com/spatie/laravel-data/pull/694
+* Handle `null` for `fieldContext` within `resolvePotentialPartialArray` by @faustbrian in https://github.com/spatie/laravel-data/pull/693
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.3.0...4.3.1
+
 ## 4.3.0 - 2024-03-11
 
 ### What's Changed
