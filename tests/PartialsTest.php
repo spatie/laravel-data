@@ -1476,20 +1476,20 @@ it('handles partials when not transforming values by copying them to a lazy arra
         }
     };
 
-    //    expect($dataClass->include('collection.simple')->toArray())->toMatchArray([
-    //        'collection' => [
-    //            [
-    //                'simple' => [
-    //                    'string' => 'Rick Astley',
-    //                ],
-    //            ],
-    //            [
-    //                'simple' => [
-    //                    'string' => 'Jon Bon Jovi',
-    //                ],
-    //            ],
-    //        ],
-    //    ]);
+    expect($dataClass->include('collection.simple')->toArray())->toMatchArray([
+        'collection' => [
+            [
+                'simple' => [
+                    'string' => 'Rick Astley',
+                ],
+            ],
+            [
+                'simple' => [
+                    'string' => 'Jon Bon Jovi',
+                ],
+            ],
+        ],
+    ]);
 
     $nested = $dataClass->include('collection.simple')->all()['collection'];
 
@@ -1596,6 +1596,5 @@ it('handles circular dependencies', function () {
             ],
         ],
     ]);
-
     // Not really a test with expectation, we just want to check we don't end up in an infinite loop
 });

@@ -9,6 +9,7 @@ use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Resolvers\Concerns\ChecksTransformationDepth;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataContainer;
@@ -20,6 +21,8 @@ use Spatie\LaravelData\Transformers\Transformer;
 
 class TransformedDataResolver
 {
+    use ChecksTransformationDepth;
+
     public function __construct(
         protected DataConfig $dataConfig,
         protected VisibleDataFieldsResolver $visibleDataFieldsResolver,
@@ -30,6 +33,10 @@ class TransformedDataResolver
         BaseData&TransformableData $data,
         TransformationContext $context,
     ): array {
+        if ($this->hasReachedMaxTransformationDepth($context)) {
+            return $this->handleMaxDepthReached($context);
+        }
+
         $dataClass = $this->dataConfig->getDataClass($data::class);
 
         $transformed = $this->transform($data, $context, $dataClass);
@@ -140,7 +147,7 @@ class TransformedDataResolver
     protected function transformDataOrDataCollection(
         mixed $value,
         TransformationContext $currentContext,
-        ?TransformationContext $fieldContext
+        TransformationContext $fieldContext
     ): mixed {
         $wrapExecutionType = $this->resolveWrapExecutionType($value, $currentContext);
 
@@ -215,7 +222,7 @@ class TransformedDataResolver
         array $value,
         ?TransformationContext $fieldContext,
     ): array {
-        if($fieldContext === null) {
+        if ($fieldContext === null) {
             return $value;
         }
 

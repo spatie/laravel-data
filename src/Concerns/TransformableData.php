@@ -21,7 +21,10 @@ trait TransformableData
         $transformationContext = match (true) {
             $transformationContext instanceof TransformationContext => $transformationContext,
             $transformationContext instanceof TransformationContextFactory => $transformationContext->get($this),
-            $transformationContext === null => new TransformationContext()
+            $transformationContext === null => new TransformationContext(
+                maxDepth: config('data.max_transformation_depth'),
+                throwWhenMaxDepthReached: config('data.throw_when_max_transformation_depth_reached')
+            )
         };
 
         $resolver = match (true) {

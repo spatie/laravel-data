@@ -16,6 +16,9 @@ it('can create a transformation context', function () {
     expect($context->mapPropertyNames)->toBeTrue();
     expect($context->wrapExecutionType)->toBe(WrapExecutionType::Disabled);
     expect($context->transformers)->toBeNull();
+    expect($context->depth)->toBe(0);
+    expect($context->maxDepth)->toBeNull();
+    expect($context->throwWhenMaxDepthReached)->toBeTrue();
 });
 
 it('can disable value transformation', function () {
@@ -81,4 +84,24 @@ it('can add a custom transformers', function () {
 
     expect($context->transformers)->not()->toBe(null);
     expect($context->transformers->findTransformerForValue('Hello World'))->toBeInstanceOf(StringToUpperTransformer::class);
+});
+
+it('can set a max transformation depth', function () {
+    $context = TransformationContextFactory::create()
+        ->maxDepth(4)
+        ->get(SimpleData::from('Hello World'));
+
+    expect($context->maxDepth)->toBe(4);
+    expect($context->depth)->toBe(0);
+    expect($context->throwWhenMaxDepthReached)->toBeTrue();
+});
+
+it('can set a max transformation depth without failing', function () {
+    $context = TransformationContextFactory::create()
+        ->maxDepth(4, throw: false)
+        ->get(SimpleData::from('Hello World'));
+
+    expect($context->maxDepth)->toBe(4);
+    expect($context->depth)->toBe(0);
+    expect($context->throwWhenMaxDepthReached)->toBeFalse();
 });

@@ -121,6 +121,21 @@ return [
     'ignore_invalid_partials' => false,
 
     /**
+     * When transforming a nested chain of data objects, the package can end up in an infinite
+     * loop when including a recursive relationship. The max transformation depth can be
+     * set as a safety measure to prevent this from happening. When set to null, the
+     * package will not enforce a maximum depth.
+     */
+    'max_transformation_depth' => null,
+
+    /**
+     * When the maximum transformation depth is reached, the package will throw an exception.
+     * You can disable this behaviour by setting this option to true which will return an
+     * empty array.
+     */
+    'throw_when_max_transformation_depth_reached' => true,
+
+    /**
     * When using the `make:data` command, the package will use these settings to generate
     * the data classes. You can override these settings by passing options to the command.
     */
