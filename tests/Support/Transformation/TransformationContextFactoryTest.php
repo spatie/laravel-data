@@ -18,7 +18,7 @@ it('can create a transformation context', function () {
     expect($context->transformers)->toBeNull();
     expect($context->depth)->toBe(0);
     expect($context->maxDepth)->toBeNull();
-    expect($context->failWhenMaxDepthReached)->toBeTrue();
+    expect($context->throwWhenMaxDepthReached)->toBeTrue();
 });
 
 it('can disable value transformation', function () {
@@ -93,15 +93,15 @@ it('can set a max transformation depth', function () {
 
     expect($context->maxDepth)->toBe(4);
     expect($context->depth)->toBe(0);
-    expect($context->failWhenMaxDepthReached)->toBeTrue();
+    expect($context->throwWhenMaxDepthReached)->toBeTrue();
 });
 
 it('can set a max transformation depth without failing', function () {
     $context = TransformationContextFactory::create()
-        ->maxDepth(4, fail: false)
+        ->maxDepth(4, throw: false)
         ->get(SimpleData::from('Hello World'));
 
     expect($context->maxDepth)->toBe(4);
     expect($context->depth)->toBe(0);
-    expect($context->failWhenMaxDepthReached)->toBeFalse();
+    expect($context->throwWhenMaxDepthReached)->toBeFalse();
 });

@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Resolvers\Concerns;
 use Spatie\LaravelData\Exceptions\MaxTransformationDepthReached;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
 
-trait ChecksTransformationDepths
+trait ChecksTransformationDepth
 {
     public function hasReachedMaxTransformationDepth(TransformationContext $context): bool
     {
@@ -14,7 +14,7 @@ trait ChecksTransformationDepths
 
     public function handleMaxDepthReached(TransformationContext $context): array
     {
-        if ($context->failWhenMaxDepthReached) {
+        if ($context->throwWhenMaxDepthReached) {
             throw MaxTransformationDepthReached::create($context->maxDepth);
         }
 

@@ -443,7 +443,7 @@ it('it possible to set the max transformation depth when transforming objects', 
     ))->toThrow(MaxTransformationDepthReached::class);
 
     expect(TestMaxDataObjectTransformationDepthB::fromOther($a)->transform(
-        TransformationContextFactory::create()->maxDepth(4, fail: false)
+        TransformationContextFactory::create()->maxDepth(4, throw: false)
     ))->toBe([
         'dataA' => [
             'dataB' => [
@@ -497,7 +497,7 @@ it('it possible to set the max transformation depth when transforming collection
     ))->toThrow(MaxTransformationDepthReached::class);
 
     expect(TestMaxDatCollectionTransformationDepthB::fromOther($a)->transform(
-        TransformationContextFactory::create()->maxDepth(4, fail: false)
+        TransformationContextFactory::create()->maxDepth(4, throw: false)
     ))->toBe([
         'cb' => [
             [

@@ -26,7 +26,7 @@ class TransformationContext implements Stringable
         public ?PartialsCollection $exceptPartials = null,
         public int $depth = 0,
         public ?int $maxDepth = null,
-        public bool $failWhenMaxDepthReached = true,
+        public bool $throwWhenMaxDepthReached = true,
     ) {
     }
 

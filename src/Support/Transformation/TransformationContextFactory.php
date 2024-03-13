@@ -13,6 +13,10 @@ class TransformationContextFactory
 {
     use ForwardsToPartialsDefinition;
 
+    public ?int $maxDepth;
+
+    public bool $throwWhenMaxDepthReached;
+
     public static function create(): self
     {
         return new self();
@@ -27,9 +31,9 @@ class TransformationContextFactory
         public ?PartialsCollection $excludePartials = null,
         public ?PartialsCollection $onlyPartials = null,
         public ?PartialsCollection $exceptPartials = null,
-        public ?int $maxDepth = null,
-        public bool $failWhenMaxDepthReached = true,
     ) {
+        $this->maxDepth = config('data.max_transformation_depth', null);
+        $this->throwWhenMaxDepthReached = config('data.throw_when_max_transformation_depth_reached', true);
     }
 
     public function get(
@@ -94,7 +98,7 @@ class TransformationContextFactory
             $exceptPartials,
             depth: 0,
             maxDepth: $this->maxDepth,
-            failWhenMaxDepthReached: $this->failWhenMaxDepthReached,
+            throwWhenMaxDepthReached: $this->throwWhenMaxDepthReached,
         );
     }
 
@@ -160,10 +164,10 @@ class TransformationContextFactory
         return $this;
     }
 
-    public function maxDepth(?int $maxDepth, bool $fail = true): static
+    public function maxDepth(?int $maxDepth, bool $throw = true): static
     {
         $this->maxDepth = $maxDepth;
-        $this->failWhenMaxDepthReached = $fail;
+        $this->throwWhenMaxDepthReached = $throw;
 
         return $this;
     }

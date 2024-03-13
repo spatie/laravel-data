@@ -14,7 +14,7 @@ use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
-use Spatie\LaravelData\Resolvers\Concerns\ChecksTransformationDepths;
+use Spatie\LaravelData\Resolvers\Concerns\ChecksTransformationDepth;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
@@ -23,7 +23,7 @@ use Spatie\LaravelData\Support\Wrapping\WrapType;
 
 class TransformedDataCollectableResolver
 {
-    use ChecksTransformationDepths;
+    use ChecksTransformationDepth;
 
     public function __construct(
         protected DataConfig $dataConfig

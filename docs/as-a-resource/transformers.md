@@ -175,7 +175,7 @@ Setting the transformation depth to `null` will disable the transformation depth
 It is also possible if a `MaxTransformationDepthReached` exception should be thrown or an empty array should be returned:
 
 ```php
-'fail_when_max_transformation_depth_reached' => true,
+'throw_when_max_transformation_depth_reached' => true,
 ```
 
 It is also possible to set the transformation depth on a specific transformation by using a `TransformationContextFactory`:
@@ -190,6 +190,6 @@ By default, an exception will be thrown when the maximum transformation depth is
 
 ```php
 ArtistData::from($artist)->transform(
-    TransformationContextFactory::create()->maxDepth(20, fail: false)
+    TransformationContextFactory::create()->maxDepth(20, throw: false)
 );
 ```

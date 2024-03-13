@@ -133,7 +133,7 @@ return [
      * You can disable this behaviour by setting this option to true which will return an
      * empty array.
      */
-    'fail_when_max_transformation_depth_reached' => true,
+    'throw_when_max_transformation_depth_reached' => true,
 
     /**
     * When using the `make:data` command, the package will use these settings to generate

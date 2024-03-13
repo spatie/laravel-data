@@ -45,7 +45,7 @@ class VisibleDataFieldsResolver
                     $transformationContext->transformers,
                     depth: $transformationContext->depth + 1,
                     maxDepth: $transformationContext->maxDepth,
-                    failWhenMaxDepthReached: $transformationContext->failWhenMaxDepthReached,
+                    throwWhenMaxDepthReached: $transformationContext->throwWhenMaxDepthReached,
                 );
             }
         }

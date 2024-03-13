@@ -9,7 +9,7 @@ use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
-use Spatie\LaravelData\Resolvers\Concerns\ChecksTransformationDepths;
+use Spatie\LaravelData\Resolvers\Concerns\ChecksTransformationDepth;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataContainer;
@@ -21,7 +21,7 @@ use Spatie\LaravelData\Transformers\Transformer;
 
 class TransformedDataResolver
 {
-    use ChecksTransformationDepths;
+    use ChecksTransformationDepth;
 
     public function __construct(
         protected DataConfig $dataConfig,
