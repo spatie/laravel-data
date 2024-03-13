@@ -27,6 +27,8 @@ class TransformationContextFactory
         public ?PartialsCollection $excludePartials = null,
         public ?PartialsCollection $onlyPartials = null,
         public ?PartialsCollection $exceptPartials = null,
+        public ?int $maxDepth = null,
+        public bool $failWhenMaxDepthReached = true,
     ) {
     }
 
@@ -90,6 +92,9 @@ class TransformationContextFactory
             $excludePartials,
             $onlyPartials,
             $exceptPartials,
+            depth: 0,
+            maxDepth: $this->maxDepth,
+            failWhenMaxDepthReached: $this->failWhenMaxDepthReached,
         );
     }
 
@@ -151,6 +156,14 @@ class TransformationContextFactory
         }
 
         $this->transformers->add($transformable, $transformer);
+
+        return $this;
+    }
+
+    public function maxDepth(?int $maxDepth, bool $fail = true): static
+    {
+        $this->maxDepth = $maxDepth;
+        $this->failWhenMaxDepthReached = $fail;
 
         return $this;
     }

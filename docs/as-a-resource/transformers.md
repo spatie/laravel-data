@@ -154,3 +154,36 @@ ArtistData::from($artist)->transform(
 );
 ```
 
+## Transformation depth
+
+When transforming a complicated structure of nested data objects it is possible that an infinite loop is created of data objects including each other.
+To prevent this, a transformation depth can be set, when that depth is reached when transforming, either an exception will be thrown or an empty
+array is returned, stopping the transformation.
+
+This transformation depth can be set globally in the `data.php` config file:
+
+```php
+'max_transformation_depth' => 20,
+```
+
+It is also possible if a `MaxTransformationDepthReached` exception should be thrown or an empty array should be returned:
+
+```php
+'fail_when_max_transformation_depth_reached' => true,
+```
+
+It is also possible to set the transformation depth on a specific transformation by using a `TransformationContextFactory`:
+
+```php
+ArtistData::from($artist)->transform(
+    TransformationContextFactory::create()->maxDepth(20)
+);
+```
+
+By default, an exception will be thrown when the maximum transformation depth is reached. This can be changed to return an empty array as such:
+
+```php
+ArtistData::from($artist)->transform(
+    TransformationContextFactory::create()->maxDepth(20, fail: false)
+);
+```

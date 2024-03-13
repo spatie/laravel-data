@@ -9,6 +9,7 @@ use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Exceptions\MaxTransformationDepthReached;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
@@ -400,3 +401,114 @@ it('does not transform a typed iterable with a custom transformer when a union t
 
     expect($transformed)->toBe(['array' => 'A']);
 })->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
+
+
+it('it possible to set the max transformation depth when transforming objects', function () {
+    $a = new stdClass();
+    $b = new stdClass();
+
+    $a->b = $b;
+    $b->a = $a;
+
+    class TestMaxDataObjectTransformationDepthA extends Data
+    {
+        public function __construct(
+            public Lazy|TestMaxDataObjectTransformationDepthB $dataB
+        ) {
+            $this->includePermanently('dataB');
+        }
+
+        public static function fromOther(stdClass $b): self
+        {
+            return new self(Lazy::create(fn () => TestMaxDataObjectTransformationDepthB::from($b->a)));
+        }
+    }
+
+    class TestMaxDataObjectTransformationDepthB extends Data
+    {
+        public function __construct(
+            public Lazy|TestMaxDataObjectTransformationDepthA $dataA
+        ) {
+            $this->includePermanently('dataA');
+        }
+
+        public static function fromOther(stdClass $a): self
+        {
+            return new self(Lazy::create(fn () => TestMaxDataObjectTransformationDepthA::from($a->b)));
+        }
+    }
+
+    expect(fn () => TestMaxDataObjectTransformationDepthB::fromOther($a)->transform(
+        TransformationContextFactory::create()->maxDepth(4)
+    ))->toThrow(MaxTransformationDepthReached::class);
+
+    expect(TestMaxDataObjectTransformationDepthB::fromOther($a)->transform(
+        TransformationContextFactory::create()->maxDepth(4, fail: false)
+    ))->toBe([
+        'dataA' => [
+            'dataB' => [
+                'dataA' => [
+                    'dataB' => [],
+                ],
+            ],
+        ],
+    ]);
+});
+
+it('it possible to set the max transformation depth when transforming collections', function () {
+    $a = new stdClass();
+    $b = new stdClass();
+
+    $a->b = $b;
+    $b->a = $a;
+
+    class TestMaxDatCollectionTransformationDepthA extends Data
+    {
+        public function __construct(
+            #[DataCollectionOf(TestMaxDatCollectionTransformationDepthB::class)]
+            public Lazy|DataCollection $ca
+        ) {
+            $this->includePermanently('ca');
+        }
+
+        public static function fromOther(stdClass $b): self
+        {
+            return new self(Lazy::create(fn () => TestMaxDatCollectionTransformationDepthB::collect([$b->a])));
+        }
+    }
+
+    class TestMaxDatCollectionTransformationDepthB extends Data
+    {
+        public function __construct(
+            #[DataCollectionOf(TestMaxDatCollectionTransformationDepthA::class)]
+            public Lazy|DataCollection $cb
+        ) {
+            $this->includePermanently('cb');
+        }
+
+        public static function fromOther(stdClass $a): self
+        {
+            return new self(Lazy::create(fn () => TestMaxDatCollectionTransformationDepthA::collect([$a->b])));
+        }
+    }
+
+    expect(fn () => TestMaxDatCollectionTransformationDepthB::fromOther($a)->transform(
+        TransformationContextFactory::create()->maxDepth(4)
+    ))->toThrow(MaxTransformationDepthReached::class);
+
+    expect(TestMaxDatCollectionTransformationDepthB::fromOther($a)->transform(
+        TransformationContextFactory::create()->maxDepth(4, fail: false)
+    ))->toBe([
+        'cb' => [
+            [
+                'ca' => [
+                    [
+                        'cb' => [
+                            ['ca' => []],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ]);
+});

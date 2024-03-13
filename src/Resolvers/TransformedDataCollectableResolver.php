@@ -14,6 +14,7 @@ use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
+use Spatie\LaravelData\Resolvers\Concerns\ChecksTransformationDepths;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Transformation\TransformationContext;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
@@ -22,6 +23,8 @@ use Spatie\LaravelData\Support\Wrapping\WrapType;
 
 class TransformedDataCollectableResolver
 {
+    use ChecksTransformationDepths;
+
     public function __construct(
         protected DataConfig $dataConfig
     ) {
@@ -31,6 +34,10 @@ class TransformedDataCollectableResolver
         iterable $items,
         TransformationContext $context,
     ): array {
+        if ($this->hasReachedMaxTransformationDepth($context)) {
+            return $this->handleMaxDepthReached($context);
+        }
+
         $wrap = $items instanceof WrappableData
             ? $items->getWrap()
             : new Wrap(WrapType::UseGlobal);
