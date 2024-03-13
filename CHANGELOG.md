@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.4.0 - 2024-03-13
+
+### What's Changed
+
+* Add support for transformation max depths by @rubenvanassche in https://github.com/spatie/laravel-data/pull/699
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.3.2...4.4.0
+
 ## 4.3.2 - 2024-03-12
 
 ### What's Changed
