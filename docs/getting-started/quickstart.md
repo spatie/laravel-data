@@ -310,7 +310,7 @@ use Str;
 
 class ImageCast implements Cast
 {
-        public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): Image
+        public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): Image|Uncastable
     {
         // Scenario A
         if ($value instanceof UploadedFile) {
@@ -330,13 +330,13 @@ class ImageCast implements Cast
             );
         }
 
-        throw Uncastable::create();
+        return Uncastable::create();
     }
 }
 
 ```
 
-Ultimately, we throw `Uncastable`, telling the package to try other casts (if available) because this cast cannot cast the value.
+Ultimately, we return `Uncastable`, telling the package to try other casts (if available) because this cast cannot cast the value.
 
 The last thing we need to do is add the cast to our property. We use the `WithCast` attribute for this:
 
