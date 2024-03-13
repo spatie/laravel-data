@@ -166,6 +166,12 @@ This transformation depth can be set globally in the `data.php` config file:
 'max_transformation_depth' => 20,
 ```
 
+Setting the transformation depth to `null` will disable the transformation depth check:
+
+```php
+'max_transformation_depth' => null,
+```
+
 It is also possible if a `MaxTransformationDepthReached` exception should be thrown or an empty array should be returned:
 
 ```php
