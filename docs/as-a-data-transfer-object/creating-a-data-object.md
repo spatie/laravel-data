@@ -208,6 +208,6 @@ class SongData extends Dto
 }
 ```
 
-The `Dto` class is a data class in its most basic form. It can br created from anything using magical methods, can
+The `Dto` class is a data class in its most basic form. It can be created from anything using magical methods, can
 validate payloads before creating the data object and can be created using factories. But it doesn't have any of the
 other functionality that the `Data` class has.
