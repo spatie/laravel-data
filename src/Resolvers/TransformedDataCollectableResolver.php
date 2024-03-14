@@ -85,7 +85,7 @@ class TransformedDataCollectableResolver
         $items = array_map(fn (BaseData $data) => $this->transformationClosure($nestedContext)($data), $paginator->items());
 
         if ($nestedContext->transformValues === false) {
-            return $paginator->all();
+            return $items;
         }
 
         $paginated = $paginator->toArray();
