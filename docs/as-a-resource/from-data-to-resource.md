@@ -52,7 +52,7 @@ Will return a collection automatically transformed to JSON:
 It is also possible to provide a paginator:
 
 ```php
-SongData::collect(Song::paginate());
+SongData::collect(Song::paginate(), PaginatedDataCollection::class);
 ```
 
 The data object is smart enough to create a paginated response from this with links to the next, previous, last, ... pages:
