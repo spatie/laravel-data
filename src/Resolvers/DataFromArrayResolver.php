@@ -54,6 +54,10 @@ class DataFromArrayResolver
             }
 
             if ($property->computed) {
+                if (! config('data.throw_when_trying_to_set_computed_property_value')) {
+                    continue; // Ignore the value being passed into the computed property and let it be recalculated
+                }
+
                 throw CannotSetComputedValue::create($property);
             }
 

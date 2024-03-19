@@ -136,6 +136,13 @@ return [
     'throw_when_max_transformation_depth_reached' => true,
 
     /**
+     * When trying to set a computed property value, the package will throw an exception.
+     * You can disable this behaviour by setting this option to false, which will then just
+     * ignore the value being passed into the computed property and recalculate it.
+     */
+    'throw_when_trying_to_set_computed_property_value' => true,
+
+    /**
     * When using the `make:data` command, the package will use these settings to generate
     * the data classes. You can override these settings by passing options to the command.
     */
