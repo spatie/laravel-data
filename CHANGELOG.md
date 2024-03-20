@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.4.1 - 2024-03-20
+
+### What's Changed
+
+* fix issue where DataCollection keys were missing in TypeScript by @rubenvanassche
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.4.0...4.4.1
+
 ## 4.4.0 - 2024-03-13
 
 ### What's Changed
