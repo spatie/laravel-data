@@ -3,6 +3,7 @@
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\LazyCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
@@ -275,4 +276,34 @@ it('can use a custom collection extended from collection to collect a collection
     expect($collection)->toBeInstanceOf(CustomCollection::class);
     expect($collection[0])->toBeInstanceOf(SimpleData::class);
     expect($collection[1])->toBeInstanceOf(SimpleData::class);
+});
+
+it('does not mutate wrapped paginators during transformation', function () {
+    $paginatorOfSimpleData = new Paginator([
+        ['string' => 'A'],
+        ['string' => 'B'],
+    ], perPage: 15);
+
+    $collection = SimpleData::collect($paginatorOfSimpleData, PaginatedDataCollection::class);
+    $expect = [
+        'data' => [
+            ['string' => 'A'],
+            ['string' => 'B'],
+        ],
+        'links' => [],
+        'meta' => [
+            'current_page' => 1,
+            'first_page_url' => '/?page=1',
+            'from' => 1,
+            'next_page_url' => null,
+            'path' => '/',
+            'per_page' => 15,
+            'prev_page_url' => null,
+            'to' => 2,
+        ],
+    ];
+
+    // Perform the transformation twice, the second should not throw
+    expect($collection->toArray())->toBe($expect);
+    expect($collection->toArray())->toBe($expect);
 });
