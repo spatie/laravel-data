@@ -57,10 +57,10 @@ class DataCollectableFromSomethingResolver
             DataTypeKind::DataArray, DataTypeKind::Array => $this->normalizeToArray($normalizedItems),
             DataTypeKind::DataEnumerable, DataTypeKind::Enumerable => new $intoType->name($this->normalizeToArray($normalizedItems)),
             DataTypeKind::DataCollection => new $intoType->name($dataClass, $this->normalizeToArray($normalizedItems)),
-            DataTypeKind::DataPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToPaginator($normalizedItems, $collectableMetaData)),
-            DataTypeKind::DataCursorPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToCursorPaginator($normalizedItems, $collectableMetaData)),
-            DataTypeKind::DataPaginator, DataTypeKind::Paginator => $this->normalizeToPaginator($normalizedItems, $collectableMetaData),
-            DataTypeKind::DataCursorPaginator, DataTypeKind::CursorPaginator => $this->normalizeToCursorPaginator($normalizedItems, $collectableMetaData),
+            DataTypeKind::DataPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToPaginator($normalizedItems, $collectableMetaData, null)),
+            DataTypeKind::DataCursorPaginatedCollection => new $intoType->name($dataClass, $this->normalizeToCursorPaginator($normalizedItems, $collectableMetaData, null)),
+            DataTypeKind::DataPaginator, DataTypeKind::Paginator => $this->normalizeToPaginator($normalizedItems, $collectableMetaData, $intoType),
+            DataTypeKind::DataCursorPaginator, DataTypeKind::CursorPaginator => $this->normalizeToCursorPaginator($normalizedItems, $collectableMetaData, $intoType),
             default => throw CannotCreateDataCollectable::create(get_debug_type($items), $intoType->name)
         };
     }
@@ -173,6 +173,7 @@ class DataCollectableFromSomethingResolver
     protected function normalizeToPaginator(
         array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator $items,
         CollectableMetaData $collectableMetaData,
+        ?NamedType $intoType,
     ): Paginator|AbstractPaginator {
         if ($items instanceof Paginator || $items instanceof AbstractPaginator) {
             return $items;
@@ -180,7 +181,9 @@ class DataCollectableFromSomethingResolver
 
         $normalizedItems = $this->normalizeToArray($items);
 
-        return new LengthAwarePaginator(
+        $type = $intoType->name ?? LengthAwarePaginator::class;
+
+        return new ($type)(
             $normalizedItems,
             $collectableMetaData->paginator_total ?? count($items),
             $collectableMetaData->paginator_per_page ?? 15,
@@ -190,6 +193,7 @@ class DataCollectableFromSomethingResolver
     protected function normalizeToCursorPaginator(
         array|Paginator|AbstractPaginator|CursorPaginator|AbstractCursorPaginator $items,
         CollectableMetaData $collectableMetaData,
+        ?NamedType $intoType,
     ): CursorPaginator|AbstractCursorPaginator {
         if ($items instanceof CursorPaginator || $items instanceof AbstractCursorPaginator) {
             return $items;
@@ -197,7 +201,9 @@ class DataCollectableFromSomethingResolver
 
         $normalizedItems = $this->normalizeToArray($items);
 
-        return new \Illuminate\Pagination\CursorPaginator(
+        $type = $intoType->name ?? \Illuminate\Pagination\CursorPaginator::class;
+
+        return new ($type)(
             $normalizedItems,
             $collectableMetaData->paginator_per_page ?? 15,
             $collectableMetaData->paginator_cursor
