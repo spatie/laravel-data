@@ -16,92 +16,133 @@ trait ForwardsToPartialsDefinition
      */
     abstract protected function getPartialsContainer(): object;
 
-    public function include(string ...$includes): static
+    public function include(string|array ...$includes): static
     {
-        $partialsCollection = $this->getPartialsContainer()->includePartials ??= new PartialsCollection();
-
-        foreach ($includes as $include) {
-            $partialsCollection->attach(Partial::create($include));
-        }
+        $this->expandPartials(
+            $this->getPartialsContainer()->includePartials ??= new PartialsCollection(),
+            $includes,
+            permanent: false,
+        );
 
         return $this;
     }
 
-    public function includePermanently(string ...$includes): static
+    public function includePermanently(string|array ...$includes): static
     {
-        $partialsCollection = $this->getPartialsContainer()->includePartials ??= new PartialsCollection();
-
-        foreach ($includes as $include) {
-            $partialsCollection->attach(Partial::create($include, permanent: true));
-        }
+        $this->expandPartials(
+            $this->getPartialsContainer()->includePartials ??= new PartialsCollection(),
+            $includes,
+            permanent: true,
+        );
 
         return $this;
     }
 
-    public function exclude(string ...$excludes): static
+    public function exclude(string|array ...$excludes): static
     {
-        $partialsCollection = $this->getPartialsContainer()->excludePartials ??= new PartialsCollection();
-
-        foreach ($excludes as $exclude) {
-            $partialsCollection->attach(Partial::create($exclude));
-        }
+        $this->expandPartials(
+            $this->getPartialsContainer()->excludePartials ??= new PartialsCollection(),
+            $excludes,
+            permanent: false,
+        );
 
         return $this;
     }
 
-    public function excludePermanently(string ...$excludes): static
+    public function excludePermanently(string|array ...$excludes): static
     {
-        $partialsCollection = $this->getPartialsContainer()->excludePartials ??= new PartialsCollection();
-
-        foreach ($excludes as $exclude) {
-            $partialsCollection->attach(Partial::create($exclude, permanent: true));
-        }
+        $this->expandPartials(
+            $this->getPartialsContainer()->excludePartials ??= new PartialsCollection(),
+            $excludes,
+            permanent: true,
+        );
 
         return $this;
     }
 
-    public function only(string ...$only): static
+    public function only(string|array ...$only): static
     {
-        $partialsCollection = $this->getPartialsContainer()->onlyPartials ??= new PartialsCollection();
-
-        foreach ($only as $onlyDefinition) {
-            $partialsCollection->attach(Partial::create($onlyDefinition));
-        }
+        $this->expandPartials(
+            $this->getPartialsContainer()->onlyPartials ??= new PartialsCollection(),
+            $only,
+            permanent: false,
+        );
 
         return $this;
     }
 
-    public function onlyPermanently(string ...$only): static
+    public function onlyPermanently(string|array ...$only): static
     {
-        $partialsCollection = $this->getPartialsContainer()->onlyPartials ??= new PartialsCollection();
-
-        foreach ($only as $onlyDefinition) {
-            $partialsCollection->attach(Partial::create($onlyDefinition, permanent: true));
-        }
+        $this->expandPartials(
+            $this->getPartialsContainer()->onlyPartials ??= new PartialsCollection(),
+            $only,
+            permanent: true,
+        );
 
         return $this;
     }
 
-    public function except(string ...$except): static
+    public function except(string|array ...$except): static
     {
-        $partialsCollection = $this->getPartialsContainer()->exceptPartials ??= new PartialsCollection();
-
-        foreach ($except as $exceptDefinition) {
-            $partialsCollection->attach(Partial::create($exceptDefinition));
-        }
+        $this->expandPartials(
+            $this->getPartialsContainer()->exceptPartials ??= new PartialsCollection(),
+            $except,
+            permanent: false,
+        );
 
         return $this;
     }
 
-    public function exceptPermanently(string ...$except): static
+    public function exceptPermanently(string|array ...$except): static
     {
-        $partialsCollection = $this->getPartialsContainer()->exceptPartials ??= new PartialsCollection();
-
-        foreach ($except as $exceptDefinition) {
-            $partialsCollection->attach(Partial::create($exceptDefinition, permanent: true));
-        }
+        $this->expandPartials(
+            $this->getPartialsContainer()->exceptPartials ??= new PartialsCollection(),
+            $except,
+            permanent: true,
+        );
 
         return $this;
+    }
+
+    /**
+     * @param array<int, string|array<int, string>|array<string,Closure|bool>> $partials
+     */
+    protected function expandPartials(
+        PartialsCollection $partialsCollection,
+        array $partials,
+        bool $permanent,
+    ): void {
+        foreach ($partials as $partial) {
+            if (is_string($partial)) {
+                $partialsCollection->attach(Partial::create($partial, permanent: $permanent));
+
+                continue;
+            }
+
+            if (! is_array($partial)) {
+                continue;
+            }
+
+            foreach ($partial as $key => $subPartial) {
+                if (is_string($key) && is_callable($subPartial)) {
+                    $partialsCollection->attach(Partial::createConditional($key, condition: $subPartial, permanent: $permanent));
+
+                    continue;
+                }
+
+                if (is_string($key) && $subPartial === true) {
+                    $partialsCollection->attach(Partial::create($key, permanent: $permanent));
+
+                    continue;
+                }
+
+                if (is_string($subPartial)) {
+                    $partialsCollection->attach(Partial::create($subPartial, permanent: $permanent));
+
+                    continue;
+                }
+            }
+        }
     }
 
     public function includeWhen(string $include, bool|Closure $condition, bool $permanent = false): static
