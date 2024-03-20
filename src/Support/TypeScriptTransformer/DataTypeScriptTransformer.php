@@ -6,6 +6,7 @@ use phpDocumentor\Reflection\Fqsen;
 use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Boolean;
+use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Nullable;
 use phpDocumentor\Reflection\Types\Object_;
@@ -87,8 +88,8 @@ class DataTypeScriptTransformer extends DtoTransformer
                 }
 
                 return $isOptional
-                    ? "{$carry}{$propertyName}?: {$transformed};" . PHP_EOL
-                    : "{$carry}{$propertyName}: {$transformed};" . PHP_EOL;
+                    ? "{$carry}{$propertyName}?: {$transformed};".PHP_EOL
+                    : "{$carry}{$propertyName}: {$transformed};".PHP_EOL;
             },
             ''
         );
@@ -108,7 +109,10 @@ class DataTypeScriptTransformer extends DtoTransformer
         }
 
         $collectionType = match ($dataProperty->type->kind) {
-            DataTypeKind::DataCollection, DataTypeKind::DataArray, DataTypeKind::DataEnumerable, DataTypeKind::Array, DataTypeKind::Enumerable => $this->defaultCollectionType($dataProperty->type->dataClass),
+            DataTypeKind::DataCollection, DataTypeKind::DataArray, DataTypeKind::DataEnumerable, DataTypeKind::Array, DataTypeKind::Enumerable => $this->dataCollectionType(
+                $dataProperty->type->dataClass,
+                $dataProperty->type->iterableKeyType
+            ),
             DataTypeKind::DataPaginator, DataTypeKind::DataPaginatedCollection, DataTypeKind::Paginator => $this->paginatedCollectionType($dataProperty->type->dataClass),
             DataTypeKind::DataCursorPaginator, DataTypeKind::DataCursorPaginatedCollection, DataTypeKind::CursorPaginator => $this->cursorPaginatedCollectionType($dataProperty->type->dataClass),
             default => throw new RuntimeException('Cannot end up here since the type is dataCollectable')
@@ -119,6 +123,20 @@ class DataTypeScriptTransformer extends DtoTransformer
         }
 
         return $collectionType;
+    }
+
+    protected function dataCollectionType(string $class, ?string $keyType): Type
+    {
+        $keyType = match ($keyType) {
+            'string' => new String_(),
+            'int' => new Integer(),
+            default => new Compound([new String_(), new Integer()]),
+        };
+
+        return new Array_(
+            new Object_(new Fqsen("\\{$class}")),
+            $keyType
+        );
     }
 
     protected function defaultCollectionType(string $class): Type

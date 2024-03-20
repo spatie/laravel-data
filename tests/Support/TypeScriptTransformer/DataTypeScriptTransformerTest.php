@@ -217,7 +217,9 @@ it('it respects a TypeScript class optional attribute', function () {
             public string $name,
         ) {
         }
-    };
+    }
+
+    ;
 
     $transformer = new DataTypeScriptTransformer($config);
     $reflection = new ReflectionClass(DummyTypeScriptOptionalClass::class);
@@ -228,6 +230,32 @@ it('it respects a TypeScript class optional attribute', function () {
         {
         id?: number;
         name?: string;
+        }
+        TXT,
+        $transformer->transform($reflection, 'DataObject')->transformed
+    );
+});
+
+it('can transform a collection as a TypeScript record', function () {
+    $config = TypeScriptTransformerConfig::create();
+
+    $data = new class () extends Data {
+        /** @var \Spatie\LaravelData\Tests\Fakes\SimpleData[] */
+        public array $collectionAsArray;
+
+        /** @var array<string, \Spatie\LaravelData\Tests\Fakes\SimpleData> */
+        public array $collectionAsRecord;
+    };
+
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass($data);
+
+    $this->assertTrue($transformer->canTransform($reflection));
+    $this->assertEquals(
+        <<<TXT
+        {
+        collectionAsArray: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
+        collectionAsRecord: { [key: string]: {%Spatie\LaravelData\Tests\Fakes\SimpleData%} };
         }
         TXT,
         $transformer->transform($reflection, 'DataObject')->transformed
