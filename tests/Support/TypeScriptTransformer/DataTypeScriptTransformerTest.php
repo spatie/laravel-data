@@ -13,6 +13,7 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\Lazy\ClosureLazy;
 use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
+use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 use function Spatie\Snapshots\assertMatchesSnapshot as baseAssertMatchesSnapshot;
@@ -159,7 +160,7 @@ it('uses the correct types for cursor paginated data collection of attributes', 
     assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
 });
 
-it('outputs types with properties using their mapped name', function () {
+it('outputs types with properties using their mapped name on a property', function () {
     $config = TypeScriptTransformerConfig::create();
 
     $data = new class ('Good job Ruben', 'Hi Ruben') extends Data {
@@ -178,6 +179,17 @@ it('outputs types with properties using their mapped name', function () {
     expect($transformer->canTransform($reflection))->toBeTrue();
     assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
 });
+
+it('outputs types with properties using their mapped name on a class', function () {
+    $config = TypeScriptTransformerConfig::create();
+
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass(DataWithMapper::class);
+
+    expect($transformer->canTransform($reflection))->toBeTrue();
+    assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
+});
+
 
 it('it respects a TypeScript property optional attribute', function () {
     $config = TypeScriptTransformerConfig::create();
