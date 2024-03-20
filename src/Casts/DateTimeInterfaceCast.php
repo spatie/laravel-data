@@ -42,7 +42,7 @@ class DateTimeInterfaceCast implements Cast, IterableItemCast
         $datetime = $formats
             ->map(fn (string $format) => rescue(fn () => $type::createFromFormat(
                 $format,
-                $value,
+                (string) $value,
                 isset($this->timeZone) ? new DateTimeZone($this->timeZone) : null
             ), report: false))
             ->first(fn ($value) => (bool) $value);
