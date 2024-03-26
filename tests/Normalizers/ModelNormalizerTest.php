@@ -83,12 +83,24 @@ it('converts non loaded relations to either a lazy or load them if non nullable'
     {
         #[DataCollectionOf(FakeNestedModelData::class)]
         public null|Lazy|DataCollection $fake_nested_models;
+        public int $fake_nested_models_count;
+        public string $fake;
     }
 
-    $data = FakeModelDataLazyNullable::from($model->withoutRelations());
+    $model = $model->withoutRelations();
+    $data = FakeModelDataLazyNullable::from($model);
 
-    expect($data->toArray())->not()->toHaveKey('fake_nested_models')
-        ->and($data->fake_nested_models)->toBeInstanceOf(Lazy::class)
+    $dataArr = $data->toArray();
+
+    expect($dataArr)->toHaveKey('fake')->and($dataArr['fake'])->toBe('this_is_fake');
+
+    expect($dataArr)->toHaveKey('fake_nested_models_count')
+        ->and($data->fake_nested_models_count)->toBe(2);
+
+    expect($dataArr)->not()->toHaveKey('fake_nested_models')
+        ->and($data->fake_nested_models)->toBeInstanceOf(Lazy::class);
+
+    expect($model->relationLoaded('fakeNestedModels'))->toBe(false)
         ->and($data->fake_nested_models->resolve())->toHaveCount(2);
 
 

@@ -22,12 +22,19 @@ class LoadsModelRelationsDataPipe implements DataPipe
                 $relation = $dataProperty->inputMappedName ?? $dataProperty->name;
 
                 $relationRetriever = function () use ($payload, $relation) {
-                    try {
-                        $relationName = $payload::$snakeAttributes ? Str::camel($relation) : $relation;
-                        return $payload->loadMissing($relationName)->{$relationName};
-                    } catch (RelationNotFoundException) {
-                        return $payload->{$relation};
+                    $count = false;
+
+                    if (Str::endsWith($relation, '_count')) {
+                        $relation = Str::substr($relation, 0, -6);
+                        $count = true;
                     }
+                    if ($payload::$snakeAttributes) {
+                        $relationName = Str::studly($relation);
+                        if (method_exists($payload, $relationName)) {
+                            $relation = $relationName;
+                        }
+                    }
+                    return $count ? $payload->$relation()->count() : $payload->$relation;
                 };
 
                 $properties[$dataProperty->name] = match(true) {

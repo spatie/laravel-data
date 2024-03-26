@@ -21,6 +21,11 @@ class FakeModel extends Model
         return $this->hasMany(FakeNestedModel::class);
     }
 
+    public function getFakeAttribute(): string
+    {
+        return 'this_is_fake';
+    }
+
     public function accessor(): Attribute
     {
         return Attribute::get(fn () => "accessor_{$this->string}");
