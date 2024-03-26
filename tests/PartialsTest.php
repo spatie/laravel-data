@@ -225,6 +225,53 @@ it('can conditionally include nested', function () {
         ]);
 });
 
+it('doesnt throw when nested collection lazy is not a data collection', function () {
+    $dataClass = new class () extends Data {
+        public Collection $nested;
+    };
+
+    $data = $dataClass::collect([
+        [
+            'nested' => [DummyDto::rick()],
+        ],
+    ], DataCollection::class);
+
+    expect($data->include('nested.artist')->toArray())
+        ->toMatchArray([
+            ['nested' => [DummyDto::rick()]],
+        ]);
+});
+
+it('can conditionally include nested collection', function () {
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(MultiLazyData::class)]
+        public Collection $nested;
+    };
+
+    $data = $dataClass::collect([
+        [
+            'nested' => [DummyDto::rick()],
+        ], [
+            'nested' => [DummyDto::darude()],
+        ], [
+            'nested' => [DummyDto::bon()],
+        ]
+    ], DataCollection::class);
+
+    expect($data->toArray())->toMatchArray([
+        ['nested' => [[]]],
+        ['nested' => [[]]],
+        ['nested' => [[]]]
+    ]);
+
+    expect($data->include('nested.{artist,year}')->toArray())
+        ->toMatchArray([
+            ['nested' => [['artist' => DummyDto::rick()->artist, 'year' => DummyDto::rick()->year]]],
+            ['nested' => [['artist' => DummyDto::darude()->artist, 'year' => DummyDto::darude()->year]]],
+            ['nested' => [['artist' => DummyDto::bon()->artist, 'year' => DummyDto::bon()->year]]]
+        ]);
+});
+
 it('can conditionally include using class defaults', function () {
     PartialClassConditionalData::setDefinitions(includeDefinitions: [
         'string' => fn (PartialClassConditionalData $data) => $data->enabled,

@@ -20,4 +20,9 @@ class DummyDto
     {
         return new self('Bon Jovi', 'Living on a prayer', 1986);
     }
+
+    public static function darude(): static
+    {
+        return new self('Darude', 'sandstorm', 2000);
+    }
 }
