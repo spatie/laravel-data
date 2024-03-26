@@ -11,6 +11,10 @@ use Illuminate\Support\Enumerable;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
+use Spatie\LaravelData\DataPipeline;
+use Spatie\LaravelData\DataPipes\DataPipe;
+use Spatie\LaravelData\Support\Creation\CreationContext;
+use Spatie\LaravelData\Support\DataClass;
 use function Pest\Laravel\postJson;
 
 use Spatie\LaravelData\Attributes\Computed;
@@ -1067,3 +1071,60 @@ it('will cast iterables into the correct type', function () {
         ->toBeArray()
         ->toEqual(['a', 'collection']);
 })->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
+
+it('keeps the creation context path up to date', function () {
+    global $testCreationContexts;
+    $testCreationContexts = [];
+    class TestDataPipe implements DataPipe
+    {
+        public function handle(mixed $payload, DataClass $class, array $properties, CreationContext $creationContext): array
+        {
+            global $testCreationContexts;
+            $testCreationContexts[] = clone $creationContext;
+
+            return $properties;
+        }
+    }
+    class TestNestedDataPipe implements DataPipe
+    {
+        public function handle(mixed $payload, DataClass $class, array $properties, CreationContext $creationContext): array
+        {
+            global $testCreationContexts;
+            $testCreationContexts[] = clone $creationContext;
+
+            return $properties;
+        }
+    }
+
+    class SimpleDataWithTestPipe extends SimpleData
+    {
+        public static function pipeline(): DataPipeline
+        {
+            return parent::pipeline()
+                ->through(TestNestedDataPipe::class);
+        }
+    }
+
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(SimpleDataWithTestPipe::class)]
+        public Collection $collection;
+
+        public static function pipeline(): DataPipeline
+        {
+            return parent::pipeline()
+                ->through(TestDataPipe::class);
+        }
+    };
+
+    $dataClass::from([
+        'collection' => [['string' => 'no'], 'models', ['string' => 'here']],
+    ]);
+
+    expect($testCreationContexts)->toHaveCount(3);
+    expect($testCreationContexts[0])->toBeInstanceOf(CreationContext::class);
+
+    expect($testCreationContexts[0]->currentPath)->toBe([0 => 'collection', 1 => 0]);
+    expect($testCreationContexts[1]->currentPath)->toBe([0 => 'collection', 1 => 2]);
+    expect($testCreationContexts[2]->currentPath)->toHaveCount(0);
+
+});
