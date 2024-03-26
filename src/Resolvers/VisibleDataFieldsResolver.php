@@ -231,7 +231,7 @@ class VisibleDataFieldsResolver
 
             if ($nested = $includedPartial->getNested()) {
                 try {
-                    $fields[$nested]->addIncludedPartial($includedPartial->next());
+                    $fields[$nested]?->addIncludedPartial($includedPartial->next());
                     $includedFields[] = $nested;
                 } catch (ErrorException $exception) {
                     $this->handleNonExistingNestedField($exception, PartialType::Include, $nested, $dataClass, $transformationContext);
