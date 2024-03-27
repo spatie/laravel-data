@@ -27,7 +27,7 @@ class CastPropertiesDataPipe implements DataPipe
         CreationContext $creationContext
     ): array {
         foreach ($properties as $name => $value) {
-            $dataProperty = $class->properties->first(fn (DataProperty $dataProperty) => $dataProperty->name === $name);
+            $dataProperty = $class->properties[$name] ?? null;
 
             if ($dataProperty === null) {
                 continue;
