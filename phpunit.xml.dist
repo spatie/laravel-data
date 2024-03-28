@@ -37,6 +37,6 @@
         <junit outputFile="build/report.junit.xml"/>
     </logging>
     <php>
-        <env name="CACHE_DRIVER" value="array"/>
+        <env name="CACHE_STORE" value="array"/>
     </php>
 </phpunit>
