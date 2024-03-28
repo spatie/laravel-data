@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Support\EloquentCasts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Crypt;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\TransformableData;
@@ -21,6 +22,10 @@ class DataCollectionEloquentCast implements CastsAttributes
 
     public function get($model, string $key, $value, array $attributes): ?DataCollection
     {
+        if (is_string($value) && in_array('encrypted', $this->arguments)) {
+            $value = Crypt::decryptString($value);
+        }
+
         if ($value === null && in_array('default', $this->arguments)) {
             $value = '[]';
         }
@@ -66,6 +71,12 @@ class DataCollectionEloquentCast implements CastsAttributes
 
         $dataCollection = new ($this->dataCollectionClass)($this->dataClass, $data);
 
-        return $dataCollection->toJson();
+        $dataCollection = $dataCollection->toJson();
+
+        if (in_array('encrypted', $this->arguments)) {
+            return Crypt::encryptString($dataCollection);
+        }
+
+        return $dataCollection;
     }
 }
