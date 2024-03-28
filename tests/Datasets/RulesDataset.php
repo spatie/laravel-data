@@ -57,6 +57,7 @@ use Spatie\LaravelData\Attributes\Validation\IPv6;
 use Spatie\LaravelData\Attributes\Validation\Json;
 use Spatie\LaravelData\Attributes\Validation\LessThan;
 use Spatie\LaravelData\Attributes\Validation\LessThanOrEqualTo;
+use Spatie\LaravelData\Attributes\Validation\ListType;
 use Spatie\LaravelData\Attributes\Validation\Lowercase;
 use Spatie\LaravelData\Attributes\Validation\MacAddress;
 use Spatie\LaravelData\Attributes\Validation\Max;
@@ -312,6 +313,11 @@ dataset('attributes', function () {
     yield fixature(
         attribute: new LessThanOrEqualTo('field'),
         expected: 'lte:field',
+    );
+
+    yield fixature(
+        attribute: new ListType(),
+        expected: 'list',
     );
 
     yield fixature(
