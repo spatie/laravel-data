@@ -122,14 +122,14 @@ class ToUpperCastAndTransformer implements Cast, Transformer
 }
 ```
 
-Within your data object, you can use the `WithCastAndTransform` attribute to use the cast and transformer:
+Within your data object, you can use the `WithCastAndTransformer` attribute to use the cast and transformer:
 
 ```php
 class SongData extends Data
 {
     public function __construct(
         public string $title,
-        #[WithCastAndTransform(SomeCastAndTransformer::class)]
+        #[WithCastAndTransformer(SomeCastAndTransformer::class)]
         public string $artist,
     ) {
     }
