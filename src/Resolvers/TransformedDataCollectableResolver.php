@@ -112,7 +112,7 @@ class TransformedDataCollectableResolver
     protected function transformationClosure(
         TransformationContext $nestedContext,
     ): Closure {
-        return function (BaseData $data) use ($nestedContext) {
+        return function ($data) use ($nestedContext) {
             if (! $data instanceof TransformableData) {
                 return $data;
             }
