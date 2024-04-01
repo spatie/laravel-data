@@ -21,7 +21,11 @@ class LoadsModelRelationsDataPipe implements DataPipe
                 }
                 $relation = $dataProperty->inputMappedName ?? $dataProperty->name;
 
-                $relationRetriever = function () use ($payload, $relation) {
+                $wrap = function ($fn) use ($dataProperty) {
+                    return fn () => $dataProperty->type->dataCollectableClass ? $dataProperty->type->dataClass::collect($fn()) : $fn();
+                };
+
+                $relationRetriever = $wrap(function () use ($payload, $relation) {
                     $count = false;
 
                     if (Str::endsWith($relation, '_count')) {
@@ -35,7 +39,7 @@ class LoadsModelRelationsDataPipe implements DataPipe
                         }
                     }
                     return $count ? $payload->$relation()->count() : $payload->$relation;
-                };
+                });
 
                 $properties[$dataProperty->name] = match(true) {
                     (bool)$dataProperty->type->lazyType => Lazy::create($relationRetriever)->defaultIncluded(!$dataProperty->type->isOptional && !$dataProperty->type->isNullable),
