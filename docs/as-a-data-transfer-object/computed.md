@@ -34,4 +34,5 @@ Again there are a few conditions for this approach:
 
 - You must always use a sole property, a property within the constructor definition won't work
 - Computed properties cannot be defined in the payload, a `CannotSetComputedValue` will be thrown if this is the case
+- If the `ignore_exception_when_trying_to_set_computed_property_value` configuration option is set to `true`, the computed property will be silently ignored when trying to set it in the payload and no `CannotSetComputedValue` exception will be thrown.
 

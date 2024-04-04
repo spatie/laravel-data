@@ -17,6 +17,13 @@ return [
      */
     'features' => [
         'cast_and_transform_iterables' => false,
+
+        /**
+         * When trying to set a computed property value, the package will throw an exception.
+         * You can disable this behaviour by setting this option to true, which will then just
+         * ignore the value being passed into the computed property and recalculate it.
+         */
+        'ignore_exception_when_trying_to_set_computed_property_value' => false,
     ],
 
     /**
