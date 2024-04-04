@@ -657,6 +657,18 @@ it('can have a computed value when creating the data object', function () {
         }
     };
 
+    expect($dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Something to Be Ignored']))
+        ->first_name->toBe('Ruben')
+        ->last_name->toBe('Van Assche')
+        ->full_name->toBe('Ruben Van Assche');
+
+    expect($dataObject::validateAndCreate(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Something to Be Ignored']))
+        ->first_name->toBe('Ruben')
+        ->last_name->toBe('Van Assche')
+        ->full_name->toBe('Ruben Van Assche');
+
+    config()->set('data.features.ignore_exception_when_trying_to_set_computed_property_value', false);
+
     expect($dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche']))
         ->first_name->toBe('Ruben')
         ->last_name->toBe('Van Assche')
@@ -669,18 +681,6 @@ it('can have a computed value when creating the data object', function () {
 
     expect(fn () => $dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Ruben Versieck']))
         ->toThrow(CannotSetComputedValue::class);
-
-    config()->set('data.throw_when_trying_to_set_computed_property_value', false);
-
-    expect($dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Something to Be Ignored']))
-        ->first_name->toBe('Ruben')
-        ->last_name->toBe('Van Assche')
-        ->full_name->toBe('Ruben Van Assche');
-
-    expect($dataObject::validateAndCreate(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Something to Be Ignored']))
-        ->first_name->toBe('Ruben')
-        ->last_name->toBe('Van Assche')
-        ->full_name->toBe('Ruben Van Assche');
 });
 
 it('can have a nullable computed value', function () {
