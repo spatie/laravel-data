@@ -192,7 +192,7 @@ public string $closure;
 
 ```php
 #[Date]
-public Carbon $closure; 
+public Carbon $date; 
 ```
 
 ## DateEquals
@@ -201,10 +201,10 @@ public Carbon $closure;
 
 ```php
 #[DateEquals('tomorrow')]
-public Carbon $closure; 
+public Carbon $date; 
 
 #[DateEquals(Carbon::yesterday())]
-public Carbon $closure; 
+public Carbon $date; 
 ```
 
 ## DateFormat
@@ -213,7 +213,10 @@ public Carbon $closure;
 
 ```php
 #[DateFormat('d-m-Y')]
-public Carbon $closure; 
+public Carbon $date;
+
+#[DateFormat(['Y-m-d', 'Y-m-d H:i:s'])]
+public Carbon $date;  
 ```
 
 ## Declined
