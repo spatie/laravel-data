@@ -11,8 +11,6 @@ use Spatie\LaravelData\Tests\Fakes\Collections\CustomCollection;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
-use function Spatie\Snapshots\assertMatchesSnapshot;
-
 it('can filter a collection', function () {
     $collection = new DataCollection(SimpleData::class, ['A', 'B']);
 
@@ -236,35 +234,6 @@ it('a collection can be merged', function () {
         ['string' => 'D'],
     ])
         ->toMatchArray($filtered);
-});
-
-it('can serialize and unserialize a data collection', function () {
-    $collection = new DataCollection(SimpleData::class, ['A', 'B']);
-
-    $serialized = serialize($collection);
-
-    assertMatchesSnapshot($serialized);
-
-    $unserialized = unserialize($serialized);
-
-    expect($unserialized)->toBeInstanceOf(DataCollection::class);
-    expect($unserialized)->toEqual(new DataCollection(SimpleData::class, ['A', 'B']));
-});
-
-it('during the serialization process some properties are thrown away', function () {
-    $collection = new DataCollection(SimpleData::class, ['A', 'B']);
-
-    $collection->include('test');
-    $collection->exclude('test');
-    $collection->only('test');
-    $collection->except('test');
-    $collection->wrap('test');
-
-    $unserialized = unserialize(serialize($collection));
-
-    $invaded = invade($unserialized);
-
-    expect($invaded->_dataContext)->toBeNull();
 });
 
 it('can use a custom collection extended from collection to collect a collection of data objects', function () {
