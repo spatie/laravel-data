@@ -170,19 +170,19 @@ class DataIterableAnnotationReader
             ];
         }
 
-        if (class_exists($class)) {
+        $fcqn = $this->resolveFcqn($reflection, $class);
+
+        if (is_subclass_of($fcqn, BaseData::class)) {
             return [
-                'type' => $class,
-                'isData' => false,
+                'type' => $fcqn,
+                'isData' => true,
             ];
         }
 
-        $class = $this->resolveFcqn($reflection, $class);
-
-        if (is_subclass_of($class, BaseData::class)) {
+        if (class_exists($fcqn)) {
             return [
-                'type' => $class,
-                'isData' => true,
+                'type' => $fcqn,
+                'isData' => false,
             ];
         }
 
