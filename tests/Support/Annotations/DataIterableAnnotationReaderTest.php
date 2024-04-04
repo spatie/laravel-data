@@ -6,6 +6,7 @@ use Spatie\LaravelData\Support\Annotations\DataIterableAnnotationReader;
 use Spatie\LaravelData\Tests\Fakes\CollectionDataAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\CollectionNonDataAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\Error;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 it(
@@ -178,6 +179,11 @@ it(
     yield 'propertyL' => [
         'property' => 'propertyL',
         'expected' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false),
+    ];
+
+    yield 'propertyP' => [
+        'property' => 'propertyP',
+        'expected' => new DataIterableAnnotation(Error::class, isData: true),
     ];
 });
 

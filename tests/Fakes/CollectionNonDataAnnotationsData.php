@@ -55,6 +55,9 @@ class CollectionNonDataAnnotationsData
 
     public array $propertyO;
 
+    /** @var \Illuminate\Support\Collection<Error> */
+    public Collection $propertyP;
+
     /**
      * @param \Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum[]|null $paramA
      * @param null|\Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum[] $paramB
