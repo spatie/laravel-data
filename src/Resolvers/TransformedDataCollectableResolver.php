@@ -20,6 +20,7 @@ use Spatie\LaravelData\Support\Transformation\TransformationContext;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 use Spatie\LaravelData\Support\Wrapping\WrapType;
+use TestDataCollectionWithNested;
 
 class TransformedDataCollectableResolver
 {
@@ -125,7 +126,21 @@ class TransformedDataCollectableResolver
                 return $data;
             }
 
-            return $data->transform(clone $nestedContext);
+            $clonedContext = clone $nestedContext;
+
+            if($data::class === TestDataCollectionWithNested::class) {
+                ray((string) $clonedContext);
+            }
+
+            $transformed = $data->transform($clonedContext);
+
+            if($data::class === TestDataCollectionWithNested::class) {
+                ray($nestedContext, $clonedContext);
+            }
+
+            return $transformed;
+
+            //            return $data->transform(clone $nestedContext);
         };
     }
 }
