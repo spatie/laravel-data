@@ -711,6 +711,8 @@ it('can have a nullable computed value', function () {
         ->name->toBeNull()
         ->upper_name->toBeNull();
 
+    config()->set('data.features.ignore_exception_when_trying_to_set_computed_property_value', false);
+
     expect(fn () => $dataObject::from(['name' => 'Ruben', 'upper_name' => 'RUBEN']))
         ->toThrow(CannotSetComputedValue::class);
 
