@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support\Lazy;
 
 use Closure;
+use Laravel\SerializableClosure\SerializableClosure;
 use Spatie\LaravelData\Lazy;
 
 class ConditionalLazy extends Lazy
@@ -21,5 +22,21 @@ class ConditionalLazy extends Lazy
     public function shouldBeIncluded(): bool
     {
         return (bool) ($this->condition)();
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            'condition' => new SerializableClosure($this->condition),
+            'value' => new SerializableClosure($this->value),
+            'defaultIncluded' => $this->defaultIncluded,
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->condition = $data['condition']->getClosure();
+        $this->value = $data['value']->getClosure();
+        $this->defaultIncluded = $data['defaultIncluded'];
     }
 }

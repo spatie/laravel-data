@@ -44,6 +44,10 @@ abstract class Lazy
 
     abstract public function resolve(): mixed;
 
+    abstract public function __serialize(): array;
+
+    abstract public function __unserialize(array $data): void;
+
     public function defaultIncluded(bool $defaultIncluded = true): self
     {
         $this->defaultIncluded = $defaultIncluded;
