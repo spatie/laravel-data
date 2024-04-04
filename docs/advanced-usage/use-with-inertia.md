@@ -48,7 +48,7 @@ We provide two kinds of lazy properties:
 Now within your JavaScript code, you can include the properties as such:
 
 ```js
-Inertia.reload((url, {
+router.reload((url, {
     only: ['title'],
 });
 ```
