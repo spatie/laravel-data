@@ -563,6 +563,15 @@ public int $closure;
 public string $closure; 
 ```
 
+## List
+
+[Docs](https://laravel.com/docs/validation#rule-list)
+
+```php
+#[List]
+public array $array; 
+```
+
 ## MacAddress
 
 [Docs](https://laravel.com/docs/validation#rule-mac)
