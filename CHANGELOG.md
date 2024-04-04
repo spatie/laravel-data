@@ -2,6 +2,28 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.5.0 - 2024-04-04
+
+### What's Changed
+
+* Cast value to string for createFromFormat by @kylekatarnls in https://github.com/spatie/laravel-data/pull/707
+* fix: avoid mutation during `DataCollectable` transformation by @innocenzi in https://github.com/spatie/laravel-data/pull/696
+* Add new section to the docs for package testing by @adam-code-labx in https://github.com/spatie/laravel-data/pull/711
+* Change default cache variable by @Elnadrion in https://github.com/spatie/laravel-data/pull/717
+* Improve performance of CastPropertiesDataPipe by using hash lookups instead of ->first by @LauJosefsen in https://github.com/spatie/laravel-data/pull/721
+* Change method of creating object without magic methods by @daveroverts in https://github.com/spatie/laravel-data/pull/725
+* Upgrade to inertia 1.0 by @kimulisiraj in https://github.com/spatie/laravel-data/pull/726
+* Allow to pass multiple formats to Laravel's `date_format` rule by @riesjart in https://github.com/spatie/laravel-data/pull/727
+* Add attribute for Laravel's `list` validation rule by @riesjart in https://github.com/spatie/laravel-data/pull/728
+* chore(deps): bump dependabot/fetch-metadata from 1.6.0 to 2.0.0 by @dependabot in https://github.com/spatie/laravel-data/pull/718
+* Update creating-a-cast.md by @AlexRegenbogen in https://github.com/spatie/laravel-data/pull/724
+* Fix wrong link to using attributes page by @BernhardK91 in https://github.com/spatie/laravel-data/pull/733
+* Add better support for serializing data by @rubenvanassche in https://github.com/spatie/laravel-data/pull/735
+* Fix for the use of built-in class names in Collection annotations by @27pchrisl in https://github.com/spatie/laravel-data/pull/736
+* Adds a config option to silently ignore when a Computed Property is being set by @erikaraujo in https://github.com/spatie/laravel-data/pull/714
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.4.1...4.5.0
+
 ## 4.4.1 - 2024-03-20
 
 ### What's Changed
