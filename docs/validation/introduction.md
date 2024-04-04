@@ -107,7 +107,7 @@ class SongData extends Data
 
 When you provide an artist with a length of more than 20 characters, the validation will fail.
 
-There's a complete [chapter](/docs/laravel-data/v4/validation/using-attributes) dedicated to validation attributes.
+There's a complete [chapter](/docs/laravel-data/v4/validation/using-validation-attributes) dedicated to validation attributes.
 
 ### Manual rules
 
