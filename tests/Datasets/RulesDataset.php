@@ -124,6 +124,7 @@ dataset('attributes', function () {
     yield from betweenAttributes();
     yield from currentPasswordAttributes();
     yield from dateEqualsAttributes();
+    yield from dateFormatAttributes();
     yield from dimensionsAttributes();
     yield from distinctAttributes();
     yield from doesntEndWithAttributes();
@@ -193,11 +194,6 @@ dataset('attributes', function () {
     yield fixature(
         attribute: new Date(),
         expected: 'date',
-    );
-
-    yield fixature(
-        attribute: new DateFormat('Y-m-d'),
-        expected: 'date_format:Y-m-d',
     );
 
     yield fixature(
@@ -581,6 +577,24 @@ function dateEqualsAttributes(): Generator
     yield fixature(
         attribute: new DateEquals('2020-05-15 00:00:00'),
         expected: 'date_equals:2020-05-15 00:00:00',
+    );
+}
+
+function dateFormatAttributes(): Generator
+{
+    yield fixature(
+        attribute: new DateFormat('Y-m-d'),
+        expected: 'date_format:Y-m-d',
+    );
+
+    yield fixature(
+        attribute: new DateFormat(['Y-m-d', 'Y-m-d H:i:s']),
+        expected: 'date_format:Y-m-d,Y-m-d H:i:s',
+    );
+
+    yield fixature(
+        attribute: new DateFormat('Y-m-d', 'Y-m-d H:i:s'),
+        expected: 'date_format:Y-m-d,Y-m-d H:i:s',
     );
 }
 
