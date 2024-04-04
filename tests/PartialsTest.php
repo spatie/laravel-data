@@ -631,7 +631,6 @@ it('can perform only and except on array properties', function () {
         ]);
 });
 
-
 it('can fetch lazy properties like regular properties within PHP', function () {
 
     $dataClass = new class () extends Data {

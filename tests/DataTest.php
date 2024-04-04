@@ -1,9 +1,7 @@
 <?php
 
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
-use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\BaseData;
 use Spatie\LaravelData\Concerns\ContextableData;
@@ -22,11 +20,8 @@ use Spatie\LaravelData\Contracts\TransformableData as TransformableDataContract;
 use Spatie\LaravelData\Contracts\ValidateableData as ValidateableDataContract;
 use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Dto;
 use Spatie\LaravelData\Resource;
-use Spatie\LaravelData\Tests\Fakes\DummyDto;
-use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDto;
 use Spatie\LaravelData\Tests\Fakes\SimpleResource;
 
@@ -81,51 +76,5 @@ it('can use data as an Resource', function () {
 
     expect($resource)->not()->toHaveMethods([
         'validate',
-    ]);
-});
-
-// TODO: move
-
-it('doesnt throw when nested collection lazy is not a data collection', function () {
-    $dataClass = new class () extends Data {
-        public Collection $nested;
-    };
-
-    $data = $dataClass::collect([
-        [
-            'nested' => [DummyDto::rick()],
-        ],
-    ], DataCollection::class);
-
-
-    expect($data->include('nested.artist')->toArray())->toMatchArray([
-        ['nested' => [DummyDto::rick()]],
-    ]);
-});
-
-it('can conditionally include nested collection', function () {
-    class TestDataCollectionWithNested extends Data
-    {
-        #[DataCollectionOf(MultiLazyData::class)]
-        public Collection $nested;
-    }
-
-    $data = TestDataCollectionWithNested::collect([
-        [
-            'nested' => [DummyDto::rick()],
-        ], [
-            'nested' => [DummyDto::bon()],
-        ],
-    ], DataCollection::class);
-
-
-    expect($data->toArray())->toMatchArray([
-        ['nested' => [[]]],
-        ['nested' => [[]]],
-    ]);
-
-    expect($data->include('nested.{artist,year}')->toArray())->toMatchArray([
-        ['nested' => [['artist' => DummyDto::rick()->artist, 'year' => DummyDto::rick()->year]]],
-        ['nested' => [['artist' => DummyDto::bon()->artist, 'year' => DummyDto::bon()->year]]],
     ]);
 });
