@@ -129,7 +129,7 @@ class DataTypeScriptTransformer extends DtoTransformer
     {
         $keyType = match ($keyType) {
             'string' => new String_(),
-            'int' => new Integer(),
+            'int' => null,
             default => new Compound([new String_(), new Integer()]),
         };
 

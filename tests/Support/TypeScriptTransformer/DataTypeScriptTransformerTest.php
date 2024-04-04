@@ -273,3 +273,25 @@ it('can transform a collection as a TypeScript record', function () {
         $transformer->transform($reflection, 'DataObject')->transformed
     );
 });
+
+it('will transform a collection with int key as an array', function () {
+    $config = TypeScriptTransformerConfig::create();
+
+    $data = new class () extends Data {
+        /** @var array<int, \Spatie\LaravelData\Tests\Fakes\SimpleData> */
+        public array $collection;
+    };
+
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass($data);
+
+    $this->assertTrue($transformer->canTransform($reflection));
+    $this->assertEquals(
+        <<<TXT
+        {
+        collection: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
+        }
+        TXT,
+        $transformer->transform($reflection, 'DataObject')->transformed
+    );
+});
