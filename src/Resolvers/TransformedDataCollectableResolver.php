@@ -89,10 +89,8 @@ class TransformedDataCollectableResolver
         Wrap $wrap,
         TransformationContext $nestedContext,
     ): array {
-        $items = array_map(fn (BaseData $data) => $this->transformationClosure($nestedContext)($data), $paginator->items());
-
         if ($nestedContext->transformValues === false) {
-            return $items;
+            return $paginator->map(fn (BaseData $data) => $this->transformationClosure($nestedContext)($data))->all();
         }
 
         $paginated = $paginator->toArray();
@@ -100,7 +98,7 @@ class TransformedDataCollectableResolver
         $wrapKey = $wrap->getKey() ?? 'data';
 
         return [
-            $wrapKey => $items,
+            $wrapKey => array_map(fn (BaseData $data) => $this->transformationClosure($nestedContext)($data), $paginator->items()),
             'links' => $paginated['links'] ?? [],
             'meta' => Arr::except($paginated, [
                 'data',
