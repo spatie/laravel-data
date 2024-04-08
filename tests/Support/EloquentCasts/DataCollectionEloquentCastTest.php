@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\DB;
 
+use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractData;
+use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
+use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
 use function Pest\Laravel\assertDatabaseHas;
 
 use Spatie\LaravelData\DataCollection;
@@ -150,4 +153,19 @@ it('loads a custom data collection when nullable argument used and value is null
     expect($model->data_collection)
         ->toBeInstanceOf(SimpleDataCollection::class)
         ->toBeEmpty();
+});
+
+it('can use an abstract data collection with multiple children', function () {
+    $abstractA = new AbstractDataA('A\A');
+    $abstractB = new AbstractDataB('B\B');
+
+    $modelId = DummyModelWithCasts::create([
+        'abstract_collection' => [$abstractA, $abstractB],
+    ])->id;
+
+    $model = DummyModelWithCasts::find($modelId);
+
+    expect($model->abstract_collection)
+        ->toBeInstanceOf(DataCollection::class)
+        ->each->toBeInstanceOf(AbstractData::class);
 });
