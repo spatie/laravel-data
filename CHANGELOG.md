@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.5.1 - 2024-04-10
+
+### What's Changed
+
+* Abstract data object as collection by @onursimsek in https://github.com/spatie/laravel-data/pull/741
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.5.0...4.5.1
+
 ## 4.5.0 - 2024-04-04
 
 ### What's Changed
