@@ -2,12 +2,13 @@
 
 use Illuminate\Support\Facades\DB;
 
-use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractData;
-use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
-use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
 use function Pest\Laravel\assertDatabaseHas;
 
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractData;
+use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
+
+use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
 
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 

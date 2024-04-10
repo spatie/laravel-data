@@ -75,6 +75,7 @@ class DataCollectionEloquentCast implements CastsAttributes
             function (array | BaseData $item) use ($isAbstract) {
                 if ($isAbstract) {
                     $class = get_class($item);
+
                     return [
                         'type' => $this->dataConfig->morphMap->getDataClassAlias($class) ?? $class,
                         'data' => json_decode(json: $item->toJson(), associative: true, flags: JSON_THROW_ON_ERROR),
