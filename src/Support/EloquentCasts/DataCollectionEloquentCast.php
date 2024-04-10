@@ -35,19 +35,17 @@ class DataCollectionEloquentCast implements CastsAttributes
 
         $data = json_decode($value, true, flags: JSON_THROW_ON_ERROR);
 
-        $isAbstract = $this->isAbstractClassCast();
-        $data = array_map(
-            function (array $item) use ($isAbstract) {
-                if ($isAbstract) {
-                    $dataClass = $this->dataConfig->morphMap->getMorphedDataClass($item['type']) ?? $item['type'];
+        $dataClass = $this->dataConfig->getDataClass($this->dataClass);
 
-                    return $dataClass::from($item['data']);
-                }
+        $data = array_map(function (array $item) use ($dataClass) {
+            if ($dataClass->isAbstract && $dataClass->transformable) {
+                $morphedClass = $this->dataConfig->morphMap->getMorphedDataClass($item['type']) ?? $item['type'];
 
-                return ($this->dataClass)::from($item);
-            },
-            $data
-        );
+                return $morphedClass::from($item['data']);
+            }
+
+            return ($this->dataClass)::from($item);
+        }, $data);
 
         return new ($this->dataCollectionClass)($this->dataClass, $data);
     }
@@ -70,26 +68,24 @@ class DataCollectionEloquentCast implements CastsAttributes
             throw CannotCastData::shouldBeArray($model::class, $key);
         }
 
-        $isAbstract = $this->isAbstractClassCast();
-        $data = array_map(
-            function (array | BaseData $item) use ($isAbstract) {
-                if ($isAbstract) {
-                    $class = get_class($item);
+        $dataClass = $this->dataConfig->getDataClass($this->dataClass);
 
-                    return [
-                        'type' => $this->dataConfig->morphMap->getDataClassAlias($class) ?? $class,
-                        'data' => json_decode(json: $item->toJson(), associative: true, flags: JSON_THROW_ON_ERROR),
-                    ];
-                }
+        $data = array_map(function (array|BaseData $item) use ($dataClass) {
+            if ($dataClass->isAbstract && $item instanceof TransformableData) {
+                $class = get_class($item);
 
-                return is_array($item)
-                    ? ($this->dataClass)::from($item)
-                    : $item;
-            },
-            $value
-        );
+                return [
+                    'type' => $this->dataConfig->morphMap->getDataClassAlias($class) ?? $class,
+                    'data' => json_decode(json: $item->toJson(), associative: true, flags: JSON_THROW_ON_ERROR),
+                ];
+            }
 
-        if ($isAbstract) {
+            return is_array($item)
+                ? ($this->dataClass)::from($item)
+                : $item;
+        }, $value);
+
+        if ($dataClass->isAbstract) {
             return json_encode($data);
         }
 

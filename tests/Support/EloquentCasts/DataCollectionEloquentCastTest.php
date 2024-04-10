@@ -169,4 +169,7 @@ it('can use an abstract data collection with multiple children', function () {
     expect($model->abstract_collection)
         ->toBeInstanceOf(DataCollection::class)
         ->each->toBeInstanceOf(AbstractData::class);
+
+    expect($model->abstract_collection[0])->toBeInstanceOf(AbstractDataA::class);
+    expect($model->abstract_collection[1])->toBeInstanceOf(AbstractDataB::class);
 });
