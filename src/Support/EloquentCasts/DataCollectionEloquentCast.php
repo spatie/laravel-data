@@ -9,14 +9,18 @@ use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotCastData;
+use Spatie\LaravelData\Support\DataConfig;
 
 class DataCollectionEloquentCast implements CastsAttributes
 {
+    protected DataConfig $dataConfig;
+
     public function __construct(
         protected string $dataClass,
         protected string $dataCollectionClass = DataCollection::class,
         protected array $arguments = []
     ) {
+        $this->dataConfig = app(DataConfig::class);
     }
 
     public function get($model, string $key, $value, array $attributes): ?DataCollection
@@ -31,8 +35,17 @@ class DataCollectionEloquentCast implements CastsAttributes
 
         $data = json_decode($value, true, flags: JSON_THROW_ON_ERROR);
 
+        $isAbstract = $this->isAbstractClassCast();
         $data = array_map(
-            fn (array $item) => ($this->dataClass)::from($item),
+            function (array $item) use ($isAbstract) {
+                if ($isAbstract) {
+                    $dataClass = $this->dataConfig->morphMap->getMorphedDataClass($item['type']) ?? $item['type'];
+
+                    return $dataClass::from($item['data']);
+                }
+
+                return ($this->dataClass)::from($item);
+            },
             $data
         );
 
@@ -57,15 +70,35 @@ class DataCollectionEloquentCast implements CastsAttributes
             throw CannotCastData::shouldBeArray($model::class, $key);
         }
 
+        $isAbstract = $this->isAbstractClassCast();
         $data = array_map(
-            fn (array | BaseData $item) => is_array($item)
-                ? ($this->dataClass)::from($item)
-                : $item,
+            function (array | BaseData $item) use ($isAbstract) {
+                if ($isAbstract) {
+                    $class = get_class($item);
+                    return [
+                        'type' => $this->dataConfig->morphMap->getDataClassAlias($class) ?? $class,
+                        'data' => json_decode(json: $item->toJson(), associative: true, flags: JSON_THROW_ON_ERROR),
+                    ];
+                }
+
+                return is_array($item)
+                    ? ($this->dataClass)::from($item)
+                    : $item;
+            },
             $value
         );
+
+        if ($isAbstract) {
+            return json_encode($data);
+        }
 
         $dataCollection = new ($this->dataCollectionClass)($this->dataClass, $data);
 
         return $dataCollection->toJson();
+    }
+
+    protected function isAbstractClassCast(): bool
+    {
+        return $this->dataConfig->getDataClass($this->dataClass)->isAbstract;
     }
 }

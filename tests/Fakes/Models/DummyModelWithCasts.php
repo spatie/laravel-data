@@ -15,6 +15,7 @@ class DummyModelWithCasts extends Model
         'data' => SimpleData::class,
         'data_collection' => DataCollection::class.':'.SimpleData::class,
         'abstract_data' => AbstractData::class,
+        'abstract_collection' => DataCollection::class . ':' . AbstractData::class,
     ];
 
     public $timestamps = false;
@@ -27,6 +28,7 @@ class DummyModelWithCasts extends Model
             $blueprint->text('data')->nullable();
             $blueprint->text('data_collection')->nullable();
             $blueprint->text('abstract_data')->nullable();
+            $blueprint->text('abstract_collection')->nullable();
         });
     }
 }
