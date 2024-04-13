@@ -62,6 +62,10 @@ class DataPropertyFactory
             fn (object $attribute) => $attribute instanceof WithoutValidation
         ) && ! $computed;
 
+        $getterSetter = $attributes->first(
+            fn(object $attribute) => $attribute instanceof \Spatie\LaravelData\Attributes\DataProperty
+        );
+
         return new DataProperty(
             name: $reflectionProperty->name,
             className: $reflectionProperty->class,
@@ -84,6 +88,8 @@ class DataPropertyFactory
             inputMappedName: $inputMappedName,
             outputMappedName: $outputMappedName,
             attributes: $attributes,
+            getter: $getterSetter?->getter,
+            setter: $getterSetter?->setter
         );
     }
 }

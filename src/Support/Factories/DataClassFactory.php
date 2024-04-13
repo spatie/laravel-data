@@ -139,9 +139,17 @@ class DataClassFactory
     ): Collection {
         $defaultValues = $this->resolveDefaultValues($reflectionClass, $constructorReflectionMethod);
 
-        return collect($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC))
+        $publicProperties = collect($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC))
             ->reject(fn (ReflectionProperty $property) => $property->isStatic())
-            ->values()
+            ->values();
+
+        $protectedProperties = collect($reflectionClass->getProperties(ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE))
+            ->reject(fn (ReflectionProperty $property) => $property->isStatic()
+                || empty($property->getAttributes(\Spatie\LaravelData\Attributes\DataProperty::class)))
+            ->values();
+
+        return $publicProperties
+            ->merge($protectedProperties)
             ->mapWithKeys(fn (ReflectionProperty $property) => [
                 $property->name => $this->propertyFactory->build(
                     $property,

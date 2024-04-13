@@ -41,6 +41,7 @@ use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomCursorPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomPaginatedDataCollection;
+use Spatie\LaravelData\Tests\Fakes\DataWithProtectedProperty;
 use Spatie\LaravelData\Tests\Fakes\EnumData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\ModelData;
@@ -1067,3 +1068,20 @@ it('will cast iterables into the correct type', function () {
         ->toBeArray()
         ->toEqual(['a', 'collection']);
 })->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
+
+it('can create data object with protected property via constructor', function () {
+    $data = DataWithProtectedProperty::from([
+        'string' => 'test'
+    ]);
+
+    expect($data->getString())->toEqual('test');
+});
+
+it('can create data object with protected property via setter', function () {
+    $data = DataWithProtectedProperty::from([
+        'string' => 'test',
+        'nonConstructorProperty' => 'test'
+    ]);
+
+    expect($data->getNonConstructorProperty())->toEqual('test');
+});

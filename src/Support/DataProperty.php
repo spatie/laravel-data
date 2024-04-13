@@ -27,6 +27,8 @@ class DataProperty
         public readonly ?string $inputMappedName,
         public readonly ?string $outputMappedName,
         public readonly Collection $attributes,
+        public readonly ?string $getter,
+        public readonly ?string $setter,
     ) {
     }
 }

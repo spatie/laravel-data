@@ -61,7 +61,11 @@ class DataFromArrayResolver
                 continue; // Ignore the value being passed into the computed property and let it be recalculated
             }
 
-            $data->{$property->name} = $properties[$property->name];
+            if ($setter = $property->setter) {
+                $data->{$setter}($properties[$property->name]);
+            } else {
+                $data->{$property->name} = $properties[$property->name];
+            }
         }
 
         return $data;
