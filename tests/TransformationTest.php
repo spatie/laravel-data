@@ -134,17 +134,24 @@ it('can transform to JSON', function () {
 });
 
 it('can use a custom transformer for a data object and/or data collectable', function () {
-    $nestedData = new class (42, 'Hello World') extends Data {
+    $nestedData = new class (42, 'Hello World', '!') extends Data {
         public function __construct(
             public int $integer,
             public string $string,
+            #[\Spatie\LaravelData\Attributes\DataProperty(getter: 'getPrivateString')]
+            private string $privateString,
         ) {
+        }
+
+        public function getPrivateString(): string
+        {
+            return $this->privateString;
         }
     };
 
     $nestedDataCollection = $nestedData::collect([
-        ['integer' => 314, 'string' => 'pi'],
-        ['integer' => '69', 'string' => 'Laravel after hours'],
+        ['integer' => 314, 'string' => 'pi', 'privateString' => '3.14'],
+        ['integer' => '69', 'string' => 'Laravel after hours', 'privateString' => '80085'],
     ]);
 
     $dataWithDefaultTransformers = new class ($nestedData, $nestedDataCollection) extends Data {
@@ -171,19 +178,19 @@ it('can use a custom transformer for a data object and/or data collectable', fun
 
     expect($dataWithDefaultTransformers->toArray())
         ->toMatchArray([
-            'nestedData' => ['integer' => 42, 'string' => 'Hello World'],
+            'nestedData' => ['integer' => 42, 'string' => 'Hello World', 'privateString' => '!'],
             'nestedDataCollection' => [
-                ['integer' => 314, 'string' => 'pi'],
-                ['integer' => '69', 'string' => 'Laravel after hours'],
+                ['integer' => 314, 'string' => 'pi', 'privateString' => '3.14'],
+                ['integer' => '69', 'string' => 'Laravel after hours', 'privateString' => '80085'],
             ],
         ]);
 
     expect($dataWithSpecificTransformers->toArray())
         ->toMatchArray([
-            'nestedData' => ['integer' => 'CONFIDENTIAL', 'string' => 'CONFIDENTIAL'],
+            'nestedData' => ['integer' => 'CONFIDENTIAL', 'string' => 'CONFIDENTIAL', 'privateString' => 'CONFIDENTIAL'],
             'nestedDataCollection' => [
-                ['integer' => 'CONFIDENTIAL', 'string' => 'CONFIDENTIAL'],
-                ['integer' => 'CONFIDENTIAL', 'string' => 'CONFIDENTIAL'],
+                ['integer' => 'CONFIDENTIAL', 'string' => 'CONFIDENTIAL', 'privateString' => 'CONFIDENTIAL'],
+                ['integer' => 'CONFIDENTIAL', 'string' => 'CONFIDENTIAL', 'privateString' => 'CONFIDENTIAL'],
             ],
         ]);
 });
