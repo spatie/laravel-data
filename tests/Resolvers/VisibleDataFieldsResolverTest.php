@@ -369,6 +369,8 @@ class VisibleFieldsData extends Data
     public function __construct(
         public string $string,
         public int $int,
+        #[DataProperty(getter: 'getPrivateString')]
+        private string $privateString,
         public VisibleFieldsSingleData $single,
         public VisibleFieldsNestedData $nested,
         #[DataCollectionOf(VisibleFieldsSingleData::class)]
@@ -376,11 +378,17 @@ class VisibleFieldsData extends Data
     ) {
     }
 
+    public function getPrivateString(): string
+    {
+        return $this->privateString;
+    }
+
     public static function instance(): self
     {
         return new self(
             'hello',
             42,
+            'worlds',
             VisibleFieldsSingleData::instance(),
             VisibleFieldsNestedData::instance(),
             [
@@ -414,12 +422,14 @@ it('can execute excepts', function (
         'fields' => [
             'string' => null,
             'int' => null,
+            'privateString' => null,
             'nested' => new TransformationContext(),
             'collection' => new TransformationContext(),
         ],
         'transformed' => [
             'string' => 'hello',
             'int' => 42,
+            'privateString' => 'worlds',
             'nested' => [
                 'a' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
                 'b' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
@@ -433,7 +443,7 @@ it('can execute excepts', function (
 
     yield 'multiple fields' => [
         'factory' => fn () => TransformationContextFactory::create()
-            ->except('{string,int,single}'),
+            ->except('{string,int,privateString,single}'),
         'fields' => [
             'nested' => new TransformationContext(),
             'collection' => new TransformationContext(),
@@ -459,7 +469,7 @@ it('can execute excepts', function (
 
     yield 'nested data object single field' => [
         'factory' => fn () => TransformationContextFactory::create()
-            ->except('string', 'int', 'single', 'collection') // ignore non nested object fields
+            ->except('string', 'int', 'privateString', 'single', 'collection') // ignore non nested object fields
             ->except('nested.a'),
         'fields' => [
             'nested' => new TransformationContext(
@@ -477,7 +487,7 @@ it('can execute excepts', function (
 
     yield 'nested data object multiple fields' => [
         'factory' => fn () => TransformationContextFactory::create()
-            ->except('string', 'int', 'single', 'collection') // ignore non nested object fields
+            ->except('string', 'int', 'privateString', 'single', 'collection') // ignore non nested object fields
             ->except('nested.{a,b}'),
         'fields' => [
             'nested' => new TransformationContext(
@@ -493,7 +503,7 @@ it('can execute excepts', function (
 
     yield 'nested data object all' => [
         'factory' => fn () => TransformationContextFactory::create()
-            ->except('string', 'int', 'single', 'collection') // ignore non nested object fields
+            ->except('string', 'int', 'privateString', 'single', 'collection') // ignore non nested object fields
             ->except('nested.*'),
         'fields' => [
             'nested' => new TransformationContext(
@@ -509,7 +519,7 @@ it('can execute excepts', function (
 
     yield 'nested data collectable single field' => [
         'factory' => fn () => TransformationContextFactory::create()
-            ->except('string', 'int', 'single', 'nested') // ignore non collection fields
+            ->except('string', 'int', 'privateString', 'single', 'nested') // ignore non collection fields
             ->except('collection.string'),
         'fields' => [
             'collection' => new TransformationContext(
@@ -528,7 +538,7 @@ it('can execute excepts', function (
 
     yield 'nested data collectable multiple fields' => [
         'factory' => fn () => TransformationContextFactory::create()
-            ->except('string', 'int', 'single', 'nested') // ignore non collection fields
+            ->except('string', 'int', 'privateString', 'single', 'nested') // ignore non collection fields
             ->except('collection.{string,int,privateString}'),
         'fields' => [
             'collection' => new TransformationContext(
@@ -547,7 +557,7 @@ it('can execute excepts', function (
 
     yield 'nested data collectable all' => [
         'factory' => fn () => TransformationContextFactory::create()
-            ->except('string', 'int', 'single', 'nested') // ignore non collection fields
+            ->except('string', 'int', 'privateString', 'single', 'nested') // ignore non collection fields
             ->except('collection.*'),
         'fields' => [
             'collection' => new TransformationContext(
@@ -566,7 +576,7 @@ it('can execute excepts', function (
 
     yield 'combination' => [
         'factory' => fn () => TransformationContextFactory::create()
-            ->except('string', 'int', 'single.string')
+            ->except('string', 'int', 'privateString', 'single.string')
             ->except('collection.string')
             ->except('nested.a.string'),
         'fields' => [
@@ -648,6 +658,7 @@ it("can execute only's", function (
         'fields' => [
             'string' => null,
             'int' => null,
+            'privateString' => null,
             'single' => new TransformationContext(),
             'nested' => new TransformationContext(),
             'collection' => new TransformationContext(),
@@ -655,6 +666,7 @@ it("can execute only's", function (
         'transformed' => [
             'string' => 'hello',
             'int' => 42,
+            'privateString' => 'worlds',
             'single' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             'nested' => [
                 'a' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
