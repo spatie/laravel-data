@@ -70,7 +70,9 @@ class TransformedDataResolver
 
             $value = $this->resolvePropertyValue(
                 $property,
-                $data->{$name},
+                $property->getter
+                    ? Lazy::create(fn() => $data->{$property->getter}())->defaultIncluded()
+                    : $data->{$name},
                 $context,
                 $visibleFields[$name] ?? null,
             );

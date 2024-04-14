@@ -26,7 +26,11 @@ class VisibleDataFieldsResolver
         DataClass $dataClass,
         TransformationContext $transformationContext,
     ): array {
-        $dataInitializedFields = get_object_vars($data);
+        $privateProperties = collect($dataClass->properties)
+            ->filter(fn(DataProperty $p) => $p->getter || $p->setter)
+            ->mapWithKeys(fn(DataProperty $p) => [$p->name => Lazy::create(fn() => $data->{$p->getter}())->defaultIncluded()])
+            ->all();
+        $dataInitializedFields = $privateProperties + get_object_vars($data);
 
         $fields = $dataClass->transformationFields->resolve();
 
@@ -75,7 +79,7 @@ class VisibleDataFieldsResolver
         ) : [];
 
         foreach ($fields as $field => $fieldTransFormationContext) {
-            $value = $data->{$field};
+            $value = $dataInitializedFields[$field];
 
             if ($value instanceof Optional) {
                 unset($fields[$field]);

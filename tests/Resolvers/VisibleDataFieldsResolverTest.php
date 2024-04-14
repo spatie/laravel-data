@@ -2,6 +2,7 @@
 
 use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\DataProperty;
 use Spatie\LaravelData\Attributes\Hidden;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Exceptions\CannotPerformPartialOnDataField;
@@ -63,6 +64,36 @@ it('will hide fields which are uninitialized', function () {
     ]);
 
     expect($dataClass->toArray())->toBe([
+        'visible' => 'visible',
+    ]);
+});
+
+it('will hide private fields that are not data properties', function () {
+    $dataClass = new class () extends Data {
+        private string $visible = 'visible';
+    };
+
+    expect(findVisibleFields($dataClass, TransformationContextFactory::create()))->toBeEmpty();
+
+    expect($dataClass->toArray())->toBeEmpty();
+});
+
+it('will show private fields that are data properties', function () {
+    $dataClass = new class () extends Data {
+        #[DataProperty(getter: 'isVisible')]
+        private string $visible = 'visible';
+
+        public function isVisible(): string
+        {
+            return $this->visible;
+        }
+    };
+
+    expect(findVisibleFields($dataClass, TransformationContextFactory::create()))->toEqual([
+        'visible' => null,
+    ]);
+
+    expect($dataClass->toArray())->toEqual([
         'visible' => 'visible',
     ]);
 });
