@@ -124,18 +124,27 @@ it('will always show non-lazy values when no only or exclude operations are perf
         public function __construct(
             public string $visible = 'visible',
             public Lazy|string $lazy = 'lazy but visible',
+            #[DataProperty(getter: 'getPrivate')]
+            private string $private = 'private',
         ) {
+        }
+
+        public function getPrivate(): string
+        {
+            return $this->private;
         }
     };
 
     expect(findVisibleFields($dataClass, TransformationContextFactory::create()))->toEqual([
         'visible' => null,
         'lazy' => null,
+        'private' => null,
     ]);
 
     expect($dataClass->toArray())->toBe([
         'visible' => 'visible',
         'lazy' => 'lazy but visible',
+        'private' => 'private',
     ]);
 });
 
@@ -211,21 +220,30 @@ it('can include data based upon relations loaded when they are null', function (
 });
 
 it('can include lazy data by default', function () {
-    $dataClass = new class ('') extends Data {
+    $dataClass = new class ('', '') extends Data {
         public function __construct(
-            public string|Lazy $name
+            public string|Lazy $name,
+            #[DataProperty(getter: 'getPrivateString')]
+            private string $privateString
         ) {
         }
 
-        public static function create(string $name): static
+        public function getPrivateString(): string
+        {
+            return $this->privateString;
+        }
+
+        public static function create(string $name, string $privateString): static
         {
             return new self(
-                Lazy::create(fn () => $name)->defaultIncluded()
+                Lazy::create(fn () => $name)->defaultIncluded(),
+                $privateString
             );
         }
     };
 
-    expect($dataClass::create('Ruben')->toArray())->toMatchArray(['name' => 'Ruben']);
+    expect($dataClass::create('Ruben', 'Private')->toArray())
+        ->toMatchArray(['name' => 'Ruben', 'privateString' => 'Private']);
 });
 
 it('always transforms lazy inertia data to inertia lazy props', function () {
