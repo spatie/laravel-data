@@ -288,10 +288,19 @@ it('will fail gracefully when a nested field does not exist', function () {
 
         public Lazy|string $string;
 
+        #[DataProperty(getter: 'getPrivateString')]
+        private string $privateString;
+
         public function __construct()
         {
             $this->simple = Lazy::create(fn () => new SimpleData('Hello'));
             $this->string = Lazy::create(fn () => 'World');
+            $this->privateString = '!';
+        }
+
+        public function getPrivateString(): string
+        {
+            return $this->privateString;
         }
     };
 
@@ -305,13 +314,15 @@ it('will fail gracefully when a nested field does not exist', function () {
 
     config()->set('data.ignore_invalid_partials', true);
 
-    expect(findVisibleFields($dataClass, TransformationContextFactory::create()->include('certainly-not-simple.string', 'string')))
+    expect(findVisibleFields($dataClass, TransformationContextFactory::create()->include('certainly-not-simple.string', 'string', 'privateString')))
         ->toEqual([
             'string' => null,
+            'privateString' => null,
         ]);
 
-    expect($dataClass->include('certainly-not-simple.string', 'string')->toArray())->toEqual([
+    expect($dataClass->include('certainly-not-simple.string', 'string', 'privateString')->toArray())->toEqual([
         'string' => 'World',
+        'privateString' => '!'
     ]);
 });
 
