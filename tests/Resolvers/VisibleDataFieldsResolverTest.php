@@ -330,13 +330,20 @@ class VisibleFieldsSingleData extends Data
 {
     public function __construct(
         public string $string,
-        public int $int
+        public int $int,
+        #[DataProperty(getter: 'getPrivateString')]
+        private string $privateString,
     ) {
+    }
+
+    public function getPrivateString(): string
+    {
+        return $this->privateString;
     }
 
     public static function instance(): self
     {
-        return new self('hello', 42);
+        return new self('hello', 42, 'worlds');
     }
 }
 
@@ -414,12 +421,12 @@ it('can execute excepts', function (
             'string' => 'hello',
             'int' => 42,
             'nested' => [
-                'a' => ['string' => 'hello', 'int' => 42],
-                'b' => ['string' => 'hello', 'int' => 42],
+                'a' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
+                'b' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             ],
             'collection' => [
-                ['string' => 'hello', 'int' => 42],
-                ['string' => 'hello', 'int' => 42],
+                ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
+                ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             ],
         ],
     ];
@@ -433,12 +440,12 @@ it('can execute excepts', function (
         ],
         'transformed' => [
             'nested' => [
-                'a' => ['string' => 'hello', 'int' => 42],
-                'b' => ['string' => 'hello', 'int' => 42],
+                'a' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
+                'b' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             ],
             'collection' => [
-                ['string' => 'hello', 'int' => 42],
-                ['string' => 'hello', 'int' => 42],
+                ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
+                ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             ],
         ],
     ];
@@ -463,7 +470,7 @@ it('can execute excepts', function (
         ],
         'transformed' => [
             'nested' => [
-                'b' => ['string' => 'hello', 'int' => 42],
+                'b' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             ],
         ],
     ];
@@ -513,8 +520,8 @@ it('can execute excepts', function (
         ],
         'transformed' => [
             'collection' => [
-                ['int' => 42],
-                ['int' => 42],
+                ['int' => 42, 'privateString' => 'worlds'],
+                ['int' => 42, 'privateString' => 'worlds'],
             ],
         ],
     ];
@@ -522,11 +529,11 @@ it('can execute excepts', function (
     yield 'nested data collectable multiple fields' => [
         'factory' => fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single', 'nested') // ignore non collection fields
-            ->except('collection.{string,int}'),
+            ->except('collection.{string,int,privateString}'),
         'fields' => [
             'collection' => new TransformationContext(
                 exceptPartials: PartialsCollection::create(
-                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], pointer: 1)
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int', 'privateString'])], pointer: 1)
                 ),
             ),
         ],
@@ -580,14 +587,14 @@ it('can execute excepts', function (
             ),
         ],
         'transformed' => [
-            'single' => ['int' => 42],
+            'single' => ['int' => 42, 'privateString' => 'worlds'],
             'collection' => [
-                ['int' => 42],
-                ['int' => 42],
+                ['int' => 42, 'privateString' => 'worlds'],
+                ['int' => 42, 'privateString' => 'worlds'],
             ],
             'nested' => [
-                'a' => ['int' => 42],
-                'b' => ['string' => 'hello', 'int' => 42],
+                'a' => ['int' => 42, 'privateString' => 'worlds'],
+                'b' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             ],
         ],
     ];
@@ -616,7 +623,7 @@ it("can execute only's", function (
             'single' => new TransformationContext(),
         ],
         'transformed' => [
-            'single' => ['string' => 'hello', 'int' => 42,],
+            'single' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
         ],
     ];
 
@@ -631,7 +638,7 @@ it("can execute only's", function (
         'transformed' => [
             'string' => 'hello',
             'int' => 42,
-            'single' => ['string' => 'hello', 'int' => 42,],
+            'single' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
         ],
     ];
 
@@ -648,14 +655,14 @@ it("can execute only's", function (
         'transformed' => [
             'string' => 'hello',
             'int' => 42,
-            'single' => ['string' => 'hello', 'int' => 42,],
+            'single' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             'nested' => [
-                'a' => ['string' => 'hello', 'int' => 42],
-                'b' => ['string' => 'hello', 'int' => 42],
+                'a' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
+                'b' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             ],
             'collection' => [
-                ['string' => 'hello', 'int' => 42],
-                ['string' => 'hello', 'int' => 42],
+                ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
+                ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             ],
         ],
     ];
@@ -672,7 +679,7 @@ it("can execute only's", function (
         ],
         'transformed' => [
             'nested' => [
-                'a' => ['string' => 'hello', 'int' => 42],
+                'a' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             ],
         ],
     ];
@@ -689,8 +696,8 @@ it("can execute only's", function (
         ],
         'transformed' => [
             'nested' => [
-                'a' => ['string' => 'hello', 'int' => 42],
-                'b' => ['string' => 'hello', 'int' => 42],
+                'a' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
+                'b' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             ],
         ],
     ];
@@ -707,8 +714,8 @@ it("can execute only's", function (
         ],
         'transformed' => [
             'nested' => [
-                'a' => ['string' => 'hello', 'int' => 42],
-                'b' => ['string' => 'hello', 'int' => 42],
+                'a' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
+                'b' => ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             ],
         ],
     ];
@@ -733,18 +740,18 @@ it("can execute only's", function (
 
     yield 'nested data collectable multiple fields' => [
         'factory' => fn () => TransformationContextFactory::create()
-            ->only('collection.{string,int}'),
+            ->only('collection.{string,int,privateString}'),
         'fields' => [
             'collection' => new TransformationContext(
                 onlyPartials: PartialsCollection::create(
-                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], pointer: 1)
+                    new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int', 'privateString'])], pointer: 1)
                 ),
             ),
         ],
         'transformed' => [
             'collection' => [
-                ['string' => 'hello', 'int' => 42],
-                ['string' => 'hello', 'int' => 42],
+                ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
+                ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             ],
         ],
     ];
@@ -761,8 +768,8 @@ it("can execute only's", function (
         ],
         'transformed' => [
             'collection' => [
-                ['string' => 'hello', 'int' => 42],
-                ['string' => 'hello', 'int' => 42],
+                ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
+                ['string' => 'hello', 'int' => 42, 'privateString' => 'worlds'],
             ],
         ],
     ];
