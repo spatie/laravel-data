@@ -196,18 +196,35 @@ it('can use a custom transformer for a data object and/or data collectable', fun
 });
 
 it('can transform built it types with custom transformers', function () {
-    $data = new class ('Hello World', 'Hello World') extends Data {
+    $data = new class ('Hello World', 'Hello World', 'Hello World', 'Hello World') extends Data {
         public function __construct(
             public string $without_transformer,
             #[WithTransformer(StringToUpperTransformer::class)]
-            public string $with_transformer
+            public string $with_transformer,
+            #[\Spatie\LaravelData\Attributes\DataProperty(getter: 'getPrivateWithoutTransformer')]
+            private string $privateWithoutTransformer,
+            #[\Spatie\LaravelData\Attributes\DataProperty(getter: 'getPrivateWithTransformer')]
+            #[WithTransformer(StringToUpperTransformer::class)]
+            private string $privateWithTransformer,
         ) {
+        }
+
+        public function getPrivateWithoutTransformer(): string
+        {
+            return $this->privateWithoutTransformer;
+        }
+
+        public function getPrivateWithTransformer(): string
+        {
+            return $this->privateWithoutTransformer;
         }
     };
 
     expect($data->toArray())->toMatchArray([
         'without_transformer' => 'Hello World',
         'with_transformer' => 'HELLO WORLD',
+        'privateWithoutTransformer' => 'Hello World',
+        'privateWithTransformer' => 'HELLO WORLD',
     ]);
 });
 
