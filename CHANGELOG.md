@@ -2,6 +2,19 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.6.0 - 2024-05-03
+
+### What's Changed
+
+- Add initial support for casting union types
+- Fix an issue with paginator includes not working
+- Fix consistency of After, AfterOrEqual, Before, BeforeOrEquals rules
+- Fix creation context issue (#749)
+- Fix an performance issue where when creating a data object from models, the attributes were always called
+- Add a #[LoadRelation] attribute which allows loading model relations when creating data objects on the fly
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.5.1...4.6.0
+
 ## 3.12.0 - 2024-04-24
 
 ### What's Changed
