@@ -168,7 +168,7 @@ Laravel-data 4.0.0 was released 5 hours ago, time for an update!
 
 - Make ValidationPath Stringable
 - Fix PHPStan
-- Improve performance when optional peoperty exists (#612)
+- Improve performance when optional property exists (#612)
 
 ## 3.10.0 - 2023-12-01
 
