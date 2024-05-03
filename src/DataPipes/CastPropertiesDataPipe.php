@@ -94,7 +94,8 @@ class CastPropertiesDataPipe implements DataPipe
                   : $context->collect($value, $property->type->iterableClass);
 
               $creationContext->previous();
-                return $data;
+
+              return $data;
             } catch (CannotCreateData) {
                 return $value;
             }
