@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Contracts\BaseData;
@@ -93,12 +94,66 @@ class TransformedDataCollectableResolver
             return $paginator->map(fn (BaseData $data) => $this->transformationClosure($nestedContext)($data))->all();
         }
 
-        $paginated = $paginator->toArray();
+        $items = array_map(fn (BaseData $data) => $this->transformationClosure($nestedContext)($data), $paginator->items());
+
+        ['links' => $links, 'meta' => $meta] = match ($paginator::class) {
+            LengthAwarePaginator::class => $this->resolveLengthAwarePaginatorLinksAndMeta($paginator),
+            CursorPaginator::class => $this->resolveCursorPaginatorLinksAndMeta($paginator),
+            default => $this->resolveUnknownPaginatorLinksAndMeta($paginator),
+        };
 
         $wrapKey = $wrap->getKey() ?? 'data';
 
         return [
-            $wrapKey => array_map(fn (BaseData $data) => $this->transformationClosure($nestedContext)($data), $paginator->items()),
+            $wrapKey => $items,
+            'links' => $links,
+            'meta' => $meta,
+        ];
+    }
+
+    protected function resolveLengthAwarePaginatorLinksAndMeta(
+        LengthAwarePaginator $paginator
+    ): array {
+        return [
+            'links' => $paginator->linkCollection()->toArray(),
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'first_page_url' => $paginator->url(1),
+                'from' => $paginator->firstItem(),
+                'last_page' => $paginator->lastPage(),
+                'last_page_url' => $paginator->url($paginator->lastPage()),
+                'next_page_url' => $paginator->nextPageUrl(),
+                'path' => $paginator->path(),
+                'per_page' => $paginator->perPage(),
+                'prev_page_url' => $paginator->previousPageUrl(),
+                'to' => $paginator->lastItem(),
+                'total' => $paginator->total(),
+            ],
+        ];
+    }
+
+    protected function resolveCursorPaginatorLinksAndMeta(
+        CursorPaginator $paginator
+    ): array {
+        return [
+            'links' => [],
+            'meta' => [
+                'path' => $paginator->path(),
+                'per_page' => $paginator->perPage(),
+                'next_cursor' => $paginator->nextCursor()?->encode(),
+                'next_page_url' => $paginator->nextPageUrl(),
+                'prev_cursor' => $paginator->previousCursor()?->encode(),
+                'prev_page_url' => $paginator->previousPageUrl(),
+            ],
+        ];
+    }
+
+    protected function resolveUnknownPaginatorLinksAndMeta(
+        Paginator|CursorPaginator $paginator,
+    ): array {
+        $paginated = $paginator->toArray();
+
+        return [
             'links' => $paginated['links'] ?? [],
             'meta' => Arr::except($paginated, [
                 'data',
