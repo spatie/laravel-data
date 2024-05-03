@@ -1074,36 +1074,33 @@ it('will cast iterables into the correct type', function () {
 })->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
 
 it('keeps the creation context path up to date', function () {
-    global $testCreationContexts;
-    $testCreationContexts = [];
-    class TestDataPipe implements DataPipe
+    class TestCreationContextCollectorDataPipe implements DataPipe
     {
+        public static array $contexts = [];
+
         public function handle(mixed $payload, DataClass $class, array $properties, CreationContext $creationContext): array
         {
-            global $testCreationContexts;
-            $testCreationContexts[] = clone $creationContext;
+            static::$contexts[] = clone $creationContext;
 
             return $properties;
         }
     }
 
-    class SimpleDataWithTestPipe extends SimpleData
+    class TestDataWithCreationContextCollectorPipe extends SimpleData
     {
         public static function pipeline(): DataPipeline
         {
-            return parent::pipeline()
-                ->through(TestDataPipe::class);
+            return parent::pipeline()->through(TestCreationContextCollectorDataPipe::class);
         }
     }
 
     $dataClass = new class () extends Data {
-        #[DataCollectionOf(SimpleDataWithTestPipe::class)]
+        #[DataCollectionOf(TestDataWithCreationContextCollectorPipe::class)]
         public Collection $collection;
 
         public static function pipeline(): DataPipeline
         {
-            return parent::pipeline()
-                ->through(TestDataPipe::class);
+            return parent::pipeline()->through(TestCreationContextCollectorDataPipe::class);
         }
     };
 
@@ -1111,12 +1108,13 @@ it('keeps the creation context path up to date', function () {
         'collection' => [['string' => 'no'], 'models', ['string' => 'here']],
     ]);
 
-    expect($testCreationContexts)->toHaveCount(3);
-    expect($testCreationContexts[0])->toBeInstanceOf(CreationContext::class);
+    expect(TestCreationContextCollectorDataPipe::$contexts)
+        ->toHaveCount(3)
+        ->each()->toBeInstanceOf(CreationContext::class);
 
-    expect($testCreationContexts[0]->currentPath)->toBe([0 => 'collection', 1 => 0]);
-    expect($testCreationContexts[1]->currentPath)->toBe([0 => 'collection', 1 => 2]);
-    expect($testCreationContexts[2]->currentPath)->toHaveCount(0);
+    expect(TestCreationContextCollectorDataPipe::$contexts[0]->currentPath)->toBe([0 => 'collection', 1 => 0]);
+    expect(TestCreationContextCollectorDataPipe::$contexts[1]->currentPath)->toBe([0 => 'collection', 1 => 2]);
+    expect(TestCreationContextCollectorDataPipe::$contexts[2]->currentPath)->toHaveCount(0);
 
 });
 
