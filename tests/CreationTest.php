@@ -11,28 +11,29 @@ use Illuminate\Support\Enumerable;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
-use Spatie\LaravelData\DataPipeline;
-use Spatie\LaravelData\DataPipes\DataPipe;
-use Spatie\LaravelData\Support\Creation\CreationContext;
-use Spatie\LaravelData\Support\DataClass;
 use function Pest\Laravel\postJson;
 
 use Spatie\LaravelData\Attributes\Computed;
-
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\WithCast;
+
 use Spatie\LaravelData\Attributes\WithCastable;
+
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Concerns\WithDeprecatedCollectionMethod;
 use Spatie\LaravelData\Contracts\DeprecatedData as DeprecatedDataContract;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\DataPipeline;
+use Spatie\LaravelData\DataPipes\DataPipe;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\Creation\CreationContext;
+use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastable;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
@@ -1153,4 +1154,3 @@ it('is possible to create a union type data collectable', function () {
         [10, SimpleData::from('Hello World')]
     );
 })->todo();
-

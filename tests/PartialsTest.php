@@ -236,18 +236,18 @@ it('can conditionally include nested collection', function () {
             'nested' => [DummyDto::rick()],
         ], [
             'nested' => [DummyDto::bon()],
-        ]
+        ],
     ], DataCollection::class);
 
     expect($data->toArray())->toMatchArray([
         ['nested' => [[]]],
-        ['nested' => [[]]]
+        ['nested' => [[]]],
     ]);
 
     expect($data->include('nested.{artist,year}')->toArray())
         ->toMatchArray([
             ['nested' => [['artist' => DummyDto::rick()->artist, 'year' => DummyDto::rick()->year]]],
-            ['nested' => [['artist' => DummyDto::bon()->artist, 'year' => DummyDto::bon()->year]]]
+            ['nested' => [['artist' => DummyDto::bon()->artist, 'year' => DummyDto::bon()->year]]],
         ]);
 });
 

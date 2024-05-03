@@ -88,7 +88,7 @@ class CastPropertiesDataPipe implements DataPipe
         ) {
             try {
                 $context = $creationContext->next($property->type->dataClass, $property->name);
-              
+
                 $data = $property->type->kind->isDataObject()
                     ? $context->from($value)
                     : $context->collect($value, $property->type->iterableClass);
