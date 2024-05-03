@@ -10,7 +10,8 @@ is called upon.
 For example, let's retake a look at the `Song` model we saw earlier. We can add the `WithData` trait as follows:
 
 ```php
-class Song extends Model{
+class Song extends Model
+{
     use WithData;
     
     protected $dataClass = SongData::class;

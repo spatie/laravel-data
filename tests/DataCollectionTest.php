@@ -8,7 +8,9 @@ use Illuminate\Support\LazyCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\Collections\CustomCollection;
+use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
+use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 it('can filter a collection', function () {
@@ -275,4 +277,23 @@ it('does not mutate wrapped paginators during transformation', function () {
     // Perform the transformation twice, the second should not throw
     expect($collection->toArray())->toBe($expect);
     expect($collection->toArray())->toBe($expect);
+});
+
+it('it can include lazy items through a paginated data collection', function () {
+    // https://github.com/spatie/laravel-data/issues/746
+
+    $collection = new PaginatedDataCollection(
+        MultiLazyData::class,
+        new LengthAwarePaginator([
+            DummyDto::rick(),
+            DummyDto::bon(),
+        ], 2, 15),
+    );
+
+    $filtered = $collection->through(fn (MultiLazyData $data) => $data->include('artist'))->toArray();
+
+    expect($filtered['data'])->toMatchArray([
+        ['artist' => 'Rick Astley'],
+        ['artist' => 'Bon Jovi'],
+    ]);
 });
