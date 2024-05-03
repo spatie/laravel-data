@@ -1085,23 +1085,13 @@ it('keeps the creation context path up to date', function () {
             return $properties;
         }
     }
-    class TestNestedDataPipe implements DataPipe
-    {
-        public function handle(mixed $payload, DataClass $class, array $properties, CreationContext $creationContext): array
-        {
-            global $testCreationContexts;
-            $testCreationContexts[] = clone $creationContext;
-
-            return $properties;
-        }
-    }
 
     class SimpleDataWithTestPipe extends SimpleData
     {
         public static function pipeline(): DataPipeline
         {
             return parent::pipeline()
-                ->through(TestNestedDataPipe::class);
+                ->through(TestDataPipe::class);
         }
     }
 
