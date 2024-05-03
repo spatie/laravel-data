@@ -1067,3 +1067,38 @@ it('will cast iterables into the correct type', function () {
         ->toBeArray()
         ->toEqual(['a', 'collection']);
 })->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
+
+it('is possible to create an union type data object', function () {
+    $dataClass = new class () extends Data {
+        public string|SimpleData $property;
+    };
+
+    expect($dataClass::from(['property' => 'Hello World'])->property)->toBeInstanceOf(SimpleData::class);
+
+    $dataClass = new class () extends Data {
+        public int|SimpleData $property;
+    };
+
+    expect($dataClass::from(['property' => 10])->property)->toBeInt();
+    expect($dataClass::from(['property' => 'Hello World'])->property)->toBeInstanceOf(SimpleData::class);
+
+    $dataClass = new class () extends Data {
+        public int|SimpleData|Optional|Lazy $property;
+    };
+
+    expect($dataClass::from(['property' => 10])->property)->toBeInt();
+    expect($dataClass::from(['property' => 'Hello World'])->property)->toBeInstanceOf(SimpleData::class);
+    expect($dataClass::from(['property' => Lazy::create(fn () => 10)])->property)->toBeInstanceOf(Lazy::class);
+    expect($dataClass::from([])->property)->toBeInstanceOf(Optional::class);
+});
+
+it('is possible to create a union type data collectable', function () {
+    $dataClass = new class () extends Data {
+        /** @var array<int|SimpleData> */
+        public array $property;
+    };
+
+    expect($dataClass::from(['property' => [10, 'Hello World']])->property)->toEqual(
+        [10, SimpleData::from('Hello World')]
+    );
+})->todo();

@@ -6,6 +6,7 @@ use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Casts\IterableItemCast;
 use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Enums\DataTypeKind;
+use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
@@ -87,9 +88,13 @@ class CastPropertiesDataPipe implements DataPipe
         ) {
             $context = $creationContext->next($property->type->dataClass, $property->name);
 
-            return $property->type->kind->isDataObject()
-                ? $context->from($value)
-                : $context->collect($value, $property->type->iterableClass);
+            try {
+                return $property->type->kind->isDataObject()
+                    ? $context->from($value)
+                    : $context->collect($value, $property->type->iterableClass);
+            } catch (CannotCreateData) {
+                return $value;
+            }
         }
 
         if (
