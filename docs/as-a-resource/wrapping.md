@@ -160,7 +160,8 @@ UserData::from(User::first())->wrap('data');
 A data collection inside a data object WILL get wrapped when a wrapping key is set:
 
 ```php
-use Spatie\LaravelData\Attributes\DataCollectionOf;use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\DataCollection;
 
 class AlbumData extends Data
 {
