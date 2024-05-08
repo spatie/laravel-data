@@ -3,6 +3,7 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
+use Spatie\LaravelData\Attributes\MapInputName;
 use function Pest\Laravel\mock;
 
 use Spatie\LaravelData\Attributes\FromRouteParameter;
@@ -85,6 +86,10 @@ it('can fill data properties from route parameters using custom property mapping
         public string $tag;
         #[FromRouteParameterProperty('something', 'rows.*.total')]
         public array $totals;
+
+        #[FromRouteParameter('user_id')]
+        #[MapInputName('user_id')]
+        public int $userId;
     };
 
     $something = [
@@ -102,6 +107,7 @@ it('can fill data properties from route parameters using custom property mapping
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('something')->times(4)->andReturns($something);
+    $requestMock->expects('route')->with('user_id')->once()->andReturns(1);
     $requestMock->expects('toArray')->andReturns([]);
 
     $data = $dataClass::from($requestMock);
@@ -110,6 +116,7 @@ it('can fill data properties from route parameters using custom property mapping
     expect($data->foo)->toEqual('bar');
     expect($data->tag)->toEqual('foo');
     expect($data->totals)->toEqual([10, 20, 30]);
+    expect($data->userId)->toEqual(1);
 });
 
 it('replaces properties when route parameter properties exist', function () {
@@ -118,6 +125,10 @@ it('replaces properties when route parameter properties exist', function () {
         public string $name;
         #[FromRouteParameterProperty('bar')]
         public string $slug;
+
+        #[FromRouteParameter('user_id')]
+        #[MapInputName('user_id')]
+        public int $userId;
     };
 
     $foo = 'Foo Lighters';
@@ -126,12 +137,14 @@ it('replaces properties when route parameter properties exist', function () {
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('foo')->once()->andReturns($foo);
     $requestMock->expects('route')->with('bar')->once()->andReturns($bar);
-    $requestMock->expects('toArray')->andReturns(['name' => 'Loo Cleaners', 'slug' => 'loo-cleaners']);
+    $requestMock->expects('route')->with('user_id')->once()->andReturns(2);
+    $requestMock->expects('toArray')->andReturns(['name' => 'Loo Cleaners', 'slug' => 'loo-cleaners', 'user_id' => 1]);
 
     $data = $dataClass::from($requestMock);
 
     expect($data->name)->toEqual('Foo Lighters');
     expect($data->slug)->toEqual('foo-lighters');
+    expect($data->userId)->toEqual(2);
 });
 
 it('skips replacing properties when route parameter properties exist and replacing is disabled', function () {
