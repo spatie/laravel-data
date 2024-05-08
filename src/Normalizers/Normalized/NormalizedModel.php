@@ -86,6 +86,6 @@ class NormalizedModel implements Normalized
             return $this->properties[$name] = $this->model->getRelation($studlyName);
         }
 
-        return UnknownProperty::create();
+        return $this->properties[$name] = UnknownProperty::create();
     }
 }
