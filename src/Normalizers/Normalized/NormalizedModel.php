@@ -69,18 +69,23 @@ class NormalizedModel implements Normalized
             return $this->properties[$name] = $this->model->getAttribute($name);
         }
 
-        if (! $dataProperty->attributes->contains(fn (object $attribute) => $attribute::class === LoadRelation::class)) {
-            return UnknownProperty::create();
-        }
-
         $studlyName = Str::studly($name);
 
-        if (! method_exists($this->model, $studlyName)) {
-            return UnknownProperty::create();
+        if ($dataProperty->attributes->contains(fn (object $attribute) => $attribute::class === LoadRelation::class)) {
+            if (method_exists($this->model, $name)) {
+                $this->model->loadMissing($name);
+            } else if (method_exists($this->model, $studlyName)) {
+                $this->model->loadMissing($studlyName);
+            }
         }
 
-        $this->model->load($studlyName);
+        if ($this->model->relationLoaded($name)) {
+            return $this->properties[$name] = $this->model->getRelation($name);
+        }
+        if ($this->model->relationLoaded($studlyName)) {
+            return $this->properties[$name] = $this->model->getRelation($studlyName);
+        }
 
-        return $this->properties[$name] = $this->model->{$studlyName};
+        return UnknownProperty::create();
     }
 }
