@@ -63,4 +63,15 @@ class PartialsCollection extends SplObjectStorage implements Stringable
             )
         );
     }
+
+    public function manualClone(): PartialsCollection
+    {
+        $collection = new self();
+
+        foreach ($this as $partial) {
+            $collection->attach(clone $partial);
+        }
+
+        return $collection;
+    }
 }

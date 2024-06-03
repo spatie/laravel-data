@@ -191,6 +191,7 @@ class DataClassFactory
                     $property->type->kind->isDataCollectable()
                     || $property->type->kind->isDataObject()
                     || $property->type->kind === DataTypeKind::Array
+                    || $property->type->kind === DataTypeKind::Enumerable
                 ) {
                     return true;
                 }

@@ -241,7 +241,7 @@ class AlbumData extends Data
     public function includeProperties(): array
     {
         return [
-            'songs' => count($this->songs) > 0,
+            'songs' => $this->title === 'Together Forever',
         ];
     }
 }
@@ -264,7 +264,7 @@ class AlbumData extends Data
     public function includeProperties(): array
     {
         return [
-            'songs.title' => count($this->songs) > 0,
+            'songs.title' => $this->title === 'Together Forever',
         ];
     }
 }

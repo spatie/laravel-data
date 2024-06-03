@@ -3,6 +3,8 @@
 namespace Spatie\LaravelData\Support;
 
 use Spatie\LaravelData\Exceptions\CannotCreateData;
+use Spatie\LaravelData\Normalizers\Normalized\Normalized;
+use Spatie\LaravelData\Normalizers\Normalized\UnknownProperty;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 
 class ResolvedDataPipeline
@@ -34,12 +36,35 @@ class ResolvedDataPipeline
             throw CannotCreateData::noNormalizerFound($this->dataClass->name, $value);
         }
 
+        if (! is_array($properties)) {
+            $properties = $this->transformNormalizedToArray($properties);
+        }
+
         $properties = ($this->dataClass->name)::prepareForPipeline($properties);
 
         foreach ($this->pipes as $pipe) {
             $piped = $pipe->handle($value, $this->dataClass, $properties, $creationContext);
 
             $properties = $piped;
+        }
+
+        return $properties;
+    }
+
+    protected function transformNormalizedToArray(Normalized $normalized): array
+    {
+        $properties = [];
+
+        foreach ($this->dataClass->properties as $property) {
+            $name = $property->inputMappedName ?? $property->name;
+
+            $value = $normalized->getProperty($name, $property);
+
+            if ($value === UnknownProperty::create()) {
+                continue;
+            }
+
+            $properties[$name] = $value;
         }
 
         return $properties;

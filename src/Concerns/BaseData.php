@@ -90,6 +90,7 @@ trait BaseData
             ->properties
             ->map(fn (DataProperty $property) => $property->name)
             ->when($dataClass->appendable, fn (Collection $properties) => $properties->push('_additional'))
+            ->when(property_exists($this, '_dataContext'), fn (Collection $properties) => $properties->push('_dataContext'))
             ->toArray();
     }
 }

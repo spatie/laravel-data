@@ -3,14 +3,15 @@
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\LazyCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\Collections\CustomCollection;
+use Spatie\LaravelData\Tests\Fakes\DummyDto;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
+use Spatie\LaravelData\Tests\Fakes\MultiLazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-
-use function Spatie\Snapshots\assertMatchesSnapshot;
 
 it('can filter a collection', function () {
     $collection = new DataCollection(SimpleData::class, ['A', 'B']);
@@ -237,35 +238,6 @@ it('a collection can be merged', function () {
         ->toMatchArray($filtered);
 });
 
-it('can serialize and unserialize a data collection', function () {
-    $collection = new DataCollection(SimpleData::class, ['A', 'B']);
-
-    $serialized = serialize($collection);
-
-    assertMatchesSnapshot($serialized);
-
-    $unserialized = unserialize($serialized);
-
-    expect($unserialized)->toBeInstanceOf(DataCollection::class);
-    expect($unserialized)->toEqual(new DataCollection(SimpleData::class, ['A', 'B']));
-});
-
-it('during the serialization process some properties are thrown away', function () {
-    $collection = new DataCollection(SimpleData::class, ['A', 'B']);
-
-    $collection->include('test');
-    $collection->exclude('test');
-    $collection->only('test');
-    $collection->except('test');
-    $collection->wrap('test');
-
-    $unserialized = unserialize(serialize($collection));
-
-    $invaded = invade($unserialized);
-
-    expect($invaded->_dataContext)->toBeNull();
-});
-
 it('can use a custom collection extended from collection to collect a collection of data objects', function () {
     $collection = SimpleData::collect(new CustomCollection([
         ['string' => 'A'],
@@ -275,4 +247,53 @@ it('can use a custom collection extended from collection to collect a collection
     expect($collection)->toBeInstanceOf(CustomCollection::class);
     expect($collection[0])->toBeInstanceOf(SimpleData::class);
     expect($collection[1])->toBeInstanceOf(SimpleData::class);
+});
+
+it('does not mutate wrapped paginators during transformation', function () {
+    $paginatorOfSimpleData = new Paginator([
+        ['string' => 'A'],
+        ['string' => 'B'],
+    ], perPage: 15);
+
+    $collection = SimpleData::collect($paginatorOfSimpleData, PaginatedDataCollection::class);
+    $expect = [
+        'data' => [
+            ['string' => 'A'],
+            ['string' => 'B'],
+        ],
+        'links' => [],
+        'meta' => [
+            'current_page' => 1,
+            'first_page_url' => '/?page=1',
+            'from' => 1,
+            'next_page_url' => null,
+            'path' => '/',
+            'per_page' => 15,
+            'prev_page_url' => null,
+            'to' => 2,
+        ],
+    ];
+
+    // Perform the transformation twice, the second should not throw
+    expect($collection->toArray())->toBe($expect);
+    expect($collection->toArray())->toBe($expect);
+});
+
+it('it can include lazy items through a paginated data collection', function () {
+    // https://github.com/spatie/laravel-data/issues/746
+
+    $collection = new PaginatedDataCollection(
+        MultiLazyData::class,
+        new LengthAwarePaginator([
+            DummyDto::rick(),
+            DummyDto::bon(),
+        ], 2, 15),
+    );
+
+    $filtered = $collection->through(fn (MultiLazyData $data) => $data->include('artist'))->toArray();
+
+    expect($filtered['data'])->toMatchArray([
+        ['artist' => 'Rick Astley'],
+        ['artist' => 'Bon Jovi'],
+    ]);
 });

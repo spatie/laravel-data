@@ -265,4 +265,30 @@ class Partial implements Stringable
     {
         return implode('.', $this->segments)." (current: {$this->pointer})";
     }
+
+    public function __serialize(): array
+    {
+        return [
+            'segmentCount' => $this->segmentCount,
+            'endsInAll' => $this->endsInAll,
+            'segments' => $this->segments,
+            'condition' => $this->condition
+                ? serialize(new SerializableClosure($this->condition))
+                : null,
+            'permanent' => $this->permanent,
+            'pointer' => $this->pointer,
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->segmentCount = $data['segmentCount'];
+        $this->endsInAll = $data['endsInAll'];
+        $this->segments = $data['segments'];
+        $this->pointer = $data['pointer'];
+        $this->condition = $data['condition']
+            ? unserialize($data['condition'])->getClosure()
+            : null;
+        $this->permanent = $data['permanent'];
+    }
 }

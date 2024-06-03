@@ -54,6 +54,7 @@ use Spatie\LaravelData\Attributes\Validation\IPv6;
 use Spatie\LaravelData\Attributes\Validation\Json;
 use Spatie\LaravelData\Attributes\Validation\LessThan;
 use Spatie\LaravelData\Attributes\Validation\LessThanOrEqualTo;
+use Spatie\LaravelData\Attributes\Validation\ListType;
 use Spatie\LaravelData\Attributes\Validation\Lowercase;
 use Spatie\LaravelData\Attributes\Validation\MacAddress;
 use Spatie\LaravelData\Attributes\Validation\Max;
@@ -164,6 +165,7 @@ class ValidationRuleFactory
             Json::keyword() => Json::class,
             LessThan::keyword() => LessThan::class,
             LessThanOrEqualTo::keyword() => LessThanOrEqualTo::class,
+            ListType::keyword() => ListType::class,
             Lowercase::keyword() => Lowercase::class,
             MacAddress::keyword() => MacAddress::class,
             Max::keyword() => Max::class,
