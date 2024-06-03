@@ -229,3 +229,18 @@ $artist = Artist::create([
 $artist->songs; // DataCollection
 $artist->songs->count();// 0
 ```
+
+## Using encryption with data objects and collections
+
+Similar to Laravel's native encrypted casts, you can also encrypt data objects and collections.
+
+When retrieving the model, the data object will be decrypted automatically.
+
+```php
+class Artist extends Model
+{
+    protected $casts = [
+        'songs' => DataCollection::class.':'.SongData::class.',encrypted',
+    ];
+}
+```
