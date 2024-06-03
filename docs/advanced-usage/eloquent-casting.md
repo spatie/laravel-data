@@ -115,6 +115,19 @@ The child data object value of the model will be stored in the database as a JSO
 
 When retrieving the model, the data object will be instantiated based on the `type` key in the JSON string.
 
+#### Abstract data object with collection
+
+You can use with collection.
+
+```php
+class Record extends Model
+{
+    protected $casts = [
+        'configs' => DataCollection::class . ':' . RecordConfig::class,
+    ];
+}
+```
+
 #### Abstract data class morphs
 
 By default, the `type` key in the JSON string will be the fully qualified class name of the child data object. This can break your application quite easily when you refactor your code. To prevent this, you can add a morph map like with [Eloquent models](https://laravel.com/docs/eloquent-relationships#polymorphic-relationships). Within your `AppServiceProvivder` you can add the following mapping:
@@ -215,4 +228,19 @@ $artist = Artist::create([
 
 $artist->songs; // DataCollection
 $artist->songs->count();// 0
+```
+
+## Using encryption with data objects and collections
+
+Similar to Laravel's native encrypted casts, you can also encrypt data objects and collections.
+
+When retrieving the model, the data object will be decrypted automatically.
+
+```php
+class Artist extends Model
+{
+    protected $casts = [
+        'songs' => DataCollection::class.':'.SongData::class.',encrypted',
+    ];
+}
 ```
