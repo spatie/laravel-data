@@ -2,6 +2,59 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.6.0 - 2024-05-03
+
+### What's Changed
+
+- Add initial support for casting union types
+- Fix an issue with paginator includes not working
+- Fix consistency of After, AfterOrEqual, Before, BeforeOrEquals rules
+- Fix creation context issue (#749)
+- Fix an performance issue where when creating a data object from models, the attributes were always called
+- Add a #[LoadRelation] attribute which allows loading model relations when creating data objects on the fly
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.5.1...4.6.0
+
+## 3.12.0 - 2024-04-24
+
+### What's Changed
+
+* Backport cache fix to v3 by @jameshulse in https://github.com/spatie/laravel-data/pull/671
+* fix: adds environment variable to disable structure caching by @jaydublu2002 in https://github.com/spatie/laravel-data/pull/645
+* v3 support for Laravel 11 by @jameshulse in https://github.com/spatie/laravel-data/pull/739
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.5.1...3.12.0
+
+## 4.5.1 - 2024-04-10
+
+### What's Changed
+
+* Abstract data object as collection by @onursimsek in https://github.com/spatie/laravel-data/pull/741
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.5.0...4.5.1
+
+## 4.5.0 - 2024-04-04
+
+### What's Changed
+
+* Cast value to string for createFromFormat by @kylekatarnls in https://github.com/spatie/laravel-data/pull/707
+* fix: avoid mutation during `DataCollectable` transformation by @innocenzi in https://github.com/spatie/laravel-data/pull/696
+* Add new section to the docs for package testing by @adam-code-labx in https://github.com/spatie/laravel-data/pull/711
+* Change default cache variable by @Elnadrion in https://github.com/spatie/laravel-data/pull/717
+* Improve performance of CastPropertiesDataPipe by using hash lookups instead of ->first by @LauJosefsen in https://github.com/spatie/laravel-data/pull/721
+* Change method of creating object without magic methods by @daveroverts in https://github.com/spatie/laravel-data/pull/725
+* Upgrade to inertia 1.0 by @kimulisiraj in https://github.com/spatie/laravel-data/pull/726
+* Allow to pass multiple formats to Laravel's `date_format` rule by @riesjart in https://github.com/spatie/laravel-data/pull/727
+* Add attribute for Laravel's `list` validation rule by @riesjart in https://github.com/spatie/laravel-data/pull/728
+* chore(deps): bump dependabot/fetch-metadata from 1.6.0 to 2.0.0 by @dependabot in https://github.com/spatie/laravel-data/pull/718
+* Update creating-a-cast.md by @AlexRegenbogen in https://github.com/spatie/laravel-data/pull/724
+* Fix wrong link to using attributes page by @BernhardK91 in https://github.com/spatie/laravel-data/pull/733
+* Add better support for serializing data by @rubenvanassche in https://github.com/spatie/laravel-data/pull/735
+* Fix for the use of built-in class names in Collection annotations by @27pchrisl in https://github.com/spatie/laravel-data/pull/736
+* Adds a config option to silently ignore when a Computed Property is being set by @erikaraujo in https://github.com/spatie/laravel-data/pull/714
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.4.1...4.5.0
+
 ## 4.4.1 - 2024-03-20
 
 ### What's Changed
@@ -128,7 +181,7 @@ Laravel-data 4.0.0 was released 5 hours ago, time for an update!
 
 - Make ValidationPath Stringable
 - Fix PHPStan
-- Improve performance when optional peoperty exists (#612)
+- Improve performance when optional property exists (#612)
 
 ## 3.10.0 - 2023-12-01
 

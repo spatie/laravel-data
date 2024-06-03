@@ -14,21 +14,26 @@ use Illuminate\Validation\ValidationException;
 use function Pest\Laravel\postJson;
 
 use Spatie\LaravelData\Attributes\Computed;
-
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\WithCast;
+
 use Spatie\LaravelData\Attributes\WithCastable;
+
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Concerns\WithDeprecatedCollectionMethod;
 use Spatie\LaravelData\Contracts\DeprecatedData as DeprecatedDataContract;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\DataPipeline;
+use Spatie\LaravelData\DataPipes\DataPipe;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\Creation\CreationContext;
+use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastable;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCollectionCast;
@@ -657,6 +662,18 @@ it('can have a computed value when creating the data object', function () {
         }
     };
 
+    expect($dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Something to Be Ignored']))
+        ->first_name->toBe('Ruben')
+        ->last_name->toBe('Van Assche')
+        ->full_name->toBe('Ruben Van Assche');
+
+    expect($dataObject::validateAndCreate(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Something to Be Ignored']))
+        ->first_name->toBe('Ruben')
+        ->last_name->toBe('Van Assche')
+        ->full_name->toBe('Ruben Van Assche');
+
+    config()->set('data.features.ignore_exception_when_trying_to_set_computed_property_value', false);
+
     expect($dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche']))
         ->first_name->toBe('Ruben')
         ->last_name->toBe('Van Assche')
@@ -698,6 +715,8 @@ it('can have a nullable computed value', function () {
     expect($dataObject::validateAndCreate(['name' => null]))
         ->name->toBeNull()
         ->upper_name->toBeNull();
+
+    config()->set('data.features.ignore_exception_when_trying_to_set_computed_property_value', false);
 
     expect(fn () => $dataObject::from(['name' => 'Ruben', 'upper_name' => 'RUBEN']))
         ->toThrow(CannotSetComputedValue::class);
@@ -1053,3 +1072,83 @@ it('will cast iterables into the correct type', function () {
         ->toBeArray()
         ->toEqual(['a', 'collection']);
 })->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
+
+it('keeps the creation context path up to date', function () {
+    class TestCreationContextCollectorDataPipe implements DataPipe
+    {
+        public static array $contexts = [];
+
+        public function handle(mixed $payload, DataClass $class, array $properties, CreationContext $creationContext): array
+        {
+            static::$contexts[] = clone $creationContext;
+
+            return $properties;
+        }
+    }
+
+    class TestDataWithCreationContextCollectorPipe extends SimpleData
+    {
+        public static function pipeline(): DataPipeline
+        {
+            return parent::pipeline()->through(TestCreationContextCollectorDataPipe::class);
+        }
+    }
+
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(TestDataWithCreationContextCollectorPipe::class)]
+        public Collection $collection;
+
+        public static function pipeline(): DataPipeline
+        {
+            return parent::pipeline()->through(TestCreationContextCollectorDataPipe::class);
+        }
+    };
+
+    $dataClass::from([
+        'collection' => [['string' => 'no'], 'models', ['string' => 'here']],
+    ]);
+
+    expect(TestCreationContextCollectorDataPipe::$contexts)
+        ->toHaveCount(3)
+        ->each()->toBeInstanceOf(CreationContext::class);
+
+    expect(TestCreationContextCollectorDataPipe::$contexts[0]->currentPath)->toBe([0 => 'collection', 1 => 0]);
+    expect(TestCreationContextCollectorDataPipe::$contexts[1]->currentPath)->toBe([0 => 'collection', 1 => 2]);
+    expect(TestCreationContextCollectorDataPipe::$contexts[2]->currentPath)->toHaveCount(0);
+
+});
+
+it('is possible to create an union type data object', function () {
+    $dataClass = new class () extends Data {
+        public string|SimpleData $property;
+    };
+
+    expect($dataClass::from(['property' => 'Hello World'])->property)->toBeInstanceOf(SimpleData::class);
+
+    $dataClass = new class () extends Data {
+        public int|SimpleData $property;
+    };
+
+    expect($dataClass::from(['property' => 10])->property)->toBeInt();
+    expect($dataClass::from(['property' => 'Hello World'])->property)->toBeInstanceOf(SimpleData::class);
+
+    $dataClass = new class () extends Data {
+        public int|SimpleData|Optional|Lazy $property;
+    };
+
+    expect($dataClass::from(['property' => 10])->property)->toBeInt();
+    expect($dataClass::from(['property' => 'Hello World'])->property)->toBeInstanceOf(SimpleData::class);
+    expect($dataClass::from(['property' => Lazy::create(fn () => 10)])->property)->toBeInstanceOf(Lazy::class);
+    expect($dataClass::from([])->property)->toBeInstanceOf(Optional::class);
+});
+
+it('is possible to create a union type data collectable', function () {
+    $dataClass = new class () extends Data {
+        /** @var array<int|SimpleData> */
+        public array $property;
+    };
+
+    expect($dataClass::from(['property' => [10, 'Hello World']])->property)->toEqual(
+        [10, SimpleData::from('Hello World')]
+    );
+})->todo();

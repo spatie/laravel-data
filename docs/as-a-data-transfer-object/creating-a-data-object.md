@@ -184,7 +184,7 @@ objects. When a null value is given, it will return null.
 You can ignore the magical creation methods when creating a data object as such:
 
 ```php
-SongData::withoutMagicalCreationFrom($song);
+SongData::factory()->withoutMagicalCreation()->from($song);
 ```
 
 ## Advanced creation using factories

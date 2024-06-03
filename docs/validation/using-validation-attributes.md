@@ -157,7 +157,7 @@ class CustomRule extends CustomValidationAttribute
     /**
      * @return array<object|string>|object|string
      */
-    public function getRules(ValidationPath $path): array|object|string;
+    public function getRules(ValidationPath $path): array|object|string
     {
         return [new CustomRule()];
     }

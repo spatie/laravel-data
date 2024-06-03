@@ -192,7 +192,7 @@ public string $closure;
 
 ```php
 #[Date]
-public Carbon $closure; 
+public Carbon $date; 
 ```
 
 ## DateEquals
@@ -201,10 +201,10 @@ public Carbon $closure;
 
 ```php
 #[DateEquals('tomorrow')]
-public Carbon $closure; 
+public Carbon $date; 
 
 #[DateEquals(Carbon::yesterday())]
-public Carbon $closure; 
+public Carbon $date; 
 ```
 
 ## DateFormat
@@ -213,7 +213,10 @@ public Carbon $closure;
 
 ```php
 #[DateFormat('d-m-Y')]
-public Carbon $closure; 
+public Carbon $date;
+
+#[DateFormat(['Y-m-d', 'Y-m-d H:i:s'])]
+public Carbon $date;  
 ```
 
 ## Declined
@@ -561,6 +564,15 @@ public int $closure;
 ```php
 #[Lowercase]
 public string $closure; 
+```
+
+## List
+
+[Docs](https://laravel.com/docs/validation#rule-list)
+
+```php
+#[List]
+public array $array; 
 ```
 
 ## MacAddress

@@ -342,7 +342,7 @@ it('can execute excepts', function (
     expect($data->transform($factory))->toEqual($expectedTransformed);
 })->with(function () {
     yield 'single field' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->except('single'),
         'fields' => [
             'string' => null,
@@ -365,7 +365,7 @@ it('can execute excepts', function (
     ];
 
     yield 'multiple fields' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->except('{string,int,single}'),
         'fields' => [
             'nested' => new TransformationContext(),
@@ -384,14 +384,14 @@ it('can execute excepts', function (
     ];
 
     yield 'all' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->except('*'),
         'fields' => [],
         'transformed' => [],
     ];
 
     yield 'nested data object single field' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single', 'collection') // ignore non nested object fields
             ->except('nested.a'),
         'fields' => [
@@ -409,7 +409,7 @@ it('can execute excepts', function (
     ];
 
     yield 'nested data object multiple fields' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single', 'collection') // ignore non nested object fields
             ->except('nested.{a,b}'),
         'fields' => [
@@ -425,7 +425,7 @@ it('can execute excepts', function (
     ];
 
     yield 'nested data object all' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single', 'collection') // ignore non nested object fields
             ->except('nested.*'),
         'fields' => [
@@ -441,7 +441,7 @@ it('can execute excepts', function (
     ];
 
     yield 'nested data collectable single field' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single', 'nested') // ignore non collection fields
             ->except('collection.string'),
         'fields' => [
@@ -460,7 +460,7 @@ it('can execute excepts', function (
     ];
 
     yield 'nested data collectable multiple fields' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single', 'nested') // ignore non collection fields
             ->except('collection.{string,int}'),
         'fields' => [
@@ -479,7 +479,7 @@ it('can execute excepts', function (
     ];
 
     yield 'nested data collectable all' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single', 'nested') // ignore non collection fields
             ->except('collection.*'),
         'fields' => [
@@ -498,7 +498,7 @@ it('can execute excepts', function (
     ];
 
     yield 'combination' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single.string')
             ->except('collection.string')
             ->except('nested.a.string'),
@@ -550,7 +550,7 @@ it("can execute only's", function (
     expect($data->transform($factory))->toEqual($expectedTransformed);
 })->with(function () {
     yield 'single field' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('single'),
         'fields' => [
             'single' => new TransformationContext(),
@@ -561,7 +561,7 @@ it("can execute only's", function (
     ];
 
     yield 'multiple fields' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('{string,int,single}'),
         'fields' => [
             'string' => null,
@@ -576,7 +576,7 @@ it("can execute only's", function (
     ];
 
     yield 'all' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('*'),
         'fields' => [
             'string' => null,
@@ -601,7 +601,7 @@ it("can execute only's", function (
     ];
 
     yield 'nested data object single field' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('nested.a'),
         'fields' => [
             'nested' => new TransformationContext(
@@ -618,7 +618,7 @@ it("can execute only's", function (
     ];
 
     yield 'nested data object multiple fields' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('nested.{a,b}'),
         'fields' => [
             'nested' => new TransformationContext(
@@ -636,7 +636,7 @@ it("can execute only's", function (
     ];
 
     yield 'nested data object all' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('nested.*'),
         'fields' => [
             'nested' => new TransformationContext(
@@ -654,7 +654,7 @@ it("can execute only's", function (
     ];
 
     yield 'nested data collectable single field' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('collection.string'),
         'fields' => [
             'collection' => new TransformationContext(
@@ -672,7 +672,7 @@ it("can execute only's", function (
     ];
 
     yield 'nested data collectable multiple fields' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('collection.{string,int}'),
         'fields' => [
             'collection' => new TransformationContext(
@@ -690,7 +690,7 @@ it("can execute only's", function (
     ];
 
     yield 'nested data collectable all' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('collection.*'),
         'fields' => [
             'collection' => new TransformationContext(
@@ -708,7 +708,7 @@ it("can execute only's", function (
     ];
 
     yield 'combination' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('string', 'single.string')
             ->only('collection.string')
             ->only('nested.a.string'),
@@ -822,7 +822,7 @@ it('can execute includes', function (
     expect($data->transform($factory))->toEqual($expectedTransformed);
 })->with(function () {
     yield 'single field' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->include('single'),
         'fields' => [
             'single' => new TransformationContext(),
@@ -833,7 +833,7 @@ it('can execute includes', function (
     ];
 
     yield 'multiple fields' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->include('{string,int,single}'),
         'fields' => [
             'single' => new TransformationContext(),
@@ -848,7 +848,7 @@ it('can execute includes', function (
     ];
 
     yield 'all' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->include('*'),
         'fields' => [
             'single' => new TransformationContext(
@@ -885,7 +885,7 @@ it('can execute includes', function (
     ];
 
     yield 'nested data object single field' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->include('nested.a'),
         'fields' => [
@@ -903,7 +903,7 @@ it('can execute includes', function (
     ];
 
     yield 'nested data object multiple fields' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->include('nested.{a,b}'),
         'fields' => [
@@ -922,7 +922,7 @@ it('can execute includes', function (
     ];
 
     yield 'nested data object all' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->include('nested.*'),
         'fields' => [
@@ -941,7 +941,7 @@ it('can execute includes', function (
     ];
 
     yield 'nested data object deep nesting' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->include('nested.a.string', 'nested.b.int'),
         'fields' => [
@@ -961,7 +961,7 @@ it('can execute includes', function (
     ];
 
     yield 'nested data collectable single field' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('collection') // ignore non collection fields
             ->include('collection.string'),
         'fields' => [
@@ -980,7 +980,7 @@ it('can execute includes', function (
     ];
 
     yield 'nested data collectable multiple fields' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('collection') // ignore non collection fields
             ->include('collection.{string,int}'),
         'fields' => [
@@ -999,7 +999,7 @@ it('can execute includes', function (
     ];
 
     yield 'nested data collectable all' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('collection') // ignore non collection fields
             ->include('collection.*'),
         'fields' => [
@@ -1018,7 +1018,7 @@ it('can execute includes', function (
     ];
 
     yield 'combination' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->include('string', 'single.string')
             ->include('collection.string')
             ->include('nested.a.string'),
@@ -1071,7 +1071,7 @@ it('can execute excludes', function (
     expect($data->transform($factory))->toEqual($expectedTransformed);
 })->with(function () {
     yield 'single field' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->exclude('single'),
         'fields' => [
             'string' => null,
@@ -1094,7 +1094,7 @@ it('can execute excludes', function (
     ];
 
     yield 'multiple fields' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->exclude('{string,int,single}'),
         'fields' => [
             'nested' => new TransformationContext(),
@@ -1113,14 +1113,14 @@ it('can execute excludes', function (
     ];
 
     yield 'all' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->exclude('*'),
         'fields' => [],
         'transformed' => [],
     ];
 
     yield 'nested data object single field' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->exclude('nested.a'),
         'fields' => [
@@ -1138,7 +1138,7 @@ it('can execute excludes', function (
     ];
 
     yield 'nested data object multiple fields' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->exclude('nested.{a,b}'),
         'fields' => [
@@ -1154,7 +1154,7 @@ it('can execute excludes', function (
     ];
 
     yield 'nested data object all' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->exclude('nested.*'),
         'fields' => [
@@ -1170,7 +1170,7 @@ it('can execute excludes', function (
     ];
 
     yield 'nested data object deep nesting' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->exclude('nested.a.string', 'nested.b.int'),
         'fields' => [
@@ -1190,7 +1190,7 @@ it('can execute excludes', function (
     ];
 
     yield 'nested data collectable single field' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('collection') // ignore non collection fields
             ->exclude('collection.string'),
         'fields' => [
@@ -1209,7 +1209,7 @@ it('can execute excludes', function (
     ];
 
     yield 'nested data collectable multiple fields' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('collection') // ignore non collection fields
             ->exclude('collection.{string,int}'),
         'fields' => [
@@ -1228,7 +1228,7 @@ it('can execute excludes', function (
     ];
 
     yield 'nested data collectable all' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->only('collection') // ignore non collection fields
             ->exclude('collection.*'),
         'fields' => [
@@ -1247,7 +1247,7 @@ it('can execute excludes', function (
     ];
 
     yield 'combination' => [
-        'factory' => TransformationContextFactory::create()
+        'factory' => fn () => TransformationContextFactory::create()
             ->exclude('string', 'single.string')
             ->exclude('collection.string')
             ->exclude('nested.a.string'),

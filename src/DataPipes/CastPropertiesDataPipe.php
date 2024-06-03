@@ -6,6 +6,7 @@ use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Casts\IterableItemCast;
 use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Enums\DataTypeKind;
+use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
@@ -27,7 +28,7 @@ class CastPropertiesDataPipe implements DataPipe
         CreationContext $creationContext
     ): array {
         foreach ($properties as $name => $value) {
-            $dataProperty = $class->properties->first(fn (DataProperty $dataProperty) => $dataProperty->name === $name);
+            $dataProperty = $class->properties[$name] ?? null;
 
             if ($dataProperty === null) {
                 continue;
@@ -85,11 +86,19 @@ class CastPropertiesDataPipe implements DataPipe
             $property->type->kind->isDataObject()
             || $property->type->kind->isDataCollectable()
         ) {
-            $context = $creationContext->next($property->type->dataClass, $property->name);
+            try {
+                $context = $creationContext->next($property->type->dataClass, $property->name);
 
-            return $property->type->kind->isDataObject()
-                ? $context->from($value)
-                : $context->collect($value, $property->type->iterableClass);
+                $data = $property->type->kind->isDataObject()
+                    ? $context->from($value)
+                    : $context->collect($value, $property->type->iterableClass);
+
+                $creationContext->previous();
+
+                return $data;
+            } catch (CannotCreateData) {
+                return $value;
+            }
         }
 
         if (
