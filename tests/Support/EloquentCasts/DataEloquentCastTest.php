@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 use function Pest\Laravel\assertDatabaseHas;
 
 use Spatie\LaravelData\Support\DataConfig;
-
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
