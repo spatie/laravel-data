@@ -22,6 +22,15 @@ it('can get a data object from model', function () {
         ->date->toEqual($data->date);
 });
 
+it('does not loop infinitely on relations', function () {
+    $m1 = new FakeModel();
+    $m2 = new FakeNestedModel();
+    $m2->setRelation('parent', $m1);
+    $m1->setRelation('pivot', $m2);
+
+    FakeModelData::from($m1);
+});
+
 it('can get a data object with nesting from model and relations when loaded', function () {
     $model = FakeModel::factory()->create();
 
