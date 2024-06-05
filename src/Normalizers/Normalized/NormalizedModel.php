@@ -74,7 +74,7 @@ class NormalizedModel implements Normalized
         if ($dataProperty->attributes->contains(fn (object $attribute) => $attribute::class === LoadRelation::class)) {
             if (method_exists($this->model, $name)) {
                 $this->model->loadMissing($name);
-            } else if (method_exists($this->model, $studlyName)) {
+            } elseif (method_exists($this->model, $studlyName)) {
                 $this->model->loadMissing($studlyName);
             }
         }
