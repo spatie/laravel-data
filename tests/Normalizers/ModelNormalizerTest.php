@@ -23,12 +23,18 @@ it('can get a data object from model', function () {
 });
 
 it('does not loop infinitely on relations', function () {
-    $m1 = new FakeModel();
-    $m2 = new FakeNestedModel();
+    $m1 = FakeModel::factory()->makeOne();
+    $m2 = FakeNestedModel::factory()->makeOne();
     $m2->setRelation('parent', $m1);
     $m1->setRelation('pivot', $m2);
 
-    FakeModelData::from($m1);
+    $data = FakeModelData::from($m1);
+
+    expect($m1)
+        ->string->toEqual($data->string)
+        ->nullable->toEqual($data->nullable)
+        ->date->toEqual($data->date);
+
 });
 
 it('can get a data object with nesting from model and relations when loaded', function () {
