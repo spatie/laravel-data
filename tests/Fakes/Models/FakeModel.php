@@ -22,7 +22,7 @@ class FakeModel extends Model
         return $this->hasMany(FakeNestedModel::class);
     }
 
-    public function alt_fake_nested_models(): HasMany
+    public function fake_nested_models_snake_cased(): HasMany
     {
         return $this->hasMany(FakeNestedModel::class);
     }

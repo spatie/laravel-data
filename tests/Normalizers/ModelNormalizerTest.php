@@ -23,18 +23,18 @@ it('can get a data object from model', function () {
 });
 
 it('does not loop infinitely on relations', function () {
-    $m1 = FakeModel::factory()->makeOne();
-    $m2 = FakeNestedModel::factory()->makeOne();
-    $m2->setRelation('parent', $m1);
-    $m1->setRelation('pivot', $m2);
+    $parentModel = FakeModel::factory()->makeOne();
+    $childModel = FakeNestedModel::factory()->makeOne();
 
-    $data = FakeModelData::from($m1);
+    $childModel->setRelation('parent', $parentModel);
+    $parentModel->setRelation('pivot', $childModel);
 
-    expect($m1)
+    $data = FakeModelData::from($parentModel);
+
+    expect($parentModel)
         ->string->toEqual($data->string)
         ->nullable->toEqual($data->nullable)
         ->date->toEqual($data->date);
-
 });
 
 it('can get a data object with nesting from model and relations when loaded', function () {
@@ -120,10 +120,10 @@ it('can load relations on a model when required and the LoadRelation attribute i
         public array $fake_nested_models;
 
         #[LoadRelation, DataCollectionOf(FakeNestedModelData::class)]
-        public array $alt_fake_nested_models;
+        public array $fake_nested_models_snake_cased;
     };
 
-    $model->load('alt_fake_nested_models');
+    $model->load('fake_nested_models_snake_cased');
     DB::enableQueryLog();
 
     $data = $dataClass::from($model);
@@ -134,7 +134,7 @@ it('can load relations on a model when required and the LoadRelation attribute i
         ->toHaveCount(2)
         ->each->toBeInstanceOf(FakeNestedModelData::class);
 
-    expect($data->alt_fake_nested_models)
+    expect($data->fake_nested_models_snake_cased)
         ->toHaveCount(2)
         ->each->toBeInstanceOf(FakeNestedModelData::class);
     expect($queryLog)->toHaveCount(1);
