@@ -22,6 +22,21 @@ it('can get a data object from model', function () {
         ->date->toEqual($data->date);
 });
 
+it('does not loop infinitely on relations', function () {
+    $m1 = FakeModel::factory()->makeOne();
+    $m2 = FakeNestedModel::factory()->makeOne();
+    $m2->setRelation('parent', $m1);
+    $m1->setRelation('pivot', $m2);
+
+    $data = FakeModelData::from($m1);
+
+    expect($m1)
+        ->string->toEqual($data->string)
+        ->nullable->toEqual($data->nullable)
+        ->date->toEqual($data->date);
+
+});
+
 it('can get a data object with nesting from model and relations when loaded', function () {
     $model = FakeModel::factory()->create();
 
@@ -103,8 +118,12 @@ it('can load relations on a model when required and the LoadRelation attribute i
     $dataClass = new class () extends Data {
         #[LoadRelation, DataCollectionOf(FakeNestedModelData::class)]
         public array $fake_nested_models;
+
+        #[LoadRelation, DataCollectionOf(FakeNestedModelData::class)]
+        public array $alt_fake_nested_models;
     };
 
+    $model->load('alt_fake_nested_models');
     DB::enableQueryLog();
 
     $data = $dataClass::from($model);
@@ -112,6 +131,10 @@ it('can load relations on a model when required and the LoadRelation attribute i
     $queryLog = DB::getQueryLog();
 
     expect($data->fake_nested_models)
+        ->toHaveCount(2)
+        ->each->toBeInstanceOf(FakeNestedModelData::class);
+
+    expect($data->alt_fake_nested_models)
         ->toHaveCount(2)
         ->each->toBeInstanceOf(FakeNestedModelData::class);
     expect($queryLog)->toHaveCount(1);
@@ -154,8 +177,8 @@ it('will not automatically load relation when the LoadRelation attribute is not 
 it('can use mappers to map the names', function () {
     $model = FakeModel::factory()->create();
 
-    $nestedModelA = FakeNestedModel::factory()->for($model)->create();
-    $nestedModelB = FakeNestedModel::factory()->for($model)->create();
+    FakeNestedModel::factory()->for($model)->create();
+    FakeNestedModel::factory()->for($model)->create();
 
     $dataClass = new class () extends Data {
         #[DataCollectionOf(FakeNestedModelData::class), MapInputName(SnakeCaseMapper::class)]
