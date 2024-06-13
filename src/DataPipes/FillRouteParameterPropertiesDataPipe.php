@@ -31,7 +31,9 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            if (! $attribute->replaceWhenPresentInBody && array_key_exists($dataProperty->name, $properties)) {
+            // if inputMappedName exists, use it first
+            $name = $dataProperty->inputMappedName ?: $dataProperty->name;
+            if (! $attribute->replaceWhenPresentInBody && array_key_exists($name, $properties)) {
                 continue;
             }
 
@@ -41,7 +43,12 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            $properties[$dataProperty->name] = $this->resolveValue($dataProperty, $attribute, $parameter);
+            $properties[$name] = $this->resolveValue($dataProperty, $attribute, $parameter);
+
+            // keep the original property name
+            if ($name !== $dataProperty->name) {
+                $properties[$dataProperty->name] = $properties[$name];
+            }
         }
 
         return $properties;
