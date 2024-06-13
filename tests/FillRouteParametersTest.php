@@ -3,11 +3,12 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
-use Spatie\LaravelData\Attributes\MapInputName;
 use function Pest\Laravel\mock;
 
 use Spatie\LaravelData\Attributes\FromRouteParameter;
+
 use Spatie\LaravelData\Attributes\FromRouteParameterProperty;
+use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Exceptions\CannotFillFromRouteParameterPropertyUsingScalarValue;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
