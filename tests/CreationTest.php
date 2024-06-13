@@ -235,6 +235,7 @@ it('can create a data object from a model', function () {
         'boolean' => true,
         'date' => CarbonImmutable::create(2020, 05, 16, 12, 00, 00),
         'nullable_date' => null,
+        'nullable_optional_date' => null,
     ]);
 
     $dataClass = new class () extends Data {
@@ -245,6 +246,10 @@ it('can create a data object from a model', function () {
         public Carbon $date;
 
         public ?Carbon $nullable_date;
+
+        public Optional|Carbon $optional_date;
+
+        public Optional|null|Carbon $nullable_optional_date;
     };
 
     $data = $dataClass::from(DummyModel::findOrFail($model->id));
@@ -253,8 +258,12 @@ it('can create a data object from a model', function () {
         ->string->toEqual('test')
         ->boolean->toBeTrue()
         ->nullable_date->toBeNull()
+        ->optional_date->toBeInstanceOf(Optional::class)
+        ->nullable_optional_date->toBeNull()
         ->and(CarbonImmutable::create(2020, 05, 16, 12, 00, 00)->eq($data->date))->toBeTrue();
 });
+
+
 
 it('can create a data object from a stdClass object', function () {
     $object = (object) [

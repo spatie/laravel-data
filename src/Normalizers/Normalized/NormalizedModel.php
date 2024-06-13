@@ -21,7 +21,15 @@ class NormalizedModel implements Normalized
     {
         $propertyName = $this->model::$snakeAttributes ? Str::snake($name) : $name;
 
-        return $this->properties[$propertyName] ?? $this->fetchNewProperty($propertyName, $dataProperty);
+        $value = array_key_exists($propertyName, $this->properties)
+            ? $this->properties[$propertyName]
+            : $this->fetchNewProperty($propertyName, $dataProperty);
+
+        if ($value === null && ! $dataProperty->type->isNullable) {
+            return UnknownProperty::create();
+        }
+
+        return $value;
     }
 
     protected function initialize(Model $model): void

@@ -11,6 +11,8 @@ class DummyModel extends Model
     protected $casts = [
         'date' => 'datetime',
         'nullable_date' => 'datetime',
+        'optional_date' => 'datetime',
+        'nullable_optional_date' => 'datetime',
         'boolean' => 'boolean',
     ];
 
@@ -22,6 +24,8 @@ class DummyModel extends Model
             $blueprint->string('string');
             $blueprint->dateTime('date');
             $blueprint->dateTime('nullable_date')->nullable();
+            $blueprint->dateTime('optional_date')->nullable();
+            $blueprint->dateTime('nullable_optional_date')->nullable();
             $blueprint->boolean('boolean');
 
             $blueprint->timestamps();
