@@ -262,8 +262,18 @@ dataset('attributes', function () {
     );
 
     yield fixature(
+        attribute: new GreaterThan(10),
+        expected: 'gt:10',
+    );
+
+    yield fixature(
         attribute: new GreaterThanOrEqualTo('field'),
         expected: 'gte:field',
+    );
+
+    yield fixature(
+        attribute: new GreaterThanOrEqualTo('10'),
+        expected: 'gte:10',
     );
 
     yield fixature(
@@ -307,8 +317,18 @@ dataset('attributes', function () {
     );
 
     yield fixature(
+        attribute: new LessThan(10),
+        expected: 'lt:10',
+    );
+
+    yield fixature(
         attribute: new LessThanOrEqualTo('field'),
         expected: 'lte:field',
+    );
+
+    yield fixature(
+        attribute: new LessThanOrEqualTo(10),
+        expected: 'lte:10',
     );
 
     yield fixature(

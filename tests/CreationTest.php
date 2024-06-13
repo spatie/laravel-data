@@ -235,6 +235,7 @@ it('can create a data object from a model', function () {
         'boolean' => true,
         'date' => CarbonImmutable::create(2020, 05, 16, 12, 00, 00),
         'nullable_date' => null,
+        'nullable_optional_date' => null,
     ]);
 
     $dataClass = new class () extends Data {
@@ -245,6 +246,10 @@ it('can create a data object from a model', function () {
         public Carbon $date;
 
         public ?Carbon $nullable_date;
+
+        public Optional|Carbon $optional_date;
+
+        public Optional|null|Carbon $nullable_optional_date;
     };
 
     $data = $dataClass::from(DummyModel::findOrFail($model->id));
@@ -253,8 +258,12 @@ it('can create a data object from a model', function () {
         ->string->toEqual('test')
         ->boolean->toBeTrue()
         ->nullable_date->toBeNull()
+        ->optional_date->toBeInstanceOf(Optional::class)
+        ->nullable_optional_date->toBeNull()
         ->and(CarbonImmutable::create(2020, 05, 16, 12, 00, 00)->eq($data->date))->toBeTrue();
 });
+
+
 
 it('can create a data object from a stdClass object', function () {
     $object = (object) [
@@ -1071,6 +1080,39 @@ it('will cast iterables into the correct type', function () {
     expect($data->array)
         ->toBeArray()
         ->toEqual(['a', 'collection']);
+})->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
+
+it('will cast iterables into default types', function () {
+    $dataClass = new class () extends Data {
+        /** @var array<int, string> */
+        public array $strings;
+
+        /** @var array<int, bool> */
+        public array $bools;
+
+        /** @var array<int, int> */
+        public array $ints;
+
+        /** @var array<int, float> */
+        public array $floats;
+
+        /** @var array<int, array> */
+        public array $arrays;
+    };
+
+    $data = $dataClass::from([
+        'strings' => ['Hello', 42, 3.14, true, '0', 'false'],
+        'bools' => ['Hello', 42, 3.14, true, ['nested'], '0', 'false'],
+        'ints' => ['Hello', 42, 3.14, true, ['nested'], '0', 'false'],
+        'floats' => ['Hello', 42, 3.14, true, ['nested'], '0', 'false'],
+        'arrays' => ['Hello', 42, 3.14, true, ['nested'], '0', 'false'],
+    ]);
+
+    expect($data->strings)->toBe(['Hello', '42', '3.14', '1', '0', 'false']);
+    expect($data->bools)->toBe([true, true, true, true, true, false, true]);
+    expect($data->ints)->toBe([0, 42, 3, 1, 1, 0, 0]);
+    expect($data->floats)->toBe([0.0, 42.0, 3.14, 1.0, 1.0, 0.0, 0.0]);
+    expect($data->arrays)->toEqual([['Hello'], [42], [3.14], [true], ['nested'], ['0'], ['false']]);
 })->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
 
 it('keeps the creation context path up to date', function () {

@@ -21,12 +21,20 @@ class NormalizedModel implements Normalized
     {
         $propertyName = $this->model::$snakeAttributes ? Str::snake($name) : $name;
 
-        return $this->properties[$propertyName] ?? $this->fetchNewProperty($propertyName, $dataProperty);
+        $value = array_key_exists($propertyName, $this->properties)
+            ? $this->properties[$propertyName]
+            : $this->fetchNewProperty($propertyName, $dataProperty);
+
+        if ($value === null && ! $dataProperty->type->isNullable) {
+            return UnknownProperty::create();
+        }
+
+        return $value;
     }
 
     protected function initialize(Model $model): void
     {
-        $this->properties = $model->toArray();
+        $this->properties = $model->withoutRelations()->toArray();
 
         foreach ($model->getDates() as $key) {
             if (isset($this->properties[$key])) {
@@ -39,14 +47,6 @@ class NormalizedModel implements Normalized
                 if (isset($this->properties[$key])) {
                     $this->properties[$key] = $model->getAttribute($key);
                 }
-            }
-        }
-
-        foreach ($model->getRelations() as $key => $relation) {
-            $key = $model::$snakeAttributes ? Str::snake($key) : $key;
-
-            if (isset($this->properties[$key])) {
-                $this->properties[$key] = $relation;
             }
         }
     }
@@ -69,18 +69,23 @@ class NormalizedModel implements Normalized
             return $this->properties[$name] = $this->model->getAttribute($name);
         }
 
-        if (! $dataProperty->attributes->contains(fn (object $attribute) => $attribute::class === LoadRelation::class)) {
-            return UnknownProperty::create();
+        $camelName = Str::camel($name);
+
+        if ($dataProperty->attributes->contains(fn (object $attribute) => $attribute::class === LoadRelation::class)) {
+            if (method_exists($this->model, $name)) {
+                $this->model->loadMissing($name);
+            } elseif (method_exists($this->model, $camelName)) {
+                $this->model->loadMissing($camelName);
+            }
         }
 
-        $studlyName = Str::studly($name);
-
-        if (! method_exists($this->model, $studlyName)) {
-            return UnknownProperty::create();
+        if ($this->model->relationLoaded($name)) {
+            return $this->properties[$name] = $this->model->getRelation($name);
+        }
+        if ($this->model->relationLoaded($camelName)) {
+            return $this->properties[$name] = $this->model->getRelation($camelName);
         }
 
-        $this->model->load($studlyName);
-
-        return $this->properties[$name] = $this->model->{$studlyName};
+        return $this->properties[$name] = UnknownProperty::create();
     }
 }

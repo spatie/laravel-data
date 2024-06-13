@@ -22,6 +22,11 @@ class FakeModel extends Model
         return $this->hasMany(FakeNestedModel::class);
     }
 
+    public function fake_nested_models_snake_cased(): HasMany
+    {
+        return $this->hasMany(FakeNestedModel::class);
+    }
+
     public function accessor(): Attribute
     {
         return Attribute::get(fn () => "accessor_{$this->string}");

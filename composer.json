@@ -25,7 +25,7 @@
     "require-dev" : {
         "fakerphp/faker": "^1.14",
         "friendsofphp/php-cs-fixer": "^3.0",
-        "inertiajs/inertia-laravel": "dev-master#4508fd1",
+        "inertiajs/inertia-laravel": "^1.2",
         "livewire/livewire": "^3.0",
         "mockery/mockery": "^1.6",
         "nesbot/carbon": "^2.63",

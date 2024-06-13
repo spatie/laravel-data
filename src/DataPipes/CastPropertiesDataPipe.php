@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Support\Enumerable;
+use Spatie\LaravelData\Casts\BuiltinTypeCast;
 use Spatie\LaravelData\Casts\IterableItemCast;
 use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Enums\DataTypeKind;
@@ -205,6 +206,10 @@ class CastPropertiesDataPipe implements DataPipe
             if (! $casted instanceof Uncastable) {
                 return $possibleCast;
             }
+        }
+
+        if(in_array($property->type->iterableItemType, ['bool', 'int', 'float', 'array', 'string'])) {
+            return new BuiltinTypeCast($property->type->iterableItemType);
         }
 
         return null;
