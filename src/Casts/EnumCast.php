@@ -38,7 +38,7 @@ class EnumCast implements Cast, IterableItemCast
 
         /** @var class-string<\BackedEnum> $type */
         try {
-            return $type::from($value);
+            return $value instanceof $type && $value === $type::from($value->value) ? $value : $type::from($value);
         } catch (Throwable $e) {
             throw CannotCastEnum::create($type, $value);
         }
