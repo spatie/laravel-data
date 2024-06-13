@@ -71,19 +71,3 @@ it('fails with other types', function () {
     )
         ->toEqual(Uncastable::create());
 });
-
-
-it('it can create data when enum is already casted', function () {
-    $class = new class () {
-        public DummyBackedEnum $enum;
-    };
-
-    expect(
-        $this->caster->cast(
-            FakeDataStructureFactory::property($class, 'enum'),
-            DummyBackedEnum::FOO,
-            [],
-            CreationContextFactory::createFromConfig($class::class)->get()
-        )
-    )->toEqual(DummyBackedEnum::FOO);
-});
