@@ -2,6 +2,29 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.7.0 - 2024-06-13
+
+### What's Changed
+
+* Fix typo in docs by @DvDty in https://github.com/spatie/laravel-data/pull/769
+* Update wrapping.md by @kimulisiraj in https://github.com/spatie/laravel-data/pull/770
+* Fix typos on "Use with Livewire" page by @vkarchevskyi in https://github.com/spatie/laravel-data/pull/777
+* Fix dataCastUsing method signature by @shankhadevpadam in https://github.com/spatie/laravel-data/pull/781
+* Avoid loading already loaded relations and allow loading non studly relation names by @Tofandel in https://github.com/spatie/laravel-data/pull/773
+* Fix routing parameters filled in incorrectly using mapping property names by @guiqibusixin in https://github.com/spatie/laravel-data/pull/775
+* Feature: add ability to store eloquent casts as an encrypted string by @eugen-stranz in https://github.com/spatie/laravel-data/pull/723
+
+### New Contributors
+
+* @DvDty made their first contribution in https://github.com/spatie/laravel-data/pull/769
+* @vkarchevskyi made their first contribution in https://github.com/spatie/laravel-data/pull/777
+* @shankhadevpadam made their first contribution in https://github.com/spatie/laravel-data/pull/781
+* @guiqibusixin made their first contribution in https://github.com/spatie/laravel-data/pull/775
+* @eugen-stranz made their first contribution in https://github.com/spatie/laravel-data/pull/723
+* @yob-yob made their first contribution in https://github.com/spatie/laravel-data/pull/776
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.6.0...4.7.0
+
 ## 4.6.0 - 2024-05-03
 
 ### What's Changed
