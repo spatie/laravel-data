@@ -39,7 +39,7 @@ SongData::from([
 ]);
 ```
 
-And get an error because the first two properties are simple PHP types(string, int's, floats, booleans, arrays), but the following two properties are more complex types: `DateTime` and `Enum`, respectively.
+And get an error because the first two properties are simple PHP types(strings, ints, floats, booleans, arrays), but the following two properties are more complex types: `DateTime` and `Enum`, respectively.
 
 These types cannot be automatically created. A cast is needed to construct them from a string.
 

@@ -96,7 +96,7 @@ Extends from the `DataType` and has the following additional properties:
 
 An enum representing the kind of type of a property/parameter with respect to the package:
 
-- Default: a non package spefic type
+- Default: a non package specific type
 - DataObject: a data object
 - DataCollection: a `DataCollection` of data objects
 - DataPaginatedCollection: a `DataPaginatedCollection` of data objects
