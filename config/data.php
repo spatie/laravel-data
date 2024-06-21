@@ -11,6 +11,11 @@ return [
     'date_format' => DATE_ATOM,
 
     /**
+     * Set a default timezone for casting date
+     */
+    'default_timezone' => null,
+
+    /**
      * It is possible to enable certain features of the package, these would otherwise
      * be breaking changes, and thus they are disabled by default. In the next major
      * version of the package, these features will be enabled by default.
