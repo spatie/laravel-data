@@ -2,6 +2,21 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.7.1 - 2024-06-25
+
+### What's Changed
+
+* Fix some typos in docs by @Klaas058 in https://github.com/spatie/laravel-data/pull/794
+* Provide a default timezone for casting date by @PhilippeThouvenot in https://github.com/spatie/laravel-data/pull/799
+* Remove object rule caching
+* Fix an issue where a normalized model attribute fetching a relation would not use the loaded relation
+
+### New Contributors
+
+* @PhilippeThouvenot made their first contribution in https://github.com/spatie/laravel-data/pull/799
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.7.0...4.7.1
+
 ## 4.7.0 - 2024-06-13
 
 ### What's Changed
