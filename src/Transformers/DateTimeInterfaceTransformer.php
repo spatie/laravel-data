@@ -21,7 +21,7 @@ class DateTimeInterfaceTransformer implements Transformer
 
     public function transform(DataProperty $property, mixed $value, TransformationContext $context): string
     {
-        $this->setTimeZone ??= config('data.default_timezone');
+        $this->setTimeZone ??= config('data.date_timezone');
 
         /** @var DateTimeInterface $value */
         if ($this->setTimeZone) {

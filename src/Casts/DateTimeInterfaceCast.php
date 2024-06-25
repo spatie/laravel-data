@@ -51,7 +51,7 @@ class DateTimeInterfaceCast implements Cast, IterableItemCast
             throw CannotCastDate::create($formats->toArray(), $type, $value);
         }
 
-        $this->setTimeZone ??= config('data.default_timezone');
+        $this->setTimeZone ??= config('data.date_timezone');
 
         if ($this->setTimeZone) {
             return $datetime->setTimezone(new DateTimeZone($this->setTimeZone));
