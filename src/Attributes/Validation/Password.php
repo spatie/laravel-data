@@ -41,7 +41,7 @@ class Password extends ObjectValidationAttribute
         $default = $this->normalizePossibleRouteReferenceParameter($this->default);
 
         if ($default && $this->rule === null) {
-            return $this->rule = BasePassword::default();
+            return BasePassword::default();
         }
 
         $rule = BasePassword::min($min);
@@ -66,7 +66,7 @@ class Password extends ObjectValidationAttribute
             $rule->uncompromised($uncompromisedThreshold);
         }
 
-        return $this->rule = $rule;
+        return $rule;
     }
 
     public static function keyword(): string

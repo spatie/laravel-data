@@ -27,7 +27,7 @@ class Enum extends ObjectValidationAttribute
             return $this->rule;
         }
 
-        return $this->rule = $this->enum instanceof EnumRule
+        return $this->enum instanceof EnumRule
             ? $this->enum
             : new EnumRule((string) $this->enum);
     }

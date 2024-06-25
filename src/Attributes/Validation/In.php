@@ -36,7 +36,7 @@ class In extends ObjectValidationAttribute
             Arr::flatten($this->values)
         );
 
-        return  $this->rule = new BaseIn($this->values);
+        return new BaseIn($this->values);
     }
 
     public static function keyword(): string

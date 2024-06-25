@@ -51,7 +51,7 @@ class Exists extends ObjectValidationAttribute
             $rule->where($this->where);
         }
 
-        return $this->rule = $rule;
+        return $rule;
     }
 
     public static function keyword(): string

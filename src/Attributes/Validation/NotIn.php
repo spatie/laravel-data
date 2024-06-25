@@ -27,7 +27,7 @@ class NotIn extends ObjectValidationAttribute
         }
 
         if (count($this->values) === 1 && $this->values[0] instanceof BaseNotIn) {
-            return $this->rule = $this->values[0];
+            return $this->values[0];
         }
 
         $this->values = array_map(
@@ -35,7 +35,7 @@ class NotIn extends ObjectValidationAttribute
             Arr::flatten($this->values)
         );
 
-        return $this->rule = new BaseNotIn($this->values);
+        return  new BaseNotIn($this->values);
     }
 
     public static function keyword(): string
