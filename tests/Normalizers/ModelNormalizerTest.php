@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Support\Facades\DB;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\LoadRelation;
@@ -196,4 +197,35 @@ it('can use mappers to map the names', function () {
         ->toBeInstanceOf(FakeNestedModelData::class);
 
     expect($data)->oldAccessor->toEqual($model->old_accessor);
+});
+
+it('can create a data property for a model attribute which fetches a relation that is loaded and it will not trigger a lazy loading exception', function () {
+    $dataClass = new class ('') extends Data {
+        public function __construct(public string $accessor_using_relation)
+        {
+        }
+    };
+
+    $model = FakeModel::factory()->create();
+    FakeNestedModel::factory()->for($model)->create();
+
+    $freshModel = FakeModel::query()->first();
+
+    $freshModel->preventsLazyLoading = true;
+
+    expect(function () use ($dataClass, $freshModel) {
+        $freshModel->append('accessorUsingRelation');
+
+        $dataClass::from($freshModel);
+    })->toThrow(LazyLoadingViolationException::class);
+
+    $freshModel = $freshModel
+        ->load('fakeNestedModels')
+        ->append('accessorUsingRelation');
+
+    $data = $dataClass::from($freshModel);
+
+    expect($freshModel)
+        ->accessor_using_relation
+        ->toEqual($data->accessor_using_relation);
 });

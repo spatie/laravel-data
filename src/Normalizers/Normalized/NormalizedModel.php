@@ -34,7 +34,7 @@ class NormalizedModel implements Normalized
 
     protected function initialize(Model $model): void
     {
-        $this->properties = $model->withoutRelations()->toArray();
+        $this->properties = $model->attributesToArray();
 
         foreach ($model->getDates() as $key) {
             if (isset($this->properties[$key])) {

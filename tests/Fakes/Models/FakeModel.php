@@ -47,6 +47,11 @@ class FakeModel extends Model
         return Attribute::get(fn () => throw new Exception('This accessor should not be called'));
     }
 
+    public function getAccessorUsingRelationAttribute(): string
+    {
+        return $this->fakeNestedModels->first()->string;
+    }
+
     protected static function newFactory()
     {
         return FakeModelFactory::new();
