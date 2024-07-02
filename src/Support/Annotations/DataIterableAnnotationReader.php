@@ -51,6 +51,7 @@ class DataIterableAnnotationReader
         $kindPattern = '(?:@property|@var|@param)\s*';
         $fqsenPattern = '[\\\\a-z0-9_\|]+';
         $typesPattern = '[\\\\a-z0-9_\\|\\[\\]]+';
+        $optionalTypesPattern = '(?:'.$typesPattern.')*';
         $keyPattern = '(?<key>int|string|int\|string|string\|int|array-key)';
         $parameterPattern = '\s*\$?(?<parameter>[a-z0-9_]+)?';
 
@@ -61,7 +62,7 @@ class DataIterableAnnotationReader
         );
 
         preg_match_all(
-            "/{$kindPattern}(?<collectionClass>{$fqsenPattern})<(?:{$keyPattern}\s*?,\s*?)?(?<dataClass>{$fqsenPattern})>{$parameterPattern}/i",
+            "/{$kindPattern}(?<collectionClass>{$fqsenPattern})<(?:{$keyPattern}\s*?,\s*?)?(?<dataClass>{$fqsenPattern})>{$optionalTypesPattern}{$parameterPattern}/i",
             $comment,
             $collectionMatches,
         );

@@ -11,6 +11,7 @@ use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
  * @property \Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum[] $propertyM
  * @property array<\Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum> $propertyN
  * @property array<DummyBackedEnum> $propertyO
+ * @property array<DummyBackedEnum>|null $propertyQ
  */
 class CollectionNonDataAnnotationsData
 {
@@ -58,6 +59,11 @@ class CollectionNonDataAnnotationsData
     /** @var \Illuminate\Support\Collection<Error> */
     public Collection $propertyP;
 
+    public array $propertyQ;
+
+    /** @var \Illuminate\Support\Collection<Error>|null */
+    public ?Collection $propertyR;
+
     /**
      * @param \Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum[]|null $paramA
      * @param null|\Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum[] $paramB
@@ -69,6 +75,7 @@ class CollectionNonDataAnnotationsData
      * @param array<DummyBackedEnum> $paramH
      * @param array<int,DummyBackedEnum> $paramJ
      * @param array<int, DummyBackedEnum> $paramI
+     * @param \Spatie\LaravelData\DataCollection<\Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum>|null $paramK
      */
     public function method(
         array $paramA,
@@ -80,6 +87,7 @@ class CollectionNonDataAnnotationsData
         array $paramG,
         array $paramJ,
         array $paramI,
+        ?array $paramK,
     ) {
 
     }

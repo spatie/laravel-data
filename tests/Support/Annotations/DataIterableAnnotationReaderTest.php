@@ -81,6 +81,11 @@ it(
         'property' => 'propertyM',
         'expected' => new DataIterableAnnotation(SimpleData::class, isData: true),
     ];
+
+    yield 'propertyU' => [
+        'property' => 'propertyU',
+        'expected' => new DataIterableAnnotation(SimpleData::class, isData: true),
+    ];
 });
 
 it('can get the data class for a data collection by class annotation', function () {
@@ -93,6 +98,7 @@ it('can get the data class for a data collection by class annotation', function 
         new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyQ'),
         new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyR'),
         new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyS'),
+        new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyT'),
     ]);
 });
 
@@ -110,6 +116,7 @@ it('can get data class for a data collection by method annotation', function () 
         new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramH'),
         new DataIterableAnnotation(SimpleData::class, isData: true, keyType: 'int', property: 'paramJ'),
         new DataIterableAnnotation(SimpleData::class, isData: true, keyType: 'int', property: 'paramI'),
+        new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramK'),
     ]);
 });
 
@@ -185,6 +192,11 @@ it(
         'property' => 'propertyP',
         'expected' => new DataIterableAnnotation(Error::class, isData: true),
     ];
+
+    yield 'propertyR' => [
+        'property' => 'propertyR',
+        'expected' => new DataIterableAnnotation(Error::class, isData: true),
+    ];
 });
 
 it('can get the iterable class for a collection by class annotation', function () {
@@ -194,6 +206,7 @@ it('can get the iterable class for a collection by class annotation', function (
         new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyM'),
         new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyN'),
         new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyO'),
+        new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyQ'),
     ]);
 });
 
@@ -211,6 +224,7 @@ it('can get iterable class for a data by method annotation', function () {
         new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramH'),
         new DataIterableAnnotation(DummyBackedEnum::class, isData: false, keyType: 'int', property: 'paramJ'),
         new DataIterableAnnotation(DummyBackedEnum::class, isData: false, keyType: 'int', property: 'paramI'),
+        new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramK'),
     ]);
 });
 

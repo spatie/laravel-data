@@ -14,6 +14,7 @@ use Spatie\LaravelData\DataCollection;
  * @property array<\Spatie\LaravelData\Tests\Fakes\SimpleData> $propertyQ
  * @property \Spatie\LaravelData\Tests\Fakes\SimpleData[] $propertyR
  * @property array<SimpleData> $propertyS
+ * @property \Illuminate\Support\Collection<\Spatie\LaravelData\Tests\Fakes\SimpleData>|null $propertyT
  */
 class CollectionDataAnnotationsData
 {
@@ -67,6 +68,11 @@ class CollectionDataAnnotationsData
 
     public array $propertyS;
 
+    public ?array $propertyT;
+
+    /** @var \Illuminate\Support\Collection<\Spatie\LaravelData\Tests\Fakes\SimpleData>|null */
+    public ?array $propertyU;
+
     /**
      * @param \Spatie\LaravelData\Tests\Fakes\SimpleData[]|null $paramA
      * @param null|\Spatie\LaravelData\Tests\Fakes\SimpleData[] $paramB
@@ -78,6 +84,7 @@ class CollectionDataAnnotationsData
      * @param array<SimpleData> $paramH
      * @param array<int,SimpleData> $paramJ
      * @param array<int, SimpleData> $paramI
+     * @param \Spatie\LaravelData\DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData>|null $paramK
      */
     public function method(
         array $paramA,
@@ -89,6 +96,7 @@ class CollectionDataAnnotationsData
         array $paramG,
         array $paramJ,
         array $paramI,
+        ?array $paramK,
     ) {
 
     }
