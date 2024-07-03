@@ -133,7 +133,7 @@ If the collection is well-typed, you don't need to use annotations:
  *
  * @extends \Illuminate\Support\Collection<TKey, TValue>
  */
-class SongDataCollection
+class SongDataCollection extends Collection
 {
 }
 
