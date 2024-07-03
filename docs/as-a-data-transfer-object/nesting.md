@@ -124,6 +124,29 @@ class AlbumData extends Data
 }
 ```
 
+If the collection is well-typed, you don't need to use annotations:
+
+```php
+/**
+ * @template TKey of array-key
+ * @template TValue of \App\Data\SongData
+ *
+ * @extends \Illuminate\Support\Collection<TKey, TValue>
+ */
+class SongDataCollection
+{
+}
+
+class AlbumData extends Data
+{
+    public function __construct(
+        public string $title,
+        public SongDataCollection $songs,
+    ) {
+    }
+}
+```
+
 You can also use an attribute to define the type of data objects that will be stored within a collection:
 
 ```php

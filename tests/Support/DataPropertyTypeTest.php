@@ -572,6 +572,54 @@ it('can deduce an enumerable data collection union type', function () {
         ->iterableClass->toBe(Collection::class);
 });
 
+it('can deduce an enumerable data collection type from collection', function () {
+    $type = resolveDataType(new class () {
+        public DataCollectionWithTemplate $property;
+    });
+
+    expect($type)
+        ->isOptional->toBeFalse()
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->lazyType->toBeNull()
+        ->kind->toBe(DataTypeKind::DataEnumerable)
+        ->dataClass->toBe(SimpleData::class)
+        ->iterableClass->toBe(DataCollectionWithTemplate::class)
+        ->getAcceptedTypes()->toHaveKeys([DataCollectionWithTemplate::class]);
+
+    expect($type->type)
+        ->toBeInstanceOf(NamedType::class)
+        ->name->toBe(DataCollectionWithTemplate::class)
+        ->builtIn->toBeFalse()
+        ->kind->toBe(DataTypeKind::DataEnumerable)
+        ->dataClass->toBe(SimpleData::class)
+        ->iterableClass->toBe(DataCollectionWithTemplate::class);
+});
+
+it('can deduce an enumerable data collection union type from collection', function () {
+    $type = resolveDataType(new class () {
+        public DataCollectionWithTemplate|Lazy $property;
+    });
+
+    expect($type)
+        ->isOptional->toBeFalse()
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->lazyType->toBe(Lazy::class)
+        ->kind->toBe(DataTypeKind::DataEnumerable)
+        ->dataClass->toBe(SimpleData::class)
+        ->iterableClass->toBe(DataCollectionWithTemplate::class)
+        ->getAcceptedTypes()->toHaveKeys([DataCollectionWithTemplate::class]);
+
+    expect($type->type)
+        ->toBeInstanceOf(NamedType::class)
+        ->name->toBe(DataCollectionWithTemplate::class)
+        ->builtIn->toBeFalse()
+        ->kind->toBe(DataTypeKind::DataEnumerable)
+        ->dataClass->toBe(SimpleData::class)
+        ->iterableClass->toBe(DataCollectionWithTemplate::class);
+});
+
 it('can deduce a paginator data collection type', function () {
     $type = resolveDataType(new class () {
         #[DataCollectionOf(SimpleData::class)]
