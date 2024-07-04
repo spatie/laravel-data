@@ -19,7 +19,8 @@ class CollectionAnnotationReader
     public function __construct(
         protected readonly TypeResolver $typeResolver,
         protected readonly ContextFactory $contextFactory,
-    ) {}
+    ) {
+    }
 
     protected Context $context;
 
@@ -109,7 +110,7 @@ class CollectionAnnotationReader
 
                     return [
                         'keyType' => $keyType,
-                        'valueType' => $valueType
+                        'valueType' => $valueType,
                     ];
                 }
             }
