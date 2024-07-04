@@ -35,6 +35,7 @@ use Spatie\LaravelData\Support\Types\IntersectionType;
 use Spatie\LaravelData\Support\Types\NamedType;
 use Spatie\LaravelData\Support\Types\UnionType;
 use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
+use Spatie\LaravelData\Tests\Fakes\Collections\SimpleDataCollectionWithAnotations;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -574,7 +575,7 @@ it('can deduce an enumerable data collection union type', function () {
 
 it('can deduce an enumerable data collection type from collection', function () {
     $type = resolveDataType(new class () {
-        public DataCollectionWithTemplate $property;
+        public SimpleDataCollectionWithAnotations $property;
     });
 
     expect($type)
@@ -584,21 +585,21 @@ it('can deduce an enumerable data collection type from collection', function () 
         ->lazyType->toBeNull()
         ->kind->toBe(DataTypeKind::DataEnumerable)
         ->dataClass->toBe(SimpleData::class)
-        ->iterableClass->toBe(DataCollectionWithTemplate::class)
-        ->getAcceptedTypes()->toHaveKeys([DataCollectionWithTemplate::class]);
+        ->iterableClass->toBe(SimpleDataCollectionWithAnotations::class)
+        ->getAcceptedTypes()->toHaveKeys([SimpleDataCollectionWithAnotations::class]);
 
     expect($type->type)
         ->toBeInstanceOf(NamedType::class)
-        ->name->toBe(DataCollectionWithTemplate::class)
+        ->name->toBe(SimpleDataCollectionWithAnotations::class)
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataEnumerable)
         ->dataClass->toBe(SimpleData::class)
-        ->iterableClass->toBe(DataCollectionWithTemplate::class);
+        ->iterableClass->toBe(SimpleDataCollectionWithAnotations::class);
 });
 
 it('can deduce an enumerable data collection union type from collection', function () {
     $type = resolveDataType(new class () {
-        public DataCollectionWithTemplate|Lazy $property;
+        public SimpleDataCollectionWithAnotations|Lazy $property;
     });
 
     expect($type)
@@ -608,16 +609,16 @@ it('can deduce an enumerable data collection union type from collection', functi
         ->lazyType->toBe(Lazy::class)
         ->kind->toBe(DataTypeKind::DataEnumerable)
         ->dataClass->toBe(SimpleData::class)
-        ->iterableClass->toBe(DataCollectionWithTemplate::class)
-        ->getAcceptedTypes()->toHaveKeys([DataCollectionWithTemplate::class]);
+        ->iterableClass->toBe(SimpleDataCollectionWithAnotations::class)
+        ->getAcceptedTypes()->toHaveKeys([SimpleDataCollectionWithAnotations::class]);
 
     expect($type->type)
         ->toBeInstanceOf(NamedType::class)
-        ->name->toBe(DataCollectionWithTemplate::class)
+        ->name->toBe(SimpleDataCollectionWithAnotations::class)
         ->builtIn->toBeFalse()
         ->kind->toBe(DataTypeKind::DataEnumerable)
         ->dataClass->toBe(SimpleData::class)
-        ->iterableClass->toBe(DataCollectionWithTemplate::class);
+        ->iterableClass->toBe(SimpleDataCollectionWithAnotations::class);
 });
 
 it('can deduce a paginator data collection type', function () {
