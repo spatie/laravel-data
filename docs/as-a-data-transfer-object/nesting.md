@@ -124,7 +124,7 @@ class AlbumData extends Data
 }
 ```
 
-If the collection is well-typed, you don't need to use annotations:
+If the collection is well-annotated, the `Data` class doesn't need to use annotations:
 
 ```php
 /**
