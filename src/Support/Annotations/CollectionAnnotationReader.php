@@ -94,9 +94,18 @@ class CollectionAnnotationReader
             if ($tag->getName() === 'extends') {
                 $description = $tag->getDescription();
 
-                if (preg_match('/<\s*([^,]+)\s*,\s*([^>]+)\s*>/', $description, $matches)) {
-                    $keyType = $templateTypes[$matches[1]] ?? $this->resolve($matches[1]);
-                    $valueType = $templateTypes[$matches[2]] ?? $this->resolve($matches[2]);
+                if (preg_match('/<\s*([^,\s]+)?\s*(?:,\s*([^>\s]+))?\s*>/', $description, $matches)) {
+
+                    if (count($matches) === 3) {
+                        $keyType = $templateTypes[$matches[1]] ?? $this->resolve($matches[1]);
+                        $valueType = $templateTypes[$matches[2]] ?? $this->resolve($matches[2]);
+                    } else {
+                        $keyType = null;
+                        $valueType = $templateTypes[$matches[1]] ?? $this->resolve($matches[1]);
+                    }
+
+                    $valueType = explode('|', $valueType)[0];
+                    $keyType = $keyType ? explode('|', $keyType)[0] : null;
 
                     return [
                         'keyType' => $keyType,
