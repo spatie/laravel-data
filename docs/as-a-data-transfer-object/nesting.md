@@ -129,9 +129,9 @@ If the collection is well-annotated, the `Data` class doesn't need to use annota
 ```php
 /**
  * @template TKey of array-key
- * @template TValue of \App\Data\SongData
+ * @template TData of \App\Data\SongData
  *
- * @extends \Illuminate\Support\Collection<TKey, TValue>
+ * @extends \Illuminate\Support\Collection<TKey, TData>
  */
 class SongDataCollection extends Collection
 {
