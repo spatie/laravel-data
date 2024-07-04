@@ -104,8 +104,8 @@ class CollectionAnnotationReader
                         $valueType = $templateTypes[$matches[1]] ?? $this->resolve($matches[1]);
                     }
 
-                    $valueType = explode('|', $valueType)[0];
                     $keyType = $keyType ? explode('|', $keyType)[0] : null;
+                    $valueType = explode('|', $valueType)[0];
 
                     return [
                         'keyType' => $keyType,

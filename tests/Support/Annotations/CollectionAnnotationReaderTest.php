@@ -93,9 +93,9 @@ it(
 
 /**
  * @template TKey of array-key
- * @template TValue of \Spatie\LaravelData\Tests\Fakes\SimpleData
+ * @template TData of \Spatie\LaravelData\Tests\Fakes\SimpleData
  *
- * @extends \Illuminate\Support\Collection<TKey, TValue>
+ * @extends \Illuminate\Support\Collection<TKey, TData>
  */
 class DataCollectionWithTemplate extends Collection
 {
