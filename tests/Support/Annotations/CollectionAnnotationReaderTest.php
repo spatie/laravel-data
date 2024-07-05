@@ -93,6 +93,11 @@ it(
         'className' => CollectionWithoutDocBlock::class,
         'expected' => null,
     ];
+
+    yield CollectionWithoutType::class => [
+        'className' => CollectionWithoutType::class,
+        'expected' => null,
+    ];
 });
 
 
@@ -228,5 +233,12 @@ class CollectionWhoImplementsNothing
 }
 
 class CollectionWithoutDocBlock extends Collection
+{
+}
+
+/**
+ * @extends \Illuminate\Support\Collection
+ */
+class CollectionWithoutType extends Collection
 {
 }
