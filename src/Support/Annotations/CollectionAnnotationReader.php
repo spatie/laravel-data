@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Annotations;
 
-use Countable;
 use Iterator;
 use IteratorAggregate;
 use phpDocumentor\Reflection\DocBlock\Tags\Generic;
@@ -12,7 +11,6 @@ use phpDocumentor\Reflection\Types\Context;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use ReflectionClass;
 use Spatie\LaravelData\Data;
-use Traversable;
 
 class CollectionAnnotationReader
 {
@@ -123,10 +121,8 @@ class CollectionAnnotationReader
     {
         // Check if the class implements common collection interfaces
         $collectionInterfaces = [
-            Traversable::class,
             Iterator::class,
             IteratorAggregate::class,
-            Countable::class,
         ];
 
         foreach ($collectionInterfaces as $interface) {

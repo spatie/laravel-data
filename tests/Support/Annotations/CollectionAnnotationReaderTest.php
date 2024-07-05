@@ -44,11 +44,6 @@ it(
         'expected' => new CollectionAnnotation(type: SimpleData::class, isData: true),
     ];
 
-    yield DataCollectionWithoutExtends::class => [
-        'className' => DataCollectionWithoutExtends::class,
-        'expected' => null,
-    ];
-
     yield NonDataCollectionWithTemplate::class => [
         'className' => NonDataCollectionWithTemplate::class,
         'expected' => new CollectionAnnotation(type: DummyBackedEnum::class, isData: false),
@@ -79,13 +74,23 @@ it(
         'expected' => new CollectionAnnotation(type: DummyBackedEnum::class, isData: false),
     ];
 
-    yield NonDataCollectionWithoutExtends::class => [
-        'className' => NonDataCollectionWithoutExtends::class,
+    yield CollectionWhoImplementsIterator::class => [
+        'className' => CollectionWhoImplementsIterator::class,
+        'expected' => new CollectionAnnotation(type: DummyBackedEnum::class, isData: false),
+    ];
+
+    yield CollectionWhoImplementsIteratorAggregate::class => [
+        'className' => CollectionWhoImplementsIteratorAggregate::class,
+        'expected' => new CollectionAnnotation(type: DummyBackedEnum::class, isData: false),
+    ];
+
+    yield CollectionWhoImplementsNothing::class => [
+        'className' => CollectionWhoImplementsNothing::class,
         'expected' => null,
     ];
 
-    yield NonCollectionWithTemplate::class => [
-        'className' => NonCollectionWithTemplate::class,
+    yield CollectionWithoutDocBlock::class => [
+        'className' => CollectionWithoutDocBlock::class,
         'expected' => null,
     ];
 });
@@ -136,10 +141,6 @@ class DataCollectionWithoutKey extends Collection
 {
 }
 
-class DataCollectionWithoutExtends extends Collection
-{
-}
-
 /**
  * @template TKey of array-key
  * @template TValue of \Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum
@@ -185,13 +186,47 @@ class NonDataCollectionWithoutKey extends Collection
 {
 }
 
-class NonDataCollectionWithoutExtends extends Collection
+/**
+ * @extends \Illuminate\Support\Collection<array-key, \Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum>
+ */
+class CollectionWhoImplementsIterator implements Iterator
 {
+    public function current(): mixed
+    {
+    }
+    public function next(): void
+    {
+    }
+    public function key(): mixed
+    {
+    }
+    public function valid(): bool
+    {
+        return true;
+    }
+    public function rewind(): void
+    {
+    }
 }
 
 /**
- * @extends \Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum
+ * @extends \Illuminate\Support\Collection<array-key, \Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum>
  */
-class NonCollectionWithTemplate
+class CollectionWhoImplementsIteratorAggregate implements IteratorAggregate
+{
+    public function getIterator(): Traversable
+    {
+        return $this;
+    }
+}
+
+/**
+ * @extends \Illuminate\Support\Collection<array-key, \Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum>
+ */
+class CollectionWhoImplementsNothing
+{
+}
+
+class CollectionWithoutDocBlock extends Collection
 {
 }
