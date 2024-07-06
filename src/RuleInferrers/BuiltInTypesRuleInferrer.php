@@ -29,7 +29,9 @@ class BuiltInTypesRuleInferrer implements RuleInferrer
         }
 
         if ($property->type->type->acceptsType('bool')) {
-            $rules->removeType(RequiringRule::class);
+            if (! config('data.require_rule_for_booleans')) {
+                $rules->removeType(RequiringRule::class);
+            }
 
             $rules->add(new BooleanType());
         }

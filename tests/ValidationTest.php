@@ -112,17 +112,27 @@ it('can validate an array', function () {
         ]);
 });
 
-it('can validate a bool', function () {
+it('can validate a bool', function (bool $requireRuleForBooleans) {
     $dataClass = new class () extends Data {
         public bool $property;
     };
 
+    config()->set('data.require_rule_for_booleans', $requireRuleForBooleans);
+
+    $rules = [];
+
+    if ($requireRuleForBooleans) {
+        $rules[] = 'required';
+    }
+
+    $rules[] = 'boolean';
+
     DataValidationAsserter::for($dataClass)
         ->assertOk(['property' => true])
         ->assertRules([
-            'property' => ['boolean'],
+            'property' => $rules,
         ]);
-});
+})->with([true, false]);
 
 it('can validate a nullable type', function () {
     $dataClass = new class () extends Data {

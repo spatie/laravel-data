@@ -67,6 +67,11 @@ return [
     ],
 
     /**
+     * By default, boolean attributes that are non-optional, non-nullable, and have no default value are not required during validation.
+     */
+    'require_rule_for_booleans' => false,
+
+    /**
      * Normalizers return an array representation of the payload, or null if
      * it cannot normalize the payload. The normalizers below are used for
      * every data object, unless overridden in a specific data object class.
