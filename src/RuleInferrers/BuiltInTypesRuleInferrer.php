@@ -6,6 +6,7 @@ use BackedEnum;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\BooleanType;
 use Spatie\LaravelData\Attributes\Validation\Enum;
+use Spatie\LaravelData\Attributes\Validation\IntegerType;
 use Spatie\LaravelData\Attributes\Validation\Numeric;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Support\DataProperty;
@@ -22,6 +23,10 @@ class BuiltInTypesRuleInferrer implements RuleInferrer
     ): PropertyRules {
         if ($property->type->type->acceptsType('int')) {
             $rules->add(new Numeric());
+
+            if (config('data.integer_rule_for_integers')) {
+                $rules->add(new IntegerType());
+            }
         }
 
         if ($property->type->type->acceptsType('string')) {

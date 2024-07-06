@@ -67,6 +67,11 @@ return [
     ],
 
     /**
+     * By default, integer attributes validation accepts both float and integer values. In some cases, it can be useful to only accept integers.
+     */
+    'integer_rule_for_integers' => false,
+
+    /**
      * Normalizers return an array representation of the payload, or null if
      * it cannot normalize the payload. The normalizers below are used for
      * every data object, unless overridden in a specific data object class.

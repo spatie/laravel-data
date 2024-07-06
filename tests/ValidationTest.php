@@ -88,17 +88,25 @@ it('can validate a float', function () {
         ]);
 });
 
-it('can validate an integer', function () {
+it('can validate an integer', function (bool $integerRuleForIntegers) {
     $dataClass = new class () extends Data {
         public int $property;
     };
 
+    config()->set('data.integer_rule_for_integers', $integerRuleForIntegers);
+
+    $rules = ['required', 'numeric'];
+
+    if ($integerRuleForIntegers) {
+        $rules[] = 'integer';
+    }
+
     DataValidationAsserter::for($dataClass)
         ->assertOk(['property' => 10.0])
         ->assertRules([
-            'property' => ['required', 'numeric'],
+            'property' => $rules,
         ]);
-});
+})->with([true, false]);
 
 it('can validate an array', function () {
     $dataClass = new class () extends Data {
