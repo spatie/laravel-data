@@ -14,7 +14,8 @@ class DateTimeInterfaceCast implements Cast, IterableItemCast
         protected null|string|array $format = null,
         protected ?string $type = null,
         protected ?string $setTimeZone = null,
-        protected ?string $timeZone = null
+        protected ?string $timeZone = null,
+        protected ?bool $setMidnight = false
     ) {
     }
 
@@ -54,7 +55,12 @@ class DateTimeInterfaceCast implements Cast, IterableItemCast
         $this->setTimeZone ??= config('data.date_timezone');
 
         if ($this->setTimeZone) {
-            return $datetime->setTimezone(new DateTimeZone($this->setTimeZone));
+            $datetime =  $datetime->setTimezone(new DateTimeZone($this->setTimeZone));
+        }
+
+        //Force the time to 00:00:00.000
+        if ($this->setMidnight) {
+            $datetime = $datetime->setTime(0, 0);
         }
 
         return $datetime;
