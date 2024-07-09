@@ -15,7 +15,7 @@ class DateTimeInterfaceCast implements Cast, IterableItemCast
         protected ?string $type = null,
         protected ?string $setTimeZone = null,
         protected ?string $timeZone = null,
-        protected ?bool $setMidnight = false
+        protected bool $setMidnight = false
     ) {
     }
 
