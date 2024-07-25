@@ -566,12 +566,12 @@ public int $closure;
 public string $closure; 
 ```
 
-## List
+## ListType
 
 [Docs](https://laravel.com/docs/validation#rule-list)
 
 ```php
-#[List]
+#[ListType]
 public array $array; 
 ```
 
