@@ -1,5 +1,6 @@
 <?php
 
+use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Hidden;
@@ -179,6 +180,21 @@ it('can check if a property is hidden', function () {
             #[Hidden]
             public string $property;
         })->hidden
+    )->toBeTrue();
+});
+
+it('can check if a property is auto-lazy', function () {
+    expect(
+        resolveHelper(new class () {
+            public string $property;
+        })->autoLazy
+    )->toBeFalse();
+
+    expect(
+        resolveHelper(new class () {
+            #[AutoLazy]
+            public string $property;
+        })->autoLazy
     )->toBeTrue();
 });
 
