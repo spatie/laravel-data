@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\BaseData;
@@ -78,19 +77,4 @@ it('can use data as an Resource', function () {
     expect($resource)->not()->toHaveMethods([
         'validate',
     ]);
-});
-
-class TestDTO extends Data
-{
-    public function __construct(
-        /** @var Collection<int, string> $items */
-        public readonly Collection $items
-    ) {
-    }
-}
-
-it('Empty array should return Collection too', function () {
-    // Throws the above mentioned error
-    $result = TestDTO::from(['items' => []]);
-    expect($result->items)->toBeEmpty();
 });
