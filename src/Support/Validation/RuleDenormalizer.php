@@ -62,7 +62,6 @@ class RuleDenormalizer
             ->map(fn (mixed $value) => $this->normalizeRuleParameter($value, $path))
             ->reject(fn (mixed $value) => $value === null);
 
-
         if ($parameters->isEmpty()) {
             return [$rule->keyword()];
         }

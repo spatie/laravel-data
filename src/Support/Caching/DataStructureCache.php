@@ -17,7 +17,7 @@ class DataStructureCache
     public function __construct(
         protected array $cacheConfig,
     ) {
-        $this->store = cache()->store(($this->cacheConfig['store'] ?? null))?->getStore();
+        $this->store = cache()->store(($this->cacheConfig['store'] ?? null))->getStore();
         $this->prefix = ($this->cacheConfig['prefix'] ?? '') ? "{$this->cacheConfig['prefix']}." : '';
         $this->duration = $this->cacheConfig['duration'] ?? null;
     }
