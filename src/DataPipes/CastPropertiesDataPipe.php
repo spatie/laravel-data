@@ -146,10 +146,6 @@ class CastPropertiesDataPipe implements DataPipe
         array $properties,
         CreationContext $creationContext
     ): iterable {
-        if (empty($values)) {
-            return $values;
-        }
-
         if ($values instanceof Enumerable) {
             $values = $values->all();
         }
@@ -179,6 +175,10 @@ class CastPropertiesDataPipe implements DataPipe
         array $properties,
         CreationContext $creationContext
     ): array {
+        if(empty($values)) {
+            return $values;
+        }
+
         /** @var ?IterableItemCast $cast */
         $cast = $this->findCastForIterableItems($property, $values, $properties, $creationContext);
 

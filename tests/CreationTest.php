@@ -1087,6 +1087,34 @@ it('will cast iterables into the correct type', function () {
         ->toEqual(['a', 'collection']);
 })->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
 
+it('will cast an empty iterables list into the correct type', function () {
+    $dataClass = new class () extends Data {
+        public EloquentCollection $collection;
+
+        public CustomCollection $customCollection;
+
+        public array $array;
+    };
+
+    $data = $dataClass::from([
+        'collection' => [],
+        'customCollection' => [],
+        'array' => collect([]),
+    ]);
+
+    expect($data->collection)
+        ->toBeInstanceOf(EloquentCollection::class)
+        ->toEqual(new EloquentCollection([]));
+
+    expect($data->customCollection)
+        ->toBeInstanceOf(CustomCollection::class)
+        ->toEqual(new CustomCollection([]));
+
+    expect($data->array)
+        ->toBeArray()
+        ->toEqual([]);
+})->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
+
 it('will cast iterables into default types', function () {
     $dataClass = new class () extends Data {
         /** @var array<int, string> */
