@@ -19,8 +19,8 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use function Spatie\Snapshots\assertMatchesSnapshot as baseAssertMatchesSnapshot;
 
 use Spatie\Snapshots\Driver;
-use Spatie\TypeScriptTransformer\Attributes\Optional as TypeScriptOptional;
 use Spatie\TypeScriptTransformer\Attributes\Hidden as TypeScriptHidden;
+use Spatie\TypeScriptTransformer\Attributes\Optional as TypeScriptOptional;
 use Spatie\TypeScriptTransformer\TypeScriptTransformerConfig;
 
 function assertMatchesSnapshot($actual, Driver $driver = null): void
