@@ -179,6 +179,73 @@ The property will now always be included when the data object is transformed. Yo
 AlbumData::create(Album::first())->exclude('songs');
 ```
 
+## Auto Lazy
+
+Writing Lazy properties can be a bit cumbersome. It is often a repetitive task to write the same code over and over again while the package can infer almost everything.
+
+Let's take a look at our previous example:
+
+```php
+class UserData extends Data
+{
+    public function __construct(
+        public string $title,
+        public Lazy|SongData $favorite_song,
+    ) {
+    }
+
+    public static function fromModel(User $user): self
+    {
+        return new self(
+            $user->title,
+            Lazy::create(fn() => SongData::from($user->favorite_song))
+        );
+    }
+}
+```
+
+The package knows how to get the property from the model and wrap it into a data object, but since we're using a lazy property, we need to write our own magic creation method with a lot of repetitive code.
+
+In such a situation auto lazy might be a good fit, instead of casting the property directly into the data object, the casting process is wrapped in a lazy Closure.
+
+This makes it possible to rewrite the example as such:
+
+```php
+#[AutoLazy]
+class UserData extends Data
+{
+    public function __construct(
+        public string $title,
+        public Lazy|SongData $favorite_song,
+    ) {
+    }
+}
+```
+
+While achieving the same result!
+
+Auto Lazy wraps the casting process of a value for every property typed as `Lazy` into a Lazy Closure when the `AutoLazy` attribute is present on the class.
+
+It is also possible to use the `AutoLazy` attribute on a property level:
+
+```php
+class UserData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[AutoLazy]
+        public Lazy|SongData $favorite_song,
+    ) {
+    }
+}
+```
+
+The auto lazy process won't be applied in the following situations:
+
+- When a null value is passed to the property
+- When the property value isn't present in the input payload and the property typed as `Optional`
+- When a Lazy Closure is passed to the property
+
 ## Only and Except
 
 Lazy properties are great for reducing payloads sent over the wire. However, when you completely want to remove a property Laravel's `only` and `except` methods can be used:
