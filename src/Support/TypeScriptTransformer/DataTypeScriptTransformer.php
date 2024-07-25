@@ -20,6 +20,7 @@ use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Lazy\ClosureLazy;
 use Spatie\LaravelTypeScriptTransformer\Transformers\DtoTransformer;
+use Spatie\TypeScriptTransformer\Attributes\Hidden;
 use Spatie\TypeScriptTransformer\Attributes\Optional as TypeScriptOptional;
 use Spatie\TypeScriptTransformer\Structures\MissingSymbolsCollection;
 use Spatie\TypeScriptTransformer\TypeProcessors\DtoCollectionTypeProcessor;
@@ -65,6 +66,12 @@ class DataTypeScriptTransformer extends DtoTransformer
                 $type = $this->resolveTypeForProperty($property, $dataProperty, $missingSymbols);
 
                 if ($type === null) {
+                    return $carry;
+                }
+
+                $isHidden = ! empty($property->getAttributes(Hidden::class));
+
+                if ($isHidden) {
                     return $carry;
                 }
 
