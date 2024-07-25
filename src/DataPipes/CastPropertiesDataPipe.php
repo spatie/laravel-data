@@ -14,6 +14,7 @@ use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Types\CombinationType;
 
 class CastPropertiesDataPipe implements DataPipe
 {
@@ -97,8 +98,16 @@ class CastPropertiesDataPipe implements DataPipe
                 $creationContext->previous();
 
                 return $data;
-            } catch (CannotCreateData) {
-                return $value;
+            } catch (CannotCreateData $exception) {
+                $creationContext->previous();
+
+                if ($property->type->type instanceof CombinationType) {
+                    // Try another type in the union (which will need to be a simple type like string, int)
+                    // In the future we should deterministically choose the correct type to cast to
+                    return $value;
+                }
+
+                throw $exception;
             }
         }
 
@@ -208,7 +217,7 @@ class CastPropertiesDataPipe implements DataPipe
             }
         }
 
-        if(in_array($property->type->iterableItemType, ['bool', 'int', 'float', 'array', 'string'])) {
+        if (in_array($property->type->iterableItemType, ['bool', 'int', 'float', 'array', 'string'])) {
             return new BuiltinTypeCast($property->type->iterableItemType);
         }
 
