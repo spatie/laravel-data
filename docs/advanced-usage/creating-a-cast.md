@@ -84,6 +84,7 @@ class Email implements Castable
   {
     return new class implements Cast {
         public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): mixed
+        {
             return new Email($value);
         }
     };

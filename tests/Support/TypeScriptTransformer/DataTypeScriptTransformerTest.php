@@ -19,6 +19,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use function Spatie\Snapshots\assertMatchesSnapshot as baseAssertMatchesSnapshot;
 
 use Spatie\Snapshots\Driver;
+use Spatie\TypeScriptTransformer\Attributes\Hidden as TypeScriptHidden;
 use Spatie\TypeScriptTransformer\Attributes\Optional as TypeScriptOptional;
 use Spatie\TypeScriptTransformer\TypeScriptTransformerConfig;
 
@@ -242,6 +243,32 @@ it('it respects a TypeScript class optional attribute', function () {
         {
         id?: number;
         name?: string;
+        }
+        TXT,
+        $transformer->transform($reflection, 'DataObject')->transformed
+    );
+});
+
+it('it respects a TypeScript property hidden attribute', function () {
+    $config = TypeScriptTransformerConfig::create();
+
+    $data = new class (10, 'Ruben') extends Data {
+        public function __construct(
+            #[TypeScriptHidden]
+            public int $id,
+            public string $name,
+        ) {
+        }
+    };
+
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass($data);
+
+    $this->assertTrue($transformer->canTransform($reflection));
+    $this->assertEquals(
+        <<<TXT
+        {
+        name: string;
         }
         TXT,
         $transformer->transform($reflection, 'DataObject')->transformed

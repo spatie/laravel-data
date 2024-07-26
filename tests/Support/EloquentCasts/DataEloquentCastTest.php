@@ -135,17 +135,12 @@ it('can use an abstract data class with morph map', function () {
 });
 
 it('can save an encrypted data object', function () {
-    // Save the encrypted data to the database
-    DummyModelWithEncryptedCasts::create([
+    $model = DummyModelWithEncryptedCasts::create([
         'data' => new SimpleData('Test'),
     ]);
 
-    // Retrieve the model from the database without Eloquent casts
-    $model = DB::table('dummy_model_with_casts')
-        ->first();
-
     try {
-        Crypt::decryptString($model->data);
+        Crypt::decryptString($model->getRawOriginal('data'));
         $isEncrypted = true;
     } catch (DecryptException $e) {
         $isEncrypted = false;
@@ -155,7 +150,6 @@ it('can save an encrypted data object', function () {
 });
 
 it('can load an encrypted data object', function () {
-    // Save the encrypted data to the database
     DummyModelWithEncryptedCasts::create([
         'data' => new SimpleData('Test'),
     ]);
@@ -164,4 +158,28 @@ it('can load an encrypted data object', function () {
     $model = DummyModelWithEncryptedCasts::first();
 
     expect($model->data)->toEqual(new SimpleData('Test'));
+});
+
+it('can load and save an abstract defined data object', function () {
+    $abstractA = new AbstractDataA('A\A');
+
+    $modelId = DummyModelWithEncryptedCasts::create([
+        'abstract_data' => $abstractA,
+    ])->id;
+
+    $model = DummyModelWithEncryptedCasts::find($modelId);
+
+    expect($model->abstract_data)
+        ->toBeInstanceOf(AbstractDataA::class)
+        ->a->toBe('A\A');
+
+
+    try {
+        Crypt::decryptString($model->getRawOriginal('abstract_data'));
+        $isEncrypted = true;
+    } catch (DecryptException $e) {
+        $isEncrypted = false;
+    }
+
+    expect($isEncrypted)->toBeTrue();
 });

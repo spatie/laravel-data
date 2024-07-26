@@ -92,7 +92,7 @@ class SongData extends Data
 Now when collecting an array data objects a `SongCollection` will be returned:
 
 ```php
-SongData::collect([
+SongData::collectArray([
     ['title' => 'Never Gonna Give You Up', 'artist' => 'Rick Astley'],
     ['title' => 'Living on a prayer', 'artist' => 'Bon Jovi'],
 ]); // returns an SongCollection of SongData objects

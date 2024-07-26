@@ -17,9 +17,7 @@ use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\WithCast;
-
 use Spatie\LaravelData\Attributes\WithCastable;
-
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Casts\Uncastable;
 use Spatie\LaravelData\Concerns\WithDeprecatedCollectionMethod;
@@ -51,6 +49,7 @@ use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\ModelData;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
+use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelData;
@@ -262,7 +261,6 @@ it('can create a data object from a model', function () {
         ->nullable_optional_date->toBeNull()
         ->and(CarbonImmutable::create(2020, 05, 16, 12, 00, 00)->eq($data->date))->toBeTrue();
 });
-
 
 
 it('can create a data object from a stdClass object', function () {
@@ -753,6 +751,12 @@ it('throws a readable exception message when the constructor fails', function (
     yield 'one param' => [['first' => 'First'], 'Could not create `Spatie\LaravelData\Tests\Fakes\MultiData`: the constructor requires 2 parameters, 1 given. Parameters given: first. Parameters missing: second.'],
 ]);
 
+it('throws a readable exception message when the constructor of a nested data object fails', function () {
+    expect(fn () => NestedData::from([
+        'simple' => [],
+    ]))->toThrow(CannotCreateData::class, 'Could not create `Spatie\LaravelData\Tests\Fakes\SimpleData`: the constructor requires 1 parameters, 0 given. Parameters missing: string.');
+});
+
 it('a can create a collection of data objects', function () {
     $collectionA = new DataCollection(SimpleData::class, [
         SimpleData::from('A'),
@@ -1058,6 +1062,7 @@ it('will cast array items when an iterable interface type is defined that can be
 it('will cast iterables into the correct type', function () {
     $dataClass = new class () extends Data {
         public EloquentCollection $collection;
+
         public CustomCollection $customCollection;
 
         public array $array;
@@ -1080,6 +1085,34 @@ it('will cast iterables into the correct type', function () {
     expect($data->array)
         ->toBeArray()
         ->toEqual(['a', 'collection']);
+})->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
+
+it('will cast an empty iterables list into the correct type', function () {
+    $dataClass = new class () extends Data {
+        public EloquentCollection $collection;
+
+        public CustomCollection $customCollection;
+
+        public array $array;
+    };
+
+    $data = $dataClass::from([
+        'collection' => [],
+        'customCollection' => [],
+        'array' => collect([]),
+    ]);
+
+    expect($data->collection)
+        ->toBeInstanceOf(EloquentCollection::class)
+        ->toEqual(new EloquentCollection([]));
+
+    expect($data->customCollection)
+        ->toBeInstanceOf(CustomCollection::class)
+        ->toEqual(new CustomCollection([]));
+
+    expect($data->array)
+        ->toBeArray()
+        ->toEqual([]);
 })->skip(fn () => config('data.features.cast_and_transform_iterables') === false);
 
 it('will cast iterables into default types', function () {

@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.7.2 - 2024-07-25
+
+- Fix issue where an exception was not always thrown while it should (#809)
+- Solve an issue where an empty container with an iterable cast won't be cast (#810)
+- Fix Parsing of Optional Types Annotations in DataIterableAnnotation (#808)
+- Support TypeScript Hidden Properties (#820)
+- Fix issue where abstract eloquent casts were not encrypted(#828)
+
 ## 4.7.1 - 2024-06-25
 
 ### What's Changed

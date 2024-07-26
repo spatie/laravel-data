@@ -61,7 +61,7 @@ class DataIterableAnnotationReader
         );
 
         preg_match_all(
-            "/{$kindPattern}(?<collectionClass>{$fqsenPattern})<(?:{$keyPattern}\s*?,\s*?)?(?<dataClass>{$fqsenPattern})>{$parameterPattern}/i",
+            "/{$kindPattern}(?<collectionClass>{$fqsenPattern})<(?:{$keyPattern}\s*?,\s*?)?(?<dataClass>{$fqsenPattern})>(?:{$typesPattern})*{$parameterPattern}/i",
             $comment,
             $collectionMatches,
         );
