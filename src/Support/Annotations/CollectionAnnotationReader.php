@@ -20,31 +20,45 @@ class CollectionAnnotationReader
     ) {
     }
 
+    /** @var array<class-string, CollectionAnnotation|null> */
+    protected static array $cache = [];
+
     protected Context $context;
 
-    public function getForClass(ReflectionClass $class): ?CollectionAnnotation
+    public function getForClass(string $className): ?CollectionAnnotation
     {
-        if (! $this->isCollection($class)) {
-            return null;
+        // Check the cache first
+        if (array_key_exists($className, self::$cache)) {
+            return self::$cache[$className];
         }
 
+        // Create ReflectionClass from class string
+        $class = new ReflectionClass($className);
+
+        // Determine if the class is a collection
+        if (! $this->isCollection($class)) {
+            return self::$cache[$className] = null;
+        }
+
+        // Get the collection return type
         $type = $this->getCollectionReturnType($class);
 
         if ($type === null || $type['valueType'] === null) {
-            return null;
+            return self::$cache[$className] = null;
         }
 
-        $isData = false;
+        $isData = is_subclass_of($type['valueType'], Data::class);
 
-        if (is_subclass_of($type['valueType'], Data::class)) {
-            $isData = true;
-        }
-
-        return new CollectionAnnotation(
+        $annotation = new CollectionAnnotation(
             type: $type['valueType'],
             isData: $isData,
             keyType: $type['keyType'] ?? 'array-key',
         );
+
+        // Cache the result
+        self::$cache[$className] = $annotation;
+
+        return $annotation;
     }
 
     /**

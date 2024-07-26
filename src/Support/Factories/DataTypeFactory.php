@@ -360,7 +360,7 @@ class DataTypeFactory
             $iterableItemType === null
             && $typeable instanceof ReflectionProperty
             && class_exists($name)
-            && $annotation = $this->collectionAnnotationReader->getForClass(new ReflectionClass($name))
+            && $annotation = $this->collectionAnnotationReader->getForClass($name)
         ) {
             $isData = $annotation->isData;
             $iterableItemType = $annotation->type;

@@ -9,7 +9,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 it(
     'verifies the correct CollectionAnnotation is returned for a given class',
     function (string $className, ?CollectionAnnotation $expected) {
-        $annotations = app(CollectionAnnotationReader::class)->getForClass(new ReflectionClass($className));
+        $annotations = app(CollectionAnnotationReader::class)->getForClass($className);
 
         expect($annotations)->toEqual($expected);
     }
