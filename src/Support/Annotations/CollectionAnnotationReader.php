@@ -8,15 +8,15 @@ use phpDocumentor\Reflection\DocBlock\Tags\Generic;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\TypeResolver;
 use phpDocumentor\Reflection\Types\Context;
-use phpDocumentor\Reflection\Types\ContextFactory;
 use ReflectionClass;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Resolvers\ContextResolver;
 
 class CollectionAnnotationReader
 {
     public function __construct(
+        protected readonly ContextResolver $contextResolver,
         protected readonly TypeResolver $typeResolver,
-        protected readonly ContextFactory $contextFactory,
     ) {
     }
 
@@ -55,10 +55,7 @@ class CollectionAnnotationReader
         // Initialize TypeResolver and DocBlockFactory
         $docBlockFactory = DocBlockFactory::createInstance();
 
-        // Extract the namespace and uses from the file content
-        $namespace = $class->getNamespaceName();
-        $fileContent = file_get_contents($class->getFileName());
-        $this->context = $this->contextFactory->createForNamespace($namespace, $fileContent);
+        $this->context = $this->contextResolver->get($class);
 
         // Get the PHPDoc comment of the class
         $docComment = $class->getDocComment();
