@@ -25,6 +25,9 @@ class CollectionAnnotationReader
 
     protected Context $context;
 
+    /**
+     * @param class-string $className
+     */
     public function getForClass(string $className): ?CollectionAnnotation
     {
         // Check the cache first
@@ -33,7 +36,7 @@ class CollectionAnnotationReader
         }
 
         // Create ReflectionClass from class string
-        $class = new ReflectionClass($className);
+        $class = $this->getReflectionClass($className);
 
         // Determine if the class is a collection
         if (! $this->isCollection($class)) {
@@ -59,6 +62,36 @@ class CollectionAnnotationReader
         self::$cache[$className] = $annotation;
 
         return $annotation;
+    }
+
+    public static function clearCache(): void
+    {
+        self::$cache = [];
+    }
+
+    /**
+     * @param class-string $className
+     */
+    protected function getReflectionClass(string $className): ReflectionClass
+    {
+        return new ReflectionClass($className);
+    }
+
+    protected function isCollection(ReflectionClass $class): bool
+    {
+        // Check if the class implements common collection interfaces
+        $collectionInterfaces = [
+            Iterator::class,
+            IteratorAggregate::class,
+        ];
+
+        foreach ($collectionInterfaces as $interface) {
+            if ($class->implementsInterface($interface)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -126,23 +159,6 @@ class CollectionAnnotationReader
         }
 
         return null;
-    }
-
-    protected function isCollection(ReflectionClass $class): bool
-    {
-        // Check if the class implements common collection interfaces
-        $collectionInterfaces = [
-            Iterator::class,
-            IteratorAggregate::class,
-        ];
-
-        foreach ($collectionInterfaces as $interface) {
-            if ($class->implementsInterface($interface)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     protected function resolve(string $type): ?string

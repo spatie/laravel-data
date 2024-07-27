@@ -1,10 +1,16 @@
 <?php
 
 use Illuminate\Support\Collection;
+use phpDocumentor\Reflection\TypeResolver;
+use Spatie\LaravelData\Resolvers\ContextResolver;
 use Spatie\LaravelData\Support\Annotations\CollectionAnnotation;
 use Spatie\LaravelData\Support\Annotations\CollectionAnnotationReader;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+
+beforeEach(function () {
+    CollectionAnnotationReader::clearCache();
+});
 
 it(
     'verifies the correct CollectionAnnotation is returned for a given class',
@@ -100,6 +106,31 @@ it(
     ];
 });
 
+it('can caches the result', function (string $className) {
+
+    // Create a partial mock
+    $collectionAnnotationReader = Mockery::spy(CollectionAnnotationReader::class, [
+        app(ContextResolver::class),
+        app(TypeResolver::class),
+    ])->makePartial();
+
+    // Call the getForClass method with a test class
+    $collectionAnnotation = $collectionAnnotationReader->getForClass($className);
+
+    // Call the getForClass method again to test caching
+    $cachedCollectionAnnotation = $collectionAnnotationReader->getForClass($className);
+
+    // Assert the cache is used and the same annotation is returned
+    expect($cachedCollectionAnnotation)->toBe($collectionAnnotation);
+
+    // Check if getReflectionClass was called only once
+    $collectionAnnotationReader->shouldHaveReceived('getReflectionClass')->once();
+
+})->with([
+    [CollectionWhoImplementsNothing::class], // first return
+    [CollectionWithoutDocBlock::class], // second return
+    [DataCollectionWithTemplate::class], // third return
+]);
 
 /**
  * @template TKey of array-key
