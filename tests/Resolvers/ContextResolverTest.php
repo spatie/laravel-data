@@ -11,7 +11,7 @@ it('can resolve context from property', function () {
     $reflectionProperty = new ReflectionProperty(TestContextResolverClass::class, 'testProperty');
 
     // Resolve the context
-    $context = $resolver->get($reflectionProperty);
+    $context = $resolver->execute($reflectionProperty);
 
     // Create expected context
     $expectedContext = (new ContextFactory())->createFromReflector($reflectionProperty->getDeclaringClass());
@@ -28,7 +28,7 @@ it('can resolve context from class', function () {
     $reflectionClass = new ReflectionClass(TestContextResolverClass::class);
 
     // Resolve the context
-    $context = $resolver->get($reflectionClass);
+    $context = $resolver->execute($reflectionClass);
 
     // Create expected context
     $expectedContext = (new ContextFactory())->createFromReflector($reflectionClass);
@@ -45,7 +45,7 @@ it('can resolve context from method', function () {
     $reflectionMethod = new ReflectionMethod(TestContextResolverClass::class, 'testMethod');
 
     // Resolve the context
-    $context = $resolver->get($reflectionMethod);
+    $context = $resolver->execute($reflectionMethod);
 
     // Create expected context
     $expectedContext = (new ContextFactory())->createFromReflector($reflectionMethod->getDeclaringClass());
@@ -62,10 +62,10 @@ it('uses cache when resolving the same class multiple times', function () {
     $reflectionClass = new ReflectionClass(TestContextResolverClass::class);
 
     // Resolve the context the first time
-    $context1 = $resolver->get($reflectionClass);
+    $context1 = $resolver->execute($reflectionClass);
 
     // Resolve the context the second time
-    $context2 = $resolver->get($reflectionClass);
+    $context2 = $resolver->execute($reflectionClass);
 
     // Assertions
     expect($context1)->toBeInstanceOf(Context::class);

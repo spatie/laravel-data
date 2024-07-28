@@ -197,7 +197,7 @@ class DataIterableAnnotationReader
         ReflectionProperty|ReflectionClass|ReflectionMethod $reflection,
         string $class
     ): ?string {
-        $context = $this->contextResolver->get($reflection);
+        $context = $this->contextResolver->execute($reflection);
 
         $type = (new FqsenResolver())->resolve($class, $context);
 

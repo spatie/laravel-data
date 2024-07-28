@@ -102,7 +102,7 @@ class CollectionAnnotationReader
         // Initialize TypeResolver and DocBlockFactory
         $docBlockFactory = DocBlockFactory::createInstance();
 
-        $this->context = $this->contextResolver->get($class);
+        $this->context = $this->contextResolver->execute($class);
 
         // Get the PHPDoc comment of the class
         $docComment = $class->getDocComment();
