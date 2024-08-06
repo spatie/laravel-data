@@ -431,7 +431,7 @@ class AuthorData extends Data
 }
 ```
 
-Notice that we've typed the `$posts` property as an array of `PostData` objects using a docblock.  This will be very useful later on! The package always needs to know what type of data objects are stored in an array. Off course, when you're storing other types then data objects this is not required but recommended.
+Notice that we've typed the `$posts` property as an array of `PostData` objects using a docblock.  This will be very useful later on! The package always needs to know what type of data objects are stored in an array. Of course, when you're storing other types then data objects this is not required but recommended.
 
 We can now create an author object as such:
 
