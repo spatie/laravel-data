@@ -4,20 +4,21 @@ namespace Spatie\LaravelData\Support\Annotations;
 
 use Illuminate\Support\Arr;
 use phpDocumentor\Reflection\FqsenResolver;
-use phpDocumentor\Reflection\Types\Context;
-use phpDocumentor\Reflection\Types\ContextFactory;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Resolvers\ContextResolver;
 
 /**
  * @note To myself, always use the fully qualified class names in pest tests when using anonymous classes
  */
 class DataIterableAnnotationReader
 {
-    /** @var array<string, Context> */
-    protected static array $contexts = [];
+    public function __construct(
+        protected readonly ContextResolver $contextResolver,
+    ) {
+    }
 
     /** @return array<string, DataIterableAnnotation> */
     public function getForClass(ReflectionClass $class): array
@@ -196,19 +197,10 @@ class DataIterableAnnotationReader
         ReflectionProperty|ReflectionClass|ReflectionMethod $reflection,
         string $class
     ): ?string {
-        $context = $this->getContext($reflection);
+        $context = $this->contextResolver->execute($reflection);
 
         $type = (new FqsenResolver())->resolve($class, $context);
 
         return ltrim((string) $type, '\\');
-    }
-
-    protected function getContext(ReflectionProperty|ReflectionClass|ReflectionMethod $reflection): Context
-    {
-        $reflectionClass = $reflection instanceof ReflectionProperty || $reflection instanceof ReflectionMethod
-            ? $reflection->getDeclaringClass()
-            : $reflection;
-
-        return static::$contexts[$reflectionClass->getName()] ??= (new ContextFactory())->createFromReflector($reflectionClass);
     }
 }
