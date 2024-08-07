@@ -1,5 +1,6 @@
 <?php
 
+use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Hidden;
@@ -12,6 +13,7 @@ use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Factories\DataPropertyFactory;
 use Spatie\LaravelData\Tests\Fakes\CastTransformers\FakeCastTransformer;
@@ -22,12 +24,19 @@ use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 function resolveHelper(
     object $class,
     bool $hasDefaultValue = false,
-    mixed $defaultValue = null
+    mixed $defaultValue = null,
+    bool $autoLazyClass = false,
 ): DataProperty {
     $reflectionProperty = new ReflectionProperty($class, 'property');
     $reflectionClass = new ReflectionClass($class);
 
-    return app(DataPropertyFactory::class)->build($reflectionProperty, $reflectionClass, $hasDefaultValue, $defaultValue);
+    return app(DataPropertyFactory::class)->build(
+        $reflectionProperty,
+        $reflectionClass,
+        $hasDefaultValue,
+        $defaultValue,
+        autoLazyClass: $autoLazyClass
+    );
 }
 
 it('can get the cast attribute with arguments', function () {
@@ -181,6 +190,36 @@ it('can check if a property is hidden', function () {
         })->hidden
     )->toBeTrue();
 });
+
+it('can check if a property is auto-lazy', function () {
+    expect(
+        resolveHelper(new class () {
+            public string $property;
+        })->autoLazy
+    )->toBeFalse();
+
+    expect(
+        resolveHelper(new class () {
+            #[AutoLazy]
+            public string $property;
+        })->autoLazy
+    )->toBeTrue();
+});
+
+it('will set a property as auto-lazy when the class is auto-lazy and a lazy type is allowed', function () {
+    expect(
+        resolveHelper(new class () {
+            public string $property;
+        }, autoLazyClass: true)->autoLazy
+    )->toBeFalse();
+
+    expect(
+        resolveHelper(new class () {
+            public string|Lazy $property;
+        }, autoLazyClass: true)->autoLazy
+    )->toBeTrue();
+});
+
 
 it('wont throw an error if non existing attribute is used on a data class property', function () {
     expect(NonExistingPropertyAttributeData::from(['property' => 'hello'])->property)->toEqual('hello')

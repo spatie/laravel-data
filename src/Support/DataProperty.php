@@ -20,6 +20,7 @@ class DataProperty
         public readonly bool $hidden,
         public readonly bool $isPromoted,
         public readonly bool $isReadonly,
+        public readonly bool $autoLazy,
         public readonly bool $hasDefaultValue,
         public readonly mixed $defaultValue,
         public readonly ?Cast $cast,
