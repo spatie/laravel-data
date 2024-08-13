@@ -14,54 +14,47 @@ use Spatie\LaravelData\Resolvers\ContextResolver;
 
 class CollectionAnnotationReader
 {
+    /** @var array<class-string, CollectionAnnotation|null> */
+    protected static array $cache = [];
+
+    protected Context $context;
+
     public function __construct(
         protected readonly ContextResolver $contextResolver,
         protected readonly TypeResolver $typeResolver,
     ) {
     }
 
-    /** @var array<class-string, CollectionAnnotation|null> */
-    protected static array $cache = [];
-
-    protected Context $context;
-
     /**
      * @param class-string $className
      */
     public function getForClass(string $className): ?CollectionAnnotation
     {
-        // Check the cache first
         if (array_key_exists($className, self::$cache)) {
             return self::$cache[$className];
         }
 
-        // Create ReflectionClass from class string
-        $class = $this->getReflectionClass($className);
+        $class = new ReflectionClass($className);
 
-        // Determine if the class is a collection
-        if (! $this->isCollection($class)) {
+        if(empty($class->getDocComment())) {
             return self::$cache[$className] = null;
         }
 
-        // Get the collection return type
+        if (! $this->isIterable($class)) {
+            return self::$cache[$className] = null;
+        }
+
         $type = $this->getCollectionReturnType($class);
 
         if ($type === null || $type['valueType'] === null) {
             return self::$cache[$className] = null;
         }
 
-        $isData = is_subclass_of($type['valueType'], Data::class);
-
-        $annotation = new CollectionAnnotation(
+        return self::$cache[$className] = new CollectionAnnotation(
             type: $type['valueType'],
-            isData: $isData,
+            isData: is_subclass_of($type['valueType'], Data::class),
             keyType: $type['keyType'] ?? 'array-key',
         );
-
-        // Cache the result
-        self::$cache[$className] = $annotation;
-
-        return $annotation;
     }
 
     public static function clearCache(): void
@@ -69,17 +62,8 @@ class CollectionAnnotationReader
         self::$cache = [];
     }
 
-    /**
-     * @param class-string $className
-     */
-    protected function getReflectionClass(string $className): ReflectionClass
+    protected function isIterable(ReflectionClass $class): bool
     {
-        return new ReflectionClass($className);
-    }
-
-    protected function isCollection(ReflectionClass $class): bool
-    {
-        // Check if the class implements common collection interfaces
         $collectionInterfaces = [
             Iterator::class,
             IteratorAggregate::class,
@@ -99,27 +83,23 @@ class CollectionAnnotationReader
      */
     protected function getCollectionReturnType(ReflectionClass $class): ?array
     {
-        // Initialize TypeResolver and DocBlockFactory
         $docBlockFactory = DocBlockFactory::createInstance();
 
         $this->context = $this->contextResolver->execute($class);
 
-        // Get the PHPDoc comment of the class
         $docComment = $class->getDocComment();
+
         if ($docComment === false) {
             return null;
         }
 
-        // Create the DocBlock instance
         $docBlock = $docBlockFactory->create($docComment, $this->context);
 
-        // Initialize variables
         $templateTypes = [];
         $keyType = null;
         $valueType = null;
 
         foreach ($docBlock->getTags() as $tag) {
-
             if (! $tag instanceof Generic) {
                 continue;
             }
@@ -138,7 +118,6 @@ class CollectionAnnotationReader
                 $description = $tag->getDescription();
 
                 if (preg_match('/<\s*([^,\s]+)?\s*(?:,\s*([^>\s]+))?\s*>/', $description, $matches)) {
-
                     if (count($matches) === 3) {
                         $keyType = $templateTypes[$matches[1]] ?? $this->resolve($matches[1]);
                         $valueType = $templateTypes[$matches[2]] ?? $this->resolve($matches[2]);
