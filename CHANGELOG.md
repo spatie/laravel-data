@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.81 - 2024-08-13
+
+- Fix a missing dependency
+
 ## 4.8.0 - 2024-08-13
 
 ### What's Changed
