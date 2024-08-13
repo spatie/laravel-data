@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.8.0 - 2024-08-13
+
+### What's Changed
+
+* Detect data from collection by @clementbirkle in https://github.com/spatie/laravel-data/pull/812
+* Fix an issue where dd or dump did not work
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.7.2...4.8.0
+
 ## 4.7.2 - 2024-07-25
 
 - Fix issue where an exception was not always thrown while it should (#809)
