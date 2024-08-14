@@ -11,7 +11,7 @@ beforeEach(function () {
     $this->caster = new EnumCast();
 });
 
-it('can cast enum', function () {
+it('can cast enum', function (mixed $value) {
     $class = new class () {
         public DummyBackedEnum $enum;
     };
@@ -19,12 +19,12 @@ it('can cast enum', function () {
     expect(
         $this->caster->cast(
             FakeDataStructureFactory::property($class, 'enum'),
-            'foo',
+            $value,
             [],
             CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toEqual(DummyBackedEnum::FOO);
-});
+})->with(['foo', DummyBackedEnum::FOO]);
 
 it('fails when it cannot cast an enum from value', function () {
     $class = new class () {
