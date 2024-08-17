@@ -117,6 +117,36 @@ it('can have default mappers', function () {
     ]);
 });
 
+it('input name mappers only work when no mappers are specified', function () {
+    config()->set('data.naming_strategy.input', CamelCaseMapper::class);
+    config()->set('data.naming_strategy.output', SnakeCaseMapper::class);
+
+    $attributes = getAttributes(new class () {
+        #[MapInputName(StudlyCaseMapper::class)]
+        public $property;
+    });
+
+    expect($this->resolver->execute($attributes))->toMatchArray([
+        'inputNameMapper' => new StudlyCaseMapper(),
+        'outputNameMapper' => new SnakeCaseMapper(),
+    ]);
+});
+
+it('output name mappers only work when no mappers are specified', function () {
+    config()->set('data.naming_strategy.input', CamelCaseMapper::class);
+    config()->set('data.naming_strategy.output', SnakeCaseMapper::class);
+
+    $attributes = getAttributes(new class () {
+        #[MapOutputName(StudlyCaseMapper::class)]
+        public $property;
+    });
+
+    expect($this->resolver->execute($attributes))->toMatchArray([
+        'inputNameMapper' => new CamelCaseMapper(),
+        'outputNameMapper' => new StudlyCaseMapper(),
+    ]);
+});
+
 it('can ignore certain mapper types', function () {
     $attributes = getAttributes(new class () {
         #[MapInputName('input'), MapOutputName(CamelCaseMapper::class)]
