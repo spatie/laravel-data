@@ -91,7 +91,7 @@ class NameMappersResolver
 
     private function resolveDefaultNameMapper(bool $input): null|MapInputName|MapOutputName
     {
-        $nameMapper = config('data.naming_strategy.'.($input ? 'input' : 'output'));
+        $nameMapper = $input ? config('data.naming_strategy.input') : config('data.naming_strategy.output');
 
         if ($nameMapper === null) {
             return null;
