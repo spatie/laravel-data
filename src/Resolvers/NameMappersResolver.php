@@ -34,7 +34,8 @@ class NameMappersResolver
     ): ?NameMapper {
         /** @var \Spatie\LaravelData\Attributes\MapInputName|\Spatie\LaravelData\Attributes\MapName|null $mapper */
         $mapper = $attributes->first(fn (object $attribute) => $attribute instanceof MapInputName)
-            ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName);
+            ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName)
+            ?? $this->resolveDefaultNameMapper(input: true);
 
         if ($mapper) {
             return $this->resolveMapper($mapper->input);
@@ -48,7 +49,8 @@ class NameMappersResolver
     ): ?NameMapper {
         /** @var \Spatie\LaravelData\Attributes\MapOutputName|\Spatie\LaravelData\Attributes\MapName|null $mapper */
         $mapper = $attributes->first(fn (object $attribute) => $attribute instanceof MapOutputName)
-            ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName);
+            ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName)
+            ?? $this->resolveDefaultNameMapper(input: false);
 
         if ($mapper) {
             return $this->resolveMapper($mapper->output);
@@ -85,5 +87,19 @@ class NameMappersResolver
         }
 
         return new ProvidedNameMapper($value);
+    }
+
+    private function resolveDefaultNameMapper(bool $input): null|MapInputName|MapOutputName
+    {
+        $nameMapper = config('data.naming_strategy.'.($input ? 'input' : 'output'));
+
+        if ($nameMapper === null) {
+            return null;
+        }
+
+        return match ($input) {
+            true => new MapInputName($nameMapper),
+            false => new MapOutputName($nameMapper),
+        };
     }
 }

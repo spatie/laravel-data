@@ -5,6 +5,7 @@ use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Mappers\CamelCaseMapper;
+use Spatie\LaravelData\Mappers\StudlyCaseMapper;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
@@ -93,6 +94,20 @@ it('can map a string', function () {
 it('can map a mapper class', function () {
     $attributes = getAttributes(new class () {
         #[MapName(CamelCaseMapper::class, SnakeCaseMapper::class)]
+        public $property;
+    });
+
+    expect($this->resolver->execute($attributes))->toMatchArray([
+        'inputNameMapper' => new CamelCaseMapper(),
+        'outputNameMapper' => new SnakeCaseMapper(),
+    ]);
+});
+
+it('can have default mappers', function () {
+    config()->set('data.naming_strategy.input', CamelCaseMapper::class);
+    config()->set('data.naming_strategy.output', SnakeCaseMapper::class);
+
+    $attributes = getAttributes(new class () {
         public $property;
     });
 
