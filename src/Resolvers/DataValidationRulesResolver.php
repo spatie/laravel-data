@@ -241,19 +241,19 @@ class DataValidationRulesResolver
             $path
         );
 
-        $rulesFromRulesMethod = app()->call([$class->name, 'rules'], ['context' => $validationContext]);
+        $manualRules = app()->call([$class->name, 'rules'], ['context' => $validationContext]);
 
         if ($this->shouldMergeRules($class)) {
-            $rulesFromRulesMethod = collect($rulesFromRulesMethod)->map(
+            $manualRules = collect($manualRules)->map(
                 fn (string|array $rules) => is_array($rules) ? $rules : explode('|', $rules)
             )->all();
 
-            $dataRules->rules = array_merge_recursive($dataRules->rules, $rulesFromRulesMethod);
+            $dataRules->rules = array_merge_recursive($dataRules->rules, $manualRules);
 
             return;
         }
 
-        foreach ($rulesFromRulesMethod as $key => $rules) {
+        foreach ($manualRules as $key => $rules) {
             if (in_array($key, $withoutValidationProperties)) {
                 continue;
             }
