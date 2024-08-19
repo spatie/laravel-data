@@ -249,6 +249,7 @@ class DataValidationRulesResolver
             )->all();
 
             $dataRules->rules = array_merge_recursive($dataRules->rules, $rulesFromRulesMethod);
+
             return;
         }
 
