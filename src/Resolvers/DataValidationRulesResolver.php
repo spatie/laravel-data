@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use Spatie\LaravelData\Attributes\MergeRuleset;
+use Spatie\LaravelData\Attributes\MergeRules;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Support\DataClass;
@@ -287,6 +287,6 @@ class DataValidationRulesResolver
 
     protected function shouldMergeRules(DataClass $class): bool
     {
-        return $class->attributes->contains(fn (object $attribute) => $attribute::class === MergeRuleset::class);
+        return $class->attributes->contains(fn (object $attribute) => $attribute::class === MergeRules::class);
     }
 }

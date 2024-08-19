@@ -2,11 +2,11 @@
 
 namespace Spatie\LaravelData\Tests\Fakes;
 
-use Spatie\LaravelData\Attributes\MergeRuleset;
+use Spatie\LaravelData\Attributes\MergeRules;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Data;
 
-#[MergeRuleset]
+#[MergeRules]
 class DataWithMergedRuleset extends Data
 {
     public function __construct(
