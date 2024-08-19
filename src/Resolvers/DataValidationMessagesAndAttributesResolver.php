@@ -3,7 +3,9 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Contracts\HasValidationAttributeName;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\Types\NamedType;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class DataValidationMessagesAndAttributesResolver
@@ -61,6 +63,14 @@ class DataValidationMessagesAndAttributesResolver
                 $attributes = array_merge($attributes, $collected['attributes']);
 
                 continue;
+            }
+
+            if ($dataProperty->type->type instanceof NamedType) {
+                $typeClass = $dataProperty->type->type->name;
+
+                if (is_a($typeClass, HasValidationAttributeName::class, true)) {
+                    $attributes[$propertyPath->get()] = app()->call([$typeClass, 'validationAttributeName']);
+                }
             }
         }
 

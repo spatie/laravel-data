@@ -40,6 +40,7 @@ use Spatie\LaravelData\Attributes\Validation\RequiredWithout;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\WithoutValidation;
+use Spatie\LaravelData\Contracts\HasValidationAttributeName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
@@ -1967,6 +1968,30 @@ it('can resolve validation dependencies for attributes ', function () {
         payload: ['name' => null],
         errors: ['name' => [__('validation.required', ['attribute' => 'rickster'])]]
     );
+});
+
+it('can resolve validation attributes from type ', function () {
+    class Address implements HasValidationAttributeName {
+        public function __construct(
+            public string $value,
+        ) {
+        }
+
+        public static function validationAttributeName(): string
+        {
+            return 'Home address';
+        }
+    }
+
+    $data = new class () extends Data {
+        public Address $address;
+    };
+
+    DataValidationAsserter::for($data)
+        ->assertAttributes(
+            ['address' => 'Home address'],
+            payload: ['address' => new Address('123 Fake Street')],
+        );
 });
 
 it('can manually set the redirect url', function () {

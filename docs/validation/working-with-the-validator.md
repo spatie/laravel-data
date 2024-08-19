@@ -51,6 +51,33 @@ class SongData extends Data
 }
 ```
 
+### Defining attribute in type
+
+If you want to define attribute name in the type itself, you can implement the `HasValidationAttributeName` interface:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public Title $title,
+    ) {
+    }
+}
+
+class Title implements HasValidationAttributeName
+{
+    public function __construct(
+        public string $value,
+    ) {
+    }
+
+    public static function validationAttributeName(): string
+    {
+        return 'Song title';
+    }
+}
+```
+
 ## Overwriting other validation functionality
 
 Next to overwriting the validator, attributes and messages it is also possible to overwrite the following functionality.
