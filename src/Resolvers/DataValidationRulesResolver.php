@@ -244,6 +244,10 @@ class DataValidationRulesResolver
         $rulesFromRulesMethod = app()->call([$class->name, 'rules'], ['context' => $validationContext]);
 
         if ($this->shouldMergeRules($class)) {
+            $rulesFromRulesMethod = collect($rulesFromRulesMethod)->map(
+                fn (string|array $rules) => is_array($rules) ? $rules : explode('|', $rules)
+            )->all();
+
             $dataRules->rules = array_merge_recursive($dataRules->rules, $rulesFromRulesMethod);
             return;
         }
