@@ -50,3 +50,35 @@ class ContractData extends Data
     }
 }
 ```
+
+
+## Mapping Nested Properties
+
+You can also map nested properties using dot notation in the `MapInputName` attribute. This is useful when you want to extract a nested value from an array and assign it to a property in your data object:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        #[MapInputName("title.name")]
+        public string $title,
+        #[MapInputName("artists.0.name")]
+        public string $artist
+    ) {
+    }
+}
+```
+
+You can create the data object from an array with nested structures:
+
+```php
+SongData::from([
+    "title" => [
+        "name" => "Never gonna give you up"
+    ],
+    "artists" => [
+        ["name" => "Rick Astley"]
+    ]
+]);
+```
+
