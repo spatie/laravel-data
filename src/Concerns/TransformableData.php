@@ -13,8 +13,6 @@ use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 
 trait TransformableData
 {
-    use ContextableData;
-
     public function transform(
         null|TransformationContextFactory|TransformationContext $transformationContext = null,
     ): array {
