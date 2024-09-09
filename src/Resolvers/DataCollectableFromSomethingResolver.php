@@ -151,7 +151,7 @@ class DataCollectableFromSomethingResolver
             return $payload;
         }
 
-        if($items === null) {
+        if ($items === null) {
             return [];
         }
 

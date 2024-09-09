@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use function Pest\Laravel\mock;
 
 use Spatie\LaravelData\Attributes\FromRouteParameter;
-
 use Spatie\LaravelData\Attributes\FromRouteParameterProperty;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;

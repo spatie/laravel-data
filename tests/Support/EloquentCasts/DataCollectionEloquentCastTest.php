@@ -7,11 +7,8 @@ use function Pest\Laravel\assertDatabaseHas;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractData;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
-
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
-
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
-
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCustomCollectionCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;

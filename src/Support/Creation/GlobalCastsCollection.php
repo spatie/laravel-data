@@ -27,11 +27,11 @@ class GlobalCastsCollection implements IteratorAggregate
     {
         $castable = ltrim($castable, ' \\');
 
-        if($cast instanceof Cast) {
+        if ($cast instanceof Cast) {
             $this->casts[$castable] = $cast;
         }
 
-        if($cast instanceof IterableItemCast) {
+        if ($cast instanceof IterableItemCast) {
             $this->iterableItemCasts[$castable] = $cast;
         }
 

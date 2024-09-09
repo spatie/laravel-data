@@ -36,7 +36,7 @@ class CollectionAnnotationReader
 
         $class = new ReflectionClass($className);
 
-        if(empty($class->getDocComment())) {
+        if (empty($class->getDocComment())) {
             return self::$cache[$className] = null;
         }
 

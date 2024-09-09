@@ -59,7 +59,7 @@ class DataContext
             foreach ($context->includePartials as $partial) {
                 $partial = $decoupledPartialResolver->execute($partial);
 
-                if($partial !== null) {
+                if ($partial !== null) {
                     $this->includePartials->attach($partial);
                 }
             }
@@ -71,7 +71,7 @@ class DataContext
             foreach ($context->excludePartials as $partial) {
                 $partial = $decoupledPartialResolver->execute($partial);
 
-                if($partial !== null) {
+                if ($partial !== null) {
                     $this->excludePartials->attach($partial);
                 }
             }
@@ -83,7 +83,7 @@ class DataContext
             foreach ($context->onlyPartials as $partial) {
                 $partial = $decoupledPartialResolver->execute($partial);
 
-                if($partial !== null) {
+                if ($partial !== null) {
                     $this->onlyPartials->attach($partial);
                 }
             }
@@ -95,7 +95,7 @@ class DataContext
             foreach ($context->exceptPartials as $partial) {
                 $partial = $decoupledPartialResolver->execute($partial);
 
-                if($partial !== null) {
+                if ($partial !== null) {
                     $this->exceptPartials->attach($partial);
                 }
             }

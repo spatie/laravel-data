@@ -31,7 +31,7 @@ class DataFromArrayResolver
         $data = $this->createData($dataClass, $properties);
 
         foreach ($dataClass->properties as $property) {
-            if(
+            if (
                 $property->isPromoted
                 || $property->isReadonly
                 || ! array_key_exists($property->name, $properties)

@@ -175,7 +175,7 @@ class CastPropertiesDataPipe implements DataPipe
         array $properties,
         CreationContext $creationContext
     ): array {
-        if(empty($values)) {
+        if (empty($values)) {
             return $values;
         }
 
