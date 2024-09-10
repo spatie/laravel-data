@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.9.0 - 2024-09-10
+
+- Move some interfaces around in order to avoid a circular chaos
+
 ## 4.8.2 - 2024-08-30
 
 - Remove a circular dependency
