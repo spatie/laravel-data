@@ -15,7 +15,7 @@ class DefaultValuesDataPipe implements DataPipe
         CreationContext $creationContext
     ): array {
         foreach ($class->properties as $name => $property) {
-            if(array_key_exists($name, $properties)) {
+            if (array_key_exists($name, $properties)) {
                 continue;
             }
 

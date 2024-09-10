@@ -22,7 +22,7 @@ class UnserializeCast implements Cast
         try {
             return unserialize($value);
         } catch (\Throwable $e) {
-            if($this->failSilently) {
+            if ($this->failSilently) {
                 return Uncastable::create();
             }
 

@@ -76,7 +76,7 @@ class NameMappersResolver
             return new ProvidedNameMapper($value);
         }
 
-        if($value instanceof NameMapper) {
+        if ($value instanceof NameMapper) {
             return $value;
         }
 

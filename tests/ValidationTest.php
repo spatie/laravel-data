@@ -18,9 +18,7 @@ use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-
 use Spatie\LaravelData\Attributes\MapInputName;
-
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Bail;

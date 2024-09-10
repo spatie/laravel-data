@@ -25,7 +25,7 @@ class AttributesRuleInferrer implements RuleInferrer
             ->attributes
             ->filter(fn (object $attribute) => $attribute instanceof ValidationRule)
             ->each(function (ValidationRule $rule) use ($rules) {
-                if($rule instanceof Present && $rules->hasType(RequiringRule::class)) {
+                if ($rule instanceof Present && $rules->hasType(RequiringRule::class)) {
                     $rules->removeType(RequiringRule::class);
                 }
 
