@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Concerns;
 use Exception;
 use Spatie\LaravelData\Contracts\BaseData as BaseDataContract;
 use Spatie\LaravelData\Contracts\BaseDataCollectable as BaseDataCollectableContract;
+use Spatie\LaravelData\Contracts\ContextableData as ContextableDataContract;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
@@ -31,7 +32,7 @@ trait TransformableData
             default => throw new Exception('Cannot transform data object')
         };
 
-        if ($this instanceof IncludeableDataContract) {
+        if ($this instanceof IncludeableDataContract && $this instanceof ContextableDataContract) {
             $transformationContext->mergePartialsFromDataContext($this);
         }
 

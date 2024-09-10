@@ -10,6 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\ContextableData as ContextableDataContract;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
@@ -170,7 +171,10 @@ class TransformedDataCollectableResolver
                 return $data;
             }
 
-            if ($nestedContext->transformValues === false && $nestedContext->hasPartials()) {
+            if ($nestedContext->transformValues === false
+                && $nestedContext->hasPartials()
+                && $data instanceof ContextableDataContract
+            ) {
                 $data->getDataContext()->mergeTransformationContext($nestedContext);
 
                 return $data;

@@ -2,8 +2,7 @@
 
 namespace Spatie\LaravelData\Support\Transformation;
 
-use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Support\Partials\PartialsCollection;
 use Spatie\LaravelData\Support\Wrapping\Wrap;
@@ -105,7 +104,7 @@ class DataContext
     }
 
     public function getRequiredPartialsAndRemoveTemporaryOnes(
-        BaseData|BaseDataCollectable $data,
+        IncludeableData $data,
         PartialsCollection $partials,
     ): PartialsCollection {
         $requiredPartials = new PartialsCollection();

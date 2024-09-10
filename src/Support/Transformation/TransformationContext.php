@@ -2,8 +2,7 @@
 
 namespace Spatie\LaravelData\Support\Transformation;
 
-use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Contracts\ContextableData;
 use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Support\Partials\Partial;
 use Spatie\LaravelData\Support\Partials\PartialsCollection;
@@ -144,11 +143,8 @@ class TransformationContext implements Stringable
         }
     }
 
-    /**
-     * @param IncludeableData&(BaseData|BaseDataCollectable) $data
-     */
     public function mergePartialsFromDataContext(
-        IncludeableData $data
+        IncludeableData&ContextableData $data
     ): self {
         $dataContext = $data->getDataContext();
 

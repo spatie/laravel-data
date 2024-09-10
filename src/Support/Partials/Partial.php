@@ -4,8 +4,7 @@ namespace Spatie\LaravelData\Support\Partials;
 
 use Closure;
 use Laravel\SerializableClosure\SerializableClosure;
-use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Support\Partials\Segments\AllPartialSegment;
 use Spatie\LaravelData\Support\Partials\Segments\FieldsPartialSegment;
 use Spatie\LaravelData\Support\Partials\Segments\NestedPartialSegment;
@@ -218,7 +217,7 @@ class Partial implements Stringable
         return $this->segments[$this->pointer] ?? null;
     }
 
-    public function isRequired(BaseData|BaseDataCollectable $data): bool
+    public function isRequired(IncludeableData $data): bool
     {
         if ($this->condition === null) {
             return true;
