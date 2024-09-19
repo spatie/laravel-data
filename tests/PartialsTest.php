@@ -7,6 +7,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Resolvers\RequestQueryStringPartialsResolver;
+use Spatie\LaravelData\Resource;
 use Spatie\LaravelData\Support\Partials\Partial;
 use Spatie\LaravelData\Support\Partials\PartialsCollection;
 use Spatie\LaravelData\Support\Partials\PartialType;
@@ -869,7 +870,7 @@ it('can work with lazy array data collections', function () {
 });
 
 it('can work with lazy laravel data collections', function () {
-    $dataClass = new class () extends Data {
+    $dataClass = new class () extends Resource {
         #[DataCollectionOf(SimpleData::class)]
         public Lazy|Collection $lazyCollection;
 
