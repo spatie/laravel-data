@@ -13,6 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 use function Pest\Laravel\postJson;
 
+use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Min;
@@ -1227,3 +1228,107 @@ it('is possible to create a union type data collectable', function () {
         [10, SimpleData::from('Hello World')]
     );
 })->todo();
+
+it('can create a data object with auto lazy properties', function () {
+    $dataClass = new class () extends Data {
+        #[AutoLazy]
+        public Lazy|SimpleData $data;
+
+        /** @var Lazy|Collection<int, Spatie\LaravelData\Tests\Fakes\SimpleData> */
+        #[AutoLazy]
+        public Lazy|Collection $dataCollection;
+
+        #[AutoLazy]
+        public Lazy|string $string;
+
+        #[AutoLazy]
+        public Lazy|string $overwrittenLazy;
+
+        #[AutoLazy]
+        public Optional|Lazy|string $optionalLazy;
+
+        #[AutoLazy]
+        public null|string|Lazy $nullableLazy;
+    };
+
+    $data = $dataClass::from([
+        'data' => 'Hello World',
+        'dataCollection' => ['Hello', 'World'],
+        'string' => 'Hello World',
+        'overwrittenLazy' => Lazy::create(fn () => 'Overwritten Lazy'),
+    ]);
+
+    expect($data->data)->toBeInstanceOf(Lazy::class);
+    expect($data->dataCollection)->toBeInstanceOf(Lazy::class);
+    expect($data->string)->toBeInstanceOf(Lazy::class);
+    expect($data->overwrittenLazy)->toBeInstanceOf(Lazy::class);
+    expect($data->optionalLazy)->toBeInstanceOf(Optional::class);
+    expect($data->nullableLazy)->toBeNull();
+
+    expect($data->toArray())->toBe([
+        'nullableLazy' => null,
+    ]);
+    expect($data->include('data', 'dataCollection', 'string', 'overwrittenLazy')->toArray())->toBe([
+        'data' => ['string' => 'Hello World'],
+        'dataCollection' => [
+            ['string' => 'Hello'],
+            ['string' => 'World'],
+        ],
+        'string' => 'Hello World',
+        'overwrittenLazy' => 'Overwritten Lazy',
+        'nullableLazy' => null,
+    ]);
+});
+
+it('can create an auto-lazy class level attribute class', function () {
+    #[AutoLazy]
+    class TestAutoLazyClassAttributeData extends Data
+    {
+        public Lazy|SimpleData $data;
+
+        /** @var Lazy|Collection<int, Spatie\LaravelData\Tests\Fakes\SimpleData> */
+        public Lazy|Collection $dataCollection;
+
+        public Lazy|string $string;
+
+        public Lazy|string $overwrittenLazy;
+
+        public Optional|Lazy|string $optionalLazy;
+
+        public null|string|Lazy $nullableLazy;
+
+        public string $regularString;
+    }
+
+    $data = TestAutoLazyClassAttributeData::from([
+        'data' => 'Hello World',
+        'dataCollection' => ['Hello', 'World'],
+        'string' => 'Hello World',
+        'overwrittenLazy' => Lazy::create(fn () => 'Overwritten Lazy'),
+        'regularString' => 'Hello World',
+    ]);
+
+    expect($data->data)->toBeInstanceOf(Lazy::class);
+    expect($data->dataCollection)->toBeInstanceOf(Lazy::class);
+    expect($data->string)->toBeInstanceOf(Lazy::class);
+    expect($data->overwrittenLazy)->toBeInstanceOf(Lazy::class);
+    expect($data->optionalLazy)->toBeInstanceOf(Optional::class);
+    expect($data->nullableLazy)->toBeNull();
+    expect($data->regularString)->toBe('Hello World');
+
+    expect($data->toArray())->toBe([
+        'nullableLazy' => null,
+        'regularString' => 'Hello World',
+    ]);
+    expect($data->include('data', 'dataCollection', 'string', 'overwrittenLazy')->toArray())->toBe([
+        'data' => ['string' => 'Hello World'],
+        'dataCollection' => [
+            ['string' => 'Hello'],
+            ['string' => 'World'],
+        ],
+        'string' => 'Hello World',
+        'overwrittenLazy' => 'Overwritten Lazy',
+        'nullableLazy' => null,
+        'regularString' => 'Hello World',
+    ]);
+});

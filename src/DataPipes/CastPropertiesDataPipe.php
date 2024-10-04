@@ -40,7 +40,23 @@ class CastPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            $properties[$name] = $this->cast($dataProperty, $value, $properties, $creationContext);
+            if ($dataProperty->autoLazy) {
+                $properties[$name] = Lazy::create(fn () => $this->cast(
+                    $dataProperty,
+                    $value,
+                    $properties,
+                    $creationContext
+                ));
+
+                continue;
+            }
+
+            $properties[$name] = $this->cast(
+                $dataProperty,
+                $value,
+                $properties,
+                $creationContext
+            );
         }
 
         return $properties;
