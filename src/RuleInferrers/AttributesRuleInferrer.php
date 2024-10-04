@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\RuleInferrers;
 
 use Spatie\LaravelData\Attributes\Validation\Present;
+use Spatie\LaravelData\Attributes\Validation\Sometimes;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
@@ -27,6 +28,10 @@ class AttributesRuleInferrer implements RuleInferrer
             ->each(function (ValidationRule $rule) use ($rules) {
                 if ($rule instanceof Present && $rules->hasType(RequiringRule::class)) {
                     $rules->removeType(RequiringRule::class);
+                }
+
+                if ($rule instanceof RequiringRule && $rules->hasType(Sometimes::class)) {
+                    $rules->removeType(Sometimes::class);
                 }
 
                 $rules->add(
