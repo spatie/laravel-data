@@ -279,7 +279,9 @@ it('is possible to have multiple required rules', function () {
     DataValidationAsserter::for(new class () extends Data {
         #[RequiredUnless('is_required', false), RequiredWith('make_required')]
         public string $property;
+
         public string $make_required;
+
         public bool $is_required;
     })->assertRules([
         'property' => ['string', 'required_unless:is_required', 'required_with:make_required'],
@@ -1852,6 +1854,55 @@ it('can manually set messages in collections', function () {
             errors: [
                 'collection.0.name' => ['Fix it Rick!'],
                 'collection.1.name' => ['Fix it Rick!'],
+            ]
+        );
+});
+
+it('can manually set messages in double nested collections (yeah this failed once)', function () {
+    class TestDoubleNestedCollectionValidationMessagesDataA extends Data
+    {
+        public string $name;
+
+        public string $song;
+
+        public static function messages(): array
+        {
+            return [
+                'name.required' => 'Fix it Rick!',
+            ];
+        }
+    }
+
+    class TestDoubleNestedCollectionValidationMessagesInitialDataA extends Data
+    {
+        #[DataCollectionOf(TestDoubleNestedCollectionValidationMessagesDataA::class)]
+        public DataCollection $nestedCollection;
+    }
+
+    DataValidationAsserter::for(new class () extends Data {
+        #[DataCollectionOf(TestDoubleNestedCollectionValidationMessagesInitialDataA::class)]
+        public DataCollection $collection;
+    })
+        ->assertMessages(
+            messages: ['collection.*.nestedCollection.*.name.required' => 'Fix it Rick!'],
+            payload: ['collection' => [['nestedCollection' => ['collection' => [['song' => 'Never Gonna Give You Up']]]]]],
+        )
+        ->assertErrors(
+            payload: [
+                'collection' => [
+                    [
+                        'nestedCollection' => [
+                            ['song' => 'Never Gonna Give You Up'],
+                            ['song' => 'Giving up on love'],
+                        ],
+                    ],
+                    ['nestedCollection' => [['song' => 'Together Forever']]],
+                ],
+            ],
+            errors: [
+                'collection.0.nestedCollection.0.name' => ['Fix it Rick!'],
+                'collection.0.nestedCollection.1.name' => ['Fix it Rick!'],
+                'collection.1.nestedCollection.0.name' => ['Fix it Rick!'],
             ]
         );
 });
