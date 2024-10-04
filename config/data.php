@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Enumerable;
+use Spatie\LaravelData\Mappers\NameMapper;
 
 return [
     /**
@@ -127,6 +128,15 @@ return [
      * behaviour can be changed to always validate or to completely disable validation.
      */
     'validation_strategy' => \Spatie\LaravelData\Support\Creation\ValidationStrategy::OnlyRequests->value,
+
+    /**
+     * The default name mapping strategy for data objects' keys.
+     * This has to be a class implementing the `Spatie\LaravelData\Mappers\NameMapper` interface.
+     */
+    'naming_strategy' => [
+        'input' => null,
+        'output' => null,
+    ],
 
     /**
      * When using an invalid include, exclude, only or except partial, the package will
