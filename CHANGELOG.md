@@ -2,6 +2,19 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.10.0 - 2024-10-04
+
+It has been a fews weeks, a mostly bugfix release with one new feature, enjoy!
+
+- Fix an issue where required rules could not be combined with optional (#844)
+- Fix Livewire return type to make sure it can return everything in the data object (#836)
+- Fix issue where validation messages where ignored by collections nested in collections (#867)
+- Fix Resource to include Contextable data inteface (#868)
+- Stop NormalizedModel from initializing itself and try to lazy load properties when required (#870)
+- Passing an enum to caster handle without an error (#841)
+- Passing date objects to caster handle without an error (#842)
+- Allow setting a default mapping strategy  (#846)
+
 ## 4.9.0 - 2024-09-10
 
 - Move some interfaces around in order to avoid a circular chaos
