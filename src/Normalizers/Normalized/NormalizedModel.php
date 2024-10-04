@@ -83,7 +83,6 @@ class NormalizedModel implements Normalized
         return array_key_exists($name, $this->attributesProperty->getValue($this->model)) ||
             array_key_exists($name, $this->castsProperty->getValue($this->model)) ||
             $this->model->hasGetMutator($name) ||
-            $this->model->hasAttributeMutator($name) ||
-            $this->model->isClassCastable($name);
+            $this->model->hasAttributeMutator($name);
     }
 }
