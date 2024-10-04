@@ -3,9 +3,12 @@
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\MapName;
+use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Resolvers\RequestQueryStringPartialsResolver;
 use Spatie\LaravelData\Support\Partials\Partial;
 use Spatie\LaravelData\Support\Partials\PartialsCollection;
@@ -23,7 +26,6 @@ use Spatie\LaravelData\Tests\Fakes\OnlyData;
 use Spatie\LaravelData\Tests\Fakes\PartialClassConditionalData;
 use Spatie\LaravelData\Tests\Fakes\SimpleChildDataWithMappedOutputName;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedOutputName;
 use Spatie\LaravelData\Tests\Fakes\UlarData;
 
 /**
@@ -1578,6 +1580,28 @@ it('handles partials when not transforming values by copying them to lazy nested
 });
 
 it('handles parsing except from request with mapped output name', function () {
+    #[MapName(SnakeCaseMapper::class)]
+    class SimpleDataWithMappedOutputName extends Data
+    {
+        public function __construct(
+            public int $id,
+            #[MapOutputName('paid_amount')]
+            public float $amount,
+            public string $anyString,
+            public SimpleChildDataWithMappedOutputName $child
+        ) {
+        }
+
+        public static function allowedRequestExcept(): ?array
+        {
+            return [
+                'amount',
+                'anyString',
+                'child',
+            ];
+        }
+    }
+
     $dataclass = SimpleDataWithMappedOutputName::from([
         'id' => 1,
         'amount' => 1000,
