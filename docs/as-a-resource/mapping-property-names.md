@@ -54,6 +54,15 @@ class ContractData extends Data
 }
 ```
 
+It is possible to set a default name mapping strategy for all data objects in the `data.php` config file:
+
+```php
+'name_mapping_strategy' => [
+    'input' => null,
+    'output' => SnakeCaseMapper::class,
+],
+```
+
 You can now create a data object as such:
 
 ```php

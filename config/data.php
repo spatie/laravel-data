@@ -1,8 +1,5 @@
 <?php
 
-use Illuminate\Support\Enumerable;
-use Spatie\LaravelData\Mappers\NameMapper;
-
 return [
     /**
      * The package will use this format when working with dates. If this option
@@ -130,10 +127,11 @@ return [
     'validation_strategy' => \Spatie\LaravelData\Support\Creation\ValidationStrategy::OnlyRequests->value,
 
     /**
-     * The default name mapping strategy for data objects' keys.
-     * This has to be a class implementing the `Spatie\LaravelData\Mappers\NameMapper` interface.
+     * A data object can map the names of its properties when transforming (output) or when
+     * creating (input). By default, the package will not map any names. You can set a
+     * global strategy here, or override it on a specific data object.
      */
-    'naming_strategy' => [
+    'name_mapping_strategy' => [
         'input' => null,
         'output' => null,
     ],

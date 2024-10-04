@@ -104,8 +104,8 @@ it('can map a mapper class', function () {
 });
 
 it('can have default mappers', function () {
-    config()->set('data.naming_strategy.input', CamelCaseMapper::class);
-    config()->set('data.naming_strategy.output', SnakeCaseMapper::class);
+    config()->set('data.name_mapping_strategy.input', CamelCaseMapper::class);
+    config()->set('data.name_mapping_strategy.output', SnakeCaseMapper::class);
 
     $attributes = getAttributes(new class () {
         public $property;
@@ -118,8 +118,8 @@ it('can have default mappers', function () {
 });
 
 it('input name mappers only work when no mappers are specified', function () {
-    config()->set('data.naming_strategy.input', CamelCaseMapper::class);
-    config()->set('data.naming_strategy.output', SnakeCaseMapper::class);
+    config()->set('data.name_mapping_strategy.input', CamelCaseMapper::class);
+    config()->set('data.name_mapping_strategy.output', SnakeCaseMapper::class);
 
     $attributes = getAttributes(new class () {
         #[MapInputName(StudlyCaseMapper::class)]
@@ -133,8 +133,8 @@ it('input name mappers only work when no mappers are specified', function () {
 });
 
 it('output name mappers only work when no mappers are specified', function () {
-    config()->set('data.naming_strategy.input', CamelCaseMapper::class);
-    config()->set('data.naming_strategy.output', SnakeCaseMapper::class);
+    config()->set('data.name_mapping_strategy.input', CamelCaseMapper::class);
+    config()->set('data.name_mapping_strategy.output', SnakeCaseMapper::class);
 
     $attributes = getAttributes(new class () {
         #[MapOutputName(StudlyCaseMapper::class)]
