@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.10.1 - 2024-10-07
+
+- Fix an issue where optional default values would disable validation
+
 ## 4.10.0 - 2024-10-04
 
 It has been a fews weeks, a mostly bugfix release with one new feature, enjoy!
