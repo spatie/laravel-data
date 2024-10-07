@@ -85,7 +85,7 @@ class DataTypeScriptTransformer extends DtoTransformer
                 $transformed = $this->typeToTypeScript(
                     $type,
                     $missingSymbols,
-                    $property->getDeclaringClass()->getName(),
+                    currentClass: $property->getDeclaringClass()->getName(),
                 );
 
                 $propertyName = $dataProperty->outputMappedName ?? $dataProperty->name;
