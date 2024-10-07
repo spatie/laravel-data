@@ -2364,6 +2364,21 @@ it('wont validate default values when they are not provided and rules are overwr
         ], ['default' => 'something']);
 });
 
+it('will ignore default values which are optional', function () {
+    $dataClass = new class () extends Data {
+        public function __construct(public string|Optional $property = new Optional())
+        {
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([])
+        ->assertOk(['property' => 'Hello World'])
+        ->assertErrors(['property' => 123])
+        ->assertErrors(['property' => null])
+        ->assertRules(['property' => ['sometimes', 'string']]);
+});
+
 it('a manual written present attribute rule always overwrites a generated required rule', function () {
     $dataClass = new class () extends Data {
         #[Present]
