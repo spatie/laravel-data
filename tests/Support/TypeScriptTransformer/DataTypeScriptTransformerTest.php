@@ -322,3 +322,21 @@ it('will transform a collection with int key as an array', function () {
         $transformer->transform($reflection, 'DataObject')->transformed
     );
 });
+
+it('supports converting nullable types to optional properties', function () {
+    $config = TypeScriptTransformerConfig::create();
+    $config->nullToOptional(true);
+
+    $data = new class ('foo') extends Data {
+        public function __construct(
+            public ?string $nullable,
+        ) {
+        }
+    };
+
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass($data);
+
+    expect($transformer->canTransform($reflection))->toBeTrue();
+    assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
+});
