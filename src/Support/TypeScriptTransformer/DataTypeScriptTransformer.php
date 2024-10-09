@@ -80,11 +80,13 @@ class DataTypeScriptTransformer extends DtoTransformer
                         fn (object $attribute) => $attribute instanceof TypeScriptOptional
                     )
                     || ($dataProperty->type->lazyType && $dataProperty->type->lazyType !== ClosureLazy::class)
-                    || $dataProperty->type->isOptional;
+                    || $dataProperty->type->isOptional
+                    || ($dataProperty->type->isNullable && $this->config->shouldConsiderNullAsOptional());
 
                 $transformed = $this->typeToTypeScript(
                     $type,
                     $missingSymbols,
+                    $this->config->shouldConsiderNullAsOptional(),
                     currentClass: $property->getDeclaringClass()->getName(),
                 );
 
