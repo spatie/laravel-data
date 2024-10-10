@@ -11,6 +11,7 @@ use Illuminate\Support\Enumerable;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
+use Spatie\LaravelData\Tests\Fakes\DataWithArgumentCountErrorException;
 use function Pest\Laravel\postJson;
 
 use Spatie\LaravelData\Attributes\Computed;
@@ -750,6 +751,18 @@ it('throws a readable exception message when the constructor fails', function (
     yield 'no params' => [[], 'Could not create `Spatie\LaravelData\Tests\Fakes\MultiData`: the constructor requires 2 parameters, 0 given. Parameters missing: first, second.'],
     yield 'one param' => [['first' => 'First'], 'Could not create `Spatie\LaravelData\Tests\Fakes\MultiData`: the constructor requires 2 parameters, 1 given. Parameters given: first. Parameters missing: second.'],
 ]);
+
+it('throws a readable exception message when the ArgumentCountError exception is thrown in the constructor', function () {
+    try {
+        DataWithArgumentCountErrorException::from(['string' => 'string']);
+    } catch (ArgumentCountError $e) {
+        expect($e->getMessage())->toBe('This function expects exactly 2 arguments, 1 given.');
+        expect($e->getFile())->toContain('/tests/Fakes/DataWithArgumentCountErrorException.php');
+        expect($e->getLine())->toBe(13);
+
+        return;
+    }
+});
 
 it('throws a readable exception message when the constructor of a nested data object fails', function () {
     expect(fn () => NestedData::from([
