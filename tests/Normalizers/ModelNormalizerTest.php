@@ -118,7 +118,7 @@ it('can load relations on a model when required and the LoadRelation attribute i
 
     $dataClass = new class () extends Data {
         #[LoadRelation, DataCollectionOf(FakeNestedModelData::class)]
-        public array $fake_nested_models;
+        public array $fakeNestedModels;
 
         #[LoadRelation, DataCollectionOf(FakeNestedModelData::class)]
         public array $fake_nested_models_snake_cased;
@@ -131,7 +131,7 @@ it('can load relations on a model when required and the LoadRelation attribute i
 
     $queryLog = DB::getQueryLog();
 
-    expect($data->fake_nested_models)
+    expect($data->fakeNestedModels)
         ->toHaveCount(2)
         ->each->toBeInstanceOf(FakeNestedModelData::class);
 
@@ -183,7 +183,9 @@ it('can use mappers to map the names', function () {
 
     $dataClass = new class () extends Data {
         #[DataCollectionOf(FakeNestedModelData::class), MapInputName(SnakeCaseMapper::class)]
-        public array|Optional $fakeNestedModels;
+        public array $fakeNestedModels;
+        #[DataCollectionOf(FakeNestedModelData::class), MapInputName(SnakeCaseMapper::class), LoadRelation]
+        public array|Optional $fakeNestedModelsSnakeCased;
 
         #[MapInputName(SnakeCaseMapper::class)]
         public string $oldAccessor;
@@ -191,7 +193,8 @@ it('can use mappers to map the names', function () {
 
     $data = $dataClass::from($model->load('fakeNestedModels'));
 
-    expect($data->fakeNestedModels)
+    expect(isset($data->fakeNestedModels))->toBeFalse();
+    expect($data->fakeNestedModelsSnakeCased)
         ->toHaveCount(2)
         ->each()
         ->toBeInstanceOf(FakeNestedModelData::class);
