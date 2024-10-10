@@ -91,14 +91,23 @@ class DataFromArrayResolver
             }
         }
 
-        try {
-            return new $dataClass->name(...$parameters);
-        } catch (ArgumentCountError $error) {
+        if ($this->isAnyParameterMissing($dataClass, array_keys($parameters))) {
             throw CannotCreateData::constructorMissingParameters(
                 $dataClass,
                 $parameters,
-                $error
             );
         }
+
+        return new $dataClass->name(...$parameters);
+    }
+
+    protected function isAnyParameterMissing(DataClass $dataClass, array $parameters): bool
+    {
+        return $dataClass
+            ->constructorMethod
+            ->parameters
+            ->pluck('name')
+            ->diff($parameters)
+            ->isNotEmpty();
     }
 }
