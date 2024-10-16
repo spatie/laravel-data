@@ -50,7 +50,7 @@ it('it will merge validation rules using string rules', function () {
     }
 });
 
-it('it will skip validation rules when skipping validation', function () {
+it('it will skip validation rules when using the without validation attribute', function () {
     $data = DataWithSkippedValidationMergedRuleset::validateAndCreate(['first_name' => str_repeat('1', 20)]);
     expect($data->first_name)->toBe(str_repeat('1', 20));
 });
