@@ -68,7 +68,7 @@ class DataValidationRulesResolver
             $dataRules->add($propertyPath, $rules);
         }
 
-        $this->resolveRules(
+        $this->resolveOverwrittenRules(
             $dataClass,
             $fullPayload,
             $path,
@@ -224,7 +224,7 @@ class DataValidationRulesResolver
     }
 
 
-    protected function resolveRules(
+    protected function resolveOverwrittenRules(
         DataClass $class,
         array $fullPayload,
         ValidationPath $path,
@@ -241,30 +241,24 @@ class DataValidationRulesResolver
             $path
         );
 
-        $manualRules = app()->call([$class->name, 'rules'], ['context' => $validationContext]);
+        $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $validationContext]);
+        $shouldMergeRules = $class->attributes->contains(
+            fn (object $attribute) => $attribute::class === MergeRules::class
+        );
 
-        if ($this->shouldMergeRules($class)) {
-            $manualRules = collect($manualRules)->map(
-                fn (string|array $rules) => is_array($rules) ? $rules : explode('|', $rules)
-            )->all();
-
-            $dataRules->rules = array_merge_recursive($dataRules->rules, $manualRules);
-
-            return;
-        }
-
-        foreach ($manualRules as $key => $rules) {
+        foreach ($overwrittenRules as $key => $rules) {
             if (in_array($key, $withoutValidationProperties)) {
                 continue;
             }
 
-            $dataRules->add(
-                $path->property($key),
-                collect(Arr::wrap($rules))
-                    ->map(fn (mixed $rule) => $this->ruleDenormalizer->execute($rule, $path))
-                    ->flatten()
-                    ->all()
-            );
+            $rules = collect(Arr::wrap($rules))
+                ->map(fn (mixed $rule) => $this->ruleDenormalizer->execute($rule, $path))
+                ->flatten()
+                ->all();
+
+            $shouldMergeRules
+                ? $dataRules->merge($path->property($key), $rules)
+                : $dataRules->add($path->property($key), $rules);
         }
     }
 
@@ -288,10 +282,5 @@ class DataValidationRulesResolver
             $rules->all(),
             $path
         );
-    }
-
-    protected function shouldMergeRules(DataClass $class): bool
-    {
-        return $class->attributes->contains(fn (object $attribute) => $attribute::class === MergeRules::class);
     }
 }
