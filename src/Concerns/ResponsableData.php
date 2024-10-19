@@ -12,6 +12,8 @@ use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 trait ResponsableData
 {
+    protected int $responseStatusCode;
+
     public function toResponse($request)
     {
         $contextFactory = TransformationContextFactory::create()
@@ -63,8 +65,20 @@ trait ResponsableData
         );
     }
 
+    public function setResponseStatusCode(int $responseStatusCode): self
+    {
+        $this->responseStatusCode = $responseStatusCode;
+
+        return $this;
+    }
+
     protected function calculateResponseStatus(Request $request): int
     {
+        $responseStatusCode = $this->responseStatusCode ?? null;
+        if ($responseStatusCode !== null) {
+            return $responseStatusCode;
+        }
+
         return $request->isMethod(Request::METHOD_POST) ? Response::HTTP_CREATED : Response::HTTP_OK;
     }
 
