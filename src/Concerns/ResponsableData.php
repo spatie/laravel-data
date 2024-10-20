@@ -12,7 +12,7 @@ use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
 
 trait ResponsableData
 {
-    protected int $responseStatusCode;
+    protected int $_responseStatusCode;
 
     public function toResponse($request)
     {
@@ -67,14 +67,14 @@ trait ResponsableData
 
     public function setResponseStatusCode(int $responseStatusCode): self
     {
-        $this->responseStatusCode = $responseStatusCode;
+        $this->_responseStatusCode = $responseStatusCode;
 
         return $this;
     }
 
     protected function calculateResponseStatus(Request $request): int
     {
-        $responseStatusCode = $this->responseStatusCode ?? null;
+        $responseStatusCode = $this->_responseStatusCode ?? null;
         if ($responseStatusCode !== null) {
             return $responseStatusCode;
         }
