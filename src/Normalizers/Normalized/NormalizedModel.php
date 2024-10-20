@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Normalizers\Normalized;
 
+use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use ReflectionProperty;
@@ -38,10 +39,6 @@ class NormalizedModel implements Normalized
 
     protected function fetchNewProperty(string $name, DataProperty $dataProperty): mixed
     {
-        if ($this->hasModelAttribute($name)) {
-            return $this->properties[$name] = $this->model->getAttribute($name);
-        }
-
         $camelName = Str::camel($name);
 
         if ($dataProperty->attributes->contains(fn (object $attribute) => $attribute::class === LoadRelation::class)) {
@@ -59,6 +56,14 @@ class NormalizedModel implements Normalized
             return $this->properties[$name] = $this->model->getRelation($camelName);
         }
 
+        if (!$this->model->isRelation($name) && !$this->model->isRelation($camelName)) {
+            try {
+                return $this->properties[$name] = $this->model->getAttribute($name);
+            } catch (MissingAttributeException) {
+                // Fallback if missing Attribute
+            }
+        }
+
         return $this->properties[$name] = UnknownProperty::create();
     }
 
@@ -69,15 +74,12 @@ class NormalizedModel implements Normalized
         }
 
         // TODO: remove this once we stop supporting Laravel 10
-
         if (! isset($this->attributesProperty)) {
             $this->attributesProperty = new ReflectionProperty($this->model, 'attributes');
-            $this->attributesProperty->setAccessible(true);
         }
 
         if (! isset($this->castsProperty)) {
             $this->castsProperty = new ReflectionProperty($this->model, 'casts');
-            $this->castsProperty->setAccessible(true);
         }
 
         return array_key_exists($name, $this->attributesProperty->getValue($this->model)) ||
