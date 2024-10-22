@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.11.0 - 2024-10-22
+
+### What's Changed
+
+* feat: support "null to optional" by @innocenzi in https://github.com/spatie/laravel-data/pull/881
+* Register optimize commands by @erikgaal in https://github.com/spatie/laravel-data/pull/880
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.10.1...4.11.0
+
 ## 4.10.1 - 2024-10-07
 
 - Fix an issue where optional default values would disable validation
