@@ -79,5 +79,12 @@ class LaravelDataServiceProvider extends PackageServiceProvider
         if ($enableVarDumperCaster) {
             (new VarDumperManager())->initialize();
         }
+
+        if (method_exists($this, 'optimizes')) {
+            $this->optimizes(
+                optimize: 'data:cache-structures',
+                key: 'laravel-data',
+            );
+        }
     }
 }
