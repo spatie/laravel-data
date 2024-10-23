@@ -28,6 +28,15 @@ class DataRules
         return $this;
     }
 
+    public function merge(
+        ValidationPath $path,
+        array $rules
+    ): self {
+        $this->rules[$path->get()] = array_merge($this->rules[$path->get()] ?? [], $rules);
+
+        return $this;
+    }
+
     public function addCollection(
         ValidationPath $path,
         NestedRules $rules
