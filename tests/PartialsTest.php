@@ -709,7 +709,10 @@ it('can dynamically include data based upon the request (collection)', function 
 
     LazyData::setAllowedIncludes(['name']);
 
-    $includedResponse = (new DataCollection(LazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
+    $includedResponse = (new DataCollection(
+        LazyData::class,
+        ['Ruben', 'Freek', 'Brent']
+    ))->toResponse(request()->merge([
         'include' => 'name',
     ]));
 
@@ -776,7 +779,10 @@ it('can dynamically exclude data based upon the request (collection)', function 
 
     DefaultLazyData::setAllowedExcludes(['name']);
 
-    $excludedResponse = (new DataCollection(DefaultLazyData::class, ['Ruben', 'Freek', 'Brent']))->toResponse(request()->merge([
+    $excludedResponse = (new DataCollection(
+        DefaultLazyData::class,
+        ['Ruben', 'Freek', 'Brent']
+    ))->toResponse(request()->merge([
         'exclude' => 'name',
     ]));
 
@@ -1534,21 +1540,40 @@ it('handles partials when not transforming values by copying them to a lazy arra
     ]);
 });
 
-it('handles partials when not transforming values by copying them to lazy nested data objects in data collections', function () {
-    $dataClass = new class () extends Data {
-        public DataCollection $collection;
+it(
+    'handles partials when not transforming values by copying them to lazy nested data objects in data collections',
+    function () {
+        $dataClass = new class () extends Data {
+            public DataCollection $collection;
 
-        public function __construct()
-        {
-            $this->collection = NestedLazyData::collect([
-                'Rick Astley',
-                'Jon Bon Jovi',
-            ], DataCollection::class);
-        }
-    };
+            public function __construct()
+            {
+                $this->collection = NestedLazyData::collect([
+                    'Rick Astley',
+                    'Jon Bon Jovi',
+                ], DataCollection::class);
+            }
+        };
 
-    expect($dataClass->include('collection.simple')->toArray())->toMatchArray([
-        'collection' => [
+        expect($dataClass->include('collection.simple')->toArray())->toMatchArray([
+            'collection' => [
+                [
+                    'simple' => [
+                        'string' => 'Rick Astley',
+                    ],
+                ],
+                [
+                    'simple' => [
+                        'string' => 'Jon Bon Jovi',
+                    ],
+                ],
+            ],
+        ]);
+
+        $nested = $dataClass->include('collection.simple')->all()['collection'];
+
+        expect($nested)->toBeInstanceOf(DataCollection::class);
+        expect($nested->toArray())->toMatchArray([
             [
                 'simple' => [
                     'string' => 'Rick Astley',
@@ -1559,25 +1584,9 @@ it('handles partials when not transforming values by copying them to lazy nested
                     'string' => 'Jon Bon Jovi',
                 ],
             ],
-        ],
-    ]);
-
-    $nested = $dataClass->include('collection.simple')->all()['collection'];
-
-    expect($nested)->toBeInstanceOf(DataCollection::class);
-    expect($nested->toArray())->toMatchArray([
-        [
-            'simple' => [
-                'string' => 'Rick Astley',
-            ],
-        ],
-        [
-            'simple' => [
-                'string' => 'Jon Bon Jovi',
-            ],
-        ],
-    ]);
-});
+        ]);
+    }
+);
 
 it('handles parsing except from request with mapped output name', function () {
     #[MapName(SnakeCaseMapper::class)]
@@ -1646,4 +1655,17 @@ it('handles circular dependencies', function () {
         ],
     ]);
     // Not really a test with expectation, we just want to check we don't end up in an infinite loop
+});
+
+it('sets response code', function () {
+    // Given
+    $data = new SimpleData("roxanne");
+    // And
+    $data->setResponseStatusCode(404);
+
+    // When
+    $jsonResponse = $data->toResponse(request());
+
+    // Then
+    expect($jsonResponse->status())->toBe(404);
 });
