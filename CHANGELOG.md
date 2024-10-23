@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.11.1 - 2024-10-23
+
+- Fix an issue where the cache structures command did not work if the directory did not exist (#892)
+
 ## 4.11.0 - 2024-10-22
 
 ### What's Changed
