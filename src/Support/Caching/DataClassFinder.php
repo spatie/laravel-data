@@ -10,7 +10,7 @@ class DataClassFinder
     public static function fromConfig(array $config): self
     {
         return new self(
-            directories: $config['directories'],
+            directories:  array_filter($config['directories'], 'is_dir'),
             useReflection: $config['reflection_discovery']['enabled'],
             reflectionBasePath: $config['reflection_discovery']['base_path'],
             reflectionRootNamespace: $config['reflection_discovery']['root_namespace'],
