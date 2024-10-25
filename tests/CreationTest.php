@@ -758,7 +758,7 @@ it('throws a readable exception message when the ArgumentCountError exception is
     } catch (ArgumentCountError $e) {
         expect($e->getMessage())->toBe('This function expects exactly 2 arguments, 1 given.');
         expect($e->getFile())->toContain('/tests/Fakes/DataWithArgumentCountErrorException.php');
-        expect($e->getLine())->toBe(13);
+        expect($e->getLine())->toBe(14);
 
         return;
     }
