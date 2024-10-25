@@ -9,7 +9,9 @@ class DataWithArgumentCountErrorException extends Data
 {
     public function __construct(
         public string $string,
-        public string $optional = 'default',
+        public string $promotedOptional = 'default',
+        private string $privatePromotedOptional = 'optional',
+        string $optional = 'test',
     ) {
         throw new ArgumentCountError('This function expects exactly 2 arguments, 1 given.');
     }
