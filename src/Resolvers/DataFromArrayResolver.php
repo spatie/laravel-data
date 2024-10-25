@@ -104,8 +104,6 @@ class DataFromArrayResolver
                 throw $error;
             }
         }
-
-        return new $dataClass->name(...$parameters);
     }
 
     protected function isExceptionCausedByDataClass(ArgumentCountError $error, DataClass $dataClass): bool
