@@ -9,6 +9,8 @@ use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataParameter;
+use Spatie\LaravelData\Support\DataProperty;
 
 /**
  * @template TData of BaseData
@@ -97,6 +99,8 @@ class DataFromArrayResolver
                 $parameters,
             );
         }
+
+        return new $dataClass->name(...$parameters);
     }
 
     protected function isAnyParameterMissing(DataClass $dataClass, array $parameters): bool
@@ -104,6 +108,7 @@ class DataFromArrayResolver
         return $dataClass
             ->constructorMethod
             ->parameters
+            ->filter(fn (DataParameter|DataProperty $parameter) => ! $parameter->hasDefaultValue)
             ->pluck('name')
             ->diff($parameters)
             ->isNotEmpty();
