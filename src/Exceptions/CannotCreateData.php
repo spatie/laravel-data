@@ -24,7 +24,6 @@ class CannotCreateData extends Exception
     public static function constructorMissingParameters(
         DataClass $dataClass,
         array $parameters,
-        Throwable $previous,
     ): self {
         $parameters = collect($parameters);
 
@@ -42,6 +41,6 @@ class CannotCreateData extends Exception
                 ->map(fn (DataProperty|DataParameter $parameter) => $parameter->name)
                 ->join(', ')}.";
 
-        return new self($message, previous: $previous);
+        return new self($message);
     }
 }

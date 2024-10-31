@@ -91,23 +91,21 @@ class DataFromArrayResolver
             }
         }
 
-        try {
-            return new $dataClass->name(...$parameters);
-        } catch (ArgumentCountError $error) {
-            if ($this->isExceptionCausedByDataClass($error, $dataClass)) {
-                throw CannotCreateData::constructorMissingParameters(
-                    $dataClass,
-                    $parameters,
-                    $error,
-                );
-            } else {
-                throw $error;
-            }
+        if ($this->isAnyParameterMissing($dataClass, array_keys($parameters))) {
+            throw CannotCreateData::constructorMissingParameters(
+                $dataClass,
+                $parameters,
+            );
         }
     }
 
-    protected function isExceptionCausedByDataClass(ArgumentCountError $error, DataClass $dataClass): bool
+    protected function isAnyParameterMissing(DataClass $dataClass, array $parameters): bool
     {
-        return str_contains($error->getMessage(), sprintf('Too few arguments to function %s::__construct', $dataClass->name));
+        return $dataClass
+            ->constructorMethod
+            ->parameters
+            ->pluck('name')
+            ->diff($parameters)
+            ->isNotEmpty();
     }
 }
