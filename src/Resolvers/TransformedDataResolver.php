@@ -41,12 +41,12 @@ class TransformedDataResolver
 
         $transformed = $this->transform($data, $context, $dataClass);
 
-        if ($data instanceof WrappableData && $context->wrapExecutionType->shouldExecute()) {
-            $transformed = $data->getWrap()->wrap($transformed);
-        }
-
         if ($data instanceof AppendableData) {
             $transformed = array_merge($transformed, $data->getAdditionalData());
+        }
+
+        if ($data instanceof WrappableData && $context->wrapExecutionType->shouldExecute()) {
+            $transformed = $data->getWrap()->wrap($transformed);
         }
 
         return $transformed;

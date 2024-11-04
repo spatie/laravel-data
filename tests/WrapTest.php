@@ -148,9 +148,11 @@ it('wraps additional data', function () {
         ->getData(true);
 
     expect($data)->toMatchArray([
-        'wrap' => ['string' => 'Hello World'],
-        'additional' => 'this',
-        'with' => 'this',
+        'wrap' => [
+            'string' => 'Hello World',
+            'additional' => 'this',
+            'with' => 'this',
+        ]
     ]);
 });
 
@@ -239,6 +241,23 @@ it('will wrap responses which are data collections', function () {
             'data' => [
                 ['string' => 'Hello World'],
                 ['string' => 'HELLO WORLD'],
+            ],
+        ]);
+});
+
+it('can wrap additional properties', function () {
+    Route::post('/example-route', function () {
+        return SimpleData::from(['string' => 'Ruben'])
+            ->additional(['role' => 'admin'])
+            ->wrap('data');
+    });
+
+    performRequest('Hello World')
+        ->assertCreated()
+        ->assertJson([
+            'data' => [
+                'string' => 'Ruben',
+                'role' => 'admin',
             ],
         ]);
 });
