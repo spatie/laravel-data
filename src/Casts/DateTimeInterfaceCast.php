@@ -38,6 +38,11 @@ class DateTimeInterfaceCast implements Cast, IterableItemCast
             return Uncastable::create();
         }
 
+        // Truncate nanoseconds to microseconds (first 6 digits)
+        // Input: 2024-12-02T16:20:15.969827247Z
+        $value = preg_replace('/\.(\d{6})\d*Z$/', '.$1Z', $value);
+        // Output: 2024-12-02T16:20:15.969827Z
+
         /** @var DateTimeInterface|null $datetime */
         $datetime = $formats
             ->map(fn (string $format) => rescue(fn () => $type::createFromFormat(
