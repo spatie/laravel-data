@@ -27,7 +27,7 @@ class AuthorizedDataPipe implements DataPipe
     protected function ensureRequestIsAuthorized(string $class): void
     {
         /** @psalm-suppress UndefinedMethod */
-        if (method_exists($class, 'authorize') && $class::authorize() === false) {
+        if (method_exists($class, 'authorize') && app()->call([$class, 'authorize']) === false) {
             throw new AuthorizationException();
         }
     }
