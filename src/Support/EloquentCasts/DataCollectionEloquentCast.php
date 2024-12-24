@@ -40,10 +40,10 @@ class DataCollectionEloquentCast implements CastsAttributes
 
         $data = json_decode($value, true, flags: JSON_THROW_ON_ERROR);
 
-        $dataClass = $this->dataConfig->getDataClass($this->dataClass);
+        $isAbstractClassCast = $this->isAbstractClassCast();
 
-        $data = array_map(function (array $item) use ($dataClass) {
-            if ($dataClass->isAbstract && $dataClass->transformable && ! $dataClass->propertyMorphable) {
+        $data = array_map(function (array $item) use ($isAbstractClassCast) {
+            if ($isAbstractClassCast) {
                 $morphedClass = $this->dataConfig->morphMap->getMorphedDataClass($item['type']) ?? $item['type'];
 
                 return $morphedClass::from($item['data']);
@@ -73,10 +73,10 @@ class DataCollectionEloquentCast implements CastsAttributes
             throw CannotCastData::shouldBeArray($model::class, $key);
         }
 
-        $dataClass = $this->dataConfig->getDataClass($this->dataClass);
+        $isAbstractClassCast = $this->isAbstractClassCast();
 
-        $data = array_map(function (array|BaseData $item) use ($dataClass) {
-            if ($dataClass->isAbstract && $item instanceof TransformableData) {
+        $data = array_map(function (array|BaseData $item) use ($isAbstractClassCast) {
+            if ($isAbstractClassCast && $item instanceof TransformableData) {
                 $class = get_class($item);
 
                 return [
@@ -90,7 +90,7 @@ class DataCollectionEloquentCast implements CastsAttributes
                 : $item;
         }, $value);
 
-        if ($dataClass->isAbstract) {
+        if ($isAbstractClassCast) {
             return json_encode($data);
         }
 
@@ -107,6 +107,8 @@ class DataCollectionEloquentCast implements CastsAttributes
 
     protected function isAbstractClassCast(): bool
     {
-        return $this->dataConfig->getDataClass($this->dataClass)->isAbstract;
+        $dataClass = $this->dataConfig->getDataClass($this->dataClass);
+
+        return $dataClass->isAbstract && $dataClass->transformable && ! $dataClass->propertyMorphable;
     }
 }
