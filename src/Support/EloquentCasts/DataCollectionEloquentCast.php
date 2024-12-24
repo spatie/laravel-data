@@ -108,6 +108,7 @@ class DataCollectionEloquentCast implements CastsAttributes
     protected function isAbstractClassCast(): bool
     {
         $dataClass = $this->dataConfig->getDataClass($this->dataClass);
+
         return $dataClass->isAbstract && $dataClass->transformable;
     }
 }
