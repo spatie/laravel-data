@@ -3,7 +3,9 @@
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -1227,3 +1229,32 @@ it('is possible to create a union type data collectable', function () {
         [10, SimpleData::from('Hello World')]
     );
 })->todo();
+
+it('can casts an array of enum values to array', function () {
+    $model = new class () extends Model {
+        protected function casts(): array
+        {
+            return [
+                'enums' => AsEnumArrayObject::of(DummyBackedEnum::class),
+            ];
+        }
+    };
+
+    $dataClass = new class () extends Data {
+        /** @param array<DummyBackedEnum> $enums */
+        public function __construct(
+            public readonly array $enums = [],
+        ) {
+        }
+    };
+
+    expect($dataClass::from($model)->enums)->toEqual([]);
+
+    $model->enums = [DummyBackedEnum::FOO];
+
+    expect($dataClass::from($model)->enums)->toEqual([DummyBackedEnum::FOO]);
+
+    $model->enums = [DummyBackedEnum::FOO, DummyBackedEnum::BOO];
+
+    expect($dataClass::from($model)->enums)->toEqual([DummyBackedEnum::FOO, DummyBackedEnum::BOO]);
+});

@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Normalizers\Normalized;
 
+use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use ReflectionProperty;
@@ -31,6 +32,10 @@ class NormalizedModel implements Normalized
 
         if ($value === null && ! $dataProperty->type->isNullable) {
             return UnknownProperty::create();
+        }
+
+        if ($value instanceof ArrayObject) {
+            return $value->toArray();
         }
 
         return $value;
