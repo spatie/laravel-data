@@ -8,7 +8,7 @@ It is possible to create a data object from a model, let's say we have the follo
 ```php
 class Artist extends Model
 {
-    
+
 }
 ```
 
@@ -44,19 +44,21 @@ $artist = ArtistData::from(Artist::find(1));
 A model can have casts, these casts will be called before a data object is created. Let's extend the model:
 
 ```php
+use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
+
 class Artist extends Model
 {
     public function casts(): array
     {
        return [
-            'properties' => 'array'
+            'properties' => 'array',
+            'specialties' => AsEnumArrayObject::of(Specialty::class),
        ];
     }
 }
 ```
 
-Within the database the new column will be stored as a JSON string, but in the data object we can just use the array
-type:
+Within the database the `properties` column will be stored as a JSON string, the `specialties` column will be stored an array of enum values within, but in the data object we can just use the array type:
 
 ```php
 class ArtistData extends Data
@@ -65,6 +67,7 @@ class ArtistData extends Data
     public string $first_name;
     public string $last_name;
     public array $properties;
+    public array $specialties;
     public CarbonImmutable $created_at;
     public CarbonImmutable $updated_at;
 }
