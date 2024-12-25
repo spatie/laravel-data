@@ -121,7 +121,7 @@ parameters:
 			path: src/Support/DataConfig.php
 
 		-
-			message: "#^Call to method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),string\\|null\\>\\:\\:isEmpty\\(\\) will always evaluate to false\\.$#"
+			message: "#^Call to method Illuminate\\\\Support\\\\Collection\\<\\(string\\|int\\),null\\|string\\>\\:\\:isEmpty\\(\\) will always evaluate to false\\.$#"
 			count: 1
 			path: src/Support/Validation/RuleDenormalizer.php
 
