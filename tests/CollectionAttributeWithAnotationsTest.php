@@ -1,6 +1,6 @@
 <?php
 
-use Spatie\LaravelData\Tests\Fakes\Collections\SimpleDataCollectionWithAnotations;
+use Spatie\LaravelData\Tests\Fakes\Collections\SimpleDataCollectionWithAnnotations;
 use Spatie\LaravelData\Tests\Fakes\DataWithSimpleDataCollectionWithAnotations;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
@@ -20,7 +20,7 @@ it('can create a data object with a collection attribute from array and back', f
     $data = DataWithSimpleDataCollectionWithAnotations::from($this->payload);
 
     expect($data)->toEqual(new DataWithSimpleDataCollectionWithAnotations(
-        collection: new SimpleDataCollectionWithAnotations([
+        collection: new SimpleDataCollectionWithAnnotations([
             new SimpleData(string: 'string1'),
             new SimpleData(string: 'string2'),
             new SimpleData(string: 'string3'),

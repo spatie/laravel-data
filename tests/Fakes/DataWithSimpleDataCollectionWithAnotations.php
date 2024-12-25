@@ -3,12 +3,12 @@
 namespace Spatie\LaravelData\Tests\Fakes;
 
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Tests\Fakes\Collections\SimpleDataCollectionWithAnotations;
+use Spatie\LaravelData\Tests\Fakes\Collections\SimpleDataCollectionWithAnnotations;
 
 class DataWithSimpleDataCollectionWithAnotations extends Data
 {
     public function __construct(
-        public SimpleDataCollectionWithAnotations $collection
+        public SimpleDataCollectionWithAnnotations $collection
     ) {
     }
 }

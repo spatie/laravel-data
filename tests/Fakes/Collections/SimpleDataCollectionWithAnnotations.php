@@ -10,6 +10,6 @@ use Illuminate\Support\Collection;
  *
  * @extends \Illuminate\Support\Collection<TKey, TData>
  */
-class SimpleDataCollectionWithAnotations extends Collection
+class SimpleDataCollectionWithAnnotations extends Collection
 {
 }
