@@ -4,9 +4,11 @@ namespace Spatie\LaravelData\Support\Annotations;
 
 use Iterator;
 use IteratorAggregate;
-use phpDocumentor\Reflection\DocBlock\Tags\Generic;
+use phpDocumentor\Reflection\DocBlock\Tags\Extends_;
+use phpDocumentor\Reflection\DocBlock\Tags\Template;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\TypeResolver;
+use phpDocumentor\Reflection\Types\Collection;
 use phpDocumentor\Reflection\Types\Context;
 use ReflectionClass;
 use Spatie\LaravelData\Data;
@@ -96,44 +98,39 @@ class CollectionAnnotationReader
         $docBlock = $docBlockFactory->create($docComment, $this->context);
 
         $templateTypes = [];
-        $keyType = null;
-        $valueType = null;
 
         foreach ($docBlock->getTags() as $tag) {
-            if (! $tag instanceof Generic) {
-                continue;
-            }
-
-            if ($tag->getName() === 'template') {
-                $description = $tag->getDescription();
-
-                if (preg_match('/^(\w+)\s+of\s+([^\s]+)/', $description, $matches)) {
-                    $templateTypes[$matches[1]] = $this->resolve($matches[2]);
-                }
+            if ($tag instanceof Template) {
+                $templateName = $this->resolve($tag->getTemplateName());
+                $bound = $this->resolve((string) $tag->getBound());
+                $templateTypes[$templateName] = $bound;
 
                 continue;
             }
 
-            if ($tag->getName() === 'extends') {
-                $description = $tag->getDescription();
-
-                if (preg_match('/<\s*([^,\s]+)?\s*(?:,\s*([^>\s]+))?\s*>/', $description, $matches)) {
-                    if (count($matches) === 3) {
-                        $keyType = $templateTypes[$matches[1]] ?? $this->resolve($matches[1]);
-                        $valueType = $templateTypes[$matches[2]] ?? $this->resolve($matches[2]);
-                    } else {
-                        $keyType = null;
-                        $valueType = $templateTypes[$matches[1]] ?? $this->resolve($matches[1]);
-                    }
-
-                    $keyType = $keyType ? explode('|', $keyType)[0] : null;
-                    $valueType = explode('|', $valueType)[0];
-
-                    return [
-                        'keyType' => $keyType,
-                        'valueType' => $valueType,
-                    ];
+            if ($tag instanceof Extends_) {
+                $type = $tag->getType();
+                if (! $type instanceof Collection) {
+                    continue;
                 }
+
+                $keyType = $this->resolve((string) $type->getKeyType());
+                $valueType = $this->resolve((string) $type->getValueType());
+
+                if ($keyType === 'string|int') {
+                    $keyType = 'array-key';
+                }
+
+                $keyType = $templateTypes[$keyType] ?? $keyType;
+                $valueType = $templateTypes[$valueType] ?? $valueType;
+
+                $keyType = $keyType ? explode('|', $keyType)[0] : null;
+                $valueType = explode('|', $valueType)[0];
+
+                return [
+                    'keyType' => $keyType,
+                    'valueType' => $valueType,
+                ];
             }
         }
 
