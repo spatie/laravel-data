@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Support\Annotations;
 
 use Iterator;
 use IteratorAggregate;
-use phpDocumentor\Reflection\DocBlock\Tags\Generic;
+use phpDocumentor\Reflection\DocBlock\Tag;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\TypeResolver;
 use phpDocumentor\Reflection\Types\Context;
@@ -100,12 +100,12 @@ class CollectionAnnotationReader
         $valueType = null;
 
         foreach ($docBlock->getTags() as $tag) {
-            if (! $tag instanceof Generic) {
+            if (! $tag instanceof Tag) {
                 continue;
             }
 
             if ($tag->getName() === 'template') {
-                $description = $tag->getDescription();
+                $description = (string)$tag;
 
                 if (preg_match('/^(\w+)\s+of\s+([^\s]+)/', $description, $matches)) {
                     $templateTypes[$matches[1]] = $this->resolve($matches[2]);
@@ -115,15 +115,15 @@ class CollectionAnnotationReader
             }
 
             if ($tag->getName() === 'extends') {
-                $description = $tag->getDescription();
+                $description = (string)$tag;
 
                 if (preg_match('/<\s*([^,\s]+)?\s*(?:,\s*([^>\s]+))?\s*>/', $description, $matches)) {
                     if (count($matches) === 3) {
-                        $keyType = $templateTypes[$matches[1]] ?? $this->resolve($matches[1]);
-                        $valueType = $templateTypes[$matches[2]] ?? $this->resolve($matches[2]);
+                        $keyType = $templateTypes[class_basename($matches[1])] ?? $this->resolve($matches[1]);
+                        $valueType = $templateTypes[class_basename($matches[2])] ?? $this->resolve($matches[2]);
                     } else {
                         $keyType = null;
-                        $valueType = $templateTypes[$matches[1]] ?? $this->resolve($matches[1]);
+                        $valueType = $templateTypes[class_basename($matches[1])] ?? $this->resolve($matches[1]);
                     }
 
                     $keyType = $keyType ? explode('|', $keyType)[0] : null;
