@@ -84,9 +84,7 @@ class CollectionAnnotationReader
     protected function getCollectionReturnType(ReflectionClass $class): ?array
     {
         $docBlockFactory = DocBlockFactory::createInstance();
-
         $this->context = $this->contextResolver->execute($class);
-
         $docComment = $class->getDocComment();
 
         if ($docComment === false) {
@@ -96,45 +94,60 @@ class CollectionAnnotationReader
         $docBlock = $docBlockFactory->create($docComment, $this->context);
 
         $templateTypes = [];
-        $keyType = null;
-        $valueType = null;
 
         foreach ($docBlock->getTags() as $tag) {
             if (! $tag instanceof Tag) {
                 continue;
             }
 
-            if ($tag->getName() === 'template') {
-                $description = (string)$tag;
+            $tagName = $tag->getName();
+            $description = (string) $tag;
 
-                if (preg_match('/^(\w+)\s+of\s+([^\s]+)/', $description, $matches)) {
-                    $templateTypes[$matches[1]] = $this->resolve($matches[2]);
-                }
+            if ($tagName === 'template') {
+                $this->processTemplateTag($description, $templateTypes);
 
                 continue;
             }
 
-            if ($tag->getName() === 'extends') {
-                $description = (string)$tag;
-
-                if (preg_match('/<\s*([^,\s]+)?\s*(?:,\s*([^>\s]+))?\s*>/', $description, $matches)) {
-                    if (count($matches) === 3) {
-                        $keyType = $templateTypes[class_basename($matches[1])] ?? $this->resolve($matches[1]);
-                        $valueType = $templateTypes[class_basename($matches[2])] ?? $this->resolve($matches[2]);
-                    } else {
-                        $keyType = null;
-                        $valueType = $templateTypes[class_basename($matches[1])] ?? $this->resolve($matches[1]);
-                    }
-
-                    $keyType = $keyType ? explode('|', $keyType)[0] : null;
-                    $valueType = explode('|', $valueType)[0];
-
-                    return [
-                        'keyType' => $keyType,
-                        'valueType' => $valueType,
-                    ];
-                }
+            if ($tagName === 'extends') {
+                return $this->processExtendsTag($description, $templateTypes);
             }
+        }
+
+        return null;
+    }
+
+    private function processTemplateTag(string $description, array &$templateTypes): void
+    {
+        // The pattern matches strings like "T of SomeType", capturing "T" as the template name
+        // and "SomeType" as the type associated with the template.
+        if (preg_match('/^(\w+)\s+of\s+([^\s]+)/', $description, $matches)) {
+            $templateTypes[$matches[1]] = $this->resolve($matches[2]);
+        }
+    }
+
+    private function processExtendsTag(string $description, array $templateTypes): ?array
+    {
+        // The pattern matches strings like "<KeyType, ValueType>" or "<ValueType>",
+        // capturing "KeyType" and "ValueType" or just "ValueType" if no key type is specified.
+        if (preg_match('/<\s*([^,\s]+)?\s*(?:,\s*([^>\s]+))?\s*>/', $description, $matches)) {
+            $keyType = null;
+            $valueType = null;
+
+            if (count($matches) === 3) {
+                $keyType = $templateTypes[class_basename($matches[1])] ?? $this->resolve($matches[1]);
+                $valueType = $templateTypes[class_basename($matches[2])] ?? $this->resolve($matches[2]);
+            } else {
+                $valueType = $templateTypes[class_basename($matches[1])] ?? $this->resolve($matches[1]);
+            }
+
+            $keyType = $keyType ? explode('|', $keyType)[0] : null;
+            $valueType = explode('|', $valueType)[0];
+
+            return [
+                'keyType' => $keyType,
+                'valueType' => $valueType,
+            ];
         }
 
         return null;
