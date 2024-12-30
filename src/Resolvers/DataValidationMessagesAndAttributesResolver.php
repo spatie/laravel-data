@@ -65,8 +65,6 @@ class DataValidationMessagesAndAttributesResolver
 
                 $messages = array_merge($messages, $collected['messages']);
                 $attributes = array_merge($attributes, $collected['attributes']);
-
-                continue;
             }
         }
 
