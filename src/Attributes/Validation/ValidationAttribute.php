@@ -46,11 +46,11 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
         }
 
         if ($value === 'true' || $value === '1') {
-            return true;
+            return 'true';
         }
 
         if ($value === 'false' || $value === '0') {
-            return true;
+            return 'false';
         }
 
         return $value;
