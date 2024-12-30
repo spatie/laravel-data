@@ -27,9 +27,7 @@ class DataStructureCache
         /** @var ?CachedDataConfig $cachedConfig */
         $cachedConfig = $this->get('config');
 
-        if ($cachedConfig) {
-            $cachedConfig->setCache($this);
-        }
+        $cachedConfig?->setCache($this);
 
         return $cachedConfig;
     }
