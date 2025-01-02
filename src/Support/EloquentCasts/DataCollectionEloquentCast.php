@@ -43,7 +43,7 @@ class DataCollectionEloquentCast implements CastsAttributes
         $dataClass = $this->dataConfig->getDataClass($this->dataClass);
 
         $data = array_map(function (array $item) use ($dataClass) {
-            if ($dataClass->isAbstract && $dataClass->transformable) {
+            if ($dataClass->isAbstract && $dataClass->transformable && ! $dataClass->propertyMorphable) {
                 $morphedClass = $this->dataConfig->morphMap->getMorphedDataClass($item['type']) ?? $item['type'];
 
                 return $morphedClass::from($item['data']);

@@ -34,6 +34,12 @@ class DataValidationRulesResolver
     ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
 
+        if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
+            $payload = $path->isRoot() ? $fullPayload : Arr::get($fullPayload, $path->get(), []);
+            $class = $class::morph($payload) ?? $class;
+            $dataClass = $this->dataConfig->getDataClass($class);
+        }
+
         $withoutValidationProperties = [];
 
         foreach ($dataClass->properties as $dataProperty) {

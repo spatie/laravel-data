@@ -11,6 +11,7 @@ use ReflectionProperty;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\EmptyData;
 use Spatie\LaravelData\Contracts\IncludeableData;
+use Spatie\LaravelData\Contracts\PropertyMorphableData;
 use Spatie\LaravelData\Contracts\ResponsableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\ValidateableData;
@@ -82,6 +83,7 @@ class DataClassFactory
             constructorMethod: $constructor,
             isReadonly: method_exists($reflectionClass, 'isReadOnly') && $reflectionClass->isReadOnly(),
             isAbstract: $reflectionClass->isAbstract(),
+            propertyMorphable: $reflectionClass->implementsInterface(PropertyMorphableData::class),
             appendable: $reflectionClass->implementsInterface(AppendableData::class),
             includeable: $reflectionClass->implementsInterface(IncludeableData::class),
             responsable: $responsable,

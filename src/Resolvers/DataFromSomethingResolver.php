@@ -30,6 +30,10 @@ class DataFromSomethingResolver
         CreationContext $creationContext,
         mixed ...$payloads
     ): BaseData {
+        if ($this->isPropertyMorphable($class)) {
+            $class = $class::morph(...$payloads) ?? $class;
+        }
+
         if ($data = $this->createFromCustomCreationMethod($class, $creationContext, $payloads)) {
             return $data;
         }
@@ -58,6 +62,14 @@ class DataFromSomethingResolver
         }
 
         return $this->dataFromArrayResolver->execute($class, $properties);
+    }
+
+    protected function isPropertyMorphable(string $class): bool
+    {
+        $dataClass = $this->dataConfig
+            ->getDataClass($class);
+
+        return $dataClass->isAbstract && $dataClass->propertyMorphable;
     }
 
     protected function createFromCustomCreationMethod(
