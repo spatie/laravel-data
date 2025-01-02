@@ -12,6 +12,8 @@ use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithEncryptedCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithPropertyMorphableCast;
+use Spatie\LaravelData\Tests\Fakes\PropertyMorphableData\PropertyMorphableDataA;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithDefaultValue;
 
@@ -182,4 +184,22 @@ it('can load and save an abstract defined data object', function () {
     }
 
     expect($isEncrypted)->toBeTrue();
+});
+
+it('can load and save an abstract property-morphable data object', function () {
+    $abstractA = new PropertyMorphableDataA('foo');
+
+    $modelId = DummyModelWithPropertyMorphableCast::create([
+        'data' => $abstractA,
+    ])->id;
+
+    assertDatabaseHas(DummyModelWithPropertyMorphableCast::class, [
+        'data' => json_encode(['a' => 'foo', 'variant' => 'a']),
+    ]);
+
+    $model = DummyModelWithPropertyMorphableCast::find($modelId);
+
+    expect($model->data)
+        ->toBeInstanceOf(PropertyMorphableDataA::class)
+        ->a->toBe('foo');
 });
