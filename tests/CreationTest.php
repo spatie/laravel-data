@@ -53,6 +53,11 @@ use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelData;
+use Spatie\LaravelData\Tests\Fakes\PropertyMorphableData\AbstractPropertyMorphableData;
+use Spatie\LaravelData\Tests\Fakes\PropertyMorphableData\NestedPropertyMorphableData;
+use Spatie\LaravelData\Tests\Fakes\PropertyMorphableData\PropertyMorphableDataA;
+use Spatie\LaravelData\Tests\Fakes\PropertyMorphableData\PropertyMorphableDataB;
+use Spatie\LaravelData\Tests\Fakes\PropertyMorphableData\PropertyMorphableEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
 
@@ -1227,3 +1232,62 @@ it('is possible to create a union type data collectable', function () {
         [10, SimpleData::from('Hello World')]
     );
 })->todo();
+
+it('will allow property-morphable data to be created', function () {
+    $dataA = AbstractPropertyMorphableData::from([
+        'variant' => 'a',
+        'a' => 'foo',
+    ]);
+
+    expect($dataA)
+        ->toBeInstanceOf(PropertyMorphableDataA::class)
+        ->variant->toEqual(PropertyMorphableEnum::A)
+        ->a->toEqual('foo');
+
+    $dataB = AbstractPropertyMorphableData::from([
+        'variant' => 'b',
+        'b' => 'bar',
+    ]);
+
+    expect($dataB)
+        ->toBeInstanceOf(PropertyMorphableDataB::class)
+        ->variant->toEqual(PropertyMorphableEnum::B)
+        ->b->toEqual('bar');
+});
+
+it('will allow property-morphable data to be created from a nested collection', function () {
+    $data = NestedPropertyMorphableData::from([
+        'nestedCollection' => [
+            ['variant' => 'a', 'a' => 'foo'],
+            ['variant' => 'b', 'b' => 'bar'],
+        ],
+    ]);
+
+    expect($data->nestedCollection[0])
+        ->toBeInstanceOf(PropertyMorphableDataA::class)
+        ->variant->toEqual(PropertyMorphableEnum::A)
+        ->a->toEqual('foo');
+
+    expect($data->nestedCollection[1])
+        ->toBeInstanceOf(PropertyMorphableDataB::class)
+        ->variant->toEqual(PropertyMorphableEnum::B)
+        ->b->toEqual('bar');
+});
+
+
+it('will allow property-morphable data to be created as a collection', function () {
+    $collection = AbstractPropertyMorphableData::collect([
+        ['variant' => 'a', 'a' => 'foo'],
+        ['variant' => 'b', 'b' => 'bar'],
+    ]);
+
+    expect($collection[0])
+        ->toBeInstanceOf(PropertyMorphableDataA::class)
+        ->variant->toEqual(PropertyMorphableEnum::A)
+        ->a->toEqual('foo');
+
+    expect($collection[1])
+        ->toBeInstanceOf(PropertyMorphableDataB::class)
+        ->variant->toEqual(PropertyMorphableEnum::B)
+        ->b->toEqual('bar');
+});
