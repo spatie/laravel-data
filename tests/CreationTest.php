@@ -57,7 +57,6 @@ use Spatie\LaravelData\Tests\Fakes\PropertyMorphableData\AbstractPropertyMorphab
 use Spatie\LaravelData\Tests\Fakes\PropertyMorphableData\NestedPropertyMorphableData;
 use Spatie\LaravelData\Tests\Fakes\PropertyMorphableData\PropertyMorphableDataA;
 use Spatie\LaravelData\Tests\Fakes\PropertyMorphableData\PropertyMorphableDataB;
-use Spatie\LaravelData\Tests\Fakes\PropertyMorphableData\PropertyMorphableEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
 
@@ -1241,7 +1240,7 @@ it('will allow property-morphable data to be created', function () {
 
     expect($dataA)
         ->toBeInstanceOf(PropertyMorphableDataA::class)
-        ->variant->toEqual(PropertyMorphableEnum::A)
+        ->variant->toEqual('a')
         ->a->toEqual('foo');
 
     $dataB = AbstractPropertyMorphableData::from([
@@ -1251,7 +1250,7 @@ it('will allow property-morphable data to be created', function () {
 
     expect($dataB)
         ->toBeInstanceOf(PropertyMorphableDataB::class)
-        ->variant->toEqual(PropertyMorphableEnum::B)
+        ->variant->toEqual('b')
         ->b->toEqual('bar');
 });
 
@@ -1265,12 +1264,12 @@ it('will allow property-morphable data to be created from a nested collection', 
 
     expect($data->nestedCollection[0])
         ->toBeInstanceOf(PropertyMorphableDataA::class)
-        ->variant->toEqual(PropertyMorphableEnum::A)
+        ->variant->toEqual('a')
         ->a->toEqual('foo');
 
     expect($data->nestedCollection[1])
         ->toBeInstanceOf(PropertyMorphableDataB::class)
-        ->variant->toEqual(PropertyMorphableEnum::B)
+        ->variant->toEqual('b')
         ->b->toEqual('bar');
 });
 
@@ -1283,11 +1282,11 @@ it('will allow property-morphable data to be created as a collection', function 
 
     expect($collection[0])
         ->toBeInstanceOf(PropertyMorphableDataA::class)
-        ->variant->toEqual(PropertyMorphableEnum::A)
+        ->variant->toEqual('a')
         ->a->toEqual('foo');
 
     expect($collection[1])
         ->toBeInstanceOf(PropertyMorphableDataB::class)
-        ->variant->toEqual(PropertyMorphableEnum::B)
+        ->variant->toEqual('b')
         ->b->toEqual('bar');
 });
