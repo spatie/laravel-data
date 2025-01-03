@@ -143,3 +143,39 @@ it(
             ->assertJson(['name' => 'Rick Astley']);
     }
 );
+
+it('can build authorize parameters from the container', function (): void {
+    class SomeDependency
+    {
+        public function __construct(public string $street)
+        {
+        }
+    }
+
+    app()->bind(SomeDependency::class, fn () => new SomeDependency('Sesame'));
+    class AuthorizeFromContainerRequest extends Data
+    {
+        public static string $street;
+
+        public function __construct(public string $name)
+        {
+        }
+
+        public static function authorize(SomeDependency $dependency): bool
+        {
+            self::$street = $dependency->street;
+
+            return $dependency->street === 'Sesame';
+        }
+    }
+
+    Route::post('/route-with-authorization-dependencies', function (\AuthorizeFromContainerRequest $data) {
+        return ['name' => $data->name, 'street' => \AuthorizeFromContainerRequest::$street];
+    });
+
+    postJson('/route-with-authorization-dependencies', [
+        'name' => 'Rick Astley',
+    ])
+        ->assertOk()
+        ->assertJson(['name' => 'Rick Astley', 'street' => 'Sesame']);
+});
