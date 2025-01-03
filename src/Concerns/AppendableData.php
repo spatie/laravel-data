@@ -24,13 +24,10 @@ trait AppendableData
     {
         $additional = $this->with();
 
-        $computedAdditional = [];
-
-        foreach ($additional as $name => $value) {
-            $computedAdditional[$name] = $value instanceof Closure
-                ? ($value)($this)
-                : $value;
-        }
+        $computedAdditional = array_map(
+            fn ($value) => $value instanceof Closure ? ($value)($this) : $value,
+            $additional
+        );
 
         foreach ($this->_additional as $name => $value) {
             $computedAdditional[$name] = $value instanceof Closure

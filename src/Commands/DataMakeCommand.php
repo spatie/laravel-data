@@ -39,7 +39,7 @@ class DataMakeCommand extends GeneratorCommand
     {
         $suffix = trim($this->option('suffix'));
         if (! empty($suffix) && ! Str::endsWith($name, $suffix)) {
-            $name = $name . $suffix;
+            $name .= $suffix;
         }
 
         return parent::qualifyClass($name);

@@ -8,7 +8,7 @@ use Spatie\LaravelData\Support\DataProperty;
 class UnserializeCast implements Cast
 {
     public function __construct(
-        private bool $failSilently = false,
+        private readonly bool $failSilently = false,
     ) {
     }
 

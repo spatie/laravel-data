@@ -74,7 +74,6 @@ class DataEloquentCast implements CastsAttributes
                 'data' => json_decode($value->toJson(), associative: true, flags: JSON_THROW_ON_ERROR),
             ])
             : $value->toJson();
-        ;
 
         if (in_array('encrypted', $this->arguments)) {
             return Crypt::encryptString($value);

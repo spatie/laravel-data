@@ -19,7 +19,7 @@ class CannotPerformPartialOnDataField extends Exception
     ): self {
         $message = "Tried to {$partialType->getVerb()} a non existing field `{$field}` on `{$dataClass->name}`.".PHP_EOL;
         $message .= 'Provided transformation context:'.PHP_EOL.PHP_EOL;
-        $message .= (string) $transformationContext;
+        $message .= $transformationContext;
 
         return new self(message: $message, previous: $exception);
     }

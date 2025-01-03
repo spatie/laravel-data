@@ -9,13 +9,13 @@ use Spatie\LaravelData\Support\Validation\ValidationPath;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Exclude extends ObjectValidationAttribute
 {
-    public function __construct(protected ExcludeIf $rule)
+    public function __construct(protected ?ExcludeIf $rule = null)
     {
     }
 
     public function getRule(ValidationPath $path): object|string
     {
-        return $this->rule;
+        return $this->rule ?? self::keyword();
     }
 
     public static function keyword(): string

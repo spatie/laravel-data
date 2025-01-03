@@ -151,10 +151,6 @@ class RequestQueryStringPartialsResolver
 
         $outputMappedProperties = $dataClass->outputMappedProperties->resolve();
 
-        if (array_key_exists($field, $outputMappedProperties)) {
-            return $outputMappedProperties[$field];
-        }
-
-        return null;
+        return $outputMappedProperties[$field] ?? null;
     }
 }

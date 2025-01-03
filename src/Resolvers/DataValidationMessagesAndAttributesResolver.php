@@ -45,8 +45,9 @@ class DataValidationMessagesAndAttributesResolver
                     [...$nestingChain, $dataProperty->type->dataClass],
                 );
 
-                $messages = array_merge($messages, $nested['messages']);
-                $attributes = array_merge($attributes, $nested['attributes']);
+
+                $messages[] = $nested['messages'];
+                $attributes[] = $nested['attributes'];
 
                 continue;
             }
@@ -63,12 +64,13 @@ class DataValidationMessagesAndAttributesResolver
                     [...$nestingChain, $dataProperty->type->dataClass],
                 );
 
-                $messages = array_merge($messages, $collected['messages']);
-                $attributes = array_merge($attributes, $collected['attributes']);
-
-                continue;
+                $messages[] = $collected['messages'];
+                $attributes[] = $collected['attributes'];
             }
         }
+
+        $messages = array_merge(...$messages);
+        $attributes = array_merge(...$attributes);
 
         if (method_exists($class, 'messages')) {
             $messages = collect(app()->call([$class, 'messages']))
