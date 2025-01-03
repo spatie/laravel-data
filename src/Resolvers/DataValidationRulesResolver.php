@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Present;
+use Spatie\LaravelData\Contracts\PropertyMorphableData;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
@@ -33,6 +34,15 @@ class DataValidationRulesResolver
         DataRules $dataRules
     ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
+
+        if ($this->isPropertyMorphable($dataClass)) {
+            /**
+             * @var class-string<PropertyMorphableData> $class
+             */
+            $payload = $path->isRoot() ? $fullPayload : Arr::get($fullPayload, $path->get(), []);
+            $class = $class::morph($payload) ?? $class;
+            $dataClass = $this->dataConfig->getDataClass($class);
+        }
 
         $withoutValidationProperties = [];
 
@@ -277,5 +287,10 @@ class DataValidationRulesResolver
             $rules->all(),
             $path
         );
+    }
+
+    protected function isPropertyMorphable(DataClass $dataClass): bool
+    {
+        return $dataClass->isAbstract && $dataClass->propertyMorphable;
     }
 }

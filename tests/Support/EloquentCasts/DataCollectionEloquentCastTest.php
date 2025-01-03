@@ -8,9 +8,13 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractData;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCustomCollectionCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithPropertyMorphableCast;
+use Spatie\LaravelData\Tests\Fakes\PropertyMorphableData\PropertyMorphableDataA;
+use Spatie\LaravelData\Tests\Fakes\PropertyMorphableData\PropertyMorphableDataB;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataCollection;
 
@@ -169,4 +173,31 @@ it('can use an abstract data collection with multiple children', function () {
 
     expect($model->abstract_collection[0])->toBeInstanceOf(AbstractDataA::class);
     expect($model->abstract_collection[1])->toBeInstanceOf(AbstractDataB::class);
+});
+
+it('can load and save an abstract property-morphable data collection', function () {
+    $abstractA = new PropertyMorphableDataA('foo', DummyBackedEnum::FOO);
+    $abstractB = new PropertyMorphableDataB('bar');
+
+    $modelId = DummyModelWithPropertyMorphableCast::create([
+        'data_collection' => [$abstractA, $abstractB],
+    ])->id;
+
+    assertDatabaseHas(DummyModelWithPropertyMorphableCast::class, [
+        'data_collection' => json_encode([
+            ['a' => 'foo', 'enum' => 'foo', 'variant' => 'a'],
+            ['b' => 'bar', 'variant' => 'b'],
+        ], JSON_PRETTY_PRINT),
+    ]);
+
+    $model = DummyModelWithPropertyMorphableCast::find($modelId);
+
+    expect($model->data_collection[0])
+        ->toBeInstanceOf(PropertyMorphableDataA::class)
+        ->a->toBe('foo')
+        ->enum->toBe(DummyBackedEnum::FOO);
+
+    expect($model->data_collection[1])
+        ->toBeInstanceOf(PropertyMorphableDataB::class)
+        ->b->toBe('bar');
 });

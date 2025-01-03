@@ -85,6 +85,8 @@ class DataEloquentCast implements CastsAttributes
 
     protected function isAbstractClassCast(): bool
     {
-        return $this->dataConfig->getDataClass($this->dataClass)->isAbstract;
+        $dataClass = $this->dataConfig->getDataClass($this->dataClass);
+
+        return $dataClass->isAbstract && ! $dataClass->propertyMorphable;
     }
 }
