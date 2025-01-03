@@ -281,3 +281,64 @@ it('can define multiple date formats to be used', function () {
         ->and($data::from(['date' => '2022-05-16 17:00:00']))->toArray()
         ->toMatchArray(['date' => '2022-05-16T17:00:00+00:00']);
 });
+
+
+it('can cast date times with nanosecond precision by truncating nanoseconds to microseconds', function () {
+    $caster = new DateTimeInterfaceCast("Y-m-d\TH:i:s.u\Z");
+
+    $class = new class () {
+        public Carbon $carbon;
+
+        public CarbonImmutable $carbonImmutable;
+
+        public DateTime $dateTime;
+
+        public DateTimeImmutable $dateTimeImmutable;
+    };
+
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'carbon'),
+            '2024-12-02T16:20:15.969827247Z',
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new Carbon('2024-12-02T16:20:15.969827247Z'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'carbonImmutable'),
+            '2024-12-02T16:20:15.969827247Z',
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new CarbonImmutable('2024-12-02T16:20:15.969827247Z'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'dateTime'),
+            '2024-12-02T16:20:15.969827247Z',
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new DateTime('2024-12-02T16:20:15.969827247Z'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
+            '2024-12-02T16:20:15.969827247Z',
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new DateTimeImmutable('2024-12-02T16:20:15.969827247Z'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
+            '2024-12-02T16:20:15.969827247Z',
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new DateTimeImmutable('2024-12-02T16:20:15.969827247Z'));
+});
