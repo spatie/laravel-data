@@ -1647,3 +1647,16 @@ it('handles circular dependencies', function () {
     ]);
     // Not really a test with expectation, we just want to check we don't end up in an infinite loop
 });
+
+it('sets response code', function () {
+    // Given
+    $data = new SimpleData("roxanne");
+    // And
+    $data->setResponseStatusCode(404);
+
+    // When
+    $jsonResponse = $data->toResponse(request());
+
+    // Then
+    expect($jsonResponse->status())->toBe(404);
+});
