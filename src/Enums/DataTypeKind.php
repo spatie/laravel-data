@@ -4,21 +4,21 @@ namespace Spatie\LaravelData\Enums;
 
 use Exception;
 
-enum DataTypeKind
+enum DataTypeKind: string
 {
-    case Default;
-    case Array;
-    case Enumerable;
-    case Paginator;
-    case CursorPaginator;
-    case DataObject;
-    case DataCollection;
-    case DataPaginatedCollection;
-    case DataCursorPaginatedCollection;
-    case DataArray;
-    case DataEnumerable;
-    case DataPaginator;
-    case DataCursorPaginator;
+    case Default = 'Default';
+    case Array = 'Array';
+    case Enumerable = 'Enumerable';
+    case Paginator = 'Paginator';
+    case CursorPaginator = 'CursorPaginator';
+    case DataObject = 'DataObject';
+    case DataCollection = 'DataCollection';
+    case DataPaginatedCollection = 'DataPaginatedCollection';
+    case DataCursorPaginatedCollection = 'DataCursorPaginatedCollection';
+    case DataArray = 'DataArray';
+    case DataEnumerable = 'DataEnumerable';
+    case DataPaginator = 'DataPaginator';
+    case DataCursorPaginator = 'DataCursorPaginator';
 
     public function isDataObject(): bool
     {
