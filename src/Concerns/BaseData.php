@@ -15,6 +15,7 @@ use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
+use Spatie\LaravelData\DataPipes\FillDataPipe;
 use Spatie\LaravelData\DataPipes\FillRouteParameterPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
@@ -72,6 +73,7 @@ trait BaseData
             ->through(AuthorizedDataPipe::class)
             ->through(MapPropertiesDataPipe::class)
             ->through(FillRouteParameterPropertiesDataPipe::class)
+            ->through(FillDataPipe::class)
             ->through(ValidatePropertiesDataPipe::class)
             ->through(DefaultValuesDataPipe::class)
             ->through(CastPropertiesDataPipe::class);
