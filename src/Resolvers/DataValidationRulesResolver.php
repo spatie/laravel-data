@@ -35,9 +35,12 @@ class DataValidationRulesResolver
     ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
 
-        if ($propertyMorphableClass = $this->propertyMorphableClass($dataClass)) {
+        if ($this->isPropertyMorphable($dataClass)) {
+            /**
+             * @var class-string<PropertyMorphableData> $class
+             */
             $payload = $path->isRoot() ? $fullPayload : Arr::get($fullPayload, $path->get(), []);
-            $class = $propertyMorphableClass::morph($payload) ?? $class;
+            $class = $class::morph($payload) ?? $class;
             $dataClass = $this->dataConfig->getDataClass($class);
         }
 
@@ -286,13 +289,8 @@ class DataValidationRulesResolver
         );
     }
 
-    /**
-     * @return class-string<PropertyMorphableData>
-     */
-    protected function propertyMorphableClass(DataClass $dataClass): ?string
+    protected function isPropertyMorphable(DataClass $dataClass): bool
     {
-        return $dataClass->isAbstract && $dataClass->propertyMorphable
-            ? $dataClass->name
-            : null;
+        return $dataClass->isAbstract && $dataClass->propertyMorphable;
     }
 }

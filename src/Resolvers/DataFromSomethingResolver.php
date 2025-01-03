@@ -41,22 +41,23 @@ class DataFromSomethingResolver
 
         if ($payloadCount === 0 || $payloadCount === 1) {
             $properties = $pipeline->execute($payloads[0] ?? [], $creationContext);
-        } else {
-            $properties = [];
 
-            foreach ($payloads as $payload) {
-                foreach ($pipeline->execute($payload, $creationContext) as $key => $value) {
-                    if (array_key_exists($key, $properties) && ($value === null || $value instanceof Optional)) {
-                        continue;
-                    }
+            return $this->dataFromArray($class, $creationContext, $payloads, $properties);
+        }
 
-                    $properties[$key] = $value;
+        $properties = [];
+
+        foreach ($payloads as $payload) {
+            foreach ($pipeline->execute($payload, $creationContext) as $key => $value) {
+                if (array_key_exists($key, $properties) && ($value === null || $value instanceof Optional)) {
+                    continue;
                 }
+
+                $properties[$key] = $value;
             }
         }
 
-        return $this->propertyMorphedData($class, $creationContext, $payloads, $properties)
-            ?? $this->dataFromArrayResolver->execute($class, $properties);
+        return $this->dataFromArray($class, $creationContext, $payloads, $properties);
     }
 
     protected function createFromCustomCreationMethod(
@@ -117,12 +118,12 @@ class DataFromSomethingResolver
         return $class::$methodName(...$payloads);
     }
 
-    protected function propertyMorphedData(
+    protected function dataFromArray(
         string $class,
         CreationContext $creationContext,
         array $payloads,
         array $properties,
-    ): ?BaseData {
+    ): BaseData {
         $dataClass = $this->dataConfig->getDataClass($class);
 
         if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
@@ -134,6 +135,6 @@ class DataFromSomethingResolver
             }
         }
 
-        return null;
+        return $this->dataFromArrayResolver->execute($class, $properties);
     }
 }
