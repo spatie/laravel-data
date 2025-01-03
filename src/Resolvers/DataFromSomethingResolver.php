@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\PropertyMorphableData;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
@@ -39,25 +40,23 @@ class DataFromSomethingResolver
         $payloadCount = count($payloads);
 
         if ($payloadCount === 0 || $payloadCount === 1) {
-            return $this->dataFromArrayResolver->execute(
-                $class,
-                $pipeline->execute($payloads[0] ?? [], $creationContext)
-            );
-        }
+            $properties = $pipeline->execute($payloads[0] ?? [], $creationContext);
+        } else {
+            $properties = [];
 
-        $properties = [];
+            foreach ($payloads as $payload) {
+                foreach ($pipeline->execute($payload, $creationContext) as $key => $value) {
+                    if (array_key_exists($key, $properties) && ($value === null || $value instanceof Optional)) {
+                        continue;
+                    }
 
-        foreach ($payloads as $payload) {
-            foreach ($pipeline->execute($payload, $creationContext) as $key => $value) {
-                if (array_key_exists($key, $properties) && ($value === null || $value instanceof Optional)) {
-                    continue;
+                    $properties[$key] = $value;
                 }
-
-                $properties[$key] = $value;
             }
         }
 
-        return $this->dataFromArrayResolver->execute($class, $properties);
+        return $this->propertyMorphedData($class, $creationContext, $payloads, $properties)
+            ?? $this->dataFromArrayResolver->execute($class, $properties);
     }
 
     protected function createFromCustomCreationMethod(
@@ -116,5 +115,25 @@ class DataFromSomethingResolver
         $methodName = $method->name;
 
         return $class::$methodName(...$payloads);
+    }
+
+    protected function propertyMorphedData(
+        string $class,
+        CreationContext $creationContext,
+        array $payloads,
+        array $properties,
+    ): ?BaseData {
+        $dataClass = $this->dataConfig->getDataClass($class);
+
+        if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
+            /**
+             * @var class-string<PropertyMorphableData> $class
+             */
+            if ($morph = $class::morph($properties)) {
+                return $this->execute($morph, $creationContext, ...$payloads);
+            }
+        }
+
+        return null;
     }
 }

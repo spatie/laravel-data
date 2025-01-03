@@ -8,6 +8,7 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractData;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCustomCollectionCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
@@ -175,7 +176,7 @@ it('can use an abstract data collection with multiple children', function () {
 });
 
 it('can load and save an abstract property-morphable data collection', function () {
-    $abstractA = new PropertyMorphableDataA('foo');
+    $abstractA = new PropertyMorphableDataA('foo', DummyBackedEnum::FOO);
     $abstractB = new PropertyMorphableDataB('bar');
 
     $modelId = DummyModelWithPropertyMorphableCast::create([
@@ -184,7 +185,7 @@ it('can load and save an abstract property-morphable data collection', function 
 
     assertDatabaseHas(DummyModelWithPropertyMorphableCast::class, [
         'data_collection' => json_encode([
-            ['a' => 'foo', 'variant' => 'a'],
+            ['a' => 'foo', 'enum' => 'foo', 'variant' => 'a'],
             ['b' => 'bar', 'variant' => 'b'],
         ], JSON_PRETTY_PRINT),
     ]);
@@ -193,7 +194,8 @@ it('can load and save an abstract property-morphable data collection', function 
 
     expect($model->data_collection[0])
         ->toBeInstanceOf(PropertyMorphableDataA::class)
-        ->a->toBe('foo');
+        ->a->toBe('foo')
+        ->enum->toBe(DummyBackedEnum::FOO);
 
     expect($model->data_collection[1])
         ->toBeInstanceOf(PropertyMorphableDataB::class)

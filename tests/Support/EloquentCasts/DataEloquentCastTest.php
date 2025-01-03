@@ -9,6 +9,7 @@ use function Pest\Laravel\assertDatabaseHas;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithEncryptedCasts;
@@ -187,19 +188,20 @@ it('can load and save an abstract defined data object', function () {
 });
 
 it('can load and save an abstract property-morphable data object', function () {
-    $abstractA = new PropertyMorphableDataA('foo');
+    $abstractA = new PropertyMorphableDataA('foo', DummyBackedEnum::FOO);
 
     $modelId = DummyModelWithPropertyMorphableCast::create([
         'data' => $abstractA,
     ])->id;
 
     assertDatabaseHas(DummyModelWithPropertyMorphableCast::class, [
-        'data' => json_encode(['a' => 'foo', 'variant' => 'a']),
+        'data' => json_encode(['a' => 'foo', 'enum' => 'foo', 'variant' => 'a']),
     ]);
 
     $model = DummyModelWithPropertyMorphableCast::find($modelId);
 
     expect($model->data)
         ->toBeInstanceOf(PropertyMorphableDataA::class)
-        ->a->toBe('foo');
+        ->a->toBe('foo')
+        ->enum->toBe(DummyBackedEnum::FOO);
 });

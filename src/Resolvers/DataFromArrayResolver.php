@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Resolvers;
 
 use ArgumentCountError;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\PropertyMorphableData;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Optional;
@@ -28,11 +27,6 @@ class DataFromArrayResolver
     public function execute(string $class, array $properties): BaseData
     {
         $dataClass = $this->dataConfig->getDataClass($class);
-
-        if ($propertyMorphableClass = $this->propertyMorphableClass($dataClass)) {
-            $class = $propertyMorphableClass::morph($properties) ?? $class;
-            $dataClass = $this->dataConfig->getDataClass($class);
-        }
 
         $data = $this->createData($dataClass, $properties);
 
@@ -106,15 +100,5 @@ class DataFromArrayResolver
                 $error
             );
         }
-    }
-
-    /**
-     * @return class-string<PropertyMorphableData>
-     */
-    protected function propertyMorphableClass(DataClass $dataClass): ?string
-    {
-        return $dataClass->isAbstract && $dataClass->propertyMorphable
-            ? $dataClass->name
-            : null;
     }
 }

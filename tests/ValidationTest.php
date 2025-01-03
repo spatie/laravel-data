@@ -2545,6 +2545,14 @@ it('can validate property-morphable data', function () {
             'variant' => 'a',
         ], [
             'a' => ['The a field is required.'],
+            'enum' => ['The enum field is required.'],
+        ])
+        ->assertErrors([
+            'variant' => 'a',
+            'a' => 'foo',
+            'enum' => 'invalid',
+        ], [
+            'enum' => ['The selected enum is invalid.'],
         ])
         ->assertErrors([
             'variant' => 'b',
@@ -2554,6 +2562,7 @@ it('can validate property-morphable data', function () {
         ->assertOk([
             'variant' => 'a',
             'a' => 'foo',
+            'enum' => 'foo',
         ])
         ->assertOk([
             'variant' => 'b',
@@ -2577,9 +2586,15 @@ it('can validate nested property-morphable data', function () {
             'nestedCollection' => [['variant' => 'a'], ['variant' => 'b']],
         ], [
             'nestedCollection.0.a' => ['The nested collection.0.a field is required.'],
+            'nestedCollection.0.enum' => ['The nested collection.0.enum field is required.'],
             'nestedCollection.1.b' => ['The nested collection.1.b field is required.'],
         ])
+        ->assertErrors([
+            'nestedCollection' => [['variant' => 'a', 'a' => 'foo', 'enum' => 'invalid']],
+        ], [
+            'nestedCollection.0.enum' => ['The selected nested collection.0.enum is invalid.'],
+        ])
         ->assertOk([
-            'nestedCollection' => [['variant' => 'a', 'a' => 'foo'], ['variant' => 'b', 'b' => 'bar']],
+            'nestedCollection' => [['variant' => 'a', 'a' => 'foo', 'enum' => 'foo'], ['variant' => 'b', 'b' => 'bar']],
         ]);
 });
