@@ -11,7 +11,6 @@ use Illuminate\Support\Enumerable;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
-use Spatie\LaravelData\Tests\Fakes\DataWithArgumentCountErrorException;
 use function Pest\Laravel\postJson;
 
 use Spatie\LaravelData\Attributes\Computed;
@@ -45,6 +44,7 @@ use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomCursorPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomPaginatedDataCollection;
+use Spatie\LaravelData\Tests\Fakes\DataWithArgumentCountErrorException;
 use Spatie\LaravelData\Tests\Fakes\EnumData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\ModelData;
