@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\PropertyMorphableData;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
@@ -31,10 +30,6 @@ class DataFromSomethingResolver
         CreationContext $creationContext,
         mixed ...$payloads
     ): BaseData {
-        if ($propertyMorphableClass = $this->propertyMorphableClass($class)) {
-            $class = $propertyMorphableClass::morph(...$payloads) ?? $class;
-        }
-
         if ($data = $this->createFromCustomCreationMethod($class, $creationContext, $payloads)) {
             return $data;
         }
@@ -63,18 +58,6 @@ class DataFromSomethingResolver
         }
 
         return $this->dataFromArrayResolver->execute($class, $properties);
-    }
-
-    /**
-     * @return class-string<PropertyMorphableData>
-     */
-    protected function propertyMorphableClass(string $class): ?string
-    {
-        $dataClass = $this->dataConfig->getDataClass($class);
-
-        return $dataClass->isAbstract && $dataClass->propertyMorphable
-            ? $class
-            : null;
     }
 
     protected function createFromCustomCreationMethod(

@@ -14,9 +14,9 @@ abstract class AbstractPropertyMorphableData extends Data implements PropertyMor
     ) {
     }
 
-    public static function morph(...$payloads): ?string
+    public static function morph(array $properties): ?string
     {
-        return match ($payloads[0]['variant'] ?? null) {
+        return match ($properties['variant'] ?? null) {
             'a' => PropertyMorphableDataA::class,
             'b' => PropertyMorphableDataB::class,
             default => null,

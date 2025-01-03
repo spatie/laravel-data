@@ -4,5 +4,5 @@ namespace Spatie\LaravelData\Contracts;
 
 interface PropertyMorphableData
 {
-    public static function morph(mixed ...$payloads): ?string;
+    public static function morph(array $properties): ?string;
 }
