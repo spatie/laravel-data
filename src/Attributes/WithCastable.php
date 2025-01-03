@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Attributes;
 use Attribute;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Casts\Castable;
+use Spatie\LaravelData\Casts\CastableCast;
 use Spatie\LaravelData\Exceptions\CannotCreateCastAttribute;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY)]
@@ -26,6 +27,9 @@ class WithCastable implements GetsCast
 
     public function get(): Cast
     {
-        return $this->castableClass::dataCastUsing(...$this->arguments);
+        return new CastableCast(
+            $this->castableClass,
+            $this->arguments
+        );
     }
 }
