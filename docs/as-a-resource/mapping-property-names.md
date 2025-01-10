@@ -80,3 +80,36 @@ And a transformed version of the data object will look like this:
     'record_company' => 'RCA Records',
 ]
 ```
+
+### Available mappers:
+
+```php
+class ContractData extends Data
+{
+    public function __construct(
+        #[MapName(CamelCaseMapper::class)]
+        public string $name,
+        #[MapName(SnakeCaseMapper::class)]
+        public string $recordCompany,
+        #[MapName(new ProvidedNameMapper('country field'))]
+        public string $country,
+        #[MapName(StudlyCaseMapper::class)]
+        public string $cityName,
+        #[MapName(LowerCaseMapper::class)]
+        public string $addressLine1,
+        #[MapName(UpperCaseMapper::class)]
+        public string $addressLine2,
+    ) {
+    }
+}
+```
+```php
+[
+    'name' => 'Rick Astley',
+    'record_company' => 'RCA Records',
+    'country field' => 'Belgium',
+    'CityName' => 'Antwerp',
+    'addressline1' => 'some address line 1',
+    'ADDRESSLINE2' => 'some address line 2',
+]
+```
