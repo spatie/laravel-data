@@ -9,7 +9,7 @@ use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\TypeResolver;
 use phpDocumentor\Reflection\Types\Context;
 use ReflectionClass;
-use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Resolvers\ContextResolver;
 
 class CollectionAnnotationReader
@@ -52,7 +52,7 @@ class CollectionAnnotationReader
 
         return self::$cache[$className] = new CollectionAnnotation(
             type: $type['valueType'],
-            isData: is_subclass_of($type['valueType'], Data::class),
+            isData: class_exists($type['valueType']) && in_array(BaseData::class, class_implements($type['valueType'])),
             keyType: $type['keyType'] ?? 'array-key',
         );
     }
