@@ -34,6 +34,7 @@ class CreationContext
         public ValidationStrategy $validationStrategy,
         public readonly bool $mapPropertyNames,
         public readonly bool $disableMagicalCreation,
+        public readonly bool $useOptionalValues,
         public readonly ?array $ignoredMagicalMethods,
         public readonly ?GlobalCastsCollection $casts,
     ) {
