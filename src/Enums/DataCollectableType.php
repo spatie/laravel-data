@@ -2,11 +2,11 @@
 
 namespace Spatie\LaravelData\Enums;
 
-enum DataCollectableType
+enum DataCollectableType: string
 {
-    case Default;
-    case Array;
-    case Collection;
-    case Paginated;
-    case CursorPaginated;
+    case Default = 'Default';
+    case Array = 'Array';
+    case Collection = 'Collection';
+    case Paginated = 'Paginated';
+    case CursorPaginated = 'CursorPaginated';
 }
