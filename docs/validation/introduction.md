@@ -132,28 +132,6 @@ class SongData extends Data
 }
 ```
 
-The above example will override the automatically inferred rules. If you want the manual rules to be merged with the automatically inferred rules, you can use the `MergeRules` attribute:
-
-```php
-#[MergeRules]
-class SongData extends Data
-{
-    public function __construct(
-        public string $title,
-        public string $artist,
-    ) {
-    }
-    
-    public static function rules(): array
-    {
-        return [
-            'title' => ['max:255'],
-            'artist' => ['max:255'],
-        ];
-    }
-}
-```
-
 You can read more about manual rules in its [dedicated chapter](/docs/laravel-data/v4/validation/manual-rules).
 
 ### Using the container
