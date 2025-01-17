@@ -2,12 +2,17 @@
 
 
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\Lazy\DefaultLazy;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 use function Spatie\Snapshots\assertMatchesSnapshot;
+
+beforeEach(function () {
+    ini_set('zend.exception_ignore_args', 'Off');
+});
 
 it('can serialize and unserialize a data object', function () {
     $object = SimpleData::from('Hello world');
@@ -82,4 +87,18 @@ it('is possible to serialize conditional lazy properties', function () {
 
     expect($unserialized)->toBeInstanceOf(LazyData::class);
     expect($unserialized->toArray())->toMatchArray(['name' => 'Hello world']);
+});
+
+it('can json_encode exception trace with args when not all required properties passed', function () {
+    // When zend.exception_ignore_args is set to Off, the trace will contain the arguments
+    // We want to make sure these all can be encoded into JSON
+
+    try {
+        SimpleData::from([]);
+    } catch (CannotCreateData $e) {
+        $trace = $e->getTrace();
+        $encodedJson = json_encode($trace, JSON_THROW_ON_ERROR);
+
+        expect($encodedJson)->toBeJson();
+    }
 });
