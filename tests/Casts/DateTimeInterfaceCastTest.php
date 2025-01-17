@@ -23,7 +23,6 @@ it('can cast date times', function () {
         public DateTimeImmutable $dateTimeImmutable;
     };
 
-
     expect(
         $caster->cast(
             FakeDataStructureFactory::property($class, 'carbon'),
