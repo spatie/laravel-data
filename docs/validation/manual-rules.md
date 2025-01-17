@@ -58,6 +58,36 @@ As a rule of thumb always follow these rules:
 
 > Always use the array syntax for defining rules and not a single string which spits the rules by | characters.
 > This is needed when using regexes those | can be seen as part of the regex
+ 
+## Merging manual rules
+
+Writing manual rules doesn't mean that you can't use the automatic rules inferring anymore. By adding the `MergeValidationRules` attribute to your data class, the rules will be merged:
+
+```php
+#[MergeValidationRules]
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        public string $artist,
+    ) {
+    }
+    
+    public static function rules(): array
+    {
+        return [
+            'title' => ['max:20'],
+            'artist' => ['max:20'],
+        ];
+    }
+}
+
+// The generated rules will look like this
+[
+    'title' => [required, 'string', 'max:20'],
+    'artist' => [required, 'string', 'max:20'],
+]
+```
 
 ## Using attributes
 

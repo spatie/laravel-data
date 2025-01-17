@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use Spatie\LaravelData\Attributes\MergeRules;
+use Spatie\LaravelData\Attributes\MergeValidationRules;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Present;
 use Spatie\LaravelData\Support\DataClass;
@@ -243,7 +243,7 @@ class DataValidationRulesResolver
 
         $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $validationContext]);
         $shouldMergeRules = $class->attributes->contains(
-            fn (object $attribute) => $attribute::class === MergeRules::class
+            fn (object $attribute) => $attribute::class === MergeValidationRules::class
         );
 
         foreach ($overwrittenRules as $key => $rules) {
