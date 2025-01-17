@@ -87,6 +87,9 @@ class CreationContextFactory
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function alwaysValidate(): self
     {
         $this->validationStrategy = ValidationStrategy::Always;
