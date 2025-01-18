@@ -74,7 +74,7 @@ use Spatie\LaravelData\Casts\Castable;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;
 
-class Email implements Castable
+class Email extends Data implements Castable
 {
   public function __construct(public string $email) {
 
