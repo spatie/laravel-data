@@ -81,6 +81,29 @@ SongData::factory()
     ->from(['title' => 'Never gonna give you up', 'artist' => 'Rick Astley']); // album will `null` instead of `Optional`
 ```
 
+Note that when an Optional property has no default value, and is not nullable, and the payload does not contain a value for this property, the DTO will not have the property set - so accessing it can throw `Typed property must not be accessed before initialization` error. Therefore, it's advisable to either set a default value or make the property nullable, when using `withoutOptionalValues`.
+
+```php
+class SongData extends Data {
+    public function __construct(
+        public string $title,
+        public string $artist,
+        public Optional|string $album, // careful here!
+        public Optional|string $publisher = 'unknown',
+        public Optional|string|null $label,
+    ) {
+    }
+}
+
+$data = SongData::factory()
+    ->withoutOptionalValues()
+    ->from(['title' => 'Never gonna give you up', 'artist' => 'Rick Astley']);
+    
+$data->toArray(); // ['title' => 'Never gonna give you up', 'artist' => 'Rick Astley', 'publisher' => 'unknown', 'label' => null]
+
+$data->album; // accessing the album will throw an error, unless the property is set before accessing it
+```
+
 ## Adding additional global casts
 
 When creating a data object, it is possible to add additional casts to the data object:
