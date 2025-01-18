@@ -69,6 +69,7 @@ By combining "castables" with PHP's [anonymous classes](https://www.php.net/manu
 <?php
 namespace Spatie\LaravelData\Tests\Fakes\Castables;
 
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Casts\Castable;
 use Spatie\LaravelData\Support\Creation\CreationContext;
