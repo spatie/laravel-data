@@ -17,7 +17,7 @@ use TypeError;
 trait TransformableData
 {
     /**
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function transform(
         null|TransformationContextFactory|TransformationContext $transformationContext = null,
@@ -45,17 +45,14 @@ trait TransformableData
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function all(): array
     {
         return $this->transform(TransformationContextFactory::create()->withValueTransformation(false));
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function toArray(): array
+    public function toArray()
     {
         return $this->transform();
     }
@@ -66,7 +63,7 @@ trait TransformableData
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function jsonSerialize(): array
     {
