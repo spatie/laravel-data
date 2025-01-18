@@ -1246,7 +1246,11 @@ it('can be created without optional values', function () {
         public string $name;
 
         public string|null|Optional $description;
+
+        public int|Optional $year = 2025;
+
         public string|Optional $slug;
+
     };
 
     $data = $dataClass::factory()
@@ -1257,5 +1261,6 @@ it('can be created without optional values', function () {
 
     expect($data->name)->toBe('Ruben');
     expect($data->description)->toBeNull();
+    expect($data->year)->toBe(2025);
     expect(isset($data->slug))->toBeFalse();
 });
