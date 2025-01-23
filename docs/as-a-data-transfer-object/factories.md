@@ -65,8 +65,6 @@ SongData::factory()->ignoreMagicalMethod('fromString')->from('Never gonna give y
 When creating a data object that has optional properties, it is possible choose whether missing properties from the payload should be created as `Optional`. This can be helpful when you want to have a `null` value instead of an `Optional` object - for example, when creating the DTO from an Eloquent model with `null` values. 
 
 ```php
-use \Spatie\LaravelData\Optional;
-
 class SongData extends Data {
     public function __construct(
         public string $title,
