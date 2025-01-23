@@ -1,10 +1,16 @@
 ---
-title: Available mappers
+title: Available property mappers
 weight: 19
 ---
 
-Sometimes the property names in the array from which you're creating a data object might be different.
-You can use mappers for property names when it is created from an array using attributes:
+In previous sections we've already seen how
+to [create](/docs/laravel-data/v4/as-a-data-transfer-object/mapping-property-names) data objects where the keys of the
+payload differ from the property names of the data object. It is also possible
+to [transform](/docs/laravel-data/v4/as-a-resource/mapping-property-names) data objects to an
+array/json/... where the keys of the payload differ from the property names of the data object.
+
+These mappings can be set manually put the package also provide a set of mappers that can be used to automatically map
+property names:
 
 ```php
 class ContractData extends Data
@@ -38,4 +44,17 @@ ContractData::from([
     'addressline1' => 'some address line 1',
     'ADDRESSLINE2' => 'some address line 2',
 ]);
+```
+
+When transforming such a data object the payload will look like this:
+
+```json
+{
+    "name" : "Rick Astley",
+    "record_company" : "RCA Records",
+    "country field" : "Belgium",
+    "CityName" : "Antwerp",
+    "addressline1" : "some address line 1",
+    "ADDRESSLINE2" : "some address line 2"
+}
 ```
