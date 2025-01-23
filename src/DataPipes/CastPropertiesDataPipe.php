@@ -129,7 +129,7 @@ class CastPropertiesDataPipe implements DataPipe
 
     protected function shouldBeCasted(DataProperty $property, mixed $value): bool
     {
-        if (!is_object($value)) {
+        if (! is_object($value)) {
             return true;
         }
 
