@@ -1263,4 +1263,10 @@ it('can be created without optional values', function () {
     expect($data->description)->toBeNull();
     expect($data->year)->toBe(2025);
     expect(isset($data->slug))->toBeFalse();
+
+    expect($data->toArray())->toMatchArray([
+        'name' => 'Ruben',
+        'description' => null,
+        'year' => 2025,
+    ]);
 });
