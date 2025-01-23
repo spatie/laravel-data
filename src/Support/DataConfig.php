@@ -15,7 +15,7 @@ class DataConfig
         $dataClasses = [];
 
         $ruleInferrers = array_map(
-            fn (string $ruleInferrerClass) => app($ruleInferrerClass),
+            app(...),
             $config['rule_inferrers'] ?? []
         );
 

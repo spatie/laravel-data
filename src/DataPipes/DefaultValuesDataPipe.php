@@ -33,8 +33,6 @@ class DefaultValuesDataPipe implements DataPipe
 
             if ($property->type->isNullable) {
                 $properties[$name] = null;
-
-                continue;
             }
         }
 

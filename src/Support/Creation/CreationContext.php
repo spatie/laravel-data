@@ -79,7 +79,7 @@ class CreationContext
     ): self {
         $this->dataClass = $dataClass;
 
-        array_push($this->currentPath, $path);
+        $this->currentPath[] = $path;
 
         return $this;
     }
