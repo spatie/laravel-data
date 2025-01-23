@@ -1240,3 +1240,33 @@ it('is possible to create a union type data collectable', function () {
         [10, SimpleData::from('Hello World')]
     );
 })->todo();
+
+it('can be created without optional values', function () {
+    $dataClass = new class () extends Data {
+        public string $name;
+
+        public string|null|Optional $description;
+
+        public int|Optional $year = 2025;
+
+        public string|Optional $slug;
+
+    };
+
+    $data = $dataClass::factory()
+        ->withoutOptionalValues()
+        ->from([
+            'name' => 'Ruben',
+        ]);
+
+    expect($data->name)->toBe('Ruben');
+    expect($data->description)->toBeNull();
+    expect($data->year)->toBe(2025);
+    expect(isset($data->slug))->toBeFalse();
+
+    expect($data->toArray())->toMatchArray([
+        'name' => 'Ruben',
+        'description' => null,
+        'year' => 2025,
+    ]);
+});

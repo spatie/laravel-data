@@ -25,7 +25,7 @@ class DefaultValuesDataPipe implements DataPipe
                 continue;
             }
 
-            if ($property->type->isOptional) {
+            if ($property->type->isOptional && $creationContext->useOptionalValues) {
                 $properties[$name] = Optional::create();
 
                 continue;

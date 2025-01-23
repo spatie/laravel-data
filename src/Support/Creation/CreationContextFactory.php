@@ -31,6 +31,7 @@ class CreationContextFactory
         public ValidationStrategy $validationStrategy,
         public bool $mapPropertyNames,
         public bool $disableMagicalCreation,
+        public bool $useOptionalValues,
         public ?array $ignoredMagicalMethods,
         public ?GlobalCastsCollection $casts,
     ) {
@@ -47,6 +48,7 @@ class CreationContextFactory
             validationStrategy: ValidationStrategy::from($config['validation_strategy']),
             mapPropertyNames: true,
             disableMagicalCreation: false,
+            useOptionalValues: true,
             ignoredMagicalMethods: null,
             casts: null,
         );
@@ -61,6 +63,7 @@ class CreationContextFactory
             validationStrategy: $creationContext->validationStrategy,
             mapPropertyNames: $creationContext->mapPropertyNames,
             disableMagicalCreation: $creationContext->disableMagicalCreation,
+            useOptionalValues: $creationContext->useOptionalValues,
             ignoredMagicalMethods: $creationContext->ignoredMagicalMethods,
             casts: $creationContext->casts,
         );
@@ -125,6 +128,20 @@ class CreationContextFactory
         return $this;
     }
 
+    public function withOptionalValues(bool $withOptionalValues = true): self
+    {
+        $this->useOptionalValues = $withOptionalValues;
+
+        return $this;
+    }
+
+    public function withoutOptionalValues(bool $withoutOptionalValues = true): self
+    {
+        $this->useOptionalValues = ! $withoutOptionalValues;
+
+        return $this;
+    }
+
     public function ignoreMagicalMethod(string ...$methods): self
     {
         $this->ignoredMagicalMethods ??= [];
@@ -176,6 +193,7 @@ class CreationContextFactory
             validationStrategy: $this->validationStrategy,
             mapPropertyNames: $this->mapPropertyNames,
             disableMagicalCreation: $this->disableMagicalCreation,
+            useOptionalValues: $this->useOptionalValues,
             ignoredMagicalMethods: $this->ignoredMagicalMethods,
             casts: $this->casts,
         );
