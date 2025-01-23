@@ -91,3 +91,4 @@ SongData::from([
 ]);
 ```
 
+You can also use other mappers to input and output property name mapping (see [available mappers](/docs/laravel-data/v4/advanced-usage/available-mappers)).

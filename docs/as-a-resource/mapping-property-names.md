@@ -80,3 +80,5 @@ And a transformed version of the data object will look like this:
     'record_company' => 'RCA Records',
 ]
 ```
+
+You can also use other mappers to input and output property name mapping (see [available mappers](/docs/laravel-data/v4/advanced-usage/available-mappers)).
