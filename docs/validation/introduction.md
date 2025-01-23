@@ -284,7 +284,7 @@ When mapping property names, the validation rules will be generated for the mapp
 class SongData extends Data
 {
     public function __construct(
-        #[MapFrom('song_title')]
+        #[MapInputName('song_title')]
         public string $title,
     ) {
     }
