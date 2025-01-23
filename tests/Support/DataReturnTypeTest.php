@@ -63,21 +63,21 @@ it('can determine the return type from reflection', function (
     expect($factory->buildFromValue($value, TestReturnTypeSubject::class, false))->toEqual($expected);
 })->with(function () {
     yield 'array' => [
-        'methodName' => 'array',
-        'typeName' => 'array',
-        'value' => [],
+        'array', // methodName
+        'array', // typeName
+        [],
         new DataType(
             type: new NamedType('array', true, [], DataTypeKind::Array, null, null, 'array', null, null),
             isNullable: false,
             isMixed: false,
             kind: DataTypeKind::Array,
-        ),
+        ), // value
     ];
 
     yield 'collection' => [
-        'methodName' => 'collection',
-        'typeName' => Collection::class,
-        'value' => collect(),
+        'collection', // methodName
+        Collection::class, // typeName
+        collect(),
         new DataType(
             type: new NamedType(Collection::class, false, [
                 ArrayAccess::class,
@@ -94,13 +94,13 @@ it('can determine the return type from reflection', function (
             isNullable: false,
             isMixed: false,
             kind: DataTypeKind::Enumerable,
-        ),
+        ), // value
     ];
 
     yield 'data collection' => [
-        'methodName' => 'dataCollection',
-        'typeName' => DataCollection::class,
-        'value' => new DataCollection(SimpleData::class, []),
+        'dataCollection', // methodName
+        DataCollection::class, // typeName
+        new DataCollection(SimpleData::class, []),
         new DataType(
             type: new NamedType(DataCollection::class, false, [
                 Illuminate\Contracts\Support\Responsable::class,
@@ -122,7 +122,7 @@ it('can determine the return type from reflection', function (
             isNullable: false,
             isMixed: false,
             kind: DataTypeKind::DataCollection,
-        ),
+        ), // value
     ];
 });
 
