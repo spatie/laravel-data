@@ -5,7 +5,6 @@ namespace Spatie\LaravelData;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
-use Inertia\DeferProp;
 use Spatie\LaravelData\Support\Lazy\ClosureLazy;
 use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 use Spatie\LaravelData\Support\Lazy\DefaultLazy;
@@ -39,7 +38,7 @@ abstract class Lazy
         return new InertiaLazy($value);
     }
 
-    public static function inertiaDeferred(DeferProp $value): InertiaDeferred
+    public static function inertiaDeferred(mixed $value): InertiaDeferred
     {
         return new InertiaDeferred($value);
     }
