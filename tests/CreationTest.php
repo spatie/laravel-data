@@ -15,6 +15,7 @@ use Inertia\LazyProp;
 use function Pest\Laravel\postJson;
 
 use Spatie\LaravelData\Attributes\AutoClosureLazy;
+use Spatie\LaravelData\Attributes\AutoInertiaDeferred;
 use Spatie\LaravelData\Attributes\AutoInertiaLazy;
 use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
@@ -38,6 +39,7 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\Lazy\ClosureLazy;
+use Spatie\LaravelData\Support\Lazy\InertiaDeferred;
 use Spatie\LaravelData\Support\Lazy\InertiaLazy;
 use Spatie\LaravelData\Tests\Fakes\Castables\SimpleCastable;
 use Spatie\LaravelData\Tests\Fakes\Casts\ConfidentialDataCast;
@@ -1452,3 +1454,44 @@ it('can use auto lazy to construct a when loaded lazy with a manual defined rela
         ->toHaveCount(2)
         ->each()->toBeInstanceOf(FakeNestedModelData::class);
 });
+
+it('can create a data object with deferred properties', function () {
+    $dataClass = new class () extends Data {
+        public InertiaDeferred $deferred;
+
+        public function __construct()
+        {
+            $this->deferred = Lazy::inertiaDeferred(fn () => 'Deferred Value');
+        }
+    };
+
+    $data = $dataClass::from([]);
+
+    expect($data->deferred)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->deferred->resolve()())->toBe('Deferred Value');
+});
+
+it('can use auto deferred to construct a deferred property', function () {
+    $dataClass = new class () extends Data {
+        #[AutoInertiaDeferred]
+        public string|InertiaDeferred $string;
+    };
+
+    $data = $dataClass::from(['string' => 'Hello World']);
+
+    expect($data->string)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->toArray()['string'])->toBeInstanceOf(\Inertia\DeferProp::class);
+});
+
+it('can use class level auto deferred to construct a deferred property', function () {
+    #[AutoInertiaDeferred]
+    class AutoDeferredData extends Data
+    {
+        public string|InertiaDeferred $string;
+    };
+
+    $data = AutoDeferredData::from(['string' => 'Hello World']);
+
+    expect($data->string)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->toArray()['string'])->toBeInstanceOf(\Inertia\DeferProp::class);
+})->todo();

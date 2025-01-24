@@ -1,5 +1,6 @@
 <?php
 
+use Inertia\DeferProp;
 use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Hidden;
@@ -10,6 +11,7 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Resolvers\VisibleDataFieldsResolver;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Lazy\ClosureLazy;
+use Spatie\LaravelData\Support\Lazy\InertiaDeferred;
 use Spatie\LaravelData\Support\Lazy\InertiaLazy;
 use Spatie\LaravelData\Support\Partials\Partial;
 use Spatie\LaravelData\Support\Partials\PartialsCollection;
@@ -213,6 +215,24 @@ it('always transforms lazy inertia data to inertia lazy props', function () {
     };
 
     expect($dataClass::create('Freek')->toArray()['name'])->toBeInstanceOf(LazyProp::class);
+});
+
+it('always transforms deferred inertia data to inertia deferred props', function () {
+    $dataClass = new class () extends Data {
+        public function __construct(
+            public string|InertiaDeferred|null $name = null
+        ) {
+        }
+
+        public static function create(string $name): static
+        {
+            return new self(
+                Lazy::inertiaDeferred(fn () => $name)
+            );
+        }
+    };
+
+    expect($dataClass::create('Freek')->toArray()['name'])->toBeInstanceOf(DeferProp::class);
 });
 
 it('always transforms closure lazy into closures for inertia', function () {
