@@ -10,6 +10,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
+use Inertia\DeferProp;
+use Inertia\Inertia;
 use Inertia\LazyProp;
 
 use function Pest\Laravel\postJson;
@@ -1461,11 +1463,12 @@ it('can create a data object with deferred properties', function () {
 
         public function __construct()
         {
-            $this->deferred = Lazy::inertiaDeferred(fn () => 'Deferred Value');
         }
     };
 
-    $data = $dataClass::from([]);
+    $data = $dataClass::from([
+        "deferred" => Lazy::inertiaDeferred(Inertia::defer(fn () => 'Deferred Value')),
+    ]);
 
     expect($data->deferred)->toBeInstanceOf(InertiaDeferred::class);
     expect($data->deferred->resolve()())->toBe('Deferred Value');
@@ -1474,24 +1477,24 @@ it('can create a data object with deferred properties', function () {
 it('can use auto deferred to construct a deferred property', function () {
     $dataClass = new class () extends Data {
         #[AutoInertiaDeferred]
-        public string|InertiaDeferred $string;
+        public InertiaDeferred $string;
     };
 
-    $data = $dataClass::from(['string' => 'Hello World']);
+    $data = $dataClass::from(['string' => Lazy::inertiaDeferred(Inertia::defer(fn () => 'Deferred Value'))]);
 
     expect($data->string)->toBeInstanceOf(InertiaDeferred::class);
-    expect($data->toArray()['string'])->toBeInstanceOf(\Inertia\DeferProp::class);
+    expect($data->toArray()['string'])->toBeInstanceOf(DeferProp::class);
 });
 
 it('can use class level auto deferred to construct a deferred property', function () {
     #[AutoInertiaDeferred]
     class AutoDeferredData extends Data
     {
-        public string|InertiaDeferred $string;
+        public InertiaDeferred $deferred;
     };
 
-    $data = AutoDeferredData::from(['string' => 'Hello World']);
+    $data = AutoDeferredData::from(['string' => Inertia::defer(fn () => 'Deferred Value')]);
 
-    expect($data->string)->toBeInstanceOf(InertiaDeferred::class);
-    expect($data->toArray()['string'])->toBeInstanceOf(\Inertia\DeferProp::class);
+    expect($data->deferred)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->toArray()['string'])->toBeInstanceOf(DeferProp::class);
 })->todo();

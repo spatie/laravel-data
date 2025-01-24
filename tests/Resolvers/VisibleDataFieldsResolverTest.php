@@ -1,6 +1,7 @@
 <?php
 
 use Inertia\DeferProp;
+use Inertia\Inertia;
 use Inertia\LazyProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Hidden;
@@ -227,7 +228,7 @@ it('always transforms deferred inertia data to inertia deferred props', function
         public static function create(string $name): static
         {
             return new self(
-                Lazy::inertiaDeferred(fn () => $name)
+                Lazy::inertiaDeferred(Inertia::defer(fn () => $name))
             );
         }
     };

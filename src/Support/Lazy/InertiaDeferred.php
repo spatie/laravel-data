@@ -2,15 +2,14 @@
 
 namespace Spatie\LaravelData\Support\Lazy;
 
-use Closure;
 use Inertia\DeferProp;
 
 class InertiaDeferred extends ConditionalLazy
 {
     public function __construct(
-        Closure $value,
+        DeferProp $value,
     ) {
-        parent::__construct(fn () => true, $value);
+        parent::__construct(fn () => true, fn () => $value());
     }
 
     public function resolve(): DeferProp
