@@ -54,7 +54,7 @@ class DataClassFactory
             );
         }
 
-        $autoLazy = $attributes->contains(
+        $autoLazy = $attributes->first(
             fn (object $attribute) => $attribute instanceof AutoLazy
         );
 
@@ -141,7 +141,7 @@ class DataClassFactory
         ?ReflectionMethod $constructorReflectionMethod,
         array $mappers,
         array $dataIterablePropertyAnnotations,
-        bool $autoLazy
+        ?AutoLazy $autoLazy
     ): Collection {
         $defaultValues = $this->resolveDefaultValues($reflectionClass, $constructorReflectionMethod);
 
@@ -157,7 +157,7 @@ class DataClassFactory
                     $mappers['inputNameMapper'],
                     $mappers['outputNameMapper'],
                     $dataIterablePropertyAnnotations[$property->getName()] ?? null,
-                    autoLazyClass: $autoLazy
+                    classAutoLazy: $autoLazy
                 ),
             ]);
     }

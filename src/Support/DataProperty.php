@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support;
 
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Transformers\Transformer;
 
@@ -20,7 +21,7 @@ class DataProperty
         public readonly bool $hidden,
         public readonly bool $isPromoted,
         public readonly bool $isReadonly,
-        public readonly bool $autoLazy,
+        public readonly ?AutoLazy $autoLazy,
         public readonly bool $hasDefaultValue,
         public readonly mixed $defaultValue,
         public readonly ?Cast $cast,

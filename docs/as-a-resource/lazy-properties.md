@@ -19,7 +19,8 @@ class AlbumData extends Data
 }
 ```
 
-This will always output a collection of songs, which can become quite large. With lazy properties, we can include properties when we want to:
+This will always output a collection of songs, which can become quite large. With lazy properties, we can include
+properties when we want to:
 
 ```php
 class AlbumData extends Data
@@ -43,7 +44,8 @@ class AlbumData extends Data
 }
 ```
 
-The `songs` key won't be included in the resource when transforming it from a model. Because the closure that provides the data won't be called when transforming the data object unless we explicitly demand it.
+The `songs` key won't be included in the resource when transforming it from a model. Because the closure that provides
+the data won't be called when transforming the data object unless we explicitly demand it.
 
 Now when we transform the data object as such:
 
@@ -69,7 +71,8 @@ AlbumData::from(Album::first())->include('songs');
 
 Lazy properties will only be included when the `include` method is called on the data object with the property's name.
 
-It is also possible to nest these includes. For example, let's update the `SongData` class and make all of its properties lazy:
+It is also possible to nest these includes. For example, let's update the `SongData` class and make all of its
+properties lazy:
 
 ```php
 class SongData extends Data
@@ -108,7 +111,8 @@ If you want to include all the properties of a data object, you can do the follo
 AlbumData::from(Album::first())->include('songs.*');
 ```
 
-Explicitly including properties of data objects also works on a single data object. For example, our `UserData` looks like this:
+Explicitly including properties of data objects also works on a single data object. For example, our `UserData` looks
+like this:
 
 ```php
 class UserData extends Data
@@ -147,13 +151,15 @@ Lazy::create(fn() => SongData::collect($album->songs));
 
 With a basic `Lazy` property, you must explicitly include it when the data object is transformed.
 
-Sometimes you only want to include a property when a specific condition is true. This can be done with conditional lazy properties:
+Sometimes you only want to include a property when a specific condition is true. This can be done with conditional lazy
+properties:
 
 ```php
 Lazy::when(fn() => $this->is_admin, fn() => SongData::collect($album->songs));
 ```
 
-The property will only be included when the `is_admin` property of the data object is true. It is not possible to include the property later on with the `include` method when a condition is not accepted.
+The property will only be included when the `is_admin` property of the data object is true. It is not possible to
+include the property later on with the `include` method when a condition is not accepted.
 
 ### Relational Lazy properties
 
@@ -173,7 +179,8 @@ It is possible to mark a lazy property as included by default:
 Lazy::create(fn() => SongData::collect($album->songs))->defaultIncluded();
 ```
 
-The property will now always be included when the data object is transformed. You can explicitly exclude properties that were default included as such:
+The property will now always be included when the data object is transformed. You can explicitly exclude properties that
+were default included as such:
 
 ```php
 AlbumData::create(Album::first())->exclude('songs');
@@ -181,7 +188,8 @@ AlbumData::create(Album::first())->exclude('songs');
 
 ## Auto Lazy
 
-Writing Lazy properties can be a bit cumbersome. It is often a repetitive task to write the same code over and over again while the package can infer almost everything.
+Writing Lazy properties can be a bit cumbersome. It is often a repetitive task to write the same code over and over
+again while the package can infer almost everything.
 
 Let's take a look at our previous example:
 
@@ -204,9 +212,11 @@ class UserData extends Data
 }
 ```
 
-The package knows how to get the property from the model and wrap it into a data object, but since we're using a lazy property, we need to write our own magic creation method with a lot of repetitive code.
+The package knows how to get the property from the model and wrap it into a data object, but since we're using a lazy
+property, we need to write our own magic creation method with a lot of repetitive code.
 
-In such a situation auto lazy might be a good fit, instead of casting the property directly into the data object, the casting process is wrapped in a lazy Closure.
+In such a situation auto lazy might be a good fit, instead of casting the property directly into the data object, the
+casting process is wrapped in a lazy Closure.
 
 This makes it possible to rewrite the example as such:
 
@@ -224,7 +234,8 @@ class UserData extends Data
 
 While achieving the same result!
 
-Auto Lazy wraps the casting process of a value for every property typed as `Lazy` into a Lazy Closure when the `AutoLazy` attribute is present on the class.
+Auto Lazy wraps the casting process of a value for every property typed as `Lazy` into a Lazy Closure when the
+`AutoLazy` attribute is present on the class.
 
 It is also possible to use the `AutoLazy` attribute on a property level:
 
@@ -246,9 +257,60 @@ The auto lazy process won't be applied in the following situations:
 - When the property value isn't present in the input payload and the property typed as `Optional`
 - When a Lazy Closure is passed to the property
 
+### Auto lazy with model relations
+
+When you're constructing a data object from an Eloquent model, it is also possible to automatically create lazy
+properties for model relations which are only resolved when the relation is loaded:
+
+```php
+class UserData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[AutoWhenLoadedLazy]
+        public Lazy|SongData $favoriteSong,
+    ) {
+    }
+}
+```
+
+When the `favoriteSong` relation is loaded on the model, the property will be included in the data object.
+
+If the name of the relation doesn't match the property name, you can specify the relation name:
+
+```php
+class UserData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[AutoWhenLoadedLazy('favoriteSong')]
+        public Lazy|SongData $favorite_song,
+    ) {
+    }
+}
+```
+
+The package will use the regular casting process when the relation is loaded, so it is also perfectly possible to create a collection of data objects:
+
+```php
+class UserData extends Data
+{
+    /**
+    * @param Lazy|array<int, SongData> $favoriteSongs
+     */
+    public function __construct(
+        public string $title,
+        #[AutoWhenLoadedLazy]
+        public Lazy|array $favoriteSongs,
+    ) {
+    }
+}
+```
+
 ## Only and Except
 
-Lazy properties are great for reducing payloads sent over the wire. However, when you completely want to remove a property Laravel's `only` and `except` methods can be used:
+Lazy properties are great for reducing payloads sent over the wire. However, when you completely want to remove a
+property Laravel's `only` and `except` methods can be used:
 
 ```php
 AlbumData::from(Album::first())->only('songs'); // will only show `songs`
@@ -269,7 +331,8 @@ AlbumData::from(Album::first())->only('songs.{name, artist}');
 AlbumData::from(Album::first())->except('songs.{name, artist}');
 ```
 
-Only and except always take precedence over include and exclude, which means that when a property is hidden by `only` or `except` it is impossible to show it again using `include`.
+Only and except always take precedence over include and exclude, which means that when a property is hidden by `only` or
+`except` it is impossible to show it again using `include`.
 
 ### Conditionally
 
@@ -373,7 +436,7 @@ Our JSON would look like this when we request `https://spatie.be/my-account`:
 
 ```json
 {
-    "name": "Ruben Van Assche"
+    "name" : "Ruben Van Assche"
 }
 ```
 
@@ -385,8 +448,8 @@ https://spatie.be/my-account?include=favorite_song
 
 ```json
 {
-    "name": "Ruben Van Assche",
-    "favorite_song": {
+    "name" : "Ruben Van Assche",
+    "favorite_song" : {
         "name" : "Never Gonna Give You Up",
         "artist" : "Rick Astley"
     }
@@ -462,7 +525,8 @@ AlbumData::from(Album::first())->include('songs')->toArray(); // will include so
 AlbumData::from(Album::first())->toArray(); // will not include songs
 ```
 
-If you want to add includes/excludes/only/except to a data object and its nested chain that will be used for all future transformations, you can define them in their respective *properties methods:
+If you want to add includes/excludes/only/except to a data object and its nested chain that will be used for all future
+transformations, you can define them in their respective *properties methods:
 
 ```php
 class AlbumData extends Data

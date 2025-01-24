@@ -33,7 +33,7 @@ class DataPropertyFactory
         ?NameMapper $classInputNameMapper = null,
         ?NameMapper $classOutputNameMapper = null,
         ?DataIterableAnnotation $classDefinedDataIterableAnnotation = null,
-        bool $autoLazyClass = false,
+        ?AutoLazy $classAutoLazy = null,
     ): DataProperty {
         $attributes = collect($reflectionProperty->getAttributes())
             ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
@@ -83,9 +83,13 @@ class DataPropertyFactory
             $defaultValue = null;
         }
 
-        $autoLazy = $attributes->contains(
+        $autoLazy = $attributes->first(
             fn (object $attribute) => $attribute instanceof AutoLazy
-        ) || ($autoLazyClass && $type->lazyType !== null);
+        );
+
+        if ($classAutoLazy && $type->lazyType !== null && $autoLazy === null) {
+            $autoLazy = $classAutoLazy;
+        }
 
         return new DataProperty(
             name: $reflectionProperty->name,
