@@ -3,19 +3,17 @@
 namespace Spatie\LaravelData\Attributes;
 
 use Attribute;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Skipped;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class FromRouteParameter implements InjectsPropertyValue
+class FromAuthenticatedUser implements InjectsPropertyValue
 {
     public function __construct(
-        public string $routeParameter,
-        public bool $replaceWhenPresentInPayload = true,
-        /** @deprecated  */
-        public bool $replaceWhenPresentInBody = true
+        public ?string $guard = null,
+        public bool $replaceWhenPresentInPayload = true
     ) {
     }
 
@@ -25,21 +23,17 @@ class FromRouteParameter implements InjectsPropertyValue
         array $properties,
         CreationContext $creationContext
     ): mixed {
-        if (! $payload instanceof Request) {
+        $user = Auth::guard($this->guard)->user();
+
+        if ($user === null) {
             return Skipped::create();
         }
 
-        $parameter = $payload->route($this->routeParameter);
-
-        if ($parameter === null) {
-            return Skipped::create();
-        }
-
-        return $parameter;
+        return $user;
     }
 
     public function shouldBeReplacedWhenPresentInPayload(): bool
     {
-        return $this->replaceWhenPresentInPayload && $this->replaceWhenPresentInBody;
+        return $this->replaceWhenPresentInPayload;
     }
 }

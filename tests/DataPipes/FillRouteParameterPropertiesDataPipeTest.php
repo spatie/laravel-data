@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
@@ -9,8 +10,15 @@ use Spatie\LaravelData\Attributes\FromRouteParameter;
 use Spatie\LaravelData\Attributes\FromRouteParameterProperty;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataPipeline;
+use Spatie\LaravelData\DataPipes\FillRouteParameterPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\InjectPropertyValuesPipe;
 use Spatie\LaravelData\Exceptions\CannotFillFromRouteParameterPropertyUsingScalarValue;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
+
+/**
+ * @deprecated these are the old tests for FillRouteParameterPropertiesDataPipe, these were replaced with tests using InjectPropertyValuesPipe
+ */
 
 it('can fill data properties with route parameters', function () {
     $dataClass = new class () extends Data {
@@ -24,14 +32,24 @@ it('can fill data properties with route parameters', function () {
         public array $tags;
         #[FromRouteParameter('nested')]
         public NestedData $nested;
+
+        public static function pipeline(): DataPipeline
+        {
+            return parent::pipeline()->replace(
+                InjectPropertyValuesPipe::class,
+                FillRouteParameterPropertiesDataPipe::class,
+            );
+        }
     };
 
     $requestMock = mock(Request::class);
+
     $requestMock->expects('route')->with('id')->once()->andReturns(123);
     $requestMock->expects('route')->with('slug')->once()->andReturns('foo-bar');
     $requestMock->expects('route')->with('title')->once()->andReturns('Foo Bar');
     $requestMock->expects('route')->with('tags')->once()->andReturns(['foo', 'bar']);
     $requestMock->expects('route')->with('nested')->once()->andReturns(['simple' => ['string' => 'baz']]);
+
     $requestMock->expects('toArray')->andReturns([]);
 
     $data = $dataClass::from($requestMock);
@@ -51,6 +69,14 @@ it('can fill data properties from route parameter properties', function () {
         public string $name;
         #[FromRouteParameterProperty('baz')]
         public string $description;
+
+        public static function pipeline(): DataPipeline
+        {
+            return parent::pipeline()->replace(
+                InjectPropertyValuesPipe::class,
+                FillRouteParameterPropertiesDataPipe::class,
+            );
+        }
     };
 
     $foo = new class () extends Model {
@@ -90,6 +116,14 @@ it('can fill data properties from route parameters using custom property mapping
         #[FromRouteParameter('user_id')]
         #[MapInputName('user_id')]
         public int $userId;
+
+        public static function pipeline(): DataPipeline
+        {
+            return parent::pipeline()->replace(
+                InjectPropertyValuesPipe::class,
+                FillRouteParameterPropertiesDataPipe::class,
+            );
+        }
     };
 
     $something = [
@@ -129,6 +163,14 @@ it('replaces properties when route parameter properties exist', function () {
         #[FromRouteParameter('user_id')]
         #[MapInputName('user_id')]
         public int $userId;
+
+        public static function pipeline(): DataPipeline
+        {
+            return parent::pipeline()->replace(
+                InjectPropertyValuesPipe::class,
+                FillRouteParameterPropertiesDataPipe::class,
+            );
+        }
     };
 
     $foo = 'Foo Lighters';
@@ -153,6 +195,14 @@ it('skips replacing properties when route parameter properties exist and replaci
         public string $name;
         #[FromRouteParameterProperty('bar', replaceWhenPresentInBody: false)]
         public string $slug;
+
+        public static function pipeline(): DataPipeline
+        {
+            return parent::pipeline()->replace(
+                InjectPropertyValuesPipe::class,
+                FillRouteParameterPropertiesDataPipe::class,
+            );
+        }
     };
 
     $requestMock = mock(Request::class);
@@ -172,6 +222,14 @@ it('skips properties it cannot find a route parameter for', function () {
         public string $name;
         #[FromRouteParameterProperty('bar')]
         public ?string $slug = 'default-slug';
+
+        public static function pipeline(): DataPipeline
+        {
+            return parent::pipeline()->replace(
+                InjectPropertyValuesPipe::class,
+                FillRouteParameterPropertiesDataPipe::class,
+            );
+        }
     };
 
     $requestMock = mock(Request::class);
@@ -189,6 +247,14 @@ it('throws when trying to fill from a route parameter that has a scalar value', 
     $dataClass = new class () extends Data {
         #[FromRouteParameterProperty('foo', 'bar')]
         public string $name;
+
+        public static function pipeline(): DataPipeline
+        {
+            return parent::pipeline()->replace(
+                InjectPropertyValuesPipe::class,
+                FillRouteParameterPropertiesDataPipe::class,
+            );
+        }
     };
 
     $requestMock = mock(Request::class);

@@ -21,6 +21,7 @@ use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
 use Spatie\LaravelData\DataPipes\FillRouteParameterPropertiesDataPipe;
+use Spatie\LaravelData\DataPipes\InjectPropertyValuesPipe;
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
 
 class Resource implements BaseDataContract, AppendableDataContract, IncludeableDataContract, TransformableDataContract, ResponsableDataContract, WrappableDataContract, EmptyDataContract, ContextableDataContract
@@ -40,6 +41,7 @@ class Resource implements BaseDataContract, AppendableDataContract, IncludeableD
             ->into(static::class)
             ->through(MapPropertiesDataPipe::class)
             ->through(FillRouteParameterPropertiesDataPipe::class)
+            ->through(InjectPropertyValuesPipe::class)
             ->through(DefaultValuesDataPipe::class)
             ->through(CastPropertiesDataPipe::class);
     }

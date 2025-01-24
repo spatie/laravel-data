@@ -8,18 +8,16 @@ use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class FromRouteParameterProperty extends FromRouteParameter
+class FromAuthenticatedUserProperty extends FromAuthenticatedUser
 {
     use ResolvesPropertyForInjectedValue;
 
     public function __construct(
-        string $routeParameter,
+        ?string $guard = null,
         public ?string $property = null,
-        bool $replaceWhenPresentInPayload = true,
-        /** @deprecated  */
-        bool $replaceWhenPresentInBody = true
+        bool $replaceWhenPresentInPayload = true
     ) {
-        parent::__construct($routeParameter, $replaceWhenPresentInPayload, $replaceWhenPresentInBody);
+        parent::__construct($guard, $replaceWhenPresentInPayload);
     }
 
     public function resolve(
