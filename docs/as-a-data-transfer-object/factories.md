@@ -1,6 +1,6 @@
 ---
 title: Factories
-weight: 11
+weight: 12
 ---
 
 It is possible to automatically create data objects in all sorts of forms with this package. Sometimes a little bit more

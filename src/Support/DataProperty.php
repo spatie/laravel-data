@@ -29,19 +29,4 @@ class DataProperty
         public readonly Collection $attributes,
     ) {
     }
-
-    public function getInputName(): string
-    {
-        return $this->inputMappedName ?? $this->name;
-    }
-
-    public function setValueForProperties(array &$properties, mixed $value): void
-    {
-        $name = $this->getInputName();
-        $properties[$name] = $value;
-
-        if ($this->name !== $name) {
-            $properties[$this->name] = $value;
-        }
-    }
 }

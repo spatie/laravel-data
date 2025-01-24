@@ -1,11 +1,11 @@
 <?php
 
-namespace Spatie\LaravelData\Attributes\FromData;
+namespace Spatie\LaravelData\Attributes;
 
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;
 
-interface FromDataAttribute
+interface InjectsPropertyValue
 {
     public function resolve(
         DataProperty $dataProperty,
@@ -13,4 +13,6 @@ interface FromDataAttribute
         array $properties,
         CreationContext $creationContext
     ): mixed;
+
+    public function shouldBeReplacedWhenPresentInPayload(): bool;
 }

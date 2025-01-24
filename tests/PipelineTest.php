@@ -6,6 +6,7 @@ use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\AuthorizedDataPipe;
 use Spatie\LaravelData\DataPipes\CastPropertiesDataPipe;
 use Spatie\LaravelData\DataPipes\DefaultValuesDataPipe;
+use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
 
 it('can prepend a data pipe at the beginning of the pipeline', function () {
     $pipeline = DataPipeline::create()
@@ -24,6 +25,48 @@ it('can prepend a data pipe at the beginning of the pipeline', function () {
         ->toHaveCount(3)
         ->toMatchArray([
             AuthorizedDataPipe::class,
+            DefaultValuesDataPipe::class,
+            CastPropertiesDataPipe::class,
+        ]);
+});
+
+it('replaces an existing pipe with a new one', function () {
+    $pipeline = DataPipeline::create()
+        ->through(DefaultValuesDataPipe::class)
+        ->through(CastPropertiesDataPipe::class)
+        ->replace(DefaultValuesDataPipe::class, AuthorizedDataPipe::class);
+
+    $reflectionProperty = tap(
+        new ReflectionProperty(DataPipeline::class, 'pipes'),
+        static fn (ReflectionProperty $r) => $r->setAccessible(true),
+    );
+
+    $pipes = $reflectionProperty->getValue($pipeline);
+
+    expect($pipes)
+        ->toHaveCount(2)
+        ->toMatchArray([
+            AuthorizedDataPipe::class,
+            CastPropertiesDataPipe::class,
+        ]);
+});
+
+it('does not replace a non-existing pipe', function () {
+    $pipeline = DataPipeline::create()
+        ->through(DefaultValuesDataPipe::class)
+        ->through(CastPropertiesDataPipe::class)
+        ->replace(MapPropertiesDataPipe::class, AuthorizedDataPipe::class);
+
+    $reflectionProperty = tap(
+        new ReflectionProperty(DataPipeline::class, 'pipes'),
+        static fn (ReflectionProperty $r) => $r->setAccessible(true),
+    );
+
+    $pipes = $reflectionProperty->getValue($pipeline);
+
+    expect($pipes)
+        ->toHaveCount(2)
+        ->toMatchArray([
             DefaultValuesDataPipe::class,
             CastPropertiesDataPipe::class,
         ]);

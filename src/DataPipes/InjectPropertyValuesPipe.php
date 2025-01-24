@@ -2,31 +2,19 @@
 
 namespace Spatie\LaravelData\DataPipes;
 
-use Illuminate\Http\Request;
-use Spatie\LaravelData\Attributes\FromRouteParameter;
+use Spatie\LaravelData\Attributes\InjectsPropertyValue;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\Skipped;
 
-/**
- * @deprecated Use InjectPropertyValuesPipe instead
- */
-class FillRouteParameterPropertiesDataPipe implements DataPipe
+class InjectPropertyValuesPipe implements DataPipe
 {
-    public function handle(
-        mixed $payload,
-        DataClass $class,
-        array $properties,
-        CreationContext $creationContext
-    ): array {
-        if (! $payload instanceof Request) {
-            return $properties;
-        }
-
+    public function handle(mixed $payload, DataClass $class, array $properties, CreationContext $creationContext): array
+    {
         foreach ($class->properties as $dataProperty) {
-            /** @var FromRouteParameter|null $attribute */
+            /** @var null|InjectsPropertyValue $attribute */
             $attribute = $dataProperty->attributes->first(
-                fn (object $attribute) => $attribute instanceof FromRouteParameter
+                fn (object $attribute) => $attribute instanceof InjectsPropertyValue
             );
 
             if ($attribute === null) {

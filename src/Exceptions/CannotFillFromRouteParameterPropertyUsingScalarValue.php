@@ -3,13 +3,16 @@
 namespace Spatie\LaravelData\Exceptions;
 
 use Exception;
-use Spatie\LaravelData\Attributes\FromRouteParameterProperty;
+use Illuminate\Support\Str;
+use Spatie\LaravelData\Attributes\InjectsPropertyValue;
 use Spatie\LaravelData\Support\DataProperty;
 
 class CannotFillFromRouteParameterPropertyUsingScalarValue extends Exception
 {
-    public static function create(DataProperty $property, FromRouteParameterProperty $attribute, mixed $value): self
+    public static function create(DataProperty $property, InjectsPropertyValue $attribute): self
     {
-        return new self("Attribute FromRouteParameterProperty cannot be used with scalar route parameters. {$property->className}::{$property->name} is configured to be filled from {$attribute->routeParameter}::{$attribute->property}, but the route parameter has a scalar value ({$value}).");
+        $attribute = Str::afterLast($attribute::class, '\\');
+
+        return new self("Attribute {$attribute} cannot be used with injected scalar parameters for property {$property->className}::{$property->name}");
     }
 }
