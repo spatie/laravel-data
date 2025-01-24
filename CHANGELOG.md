@@ -2,6 +2,92 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.12.0 - 2025-01-24
+
+What a release! Probably to biggest minor release we've ever done!
+
+Some cool highlights:
+
+#### Disabling optional values
+
+Optional values are great, but sometimes a `null` value is desirable from now on you can do the following:
+
+```php
+class SongData extends Data {
+    public function __construct(
+        public string $title,
+        public string $artist,
+        public Optional|null|string $album,
+    ) {
+    }
+}
+
+SongData::factory()
+    ->withoutOptionalValues()
+    ->from(['title' => 'Never gonna give you up', 'artist' => 'Rick Astley']); // album will `null` instead of `Optional`
+
+```
+#### Injecting property values
+
+It was already possible to inject a Laravel route parameter when creating a data object, we've now extended this functionality quite a bit and also allow injecting dependencies from the container and the authenticated user.
+
+```php
+class SongData extends Data {
+    #[FromAuthenticatedUser]
+    public UserData $user;
+}
+
+```
+#### Merging manual rules
+
+In the past when the validation rules of a property were manually defined, the automatic validation rules for that property were omitted. From now on, you can define manual validation rules and merge them with the automatically generated validation rules:
+
+```php
+```php
+#[MergeValidationRules]
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        public string $artist,
+    ) {
+    }
+
+    public static function rules(): array
+    {
+        return [
+            'title' => ['max:20'],
+            'artist' => ['max:20'],
+        ];
+    }
+}
+
+```
+#### New property mappers:
+
+We now ship by default a `Uppercase` and `Lowercase` mapper for mapping property names.
+
+### All changes:
+
+* Fix GitHub action fail by @rust17 in https://github.com/spatie/laravel-data/pull/918
+* Point to the right problem on ArgumentCountError exception by @nsvetozarevic in https://github.com/spatie/laravel-data/pull/884
+* Fix an issue where anonymous classes in castables were serialized (#903) by @rubenvanassche in https://github.com/spatie/laravel-data/pull/923
+* Add the ability to optionally merge automatically inferred rules with manual rules by @CWAscend in https://github.com/spatie/laravel-data/pull/848
+* Implement enum json serialization by @dont-know-php in https://github.com/spatie/laravel-data/pull/896
+* Use comments instead of docblocks in configuration file. by @edwinvdpol in https://github.com/spatie/laravel-data/pull/904
+* Casting DateTimeInterface: Truncate nanoseconds to microseconds (first 6 digits) / with Tests by @yob-yob in https://github.com/spatie/laravel-data/pull/908
+* Use container to call `Data::authorize()` to allow for dependencies by @cosmastech in https://github.com/spatie/laravel-data/pull/910
+* Improve type for CreationContextFactory::alwaysValidate by @sanfair in https://github.com/spatie/laravel-data/pull/925
+* Removed comma character from Data Rule stub by @andrey-helldar in https://github.com/spatie/laravel-data/pull/926
+* Use BaseData contract i/o Data concrete in CollectionAnnotation by @riesjart in https://github.com/spatie/laravel-data/pull/928
+* New mappers added: `LowerCaseMapper` and `UpperCaseMapper` by @andrey-helldar in https://github.com/spatie/laravel-data/pull/927
+* Allow disabling default Optional values in CreationContext by @ragulka in https://github.com/spatie/laravel-data/pull/931
+* Fix introduction.md by @pikant in https://github.com/spatie/laravel-data/pull/937
+* General code health improvements by @xHeaven in https://github.com/spatie/laravel-data/pull/920
+* Filling properties from current user by @c-v-c-v in https://github.com/spatie/laravel-data/pull/879
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.11.1...4.12.0
+
 ## 4.11.1 - 2024-10-23
 
 - Fix an issue where the cache structures command did not work if the directory did not exist (#892)
