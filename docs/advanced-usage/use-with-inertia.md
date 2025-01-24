@@ -52,3 +52,38 @@ router.reload((url, {
     only: ['title'],
 });
 ```
+
+### Auto lazy Inertia properties
+
+We already saw earlier that the package can automatically make properties Lazy, the same can be done for Inertia properties.
+
+It is possible to rewrite the previous example as follows:
+
+```php
+use Spatie\LaravelData\Attributes\AutoClosureLazy;use Spatie\LaravelData\Attributes\AutoInertiaLazy;
+
+class SongData extends Data
+{
+    public function __construct(
+        #[AutoInertiaLazy]
+        public Lazy|string $title,
+        #[AutoClosureLazy]
+        public Lazy|string $artist,
+    ) {
+    }
+}
+```
+
+If all the properties of a class should be either Inertia or closure lazy, you can use the attributes on the class level:
+
+```php
+#[AutoInertiaLazy]
+class SongData extends Data
+{
+    public function __construct(
+        public Lazy|string $title,
+        public Lazy|string $artist,
+    ) {
+    }
+}
+```

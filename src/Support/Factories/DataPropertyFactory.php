@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Support\Factories;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionProperty;
+use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\GetsCast;
 use Spatie\LaravelData\Attributes\Hidden;
@@ -32,10 +33,19 @@ class DataPropertyFactory
         ?NameMapper $classInputNameMapper = null,
         ?NameMapper $classOutputNameMapper = null,
         ?DataIterableAnnotation $classDefinedDataIterableAnnotation = null,
+        ?AutoLazy $classAutoLazy = null,
     ): DataProperty {
         $attributes = collect($reflectionProperty->getAttributes())
             ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
             ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
+
+        $type = $this->typeFactory->buildProperty(
+            $reflectionProperty->getType(),
+            $reflectionClass,
+            $reflectionProperty,
+            $attributes,
+            $classDefinedDataIterableAnnotation
+        );
 
         $mappers = NameMappersResolver::create()->execute($attributes);
 
@@ -73,21 +83,24 @@ class DataPropertyFactory
             $defaultValue = null;
         }
 
+        $autoLazy = $attributes->first(
+            fn (object $attribute) => $attribute instanceof AutoLazy
+        );
+
+        if ($classAutoLazy && $type->lazyType !== null && $autoLazy === null) {
+            $autoLazy = $classAutoLazy;
+        }
+
         return new DataProperty(
             name: $reflectionProperty->name,
             className: $reflectionProperty->class,
-            type: $this->typeFactory->buildProperty(
-                $reflectionProperty->getType(),
-                $reflectionClass,
-                $reflectionProperty,
-                $attributes,
-                $classDefinedDataIterableAnnotation
-            ),
+            type: $type,
             validate: $validate,
             computed: $computed,
             hidden: $hidden,
             isPromoted: $reflectionProperty->isPromoted(),
             isReadonly: $reflectionProperty->isReadOnly(),
+            autoLazy: $autoLazy,
             hasDefaultValue: $hasDefaultValue,
             defaultValue: $defaultValue,
             cast: $attributes->first(fn (object $attribute) => $attribute instanceof GetsCast)?->get(),
