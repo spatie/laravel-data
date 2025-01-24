@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
-use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
@@ -17,6 +16,7 @@ class DataValidationMessagesAndAttributesResolver
         string $class,
         array $fullPayload,
         ValidationPath $path,
+        array $nestingChain = [],
     ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
 
@@ -33,43 +33,51 @@ class DataValidationMessagesAndAttributesResolver
                 continue;
             }
 
-            if (Arr::has($fullPayload, $propertyPath->get()) === false) {
-                continue;
-            }
-
             if ($dataProperty->type->kind->isDataObject()) {
+                if (in_array($dataProperty->type->dataClass, $nestingChain)) {
+                    continue;
+                }
+
                 $nested = $this->execute(
                     $dataProperty->type->dataClass,
                     $fullPayload,
                     $propertyPath,
+                    [...$nestingChain, $dataProperty->type->dataClass],
                 );
 
-                $messages = array_merge($messages, $nested['messages']);
-                $attributes = array_merge($attributes, $nested['attributes']);
+
+                $messages[] = $nested['messages'];
+                $attributes[] = $nested['attributes'];
 
                 continue;
             }
 
             if ($dataProperty->type->kind->isDataCollectable()) {
+                if (in_array($dataProperty->type->dataClass, $nestingChain)) {
+                    continue;
+                }
+
                 $collected = $this->execute(
                     $dataProperty->type->dataClass,
                     $fullPayload,
                     $propertyPath->property('*'),
+                    [...$nestingChain, $dataProperty->type->dataClass],
                 );
 
-                $messages = array_merge($messages, $collected['messages']);
-                $attributes = array_merge($attributes, $collected['attributes']);
-
-                continue;
+                $messages[] = $collected['messages'];
+                $attributes[] = $collected['attributes'];
             }
         }
+
+        $messages = array_merge(...$messages);
+        $attributes = array_merge(...$attributes);
 
         if (method_exists($class, 'messages')) {
             $messages = collect(app()->call([$class, 'messages']))
                 ->keyBy(
                     fn (mixed $messages, string $key) => ! str_contains($key, '.') && is_string($messages)
-                    ? $path->property("*.{$key}")->get()
-                    : $path->property($key)->get()
+                        ? $path->property("*.{$key}")->get()
+                        : $path->property($key)->get()
                 )
                 ->merge($messages)
                 ->all();

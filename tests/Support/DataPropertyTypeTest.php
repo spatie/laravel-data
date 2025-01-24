@@ -35,6 +35,7 @@ use Spatie\LaravelData\Support\Types\IntersectionType;
 use Spatie\LaravelData\Support\Types\NamedType;
 use Spatie\LaravelData\Support\Types\UnionType;
 use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
+use Spatie\LaravelData\Tests\Fakes\Collections\SimpleDataCollectionWithAnotations;
 use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -572,6 +573,54 @@ it('can deduce an enumerable data collection union type', function () {
         ->iterableClass->toBe(Collection::class);
 });
 
+it('can deduce an enumerable data collection type from collection', function () {
+    $type = resolveDataType(new class () {
+        public SimpleDataCollectionWithAnotations $property;
+    });
+
+    expect($type)
+        ->isOptional->toBeFalse()
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->lazyType->toBeNull()
+        ->kind->toBe(DataTypeKind::DataEnumerable)
+        ->dataClass->toBe(SimpleData::class)
+        ->iterableClass->toBe(SimpleDataCollectionWithAnotations::class)
+        ->getAcceptedTypes()->toHaveKeys([SimpleDataCollectionWithAnotations::class]);
+
+    expect($type->type)
+        ->toBeInstanceOf(NamedType::class)
+        ->name->toBe(SimpleDataCollectionWithAnotations::class)
+        ->builtIn->toBeFalse()
+        ->kind->toBe(DataTypeKind::DataEnumerable)
+        ->dataClass->toBe(SimpleData::class)
+        ->iterableClass->toBe(SimpleDataCollectionWithAnotations::class);
+});
+
+it('can deduce an enumerable data collection union type from collection', function () {
+    $type = resolveDataType(new class () {
+        public SimpleDataCollectionWithAnotations|Lazy $property;
+    });
+
+    expect($type)
+        ->isOptional->toBeFalse()
+        ->isNullable->toBeFalse()
+        ->isMixed->toBeFalse()
+        ->lazyType->toBe(Lazy::class)
+        ->kind->toBe(DataTypeKind::DataEnumerable)
+        ->dataClass->toBe(SimpleData::class)
+        ->iterableClass->toBe(SimpleDataCollectionWithAnotations::class)
+        ->getAcceptedTypes()->toHaveKeys([SimpleDataCollectionWithAnotations::class]);
+
+    expect($type->type)
+        ->toBeInstanceOf(NamedType::class)
+        ->name->toBe(SimpleDataCollectionWithAnotations::class)
+        ->builtIn->toBeFalse()
+        ->kind->toBe(DataTypeKind::DataEnumerable)
+        ->dataClass->toBe(SimpleData::class)
+        ->iterableClass->toBe(SimpleDataCollectionWithAnotations::class);
+});
+
 it('can deduce a paginator data collection type', function () {
     $type = resolveDataType(new class () {
         #[DataCollectionOf(SimpleData::class)]
@@ -698,74 +747,74 @@ it(
     }
 )->with(function () {
     yield 'no type' => [
-        'class' => new class () {
-            public $property;
-        },
-        'expected' => [],
+         new class () {  // class
+             public $property;
+         },
+        [], // expected
     ];
 
     yield 'mixed' => [
-        'class' => new class () {
-            public mixed $property;
-        },
-        'expected' => [],
+         new class () {  // class
+             public mixed $property;
+         },
+        [], // expected
     ];
 
     yield 'single' => [
-        'class' => new class () {
-            public string $property;
-        },
-        'expected' => ['string' => []],
+         new class () {  // class
+             public string $property;
+         },
+        ['string' => []], // expected
     ];
 
     yield 'multi' => [
-        'class' => new class () {
-            public string|int|bool|float|array $property;
-        },
-        'expected' => [
-            'string' => [],
-            'int' => [],
-            'bool' => [],
-            'float' => [],
-            'array' => [],
-        ],
+         new class () {  // class
+             public string|int|bool|float|array $property;
+         },
+        [
+             'string' => [],
+             'int' => [],
+             'bool' => [],
+             'float' => [],
+             'array' => [],
+         ], // expected
     ];
 
     yield 'data' => [
-        'class' => new class () {
-            public SimpleData $property;
-        },
-        'expected' => [
-            SimpleData::class => [
-                Data::class,
-                JsonSerializable::class,
-                Castable::class,
-                Jsonable::class,
-                Responsable::class,
-                Arrayable::class,
-                AppendableData::class,
-                ContextableData::class,
-                BaseData::class,
-                IncludeableData::class,
-                ResponsableData::class,
-                TransformableData::class,
-                ValidateableData::class,
-                WrappableData::class,
-                EmptyData::class,
-            ],
-        ],
+         new class () {  // class
+             public SimpleData $property;
+         },
+        [
+             SimpleData::class => [
+                 Data::class,
+                 JsonSerializable::class,
+                 Castable::class,
+                 Jsonable::class,
+                 Responsable::class,
+                 Arrayable::class,
+                 AppendableData::class,
+                 ContextableData::class,
+                 BaseData::class,
+                 IncludeableData::class,
+                 ResponsableData::class,
+                 TransformableData::class,
+                 ValidateableData::class,
+                 WrappableData::class,
+                 EmptyData::class,
+             ],
+         ], // expected
     ];
 
     yield 'enum' => [
-        'class' => new class () {
-            public DummyBackedEnum $property;
-        },
-        'expected' => [
-            DummyBackedEnum::class => [
-                UnitEnum::class,
-                BackedEnum::class,
-            ],
-        ],
+         new class () {  // class
+             public DummyBackedEnum $property;
+         },
+        [
+             DummyBackedEnum::class => [
+                 UnitEnum::class,
+                 BackedEnum::class,
+             ],
+         ], // expected
     ];
 });
 
@@ -778,147 +827,147 @@ it(
     // Base types
 
     yield [
-        'class' => new class () {
+        new class () {
             public $property;
         },
-        'type' => 'string',
-        'accepts' => true,
+        'string',
+        true,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public mixed $property;
         },
-        'type' => 'string',
-        'accepts' => true,
+        'string',
+        true,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public string $property;
         },
-        'type' => 'string',
-        'accepts' => true,
+        'string',
+        true,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public bool $property;
         },
-        'type' => 'bool',
-        'accepts' => true,
+        'bool',
+        true,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public int $property;
         },
-        'type' => 'int',
-        'accepts' => true,
+        'int',
+        true,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public float $property;
         },
-        'type' => 'float',
-        'accepts' => true,
+        'float',
+        true,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public array $property;
         },
-        'type' => 'array',
-        'accepts' => true,
+        'array',
+        true,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public string $property;
         },
-        'type' => 'array',
-        'accepts' => false,
+        'array',
+        false,
     ];
 
     // Objects
 
     yield [
-        'class' => new class () {
+        new class () {
             public SimpleData $property;
         },
-        'type' => SimpleData::class,
-        'accepts' => true,
+        SimpleData::class,
+        true,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public SimpleData $property;
         },
-        'type' => ComplicatedData::class,
-        'accepts' => false,
+        ComplicatedData::class,
+        false,
     ];
 
     // Objects with inheritance
 
     yield 'simple inheritance' => [
-        'class' => new class () {
+        new class () {
             public Data $property;
         },
-        'type' => SimpleData::class,
-        'accepts' => true,
+        SimpleData::class,
+        true,
     ];
 
     yield 'reversed inheritance' => [
-        'class' => new class () {
+        new class () {
             public SimpleData $property;
         },
-        'type' => Data::class,
-        'accepts' => false,
+        Data::class,
+        false,
     ];
 
     yield 'false inheritance' => [
-        'class' => new class () {
+        new class () {
             public Model $property;
         },
-        'type' => SimpleData::class,
-        'accepts' => false,
+        SimpleData::class,
+        false,
     ];
 
     // Objects with interfaces
 
     yield 'simple interface implementation' => [
-        'class' => new class () {
+        new class () {
             public DateTimeInterface $property;
         },
-        'type' => DateTime::class,
-        'accepts' => true,
+        DateTime::class,
+        true,
     ];
 
     yield 'reversed interface implementation' => [
-        'class' => new class () {
+        new class () {
             public DateTime $property;
         },
-        'type' => DateTimeInterface::class,
-        'accepts' => false,
+        DateTimeInterface::class,
+        false,
     ];
 
     yield 'false interface implementation' => [
-        'class' => new class () {
+        new class () {
             public Model $property;
         },
-        'type' => DateTime::class,
-        'accepts' => false,
+        DateTime::class,
+        false,
     ];
 
     // Enums
 
     yield [
-        'class' => new class () {
+        new class () {
             public DummyBackedEnum $property;
         },
-        'type' => DummyBackedEnum::class,
-        'accepts' => true,
+        DummyBackedEnum::class,
+        true,
     ];
 });
 
@@ -929,67 +978,67 @@ it(
     }
 )->with(function () {
     yield [
-        'class' => new class () {
+        new class () {
             public ?string $property;
         },
-        'value' => null,
-        'accepts' => true,
+        null,
+        true,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public string $property;
         },
-        'value' => 'Hello',
-        'accepts' => true,
+        'Hello',
+        true,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public string $property;
         },
-        'value' => 3.14,
-        'accepts' => false,
+        3.14,
+        false,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public mixed $property;
         },
-        'value' => 3.14,
-        'accepts' => true,
+        3.14,
+        true,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public Data $property;
         },
-        'value' => new SimpleData('Hello'),
-        'accepts' => true,
+        new SimpleData('Hello'),
+        true,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public SimpleData $property;
         },
-        'value' => new SimpleData('Hello'),
-        'accepts' => true,
+        new SimpleData('Hello'),
+        true,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public SimpleData $property;
         },
-        'value' => new SimpleDataWithMappedProperty('Hello'),
-        'accepts' => false,
+        new SimpleDataWithMappedProperty('Hello'),
+        false,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public DummyBackedEnum $property;
         },
-        'value' => DummyBackedEnum::FOO,
-        'accepts' => true,
+        DummyBackedEnum::FOO,
+        true,
     ];
 });
 
@@ -1002,35 +1051,35 @@ it(
     }
 )->with(function () {
     yield [
-        'class' => new class () {
+        new class () {
             public SimpleData $property;
         },
-        'type' => SimpleData::class,
-        'expectedType' => SimpleData::class,
+        SimpleData::class,
+        SimpleData::class,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public SimpleData $property;
         },
-        'type' => Data::class,
-        'expectedType' => SimpleData::class,
+        Data::class,
+        SimpleData::class,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public DummyBackedEnum $property;
         },
-        'type' => BackedEnum::class,
-        'expectedType' => DummyBackedEnum::class,
+        BackedEnum::class,
+        DummyBackedEnum::class,
     ];
 
     yield [
-        'class' => new class () {
+        new class () {
             public SimpleData $property;
         },
-        'type' => DataCollection::class,
-        'expectedType' => null,
+        DataCollection::class,
+        null,
     ];
 });
 

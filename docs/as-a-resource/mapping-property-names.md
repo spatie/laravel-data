@@ -54,6 +54,15 @@ class ContractData extends Data
 }
 ```
 
+It is possible to set a default name mapping strategy for all data objects in the `data.php` config file:
+
+```php
+'name_mapping_strategy' => [
+    'input' => null,
+    'output' => SnakeCaseMapper::class,
+],
+```
+
 You can now create a data object as such:
 
 ```php
@@ -71,3 +80,5 @@ And a transformed version of the data object will look like this:
     'record_company' => 'RCA Records',
 ]
 ```
+
+The package has a set of default mappers available, you can find them [here](/docs/laravel-data/v4/advanced-usage/available-property-mappers).

@@ -39,7 +39,7 @@ class RuleDenormalizer
             return [$rule->getRule($path)];
         }
 
-        if($rule instanceof CustomValidationAttribute) {
+        if ($rule instanceof CustomValidationAttribute) {
             return Arr::wrap($rule->getRules($path));
         }
 

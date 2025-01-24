@@ -31,7 +31,7 @@ class DataType
 
     public function getAcceptedTypes(): array
     {
-        if($this->isMixed) {
+        if ($this->isMixed) {
             return [];
         }
 

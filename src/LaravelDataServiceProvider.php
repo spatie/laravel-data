@@ -6,6 +6,7 @@ use Livewire\Livewire;
 use Spatie\LaravelData\Commands\DataMakeCommand;
 use Spatie\LaravelData\Commands\DataStructuresCacheCommand;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Resolvers\ContextResolver;
 use Spatie\LaravelData\Support\Caching\DataStructureCache;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Livewire\LivewireDataCollectionSynth;
@@ -43,6 +44,8 @@ class LaravelDataServiceProvider extends PackageServiceProvider
             }
         );
 
+        $this->app->singleton(ContextResolver::class);
+
         $this->app->beforeResolving(BaseData::class, function ($class, $parameters, $app) {
             if ($app->has($class)) {
                 return;
@@ -54,7 +57,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
             );
         });
 
-        if(config('data.livewire.enable_synths') && class_exists(Livewire::class)) {
+        if (config('data.livewire.enable_synths') && class_exists(Livewire::class)) {
             $this->registerLivewireSynths();
         }
     }
@@ -75,6 +78,13 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
         if ($enableVarDumperCaster) {
             (new VarDumperManager())->initialize();
+        }
+
+        if (method_exists($this, 'optimizes')) {
+            $this->optimizes(
+                optimize: 'data:cache-structures',
+                key: 'laravel-data',
+            );
         }
     }
 }

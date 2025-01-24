@@ -63,7 +63,7 @@ class UpdateSongController
 }
 ```
 
-We have a complete section within these docs dedicated to validation, you can find it [here](/docs/laravel-data/v4/validation).
+We have a complete section within these docs dedicated to validation, you can find it [here](/docs/laravel-data/v4/validation/introduction).
 
 ## Getting the data object filled with request data from anywhere
 

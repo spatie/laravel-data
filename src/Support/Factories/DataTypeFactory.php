@@ -17,6 +17,7 @@ use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\Annotations\CollectionAnnotationReader;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotation;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotationReader;
 use Spatie\LaravelData\Support\DataPropertyType;
@@ -36,6 +37,7 @@ class DataTypeFactory
 {
     public function __construct(
         protected DataIterableAnnotationReader $iterableAnnotationReader,
+        protected CollectionAnnotationReader $collectionAnnotationReader,
     ) {
     }
 
@@ -348,6 +350,17 @@ class DataTypeFactory
             $iterableItemType === null
             && $typeable instanceof ReflectionProperty
             && $annotation = $this->iterableAnnotationReader->getForProperty($typeable)
+        ) {
+            $isData = $annotation->isData;
+            $iterableItemType = $annotation->type;
+            $iterableKeyType = $annotation->keyType;
+        }
+
+        if (
+            $iterableItemType === null
+            && $typeable instanceof ReflectionProperty
+            && class_exists($name)
+            && $annotation = $this->collectionAnnotationReader->getForClass($name)
         ) {
             $isData = $annotation->isData;
             $iterableItemType = $annotation->type;

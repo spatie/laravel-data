@@ -14,6 +14,7 @@ use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Factories\DataPropertyFactory;
 use Spatie\LaravelData\Tests\Fakes\CastTransformers\FakeCastTransformer;
@@ -120,6 +121,19 @@ it('can get the default value', function () {
     expect($helper)
         ->hasDefaultValue->toBeTrue()
         ->defaultValue->toEqual('hello');
+});
+
+it('will ignore an Optional value as a default value', function () {
+    $helper = resolveHelper(new class () {
+        public function __construct(
+            public string|Optional $property = new Optional(),
+        ) {
+        }
+    });
+
+    expect($helper)
+        ->hasDefaultValue->toBeFalse()
+        ->defaultValue->toBeNull();
 });
 
 it('can check if the property is promoted', function () {

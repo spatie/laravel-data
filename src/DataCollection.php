@@ -17,6 +17,7 @@ use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\WrappableData;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable as BaseDataCollectableContract;
+use Spatie\LaravelData\Contracts\ContextableData as ContextableDataContract;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
 use Spatie\LaravelData\Contracts\TransformableData as TransformableDataContract;
@@ -32,7 +33,7 @@ use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
  * @implements \ArrayAccess<TKey, TValue>
  * @implements  IteratorAggregate<TKey, TValue>
  */
-class DataCollection implements Responsable, BaseDataCollectableContract, TransformableDataContract, ResponsableDataContract, IncludeableDataContract, WrappableDataContract, IteratorAggregate, Countable, ArrayAccess
+class DataCollection implements Responsable, BaseDataCollectableContract, TransformableDataContract, ResponsableDataContract, IncludeableDataContract, WrappableDataContract, ContextableDataContract, IteratorAggregate, Countable, ArrayAccess
 {
     /** @use \Spatie\LaravelData\Concerns\BaseDataCollectable<TKey, TValue> */
     use BaseDataCollectable;
@@ -112,7 +113,9 @@ class DataCollection implements Responsable, BaseDataCollectableContract, Transf
 
         $data = $this->items->offsetGet($offset);
 
-        if ($data instanceof IncludeableDataContract) {
+        if ($data instanceof IncludeableDataContract
+            && $data instanceof ContextableDataContract
+        ) {
             $data->getDataContext()->mergePartials($this->getDataContext());
         }
 

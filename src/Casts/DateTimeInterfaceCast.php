@@ -38,11 +38,16 @@ class DateTimeInterfaceCast implements Cast, IterableItemCast
             return Uncastable::create();
         }
 
+        // Truncate nanoseconds to microseconds (first 6 digits)
+        if (is_string($value)) {
+            $value = preg_replace('/\.(\d{6})\d*Z$/', '.$1Z', $value);
+        }
+
         /** @var DateTimeInterface|null $datetime */
         $datetime = $formats
             ->map(fn (string $format) => rescue(fn () => $type::createFromFormat(
                 $format,
-                (string) $value,
+                $value instanceof DateTimeInterface ? $value->format($format) : (string) $value,
                 isset($this->timeZone) ? new DateTimeZone($this->timeZone) : null
             ), report: false))
             ->first(fn ($value) => (bool) $value);

@@ -30,7 +30,7 @@ class LivewireDataSynth extends Synth
         return $target instanceof BaseData && $target instanceof TransformableData;
     }
 
-    public function get(&$target, $key): BaseData
+    public function get(&$target, $key): mixed
     {
         return $target->{$key};
     }

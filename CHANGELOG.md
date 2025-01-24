@@ -2,6 +2,57 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.11.1 - 2024-10-23
+
+- Fix an issue where the cache structures command did not work if the directory did not exist (#892)
+
+## 4.11.0 - 2024-10-22
+
+### What's Changed
+
+* feat: support "null to optional" by @innocenzi in https://github.com/spatie/laravel-data/pull/881
+* Register optimize commands by @erikgaal in https://github.com/spatie/laravel-data/pull/880
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.10.1...4.11.0
+
+## 4.10.1 - 2024-10-07
+
+- Fix an issue where optional default values would disable validation
+
+## 4.10.0 - 2024-10-04
+
+It has been a fews weeks, a mostly bugfix release with one new feature, enjoy!
+
+- Fix an issue where required rules could not be combined with optional (#844)
+- Fix Livewire return type to make sure it can return everything in the data object (#836)
+- Fix issue where validation messages where ignored by collections nested in collections (#867)
+- Fix Resource to include Contextable data inteface (#868)
+- Stop NormalizedModel from initializing itself and try to lazy load properties when required (#870)
+- Passing an enum to caster handle without an error (#841)
+- Passing date objects to caster handle without an error (#842)
+- Allow setting a default mapping strategy  (#846)
+
+## 4.9.0 - 2024-09-10
+
+- Move some interfaces around in order to avoid a circular chaos
+
+## 4.8.2 - 2024-08-30
+
+- Remove a circular dependency
+
+## 4.81 - 2024-08-13
+
+- Fix a missing dependency
+
+## 4.8.0 - 2024-08-13
+
+### What's Changed
+
+* Detect data from collection by @clementbirkle in https://github.com/spatie/laravel-data/pull/812
+* Fix an issue where dd or dump did not work
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.7.2...4.8.0
+
 ## 4.7.2 - 2024-07-25
 
 - Fix issue where an exception was not always thrown while it should (#809)

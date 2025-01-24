@@ -7,6 +7,7 @@ use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Mappers\CamelCaseMapper;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
+use Spatie\LaravelData\Mappers\StudlyCaseMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 
 function getAttributes(object $class): Collection
@@ -99,6 +100,50 @@ it('can map a mapper class', function () {
     expect($this->resolver->execute($attributes))->toMatchArray([
         'inputNameMapper' => new CamelCaseMapper(),
         'outputNameMapper' => new SnakeCaseMapper(),
+    ]);
+});
+
+it('can have default mappers', function () {
+    config()->set('data.name_mapping_strategy.input', CamelCaseMapper::class);
+    config()->set('data.name_mapping_strategy.output', SnakeCaseMapper::class);
+
+    $attributes = getAttributes(new class () {
+        public $property;
+    });
+
+    expect($this->resolver->execute($attributes))->toMatchArray([
+        'inputNameMapper' => new CamelCaseMapper(),
+        'outputNameMapper' => new SnakeCaseMapper(),
+    ]);
+});
+
+it('input name mappers only work when no mappers are specified', function () {
+    config()->set('data.name_mapping_strategy.input', CamelCaseMapper::class);
+    config()->set('data.name_mapping_strategy.output', SnakeCaseMapper::class);
+
+    $attributes = getAttributes(new class () {
+        #[MapInputName(StudlyCaseMapper::class)]
+        public $property;
+    });
+
+    expect($this->resolver->execute($attributes))->toMatchArray([
+        'inputNameMapper' => new StudlyCaseMapper(),
+        'outputNameMapper' => new SnakeCaseMapper(),
+    ]);
+});
+
+it('output name mappers only work when no mappers are specified', function () {
+    config()->set('data.name_mapping_strategy.input', CamelCaseMapper::class);
+    config()->set('data.name_mapping_strategy.output', SnakeCaseMapper::class);
+
+    $attributes = getAttributes(new class () {
+        #[MapOutputName(StudlyCaseMapper::class)]
+        public $property;
+    });
+
+    expect($this->resolver->execute($attributes))->toMatchArray([
+        'inputNameMapper' => new CamelCaseMapper(),
+        'outputNameMapper' => new StudlyCaseMapper(),
     ]);
 });
 

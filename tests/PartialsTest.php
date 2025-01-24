@@ -3,9 +3,12 @@
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\MapName;
+use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Resolvers\RequestQueryStringPartialsResolver;
 use Spatie\LaravelData\Support\Partials\Partial;
 use Spatie\LaravelData\Support\Partials\PartialsCollection;
@@ -23,7 +26,6 @@ use Spatie\LaravelData\Tests\Fakes\OnlyData;
 use Spatie\LaravelData\Tests\Fakes\PartialClassConditionalData;
 use Spatie\LaravelData\Tests\Fakes\SimpleChildDataWithMappedOutputName;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedOutputName;
 use Spatie\LaravelData\Tests\Fakes\UlarData;
 
 /**
@@ -1021,45 +1023,45 @@ it('can define permanent partials using function call', function (
     expect($data->toArray())->toBe($expectedPartialPayload);
 })->with(function () {
     yield [
-        'data' => new LazyData(
+        new LazyData(
             Lazy::create(fn () => 'Rick Astley'),
-        ),
-        'temporaryPartial' => fn (LazyData $data) => $data->include('name'),
-        'permanentPartial' => fn (LazyData $data) => $data->includePermanently('name'),
-        'expectedFullPayload' => [],
-        'expectedPartialPayload' => ['name' => 'Rick Astley'],
+        ), // data
+        fn (LazyData $data) => $data->include('name'), // temporaryPartial
+        fn (LazyData $data) => $data->includePermanently('name'), // permanentPartial
+        [], // expectedFullPayload
+        ['name' => 'Rick Astley'], // expectedPartialPayload
     ];
 
     yield [
-        'data' => new LazyData(
+        new LazyData(
             Lazy::create(fn () => 'Rick Astley')->defaultIncluded(),
-        ),
-        'temporaryPartial' => fn (LazyData $data) => $data->exclude('name'),
-        'permanentPartial' => fn (LazyData $data) => $data->excludePermanently('name'),
-        'expectedFullPayload' => ['name' => 'Rick Astley'],
-        'expectedPartialPayload' => [],
+        ), // data
+        fn (LazyData $data) => $data->exclude('name'), // temporaryPartial
+        fn (LazyData $data) => $data->excludePermanently('name'), // permanentPartial
+        ['name' => 'Rick Astley'], // expectedFullPayload
+        [], // expectedPartialPayload
     ];
 
     yield [
-        'data' => new MultiData(
+        new MultiData(
             'Rick Astley',
-            'Never gonna give you up',
+            'Never gonna give you up', // data
         ),
-        'temporaryPartial' => fn (MultiData $data) => $data->only('first'),
-        'permanentPartial' => fn (MultiData $data) => $data->onlyPermanently('first'),
-        'expectedFullPayload' => ['first' => 'Rick Astley', 'second' => 'Never gonna give you up'],
-        'expectedPartialPayload' => ['first' => 'Rick Astley'],
+        fn (MultiData $data) => $data->only('first'), // temporaryPartial
+        fn (MultiData $data) => $data->onlyPermanently('first'), // permanentPartial
+        ['first' => 'Rick Astley', 'second' => 'Never gonna give you up'], // expectedFullPayload
+        ['first' => 'Rick Astley'], // expectedPartialPayload
     ];
 
     yield [
-        'data' => new MultiData(
+        new MultiData(
             'Rick Astley',
-            'Never gonna give you up',
+            'Never gonna give you up', // data
         ),
-        'temporaryPartial' => fn (MultiData $data) => $data->except('first'),
-        'permanentPartial' => fn (MultiData $data) => $data->exceptPermanently('first'),
-        'expectedFullPayload' => ['first' => 'Rick Astley', 'second' => 'Never gonna give you up'],
-        'expectedPartialPayload' => ['second' => 'Never gonna give you up'],
+        fn (MultiData $data) => $data->except('first'), // temporaryPartial
+        fn (MultiData $data) => $data->exceptPermanently('first'), // permanentPartial
+        ['first' => 'Rick Astley', 'second' => 'Never gonna give you up'], // expectedFullPayload
+        ['second' => 'Never gonna give you up'], // expectedPartialPayload
     ];
 });
 
@@ -1183,183 +1185,183 @@ it('will check if partials are valid as request partials', function (
     expect($data->toResponse($request)->getData(assoc: true))->toEqual($expectedResponse);
 })->with(function () {
     yield 'disallowed property inclusion' => [
-        'lazyDataAllowedIncludes' => [],
-        'dataAllowedIncludes' => [],
-        'includes' => 'property',
-        'expectedPartials' => PartialsCollection::create(),
-        'expectedResponse' => [],
+        [], // lazyDataAllowedIncludes
+        [], // dataAllowedIncludes
+        'property', // includes
+        PartialsCollection::create(), // expectedPartials
+        [], // expectedResponse
     ];
 
     yield 'allowed property inclusion' => [
-        'lazyDataAllowedIncludes' => [],
-        'dataAllowedIncludes' => ['property'],
-        'includes' => 'property',
-        'expectedPartials' => PartialsCollection::create(
+        [], // lazyDataAllowedIncludes
+        ['property'], // dataAllowedIncludes
+        'property', // includes
+        PartialsCollection::create(
             Partial::create('property'),
-        ),
-        'expectedResponse' => [
+        ),// expectedPartials
+        [
             'property' => 'Hello',
-        ],
+        ],// expectedResponse
     ];
 
     yield 'allowed data property inclusion without nesting' => [
-        'lazyDataAllowedIncludes' => [],
-        'dataAllowedIncludes' => ['nested'],
-        'includes' => 'nested.name',
-        'expectedPartials' => PartialsCollection::create(
+        [], // lazyDataAllowedIncludes
+        ['nested'], // dataAllowedIncludes
+        'nested.name', // includes
+        PartialsCollection::create(
             Partial::create('nested'),
-        ),
-        'expectedResponse' => [
+        ),// expectedPartials
+        [
             'nested' => [],
-        ],
+        ],// expectedResponse
     ];
 
     yield 'allowed data property inclusion with nesting' => [
-        'lazyDataAllowedIncludes' => ['name'],
-        'dataAllowedIncludes' => ['nested'],
-        'includes' => 'nested.name',
-        'expectedPartials' => PartialsCollection::create(
+        ['name'], // lazyDataAllowedIncludes
+        ['nested'], // dataAllowedIncludes
+        'nested.name', // includes
+        PartialsCollection::create(
             Partial::create('nested.name'),
-        ),
-        'expectedResponse' => [
+        ),// expectedPartials
+        [
             'nested' => [
                 'name' => 'Hello',
             ],
-        ],
+        ], // expectedResponse
     ];
 
     yield 'allowed data collection property inclusion without nesting' => [
-        'lazyDataAllowedIncludes' => [],
-        'dataAllowedIncludes' => ['collection'],
-        'includes' => 'collection.name',
-        'expectedPartials' => PartialsCollection::create(
+        [], // lazyDataAllowedIncludes
+        ['collection'], // dataAllowedIncludes
+        'collection.name', // includes
+        PartialsCollection::create(
             Partial::create('collection'),
-        ),
-        'expectedResponse' => [
+        ), // expectedPartials
+        [
             'collection' => [
                 [],
                 [],
             ],
-        ],
+        ], // expectedResponse
     ];
 
     yield 'allowed data collection property inclusion with nesting' => [
-        'lazyDataAllowedIncludes' => ['name'],
-        'dataAllowedIncludes' => ['collection'],
-        'includes' => 'collection.name',
-        'expectedPartials' => PartialsCollection::create(
+        ['name'], // lazyDataAllowedIncludes
+        ['collection'], // dataAllowedIncludes
+        'collection.name', // includes
+        PartialsCollection::create(
             Partial::create('collection.name'),
-        ),
-        'expectedResponse' => [
+        ), // expectedPartials
+        [
             'collection' => [
                 ['name' => 'Hello'],
                 ['name' => 'World'],
             ],
-        ],
+        ], // expectedResponse
     ];
 
     yield 'allowed nested data property inclusion without defining allowed includes on nested' => [
-        'lazyDataAllowedIncludes' => null,
-        'dataAllowedIncludes' => ['nested'],
-        'includes' => 'nested.name',
-        'expectedPartials' => PartialsCollection::create(
+        null, // lazyDataAllowedIncludes
+        ['nested'], // dataAllowedIncludes
+        'nested.name', // includes
+        PartialsCollection::create(
             Partial::create('nested.name'),
-        ),
-        'expectedResponse' => [
+        ),  // expectedPartials
+        [
             'nested' => [
                 'name' => 'Hello',
             ],
-        ],
+        ],  // expectedResponse
     ];
 
     yield 'allowed all nested data property inclusion without defining allowed includes on nested' => [
-        'lazyDataAllowedIncludes' => null,
-        'dataAllowedIncludes' => ['nested'],
-        'includes' => 'nested.*',
-        'expectedPartials' => PartialsCollection::create(
+        null, // lazyDataAllowedIncludes
+        ['nested'], // dataAllowedIncludes
+        'nested.*', // includes
+        PartialsCollection::create(
             Partial::create('nested.*'),
-        ),
-        'expectedResponse' => [
+        ),  // expectedPartials
+        [
             'nested' => [
                 'name' => 'Hello',
             ],
-        ],
+        ], // expectedResponse
     ];
 
     yield 'disallowed all nested data property inclusion ' => [
-        'lazyDataAllowedIncludes' => [],
-        'dataAllowedIncludes' => ['nested'],
-        'includes' => 'nested.*',
-        'expectedPartials' => PartialsCollection::create(
+        [], // lazyDataAllowedIncludes
+        ['nested'], // dataAllowedIncludes
+        'nested.*', // includes
+        PartialsCollection::create(
             Partial::create('nested'),
-        ),
-        'expectedResponse' => [
+        ),  // expectedPartials
+        [
             'nested' => [],
-        ],
+        ], // expectedResponse
     ];
 
     yield 'multi property inclusion' => [
-        'lazyDataAllowedIncludes' => null,
-        'dataAllowedIncludes' => ['nested', 'property'],
-        'includes' => 'nested.*,property',
-        'expectedPartials' => PartialsCollection::create(
+        null, // lazyDataAllowedIncludes
+        ['nested', 'property'], // dataAllowedIncludes
+        'nested.*,property', // includes
+        PartialsCollection::create(
             Partial::create('nested.*'),
             Partial::create('property'),
-        ),
-        'expectedResponse' => [
+        ), // expectedPartials
+        [
             'property' => 'Hello',
             'nested' => [
                 'name' => 'Hello',
             ],
-        ],
+        ], // expectedResponse
     ];
 
     yield 'without property inclusion' => [
-        'lazyDataAllowedIncludes' => null,
-        'dataAllowedIncludes' => ['nested', 'property'],
-        'includes' => null,
-        'expectedPartials' => null,
-        'expectedResponse' => [],
+        null, // lazyDataAllowedIncludes
+        ['nested', 'property'], // dataAllowedIncludes
+        null, // includes
+        null, // expectedPartials
+        [], // expectedResponse
     ];
 
     yield 'with invalid partial definition' => [
-        'lazyDataAllowedIncludes' => null,
-        'dataAllowedIncludes' => null,
-        'includes' => '',
-        'expectedPartials' => PartialsCollection::create(),
-        'expectedResponse' => [],
+        null, // lazyDataAllowedIncludes
+        null, // dataAllowedIncludes
+        '', // includes
+        PartialsCollection::create(), // expectedPartials
+        [], // expectedResponse
     ];
 
     yield 'with non existing field' => [
-        'lazyDataAllowedIncludes' => [],
-        'dataAllowedIncludes' => [],
-        'includes' => 'non-existing',
-        'expectedPartials' => PartialsCollection::create(),
-        'expectedResponse' => [],
+        [], // lazyDataAllowedIncludes
+        [], // dataAllowedIncludes
+        'non-existing', // includes
+        PartialsCollection::create(), // expectedPartials
+        [], // expectedResponse
     ];
 
     yield 'with non existing nested field' => [
-        'lazyDataAllowedIncludes' => [],
-        'dataAllowedIncludes' => [],
-        'includes' => 'non-existing.still-non-existing',
-        'expectedPartials' => PartialsCollection::create(),
-        'expectedResponse' => [],
+        [], // lazyDataAllowedIncludes
+        [], // dataAllowedIncludes
+        'non-existing.still-non-existing', // includes
+        PartialsCollection::create(), // expectedPartials
+        [], // expectedResponse
     ];
 
     yield 'with non allowed nested field' => [
-        'lazyDataAllowedIncludes' => [],
-        'dataAllowedIncludes' => [],
-        'includes' => 'nested.name',
-        'expectedPartials' => PartialsCollection::create(),
-        'expectedResponse' => [],
+        [], // lazyDataAllowedIncludes
+        [], // dataAllowedIncludes
+        'nested.name', // includes
+        PartialsCollection::create(), // expectedPartials
+        [], // expectedResponse
     ];
 
     yield 'with non allowed nested all' => [
-        'lazyDataAllowedIncludes' => [],
-        'dataAllowedIncludes' => [],
-        'includes' => 'nested.*',
-        'expectedPartials' => PartialsCollection::create(),
-        'expectedResponse' => [],
+        [], // lazyDataAllowedIncludes
+        [], // dataAllowedIncludes
+        'nested.*', // includes
+        PartialsCollection::create(), // expectedPartials
+        [], // expectedResponse
     ];
 });
 
@@ -1404,13 +1406,13 @@ it('handles parsing includes from request in different formats', function (array
     expect($data)->toHaveKeys($expected);
 })->with(function () {
     yield 'input as array' => [
-        'input' => ['include' => ['artist', 'name']],
-        'expected' => ['artist', 'name'],
+         ['include' => ['artist', 'name']], // input
+         ['artist', 'name'],  // expected
     ];
 
     yield 'input as comma separated' => [
-        'input' => ['include' => 'artist,name'],
-        'expected' => ['artist', 'name'],
+         ['include' => 'artist,name'], // input
+         ['artist', 'name'],  // expected
     ];
 });
 
@@ -1578,6 +1580,28 @@ it('handles partials when not transforming values by copying them to lazy nested
 });
 
 it('handles parsing except from request with mapped output name', function () {
+    #[MapName(SnakeCaseMapper::class)]
+    class SimpleDataWithMappedOutputName extends Data
+    {
+        public function __construct(
+            public int $id,
+            #[MapOutputName('paid_amount')]
+            public float $amount,
+            public string $anyString,
+            public SimpleChildDataWithMappedOutputName $child
+        ) {
+        }
+
+        public static function allowedRequestExcept(): ?array
+        {
+            return [
+                'amount',
+                'anyString',
+                'child',
+            ];
+        }
+    }
+
     $dataclass = SimpleDataWithMappedOutputName::from([
         'id' => 1,
         'amount' => 1000,

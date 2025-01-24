@@ -34,7 +34,6 @@ class DataClassFactory
     ) {
     }
 
-
     public function build(ReflectionClass $reflectionClass): DataClass
     {
         /** @var class-string<Data> $name */

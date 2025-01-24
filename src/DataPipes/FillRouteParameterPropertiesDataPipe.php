@@ -4,12 +4,13 @@ namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Attributes\FromRouteParameter;
-use Spatie\LaravelData\Attributes\FromRouteParameterProperty;
-use Spatie\LaravelData\Exceptions\CannotFillFromRouteParameterPropertyUsingScalarValue;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataClass;
-use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Skipped;
 
+/**
+ * @deprecated Use InjectPropertyValuesPipe instead
+ */
 class FillRouteParameterPropertiesDataPipe implements DataPipe
 {
     public function handle(
@@ -23,8 +24,9 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
         }
 
         foreach ($class->properties as $dataProperty) {
+            /** @var FromRouteParameter|null $attribute */
             $attribute = $dataProperty->attributes->first(
-                fn (object $attribute) => $attribute instanceof FromRouteParameter || $attribute instanceof FromRouteParameterProperty
+                fn (object $attribute) => $attribute instanceof FromRouteParameter
             );
 
             if ($attribute === null) {
@@ -33,17 +35,18 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
 
             // if inputMappedName exists, use it first
             $name = $dataProperty->inputMappedName ?: $dataProperty->name;
-            if (! $attribute->replaceWhenPresentInBody && array_key_exists($name, $properties)) {
+
+            if (! $attribute->shouldBeReplacedWhenPresentInPayload() && array_key_exists($name, $properties)) {
                 continue;
             }
 
-            $parameter = $payload->route($attribute->routeParameter);
+            $value = $attribute->resolve($dataProperty, $payload, $properties, $creationContext);
 
-            if ($parameter === null) {
+            if ($value === Skipped::create()) {
                 continue;
             }
 
-            $properties[$name] = $this->resolveValue($dataProperty, $attribute, $parameter);
+            $properties[$name] = $value;
 
             // keep the original property name
             if ($name !== $dataProperty->name) {
@@ -52,21 +55,5 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
         }
 
         return $properties;
-    }
-
-    protected function resolveValue(
-        DataProperty $dataProperty,
-        FromRouteParameter|FromRouteParameterProperty $attribute,
-        mixed $parameter,
-    ): mixed {
-        if ($attribute instanceof FromRouteParameter) {
-            return $parameter;
-        }
-
-        if (is_scalar($parameter)) {
-            throw CannotFillFromRouteParameterPropertyUsingScalarValue::create($dataProperty, $attribute, $parameter);
-        }
-
-        return data_get($parameter, $attribute->property ?? $dataProperty->name);
     }
 }

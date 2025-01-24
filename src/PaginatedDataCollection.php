@@ -14,6 +14,7 @@ use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\WrappableData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable as BaseDataCollectableContract;
+use Spatie\LaravelData\Contracts\ContextableData as ContextableDataContract;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
 use Spatie\LaravelData\Contracts\TransformableData as TransformableDataContract;
@@ -28,7 +29,7 @@ use Spatie\LaravelData\Support\EloquentCasts\DataCollectionEloquentCast;
  *
  * @implements IteratorAggregate<TKey, TValue>
  */
-class PaginatedDataCollection implements Responsable, BaseDataCollectableContract, TransformableDataContract, ResponsableDataContract, IncludeableDataContract, WrappableDataContract, IteratorAggregate, Countable
+class PaginatedDataCollection implements Responsable, BaseDataCollectableContract, TransformableDataContract, ContextableDataContract, ResponsableDataContract, IncludeableDataContract, WrappableDataContract, IteratorAggregate, Countable
 {
     use ResponsableData;
     use IncludeableData;

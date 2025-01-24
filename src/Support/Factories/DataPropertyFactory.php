@@ -13,6 +13,7 @@ use Spatie\LaravelData\Attributes\WithCastAndTransformer;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Mappers\NameMapper;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotation;
 use Spatie\LaravelData\Support\DataProperty;
@@ -72,6 +73,16 @@ class DataPropertyFactory
             fn (object $attribute) => $attribute instanceof WithoutValidation
         ) && ! $computed;
 
+        if (! $reflectionProperty->isPromoted()) {
+            $hasDefaultValue = $reflectionProperty->hasDefaultValue();
+            $defaultValue = $reflectionProperty->getDefaultValue();
+        }
+
+        if ($hasDefaultValue && $defaultValue instanceof Optional) {
+            $hasDefaultValue = false;
+            $defaultValue = null;
+        }
+
         $autoLazy = $attributes->contains(
             fn (object $attribute) => $attribute instanceof AutoLazy
         ) || ($autoLazyClass && $type->lazyType !== null);
@@ -86,8 +97,8 @@ class DataPropertyFactory
             isPromoted: $reflectionProperty->isPromoted(),
             isReadonly: $reflectionProperty->isReadOnly(),
             autoLazy: $autoLazy,
-            hasDefaultValue: $reflectionProperty->isPromoted() ? $hasDefaultValue : $reflectionProperty->hasDefaultValue(),
-            defaultValue: $reflectionProperty->isPromoted() ? $defaultValue : $reflectionProperty->getDefaultValue(),
+            hasDefaultValue: $hasDefaultValue,
+            defaultValue: $defaultValue,
             cast: $attributes->first(fn (object $attribute) => $attribute instanceof GetsCast)?->get(),
             transformer: $attributes->first(fn (object $attribute) => $attribute instanceof WithTransformer || $attribute instanceof WithCastAndTransformer)?->get(),
             inputMappedName: $inputMappedName,

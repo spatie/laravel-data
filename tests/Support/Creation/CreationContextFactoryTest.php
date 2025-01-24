@@ -85,6 +85,22 @@ it('is possible to enable magical creation', function () {
     expect($context->disableMagicalCreation)->toBeFalse();
 });
 
+it('is possible to disable optional values', function () {
+    $context = CreationContextFactory::createFromConfig(
+        SimpleData::class
+    )->withoutOptionalValues();
+
+    expect($context->useOptionalValues)->toBeFalse();
+});
+
+it('is possible to enable optional values', function () {
+    $context = CreationContextFactory::createFromConfig(
+        SimpleData::class
+    )->withOptionalValues();
+
+    expect($context->useOptionalValues)->toBeTrue();
+});
+
 it('is possible to set ignored magical methods', function () {
     $context = CreationContextFactory::createFromConfig(
         SimpleData::class

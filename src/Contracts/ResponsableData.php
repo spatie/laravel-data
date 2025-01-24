@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Contracts;
 
 use Illuminate\Contracts\Support\Responsable;
 
-interface ResponsableData extends TransformableData, Responsable
+interface ResponsableData extends Responsable
 {
     /**
      * @param \Illuminate\Http\Request $request

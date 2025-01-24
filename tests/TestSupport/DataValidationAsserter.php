@@ -8,18 +8,14 @@ use Illuminate\Validation\ValidationRuleParser;
 use function PHPUnit\Framework\assertTrue;
 
 use Spatie\LaravelData\Data;
-
 use Spatie\LaravelData\DataPipeline;
-
 use Spatie\LaravelData\DataPipes\MapPropertiesDataPipe;
-
 use Spatie\LaravelData\DataPipes\ValidatePropertiesDataPipe;
 use Spatie\LaravelData\Normalizers\ArrayNormalizer;
 use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\Validation\DataRules;
-
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 /**

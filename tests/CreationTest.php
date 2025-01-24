@@ -45,6 +45,7 @@ use Spatie\LaravelData\Tests\Fakes\ComplicatedData;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomCursorPaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomDataCollection;
 use Spatie\LaravelData\Tests\Fakes\DataCollections\CustomPaginatedDataCollection;
+use Spatie\LaravelData\Tests\Fakes\DataWithArgumentCountErrorException;
 use Spatie\LaravelData\Tests\Fakes\EnumData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\ModelData;
@@ -752,6 +753,18 @@ it('throws a readable exception message when the constructor fails', function (
     yield 'one param' => [['first' => 'First'], 'Could not create `Spatie\LaravelData\Tests\Fakes\MultiData`: the constructor requires 2 parameters, 1 given. Parameters given: first. Parameters missing: second.'],
 ]);
 
+it('throws a readable exception message when the ArgumentCountError exception is thrown in the constructor', function () {
+    try {
+        DataWithArgumentCountErrorException::from(['string' => 'string']);
+    } catch (ArgumentCountError $e) {
+        expect($e->getMessage())->toBe('This function expects exactly 2 arguments, 1 given.');
+        expect($e->getFile())->toContain('/tests/Fakes/DataWithArgumentCountErrorException.php');
+        expect($e->getLine())->toBe(14);
+
+        return;
+    }
+});
+
 it('throws a readable exception message when the constructor of a nested data object fails', function () {
     expect(fn () => NestedData::from([
         'simple' => [],
@@ -1228,6 +1241,36 @@ it('is possible to create a union type data collectable', function () {
         [10, SimpleData::from('Hello World')]
     );
 })->todo();
+
+it('can be created without optional values', function () {
+    $dataClass = new class () extends Data {
+        public string $name;
+
+        public string|null|Optional $description;
+
+        public int|Optional $year = 2025;
+
+        public string|Optional $slug;
+
+    };
+
+    $data = $dataClass::factory()
+        ->withoutOptionalValues()
+        ->from([
+            'name' => 'Ruben',
+        ]);
+
+    expect($data->name)->toBe('Ruben');
+    expect($data->description)->toBeNull();
+    expect($data->year)->toBe(2025);
+    expect(isset($data->slug))->toBeFalse();
+
+    expect($data->toArray())->toMatchArray([
+        'name' => 'Ruben',
+        'description' => null,
+        'year' => 2025,
+    ]);
+});
 
 it('can create a data object with auto lazy properties', function () {
     $dataClass = new class () extends Data {

@@ -8,7 +8,7 @@ use Spatie\LaravelData\Support\DataProperty;
 class UnserializeCast implements Cast
 {
     public function __construct(
-        private bool $failSilently = false,
+        private readonly bool $failSilently = false,
     ) {
     }
 
@@ -22,7 +22,7 @@ class UnserializeCast implements Cast
         try {
             return unserialize($value);
         } catch (\Throwable $e) {
-            if($this->failSilently) {
+            if ($this->failSilently) {
                 return Uncastable::create();
             }
 

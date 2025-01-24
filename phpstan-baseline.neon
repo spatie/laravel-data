@@ -121,9 +121,9 @@ parameters:
 			path: src/Support/DataConfig.php
 
 		-
-			message: "#^Call to method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),string\\|null\\>\\:\\:isEmpty\\(\\) will always evaluate to false\\.$#"
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
-			path: src/Support/Validation/RuleDenormalizer.php
+			path: src/Support/Skipped.php
 
 		-
 			message: "#^Call to an undefined method DateTimeInterface\\:\\:setTimezone\\(\\)\\.$#"

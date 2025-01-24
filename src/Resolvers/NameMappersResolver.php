@@ -32,7 +32,7 @@ class NameMappersResolver
     protected function resolveInputNameMapper(
         Collection $attributes
     ): ?NameMapper {
-        /** @var \Spatie\LaravelData\Attributes\MapInputName|\Spatie\LaravelData\Attributes\MapName|null $mapper */
+        /** @var MapInputName|MapName|null $mapper */
         $mapper = $attributes->first(fn (object $attribute) => $attribute instanceof MapInputName)
             ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName);
 
@@ -40,13 +40,13 @@ class NameMappersResolver
             return $this->resolveMapper($mapper->input);
         }
 
-        return null;
+        return $this->resolveDefaultNameMapper(config('data.name_mapping_strategy.input'));
     }
 
     protected function resolveOutputNameMapper(
         Collection $attributes
     ): ?NameMapper {
-        /** @var \Spatie\LaravelData\Attributes\MapOutputName|\Spatie\LaravelData\Attributes\MapName|null $mapper */
+        /** @var MapOutputName|MapName|null $mapper */
         $mapper = $attributes->first(fn (object $attribute) => $attribute instanceof MapOutputName)
             ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName);
 
@@ -54,7 +54,7 @@ class NameMappersResolver
             return $this->resolveMapper($mapper->output);
         }
 
-        return null;
+        return $this->resolveDefaultNameMapper(config('data.name_mapping_strategy.output'));
     }
 
     protected function resolveMapper(string|int|NameMapper $value): ?NameMapper
@@ -76,7 +76,7 @@ class NameMappersResolver
             return new ProvidedNameMapper($value);
         }
 
-        if($value instanceof NameMapper) {
+        if ($value instanceof NameMapper) {
             return $value;
         }
 
@@ -85,5 +85,15 @@ class NameMappersResolver
         }
 
         return new ProvidedNameMapper($value);
+    }
+
+    protected function resolveDefaultNameMapper(
+        ?string $value,
+    ): ?NameMapper {
+        if ($value === null) {
+            return null;
+        }
+
+        return $this->resolveMapperClass($value);
     }
 }

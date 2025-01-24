@@ -41,7 +41,6 @@ trait ValidateableData
 
     public static function withValidator(Validator $validator): void
     {
-        return;
     }
 
     public static function getValidationRules(array $payload): array

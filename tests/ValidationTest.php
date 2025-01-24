@@ -18,10 +18,9 @@ use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-
 use Spatie\LaravelData\Attributes\MapInputName;
-
 use Spatie\LaravelData\Attributes\MapName;
+use Spatie\LaravelData\Attributes\MergeValidationRules;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Bail;
 use Spatie\LaravelData\Attributes\Validation\BooleanType;
@@ -281,7 +280,9 @@ it('is possible to have multiple required rules', function () {
     DataValidationAsserter::for(new class () extends Data {
         #[RequiredUnless('is_required', false), RequiredWith('make_required')]
         public string $property;
+
         public string $make_required;
+
         public bool $is_required;
     })->assertRules([
         'property' => ['string', 'required_unless:is_required', 'required_with:make_required'],
@@ -1084,18 +1085,26 @@ it('supports required without validation for optional collections', function () 
         ->assertRules(
             [
                 'someData' => [
-                    'sometimes',
                     'array',
                     'required_without:someOtherData',
                 ],
                 'someOtherData' => [
-                    'sometimes',
                     'array',
                     'required_without:someData',
                 ],
             ],
-            []
-        );
+        )
+        ->assertOk([
+            'someData' => [["string" => "Hello World"]],
+        ])
+        ->assertOk([
+            'someOtherData' => [["string" => "Hello World"]],
+        ])
+        ->assertOk([
+            'someData' => [["string" => "Hello World"]],
+            'someOtherData' => [["string" => "Hello World"]],
+        ])
+        ->assertErrors([]);
 });
 
 it('supports required without validation for nullable collections', function () {
@@ -1850,6 +1859,55 @@ it('can manually set messages in collections', function () {
         );
 });
 
+it('can manually set messages in double nested collections (yeah this failed once)', function () {
+    class TestDoubleNestedCollectionValidationMessagesDataA extends Data
+    {
+        public string $name;
+
+        public string $song;
+
+        public static function messages(): array
+        {
+            return [
+                'name.required' => 'Fix it Rick!',
+            ];
+        }
+    }
+
+    class TestDoubleNestedCollectionValidationMessagesInitialDataA extends Data
+    {
+        #[DataCollectionOf(TestDoubleNestedCollectionValidationMessagesDataA::class)]
+        public DataCollection $nestedCollection;
+    }
+
+    DataValidationAsserter::for(new class () extends Data {
+        #[DataCollectionOf(TestDoubleNestedCollectionValidationMessagesInitialDataA::class)]
+        public DataCollection $collection;
+    })
+        ->assertMessages(
+            messages: ['collection.*.nestedCollection.*.name.required' => 'Fix it Rick!'],
+            payload: ['collection' => [['nestedCollection' => ['collection' => [['song' => 'Never Gonna Give You Up']]]]]],
+        )
+        ->assertErrors(
+            payload: [
+                'collection' => [
+                    [
+                        'nestedCollection' => [
+                            ['song' => 'Never Gonna Give You Up'],
+                            ['song' => 'Giving up on love'],
+                        ],
+                    ],
+                    ['nestedCollection' => [['song' => 'Together Forever']]],
+                ],
+            ],
+            errors: [
+                'collection.0.nestedCollection.0.name' => ['Fix it Rick!'],
+                'collection.0.nestedCollection.1.name' => ['Fix it Rick!'],
+                'collection.1.nestedCollection.0.name' => ['Fix it Rick!'],
+            ]
+        );
+});
+
 it('can resolve validation dependencies for messages', function () {
     FakeInjectable::setup('Rick Astley');
 
@@ -2307,6 +2365,21 @@ it('wont validate default values when they are not provided and rules are overwr
         ], ['default' => 'something']);
 });
 
+it('will ignore default values which are optional', function () {
+    $dataClass = new class () extends Data {
+        public function __construct(public string|Optional $property = new Optional())
+        {
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([])
+        ->assertOk(['property' => 'Hello World'])
+        ->assertErrors(['property' => 123])
+        ->assertErrors(['property' => null])
+        ->assertRules(['property' => ['sometimes', 'string']]);
+});
+
 it('a manual written present attribute rule always overwrites a generated required rule', function () {
     $dataClass = new class () extends Data {
         #[Present]
@@ -2431,3 +2504,104 @@ it('handles validation with mapped attributes', function () {
         'some_property' => 1,
     ]);
 })->skip('Validation problem, fix in v5');
+
+it('will remove a sometimes rule generated by an Optional type when manually requiring something', function () {
+    $dataClass = new class () extends Data {
+        #[RequiredWith('otherProperty')]
+        public string|Optional $property;
+
+        public string|null $otherProperty;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertRules([
+            'property' => ['string', 'required_with:otherProperty'],
+            'otherProperty' => ['nullable', 'string'],
+        ], ['property' => 'Hello World', 'otherProperty' => 'Hello World'])
+        ->assertOk([
+            'property' => 'Hello World',
+            'otherProperty' => 'Hello World',
+        ])
+        ->assertOk([
+            'otherProperty' => null,
+        ])
+        ->assertErrors([
+            'otherProperty' => 'Hello World',
+        ]);
+});
+
+it('it will merge validation rules', function () {
+    #[MergeValidationRules]
+    class TestNestedDataWithMergedRules extends SimpleData
+    {
+        public static function rules(ValidationContext $context): array
+        {
+            return [
+                'string' => ['max:10', 'min:2'],
+            ];
+        }
+    }
+
+    #[MergeValidationRules]
+    class TestDataWithMergedRuleset extends Data
+    {
+        public function __construct(
+            #[Max(10)]
+            public string $array_rules,
+            #[Max(10)]
+            public string $string_rules,
+            #[WithoutValidation]
+            public string $without_validation,
+            public TestNestedDataWithMergedRules $nested
+        ) {
+        }
+
+        public static function rules(): array
+        {
+            return [
+                'array_rules' => ['min:2', 'alpha'],
+                'string_rules' => 'min:2|alpha',
+            ];
+        }
+    }
+
+    DataValidationAsserter::for(TestDataWithMergedRuleset::class)
+        ->assertRules([
+            'array_rules' => ['required', 'string', 'max:10', 'min:2', 'alpha'],
+            'string_rules' => ['required', 'string', 'max:10', 'min:2', 'alpha'],
+            'nested' => ['required', 'array'],
+            'nested.string' => ['required', 'string', 'max:10', 'min:2'],
+        ], [])
+        ->assertOk([
+            'array_rules' => 'Ruben',
+            'string_rules' => 'Ruben',
+            'nested' => ['string' => 'Ruben'],
+        ])
+        ->assertErrors([
+            'array_rules' => 'r',
+            'string_rules' => 'r',
+            'nested' => ['string' => 'r'],
+        ], [
+            'array_rules' => [__('validation.min.string', ['attribute' => 'array rules', 'min' => 2])],
+            'string_rules' => [__('validation.min.string', ['attribute' => 'string rules', 'min' => 2])],
+            'nested.string' => [__('validation.min.string', ['attribute' => 'nested.string', 'min' => 2])],
+        ])
+        ->assertErrors([
+            'array_rules' => 'rubenvanassche',
+            'string_rules' => 'rubenvanassche',
+            'nested' => ['string' => 'rubenvanassche'],
+        ], [
+            'array_rules' => [__('validation.max.string', ['attribute' => 'array rules', 'max' => 10])],
+            'string_rules' => [__('validation.max.string', ['attribute' => 'string rules', 'max' => 10])],
+            'nested.string' => [__('validation.max.string', ['attribute' => 'nested.string', 'max' => 10])],
+        ])
+        ->assertErrors([
+            'array_rules' => null,
+            'string_rules' => null,
+            'nested' => ['string' => null],
+        ], [
+            'array_rules' => [__('validation.required', ['attribute' => 'array rules'])],
+            'string_rules' => [__('validation.required', ['attribute' => 'string rules'])],
+            'nested.string' => [__('validation.required', ['attribute' => 'nested.string'])],
+        ]);
+});

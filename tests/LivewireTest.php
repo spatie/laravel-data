@@ -7,7 +7,6 @@ use function Pest\Livewire\livewire;
 
 use Spatie\LaravelData\Concerns\WireableData;
 use Spatie\LaravelData\Data;
-
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\Livewire\LivewireDataCollectionSynth;
 use Spatie\LaravelData\Support\Livewire\LivewireDataSynth;

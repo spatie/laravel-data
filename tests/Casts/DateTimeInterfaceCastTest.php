@@ -23,7 +23,6 @@ it('can cast date times', function () {
         public DateTimeImmutable $dateTimeImmutable;
     };
 
-
     expect(
         $caster->cast(
             FakeDataStructureFactory::property($class, 'carbon'),
@@ -55,6 +54,78 @@ it('can cast date times', function () {
         $caster->cast(
             FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
             '19-05-1994 00:00:00',
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new DateTimeImmutable('19-05-1994 00:00:00'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'carbon'),
+            new Carbon('19-05-1994 00:00:00'),
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new Carbon('19-05-1994 00:00:00'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'carbonImmutable'),
+            new CarbonImmutable('19-05-1994 00:00:00'),
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new CarbonImmutable('19-05-1994 00:00:00'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'dateTime'),
+            new DateTime('19-05-1994 00:00:00'),
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new DateTime('19-05-1994 00:00:00'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
+            new DateTimeImmutable('19-05-1994 00:00:00'),
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new DateTimeImmutable('19-05-1994 00:00:00'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'carbon'),
+            new DateTime('19-05-1994 00:00:00'),
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new Carbon('19-05-1994 00:00:00'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'carbonImmutable'),
+            new DateTimeImmutable('19-05-1994 00:00:00'),
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new CarbonImmutable('19-05-1994 00:00:00'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'dateTime'),
+            new Carbon('19-05-1994 00:00:00'),
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new DateTime('19-05-1994 00:00:00'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
+            new CarbonImmutable('19-05-1994 00:00:00'),
             [],
             CreationContextFactory::createFromConfig($class::class)->get()
         )
@@ -208,4 +279,65 @@ it('can define multiple date formats to be used', function () {
         ->toMatchArray(['date' => '2022-05-16T14:37:56+00:00'])
         ->and($data::from(['date' => '2022-05-16 17:00:00']))->toArray()
         ->toMatchArray(['date' => '2022-05-16T17:00:00+00:00']);
+});
+
+
+it('can cast date times with nanosecond precision by truncating nanoseconds to microseconds', function () {
+    $caster = new DateTimeInterfaceCast("Y-m-d\TH:i:s.u\Z");
+
+    $class = new class () {
+        public Carbon $carbon;
+
+        public CarbonImmutable $carbonImmutable;
+
+        public DateTime $dateTime;
+
+        public DateTimeImmutable $dateTimeImmutable;
+    };
+
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'carbon'),
+            '2024-12-02T16:20:15.969827247Z',
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new Carbon('2024-12-02T16:20:15.969827247Z'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'carbonImmutable'),
+            '2024-12-02T16:20:15.969827247Z',
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new CarbonImmutable('2024-12-02T16:20:15.969827247Z'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'dateTime'),
+            '2024-12-02T16:20:15.969827247Z',
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new DateTime('2024-12-02T16:20:15.969827247Z'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
+            '2024-12-02T16:20:15.969827247Z',
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new DateTimeImmutable('2024-12-02T16:20:15.969827247Z'));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
+            '2024-12-02T16:20:15.969827247Z',
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new DateTimeImmutable('2024-12-02T16:20:15.969827247Z'));
 });

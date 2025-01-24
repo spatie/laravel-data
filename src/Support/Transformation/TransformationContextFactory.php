@@ -2,8 +2,7 @@
 
 namespace Spatie\LaravelData\Support\Transformation;
 
-use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Support\Partials\ForwardsToPartialsDefinition;
 use Spatie\LaravelData\Support\Partials\PartialsCollection;
 use Spatie\LaravelData\Support\Wrapping\WrapExecutionType;
@@ -37,7 +36,7 @@ class TransformationContextFactory
     }
 
     public function get(
-        BaseData|BaseDataCollectable $data,
+        IncludeableData $data,
     ): TransformationContext {
         $includePartials = null;
 

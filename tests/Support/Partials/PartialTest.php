@@ -16,54 +16,54 @@ it('can parse partials', function (string $partialString, array $segments) {
 function rootPartialsProvider(): Generator
 {
     yield "empty" => [
-        'partials' => '',
-        'expected' => [],
+         '', // partials
+         [], // expected
     ];
 
     yield "root property" => [
-        'partials' => 'name',
-        'expected' => [new FieldsPartialSegment(['name'])],
+         'name', // partials
+         [new FieldsPartialSegment(['name'])], // expected
     ];
 
     yield "root multi-property" => [
-        'partials' => '{name, age}',
-        'expected' => [new FieldsPartialSegment(['name', 'age'])],
+         '{name, age}', // partials
+         [new FieldsPartialSegment(['name', 'age'])], // expected
     ];
 
     yield "root star" => [
-        'partials' => '*',
-        'expected' => [new AllPartialSegment()],
+         '*', // partials
+         [new AllPartialSegment()], // expected
     ];
 }
 
 function nestedPartialsProvider(): Generator
 {
     yield "nested property" => [
-        'partials' => 'struct.name',
-        'expected' => [new NestedPartialSegment('struct'), new FieldsPartialSegment(['name'])],
+         'struct.name', // partials
+         [new NestedPartialSegment('struct'), new FieldsPartialSegment(['name'])], // expected
     ];
 
     yield "nested multi-property" => [
-        'partials' => 'struct.{name, age}',
-        'expected' => [new NestedPartialSegment('struct'), new FieldsPartialSegment(['name', 'age'])],
+         'struct.{name, age}', // partials
+         [new NestedPartialSegment('struct'), new FieldsPartialSegment(['name', 'age'])], // expected
     ];
 
     yield "nested star" => [
-        'partials' => 'struct.*',
-        'expected' => [new NestedPartialSegment('struct'), new AllPartialSegment()],
+         'struct.*', // partials
+         [new NestedPartialSegment('struct'), new AllPartialSegment()], // expected
     ];
 }
 
 function invalidPartialsProvider(): Generator
 {
     yield "nested property on all" => [
-        'partials' => '*.name',
-        'expected' => [new AllPartialSegment()],
+         '*.name', // partials
+         [new AllPartialSegment()], // expected
     ];
 
     yield "nested property on multi-property" => [
-        'partials' => '{name, age}.name',
-        'expected' => [new FieldsPartialSegment(['name', 'age'])],
+         '{name, age}.name', // partials
+         [new FieldsPartialSegment(['name', 'age'])], // expected
     ];
 }
 

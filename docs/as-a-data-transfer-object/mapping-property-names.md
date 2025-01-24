@@ -50,3 +50,45 @@ class ContractData extends Data
     }
 }
 ```
+
+It is possible to set a default name mapping strategy for all data objects in the `data.php` config file:
+
+```php
+'name_mapping_strategy' => [
+    'input' => SnakeCaseMapper::class,
+    'output' => null,
+],
+```
+
+
+## Mapping Nested Properties
+
+You can also map nested properties using dot notation in the `MapInputName` attribute. This is useful when you want to extract a nested value from an array and assign it to a property in your data object:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        #[MapInputName("title.name")]
+        public string $title,
+        #[MapInputName("artists.0.name")]
+        public string $artist
+    ) {
+    }
+}
+```
+
+You can create the data object from an array with nested structures:
+
+```php
+SongData::from([
+    "title" => [
+        "name" => "Never gonna give you up"
+    ],
+    "artists" => [
+        ["name" => "Rick Astley"]
+    ]
+]);
+```
+
+The package has a set of default mappers available, you can find them [here](/docs/laravel-data/v4/advanced-usage/available-property-mappers).

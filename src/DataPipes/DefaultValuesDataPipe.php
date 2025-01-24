@@ -15,7 +15,7 @@ class DefaultValuesDataPipe implements DataPipe
         CreationContext $creationContext
     ): array {
         foreach ($class->properties as $name => $property) {
-            if(array_key_exists($name, $properties)) {
+            if (array_key_exists($name, $properties)) {
                 continue;
             }
 
@@ -25,7 +25,7 @@ class DefaultValuesDataPipe implements DataPipe
                 continue;
             }
 
-            if ($property->type->isOptional) {
+            if ($property->type->isOptional && $creationContext->useOptionalValues) {
                 $properties[$name] = Optional::create();
 
                 continue;
@@ -33,8 +33,6 @@ class DefaultValuesDataPipe implements DataPipe
 
             if ($property->type->isNullable) {
                 $properties[$name] = null;
-
-                continue;
             }
         }
 

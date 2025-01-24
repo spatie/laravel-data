@@ -141,7 +141,7 @@ class ArtistData extends Data
 {
     public int $id;
     public string $fullName;
-    public CarbonImmutable $createAt;
+    public CarbonImmutable $createdAt;
     public CarbonImmutable $updatedAt;
 }
 ```

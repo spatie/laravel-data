@@ -18,7 +18,7 @@
     "require" : {
         "php": "^8.1",
         "illuminate/contracts": "^10.0|^11.0",
-        "phpdocumentor/type-resolver": "^1.5",
+        "phpdocumentor/reflection": "^6.0",
         "spatie/laravel-package-tools": "^1.9.0",
         "spatie/php-structure-discoverer": "^2.0"
     },
@@ -26,10 +26,10 @@
         "fakerphp/faker": "^1.14",
         "friendsofphp/php-cs-fixer": "^3.0",
         "inertiajs/inertia-laravel": "^1.2",
+        "larastan/larastan": "^2.7",
         "livewire/livewire": "^3.0",
         "mockery/mockery": "^1.6",
         "nesbot/carbon": "^2.63",
-        "nunomaduro/larastan": "^2.0",
         "orchestra/testbench": "^8.0|^9.0",
         "pestphp/pest": "^2.31",
         "pestphp/pest-plugin-laravel": "^2.0",
@@ -38,7 +38,7 @@
         "phpstan/extension-installer": "^1.1",
         "phpunit/phpunit": "^10.0",
         "spatie/invade": "^1.0",
-        "spatie/laravel-typescript-transformer": "^2.3",
+        "spatie/laravel-typescript-transformer": "^2.5",
         "spatie/pest-plugin-snapshots": "^2.1",
         "spatie/test-time": "^1.2"
     },
