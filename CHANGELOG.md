@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.13.0 - 2025-01-24
+
+### What's Changed
+
+* Auto lazy by @rubenvanassche in https://github.com/spatie/laravel-data/pull/831
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.12.0...4.13.0
+
 ## 4.12.0 - 2025-01-24
 
 What a release! Probably to biggest minor release we've ever done!
@@ -26,6 +34,7 @@ SongData::factory()
     ->withoutOptionalValues()
     ->from(['title' => 'Never gonna give you up', 'artist' => 'Rick Astley']); // album will `null` instead of `Optional`
 
+
 ```
 #### Injecting property values
 
@@ -36,6 +45,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 ```
 #### Merging manual rules
@@ -61,6 +71,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 ```
 #### New property mappers:
