@@ -24,10 +24,7 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
         }
 
         foreach ($class->properties as $dataProperty) {
-            /** @var FromRouteParameter|null $attribute */
-            $attribute = $dataProperty->attributes->first(
-                fn (object $attribute) => $attribute instanceof FromRouteParameter
-            );
+            $attribute = $dataProperty->attributes->getAttribute(FromRouteParameter::class);
 
             if ($attribute === null) {
                 continue;

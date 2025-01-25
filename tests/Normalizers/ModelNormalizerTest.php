@@ -72,7 +72,7 @@ it('can get a data object from model with accessors', function () {
         ->old_accessor->toEqual($data->old_accessor);
 });
 
-it('it will only call model accessors when required', function () {
+it('will only call model accessors when required', function () {
     $dataClass = new class () extends Data {
         public string $accessor;
 
@@ -118,7 +118,7 @@ it('can load relations on a model when required and the LoadRelation attribute i
 
     $dataClass = new class () extends Data {
         #[LoadRelation, DataCollectionOf(FakeNestedModelData::class)]
-        public array $fakeNestedModels;
+        public array $fake_nested_models;
 
         #[LoadRelation, DataCollectionOf(FakeNestedModelData::class)]
         public array $fake_nested_models_snake_cased;
@@ -131,7 +131,7 @@ it('can load relations on a model when required and the LoadRelation attribute i
 
     $queryLog = DB::getQueryLog();
 
-    expect($data->fakeNestedModels)
+    expect($data->fake_nested_models)
         ->toHaveCount(2)
         ->each->toBeInstanceOf(FakeNestedModelData::class);
 
@@ -183,9 +183,7 @@ it('can use mappers to map the names', function () {
 
     $dataClass = new class () extends Data {
         #[DataCollectionOf(FakeNestedModelData::class), MapInputName(SnakeCaseMapper::class)]
-        public array $fakeNestedModels;
-        #[DataCollectionOf(FakeNestedModelData::class), MapInputName(SnakeCaseMapper::class), LoadRelation]
-        public array|Optional $fakeNestedModelsSnakeCased;
+        public array|Optional $fakeNestedModels;
 
         #[MapInputName(SnakeCaseMapper::class)]
         public string $oldAccessor;
@@ -193,8 +191,7 @@ it('can use mappers to map the names', function () {
 
     $data = $dataClass::from($model->load('fakeNestedModels'));
 
-    expect(isset($data->fakeNestedModels))->toBeFalse();
-    expect($data->fakeNestedModelsSnakeCased)
+    expect($data->fakeNestedModels)
         ->toHaveCount(2)
         ->each()
         ->toBeInstanceOf(FakeNestedModelData::class);

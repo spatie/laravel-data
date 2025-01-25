@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support\Factories;
 
-use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionProperty;
 use Spatie\LaravelData\Attributes\AutoLazy;
@@ -16,6 +15,7 @@ use Spatie\LaravelData\Mappers\NameMapper;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotation;
+use Spatie\LaravelData\Support\AttributeCollection;
 use Spatie\LaravelData\Support\DataProperty;
 
 class DataPropertyFactory
@@ -35,9 +35,7 @@ class DataPropertyFactory
         ?DataIterableAnnotation $classDefinedDataIterableAnnotation = null,
         ?AutoLazy $classAutoLazy = null,
     ): DataProperty {
-        $attributes = collect($reflectionProperty->getAttributes())
-            ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
-            ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
+        $attributes = AttributeCollection::makeFromReflectionAttributes($reflectionProperty->getAttributes());
 
         $type = $this->typeFactory->buildProperty(
             $reflectionProperty->getType(),
@@ -61,17 +59,11 @@ class DataPropertyFactory
             default => null,
         };
 
-        $computed = $attributes->contains(
-            fn (object $attribute) => $attribute instanceof Computed
-        );
+        $computed = $attributes->hasAttribute(Computed::class);
 
-        $hidden = $attributes->contains(
-            fn (object $attribute) => $attribute instanceof Hidden
-        );
+        $hidden = $attributes->hasAttribute(Hidden::class);
 
-        $validate = ! $attributes->contains(
-            fn (object $attribute) => $attribute instanceof WithoutValidation
-        ) && ! $computed;
+        $validate = ! $computed && ! $attributes->hasAttribute(WithoutValidation::class);
 
         if (! $reflectionProperty->isPromoted()) {
             $hasDefaultValue = $reflectionProperty->hasDefaultValue();
@@ -103,8 +95,8 @@ class DataPropertyFactory
             autoLazy: $autoLazy,
             hasDefaultValue: $hasDefaultValue,
             defaultValue: $defaultValue,
-            cast: $attributes->first(fn (object $attribute) => $attribute instanceof GetsCast)?->get(),
-            transformer: $attributes->first(fn (object $attribute) => $attribute instanceof WithTransformer || $attribute instanceof WithCastAndTransformer)?->get(),
+            cast: $attributes->getAttribute(GetsCast::class)?->get(),
+            transformer: ($attributes->getAttribute(WithTransformer::class) ?? $attributes->getAttribute(WithCastAndTransformer::class))?->get(),
             inputMappedName: $inputMappedName,
             outputMappedName: $outputMappedName,
             attributes: $attributes,

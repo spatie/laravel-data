@@ -5,17 +5,12 @@ namespace Spatie\LaravelData\Normalizers\Normalized;
 use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use ReflectionProperty;
 use Spatie\LaravelData\Attributes\LoadRelation;
 use Spatie\LaravelData\Support\DataProperty;
 
 class NormalizedModel implements Normalized
 {
     protected array $properties = [];
-
-    protected ReflectionProperty $castsProperty;
-
-    protected ReflectionProperty $attributesProperty;
 
     public function __construct(
         protected Model $model,
@@ -24,9 +19,11 @@ class NormalizedModel implements Normalized
 
     public function getProperty(string $name, DataProperty $dataProperty): mixed
     {
-        $value = array_key_exists($name, $this->properties)
-            ? $this->properties[$name]
-            : $this->fetchNewProperty($name, $dataProperty);
+        $propertyName = $this->model::$snakeAttributes ? Str::snake($name) : $name;
+
+        $value = array_key_exists($propertyName, $this->properties)
+            ? $this->properties[$propertyName]
+            : $this->fetchNewProperty($propertyName, $dataProperty);
 
         if ($value === null && ! $dataProperty->type->isNullable) {
             return UnknownProperty::create();
@@ -37,46 +34,31 @@ class NormalizedModel implements Normalized
 
     protected function fetchNewProperty(string $name, DataProperty $dataProperty): mixed
     {
-        if ($dataProperty->attributes->contains(fn (object $attribute) => $attribute::class === LoadRelation::class)) {
+        $camelName = Str::camel($name);
+
+        if ($dataProperty->attributes->hasAttribute(LoadRelation::class)) {
             if (method_exists($this->model, $name)) {
                 $this->model->loadMissing($name);
+            } elseif (method_exists($this->model, $camelName)) {
+                $this->model->loadMissing($camelName);
             }
         }
 
         if ($this->model->relationLoaded($name)) {
             return $this->properties[$name] = $this->model->getRelation($name);
         }
+        if ($this->model->relationLoaded($camelName)) {
+            return $this->properties[$name] = $this->model->getRelation($camelName);
+        }
 
-        if (!$this->model->isRelation($name)) {
+        if (! $this->model->isRelation($name) && ! $this->model->isRelation($camelName)) {
             try {
-                $propertyName = $this->model::$snakeAttributes ? Str::snake($name) : $name;
-                return $this->properties[$name] = $this->model->getAttribute($propertyName);
+                return $this->properties[$name] = $this->model->getAttribute($name);
             } catch (MissingAttributeException) {
                 // Fallback if missing Attribute
             }
         }
 
         return $this->properties[$name] = UnknownProperty::create();
-    }
-
-    protected function hasModelAttribute(string $name): bool
-    {
-        if (method_exists($this->model, 'hasAttribute')) {
-            return $this->model->hasAttribute($name);
-        }
-
-        // TODO: remove this once we stop supporting Laravel 10
-        if (! isset($this->attributesProperty)) {
-            $this->attributesProperty = new ReflectionProperty($this->model, 'attributes');
-        }
-
-        if (! isset($this->castsProperty)) {
-            $this->castsProperty = new ReflectionProperty($this->model, 'casts');
-        }
-
-        return array_key_exists($name, $this->attributesProperty->getValue($this->model)) ||
-            array_key_exists($name, $this->castsProperty->getValue($this->model)) ||
-            $this->model->hasGetMutator($name) ||
-            $this->model->hasAttributeMutator($name);
     }
 }
