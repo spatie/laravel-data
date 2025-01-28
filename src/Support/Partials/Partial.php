@@ -90,7 +90,7 @@ class Partial implements Stringable
                     substr($segmentString, 1, -1)
                 );
 
-                $segments[] = new FieldsPartialSegment(array_map(fn (string $field) => trim($field), $fields));
+                $segments[] = new FieldsPartialSegment(array_map(trim(...), $fields));
 
                 return $segments;
             }

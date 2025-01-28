@@ -40,7 +40,28 @@ class CastPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            $properties[$name] = $this->cast($dataProperty, $value, $properties, $creationContext);
+            if ($dataProperty->autoLazy) {
+                $properties[$name] = $dataProperty->autoLazy->build(
+                    fn (mixed $value) => $this->cast(
+                        $dataProperty,
+                        $value,
+                        $properties,
+                        $creationContext
+                    ),
+                    $payload,
+                    $dataProperty,
+                    $value
+                );
+
+                continue;
+            }
+
+            $properties[$name] = $this->cast(
+                $dataProperty,
+                $value,
+                $properties,
+                $creationContext
+            );
         }
 
         return $properties;
@@ -129,7 +150,7 @@ class CastPropertiesDataPipe implements DataPipe
 
     protected function shouldBeCasted(DataProperty $property, mixed $value): bool
     {
-        if (gettype($value) !== 'object') {
+        if (! is_object($value)) {
             return true;
         }
 

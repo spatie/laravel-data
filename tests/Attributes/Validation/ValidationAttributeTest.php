@@ -36,47 +36,47 @@ it('can normalize values', function ($input, $output) {
     expect((string) $normalizer)->toEqual("test:{$output}");
 })->with(function () {
     yield [
-        'input' => 'Hello world',
-        'output' => 'Hello world',
+         'Hello world',
+        'Hello world',
     ];
 
     yield [
-        'input' => 42,
-        'output' => '42',
+         42,
+        '42',
     ];
 
     yield [
-        'input' => 3.14,
-        'output' => '3.14',
+         3.14,
+        '3.14',
     ];
 
     yield [
-        'input' => true,
-        'output' => 'true',
+         true,
+        'true',
     ];
 
     yield [
-        'input' => false,
-        'output' => 'false',
+         false,
+        'false',
     ];
 
     yield [
-        'input' => ['a', 'b', 'c'],
-        'output' => 'a,b,c',
+         ['a', 'b', 'c'],
+        'a,b,c',
     ];
 
     yield [
-        'input' => CarbonImmutable::create(2020, 05, 16, 0, 0, 0, new DateTimeZone('Europe/Brussels')),
-        'output' => '2020-05-16T00:00:00+02:00',
+         CarbonImmutable::create(2020, 05, 16, 0, 0, 0, new DateTimeZone('Europe/Brussels')),
+        '2020-05-16T00:00:00+02:00',
     ];
 
     yield [
-        'input' => DummyBackedEnum::FOO,
-        'output' => 'foo',
+         DummyBackedEnum::FOO,
+        'foo',
     ];
 
     yield [
-        'input' => [DummyBackedEnum::FOO, DummyBackedEnum::BOO],
-        'output' => 'foo,boo',
+         [DummyBackedEnum::FOO, DummyBackedEnum::BOO],
+        'foo,boo',
     ];
 });

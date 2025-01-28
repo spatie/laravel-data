@@ -54,6 +54,28 @@ class DataPipeline
         return $this;
     }
 
+    public function endThrough(string|DataPipe $pipe): static
+    {
+        return $this->through($pipe);
+    }
+
+    public function replace(
+        string|DataPipe $pipe,
+        string|DataPipe $replacement
+    ): static {
+        $pipeClass = is_string($pipe) ? $pipe : $pipe::class;
+
+        foreach ($this->pipes as $key => $existingPipe) {
+            $existingPipeClass = is_string($existingPipe) ? $existingPipe : $existingPipe::class;
+
+            if ($existingPipeClass === $pipeClass) {
+                $this->pipes[$key] = $replacement;
+            }
+        }
+
+        return $this;
+    }
+
     public function resolve(): ResolvedDataPipeline
     {
         $normalizers = array_merge(

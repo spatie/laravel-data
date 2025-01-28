@@ -2,9 +2,9 @@
 
 namespace Spatie\LaravelData\Enums;
 
-enum CustomCreationMethodType
+enum CustomCreationMethodType: string
 {
-    case None;
-    case Object;
-    case Collection;
+    case None = 'None';
+    case Object = 'Object';
+    case Collection = 'Collection';
 }

@@ -1,6 +1,6 @@
 ---
 title: Factories
-weight: 11
+weight: 12
 ---
 
 It is possible to automatically create data objects in all sorts of forms with this package. Sometimes a little bit more
@@ -58,6 +58,48 @@ It is also possible to ignore the magical creation methods when creating a data 
 
 ```php
 SongData::factory()->ignoreMagicalMethod('fromString')->from('Never gonna give you up'); // Won't work since the magical method is ignored
+```
+
+## Disabling optional values
+
+When creating a data object that has optional properties, it is possible choose whether missing properties from the payload should be created as `Optional`. This can be helpful when you want to have a `null` value instead of an `Optional` object - for example, when creating the DTO from an Eloquent model with `null` values. 
+
+```php
+class SongData extends Data {
+    public function __construct(
+        public string $title,
+        public string $artist,
+        public Optional|null|string $album,
+    ) {
+    }
+}
+
+SongData::factory()
+    ->withoutOptionalValues()
+    ->from(['title' => 'Never gonna give you up', 'artist' => 'Rick Astley']); // album will `null` instead of `Optional`
+```
+
+Note that when an Optional property has no default value, and is not nullable, and the payload does not contain a value for this property, the DTO will not have the property set - so accessing it can throw `Typed property must not be accessed before initialization` error. Therefore, it's advisable to either set a default value or make the property nullable, when using `withoutOptionalValues`.
+
+```php
+class SongData extends Data {
+    public function __construct(
+        public string $title,
+        public string $artist,
+        public Optional|string $album, // careful here!
+        public Optional|string $publisher = 'unknown',
+        public Optional|string|null $label,
+    ) {
+    }
+}
+
+$data = SongData::factory()
+    ->withoutOptionalValues()
+    ->from(['title' => 'Never gonna give you up', 'artist' => 'Rick Astley']);
+    
+$data->toArray(); // ['title' => 'Never gonna give you up', 'artist' => 'Rick Astley', 'publisher' => 'unknown', 'label' => null]
+
+$data->album; // accessing the album will throw an error, unless the property is set before accessing it
 ```
 
 ## Adding additional global casts

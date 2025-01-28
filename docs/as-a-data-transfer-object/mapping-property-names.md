@@ -91,3 +91,4 @@ SongData::from([
 ]);
 ```
 
+The package has a set of default mappers available, you can find them [here](/docs/laravel-data/v4/advanced-usage/available-property-mappers).

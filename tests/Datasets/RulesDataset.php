@@ -108,10 +108,10 @@ function fixature(
     string $exception = null
 ): array {
     return [
-        'attribute' => $attribute,
-        'expected' => $expected,
-        'expectedCreatedAttribute' => $expectCreatedAttribute ?? $attribute,
-        'exception' => $exception,
+        $attribute,
+        $expected,
+        $expectCreatedAttribute ?? $attribute,
+        $exception,
     ];
 }
 

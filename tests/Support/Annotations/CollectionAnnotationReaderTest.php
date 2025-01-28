@@ -21,88 +21,88 @@ it(
     }
 )->with(function () {
     yield DataCollectionWithTemplate::class => [
-        'className' => DataCollectionWithTemplate::class,
-        'expected' => new CollectionAnnotation(type: SimpleData::class, isData: true),
+         DataCollectionWithTemplate::class, // className
+         new CollectionAnnotation(type: SimpleData::class, isData: true), // expected
     ];
 
     yield DataCollectionWithoutTemplate::class => [
-        'className' => DataCollectionWithoutTemplate::class,
-        'expected' => new CollectionAnnotation(type: SimpleData::class, isData: true),
+         DataCollectionWithoutTemplate::class, // className
+         new CollectionAnnotation(type: SimpleData::class, isData: true), // expected
     ];
 
     yield DataCollectionWithCombinationType::class => [
-        'className' => DataCollectionWithCombinationType::class,
-        'expected' => new CollectionAnnotation(type: SimpleData::class, isData: true),
+         DataCollectionWithCombinationType::class, // className
+         new CollectionAnnotation(type: SimpleData::class, isData: true), // expected
     ];
 
     yield DataCollectionWithIntegerKey::class => [
-        'className' => DataCollectionWithIntegerKey::class,
-        'expected' => new CollectionAnnotation(type: SimpleData::class, isData: true, keyType: 'int'),
+         DataCollectionWithIntegerKey::class, // className
+         new CollectionAnnotation(type: SimpleData::class, isData: true, keyType: 'int'), // expected
     ];
 
     yield DataCollectionWithCombinationKey::class => [
-        'className' => DataCollectionWithCombinationKey::class,
-        'expected' => new CollectionAnnotation(type: SimpleData::class, isData: true, keyType: 'int'),
+         DataCollectionWithCombinationKey::class, // className
+         new CollectionAnnotation(type: SimpleData::class, isData: true, keyType: 'int'), // expected
     ];
 
     yield DataCollectionWithoutKey::class => [
-        'className' => DataCollectionWithoutKey::class,
-        'expected' => new CollectionAnnotation(type: SimpleData::class, isData: true),
+         DataCollectionWithoutKey::class, // className
+         new CollectionAnnotation(type: SimpleData::class, isData: true), // expected
     ];
 
     yield NonDataCollectionWithTemplate::class => [
-        'className' => NonDataCollectionWithTemplate::class,
-        'expected' => new CollectionAnnotation(type: DummyBackedEnum::class, isData: false),
+         NonDataCollectionWithTemplate::class, // className
+         new CollectionAnnotation(type: DummyBackedEnum::class, isData: false), // expected
     ];
 
     yield NonDataCollectionWithoutTemplate::class => [
-        'className' => NonDataCollectionWithoutTemplate::class,
-        'expected' => new CollectionAnnotation(type: DummyBackedEnum::class, isData: false),
+         NonDataCollectionWithoutTemplate::class, // className
+         new CollectionAnnotation(type: DummyBackedEnum::class, isData: false), // expected
     ];
 
     yield NonDataCollectionWithCombinationType::class => [
-        'className' => NonDataCollectionWithCombinationType::class,
-        'expected' => new CollectionAnnotation(type: DummyBackedEnum::class, isData: false),
+         NonDataCollectionWithCombinationType::class, // className
+         new CollectionAnnotation(type: DummyBackedEnum::class, isData: false), // expected
     ];
 
     yield NonDataCollectionWithIntegerKey::class => [
-        'className' => NonDataCollectionWithIntegerKey::class,
-        'expected' => new CollectionAnnotation(type: DummyBackedEnum::class, isData: false, keyType: 'int'),
+         NonDataCollectionWithIntegerKey::class, // className
+         new CollectionAnnotation(type: DummyBackedEnum::class, isData: false, keyType: 'int'), // expected
     ];
 
     yield NonDataCollectionWithCombinationKey::class => [
-        'className' => NonDataCollectionWithCombinationKey::class,
-        'expected' => new CollectionAnnotation(type: DummyBackedEnum::class, isData: false, keyType: 'int'),
+         NonDataCollectionWithCombinationKey::class, // className
+         new CollectionAnnotation(type: DummyBackedEnum::class, isData: false, keyType: 'int'), // expected
     ];
 
     yield NonDataCollectionWithoutKey::class => [
-        'className' => NonDataCollectionWithoutKey::class,
-        'expected' => new CollectionAnnotation(type: DummyBackedEnum::class, isData: false),
+         NonDataCollectionWithoutKey::class, // className
+         new CollectionAnnotation(type: DummyBackedEnum::class, isData: false), // expected
     ];
 
     yield CollectionWhoImplementsIterator::class => [
-        'className' => CollectionWhoImplementsIterator::class,
-        'expected' => new CollectionAnnotation(type: DummyBackedEnum::class, isData: false),
+         CollectionWhoImplementsIterator::class, // className
+         new CollectionAnnotation(type: DummyBackedEnum::class, isData: false), // expected
     ];
 
     yield CollectionWhoImplementsIteratorAggregate::class => [
-        'className' => CollectionWhoImplementsIteratorAggregate::class,
-        'expected' => new CollectionAnnotation(type: DummyBackedEnum::class, isData: false),
+         CollectionWhoImplementsIteratorAggregate::class, // className
+         new CollectionAnnotation(type: DummyBackedEnum::class, isData: false), // expected
     ];
 
     yield CollectionWhoImplementsNothing::class => [
-        'className' => CollectionWhoImplementsNothing::class,
-        'expected' => null,
+         CollectionWhoImplementsNothing::class, // className
+         null, // expected
     ];
 
     yield CollectionWithoutDocBlock::class => [
-        'className' => CollectionWithoutDocBlock::class,
-        'expected' => null,
+         CollectionWithoutDocBlock::class, // className
+         null, // expected
     ];
 
     yield CollectionWithoutType::class => [
-        'className' => CollectionWithoutType::class,
-        'expected' => null,
+         CollectionWithoutType::class, // className
+         null, // expected
     ];
 });
 

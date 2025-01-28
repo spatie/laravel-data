@@ -8,6 +8,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
 use ReflectionProperty;
+use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\EmptyData;
 use Spatie\LaravelData\Contracts\IncludeableData;
@@ -34,7 +35,6 @@ class DataClassFactory
     ) {
     }
 
-
     public function build(ReflectionClass $reflectionClass): DataClass
     {
         /** @var class-string<Data> $name */
@@ -55,11 +55,16 @@ class DataClassFactory
             );
         }
 
+        $autoLazy = $attributes->first(
+            fn (object $attribute) => $attribute instanceof AutoLazy
+        );
+
         $properties = $this->resolveProperties(
             $reflectionClass,
             $constructorReflectionMethod,
             NameMappersResolver::create(ignoredMappers: [ProvidedNameMapper::class])->execute($attributes),
             $dataIterablePropertyAnnotations,
+            $autoLazy
         );
 
         $responsable = $reflectionClass->implementsInterface(ResponsableData::class);
@@ -138,6 +143,7 @@ class DataClassFactory
         ?ReflectionMethod $constructorReflectionMethod,
         array $mappers,
         array $dataIterablePropertyAnnotations,
+        ?AutoLazy $autoLazy
     ): Collection {
         $defaultValues = $this->resolveDefaultValues($reflectionClass, $constructorReflectionMethod);
 
@@ -153,6 +159,7 @@ class DataClassFactory
                     $mappers['inputNameMapper'],
                     $mappers['outputNameMapper'],
                     $dataIterablePropertyAnnotations[$property->getName()] ?? null,
+                    classAutoLazy: $autoLazy
                 ),
             ]);
     }

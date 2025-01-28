@@ -18,73 +18,73 @@ it(
     }
 )->with(function () {
     yield 'propertyA' => [
-        'property' => 'propertyA',
-        'expected' => new DataIterableAnnotation(SimpleData::class, isData: true),
+        'propertyA', // property
+        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
 
     yield 'propertyB' => [
-        'property' => 'propertyB',
-        'expected' => new DataIterableAnnotation(SimpleData::class, isData: true),
+        'propertyB', // property
+        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
 
     yield 'propertyC' => [
-        'property' => 'propertyC',
-        'expected' => new DataIterableAnnotation(SimpleData::class, isData: true),
+        'propertyC', // property
+        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
 
     yield 'propertyD' => [
-        'property' => 'propertyD',
-        'expected' => new DataIterableAnnotation(SimpleData::class, isData: true),
+        'propertyD', // property
+        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
 
     yield 'propertyE' => [
-        'property' => 'propertyE',
-        'expected' => new DataIterableAnnotation(SimpleData::class, isData: true),
+        'propertyE', // property
+        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
 
     yield 'propertyF' => [
-        'property' => 'propertyF',
-        'expected' => new DataIterableAnnotation(SimpleData::class, isData: true),
+        'propertyF', // property
+        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
 
     yield 'propertyG' => [
-        'property' => 'propertyG',
-        'expected' => new DataIterableAnnotation(SimpleData::class, isData: true),
+        'propertyG', // property
+        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
 
-    yield 'propertyH' => [
-        'property' => 'propertyH',
-        'expected' => null, // Attribute
+    yield 'propertyH' => [ // Attribute
+        'propertyH', // property
+        null, // expected
     ];
 
-    yield 'propertyI' => [
-        'property' => 'propertyI',
-        'expected' => null, // Invalid definition
+    yield 'propertyI' => [ // Invalid definition
+        'propertyI', // property
+        null, // expected
     ];
 
-    yield 'propertyJ' => [
-        'property' => 'propertyJ',
-        'expected' => null, // No definition
+    yield 'propertyJ' => [ // No definition
+        'propertyJ', // property
+        null, // expected
     ];
 
     yield 'propertyK' => [
-        'property' => 'propertyK',
-        'expected' => new DataIterableAnnotation(SimpleData::class, isData: true),
+        'propertyK', // property
+        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
 
     yield 'propertyL' => [
-        'property' => 'propertyL',
-        'expected' => new DataIterableAnnotation(SimpleData::class, isData: true),
+        'propertyL', // property
+        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
 
     yield 'propertyM' => [
-        'property' => 'propertyM',
-        'expected' => new DataIterableAnnotation(SimpleData::class, isData: true),
+        'propertyM', // property
+        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
 
     yield 'propertyU' => [
-        'property' => 'propertyU',
-        'expected' => new DataIterableAnnotation(SimpleData::class, isData: true),
+        'propertyU', // property
+        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
 });
 
@@ -129,73 +129,73 @@ it(
     }
 )->with(function () {
     yield 'propertyA' => [
-        'property' => 'propertyA',
-        'expected' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false),
+        'propertyA', // property
+        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
     ];
 
     yield 'propertyB' => [
-        'property' => 'propertyB',
-        'expected' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false),
+        'propertyB', // property
+        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
     ];
 
     yield 'propertyC' => [
-        'property' => 'propertyC',
-        'expected' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false),
+        'propertyC', // property
+        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
     ];
 
     yield 'propertyD' => [
-        'property' => 'propertyD',
-        'expected' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false),
+        'propertyD', // property
+        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
     ];
 
     yield 'propertyE' => [
-        'property' => 'propertyE',
-        'expected' => new DataIterableAnnotation('string', isData: false),
+        'propertyE', // property
+        new DataIterableAnnotation('string', isData: false), // expected
     ];
 
     yield 'propertyF' => [
-        'property' => 'propertyF',
-        'expected' => new DataIterableAnnotation('string', isData: false),
+        'propertyF', // property
+        new DataIterableAnnotation('string', isData: false), // expected
     ];
 
     yield 'propertyG' => [
-        'property' => 'propertyG',
-        'expected' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false),
+        'propertyG', // property
+        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
     ];
 
-    yield 'propertyH' => [
-        'property' => 'propertyH',
-        'expected' => null, // Invalid
+    yield 'propertyH' => [ // Invalid
+        'propertyH', // property
+        null, // expected
     ];
 
-    yield 'propertyI' => [
-        'property' => 'propertyI',
-        'expected' => null, // No definition
+    yield 'propertyI' => [ // No definition
+        'propertyI', // property
+        null, // expected
     ];
 
     yield 'propertyJ' => [
-        'property' => 'propertyJ',
-        'expected' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false),
+        'propertyJ', // property
+        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
     ];
 
     yield 'propertyK' => [
-        'property' => 'propertyK',
-        'expected' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false),
+        'propertyK', // property
+        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
     ];
 
     yield 'propertyL' => [
-        'property' => 'propertyL',
-        'expected' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false),
+        'propertyL', // property
+        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
     ];
 
     yield 'propertyP' => [
-        'property' => 'propertyP',
-        'expected' => new DataIterableAnnotation(Error::class, isData: true),
+        'propertyP', // property
+        new DataIterableAnnotation(Error::class, isData: true), // expected
     ];
 
     yield 'propertyR' => [
-        'property' => 'propertyR',
-        'expected' => new DataIterableAnnotation(Error::class, isData: true),
+        'propertyR', // property
+        new DataIterableAnnotation(Error::class, isData: true), // expected
     ];
 });
 
@@ -318,10 +318,10 @@ it('can recognize the key of an iterable', function (
         )
     )->toEqual(new DataIterableAnnotation('float', isData: false, keyType: $keyType));
 })->with([
-    'string key' => ['propertyA', 'string'],
-    'int key' => ['propertyB', 'int'],
-    'array key' => ['propertyC', 'array-key'],
-    'int|string key' => ['propertyD', 'int|string'],
-    'string|int key' => ['propertyE', 'string|int'],
-    'spaces' => ['propertyF', 'int'],
+    ['propertyA', 'string'], // string key
+    ['propertyB', 'int'], // int key
+    ['propertyC', 'array-key'], // array key
+    ['propertyD', 'int|string'], // int|string key
+    ['propertyE', 'string|int'], // string|int key
+    ['propertyF', 'int'], // spaces
 ]);

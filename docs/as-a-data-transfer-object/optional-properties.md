@@ -51,3 +51,21 @@ class SongData extends Data
     }
 }
 ```
+
+It is possible to automatically update `Optional` values to `null`:
+
+```php
+class SongData extends Data {
+    public function __construct(
+        public string $title,
+        public Optional|null|string $artist,
+    ) {
+    }
+}
+
+SongData::factory()
+    ->withoutOptionalValues()
+    ->from(['title' => 'Never gonna give you up']); // artist will `null` instead of `Optional`
+```
+
+You can read more about this [here](/docs/laravel-data/v4/as-a-data-transfer-object/factories#disabling-optional-values).

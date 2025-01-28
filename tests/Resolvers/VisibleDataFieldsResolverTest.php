@@ -342,15 +342,15 @@ it('can execute excepts', function (
     expect($data->transform($factory))->toEqual($expectedTransformed);
 })->with(function () {
     yield 'single field' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->except('single'),
-        'fields' => [
+        [
             'string' => null,
             'int' => null,
             'nested' => new TransformationContext(),
             'collection' => new TransformationContext(),
         ],
-        'transformed' => [
+        [
             'string' => 'hello',
             'int' => 42,
             'nested' => [
@@ -365,13 +365,13 @@ it('can execute excepts', function (
     ];
 
     yield 'multiple fields' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->except('{string,int,single}'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(),
             'collection' => new TransformationContext(),
         ],
-        'transformed' => [
+        [
             'nested' => [
                 'a' => ['string' => 'hello', 'int' => 42],
                 'b' => ['string' => 'hello', 'int' => 42],
@@ -384,24 +384,24 @@ it('can execute excepts', function (
     ];
 
     yield 'all' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->except('*'),
-        'fields' => [],
-        'transformed' => [],
+        [],
+        [],
     ];
 
     yield 'nested data object single field' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single', 'collection') // ignore non nested object fields
             ->except('nested.a'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 exceptPartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [
                 'b' => ['string' => 'hello', 'int' => 42],
             ],
@@ -409,49 +409,49 @@ it('can execute excepts', function (
     ];
 
     yield 'nested data object multiple fields' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single', 'collection') // ignore non nested object fields
             ->except('nested.{a,b}'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 exceptPartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a', 'b'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [],
         ],
     ];
 
     yield 'nested data object all' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single', 'collection') // ignore non nested object fields
             ->except('nested.*'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 exceptPartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [],
         ],
     ];
 
     yield 'nested data collectable single field' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single', 'nested') // ignore non collection fields
             ->except('collection.string'),
-        'fields' => [
+        [
             'collection' => new TransformationContext(
                 exceptPartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'collection' => [
                 ['int' => 42],
                 ['int' => 42],
@@ -460,17 +460,17 @@ it('can execute excepts', function (
     ];
 
     yield 'nested data collectable multiple fields' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single', 'nested') // ignore non collection fields
             ->except('collection.{string,int}'),
-        'fields' => [
+        [
             'collection' => new TransformationContext(
                 exceptPartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'collection' => [
                 [],
                 [],
@@ -479,17 +479,17 @@ it('can execute excepts', function (
     ];
 
     yield 'nested data collectable all' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single', 'nested') // ignore non collection fields
             ->except('collection.*'),
-        'fields' => [
+        [
             'collection' => new TransformationContext(
                 exceptPartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('collection'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'collection' => [
                 [],
                 [],
@@ -498,11 +498,11 @@ it('can execute excepts', function (
     ];
 
     yield 'combination' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->except('string', 'int', 'single.string')
             ->except('collection.string')
             ->except('nested.a.string'),
-        'fields' => [
+        [
             'single' => new TransformationContext(
                 exceptPartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('single'), new FieldsPartialSegment(['string'])], pointer: 1)
@@ -519,7 +519,7 @@ it('can execute excepts', function (
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'single' => ['int' => 42],
             'collection' => [
                 ['int' => 42],
@@ -550,25 +550,25 @@ it("can execute only's", function (
     expect($data->transform($factory))->toEqual($expectedTransformed);
 })->with(function () {
     yield 'single field' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('single'),
-        'fields' => [
+        [
             'single' => new TransformationContext(),
         ],
-        'transformed' => [
+        [
             'single' => ['string' => 'hello', 'int' => 42,],
         ],
     ];
 
     yield 'multiple fields' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('{string,int,single}'),
-        'fields' => [
+        [
             'string' => null,
             'int' => null,
             'single' => new TransformationContext(),
         ],
-        'transformed' => [
+        [
             'string' => 'hello',
             'int' => 42,
             'single' => ['string' => 'hello', 'int' => 42,],
@@ -576,16 +576,16 @@ it("can execute only's", function (
     ];
 
     yield 'all' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('*'),
-        'fields' => [
+        [
             'string' => null,
             'int' => null,
             'single' => new TransformationContext(),
             'nested' => new TransformationContext(),
             'collection' => new TransformationContext(),
         ],
-        'transformed' => [
+        [
             'string' => 'hello',
             'int' => 42,
             'single' => ['string' => 'hello', 'int' => 42,],
@@ -601,16 +601,16 @@ it("can execute only's", function (
     ];
 
     yield 'nested data object single field' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('nested.a'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 onlyPartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [
                 'a' => ['string' => 'hello', 'int' => 42],
             ],
@@ -618,16 +618,16 @@ it("can execute only's", function (
     ];
 
     yield 'nested data object multiple fields' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('nested.{a,b}'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 onlyPartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a', 'b'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [
                 'a' => ['string' => 'hello', 'int' => 42],
                 'b' => ['string' => 'hello', 'int' => 42],
@@ -636,16 +636,16 @@ it("can execute only's", function (
     ];
 
     yield 'nested data object all' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('nested.*'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 onlyPartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [
                 'a' => ['string' => 'hello', 'int' => 42],
                 'b' => ['string' => 'hello', 'int' => 42],
@@ -654,16 +654,16 @@ it("can execute only's", function (
     ];
 
     yield 'nested data collectable single field' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('collection.string'),
-        'fields' => [
+        [
             'collection' => new TransformationContext(
                 onlyPartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'collection' => [
                 ['string' => 'hello'],
                 ['string' => 'hello'],
@@ -672,16 +672,16 @@ it("can execute only's", function (
     ];
 
     yield 'nested data collectable multiple fields' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('collection.{string,int}'),
-        'fields' => [
+        [
             'collection' => new TransformationContext(
                 onlyPartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'collection' => [
                 ['string' => 'hello', 'int' => 42],
                 ['string' => 'hello', 'int' => 42],
@@ -690,16 +690,16 @@ it("can execute only's", function (
     ];
 
     yield 'nested data collectable all' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('collection.*'),
-        'fields' => [
+        [
             'collection' => new TransformationContext(
                 onlyPartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('collection'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'collection' => [
                 ['string' => 'hello', 'int' => 42],
                 ['string' => 'hello', 'int' => 42],
@@ -708,11 +708,11 @@ it("can execute only's", function (
     ];
 
     yield 'combination' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('string', 'single.string')
             ->only('collection.string')
             ->only('nested.a.string'),
-        'fields' => [
+        [
             'string' => null,
             'single' => new TransformationContext(
                 onlyPartials: PartialsCollection::create(
@@ -730,7 +730,7 @@ it("can execute only's", function (
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'string' => 'hello',
             'single' => ['string' => 'hello'],
             'collection' => [
@@ -822,25 +822,25 @@ it('can execute includes', function (
     expect($data->transform($factory))->toEqual($expectedTransformed);
 })->with(function () {
     yield 'single field' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->include('single'),
-        'fields' => [
+        [
             'single' => new TransformationContext(),
         ],
-        'transformed' => [
+        [
             'single' => [],
         ],
     ];
 
     yield 'multiple fields' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->include('{string,int,single}'),
-        'fields' => [
+        [
             'single' => new TransformationContext(),
             'int' => null,
             'string' => null,
         ],
-        'transformed' => [
+        [
             'single' => [],
             'int' => 42,
             'string' => 'hello',
@@ -848,9 +848,9 @@ it('can execute includes', function (
     ];
 
     yield 'all' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->include('*'),
-        'fields' => [
+        [
             'single' => new TransformationContext(
                 includePartials: PartialsCollection::create(
                     new Partial([new AllPartialSegment()], pointer: 3)
@@ -869,7 +869,7 @@ it('can execute includes', function (
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'single' => ['string' => 'hello', 'int' => 42,],
             'int' => 42,
             'string' => 'hello',
@@ -885,17 +885,17 @@ it('can execute includes', function (
     ];
 
     yield 'nested data object single field' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->include('nested.a'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 includePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [
                 'a' => [],
             ],
@@ -903,17 +903,17 @@ it('can execute includes', function (
     ];
 
     yield 'nested data object multiple fields' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->include('nested.{a,b}'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 includePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a', 'b'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [
                 'a' => [],
                 'b' => [],
@@ -922,17 +922,17 @@ it('can execute includes', function (
     ];
 
     yield 'nested data object all' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->include('nested.*'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 includePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [
                 'a' => ['string' => 'hello', 'int' => 42],
                 'b' => ['string' => 'hello', 'int' => 42],
@@ -941,10 +941,10 @@ it('can execute includes', function (
     ];
 
     yield 'nested data object deep nesting' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->include('nested.a.string', 'nested.b.int'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 includePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], pointer: 1),
@@ -952,7 +952,7 @@ it('can execute includes', function (
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [
                 'a' => ['string' => 'hello'],
                 'b' => ['int' => 42],
@@ -961,17 +961,17 @@ it('can execute includes', function (
     ];
 
     yield 'nested data collectable single field' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('collection') // ignore non collection fields
             ->include('collection.string'),
-        'fields' => [
+        [
             'collection' => new TransformationContext(
                 includePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'collection' => [
                 ['string' => 'hello'],
                 ['string' => 'hello'],
@@ -980,17 +980,17 @@ it('can execute includes', function (
     ];
 
     yield 'nested data collectable multiple fields' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('collection') // ignore non collection fields
             ->include('collection.{string,int}'),
-        'fields' => [
+        [
             'collection' => new TransformationContext(
                 includePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'collection' => [
                 ['string' => 'hello', 'int' => 42],
                 ['string' => 'hello', 'int' => 42],
@@ -999,17 +999,17 @@ it('can execute includes', function (
     ];
 
     yield 'nested data collectable all' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('collection') // ignore non collection fields
             ->include('collection.*'),
-        'fields' => [
+        [
             'collection' => new TransformationContext(
                 includePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('collection'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'collection' => [
                 ['string' => 'hello', 'int' => 42],
                 ['string' => 'hello', 'int' => 42],
@@ -1018,11 +1018,11 @@ it('can execute includes', function (
     ];
 
     yield 'combination' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->include('string', 'single.string')
             ->include('collection.string')
             ->include('nested.a.string'),
-        'fields' => [
+        [
             'string' => null,
             'single' => new TransformationContext(
                 includePartials: PartialsCollection::create(
@@ -1040,7 +1040,7 @@ it('can execute includes', function (
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'string' => 'hello',
             'single' => ['string' => 'hello'],
             'collection' => [
@@ -1071,15 +1071,15 @@ it('can execute excludes', function (
     expect($data->transform($factory))->toEqual($expectedTransformed);
 })->with(function () {
     yield 'single field' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->exclude('single'),
-        'fields' => [
+        [
             'string' => null,
             'int' => null,
             'nested' => new TransformationContext(),
             'collection' => new TransformationContext(),
         ],
-        'transformed' => [
+        [
             'string' => 'hello',
             'int' => 42,
             'nested' => [
@@ -1094,13 +1094,13 @@ it('can execute excludes', function (
     ];
 
     yield 'multiple fields' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->exclude('{string,int,single}'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(),
             'collection' => new TransformationContext(),
         ],
-        'transformed' => [
+        [
             'nested' => [
                 'a' => ['string' => 'hello', 'int' => 42],
                 'b' => ['string' => 'hello', 'int' => 42],
@@ -1113,24 +1113,24 @@ it('can execute excludes', function (
     ];
 
     yield 'all' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->exclude('*'),
-        'fields' => [],
-        'transformed' => [],
+        [],
+        [],
     ];
 
     yield 'nested data object single field' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->exclude('nested.a'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 excludePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [
                 'b' => ['string' => 'hello', 'int' => 42],
             ],
@@ -1138,42 +1138,42 @@ it('can execute excludes', function (
     ];
 
     yield 'nested data object multiple fields' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->exclude('nested.{a,b}'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 excludePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new FieldsPartialSegment(['a', 'b'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [],
         ],
     ];
 
     yield 'nested data object all' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->exclude('nested.*'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 excludePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [],
         ],
     ];
 
     yield 'nested data object deep nesting' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('nested') // ignore non nested object fields
             ->exclude('nested.a.string', 'nested.b.int'),
-        'fields' => [
+        [
             'nested' => new TransformationContext(
                 excludePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('nested'), new NestedPartialSegment('a'), new FieldsPartialSegment(['string'])], pointer: 1),
@@ -1181,7 +1181,7 @@ it('can execute excludes', function (
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'nested' => [
                 'a' => ['int' => 42],
                 'b' => ['string' => 'hello'],
@@ -1190,17 +1190,17 @@ it('can execute excludes', function (
     ];
 
     yield 'nested data collectable single field' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('collection') // ignore non collection fields
             ->exclude('collection.string'),
-        'fields' => [
+        [
             'collection' => new TransformationContext(
                 excludePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'collection' => [
                 ['int' => 42],
                 ['int' => 42],
@@ -1209,17 +1209,17 @@ it('can execute excludes', function (
     ];
 
     yield 'nested data collectable multiple fields' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('collection') // ignore non collection fields
             ->exclude('collection.{string,int}'),
-        'fields' => [
+        [
             'collection' => new TransformationContext(
                 excludePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('collection'), new FieldsPartialSegment(['string', 'int'])], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'collection' => [
                 [],
                 [],
@@ -1228,17 +1228,17 @@ it('can execute excludes', function (
     ];
 
     yield 'nested data collectable all' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->only('collection') // ignore non collection fields
             ->exclude('collection.*'),
-        'fields' => [
+        [
             'collection' => new TransformationContext(
                 excludePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('collection'), new AllPartialSegment()], pointer: 1)
                 ),
             ),
         ],
-        'transformed' => [
+        [
             'collection' => [
                 [],
                 [],
@@ -1247,11 +1247,11 @@ it('can execute excludes', function (
     ];
 
     yield 'combination' => [
-        'factory' => fn () => TransformationContextFactory::create()
+        fn () => TransformationContextFactory::create()
             ->exclude('string', 'single.string')
             ->exclude('collection.string')
             ->exclude('nested.a.string'),
-        'fields' => [
+        [
             'single' => new TransformationContext(
                 excludePartials: PartialsCollection::create(
                     new Partial([new NestedPartialSegment('single'), new FieldsPartialSegment(['string'])], pointer: 1)
@@ -1269,7 +1269,7 @@ it('can execute excludes', function (
             ),
             'int' => null,
         ],
-        'transformed' => [
+        [
             'single' => ['int' => 42],
             'collection' => [
                 ['int' => 42],
