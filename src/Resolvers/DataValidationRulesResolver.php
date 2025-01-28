@@ -39,9 +39,11 @@ class DataValidationRulesResolver
             /**
              * @var class-string<PropertyMorphableData> $class
              */
-            $payload = $path->isRoot() ? $fullPayload : Arr::get($fullPayload, $path->get(), []);
-            $class = $class::morph($payload) ?? $class;
-            $dataClass = $this->dataConfig->getDataClass($class);
+            $morphedClass = $class::morph(
+                $path->isRoot() ? $fullPayload : Arr::get($fullPayload, $path->get(), [])
+            );
+
+            $dataClass = $this->dataConfig->getDataClass($morphedClass ?? $class);
         }
 
         $withoutValidationProperties = [];
