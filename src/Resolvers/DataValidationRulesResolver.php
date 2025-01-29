@@ -119,10 +119,8 @@ class DataValidationRulesResolver
         }
 
         // Restrict to only morphable properties
-        $properties = Arr::only($properties, $dataClass->propertyMorphablePropertyNames);
-
-        // Only morph if all properties are present
-        if (count($properties) !== count($dataClass->propertyMorphablePropertyNames)) {
+        $properties = $dataClass->propertiesForMorph($properties);
+        if ($properties === null) {
             return null;
         }
 

@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\PropertyMorphableData;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
@@ -128,15 +127,12 @@ class DataFromSomethingResolver
         $dataClass = $this->dataConfig->getDataClass($class);
 
         if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
-            $morphableProperties = Arr::only($properties, $dataClass->propertyMorphablePropertyNames);
+            $morphableProperties = $dataClass->propertiesForMorph($properties);
 
             /**
              * @var class-string<PropertyMorphableData> $class
              */
-            if (
-                count($morphableProperties) === count($dataClass->propertyMorphablePropertyNames)
-                && $morph = $class::morph($morphableProperties)
-            ) {
+            if ($morphableProperties && $morph = $class::morph($morphableProperties)) {
                 return $this->execute($morph, $creationContext, ...$payloads);
             }
         }
