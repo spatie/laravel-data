@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 use Spatie\LaravelData\Support\DataClass;
 
-class RequiresPropertyMorphableClassRule extends ObjectValidationAttribute implements ValidationRule
+class EnsurePropertyMorphable extends ObjectValidationAttribute implements ValidationRule
 {
     public function __construct(protected DataClass $dataClass)
     {

@@ -15,8 +15,8 @@ use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\DataRules;
+use Spatie\LaravelData\Support\Validation\EnsurePropertyMorphable;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
-use Spatie\LaravelData\Support\Validation\RequiresPropertyMorphableClassRule;
 use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
 use Spatie\LaravelData\Support\Validation\RuleNormalizer;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
@@ -75,7 +75,7 @@ class DataValidationRulesResolver
             );
 
             if ($dataProperty->isForMorph) {
-                $rules[] = new RequiresPropertyMorphableClassRule($dataClass);
+                $rules[] = new EnsurePropertyMorphable($dataClass);
             }
 
             $dataRules->add($propertyPath, $rules);
@@ -109,13 +109,17 @@ class DataValidationRulesResolver
         $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
 
         try {
-            $properties = Arr::only($pipeline->execute(
+            // Attempt to cast properties
+            $properties = $pipeline->execute(
                 $path->isRoot() ? $fullPayload : Arr::get($fullPayload, $path->get(), []),
                 $creationContext
-            ), $dataClass->propertyMorphablePropertyNames);
+            );
         } catch (\Throwable $exception) {
             return null;
         }
+
+        // Restrict to only morphable properties
+        $properties = Arr::only($properties, $dataClass->propertyMorphablePropertyNames);
 
         // Only morph if all properties are present
         if (count($properties) !== count($dataClass->propertyMorphablePropertyNames)) {
