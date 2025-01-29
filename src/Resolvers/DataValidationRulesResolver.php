@@ -14,6 +14,7 @@ use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\DataRules;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
+use Spatie\LaravelData\Support\Validation\RequiresPropertyMorphableClassRule;
 use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
 use Spatie\LaravelData\Support\Validation\RuleNormalizer;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
@@ -76,6 +77,10 @@ class DataValidationRulesResolver
                 $fullPayload,
                 $path,
             );
+
+            if ($dataProperty->isForMorph) {
+                $rules[] = new RequiresPropertyMorphableClassRule($dataClass);
+            }
 
             $dataRules->add($propertyPath, $rules);
         }

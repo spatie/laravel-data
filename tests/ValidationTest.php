@@ -21,6 +21,7 @@ use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\MergeValidationRules;
+use Spatie\LaravelData\Attributes\PropertyForMorph;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Bail;
 use Spatie\LaravelData\Attributes\Validation\BooleanType;
@@ -2611,7 +2612,7 @@ describe('property-morphable validation tests', function () {
     abstract class TestValidationAbstractPropertyMorphableData extends Data implements PropertyMorphableData
     {
         public function __construct(
-            #[In('a', 'b')]
+            #[PropertyForMorph]
             public string $variant,
         ) {
         }
@@ -2650,7 +2651,7 @@ describe('property-morphable validation tests', function () {
             ->assertErrors([
                 'variant' => 'c',
             ], [
-                'variant' => ['The selected variant is invalid.'],
+                'variant' => ['The selected variant is invalid for morph.'],
             ])
             ->assertErrors([
                 'variant' => 'a',
@@ -2700,7 +2701,7 @@ describe('property-morphable validation tests', function () {
             ->assertErrors([
                 'nestedCollection' => [['variant' => 'c']],
             ], [
-                'nestedCollection.0.variant' => ['The selected nested collection.0.variant is invalid.'],
+                'nestedCollection.0.variant' => ['The selected nested collection.0.variant is invalid for morph.'],
             ])
             ->assertErrors([
                 'nestedCollection' => [['variant' => 'a'], ['variant' => 'b']],
