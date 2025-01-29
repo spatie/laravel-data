@@ -8,7 +8,9 @@ use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Attributes\MergeValidationRules;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Present;
+use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\PropertyMorphableData;
+use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
@@ -36,17 +38,11 @@ class DataValidationRulesResolver
         DataRules $dataRules
     ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
-
-        if ($this->isPropertyMorphable($dataClass)) {
-            /**
-             * @var class-string<PropertyMorphableData> $class
-             */
-            $morphedClass = $class::morph(
-                $path->isRoot() ? $fullPayload : Arr::get($fullPayload, $path->get(), [])
-            );
-
-            $dataClass = $this->dataConfig->getDataClass($morphedClass ?? $class);
-        }
+        $dataClass = $this->propertyMorphableDataClass(
+            $dataClass,
+            $fullPayload,
+            $path
+        ) ?? $dataClass;
 
         $withoutValidationProperties = [];
 
@@ -94,6 +90,44 @@ class DataValidationRulesResolver
         );
 
         return $dataRules->rules;
+    }
+
+    protected function propertyMorphableDataClass(
+        DataClass $dataClass,
+        array $fullPayload,
+        ValidationPath $path
+    ): ?DataClass {
+        if (! $dataClass->propertyMorphable) {
+            return null;
+        }
+
+        /**
+         * @var class-string<PropertyMorphableData&BaseData> $class
+         */
+        $class = $dataClass->name;
+        $creationContext = CreationContextFactory::createFromConfig($class)->get();
+        $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
+
+        try {
+            $properties = Arr::only($pipeline->execute(
+                $path->isRoot() ? $fullPayload : Arr::get($fullPayload, $path->get(), []),
+                $creationContext
+            ), $dataClass->propertyMorphablePropertyNames);
+        } catch (\Throwable $exception) {
+            return null;
+        }
+
+        // Only morph if all properties are present
+        if (count($properties) !== count($dataClass->propertyMorphablePropertyNames)) {
+            return null;
+        }
+
+        $morphedClass = $class::morph($properties);
+        if ($morphedClass === null) {
+            return null;
+        }
+
+        return $this->dataConfig->getDataClass($morphedClass);
     }
 
     protected function shouldSkipPropertyValidation(

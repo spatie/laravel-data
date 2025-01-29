@@ -35,7 +35,8 @@ class DataClass
         public DataStructureProperty $allowedRequestOnly,
         public DataStructureProperty $allowedRequestExcept,
         public DataStructureProperty $outputMappedProperties,
-        public DataStructureProperty $transformationFields
+        public DataStructureProperty $transformationFields,
+        public readonly array $propertyMorphablePropertyNames
     ) {
     }
 

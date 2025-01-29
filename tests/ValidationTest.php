@@ -2609,19 +2609,25 @@ it('it will merge validation rules', function () {
 });
 
 describe('property-morphable validation tests', function () {
+    enum TestValidationPropertyMorphableEnum: string
+    {
+        case A = 'a';
+        case B = 'b';
+    };
+
     abstract class TestValidationAbstractPropertyMorphableData extends Data implements PropertyMorphableData
     {
         public function __construct(
             #[PropertyForMorph]
-            public string $variant,
+            public TestValidationPropertyMorphableEnum $variant,
         ) {
         }
 
         public static function morph(array $properties): ?string
         {
-            return match ($properties['variant'] ?? null) {
-                'a' => TestValidationPropertyMorphableDataA::class,
-                'b' => TestValidationPropertyMorphableDataB::class,
+            return match ($properties['variant']) {
+                TestValidationPropertyMorphableEnum::A => TestValidationPropertyMorphableDataA::class,
+                TestValidationPropertyMorphableEnum::B => TestValidationPropertyMorphableDataB::class,
                 default => null,
             };
         }
@@ -2631,7 +2637,7 @@ describe('property-morphable validation tests', function () {
     {
         public function __construct(public string $a, public DummyBackedEnum $enum)
         {
-            parent::__construct('a');
+            parent::__construct(TestValidationPropertyMorphableEnum::A);
         }
     }
 
@@ -2639,7 +2645,7 @@ describe('property-morphable validation tests', function () {
     {
         public function __construct(public string $b)
         {
-            parent::__construct('b');
+            parent::__construct(TestValidationPropertyMorphableEnum::B);
         }
     }
 
@@ -2651,7 +2657,10 @@ describe('property-morphable validation tests', function () {
             ->assertErrors([
                 'variant' => 'c',
             ], [
-                'variant' => ['The selected variant is invalid for morph.'],
+                'variant' => [
+                    'The selected variant is invalid.',
+                    'The selected variant is invalid for morph.',
+                ],
             ])
             ->assertErrors([
                 'variant' => 'a',
@@ -2701,7 +2710,10 @@ describe('property-morphable validation tests', function () {
             ->assertErrors([
                 'nestedCollection' => [['variant' => 'c']],
             ], [
-                'nestedCollection.0.variant' => ['The selected nested collection.0.variant is invalid for morph.'],
+                'nestedCollection.0.variant' => [
+                    'The selected nested collection.0.variant is invalid.',
+                    'The selected nested collection.0.variant is invalid for morph.',
+                ],
             ])
             ->assertErrors([
                 'nestedCollection' => [['variant' => 'a'], ['variant' => 'b']],

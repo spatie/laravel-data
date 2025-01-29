@@ -191,24 +191,26 @@ it('can load and save an abstract defined data object', function () {
 it('can load and save an abstract property-morphable data object', function () {
     abstract class TestCastAbstractPropertyMorphableData extends Data implements PropertyMorphableData
     {
-        public function __construct(public string $variant)
-        {
+        public function __construct(
+            #[\Spatie\LaravelData\Attributes\PropertyForMorph]
+            public DummyBackedEnum $variant
+        ) {
         }
 
         public static function morph(array $properties): ?string
         {
             return match ($properties['variant'] ?? null) {
-                'a' => TestCastPropertyMorphableDataA::class,
+                DummyBackedEnum::FOO => TestCastPropertyMorphableDataFoo::class,
                 default => null,
             };
         }
     }
 
-    class TestCastPropertyMorphableDataA extends TestCastAbstractPropertyMorphableData
+    class TestCastPropertyMorphableDataFoo extends TestCastAbstractPropertyMorphableData
     {
-        public function __construct(public string $a, public DummyBackedEnum $enum)
+        public function __construct(public string $a)
         {
-            parent::__construct('a');
+            parent::__construct(DummyBackedEnum::FOO);
         }
     }
 
@@ -222,20 +224,20 @@ it('can load and save an abstract property-morphable data object', function () {
         public $timestamps = false;
     };
 
-    $abstractA = new TestCastPropertyMorphableDataA('foo', DummyBackedEnum::FOO);
+    $abstractA = new TestCastPropertyMorphableDataFoo('foo');
 
     $modelId = $modelClass::create([
         'data' => $abstractA,
     ])->id;
 
     assertDatabaseHas($modelClass::class, [
-        'data' => json_encode(['a' => 'foo', 'enum' => 'foo', 'variant' => 'a']),
+        'data' => json_encode(['a' => 'foo', 'variant' => 'foo']),
     ]);
 
     $model = $modelClass::find($modelId);
 
     expect($model->data)
-        ->toBeInstanceOf(TestCastPropertyMorphableDataA::class)
+        ->toBeInstanceOf(TestCastPropertyMorphableDataFoo::class)
         ->a->toBe('foo')
-        ->enum->toBe(DummyBackedEnum::FOO);
+        ->variant->toBe(DummyBackedEnum::FOO);
 });

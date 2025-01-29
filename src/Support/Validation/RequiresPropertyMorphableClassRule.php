@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support\Validation;
 
 use Closure;
+use Exception;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 use Spatie\LaravelData\Support\DataClass;
@@ -25,7 +26,7 @@ class RequiresPropertyMorphableClassRule extends ObjectValidationAttribute imple
 
     public static function create(string ...$parameters): static
     {
-        return new static(...$parameters);
+        throw new Exception('Cannot create a requires property morphable class rule');
     }
 
     public function validate(string $attribute, mixed $value, Closure $fail): void

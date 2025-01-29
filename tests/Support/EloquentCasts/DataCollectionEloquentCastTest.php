@@ -178,8 +178,10 @@ it('can use an abstract data collection with multiple children', function () {
 it('can load and save an abstract property-morphable data collection', function () {
     abstract class TestCollectionCastAbstractPropertyMorphableData extends Data implements PropertyMorphableData
     {
-        public function __construct(public string $variant)
-        {
+        public function __construct(
+            #[\Spatie\LaravelData\Attributes\PropertyForMorph]
+            public string $variant
+        ) {
         }
 
         public static function morph(array $properties): ?string
