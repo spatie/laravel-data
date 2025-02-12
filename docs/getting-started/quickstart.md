@@ -406,7 +406,7 @@ class PostData extends Data
 ```
 
 Magic creation methods allow you to create data objects from any type by passing them to the `from` method of a data
-object, you can read more about it [here](/laravel-data/v4/as-a-data-transfer-object/creating-a-data-object#magical-creation).
+object, you can read more about it [here](/docs/laravel-data/v4/as-a-data-transfer-object/creating-a-data-object#content-magical-creation).
 
 It can be convenient to transform more complex models than our `Post` into data objects because you can decide how a model
 would be mapped onto a data object.
