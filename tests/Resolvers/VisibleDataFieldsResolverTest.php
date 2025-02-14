@@ -231,7 +231,8 @@ it('always transforms closure lazy into closures for inertia', function () {
     };
 
     expect($dataClass::create('Freek')->toArray()['name'])->toBeInstanceOf(Closure::class);
-})->skip('Re-enable test after Inertia supports Laravel 12');;
+})->skip('Re-enable test after Inertia supports Laravel 12');
+;
 
 it('will fail gracefully when a nested field does not exist', function () {
     $dataClass = new class () extends Data {
