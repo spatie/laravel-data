@@ -25,7 +25,6 @@
     "require-dev" : {
         "fakerphp/faker": "^1.14",
         "friendsofphp/php-cs-fixer": "^3.0",
-        "larastan/larastan": "^2.7|^3.0",
         "livewire/livewire": "^3.0",
         "mockery/mockery": "^1.6",
         "nesbot/carbon": "^2.63|^3.0",
