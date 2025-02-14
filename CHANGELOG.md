@@ -2,6 +2,21 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.13.1 - 2025-02-14
+
+Allow Laravel 12
+
+### What's Changed
+
+* Bump dependabot/fetch-metadata from 2.2.0 to 2.3.0 by @dependabot in https://github.com/spatie/laravel-data/pull/940
+* Add "laravel-data-json-schemas" to third party packages by @BasilLangevin in https://github.com/spatie/laravel-data/pull/943
+
+### New Contributors
+
+* @BasilLangevin made their first contribution in https://github.com/spatie/laravel-data/pull/943
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.13.0...4.13.1
+
 ## 4.13.0 - 2025-01-24
 
 ### What's Changed
@@ -35,6 +50,7 @@ SongData::factory()
     ->from(['title' => 'Never gonna give you up', 'artist' => 'Rick Astley']); // album will `null` instead of `Optional`
 
 
+
 ```
 #### Injecting property values
 
@@ -45,6 +61,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 ```
@@ -71,6 +88,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 ```
