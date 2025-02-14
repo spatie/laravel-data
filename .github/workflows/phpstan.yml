@@ -24,8 +24,10 @@ jobs:
           php-version: '8.4'
           coverage: none
 
-      - name: Install composer dependencies
-        uses: ramsey/composer-install@v3
+      - name: Install dependencies
+        run: |
+          composer require "larastan/larastan" --no-interaction --no-update
+          composer update --prefer-dist --no-interaction --no-suggest
 
       - name: Run PHPStan
         run: ./vendor/bin/phpstan --error-format=github
