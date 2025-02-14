@@ -25,7 +25,7 @@
     "require-dev" : {
         "fakerphp/faker": "^1.14",
         "friendsofphp/php-cs-fixer": "^3.0",
-        "inertiajs/inertia-laravel": "^1.2",
+        "inertiajs/inertia-laravel": "^1.2|^2.0",
         "larastan/larastan": "^2.7",
         "livewire/livewire": "^3.0",
         "mockery/mockery": "^1.6",
