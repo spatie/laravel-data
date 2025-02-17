@@ -291,7 +291,7 @@ it('is possible to have multiple required rules', function () {
     ]);
 })->skip('Add a new ruleinferrer to rule them all and make these cases better');
 
-it('it will take care of mapping', function () {
+it('will take care of mapping', function () {
     DataValidationAsserter::for(new class () extends Data {
         #[MapInputName('some_property')]
         public string $property;
