@@ -7,6 +7,6 @@ use Spatie\LaravelData\Data;
 class DummyClass extends Data
 {
     public function __construct(
-      //
+        //
     ) {}
 }
