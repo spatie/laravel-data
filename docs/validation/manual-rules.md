@@ -56,9 +56,9 @@ class SongData extends Data
 
 As a rule of thumb always follow these rules:
 
-> Always use the array syntax for defining rules and not a single string which spits the rules by | characters.
-> This is needed when using regexes those | can be seen as part of the regex
- 
+Always use the array syntax for defining rules and not a single string which spits the rules by | characters.
+This is needed when using regexes those | can be seen as part of the regex
+
 ## Merging manual rules
 
 Writing manual rules doesn't mean that you can't use the automatic rules inferring anymore. By adding the `MergeValidationRules` attribute to your data class, the rules will be merged:
