@@ -22,11 +22,6 @@ use Spatie\LaravelData\Support\Annotations\DataIterableAnnotation;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotationReader;
 use Spatie\LaravelData\Support\DataPropertyType;
 use Spatie\LaravelData\Support\DataType;
-use Spatie\LaravelData\Support\Lazy\ClosureLazy;
-use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
-use Spatie\LaravelData\Support\Lazy\DefaultLazy;
-use Spatie\LaravelData\Support\Lazy\InertiaLazy;
-use Spatie\LaravelData\Support\Lazy\RelationalLazy;
 use Spatie\LaravelData\Support\Types\IntersectionType;
 use Spatie\LaravelData\Support\Types\NamedType;
 use Spatie\LaravelData\Support\Types\Storage\AcceptedTypesStorage;
@@ -473,7 +468,7 @@ class DataTypeFactory
                 continue;
             }
 
-            if ($inferForProperty && in_array($name, [Lazy::class, DefaultLazy::class, ClosureLazy::class, ConditionalLazy::class, RelationalLazy::class, InertiaLazy::class])) {
+            if ($inferForProperty && ($name === Lazy::class || is_subclass_of($name, Lazy::class))) {
                 $lazyType = $name;
 
                 continue;
