@@ -105,7 +105,7 @@ function fixature(
     ValidationRule $attribute,
     object|string|array $expected,
     object|string|null $expectCreatedAttribute = null,
-    string $exception = null
+    ?string $exception = null
 ): array {
     return [
         $attribute,
