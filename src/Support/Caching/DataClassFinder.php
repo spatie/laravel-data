@@ -2,7 +2,7 @@
 
 namespace Spatie\LaravelData\Support\Caching;
 
-use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Data;
 use Spatie\StructureDiscoverer\Discover;
 
 class DataClassFinder
@@ -31,7 +31,7 @@ class DataClassFinder
     public function classes(): array
     {
         $discoverer = Discover::in(...$this->directories)
-            ->implementing(BaseData::class);
+            ->extending(Data::class);            
 
         if ($this->useReflection) {
             $discoverer->useReflection($this->reflectionBasePath, $this->reflectionRootNamespace);
