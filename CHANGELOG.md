@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.13.2 - 2025-03-03
+
+### What's Changed
+
+* Fix an issue where specific Lazy classes won't be recognized
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.13.1...4.13.2
+
 ## 4.13.1 - 2025-02-14
 
 Allow Laravel 12
@@ -51,6 +59,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -61,6 +70,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -88,6 +98,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
