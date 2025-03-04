@@ -20,6 +20,7 @@ class DataClass
         public readonly ?DataMethod $constructorMethod,
         public readonly bool $isReadonly,
         public readonly bool $isAbstract,
+        public readonly bool $propertyMorphable,
         public readonly bool $appendable,
         public readonly bool $includeable,
         public readonly bool $responsable,
