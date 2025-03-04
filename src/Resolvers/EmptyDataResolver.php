@@ -15,7 +15,7 @@ class EmptyDataResolver
     {
     }
 
-    public function execute(string $class, array $extra = []): array
+    public function execute(string $class, array $extra = [], string|null $defaultValue = null): array
     {
         $dataClass = $this->dataConfig->getDataClass($class);
 
@@ -27,19 +27,19 @@ class EmptyDataResolver
             if ($property->hasDefaultValue) {
                 $payload[$name] = $property->defaultValue;
             } else {
-                $payload[$name] = $extra[$property->name] ?? $this->getValueForProperty($property);
+                $payload[$name] = $extra[$property->name] ?? $this->getValueForProperty($property, $defaultValue);
             }
         }
 
         return $payload;
     }
 
-    protected function getValueForProperty(DataProperty $property): ?array
+    protected function getValueForProperty(DataProperty $property, string|null $defaultValue = null): null|array|string
     {
         $propertyType = $property->type;
 
         if ($propertyType->isMixed) {
-            return null;
+            return $defaultValue;
         }
 
         if ($propertyType->type instanceof CombinationType && count($propertyType->type->types) > 1) {
@@ -67,6 +67,6 @@ class EmptyDataResolver
             return [];
         }
 
-        return null;
+        return $defaultValue;
     }
 }
