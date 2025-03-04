@@ -1452,3 +1452,21 @@ it('can use auto lazy to construct a when loaded lazy with a manual defined rela
         ->toHaveCount(2)
         ->each()->toBeInstanceOf(FakeNestedModelData::class);
 });
+
+it('can be created using variadic argument', function () {
+    class ExtendedData extends SimpleData
+    {
+        public function __construct(public string $name, ...$variadic)
+        {
+            parent::__construct(...$variadic);
+        }
+    }
+
+    $extendedData = ExtendedData::from([
+        'name' => 'Wrapper name',
+        'string' => 'SimpleData string',
+    ]);
+
+    expect($extendedData)->name->toEqual("Wrapper name")
+        ->string->toEqual("SimpleData string");
+});

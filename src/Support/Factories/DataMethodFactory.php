@@ -44,20 +44,7 @@ class DataMethodFactory
         ReflectionClass $reflectionClass,
         Collection $properties
     ): DataMethod {
-        $parameters = collect($reflectionMethod->getParameters())
-            ->map(function (ReflectionParameter $parameter) use ($reflectionClass, $properties) {
-                if (! $parameter->isPromoted()) {
-                    return $this->parameterFactory->build($parameter, $reflectionClass);
-                }
-
-                if ($properties->has($parameter->name)) {
-                    return $properties->get($parameter->name);
-                }
-
-                return null;
-            })
-            ->filter()
-            ->values();
+        $parameters = $this->resolveConstructorParameters($reflectionMethod, $reflectionClass, $properties);
 
         return new DataMethod(
             name: '__construct',
@@ -82,5 +69,32 @@ class DataMethodFactory
         }
 
         return CustomCreationMethodType::None;
+    }
+
+    protected function resolveConstructorParameters(
+        ReflectionMethod $reflectionMethod,
+        ReflectionClass  $reflectionClass,
+        Collection       $properties
+    ): Collection {
+        return collect($reflectionMethod->getParameters())
+            ->flatMap(function (ReflectionParameter $parameter) use ($reflectionMethod, $reflectionClass, $properties) {
+                if ($parameter->isVariadic()) {
+                    if ($parentClassConstructor = $reflectionClass->getParentClass()?->getConstructor()) {
+                        return $this->resolveConstructorParameters($parentClassConstructor, $reflectionClass, $properties);
+                    }
+                }
+
+                if (! $parameter->isPromoted()) {
+                    return [$this->parameterFactory->build($parameter, $reflectionClass)];
+                }
+
+                if ($properties->has($parameter->name)) {
+                    return [$properties->get($parameter->name)];
+                }
+
+                return null;
+            })
+            ->filter()
+            ->values();
     }
 }
