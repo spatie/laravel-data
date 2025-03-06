@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support\Factories;
 
 use Illuminate\Support\Collection;
-use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
@@ -21,6 +20,7 @@ use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotationReader;
+use Spatie\LaravelData\Support\AttributeCollection;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\LazyDataStructureProperty;
@@ -105,20 +105,24 @@ class DataClassFactory
         );
     }
 
-    protected function resolveAttributes(
-        ReflectionClass $reflectionClass
-    ): Collection {
-        $attributes = collect($reflectionClass->getAttributes())
-            ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
-            ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
+    private function resolveRecursiveAttributes(ReflectionClass $reflectionClass): array
+    {
+
+        $attributes = $reflectionClass->getAttributes();
 
         $parent = $reflectionClass->getParentClass();
 
         if ($parent !== false) {
-            $attributes = $attributes->merge(static::resolveAttributes($parent));
+            $attributes = array_merge($attributes, $this->resolveRecursiveAttributes($parent));
         }
 
         return $attributes;
+    }
+
+    protected function resolveAttributes(
+        ReflectionClass $reflectionClass
+    ): AttributeCollection {
+        return AttributeCollection::makeFromReflectionAttributes($this->resolveRecursiveAttributes($reflectionClass));
     }
 
     protected function resolveMethods(
