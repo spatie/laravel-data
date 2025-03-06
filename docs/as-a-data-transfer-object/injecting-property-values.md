@@ -160,7 +160,7 @@ Just like with route parameters, it is possible to fill properties with specific
 
 ```php
 class SongData extends Data {
-    #[FromAuthenticatedUserProperty('name')]
+    #[FromAuthenticatedUserProperty('api','name')]
     public string $username;
 }
 ```
