@@ -103,7 +103,7 @@ class DataClassFactory
             allowedRequestOnly: new LazyDataStructureProperty(fn (): ?array => $responsable ? $name::allowedRequestOnly() : null),
             allowedRequestExcept: new LazyDataStructureProperty(fn (): ?array => $responsable ? $name::allowedRequestExcept() : null),
             outputMappedProperties: $outputMappedProperties,
-            transformationFields: static::resolveTransformationFields($properties),
+            transformationFields: static::resolveTransformationFields($properties)
         );
     }
 

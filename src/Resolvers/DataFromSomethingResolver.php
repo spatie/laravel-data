@@ -127,10 +127,12 @@ class DataFromSomethingResolver
         $dataClass = $this->dataConfig->getDataClass($class);
 
         if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
+            $morphableProperties = $dataClass->propertiesForMorph($properties);
+
             /**
              * @var class-string<PropertyMorphableData> $class
              */
-            if ($morph = $class::morph($properties)) {
+            if ($morphableProperties && $morph = $class::morph($morphableProperties)) {
                 return $this->execute($morph, $creationContext, ...$payloads);
             }
         }
