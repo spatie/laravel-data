@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.14.0 - 2025-03-14
+
+If you're using cached versions of your data objects and don't clear this cache on deploy, now is the time since we've updated some internal structures.
+
+- Fix an issue where data classes could not be cached (a7d117e1224258a05c2d8e101928b6740a680a69)
+- Fix retrieval of property to work for Astrotomic/translatable (#883)
+- Refactored some internals for storing attribute information
+- Add dataClass to normalize exception message (#968)
+- Add Macroable Trait to Data Collection Classes (#971)
+
 ## 4.13.2 - 2025-03-03
 
 ### What's Changed
@@ -60,6 +70,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -70,6 +81,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -98,6 +110,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
