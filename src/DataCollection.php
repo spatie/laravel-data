@@ -7,6 +7,7 @@ use Countable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
+use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
 use Spatie\LaravelData\Concerns\BaseDataCollectable;
 use Spatie\LaravelData\Concerns\ContextableData;
@@ -42,6 +43,8 @@ class DataCollection implements Responsable, BaseDataCollectableContract, Transf
     use WrappableData;
     use TransformableData;
     use ContextableData;
+
+    use Macroable;
 
     /** @use \Spatie\LaravelData\Concerns\EnumerableMethods<TKey, TValue> */
     use EnumerableMethods;

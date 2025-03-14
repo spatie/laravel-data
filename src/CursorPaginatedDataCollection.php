@@ -6,6 +6,7 @@ use Closure;
 use Countable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
 use Spatie\LaravelData\Concerns\BaseDataCollectable;
 use Spatie\LaravelData\Concerns\ContextableData;
@@ -39,6 +40,8 @@ class CursorPaginatedDataCollection implements Responsable, BaseDataCollectableC
     /** @use \Spatie\LaravelData\Concerns\BaseDataCollectable<TKey, TValue> */
     use BaseDataCollectable;
     use ContextableData;
+
+    use Macroable;
 
     /** @var CursorPaginator<TValue> */
     protected CursorPaginator $items;
