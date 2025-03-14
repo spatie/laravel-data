@@ -72,7 +72,7 @@ it('can get a data object from model with accessors', function () {
         ->old_accessor->toEqual($data->old_accessor);
 });
 
-it('it will only call model accessors when required', function () {
+it('will only call model accessors when required', function () {
     $dataClass = new class () extends Data {
         public string $accessor;
 

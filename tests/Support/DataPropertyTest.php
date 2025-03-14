@@ -5,7 +5,6 @@ use Spatie\LaravelData\Attributes\AutoInertiaLazy;
 use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Attributes\Computed;
-use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Hidden;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapOutputName;
@@ -15,7 +14,6 @@ use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\DataProperty;
@@ -96,18 +94,6 @@ it('can get the mapped output name', function () {
     });
 
     expect($helper->outputMappedName)->toEqual('other');
-});
-
-it('can get all attributes', function () {
-    $helper = resolveHelper(new class () {
-        #[MapInputName('other')]
-        #[WithTransformer(DateTimeInterfaceTransformer::class)]
-        #[WithCast(DateTimeInterfaceCast::class)]
-        #[DataCollectionOf(SimpleData::class)]
-        public DataCollection $property;
-    });
-
-    expect($helper->attributes)->toHaveCount(4);
 });
 
 it('can get the default value', function () {

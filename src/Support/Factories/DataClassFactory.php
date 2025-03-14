@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support\Factories;
 
 use Illuminate\Support\Collection;
-use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
@@ -39,7 +38,7 @@ class DataClassFactory
         /** @var class-string<Data> $name */
         $name = $reflectionClass->name;
 
-        $attributes = $this->resolveAttributes($reflectionClass);
+        $attributes = DataAttributesCollectionFactory::buildFromReflectionClass($reflectionClass);
 
         $methods = collect($reflectionClass->getMethods());
 
@@ -54,9 +53,7 @@ class DataClassFactory
             );
         }
 
-        $autoLazy = $attributes->first(
-            fn (object $attribute) => $attribute instanceof AutoLazy
-        );
+        $autoLazy = $attributes->first(AutoLazy::class);
 
         $properties = $this->resolveProperties(
             $reflectionClass,
@@ -103,22 +100,6 @@ class DataClassFactory
             outputMappedProperties: $outputMappedProperties,
             transformationFields: static::resolveTransformationFields($properties),
         );
-    }
-
-    protected function resolveAttributes(
-        ReflectionClass $reflectionClass
-    ): Collection {
-        $attributes = collect($reflectionClass->getAttributes())
-            ->filter(fn (ReflectionAttribute $reflectionAttribute) => class_exists($reflectionAttribute->getName()))
-            ->map(fn (ReflectionAttribute $reflectionAttribute) => $reflectionAttribute->newInstance());
-
-        $parent = $reflectionClass->getParentClass();
-
-        if ($parent !== false) {
-            $attributes = $attributes->merge(static::resolveAttributes($parent));
-        }
-
-        return $attributes;
     }
 
     protected function resolveMethods(

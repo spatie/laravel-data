@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\MapOutputName;
@@ -9,11 +8,12 @@ use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Mappers\StudlyCaseMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
+use Spatie\LaravelData\Support\DataAttributesCollection;
+use Spatie\LaravelData\Support\Factories\DataAttributesCollectionFactory;
 
-function getAttributes(object $class): Collection
+function getAttributes(object $class): DataAttributesCollection
 {
-    return collect((new ReflectionProperty($class, 'property'))->getAttributes())
-        ->map(fn (ReflectionAttribute $attribute) => $attribute->newInstance());
+    return DataAttributesCollectionFactory::buildFromReflectionProperty((new ReflectionProperty($class, 'property')));
 }
 
 beforeEach(function () {

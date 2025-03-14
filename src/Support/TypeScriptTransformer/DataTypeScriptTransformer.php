@@ -53,9 +53,7 @@ class DataTypeScriptTransformer extends DtoTransformer
     ): string {
         $dataClass = app(DataConfig::class)->getDataClass($class->getName());
 
-        $isOptional = $dataClass->attributes->contains(
-            fn (object $attribute) => $attribute instanceof TypeScriptOptional
-        );
+        $isOptional = $dataClass->attributes->has(TypeScriptOptional::class);
 
         return array_reduce(
             $this->resolveProperties($class),
@@ -76,9 +74,7 @@ class DataTypeScriptTransformer extends DtoTransformer
                 }
 
                 $isOptional = $isOptional
-                    || $dataProperty->attributes->contains(
-                        fn (object $attribute) => $attribute instanceof TypeScriptOptional
-                    )
+                    || $dataProperty->attributes->has(TypeScriptOptional::class)
                     || ($dataProperty->type->lazyType && $dataProperty->type->lazyType !== ClosureLazy::class)
                     || $dataProperty->type->isOptional
                     || ($dataProperty->type->isNullable && $this->config->shouldConsiderNullAsOptional());

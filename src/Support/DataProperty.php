@@ -2,13 +2,12 @@
 
 namespace Spatie\LaravelData\Support;
 
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Transformers\Transformer;
 
 /**
- * @property Collection<string, object> $attributes
+ * @property DataAttributesCollection<string, object> $attributes
  */
 class DataProperty
 {
@@ -28,7 +27,7 @@ class DataProperty
         public readonly ?Transformer $transformer,
         public readonly ?string $inputMappedName,
         public readonly ?string $outputMappedName,
-        public readonly Collection $attributes,
+        public readonly DataAttributesCollection $attributes,
     ) {
     }
 }

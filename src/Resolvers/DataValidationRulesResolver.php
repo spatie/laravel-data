@@ -242,9 +242,7 @@ class DataValidationRulesResolver
         );
 
         $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $validationContext]);
-        $shouldMergeRules = $class->attributes->contains(
-            fn (object $attribute) => $attribute::class === MergeValidationRules::class
-        );
+        $shouldMergeRules = $class->attributes->has(MergeValidationRules::class);
 
         foreach ($overwrittenRules as $key => $rules) {
             if (in_array($key, $withoutValidationProperties)) {
