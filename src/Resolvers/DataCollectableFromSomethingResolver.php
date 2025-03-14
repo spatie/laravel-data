@@ -155,7 +155,7 @@ class DataCollectableFromSomethingResolver
             return [];
         }
 
-        throw new Exception('Unable to normalize items');
+        throw new Exception("Unable to normalize items in {$dataClass}");
     }
 
     protected function normalizeToArray(
