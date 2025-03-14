@@ -34,7 +34,7 @@ class EmptyDataResolver
         return $payload;
     }
 
-    protected function getValueForProperty(DataProperty $property, mixed $defaultReturnValue = null): null|array|string
+    protected function getValueForProperty(DataProperty $property, mixed $defaultReturnValue = null): mixed
     {
         $propertyType = $property->type;
 
