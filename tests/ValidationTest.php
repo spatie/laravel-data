@@ -21,6 +21,7 @@ use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\MergeValidationRules;
+use Spatie\LaravelData\Attributes\PropertyForMorph;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Bail;
 use Spatie\LaravelData\Attributes\Validation\BooleanType;
@@ -39,6 +40,7 @@ use Spatie\LaravelData\Attributes\Validation\RequiredWithout;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Attributes\WithoutValidation;
+use Spatie\LaravelData\Contracts\PropertyMorphableData;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
@@ -2604,4 +2606,129 @@ it('it will merge validation rules', function () {
             'string_rules' => [__('validation.required', ['attribute' => 'string rules'])],
             'nested.string' => [__('validation.required', ['attribute' => 'nested.string'])],
         ]);
+});
+
+describe('property-morphable validation tests', function () {
+    enum TestValidationPropertyMorphableEnum: string
+    {
+        case A = 'a';
+        case B = 'b';
+    };
+
+    abstract class TestValidationAbstractPropertyMorphableData extends Data implements PropertyMorphableData
+    {
+        public function __construct(
+            #[PropertyForMorph]
+            public TestValidationPropertyMorphableEnum $variant,
+        ) {
+        }
+
+        public static function morph(array $properties): ?string
+        {
+            return match ($properties['variant']) {
+                TestValidationPropertyMorphableEnum::A => TestValidationPropertyMorphableDataA::class,
+                TestValidationPropertyMorphableEnum::B => TestValidationPropertyMorphableDataB::class,
+                default => null,
+            };
+        }
+    }
+
+    class TestValidationPropertyMorphableDataA extends TestValidationAbstractPropertyMorphableData
+    {
+        public function __construct(public string $a, public DummyBackedEnum $enum)
+        {
+            parent::__construct(TestValidationPropertyMorphableEnum::A);
+        }
+    }
+
+    class TestValidationPropertyMorphableDataB extends TestValidationAbstractPropertyMorphableData
+    {
+        public function __construct(public string $b)
+        {
+            parent::__construct(TestValidationPropertyMorphableEnum::B);
+        }
+    }
+
+    it('can validate property-morphable data', function () {
+        DataValidationAsserter::for(TestValidationAbstractPropertyMorphableData::class)
+            ->assertErrors([], [
+                'variant' => ['The variant field is required.'],
+            ])
+            ->assertErrors([
+                'variant' => 'c',
+            ], [
+                'variant' => [
+                    'The selected variant is invalid.',
+                    'The selected variant is invalid for morph.',
+                ],
+            ])
+            ->assertErrors([
+                'variant' => 'a',
+            ], [
+                'a' => ['The a field is required.'],
+                'enum' => ['The enum field is required.'],
+            ])
+            ->assertErrors([
+                'variant' => 'a',
+                'a' => 'foo',
+                'enum' => 'invalid',
+            ], [
+                'enum' => ['The selected enum is invalid.'],
+            ])
+            ->assertErrors([
+                'variant' => 'b',
+            ], [
+                'b' => ['The b field is required.'],
+            ])
+            ->assertOk([
+                'variant' => 'a',
+                'a' => 'foo',
+                'enum' => 'foo',
+            ])
+            ->assertOk([
+                'variant' => 'b',
+                'b' => 'foo',
+            ]);
+    });
+
+    it('can validate nested property-morphable data', function () {
+        class TestValidationNestedPropertyMorphableData extends Data
+        {
+            public function __construct(
+                /** @var TestValidationAbstractPropertyMorphableData[] */
+                public ?DataCollection $nestedCollection,
+            ) {
+            }
+        };
+
+        DataValidationAsserter::for(TestValidationNestedPropertyMorphableData::class)
+            ->assertErrors([
+                'nestedCollection' => [[]],
+            ], [
+                'nestedCollection.0.variant' => ['The nested collection.0.variant field is required.'],
+            ])
+            ->assertErrors([
+                'nestedCollection' => [['variant' => 'c']],
+            ], [
+                'nestedCollection.0.variant' => [
+                    'The selected nested collection.0.variant is invalid.',
+                    'The selected nested collection.0.variant is invalid for morph.',
+                ],
+            ])
+            ->assertErrors([
+                'nestedCollection' => [['variant' => 'a'], ['variant' => 'b']],
+            ], [
+                'nestedCollection.0.a' => ['The nested collection.0.a field is required.'],
+                'nestedCollection.0.enum' => ['The nested collection.0.enum field is required.'],
+                'nestedCollection.1.b' => ['The nested collection.1.b field is required.'],
+            ])
+            ->assertErrors([
+                'nestedCollection' => [['variant' => 'a', 'a' => 'foo', 'enum' => 'invalid']],
+            ], [
+                'nestedCollection.0.enum' => ['The selected nested collection.0.enum is invalid.'],
+            ])
+            ->assertOk([
+                'nestedCollection' => [['variant' => 'a', 'a' => 'foo', 'enum' => 'foo'], ['variant' => 'b', 'b' => 'bar']],
+            ]);
+    });
 });

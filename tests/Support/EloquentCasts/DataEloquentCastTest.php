@@ -1,14 +1,18 @@
 <?php
 
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
 use function Pest\Laravel\assertDatabaseHas;
 
+use Spatie\LaravelData\Contracts\PropertyMorphableData;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithEncryptedCasts;
@@ -182,4 +186,58 @@ it('can load and save an abstract defined data object', function () {
     }
 
     expect($isEncrypted)->toBeTrue();
+});
+
+it('can load and save an abstract property-morphable data object', function () {
+    abstract class TestCastAbstractPropertyMorphableData extends Data implements PropertyMorphableData
+    {
+        public function __construct(
+            #[\Spatie\LaravelData\Attributes\PropertyForMorph]
+            public DummyBackedEnum $variant
+        ) {
+        }
+
+        public static function morph(array $properties): ?string
+        {
+            return match ($properties['variant'] ?? null) {
+                DummyBackedEnum::FOO => TestCastPropertyMorphableDataFoo::class,
+                default => null,
+            };
+        }
+    }
+
+    class TestCastPropertyMorphableDataFoo extends TestCastAbstractPropertyMorphableData
+    {
+        public function __construct(public string $a)
+        {
+            parent::__construct(DummyBackedEnum::FOO);
+        }
+    }
+
+    $modelClass = new class () extends Model {
+        protected $casts = [
+            'data' => TestCastAbstractPropertyMorphableData::class,
+        ];
+
+        protected $table = 'dummy_model_with_casts';
+
+        public $timestamps = false;
+    };
+
+    $abstractA = new TestCastPropertyMorphableDataFoo('foo');
+
+    $modelId = $modelClass::create([
+        'data' => $abstractA,
+    ])->id;
+
+    assertDatabaseHas($modelClass::class, [
+        'data' => json_encode(['a' => 'foo', 'variant' => 'foo']),
+    ]);
+
+    $model = $modelClass::find($modelId);
+
+    expect($model->data)
+        ->toBeInstanceOf(TestCastPropertyMorphableDataFoo::class)
+        ->a->toBe('foo')
+        ->variant->toBe(DummyBackedEnum::FOO);
 });

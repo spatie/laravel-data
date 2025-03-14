@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\PropertyMorphableData;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
@@ -39,10 +40,9 @@ class DataFromSomethingResolver
         $payloadCount = count($payloads);
 
         if ($payloadCount === 0 || $payloadCount === 1) {
-            return $this->dataFromArrayResolver->execute(
-                $class,
-                $pipeline->execute($payloads[0] ?? [], $creationContext)
-            );
+            $properties = $pipeline->execute($payloads[0] ?? [], $creationContext);
+
+            return $this->dataFromArray($class, $creationContext, $payloads, $properties);
         }
 
         $properties = [];
@@ -57,7 +57,7 @@ class DataFromSomethingResolver
             }
         }
 
-        return $this->dataFromArrayResolver->execute($class, $properties);
+        return $this->dataFromArray($class, $creationContext, $payloads, $properties);
     }
 
     protected function createFromCustomCreationMethod(
@@ -116,5 +116,27 @@ class DataFromSomethingResolver
         $methodName = $method->name;
 
         return $class::$methodName(...$payloads);
+    }
+
+    protected function dataFromArray(
+        string $class,
+        CreationContext $creationContext,
+        array $payloads,
+        array $properties,
+    ): BaseData {
+        $dataClass = $this->dataConfig->getDataClass($class);
+
+        if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
+            $morphableProperties = $dataClass->propertiesForMorph($properties);
+
+            /**
+             * @var class-string<PropertyMorphableData> $class
+             */
+            if ($morphableProperties && $morph = $class::morph($morphableProperties)) {
+                return $this->execute($morph, $creationContext, ...$payloads);
+            }
+        }
+
+        return $this->dataFromArrayResolver->execute($class, $properties);
     }
 }
