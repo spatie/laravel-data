@@ -36,7 +36,7 @@ class NormalizedModel implements Normalized
     {
         $camelName = Str::camel($name);
 
-        if ($dataProperty->attributes->hasAttribute(LoadRelation::class)) {
+        if ($dataProperty->attributes->has(LoadRelation::class)) {
             if (method_exists($this->model, $name)) {
                 $this->model->loadMissing($name);
             } elseif (method_exists($this->model, $camelName)) {

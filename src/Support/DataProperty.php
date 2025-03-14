@@ -7,7 +7,7 @@ use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Transformers\Transformer;
 
 /**
- * @property AttributeCollection<string, object> $attributes
+ * @property DataAttributesCollection<string, object> $attributes
  */
 class DataProperty
 {
@@ -27,7 +27,7 @@ class DataProperty
         public readonly ?Transformer $transformer,
         public readonly ?string $inputMappedName,
         public readonly ?string $outputMappedName,
-        public readonly AttributeCollection $attributes,
+        public readonly DataAttributesCollection $attributes,
     ) {
     }
 }

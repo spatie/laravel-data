@@ -8,11 +8,12 @@ use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Mappers\StudlyCaseMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
-use Spatie\LaravelData\Support\AttributeCollection;
+use Spatie\LaravelData\Support\DataAttributesCollection;
+use Spatie\LaravelData\Support\Factories\DataAttributesCollectionFactory;
 
-function getAttributes(object $class): AttributeCollection
+function getAttributes(object $class): DataAttributesCollection
 {
-    return AttributeCollection::makeFromReflectionAttributes((new ReflectionProperty($class, 'property'))->getAttributes());
+    return DataAttributesCollectionFactory::buildFromReflectionProperty((new ReflectionProperty($class, 'property')));
 }
 
 beforeEach(function () {

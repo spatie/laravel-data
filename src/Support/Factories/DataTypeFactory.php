@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support\Factories;
 
 use Exception;
-use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionMethod;
@@ -20,6 +19,7 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Annotations\CollectionAnnotationReader;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotation;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotationReader;
+use Spatie\LaravelData\Support\DataAttributesCollection;
 use Spatie\LaravelData\Support\DataPropertyType;
 use Spatie\LaravelData\Support\DataType;
 use Spatie\LaravelData\Support\Types\IntersectionType;
@@ -40,7 +40,7 @@ class DataTypeFactory
         ?ReflectionType $reflectionType,
         ReflectionClass|string $class,
         ReflectionProperty|ReflectionParameter|string $typeable,
-        ?Collection $attributes = null,
+        ?DataAttributesCollection $attributes = null,
         ?DataIterableAnnotation $classDefinedDataIterableAnnotation = null,
     ): DataPropertyType {
         $properties = $this->infer(
@@ -131,7 +131,7 @@ class DataTypeFactory
         ?ReflectionType $reflectionType,
         ReflectionClass|string $class,
         ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
-        ?Collection $attributes,
+        ?DataAttributesCollection $attributes,
         ?DataIterableAnnotation $classDefinedDataIterableAnnotation,
         bool $inferForProperty,
     ): array {
@@ -224,7 +224,7 @@ class DataTypeFactory
         ReflectionNamedType $reflectionType,
         ReflectionClass|string $class,
         ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
-        ?Collection $attributes,
+        ?DataAttributesCollection $attributes,
         ?DataIterableAnnotation $classDefinedDataIterableAnnotation,
         bool $inferForProperty,
     ): array {
@@ -260,7 +260,7 @@ class DataTypeFactory
         bool $builtIn,
         ReflectionClass|string $class,
         ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
-        ?Collection $attributes,
+        ?DataAttributesCollection $attributes,
         ?DataIterableAnnotation $classDefinedDataIterableAnnotation,
         bool $inferForProperty,
     ): array {
@@ -318,10 +318,7 @@ class DataTypeFactory
             ];
         }
 
-        /** @var ?DataCollectionOf $dataCollectionOfAttribute */
-        $dataCollectionOfAttribute = $attributes?->first(
-            fn (object $attribute) => $attribute instanceof DataCollectionOf
-        );
+        $dataCollectionOfAttribute = $attributes?->first(DataCollectionOf::class);
 
         $isData = false;
         $iterableItemType = null;
@@ -410,7 +407,7 @@ class DataTypeFactory
         ReflectionUnionType|ReflectionIntersectionType $reflectionType,
         ReflectionClass|string $class,
         ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
-        ?Collection $attributes,
+        ?DataAttributesCollection $attributes,
         ?DataIterableAnnotation $classDefinedDataIterableAnnotation,
         bool $inferForProperty,
     ): array {

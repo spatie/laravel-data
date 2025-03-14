@@ -15,7 +15,6 @@ use Spatie\LaravelData\Mappers\NameMapper;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotation;
-use Spatie\LaravelData\Support\AttributeCollection;
 use Spatie\LaravelData\Support\DataProperty;
 
 class DataPropertyFactory
@@ -35,7 +34,7 @@ class DataPropertyFactory
         ?DataIterableAnnotation $classDefinedDataIterableAnnotation = null,
         ?AutoLazy $classAutoLazy = null,
     ): DataProperty {
-        $attributes = AttributeCollection::makeFromReflectionAttributes($reflectionProperty->getAttributes());
+        $attributes = DataAttributesCollectionFactory::buildFromReflectionProperty($reflectionProperty);
 
         $type = $this->typeFactory->buildProperty(
             $reflectionProperty->getType(),
@@ -59,12 +58,6 @@ class DataPropertyFactory
             default => null,
         };
 
-        $computed = $attributes->hasAttribute(Computed::class);
-
-        $hidden = $attributes->hasAttribute(Hidden::class);
-
-        $validate = ! $computed && ! $attributes->hasAttribute(WithoutValidation::class);
-
         if (! $reflectionProperty->isPromoted()) {
             $hasDefaultValue = $reflectionProperty->hasDefaultValue();
             $defaultValue = $reflectionProperty->getDefaultValue();
@@ -75,28 +68,28 @@ class DataPropertyFactory
             $defaultValue = null;
         }
 
-        $autoLazy = $attributes->first(
-            fn (object $attribute) => $attribute instanceof AutoLazy
-        );
+        $autoLazy = $attributes->first(AutoLazy::class);
 
         if ($classAutoLazy && $type->lazyType !== null && $autoLazy === null) {
             $autoLazy = $classAutoLazy;
         }
 
+        $computed = $attributes->has(Computed::class);
+
         return new DataProperty(
             name: $reflectionProperty->name,
             className: $reflectionProperty->class,
             type: $type,
-            validate: $validate,
+            validate: ! $computed && ! $attributes->has(WithoutValidation::class),
             computed: $computed,
-            hidden: $hidden,
+            hidden: $attributes->has(Hidden::class),
             isPromoted: $reflectionProperty->isPromoted(),
             isReadonly: $reflectionProperty->isReadOnly(),
             autoLazy: $autoLazy,
             hasDefaultValue: $hasDefaultValue,
             defaultValue: $defaultValue,
-            cast: $attributes->getAttribute(GetsCast::class)?->get(),
-            transformer: ($attributes->getAttribute(WithTransformer::class) ?? $attributes->getAttribute(WithCastAndTransformer::class))?->get(),
+            cast: $attributes->first(GetsCast::class)?->get(),
+            transformer: ($attributes->first(WithTransformer::class) ?? $attributes->first(WithCastAndTransformer::class))?->get(),
             inputMappedName: $inputMappedName,
             outputMappedName: $outputMappedName,
             attributes: $attributes,

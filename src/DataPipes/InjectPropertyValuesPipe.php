@@ -13,9 +13,7 @@ class InjectPropertyValuesPipe implements DataPipe
     {
         foreach ($class->properties as $dataProperty) {
             /** @var null|InjectsPropertyValue $attribute */
-            $attribute = $dataProperty->attributes->first(
-                fn (object $attribute) => $attribute instanceof InjectsPropertyValue
-            );
+            $attribute = $dataProperty->attributes->first(InjectsPropertyValue::class);
 
             if ($attribute === null) {
                 continue;

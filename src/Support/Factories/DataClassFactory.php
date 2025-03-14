@@ -20,7 +20,6 @@ use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
 use Spatie\LaravelData\Resolvers\NameMappersResolver;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotationReader;
-use Spatie\LaravelData\Support\AttributeCollection;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\LazyDataStructureProperty;
@@ -39,7 +38,7 @@ class DataClassFactory
         /** @var class-string<Data> $name */
         $name = $reflectionClass->name;
 
-        $attributes = $this->resolveAttributes($reflectionClass);
+        $attributes = DataAttributesCollectionFactory::buildFromReflectionClass($reflectionClass);
 
         $methods = collect($reflectionClass->getMethods());
 
@@ -54,9 +53,7 @@ class DataClassFactory
             );
         }
 
-        $autoLazy = $attributes->first(
-            fn (object $attribute) => $attribute instanceof AutoLazy
-        );
+        $autoLazy = $attributes->first(AutoLazy::class);
 
         $properties = $this->resolveProperties(
             $reflectionClass,
@@ -103,26 +100,6 @@ class DataClassFactory
             outputMappedProperties: $outputMappedProperties,
             transformationFields: static::resolveTransformationFields($properties),
         );
-    }
-
-    private function resolveRecursiveAttributes(ReflectionClass $reflectionClass): array
-    {
-
-        $attributes = $reflectionClass->getAttributes();
-
-        $parent = $reflectionClass->getParentClass();
-
-        if ($parent !== false) {
-            $attributes = array_merge($attributes, $this->resolveRecursiveAttributes($parent));
-        }
-
-        return $attributes;
-    }
-
-    protected function resolveAttributes(
-        ReflectionClass $reflectionClass
-    ): AttributeCollection {
-        return AttributeCollection::makeFromReflectionAttributes($this->resolveRecursiveAttributes($reflectionClass));
     }
 
     protected function resolveMethods(
