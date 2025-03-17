@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Support;
 use Closure;
 
 /**
- * @template T
+ * @template-covariant T
  */
 class LazyDataStructureProperty extends DataStructureProperty
 {

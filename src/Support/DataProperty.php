@@ -6,9 +6,6 @@ use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\Transformers\Transformer;
 
-/**
- * @property DataAttributesCollection<string, object> $attributes
- */
 class DataProperty
 {
     public function __construct(

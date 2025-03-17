@@ -8,7 +8,6 @@ use Illuminate\Support\Collection;
  * @property  class-string $name
  * @property  Collection<string, DataProperty> $properties
  * @property  Collection<string, DataMethod> $methods
- * @property  DataAttributesCollection<string, object> $attributes
  * @property  array<string, \Spatie\LaravelData\Support\Annotations\DataIterableAnnotation> $dataCollectablePropertyAnnotations
  */
 class DataClass

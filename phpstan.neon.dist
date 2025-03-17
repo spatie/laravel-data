@@ -9,6 +9,3 @@ parameters:
         - types
     tmpDir: build/phpstan
     reportUnmatchedIgnoredErrors: true
-    checkOctaneCompatibility: true
-    checkModelProperties: true
-    checkMissingIterableValueType: true
