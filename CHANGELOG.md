@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.14.1 - 2025-03-17
+
+### What's Changed
+
+* fix: Model with method name matching attribute names are not retrieved by @Tofandel in https://github.com/spatie/laravel-data/pull/979
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.14.0...4.14.1
+
 ## 4.14.0 - 2025-03-14
 
 If you're using cached versions of your data objects and don't clear this cache on deploy, now is the time since we've updated some internal structures.
@@ -71,6 +79,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -81,6 +90,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -110,6 +120,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
