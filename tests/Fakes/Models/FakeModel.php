@@ -69,6 +69,7 @@ class FakeModel extends Model
         if ($key == 'translated') {
             return 'translated_string';
         }
+
         return parent::getAttribute($key);
     }
 }
