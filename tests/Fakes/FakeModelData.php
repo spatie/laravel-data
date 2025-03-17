@@ -18,6 +18,7 @@ class FakeModelData extends Data
         public Optional|null|DataCollection $fake_nested_models,
         public string $accessor,
         public string $old_accessor,
+        public string $translated,
     ) {
     }
 }
