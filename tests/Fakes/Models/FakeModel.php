@@ -56,4 +56,19 @@ class FakeModel extends Model
     {
         return FakeModelFactory::new();
     }
+
+    // Method to confuse isRelation, see https://github.com/spatie/laravel-data/issues/978
+    public function string(): string
+    {
+        return $this->string;
+    }
+
+    // Method to check for compatibility with astrotomic/translatable
+    public function getAttribute($key)
+    {
+        if ($key == 'translated') {
+            return 'translated_string';
+        }
+        return parent::getAttribute($key);
+    }
 }

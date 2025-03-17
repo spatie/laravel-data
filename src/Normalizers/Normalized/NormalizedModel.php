@@ -51,7 +51,7 @@ class NormalizedModel implements Normalized
             return $this->properties[$name] = $this->model->getRelation($camelName);
         }
 
-        if (! $this->model->isRelation($name) && ! $this->model->isRelation($camelName)) {
+        if ($this->model->hasAttribute($name) || (! $this->model->isRelation($name) && ! $this->model->isRelation($camelName))) {
             try {
                 return $this->properties[$name] = $this->model->getAttribute($name);
             } catch (MissingAttributeException) {
