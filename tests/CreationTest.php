@@ -1400,7 +1400,7 @@ it('can use auto lazy to construct an inertia lazy', function () {
 
     expect($data->string)->toBeInstanceOf(InertiaLazy::class);
     expect($data->toArray()['string'])->toBeInstanceOf(LazyProp::class);
-});
+})->skip('Re-enable test after Inertia supports Laravel 12');
 
 it('can use auto lazy to construct a closure lazy', function () {
     $dataClass = new class () extends Data {

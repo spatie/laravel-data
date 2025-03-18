@@ -61,3 +61,23 @@ it('will ignore non existing directories', function () {
 
     expect(cache()->has('laravel-data.data-class.'. SimpleData::class))->toBeTrue();
 });
+
+it('can cache data structures extending from data without using reflection', function () {
+    App::forgetInstance(DataConfig::class);
+    app()->singleton(
+        DataConfig::class,
+        function () {
+            return app()->make(DataStructureCache::class)->getConfig() ?? DataConfig::createFromConfig(config('data'));
+        }
+    );
+
+    config()->set('data.structure_caching.directories', [
+        __DIR__.'/../Fakes',
+    ]);
+
+    config()->set('data.structure_caching.reflection_discovery.enabled', false);
+
+    $this->artisan('data:cache-structures')->assertExitCode(0);
+
+    expect(cache()->has('laravel-data.data-class.'. SimpleData::class))->toBeTrue();
+});

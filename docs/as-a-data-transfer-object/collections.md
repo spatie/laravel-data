@@ -33,7 +33,7 @@ SongData::collect(Song::cursorPaginate()); // return a CursorPaginator of SongDa
 
 Internally the `from` method of the data class will be used to create a new data object for each item in the collection.
 
-When the collection already exists of data objects, the `collect` method will return the same collection:
+When the collection already contains data objects, the `collect` method will return the same collection:
 
 ```php
 SongData::collect([
@@ -49,7 +49,7 @@ an `array`and get back a Laravel collection:
 SongData::collect($songs, Collection::class); // returns a Laravel collection of SongData objects
 ```
 
-This transformation will only work with non paginator collections.
+This transformation will only work with non-paginator collections.
 
 ## Magically creating collections
 
@@ -100,10 +100,11 @@ SongData::collectArray([
 
 There are a few requirements for this to work:
 
-- The method must be **static and public**
-- The method must **start with collect**
-- The method cannot be called **collect**
-- A **return type** must be defined
+- The method must be **static**
+- The method must be **public**
+- The method must have a **return type**
+- The method name must **start with collect**
+- The method name must not be **collect**
 
 ## Creating a data object with collections
 
@@ -133,7 +134,7 @@ AlbumData::from([
 Since the collection type here is a `Collection`, the package will automatically convert the array into a collection of
 data objects.
 
-## DataCollection's, PaginatedDataCollection's and CursorPaginatedCollection's
+## DataCollections, PaginatedDataCollections and CursorPaginatedCollections
 
 The package also provides a few collection classes which can be used to create collections of data objects. It was a
 requirement to use these classes in the past versions of the package when nesting data objects collections in data

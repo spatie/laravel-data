@@ -4,7 +4,6 @@ namespace Spatie\LaravelData\Support\Annotations;
 
 use Iterator;
 use IteratorAggregate;
-use phpDocumentor\Reflection\DocBlock\Tag;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\TypeResolver;
 use phpDocumentor\Reflection\Types\Context;
@@ -96,10 +95,6 @@ class CollectionAnnotationReader
         $templateTypes = [];
 
         foreach ($docBlock->getTags() as $tag) {
-            if (! $tag instanceof Tag) {
-                continue;
-            }
-
             $tagName = $tag->getName();
             $description = (string) $tag;
 

@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Normalizers\Normalized;
 
+use Illuminate\Database\Eloquent\MissingAttributeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use ReflectionProperty;
@@ -11,10 +12,6 @@ use Spatie\LaravelData\Support\DataProperty;
 class NormalizedModel implements Normalized
 {
     protected array $properties = [];
-
-    protected ReflectionProperty $castsProperty;
-
-    protected ReflectionProperty $attributesProperty;
 
     public function __construct(
         protected Model $model,
@@ -38,13 +35,9 @@ class NormalizedModel implements Normalized
 
     protected function fetchNewProperty(string $name, DataProperty $dataProperty): mixed
     {
-        if ($this->hasModelAttribute($name)) {
-            return $this->properties[$name] = $this->model->getAttributeValue($name);
-        }
-
         $camelName = Str::camel($name);
 
-        if ($dataProperty->attributes->contains(fn (object $attribute) => $attribute::class === LoadRelation::class)) {
+        if ($dataProperty->attributes->has(LoadRelation::class)) {
             if (method_exists($this->model, $name)) {
                 $this->model->loadMissing($name);
             } elseif (method_exists($this->model, $camelName)) {
@@ -59,8 +52,17 @@ class NormalizedModel implements Normalized
             return $this->properties[$name] = $this->model->getRelation($camelName);
         }
 
+        if ($this->hasModelAttribute($name) || (! $this->model->isRelation($name) && ! $this->model->isRelation($camelName))) {
+            try {
+                return $this->properties[$name] = $this->model->getAttribute($name);
+            } catch (MissingAttributeException) {
+                // Fallback if missing Attribute
+            }
+        }
+
         return $this->properties[$name] = UnknownProperty::create();
     }
+
 
     protected function hasModelAttribute(string $name): bool
     {
@@ -68,16 +70,14 @@ class NormalizedModel implements Normalized
             return $this->model->hasAttribute($name);
         }
 
-        // TODO: to use that one once we stop supporting Laravel 10
+        // TODO: to remove that when we stop supporting Laravel 10
 
         if (! isset($this->attributesProperty)) {
             $this->attributesProperty = new ReflectionProperty($this->model, 'attributes');
-            $this->attributesProperty->setAccessible(true);
         }
 
         if (! isset($this->castsProperty)) {
             $this->castsProperty = new ReflectionProperty($this->model, 'casts');
-            $this->castsProperty->setAccessible(true);
         }
 
         return array_key_exists($name, $this->attributesProperty->getValue($this->model)) ||

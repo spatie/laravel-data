@@ -20,7 +20,8 @@ it('can get a data object from model', function () {
     expect($model)
         ->string->toEqual($data->string)
         ->nullable->toEqual($data->nullable)
-        ->date->toEqual($data->date);
+        ->date->toEqual($data->date)
+        ->translated->toEqual('translated_string');
 });
 
 it('does not loop infinitely on relations', function () {
@@ -72,7 +73,7 @@ it('can get a data object from model with accessors', function () {
         ->old_accessor->toEqual($data->old_accessor);
 });
 
-it('it will only call model accessors when required', function () {
+it('will only call model accessors when required', function () {
     $dataClass = new class () extends Data {
         public string $accessor;
 

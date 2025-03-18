@@ -1,17 +1,11 @@
 <?php
 
-use Spatie\LaravelData\Attributes\MapName;
-use Spatie\LaravelData\Attributes\WithCast;
-use Spatie\LaravelData\Attributes\WithTransformer;
-use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Support\DataMethod;
 use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 it('keeps track of a global map from attribute', function () {
     $dataClass = FakeDataStructureFactory::class(DataWithMapper::class);
@@ -79,31 +73,6 @@ it('wont throw an error if a non existing attribute is used on a data class', fu
         ->and(PhpStormClassAttributeData::from((object) ['property' => 'hello'])->property)->toEqual('hello')
         ->and(PhpStormClassAttributeData::from('{"property": "hello"}')->property)->toEqual('hello')
         ->and(ModelWithPhpStormAttributeData::from((new DummyModel())->fill(['id' => 1]))->id)->toEqual(1);
-});
-
-it('resolves parent attributes', function () {
-    #[MapName(SnakeCaseMapper::class)]
-    #[WithTransformer(DateTimeInterfaceTransformer::class, 'd-m-Y')]
-    #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
-    class TestRecursiveAttributesParentData extends Data
-    {
-    }
-
-    class TestRecursiveAttributesChildData extends TestRecursiveAttributesParentData
-    {
-        public function __construct(
-            public DateTimeInterface $dateTime
-        ) {
-        }
-    }
-
-    $dataClass = FakeDataStructureFactory::class(TestRecursiveAttributesChildData::class);
-
-    expect($dataClass->attributes)
-        ->toHaveCount(3)
-        ->contains(fn ($attribute) => $attribute instanceof MapName)->toBeTrue()
-        ->contains(fn ($attribute) => $attribute instanceof WithTransformer)->toBeTrue()
-        ->contains(fn ($attribute) => $attribute instanceof WithCast)->toBeTrue();
 });
 
 #[\JetBrains\PhpStorm\Immutable]

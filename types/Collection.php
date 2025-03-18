@@ -2,6 +2,7 @@
 
 /** @noinspection PhpExpressionResultUnusedInspection */
 
+use Illuminate\Contracts\Pagination\CursorPaginator as CursorPaginatorContract;
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\AbstractCursorPaginator;
@@ -9,12 +10,14 @@ use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\LazyCollection;
+
+use function PHPStan\Testing\assertType;
+
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use function PHPStan\Testing\assertType;
 
 // Regular collections
 $collection = SimpleData::collect(['A', 'B']);
@@ -35,7 +38,7 @@ $collection = SimpleData::collect(FakeModel::query()->paginate());
 assertType(AbstractPaginator::class.'|'.Enumerable::class.'<(int|string), '.SimpleData::class.'>', $collection);
 
 $collection = SimpleData::collect(FakeModel::query()->cursorPaginate());
-assertType(PaginatorContract::class.'|'.AbstractCursorPaginator::class.'|'.Enumerable::class.'<(int|string), '.SimpleData::class.'>', $collection);
+assertType(CursorPaginatorContract::class . '|' . PaginatorContract::class.'|'.AbstractCursorPaginator::class.'|'.AbstractPaginator::class.'|'.Enumerable::class.'<(int|string), '.SimpleData::class.'>', $collection);
 
 # into
 
@@ -53,4 +56,3 @@ assertType(PaginatedDataCollection::class.'<(int|string), '.SimpleData::class.'>
 
 $collection = SimpleData::collect(FakeModel::query()->paginate(), CursorPaginatedDataCollection::class);
 assertType(CursorPaginatedDataCollection::class.'<(int|string), '.SimpleData::class.'>', $collection);
-

@@ -2,12 +2,12 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
-use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Mappers\NameMapper;
 use Spatie\LaravelData\Mappers\ProvidedNameMapper;
+use Spatie\LaravelData\Support\DataAttributesCollection;
 
 class NameMappersResolver
 {
@@ -21,7 +21,7 @@ class NameMappersResolver
     }
 
     public function execute(
-        Collection $attributes
+        DataAttributesCollection $attributes
     ): array {
         return [
             'inputNameMapper' => $this->resolveInputNameMapper($attributes),
@@ -30,11 +30,10 @@ class NameMappersResolver
     }
 
     protected function resolveInputNameMapper(
-        Collection $attributes
+        DataAttributesCollection $attributes
     ): ?NameMapper {
-        /** @var MapInputName|MapName|null $mapper */
-        $mapper = $attributes->first(fn (object $attribute) => $attribute instanceof MapInputName)
-            ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName);
+        $mapper = $attributes->first(MapInputName::class)
+            ?? $attributes->first(MapName::class);
 
         if ($mapper) {
             return $this->resolveMapper($mapper->input);
@@ -44,11 +43,10 @@ class NameMappersResolver
     }
 
     protected function resolveOutputNameMapper(
-        Collection $attributes
+        DataAttributesCollection $attributes
     ): ?NameMapper {
-        /** @var MapOutputName|MapName|null $mapper */
-        $mapper = $attributes->first(fn (object $attribute) => $attribute instanceof MapOutputName)
-            ?? $attributes->first(fn (object $attribute) => $attribute instanceof MapName);
+        $mapper = $attributes->first(MapOutputName::class)
+            ?? $attributes->first(MapName::class);
 
         if ($mapper) {
             return $this->resolveMapper($mapper->output);

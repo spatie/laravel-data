@@ -55,7 +55,7 @@ abstract class RecordConfig extends Data
 class CdRecordConfig extends RecordConfig
 {
     public function __construct(
-        int $tracks
+        int $tracks,
         public int $bytes,
     ) {
         parent::__construct($tracks);
@@ -65,7 +65,7 @@ class CdRecordConfig extends RecordConfig
 class VinylRecordConfig extends RecordConfig
 {
     public function __construct(
-        int $tracks
+        int $tracks,
         public int $rpm,
     ) {
         parent::__construct($tracks);

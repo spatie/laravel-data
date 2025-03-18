@@ -23,7 +23,7 @@ use Spatie\TypeScriptTransformer\Attributes\Hidden as TypeScriptHidden;
 use Spatie\TypeScriptTransformer\Attributes\Optional as TypeScriptOptional;
 use Spatie\TypeScriptTransformer\TypeScriptTransformerConfig;
 
-function assertMatchesSnapshot($actual, Driver $driver = null): void
+function assertMatchesSnapshot($actual, ?Driver $driver = null): void
 {
     baseAssertMatchesSnapshot(str_replace('\\r\\n', '\\n', $actual), $driver);
 }

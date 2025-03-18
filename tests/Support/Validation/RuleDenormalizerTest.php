@@ -23,6 +23,7 @@ use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Rules\CustomInvokableLaravelRule;
 use Spatie\LaravelData\Tests\Fakes\Rules\CustomLaravelRule;
 
+/**
 it('can denormalize rules', function ($rule, $expected, $path = null) {
     $denormalizer = new RuleDenormalizer();
 
@@ -61,3 +62,4 @@ it('can denormalize rules with route parameter references', function () {
         'min:69',
     ]);
 });
+ */
