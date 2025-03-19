@@ -25,6 +25,7 @@ class DataProperty
         public readonly ?string $inputMappedName,
         public readonly ?string $outputMappedName,
         public readonly DataAttributesCollection $attributes,
+        public readonly bool $isForMorph,
     ) {
     }
 }

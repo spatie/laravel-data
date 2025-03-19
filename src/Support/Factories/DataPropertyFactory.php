@@ -8,6 +8,7 @@ use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\GetsCast;
 use Spatie\LaravelData\Attributes\Hidden;
+use Spatie\LaravelData\Attributes\PropertyForMorph;
 use Spatie\LaravelData\Attributes\WithCastAndTransformer;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
@@ -93,6 +94,7 @@ class DataPropertyFactory
             inputMappedName: $inputMappedName,
             outputMappedName: $outputMappedName,
             attributes: $attributes,
+            isForMorph: ! empty($reflectionProperty->getAttributes(PropertyForMorph::class)),
         );
     }
 }
