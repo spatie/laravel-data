@@ -16,18 +16,31 @@
                     "place": "arrayKey"
                 },
                 {
-                    "methodNames": ["collection"],
+                    "methodNames": ["empty"],
+                    "classFqn": ["\\Spatie\\LaravelData\\Concerns\\EmptyData"],
+                    "place": "arrayKey"
+                },
+                {
+                    "methodNames": ["collect"],
                     "classFqn": ["\\Spatie\\LaravelData\\Concerns\\BaseData"],
                     "place": "arrayInArrayKey"
                 },
                 {
-                    "methodNames": ["include", "exclude", "only", "except"],
-                    "classFqn": ["\\Spatie\\LaravelData\\Concerns\\IncludeableData"],
+                    "methodNames": ["collection"],
+                    "classFqn": ["\\Spatie\\LaravelData\\Concerns\\WithDeprecatedCollectionMethod"],
+                    "place": "arrayInArrayKey"
+                },
+                {
+                    "methodNames": [
+                        "include", "exclude", "only", "except",
+                        "includePermanently", "excludePermanently", "onlyPermanently", "exceptPermanently"
+                    ],
+                    "classParentFqn": ["\\Spatie\\LaravelData\\Concerns\\IncludeableData"],
                     "place": "parameter"
                 },
                 {
                     "methodNames": ["includeWhen", "excludeWhen", "onlyWhen", "exceptWhen"],
-                    "classFqn": ["\\Spatie\\LaravelData\\Concerns\\IncludeableData"],
+                    "classParentFqn": ["\\Spatie\\LaravelData\\Concerns\\IncludeableData"],
                     "place": "parameter",
                     "parameters": [1]
                 }
