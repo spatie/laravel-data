@@ -159,7 +159,7 @@ UserData::from(User::first())->wrap('data');
 }
 ```
 
-A data collection inside a data object WILL get wrapped when a wrapping key is set (in order to mimic Laravel resources):
+A data collection inside a data object will get wrapped when a wrapping key is set (in order to mimic Laravel resources):
 
 ```php
 use Spatie\LaravelData\Attributes\DataCollectionOf;
