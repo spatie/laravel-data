@@ -1461,7 +1461,7 @@ it('can use auto lazy to construct a when loaded lazy with a manual defined rela
 
 it('can create a data object with deferred properties', function () {
     $dataClass = new class () extends Data {
-        public InertiaDeferred $deferred;
+        public InertiaDeferred|string $deferred;
 
         public function __construct()
         {
@@ -1479,10 +1479,10 @@ it('can create a data object with deferred properties', function () {
 it('can use auto deferred to construct a deferred property', function () {
     $dataClass = new class () extends Data {
         #[AutoInertiaDeferred]
-        public InertiaDeferred $string;
+        public InertiaDeferred|string $string;
     };
 
-    $data = $dataClass::from(['string' => Lazy::inertiaDeferred(Inertia::defer(fn () => 'Deferred Value'))]);
+    $data = $dataClass::from(['string' => 'Deferred Value']);
 
     expect($data->string)->toBeInstanceOf(InertiaDeferred::class);
     expect($data->toArray()['string'])->toBeInstanceOf(DeferProp::class);
@@ -1492,14 +1492,14 @@ it('can use class level auto deferred to construct a deferred property', functio
     #[AutoInertiaDeferred]
     class AutoDeferredData extends Data
     {
-        public InertiaDeferred $deferred;
+        public InertiaDeferred|string $string;
     };
 
-    $data = AutoDeferredData::from(['string' => Inertia::defer(fn () => 'Deferred Value')]);
+    $data = AutoDeferredData::from(['string' => 'Deferred Value']);
 
-    expect($data->deferred)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->string)->toBeInstanceOf(InertiaDeferred::class);
     expect($data->toArray()['string'])->toBeInstanceOf(DeferProp::class);
-})->todo();
+});
 
 
 describe('property-morphable creation tests', function () {
