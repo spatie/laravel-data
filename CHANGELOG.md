@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.15.0 - 2025-04-09
+
+### What's Changed
+
+* Add test and doc changes by @rubenvanassche in https://github.com/spatie/laravel-data/pull/996
+* Add support for inertia deferred props by @matthiasweiss in https://github.com/spatie/laravel-data/pull/939
+* Add EmptyString support for Formik compatibility by @igorleszczynski in https://github.com/spatie/laravel-data/pull/955
+* Update ide.json by @Yi-pixel in https://github.com/spatie/laravel-data/pull/990
+* feature property morphable by @bentleyo  in https://github.com/spatie/laravel-data/pull/995
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.14.1...4.15.0
+
 ## 4.14.1 - 2025-03-17
 
 ### What's Changed
@@ -80,6 +92,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -90,6 +103,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -120,6 +134,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
