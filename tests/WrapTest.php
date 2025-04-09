@@ -1,9 +1,14 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 
+use function Pest\Laravel\post;
 use function Pest\Laravel\postJson;
+use function Pest\Laravel\withoutExceptionHandling;
 
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -39,7 +44,6 @@ it('can wrap data objects by method call', function () {
         ],
     ]);
 });
-
 
 
 it('can wrap data objects using a global default', function () {
@@ -239,6 +243,86 @@ it('will wrap responses which are data collections', function () {
             'data' => [
                 ['string' => 'Hello World'],
                 ['string' => 'HELLO WORLD'],
+            ],
+        ]);
+});
+
+it('check laravel functionality', function () {
+    class TestEmbeddedResource extends JsonResource
+    {
+        public function toArray(Request $request)
+        {
+            return [
+                'id' => $this['id'],
+            ];
+        }
+    }
+
+    class TestEmbeddedResourceCollection extends ResourceCollection
+    {
+        public $collects = TestEmbeddedResource::class;
+    }
+
+    class TestResource extends JsonResource
+    {
+        public function toArray(Request $request)
+        {
+            return [
+                'id' => 1,
+                'nested' => TestEmbeddedResource::make(['id' => 2]),
+                'nested_collection' => TestEmbeddedResource::collection([
+                    ['id' => 3],
+                    ['id' => 4],
+                ]),
+                'nested_collection_object' => new TestEmbeddedResourceCollection([
+                    ['id' => 5],
+                    ['id' => 6],
+                ]),
+            ];
+        }
+    }
+
+    class TestResourceCollection extends ResourceCollection
+    {
+        public $collects = TestResource::class;
+    }
+
+    Route::post('/resource', function () {
+        return TestResource::make([]);
+    });
+
+    Route::post('/collection', function () {
+        return new TestResourceCollection([
+            [],
+            [],
+        ]);
+    });
+
+    withoutExceptionHandling();
+
+    $expectedResource = [
+        'id' => 1,
+        'nested' => [
+            'id' => 2,
+        ],
+        'nested_collection' => [
+            ['id' => 3],
+            ['id' => 4],
+        ],
+        'nested_collection_object' => [
+            ['id' => 5],
+            ['id' => 6],
+        ],
+    ];
+
+    post('/resource')
+        ->assertExactJson(['data' => $expectedResource]);
+
+    post('/collection')
+        ->assertExactJson([
+            'data' => [
+                $expectedResource,
+                $expectedResource,
             ],
         ]);
 });
