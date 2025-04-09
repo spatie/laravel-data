@@ -27,7 +27,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "larastan/larastan" --no-interaction --no-update
           composer update --prefer-dist --no-interaction --no-suggest
 
       - name: Run PHPStan
