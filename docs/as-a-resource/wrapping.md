@@ -64,6 +64,8 @@ Collections can be wrapped just like data objects:
 SongData::collect(Song::all(), DataCollection::class)->wrap('data');
 ```
 
+Notice here, for now we only support wrapping `DataCollections`, `PaginatedDataCollections` and `CursorPaginatedDataCollections` on the root level. Wrapping won't work for Laravel Collections or arrays (for now) since the package cannot interfere. Nested properties with such types can be wrapped though (see further). 
+
 The JSON will now look like this:
 
 ```json
@@ -157,7 +159,7 @@ UserData::from(User::first())->wrap('data');
 }
 ```
 
-A data collection inside a data object WILL get wrapped when a wrapping key is set:
+A data collection inside a data object WILL get wrapped when a wrapping key is set (in order to mimic Laravel resources):
 
 ```php
 use Spatie\LaravelData\Attributes\DataCollectionOf;
