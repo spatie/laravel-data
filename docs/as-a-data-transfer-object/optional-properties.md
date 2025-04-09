@@ -1,6 +1,6 @@
 ---
 title: Optional properties
-weight: 5
+weight: 6
 ---
 
 Sometimes you have a data object with properties which shouldn't always be set, for example in a partial API update where you only want to update certain fields. In this case you can make a property `Optional` as such:

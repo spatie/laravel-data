@@ -17,6 +17,7 @@ class DataProperty
         public readonly bool $hidden,
         public readonly bool $isPromoted,
         public readonly bool $isReadonly,
+        public readonly bool $morphable,
         public readonly ?AutoLazy $autoLazy,
         public readonly bool $hasDefaultValue,
         public readonly mixed $defaultValue,

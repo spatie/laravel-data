@@ -8,6 +8,7 @@ use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\GetsCast;
 use Spatie\LaravelData\Attributes\Hidden;
+use Spatie\LaravelData\Attributes\PropertyForMorph;
 use Spatie\LaravelData\Attributes\WithCastAndTransformer;
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Attributes\WithTransformer;
@@ -85,6 +86,7 @@ class DataPropertyFactory
             hidden: $attributes->has(Hidden::class),
             isPromoted: $reflectionProperty->isPromoted(),
             isReadonly: $reflectionProperty->isReadOnly(),
+            morphable: $attributes->has(PropertyForMorph::class),
             autoLazy: $autoLazy,
             hasDefaultValue: $hasDefaultValue,
             defaultValue: $defaultValue,

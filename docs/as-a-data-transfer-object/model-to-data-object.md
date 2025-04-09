@@ -1,6 +1,6 @@
 ---
 title: From a model
-weight: 10
+weight: 11
 ---
 
 It is possible to create a data object from a model, let's say we have the following model:

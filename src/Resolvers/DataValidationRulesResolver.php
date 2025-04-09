@@ -12,6 +12,7 @@ use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\DataRules;
+use Spatie\LaravelData\Support\Validation\EnsurePropertyMorphable;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
 use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
 use Spatie\LaravelData\Support\Validation\RuleNormalizer;
@@ -23,7 +24,8 @@ class DataValidationRulesResolver
     public function __construct(
         protected DataConfig $dataConfig,
         protected RuleNormalizer $ruleAttributesResolver,
-        protected RuleDenormalizer $ruleDenormalizer
+        protected RuleDenormalizer $ruleDenormalizer,
+        protected DataMorphClassResolver $dataMorphClassResolver,
     ) {
     }
 
@@ -34,6 +36,21 @@ class DataValidationRulesResolver
         DataRules $dataRules
     ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
+
+        if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
+            $payload = $path->isRoot()
+                ? $fullPayload
+                : Arr::get($fullPayload, $path->get(), []);
+
+            $morphedClass = $this->dataMorphClassResolver->execute(
+                $dataClass,
+                [$payload],
+            );
+
+            $dataClass = $morphedClass
+                ? $this->dataConfig->getDataClass($morphedClass)
+                : $dataClass;
+        }
 
         $withoutValidationProperties = [];
 
@@ -64,6 +81,10 @@ class DataValidationRulesResolver
                 $fullPayload,
                 $path,
             );
+
+            if ($dataProperty->morphable) {
+                $rules[] = new EnsurePropertyMorphable($dataClass);
+            }
 
             $dataRules->add($propertyPath, $rules);
         }

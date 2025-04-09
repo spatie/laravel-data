@@ -8,6 +8,7 @@ use Spatie\LaravelData\Enums\CustomCreationMethodType;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\ResolvedDataPipeline;
 
 /**
  * @template TData of BaseData
@@ -17,6 +18,7 @@ class DataFromSomethingResolver
     public function __construct(
         protected DataConfig $dataConfig,
         protected DataFromArrayResolver $dataFromArrayResolver,
+        protected DataMorphClassResolver $dataMorphClassResolver,
     ) {
     }
 
@@ -36,26 +38,27 @@ class DataFromSomethingResolver
 
         $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
 
-        $payloadCount = count($payloads);
+        $normalizedPayloads = [];
 
-        if ($payloadCount === 0 || $payloadCount === 1) {
-            return $this->dataFromArrayResolver->execute(
-                $class,
-                $pipeline->execute($payloads[0] ?? [], $creationContext)
-            );
+        foreach ($payloads as $i => $payload) {
+            $normalizedPayloads[$i] = $pipeline->normalize($payload);
         }
 
-        $properties = [];
+        $dataClass = $this->dataConfig->getDataClass($class);
 
-        foreach ($payloads as $payload) {
-            foreach ($pipeline->execute($payload, $creationContext) as $key => $value) {
-                if (array_key_exists($key, $properties) && ($value === null || $value instanceof Optional)) {
-                    continue;
-                }
+        if ($morphDataClass = $this->dataMorphClassResolver->execute($dataClass, $normalizedPayloads)) {
+            $pipeline = $this->dataConfig->getResolvedDataPipeline($morphDataClass);
 
-                $properties[$key] = $value;
-            }
+            $creationContext->dataClass = $morphDataClass;
+            $class = $morphDataClass;
         }
+
+        $properties = $this->runPipeline(
+            $creationContext,
+            $pipeline,
+            $payloads,
+            $normalizedPayloads
+        );
 
         return $this->dataFromArrayResolver->execute($class, $properties);
     }
@@ -116,5 +119,36 @@ class DataFromSomethingResolver
         $methodName = $method->name;
 
         return $class::$methodName(...$payloads);
+    }
+
+    protected function runPipeline(
+        CreationContext $creationContext,
+        ResolvedDataPipeline $pipeline,
+        array $payloads,
+        array $normalizedPayloads
+    ): array {
+        $payloadCount = count($payloads);
+
+        if ($payloadCount === 0) {
+            return $pipeline->runPipelineOnNormalizedValue([], [], $creationContext);
+        }
+
+        if ($payloadCount === 1) {
+            return $pipeline->runPipelineOnNormalizedValue($payloads[0], $normalizedPayloads[0], $creationContext);
+        }
+
+        $properties = [];
+
+        for ($i = 0; $i < $payloadCount; $i++) {
+            foreach ($pipeline->runPipelineOnNormalizedValue($payloads[$i], $normalizedPayloads[$i], $creationContext) as $key => $value) {
+                if (array_key_exists($key, $properties) && ($value === null || $value instanceof Optional)) {
+                    continue;
+                }
+
+                $properties[$key] = $value;
+            }
+        }
+
+        return $properties;
     }
 }

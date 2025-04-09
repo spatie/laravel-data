@@ -1,6 +1,6 @@
 ---
 title: Mapping property names
-weight: 6
+weight: 7
 ---
 
 Sometimes the property names in the array from which you're creating a data object might be different. You can define another name for a property when it is created from an array using attributes:

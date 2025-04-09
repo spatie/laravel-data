@@ -1,6 +1,6 @@
 ---
 title: Default values
-weight: 7
+weight: 8
 ---
 
 There are a few ways to define default values for a data object. Since a data object is just a regular PHP class, you can use the constructor to set default values:
