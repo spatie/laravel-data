@@ -56,7 +56,7 @@ class NormalizedModel implements Normalized
             try {
                 return $this->properties[$name] = $this->model->getAttribute($name);
             } catch (MissingAttributeException) {
-                // Fallback if missing Attribute
+                // Fallback if missing Attribute exception is thrown
             }
         }
 
