@@ -373,18 +373,6 @@ parameters:
 			path: src/Support/Factories/DataClassFactory.php
 
 		-
-			message: '#^Instantiated class Inertia\\LazyProp not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Support/Lazy/InertiaLazy.php
-
-		-
-			message: '#^Method Spatie\\LaravelData\\Support\\Lazy\\InertiaLazy\:\:resolve\(\) has invalid return type Inertia\\LazyProp\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Support/Lazy/InertiaLazy.php
-
-		-
 			message: '#^Template type T is declared as covariant, but occurs in invariant position in property Spatie\\LaravelData\\Support\\LazyDataStructureProperty\:\:\$value\.$#'
 			identifier: generics.variance
 			count: 1
