@@ -67,7 +67,7 @@ abstract class Person extends Data implements PropertyMorphableData
     
     public static function morph(array $properties): ?string
     {
-        match ($properties['type']){
+        return match ($properties['type']){
             'singer' => Singer::class,
             'musician' => Musician::class,
             default => null
