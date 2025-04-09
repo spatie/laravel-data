@@ -1,10 +1,20 @@
-# Powerful data objects for Laravel
+<div align="left">
+    <a href="https://spatie.be/open-source?utm_source=github&utm_medium=banner&utm_campaign=laravel-data">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://spatie.be/packages/header/laravel-data/html/dark.webp">
+        <img alt="Logo for laravel-data" src=" https://spatie.be/packages/header/laravel-data/html/light.webp" height="190">
+      </picture>
+    </a>
+
+<h1>Powerful data objects for Laravel</h1>
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-data.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-data)
 [![Tests](https://github.com/spatie/laravel-data/actions/workflows/run-tests.yml/badge.svg)](https://github.com/spatie/laravel-data/actions/workflows/run-tests.yml)
 [![PHPStan](https://github.com/spatie/laravel-data/actions/workflows/phpstan.yml/badge.svg)](https://github.com/spatie/laravel-data/actions/workflows/phpstan.yml)
 [![Check & fix styling](https://github.com/spatie/laravel-data/actions/workflows/php-cs-fixer.yml/badge.svg)](https://github.com/spatie/laravel-data/actions/workflows/php-cs-fixer.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-data.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-data)
+    
+</div>
 
 This package enables the creation of rich data objects which can be used in various ways. Using this package you only need to describe your data once:
 

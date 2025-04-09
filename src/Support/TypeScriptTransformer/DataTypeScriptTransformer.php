@@ -170,7 +170,6 @@ class DataTypeScriptTransformer extends DtoTransformer
                 'prev_page_url' => new Nullable(new String_()),
                 'to' => new Nullable(new Integer()),
                 'total' => new Integer(),
-
             ]),
         ]);
     }

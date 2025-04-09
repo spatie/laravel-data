@@ -5,11 +5,12 @@ on:
     paths:
       - '**.php'
       - 'phpstan.neon.dist'
+      - 'phpstan-baseline.neon'
   pull_request:
     paths:
       - '**.php'
       - 'phpstan.neon.dist'
-
+      - 'phpstan-baseline.neon'
 
 jobs:
   phpstan:
@@ -26,7 +27,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "larastan/larastan" --no-interaction --no-update
           composer update --prefer-dist --no-interaction --no-suggest
 
       - name: Run PHPStan
