@@ -1,6 +1,6 @@
 ---
 title: Casts
-weight: 4
+weight: 5
 ---
 
 We extend our example data object just a little bit:

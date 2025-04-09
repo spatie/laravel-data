@@ -155,14 +155,19 @@ class DataValidationAsserter
 
     private function pipePayload(array $payload): array
     {
-        $properties = app(DataPipeline::class)
+        $pipeline = app(DataPipeline::class)
             ->normalizer(ArrayNormalizer::class)
             ->into($this->dataClass)
             ->through(MapPropertiesDataPipe::class)
             ->through(ValidatePropertiesDataPipe::class)
-            ->resolve()
-            ->execute($payload, CreationContextFactory::createFromConfig($this->dataClass)->get());
+            ->resolve();
 
-        return $properties;
+        $normalizedProperties = $pipeline->normalize($payload);
+
+        return $pipeline->runPipelineOnNormalizedValue(
+            $payload,
+            $normalizedProperties,
+            CreationContextFactory::createFromConfig($this->dataClass)->get()
+        );
     }
 }

@@ -4,11 +4,11 @@ namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\PropertyMorphableData;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\ResolvedDataPipeline;
 
 /**
  * @template TData of BaseData
@@ -18,6 +18,7 @@ class DataFromSomethingResolver
     public function __construct(
         protected DataConfig $dataConfig,
         protected DataFromArrayResolver $dataFromArrayResolver,
+        protected DataMorphClassResolver $dataMorphClassResolver,
     ) {
     }
 
@@ -37,27 +38,29 @@ class DataFromSomethingResolver
 
         $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
 
-        $payloadCount = count($payloads);
+        $normalizedPayloads = [];
 
-        if ($payloadCount === 0 || $payloadCount === 1) {
-            $properties = $pipeline->execute($payloads[0] ?? [], $creationContext);
-
-            return $this->dataFromArray($class, $creationContext, $payloads, $properties);
+        foreach ($payloads as $i => $payload) {
+            $normalizedPayloads[$i] = $pipeline->normalize($payload);
         }
 
-        $properties = [];
+        $dataClass = $this->dataConfig->getDataClass($class);
 
-        foreach ($payloads as $payload) {
-            foreach ($pipeline->execute($payload, $creationContext) as $key => $value) {
-                if (array_key_exists($key, $properties) && ($value === null || $value instanceof Optional)) {
-                    continue;
-                }
+        if ($morphDataClass = $this->dataMorphClassResolver->execute($dataClass, $normalizedPayloads)) {
+            $pipeline = $this->dataConfig->getResolvedDataPipeline($morphDataClass);
 
-                $properties[$key] = $value;
-            }
+            $creationContext->dataClass = $morphDataClass;
+            $class = $morphDataClass;
         }
 
-        return $this->dataFromArray($class, $creationContext, $payloads, $properties);
+        $properties = $this->runPipeline(
+            $creationContext,
+            $pipeline,
+            $payloads,
+            $normalizedPayloads
+        );
+
+        return $this->dataFromArrayResolver->execute($class, $properties);
     }
 
     protected function createFromCustomCreationMethod(
@@ -118,25 +121,34 @@ class DataFromSomethingResolver
         return $class::$methodName(...$payloads);
     }
 
-    protected function dataFromArray(
-        string $class,
+    protected function runPipeline(
         CreationContext $creationContext,
+        ResolvedDataPipeline $pipeline,
         array $payloads,
-        array $properties,
-    ): BaseData {
-        $dataClass = $this->dataConfig->getDataClass($class);
+        array $normalizedPayloads
+    ): array {
+        $payloadCount = count($payloads);
 
-        if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
-            $morphableProperties = $dataClass->propertiesForMorph($properties);
+        if ($payloadCount === 0) {
+            return $pipeline->runPipelineOnNormalizedValue([], [], $creationContext);
+        }
 
-            /**
-             * @var class-string<PropertyMorphableData> $class
-             */
-            if ($morphableProperties && $morph = $class::morph($morphableProperties)) {
-                return $this->execute($morph, $creationContext, ...$payloads);
+        if ($payloadCount === 1) {
+            return $pipeline->runPipelineOnNormalizedValue($payloads[0], $normalizedPayloads[0], $creationContext);
+        }
+
+        $properties = [];
+
+        for ($i = 0; $i < $payloadCount; $i++) {
+            foreach ($pipeline->runPipelineOnNormalizedValue($payloads[$i], $normalizedPayloads[$i], $creationContext) as $key => $value) {
+                if (array_key_exists($key, $properties) && ($value === null || $value instanceof Optional)) {
+                    continue;
+                }
+
+                $properties[$key] = $value;
             }
         }
 
-        return $this->dataFromArrayResolver->execute($class, $properties);
+        return $properties;
     }
 }

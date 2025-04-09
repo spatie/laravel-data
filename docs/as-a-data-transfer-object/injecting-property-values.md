@@ -1,6 +1,6 @@
 ---
 title: Injecting property values
-weight: 11
+weight: 12
 ---
 
 When creating a data object, it is possible to inject values into properties from all kinds of sources like route

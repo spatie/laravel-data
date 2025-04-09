@@ -22,6 +22,13 @@ class ResolvedDataPipeline
 
     public function execute(mixed $value, CreationContext $creationContext): array
     {
+        $normalizedValue = $this->normalize($value);
+
+        return $this->runPipelineOnNormalizedValue($value, $normalizedValue, $creationContext);
+    }
+
+    public function normalize(mixed $value): array
+    {
         $properties = null;
 
         foreach ($this->normalizers as $normalizer) {
@@ -40,7 +47,15 @@ class ResolvedDataPipeline
             $properties = $this->transformNormalizedToArray($properties);
         }
 
-        $properties = ($this->dataClass->name)::prepareForPipeline($properties);
+        return $properties;
+    }
+
+    public function runPipelineOnNormalizedValue(
+        mixed $value,
+        array $normalizedValue,
+        CreationContext $creationContext
+    ): array {
+        $properties = ($this->dataClass->name)::prepareForPipeline($normalizedValue);
 
         foreach ($this->pipes as $pipe) {
             $piped = $pipe->handle($value, $this->dataClass, $properties, $creationContext);

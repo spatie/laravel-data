@@ -86,6 +86,7 @@ class DataPropertyFactory
             hidden: $attributes->has(Hidden::class),
             isPromoted: $reflectionProperty->isPromoted(),
             isReadonly: $reflectionProperty->isReadOnly(),
+            morphable: $attributes->has(PropertyForMorph::class),
             autoLazy: $autoLazy,
             hasDefaultValue: $hasDefaultValue,
             defaultValue: $defaultValue,
@@ -94,7 +95,6 @@ class DataPropertyFactory
             inputMappedName: $inputMappedName,
             outputMappedName: $outputMappedName,
             attributes: $attributes,
-            isForMorph: ! empty($reflectionProperty->getAttributes(PropertyForMorph::class)),
         );
     }
 }

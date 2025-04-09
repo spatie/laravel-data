@@ -8,9 +8,6 @@ use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Attributes\MergeValidationRules;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Present;
-use Spatie\LaravelData\Contracts\BaseData;
-use Spatie\LaravelData\Contracts\PropertyMorphableData;
-use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
@@ -27,7 +24,8 @@ class DataValidationRulesResolver
     public function __construct(
         protected DataConfig $dataConfig,
         protected RuleNormalizer $ruleAttributesResolver,
-        protected RuleDenormalizer $ruleDenormalizer
+        protected RuleDenormalizer $ruleDenormalizer,
+        protected DataMorphClassResolver $dataMorphClassResolver,
     ) {
     }
 
@@ -38,11 +36,21 @@ class DataValidationRulesResolver
         DataRules $dataRules
     ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
-        $dataClass = $this->propertyMorphableDataClass(
-            $dataClass,
-            $fullPayload,
-            $path
-        ) ?? $dataClass;
+
+        if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
+            $payload = $path->isRoot()
+                ? $fullPayload
+                : Arr::get($fullPayload, $path->get(), []);
+
+            $morphedClass = $this->dataMorphClassResolver->execute(
+                $dataClass,
+                [$payload],
+            );
+
+            $dataClass = $morphedClass
+                ? $this->dataConfig->getDataClass($morphedClass)
+                : $dataClass;
+        }
 
         $withoutValidationProperties = [];
 
@@ -74,7 +82,7 @@ class DataValidationRulesResolver
                 $path,
             );
 
-            if ($dataProperty->isForMorph) {
+            if ($dataProperty->morphable) {
                 $rules[] = new EnsurePropertyMorphable($dataClass);
             }
 
@@ -90,46 +98,6 @@ class DataValidationRulesResolver
         );
 
         return $dataRules->rules;
-    }
-
-    protected function propertyMorphableDataClass(
-        DataClass $dataClass,
-        array $fullPayload,
-        ValidationPath $path
-    ): ?DataClass {
-        if (! $dataClass->propertyMorphable) {
-            return null;
-        }
-
-        /**
-         * @var class-string<PropertyMorphableData&BaseData> $class
-         */
-        $class = $dataClass->name;
-        $creationContext = CreationContextFactory::createFromConfig($class)->get();
-        $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
-
-        try {
-            // Attempt to cast properties
-            $properties = $pipeline->execute(
-                $path->isRoot() ? $fullPayload : Arr::get($fullPayload, $path->get(), []),
-                $creationContext
-            );
-        } catch (\Throwable $exception) {
-            return null;
-        }
-
-        // Restrict to only morphable properties
-        $properties = $dataClass->propertiesForMorph($properties);
-        if ($properties === null) {
-            return null;
-        }
-
-        $morphedClass = $class::morph($properties);
-        if ($morphedClass === null) {
-            return null;
-        }
-
-        return $this->dataConfig->getDataClass($morphedClass);
     }
 
     protected function shouldSkipPropertyValidation(
@@ -333,10 +301,5 @@ class DataValidationRulesResolver
             $rules->all(),
             $path
         );
-    }
-
-    protected function isPropertyMorphable(DataClass $dataClass): bool
-    {
-        return $dataClass->isAbstract && $dataClass->propertyMorphable;
     }
 }

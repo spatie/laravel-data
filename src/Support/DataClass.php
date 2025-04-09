@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelData\Support;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 /**
@@ -57,18 +56,5 @@ class DataClass
                 $this->$propertyName = $property->toDataStructureProperty();
             }
         }
-    }
-
-    public function propertiesForMorph(array $properties): ?array
-    {
-        $requiredProperties = $this->properties->filter(fn (DataProperty $property) => $property->isForMorph)->pluck('name');
-        $forMorph = Arr::only($properties, $requiredProperties->all());
-
-        // If all required properties are not present, return null
-        if (count($forMorph) !== $requiredProperties->count()) {
-            return null;
-        }
-
-        return $forMorph;
     }
 }
