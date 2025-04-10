@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\ComparableData;
 use Spatie\LaravelData\Contracts\ContextableData;
 use Spatie\LaravelData\Contracts\EmptyData;
 use Spatie\LaravelData\Contracts\IncludeableData;
@@ -801,6 +802,7 @@ it(
                  ValidateableData::class,
                  WrappableData::class,
                  EmptyData::class,
+                 ComparableData::class,
              ],
          ], // expected
     ];
