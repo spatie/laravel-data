@@ -16,8 +16,20 @@ Both the `Spatie\LaravelData\Data` and `Spatie\LaravelData\Resource` classes imp
 You can use the `equalTo` method to compare two data objects:
 
 ```php
-$data1 = new UserData(name: 'John', email: 'john@example.com');
-$data2 = new UserData(name: 'John', email: 'john@example.com');
+class UserData extends Data
+{
+    public function __construct(
+        public int $id,
+        public string|Optional $name = new Optional,
+    ) {}
+}
 
+$data1 = new UserData(id: 10);
+$data2 = UserData::from($data1);
+
+// Default PHP comparison
+$data1 == $data2; // false
+
+// New value comparison
 $data1->equalTo($data2); // true
 ```
