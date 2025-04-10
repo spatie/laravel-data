@@ -41,7 +41,7 @@ class DataFromSomethingResolver
         $normalizedPayloads = [];
 
         foreach ($payloads as $i => $payload) {
-            $normalizedPayloads[$i] = $pipeline->normalize($payload);
+            $normalizedPayloads[$i] = $pipeline->normalize($payload ?? []);
         }
 
         $dataClass = $this->dataConfig->getDataClass($class);
