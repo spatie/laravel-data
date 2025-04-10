@@ -181,6 +181,17 @@ it("won't cast a property that is already in the correct type", function () {
         ]));
 });
 
+it('allows creating data objects from null', function () {
+    $dataClass = new class () extends Data {
+        public ?string $name;
+    };
+
+    $data = $dataClass::from(null);
+
+    expect($data->name)
+        ->toBeNull();
+});
+
 it('allows creating data objects using Lazy', function () {
     $data = NestedLazyData::from([
         'simple' => Lazy::create(fn () => SimpleData::from('Hello')),
