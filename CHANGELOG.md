@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.15.1 - 2025-04-10
+
+### What's Changed
+
+* Fix #997 by @bentleyo in https://github.com/spatie/laravel-data/pull/998
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.15.0...4.15.1
+
 ## 4.15.0 - 2025-04-09
 
 ### What's Changed
@@ -93,6 +101,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -103,6 +112,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -134,6 +144,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
