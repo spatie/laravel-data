@@ -23,6 +23,7 @@ The DataClass represents the structure of a data object and has the following pr
 - `validatable` is the class implementing `ValidatableData`
 - `wrappable` is the class implementing `WrappableData`
 - `emptyData` the the class implementing `EmptyData`
+- `comparableData` the the class implementing `ComparableData`
 - `attributes` a collection of resolved attributes assigned to the class
 - `dataCollectablePropertyAnnotations` the property annotations of the class used to infer the data collection type
 - `allowedRequestIncludes` the allowed request includes of the class
