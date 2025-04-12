@@ -1,6 +1,6 @@
 ---
 title: Comparing data objects
-weight: 20
+weight: 15
 ---
 
 ## Comparing data objects
