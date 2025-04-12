@@ -18,16 +18,19 @@ use Spatie\LaravelData\Concerns\ResponsableData;
 use Spatie\LaravelData\Concerns\TransformableData;
 use Spatie\LaravelData\Concerns\ValidateableData;
 use Spatie\LaravelData\Concerns\WrappableData;
+use Spatie\LaravelData\Concerns\ComparableData;
 use Spatie\LaravelData\Contracts\AppendableData as AppendableDataContract;
 use Spatie\LaravelData\Contracts\BaseData as BaseDataContract;
+use Spatie\LaravelData\Contracts\ContextableData as ContextableDataContract;
 use Spatie\LaravelData\Contracts\EmptyData as EmptyDataContract;
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
 use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
 use Spatie\LaravelData\Contracts\TransformableData as TransformableDataContract;
 use Spatie\LaravelData\Contracts\ValidateableData as ValidateableDataContract;
 use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
+use Spatie\LaravelData\Contracts\ComparableData as ComparableDataContract;
 
-abstract class Data implements Responsable, AppendableDataContract, BaseDataContract, TransformableDataContract, IncludeableDataContract, ResponsableDataContract, ValidateableDataContract, WrappableDataContract, EmptyDataContract
+abstract class Data implements Responsable, AppendableDataContract, BaseDataContract, TransformableDataContract, ContextableDataContract, IncludeableDataContract, ResponsableDataContract, ValidateableDataContract, WrappableDataContract, EmptyDataContract, ComparableDataContract
 {
     use ResponsableData;
     use IncludeableData;
@@ -38,6 +41,7 @@ abstract class Data implements Responsable, AppendableDataContract, BaseDataCont
     use BaseData;
     use EmptyData;
     use ContextableData;
+    use ComparableData;
 }
 ```
 
@@ -56,5 +60,6 @@ Each interface (and corresponding trait) provides a piece of functionality:
 - **WrappableData** provides the functionality to wrap the transformed data object/collectable
 - **AppendableData** provides the functionality to append data to the transformed data payload
 - **EmptyData** provides the functionality to get an empty version of the data object
+- **ComparableData** provides the functionality to compare data objects using the `equalTo` method, which checks if two data objects are equal by comparing their array representations
 - **ValidateableData** provides the functionality to validate the data object
 - **DeprecatableData** provides the functionality to add deprecated functionality to the data object
