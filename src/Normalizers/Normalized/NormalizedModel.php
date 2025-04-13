@@ -13,6 +13,10 @@ class NormalizedModel implements Normalized
 {
     protected array $properties = [];
 
+    protected ReflectionProperty $attributesProperty;
+
+    protected ReflectionProperty $castsProperty;
+
     public function __construct(
         protected Model $model,
     ) {
