@@ -21,7 +21,6 @@ use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class DataValidationRulesResolver
 {
-
     protected array $collectionRulesCache = [];
 
     public function __construct(
@@ -198,16 +197,16 @@ class DataValidationRulesResolver
         DataRules $dataRules,
     ): void {
         $this->resolveToplevelRules(
-                             $dataProperty,
-                             $fullPayload,
-                             $path,
-                             $propertyPath,
-                             $dataRules,
-                             shouldBePresent: true
+            $dataProperty,
+            $fullPayload,
+            $path,
+            $propertyPath,
+            $dataRules,
+            shouldBePresent: true
         );
 
         // If collection payload is null or not an array, no nested rules needed
-        if (!is_array($collectionPayload)) {
+        if (! is_array($collectionPayload)) {
             return;
         }
 
@@ -216,16 +215,17 @@ class DataValidationRulesResolver
 
         // Optimization: If nested class has NO dynamic rules method, build flat array
         if (! $hasDynamicRules) {
-             // Generate rules per item but add directly
+            // Generate rules per item but add directly
             foreach ($collectionPayload as $collectionItemKey => $collectionItemValue) {
                 $itemPath = $propertyPath->property($collectionItemKey);
 
-                if (!is_array($collectionItemValue)) {
+                if (! is_array($collectionItemValue)) {
                     $dataRules->add($itemPath, ['array']);
+
                     continue;
                 }
 
-                 // Directly execute rule generation for this specific item and path
+                // Directly execute rule generation for this specific item and path
                 $this->execute(
                     $nestedDataClass->name,
                     $fullPayload,
