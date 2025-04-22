@@ -48,6 +48,9 @@ class DataFromSomethingResolver
 
         if ($morphDataClass = $this->dataMorphClassResolver->execute($dataClass, $normalizedPayloads)) {
             $pipeline = $this->dataConfig->getResolvedDataPipeline($morphDataClass);
+            foreach ($payloads as $i => $payload) {
+                $normalizedPayloads[$i] = $pipeline->normalize($payload ?? []);
+            }
 
             $creationContext->dataClass = $morphDataClass;
             $class = $morphDataClass;
