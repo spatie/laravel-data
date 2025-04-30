@@ -85,7 +85,7 @@ PostData::from(Post::findOrFail($id));
 
 ## Using requests
 
-Let's say we have a Laravel request coming from the front with these properties. Our controller would then validate these properties, and then it would store them in a model; this can be done as such:
+Let's say we have a Laravel request coming from the frontend with these properties. Our controller would then validate these properties, and then it would store them in a model; this can be done as such:
 
 ```php
 class DataController
