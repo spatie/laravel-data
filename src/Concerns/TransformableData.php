@@ -14,6 +14,8 @@ use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 
 trait TransformableData
 {
+    protected null|TransformationContextFactory|TransformationContext $_jsonSerializeContextOnce = null;
+
     public function transform(
         null|TransformationContextFactory|TransformationContext $transformationContext = null,
     ): array {
@@ -51,12 +53,25 @@ trait TransformableData
 
     public function toJson($options = 0): string
     {
-        return json_encode($this->transform(), $options);
+        return json_encode($this->jsonSerialize(), $options);
     }
 
     public function jsonSerialize(): array
     {
-        return $this->transform();
+        $transformationContext = $this->_jsonSerializeContextOnce;
+
+        if ($this->_jsonSerializeContextOnce) {
+            $this->_jsonSerializeContextOnce = null;
+        }
+
+        return $this->transform($transformationContext);
+    }
+
+    public function jsonSerializeWithTransformationContext(null|TransformationContextFactory|TransformationContext $transformationContext): array
+    {
+        $this->_jsonSerializeContextOnce = $transformationContext;
+
+        return $this->jsonSerialize();
     }
 
     public static function castUsing(array $arguments)

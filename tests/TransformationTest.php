@@ -133,6 +133,21 @@ it('can transform to JSON', function () {
         ->toEqual(json_encode(SimpleData::from('Hello')));
 });
 
+it('calls jsonSerialize when toJson is invoked', function () {
+
+    $data = new class extends Data
+    {
+        public function jsonSerialize(): array
+        {
+            return [
+                'string' => 'Hello from serialize',
+            ];
+        }
+    };
+
+    expect($data->toJson())->toBe('{"string":"Hello from serialize"}');
+});
+
 it('can use a custom transformer for a data object and/or data collectable', function () {
     $nestedData = new class (42, 'Hello World') extends Data {
         public function __construct(
