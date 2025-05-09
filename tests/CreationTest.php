@@ -1638,4 +1638,42 @@ describe('property-morphable creation tests', function () {
             ->variant->toEqual(TestPropertyMorphableEnum::B)
             ->b->toEqual('bar');
     });
+
+    it('will allow property-morphable data to be created from a default', function () {
+        abstract class TestAbstractPropertyMorphableDefaultData extends Data implements PropertyMorphableData
+        {
+            public function __construct(
+                #[\Spatie\LaravelData\Attributes\PropertyForMorph]
+                public TestPropertyMorphableEnum $variant = TestPropertyMorphableEnum::A,
+            ) {
+            }
+
+            public static function morph(array $properties): ?string
+            {
+                return match ($properties['variant'] ?? null) {
+                    TestPropertyMorphableEnum::A => TestPropertyMorphableDefaultDataA::class,
+                    default => null,
+                };
+            }
+        }
+
+        class TestPropertyMorphableDefaultDataA extends TestAbstractPropertyMorphableDefaultData
+        {
+            public function __construct(public string $a, public DummyBackedEnum $enum)
+            {
+                parent::__construct(TestPropertyMorphableEnum::A);
+            }
+        }
+
+        $dataA = TestAbstractPropertyMorphableDefaultData::from([
+            'a' => 'foo',
+            'enum' => 'foo',
+        ]);
+
+        expect($dataA)
+            ->toBeInstanceOf(TestPropertyMorphableDefaultDataA::class)
+            ->variant->toEqual(TestPropertyMorphableEnum::A)
+            ->a->toEqual('foo')
+            ->enum->toEqual(DummyBackedEnum::FOO);
+    });
 });
