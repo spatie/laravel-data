@@ -2761,6 +2761,10 @@ describe('property-morphable validation tests', function () {
                 'enum' => ['The enum field is required.'],
             ])
             ->assertOk([
+                'a' => 'foo',
+                'enum' => 'foo',
+            ])
+            ->assertOk([
                 'variant' => 'a',
                 'a' => 'foo',
                 'enum' => 'foo',
