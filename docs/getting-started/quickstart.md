@@ -41,7 +41,7 @@ We store this `PostData` object as `app/Data/PostData.php`, so we have all our d
 
 Tip: you can also quickly make a data object using the CLI: `php artisan make:data Post`, it will create a file `app/Data/PostData.php`.
 
-We can now create this a `PostData` object just like any plain PHP object:
+We can now create a `PostData` object just like any plain PHP object:
 
 ```php
 $post = new PostData(
