@@ -2,7 +2,7 @@
     <a href="https://spatie.be/open-source?utm_source=github&utm_medium=banner&utm_campaign=laravel-data">
       <picture>
         <source media="(prefers-color-scheme: dark)" srcset="https://spatie.be/packages/header/laravel-data/html/dark.webp">
-        <img alt="Logo for laravel-data" src="https://spatie.be/packages/header/laravel-data/html/light.webp" height="190">
+        <img alt="Logo for laravel-data" src="https://spatie.be/packages/header/laravel-data/html/light.webp">
       </picture>
     </a>
 
