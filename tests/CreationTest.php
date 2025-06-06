@@ -1469,6 +1469,33 @@ it('can use auto lazy to construct a when loaded lazy with a manual defined rela
         ->each()->toBeInstanceOf(FakeNestedModelData::class);
 });
 
+it('can use auto lazy to construct a data object with property promotion', function () {
+    $dataClass = new class ([]) extends Data {
+        /**
+         * @param array<int, Spatie\LaravelData\Tests\Fakes\FakeNestedModelData> $fakeNestedModels
+         */
+        public function __construct(
+            #[AutoWhenLoadedLazy]
+            public array|Lazy $fakeNestedModels
+        ) {
+        }
+    };
+
+    $model = FakeModel::factory()
+        ->has(FakeNestedModel::factory()->count(2))
+        ->create();
+
+    expect($dataClass::from($model)->all())->toBeEmpty();
+
+    $model->load('fakeNestedModels');
+
+    expect($dataClass::from($model)->all()['fakeNestedModels'])
+        ->toBeArray()
+        ->toHaveCount(2)
+        ->each()->toBeInstanceOf(FakeNestedModelData::class);
+});
+
+
 
 it('can create a data object with deferred properties', function () {
     $dataClass = new class () extends Data {

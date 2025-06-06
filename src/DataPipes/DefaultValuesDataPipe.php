@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\DataPipes;
 
 use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
+use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataClass;
@@ -35,11 +36,9 @@ class DefaultValuesDataPipe implements DataPipe
 
             if ($property->autoLazy
                 && $property->autoLazy instanceof AutoWhenLoadedLazy
-                && $property->autoLazy->relation !== null
                 && $payload instanceof Model
-                && $payload->relationLoaded($property->autoLazy->relation)
             ) {
-                $properties[$name] = $payload->getRelation($property->autoLazy->relation);
+                $properties[$name] = 'tbd'; // will be populated in cast pipe later on with the auto lazy value
             }
 
             if ($property->type->isNullable) {
