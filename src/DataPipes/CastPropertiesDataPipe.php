@@ -19,7 +19,7 @@ use Spatie\LaravelData\Support\Types\CombinationType;
 class CastPropertiesDataPipe implements DataPipe
 {
     public function __construct(
-        protected DataConfig $dataConfig,
+        protected DataConfig $dataConfig
     ) {
     }
 
