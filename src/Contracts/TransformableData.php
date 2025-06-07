@@ -23,5 +23,7 @@ interface TransformableData extends JsonSerializable, Jsonable, Arrayable, Eloqu
 
     public function jsonSerialize(): array;
 
+    public function jsonSerializeWithTransformationContext(null|TransformationContextFactory|TransformationContext $transformationContext): array;
+
     public static function castUsing(array $arguments);
 }
