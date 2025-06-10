@@ -3,6 +3,8 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithJson;
+use Spatie\LaravelData\Tests\Fakes\MultiData;
 use function Pest\Laravel\assertDatabaseHas;
 
 use Spatie\LaravelData\Contracts\PropertyMorphableData;
@@ -20,6 +22,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataCollection;
 
 beforeEach(function () {
     DummyModelWithCasts::migrate();
+    DummyModelWithJson::migrate();
 });
 
 it('can save a data collection', function () {
@@ -244,4 +247,23 @@ it('can load and save an abstract property-morphable data collection', function 
     expect($model->data_collection[1])
         ->toBeInstanceOf(TestCollectionCastPropertyMorphableDataB::class)
         ->b->toBe('bar');
+});
+
+
+it ('can correctly detect if the attribute is dirty', function() {
+
+    // TODO should we consider this as changed or not?
+    $model = DummyModelWithJson::create([
+        'data_collection' => [
+            1 => ['second' => 'Second', 'first' => 'First'],
+            0 => ['second' => 'Fourth', 'first' => 'Third'],
+        ]
+    ]);
+
+    $model->data_collection = [
+        0 => new MultiData('First', 'Second'),
+        1 => new MultiData('Third', 'Fourth'),
+    ];
+
+    expect($model->isDirty('data_collection'))->toBeFalse();
 });

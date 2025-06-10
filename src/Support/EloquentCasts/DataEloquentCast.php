@@ -6,6 +6,7 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Support\Facades\Crypt;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\TransformableData;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Support\DataConfig;
 
@@ -84,7 +85,7 @@ class DataEloquentCast implements CastsAttributes
 
     public function compare($model, string $key, $firstValue, $secondValue): bool
     {
-        return json_decode($firstValue) == json_decode($secondValue);
+        return $this->get($model, $key, $firstValue, [])->toJson() === $this->get($model, $key, $secondValue, [])->toJson();
     }
 
     protected function isAbstractClassCast(): bool
