@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithJson;
-use Spatie\LaravelData\Tests\Fakes\MultiData;
 use function Pest\Laravel\assertDatabaseHas;
 
 use Spatie\LaravelData\Contracts\PropertyMorphableData;
@@ -251,10 +250,12 @@ it ('can correctly detect if the attribute is dirty', function() {
     $model->setRawAttributes(['data' => json_encode(['second' => 'Second', 'first' => 'First'])]);
     $model->save();
 
-    // Set the first value to exactly the same value as in the database
-    $model->data->first = 'First';
-    expect($model->isDirty('data'))->toBeFalse();
+    $model->setRawAttributes(['data' => json_encode(['first' => 'First', 'second' => 'Second'])]);
+    expect($model->getRawOriginal('data'))->toBe('{"second":"Second","first":"First"}')
+        ->and($model->getAttributes()['data'])->toBe('{"first":"First","second":"Second"}')
+        ->and($model->isDirty('data'))->toBeFalse();
 
     $model->data->first = 'First2';
     expect($model->isDirty('data'))->toBeTrue();
 });
+
