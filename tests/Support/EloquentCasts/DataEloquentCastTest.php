@@ -5,6 +5,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithJson;
+use Spatie\LaravelData\Tests\Fakes\MultiData;
 use function Pest\Laravel\assertDatabaseHas;
 
 use Spatie\LaravelData\Contracts\PropertyMorphableData;
@@ -21,6 +23,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataWithDefaultValue;
 
 beforeEach(function () {
     DummyModelWithCasts::migrate();
+    DummyModelWithJson::migrate();
 });
 
 it('can save a data object', function () {
@@ -240,4 +243,18 @@ it('can load and save an abstract property-morphable data object', function () {
         ->toBeInstanceOf(TestCastPropertyMorphableDataFoo::class)
         ->a->toBe('foo')
         ->variant->toBe(DummyBackedEnum::FOO);
+});
+
+it ('can correctly detect if the attribute is dirty', function() {
+    $model = new DummyModelWithJson();
+    // Set raw because we want to inverse the order of the keys
+    $model->setRawAttributes(['data' => json_encode(['second' => 'Second', 'first' => 'First'])]);
+    $model->save();
+
+    // Set the first value to exactly the same value as in the database
+    $model->data->first = 'First';
+    expect($model->isDirty('data'))->toBeFalse();
+
+    $model->data->first = 'First2';
+    expect($model->isDirty('data'))->toBeTrue();
 });

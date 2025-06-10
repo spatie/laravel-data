@@ -82,6 +82,11 @@ class DataEloquentCast implements CastsAttributes
         return $value;
     }
 
+    public function compare($model, string $key, $firstValue, $secondValue): bool
+    {
+        return json_decode($firstValue) == json_decode($secondValue);
+    }
+
     protected function isAbstractClassCast(): bool
     {
         $dataClass = $this->dataConfig->getDataClass($this->dataClass);
