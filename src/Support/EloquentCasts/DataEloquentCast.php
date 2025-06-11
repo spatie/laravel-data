@@ -6,7 +6,6 @@ use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Support\Facades\Crypt;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\TransformableData;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Support\DataConfig;
 
