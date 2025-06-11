@@ -3,8 +3,6 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithJson;
-use Spatie\LaravelData\Tests\Fakes\MultiData;
 use function Pest\Laravel\assertDatabaseHas;
 
 use Spatie\LaravelData\Contracts\PropertyMorphableData;
@@ -17,6 +15,8 @@ use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCustomCollectionCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithJson;
+use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataCollection;
 
@@ -250,7 +250,7 @@ it('can load and save an abstract property-morphable data collection', function 
 });
 
 
-it ('can correctly detect if the attribute is dirty', function() {
+it('can correctly detect if the attribute is dirty', function () {
 
     // Set a raw JSON string with spaces in it to mimic database behavior
     $model = new DummyModelWithJson();
