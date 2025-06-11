@@ -252,18 +252,17 @@ it('can load and save an abstract property-morphable data collection', function 
 
 it ('can correctly detect if the attribute is dirty', function() {
 
-    // TODO should we consider this as changed or not?
-    $model = DummyModelWithJson::create([
-        'data_collection' => [
-            1 => ['second' => 'Second', 'first' => 'First'],
-            0 => ['second' => 'Fourth', 'first' => 'Third'],
-        ]
-    ]);
+    // Set a raw JSON string with spaces in it to mimic database behavior
+    $model = new DummyModelWithJson();
+    $model->setRawAttributes(['data_collection' => '[{"second": "Second", "first": "First"}, {"first": "Third", "second": "Fourth"}]']);
+    $model->save();
 
     $model->data_collection = [
         0 => new MultiData('First', 'Second'),
         1 => new MultiData('Third', 'Fourth'),
     ];
 
-    expect($model->isDirty('data_collection'))->toBeFalse();
+    expect($model->getRawOriginal('data_collection'))->toBe('[{"second": "Second", "first": "First"}, {"first": "Third", "second": "Fourth"}]')
+        ->and($model->getAttributes()['data_collection'])->toBe('[{"first":"First","second":"Second"},{"first":"Third","second":"Fourth"}]')
+        ->and($model->isDirty('data_collection'))->toBeFalse();
 });
