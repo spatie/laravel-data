@@ -258,8 +258,8 @@ it('can correctly detect if the attribute is dirty', function () {
     $model->save();
 
     $model->data_collection = [
-        0 => new MultiData('First', 'Second'),
-        1 => new MultiData('Third', 'Fourth'),
+        new MultiData('First', 'Second'),
+        new MultiData('Third', 'Fourth'),
     ];
 
     expect($model->getRawOriginal('data_collection'))->toBe('[{"second": "Second", "first": "First"}, {"first": "Third", "second": "Fourth"}]')
