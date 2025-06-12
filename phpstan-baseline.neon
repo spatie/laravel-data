@@ -265,14 +265,14 @@ parameters:
 			path: src/PaginatedDataCollection.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\Paginator\:\:through\(\)\.$#'
-			identifier: method.notFound
-			count: 2
+			message: '#^Method Spatie\\LaravelData\\PaginatedDataCollection\:\:through\(\) should return static\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\) but returns \$this\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
+			identifier: return.type
+			count: 1
 			path: src/PaginatedDataCollection.php
 
 		-
-			message: '#^Method Spatie\\LaravelData\\PaginatedDataCollection\:\:through\(\) should return static\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\) but returns \$this\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
-			identifier: return.type
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Contracts\\Pagination\\Paginator\<\(int\|string\),mixed\>\:\:through\(\) expects callable\(mixed\)\: mixed, Closure\(TValue, TKey\)\: TValue given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/PaginatedDataCollection.php
 
