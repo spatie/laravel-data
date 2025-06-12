@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.15.2 - 2025-06-12
+
+- Fix: CannotCreateData exception when AutoWhenLoadedLazy relationship is not loaded  (#1009)
+- Fix: Inertia deferred properties not being that flexible
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.15.1...4.15.2
+
 ## 4.15.1 - 2025-04-10
 
 ### What's Changed
@@ -102,6 +109,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -112,6 +120,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -144,6 +153,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
