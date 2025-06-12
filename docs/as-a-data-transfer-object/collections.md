@@ -253,7 +253,7 @@ This method was removed with version v4 of the package in favor for the more pow
 method can still be used by using the `WithDeprecatedCollectionMethod` trait:
 
 ```php
-use Spatie\LaravelData\WithDeprecatedCollectionMethod;
+use Spatie\LaravelData\Concerns\WithDeprecatedCollectionMethod;
 
 class SongData extends Data
 {
