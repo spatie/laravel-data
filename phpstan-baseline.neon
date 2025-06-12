@@ -79,6 +79,30 @@ parameters:
 			path: src/Attributes/Validation/ValidationAttribute.php
 
 		-
+			message: '#^Call to function is_a\(\) with arguments class\-string\<Spatie\\LaravelData\\Casts\\Cast\>, ''Spatie\\\\LaravelData\\\\Casts\\\\Cast'' and true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Attributes/WithCast.php
+
+		-
+			message: '#^Call to function is_a\(\) with arguments class\-string\<Spatie\\LaravelData\\Casts\\Cast&Spatie\\LaravelData\\Transformers\\Transformer\>, ''Spatie\\\\LaravelData\\\\Transformers\\\\Transformer'' and true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Attributes/WithCastAndTransformer.php
+
+		-
+			message: '#^Call to function is_a\(\) with arguments class\-string\<Spatie\\LaravelData\\Casts\\Castable\>, ''Spatie\\\\LaravelData\\\\Casts\\\\Castable'' and true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Attributes/WithCastable.php
+
+		-
+			message: '#^Call to function is_a\(\) with arguments class\-string\<Spatie\\LaravelData\\Transformers\\Transformer\>, ''Spatie\\\\LaravelData\\\\Transformers\\\\Transformer'' and true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Attributes/WithTransformer.php
+
+		-
 			message: '#^Call to an undefined method DateTimeInterface\:\:setTimezone\(\)\.$#'
 			identifier: method.notFound
 			count: 1

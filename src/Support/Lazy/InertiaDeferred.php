@@ -9,9 +9,11 @@ class InertiaDeferred extends ConditionalLazy
     public function __construct(
         mixed $value,
     ) {
-        $callback = is_a($value, DeferProp::class)
-            ? fn () => $value()
-            : fn () => new DeferProp($value);
+        $callback = match (true) {
+            $value instanceof DeferProp => fn () => $value(),
+            is_callable($value) => $value,
+            default => fn () => $value,
+        };
 
         parent::__construct(fn () => true, $callback);
     }
