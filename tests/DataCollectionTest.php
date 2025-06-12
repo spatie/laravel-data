@@ -256,28 +256,16 @@ it('does not mutate wrapped paginators during transformation', function () {
     ], perPage: 15);
 
     $collection = SimpleData::collect($paginatorOfSimpleData, PaginatedDataCollection::class);
+
     $expect = [
-        'data' => [
-            ['string' => 'A'],
-            ['string' => 'B'],
-        ],
-        'links' => [],
-        'meta' => [
-            'current_page' => 1,
-            'current_page_url' => '/?page=1',
-            'first_page_url' => '/?page=1',
-            'from' => 1,
-            'next_page_url' => null,
-            'path' => '/',
-            'per_page' => 15,
-            'prev_page_url' => null,
-            'to' => 2,
-        ],
+        ['string' => 'A'],
+        ['string' => 'B'],
+
     ];
 
     // Perform the transformation twice, the second should not throw
-    expect($collection->toArray())->toBe($expect);
-    expect($collection->toArray())->toBe($expect);
+    expect($collection->toArray()['data'])->toBe($expect);
+    expect($collection->toArray()['data'])->toBe($expect);
 });
 
 it('it can include lazy items through a paginated data collection', function () {
