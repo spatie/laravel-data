@@ -58,7 +58,7 @@ trait ResponsableData
         }
 
         return new JsonResponse(
-            data: $this->transform($contextFactory),
+            data: $this->jsonSerializeWithTransformationContext($contextFactory),
             status: $this->calculateResponseStatus($request),
         );
     }
