@@ -16,11 +16,13 @@ use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithEncryptedCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithJson;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithDefaultValue;
 
 beforeEach(function () {
     DummyModelWithCasts::migrate();
+    DummyModelWithJson::migrate();
 });
 
 it('can save a data object', function () {
@@ -240,4 +242,19 @@ it('can load and save an abstract property-morphable data object', function () {
         ->toBeInstanceOf(TestCastPropertyMorphableDataFoo::class)
         ->a->toBe('foo')
         ->variant->toBe(DummyBackedEnum::FOO);
+});
+
+it('can correctly detect if the attribute is dirty', function () {
+    $model = new DummyModelWithJson();
+    // Set raw because we want to inverse the order of the keys
+    $model->setRawAttributes(['data' => json_encode(['second' => 'Second', 'first' => 'First'])]);
+    $model->save();
+
+    $model->setRawAttributes(['data' => json_encode(['first' => 'First', 'second' => 'Second'])]);
+    expect($model->getRawOriginal('data'))->toBe('{"second":"Second","first":"First"}')
+        ->and($model->getAttributes()['data'])->toBe('{"first":"First","second":"Second"}')
+        ->and($model->isDirty('data'))->toBeFalse();
+
+    $model->data->first = 'First2';
+    expect($model->isDirty('data'))->toBeTrue();
 });
