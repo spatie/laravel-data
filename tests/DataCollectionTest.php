@@ -264,6 +264,7 @@ it('does not mutate wrapped paginators during transformation', function () {
         'links' => [],
         'meta' => [
             'current_page' => 1,
+            'current_page_url' => '/?page=1',
             'first_page_url' => '/?page=1',
             'from' => 1,
             'next_page_url' => null,
