@@ -258,3 +258,14 @@ it('can correctly detect if the attribute is dirty', function () {
     $model->data->first = 'First2';
     expect($model->isDirty('data'))->toBeTrue();
 });
+
+it('can correctly detect if the attribute is dirty with null values', function () {
+    $model = new DummyModelWithJson();
+    $model->save();
+
+    $model->setRawAttributes(['data' => json_encode(['first' => 'First', 'second' => 'Second'])]);
+
+    expect($model->getRawOriginal('data'))->toBe(null)
+        ->and($model->getAttributes()['data'])->toBe('{"first":"First","second":"Second"}')
+        ->and($model->isDirty('data'))->toBeTrue();
+});

@@ -107,7 +107,7 @@ class DataCollectionEloquentCast implements CastsAttributes
 
     public function compare($model, string $key, $firstValue, $secondValue): bool
     {
-        return $this->get($model, $key, $firstValue, [])->toJson() === $this->get($model, $key, $secondValue, [])->toJson();
+        return $this->get($model, $key, $firstValue, [])->toArray() === $this->get($model, $key, $secondValue, [])->toArray();
     }
 
     protected function isAbstractClassCast(): bool
