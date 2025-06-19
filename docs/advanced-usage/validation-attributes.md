@@ -361,6 +361,12 @@ public string $closure;
 ```php
 #[Enum(ChannelType::class)]
 public string $closure;
+
+#[Enum(ChannelType::class, only: [ChannelType::Email])]
+public string $closure;
+
+#[Enum(ChannelType::class, except: [ChannelType::Email])]
+public string $closure;
 ```
 
 ## ExcludeIf

@@ -13,6 +13,8 @@ class Enum extends ObjectValidationAttribute
     public function __construct(
         protected string|EnumRule|RouteParameterReference $enum,
         protected ?EnumRule $rule = null,
+        protected ?array $only = null,
+        protected ?array $except = null,
     ) {
     }
 
@@ -27,9 +29,19 @@ class Enum extends ObjectValidationAttribute
             return $this->rule;
         }
 
-        return $this->enum instanceof EnumRule
+        $rule = $this->enum instanceof EnumRule
             ? $this->enum
             : new EnumRule((string) $this->enum);
+
+        if ($this->only !== null) {
+            $rule->only($this->only);
+        }
+
+        if ($this->except !== null) {
+            $rule->except($this->except);
+        }
+
+        return $rule;
     }
 
     public static function create(string ...$parameters): static

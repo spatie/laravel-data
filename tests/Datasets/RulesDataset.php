@@ -219,11 +219,22 @@ dataset('attributes', function () {
     );
 
     yield fixature(
-        attribute: new Enum('enum_class'),
-        expected: new EnumRule('enum_class'),
-        expectCreatedAttribute: new Enum(new EnumRule('enum_class'))
+        attribute: new Enum(DummyBackedEnum::class),
+        expected: new EnumRule(DummyBackedEnum::class),
+        expectCreatedAttribute: new Enum(new EnumRule(DummyBackedEnum::class))
     );
 
+    yield fixature(
+        attribute: new Enum(DummyBackedEnum::class, only: [DummyBackedEnum::FOO]),
+        expected: (new EnumRule(DummyBackedEnum::class))->only([DummyBackedEnum::FOO]),
+        expectCreatedAttribute: new Enum((new EnumRule(DummyBackedEnum::class))->only(DummyBackedEnum::FOO))
+    );
+
+    yield fixature(
+        attribute: new Enum(DummyBackedEnum::class, except: [DummyBackedEnum::FOO]),
+        expected: (new EnumRule(DummyBackedEnum::class))->except([DummyBackedEnum::FOO]),
+        expectCreatedAttribute: new Enum((new EnumRule(DummyBackedEnum::class))->except(DummyBackedEnum::FOO))
+    );
 
     yield fixature(
         attribute: new ExcludeIf('field', true),
