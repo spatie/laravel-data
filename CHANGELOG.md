@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.15.3 - 2025-06-19
+
+- Add support for only and except in enum rule
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.15.2...4.15.3
+
 ## 4.15.2 - 2025-06-12
 
 - Fix: CannotCreateData exception when AutoWhenLoadedLazy relationship is not loaded  (#1009)
@@ -110,6 +116,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -120,6 +127,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -153,6 +161,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
