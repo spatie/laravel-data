@@ -20,7 +20,7 @@ class EnumCast implements Cast, IterableItemCast
         return $this->castValue(
             $this->type ?? $property->type->type->findAcceptedTypeForBaseType(BackedEnum::class),
             $value,
-            $property->name,
+            $property
         );
     }
 
@@ -29,14 +29,14 @@ class EnumCast implements Cast, IterableItemCast
         return $this->castValue(
             $property->type->iterableItemType,
             $value,
-            $property->name,
+            $property
         );
     }
 
     protected function castValue(
         ?string $type,
         mixed $value,
-        string $propertyName
+        DataProperty $property
     ): BackedEnum|Uncastable {
         if ($type === null) {
             return Uncastable::create();
@@ -50,7 +50,7 @@ class EnumCast implements Cast, IterableItemCast
         try {
             return $type::from($value);
         } catch (Throwable $e) {
-            throw CannotCastEnum::create($type, $value, $propertyName);
+            throw CannotCastEnum::create($type, $value, $property);
         }
     }
 }
