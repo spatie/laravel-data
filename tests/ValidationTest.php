@@ -2731,4 +2731,43 @@ describe('property-morphable validation tests', function () {
                 'nestedCollection' => [['variant' => 'a', 'a' => 'foo', 'enum' => 'foo'], ['variant' => 'b', 'b' => 'bar']],
             ]);
     });
+
+    it('can validate property-morphable data with a default', function () {
+        abstract class TestValidationAbstractPropertyMorphableDefaultData extends Data implements PropertyMorphableData
+        {
+            #[\Spatie\LaravelData\Attributes\PropertyForMorph]
+            public TestValidationPropertyMorphableEnum $variant = TestValidationPropertyMorphableEnum::A;
+
+            public static function morph(array $properties): ?string
+            {
+                return match ($properties['variant'] ?? null) {
+                    TestValidationPropertyMorphableEnum::A => TestValidationPropertyMorphableDefaultDataA::class,
+                    default => null,
+                };
+            }
+        }
+
+        class TestValidationPropertyMorphableDefaultDataA extends TestValidationAbstractPropertyMorphableDefaultData
+        {
+            public function __construct(public string $a, public DummyBackedEnum $enum)
+            {
+                $this->variant = TestValidationPropertyMorphableEnum::A;
+            }
+        }
+
+        DataValidationAsserter::for(TestValidationAbstractPropertyMorphableDefaultData::class)
+            ->assertErrors([], [
+                'a' => ['The a field is required.'],
+                'enum' => ['The enum field is required.'],
+            ])
+            ->assertOk([
+                'a' => 'foo',
+                'enum' => 'foo',
+            ])
+            ->assertOk([
+                'variant' => 'a',
+                'a' => 'foo',
+                'enum' => 'foo',
+            ]);
+    });
 });

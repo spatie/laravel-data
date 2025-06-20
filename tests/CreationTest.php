@@ -1757,6 +1757,44 @@ describe('property-morphable creation tests', function () {
             ->type->toEqual('specific');
     });
 
+    it('will allow property-morphable data to be created from a default', function () {
+        abstract class TestAbstractPropertyMorphableDefaultData extends Data implements PropertyMorphableData
+        {
+            public function __construct(
+                #[PropertyForMorph]
+                public TestPropertyMorphableEnum $variant = TestPropertyMorphableEnum::A,
+            ) {
+            }
+
+            public static function morph(array $properties): ?string
+            {
+                return match ($properties['variant'] ?? null) {
+                    TestPropertyMorphableEnum::A => TestPropertyMorphableDefaultDataA::class,
+                    default => null,
+                };
+            }
+        }
+
+        class TestPropertyMorphableDefaultDataA extends TestAbstractPropertyMorphableDefaultData
+        {
+            public function __construct(public string $a, public DummyBackedEnum $enum)
+            {
+                parent::__construct(TestPropertyMorphableEnum::A);
+            }
+        }
+
+        $dataA = TestAbstractPropertyMorphableDefaultData::from([
+            'a' => 'foo',
+            'enum' => 'foo',
+        ]);
+
+        expect($dataA)
+            ->toBeInstanceOf(TestPropertyMorphableDefaultDataA::class)
+            ->variant->toEqual(TestPropertyMorphableEnum::A)
+            ->a->toEqual('foo')
+            ->enum->toEqual(DummyBackedEnum::FOO);
+    });
+
     it('will throw an exception when a property morphable data class is not found', function () {
         expect(fn () => TestAbstractPropertyMorphableData::from([
             'variant' => 'c',
