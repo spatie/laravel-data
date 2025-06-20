@@ -251,6 +251,7 @@ it('can load and save an abstract property-morphable data collection', function 
 
 
 it('can correctly detect if the attribute is dirty', function () {
+    version_compare($this->app->version(), '12.18.0') > 0 || $this->markTestSkipped('Laravel 12.18+ only');
 
     // Set a raw JSON string with spaces in it to mimic database behavior
     $model = new DummyModelWithJson();

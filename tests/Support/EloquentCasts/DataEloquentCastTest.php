@@ -245,6 +245,8 @@ it('can load and save an abstract property-morphable data object', function () {
 });
 
 it('can correctly detect if the attribute is dirty', function () {
+    version_compare($this->app->version(), '12.18.0') > 0 || $this->markTestSkipped('Laravel 12.18+ only');
+
     $model = new DummyModelWithJson();
     // Set raw because we want to inverse the order of the keys
     $model->setRawAttributes(['data' => json_encode(['second' => 'Second', 'first' => 'First'])]);
@@ -260,6 +262,7 @@ it('can correctly detect if the attribute is dirty', function () {
 });
 
 it('can correctly detect if the attribute is dirty with null values', function () {
+    version_compare($this->app->version(), '12.18.0') > 0 || $this->markTestSkipped('Laravel 12.18+ only');
     $model = new DummyModelWithJson();
     $model->save();
 
