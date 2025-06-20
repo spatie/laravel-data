@@ -264,4 +264,4 @@ it('can correctly detect if the attribute is dirty', function () {
     expect($model->getRawOriginal('data_collection'))->toBe('[{"second": "Second", "first": "First"}, {"first": "Third", "second": "Fourth"}]')
         ->and($model->getAttributes()['data_collection'])->toBe('[{"first":"First","second":"Second"},{"first":"Third","second":"Fourth"}]')
         ->and($model->isDirty('data_collection'))->toBeFalse();
-})->skip(fn() => version_compare(app()->version(), '12.18.0', '<'));
+})->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
