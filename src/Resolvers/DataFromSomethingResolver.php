@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
+use Spatie\LaravelData\Exceptions\CannotCreateAbstractClass;
 use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
@@ -53,10 +54,12 @@ class DataFromSomethingResolver
                 $normalizedPayloads
             ));
 
-            $pipeline = $this->dataConfig->getResolvedDataPipeline($morphDataClass);
-
-            $creationContext->dataClass = $morphDataClass;
-            $class = $morphDataClass;
+            $this->replaceDataClassWithMorphedVersion(
+                $morphDataClass,
+                $pipeline,
+                $creationContext,
+                $class
+            );
         }
 
         $properties = $this->runPipeline(
@@ -67,6 +70,21 @@ class DataFromSomethingResolver
         );
 
         return $this->dataFromArrayResolver->execute($class, $properties);
+    }
+
+    protected function replaceDataClassWithMorphedVersion(
+        ?string $morphDataClass,
+        ResolvedDataPipeline &$pipeline,
+        CreationContext $creationContext,
+        string &$class,
+    ) {
+        if ($morphDataClass === null) {
+            throw CannotCreateAbstractClass::morphClassWasNotResolved(originalClass: $class);
+        }
+
+        $pipeline = $this->dataConfig->getResolvedDataPipeline($morphDataClass);
+        $creationContext->dataClass = $morphDataClass;
+        $class = $morphDataClass;
     }
 
     protected function createFromCustomCreationMethod(
