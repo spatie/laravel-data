@@ -2,17 +2,27 @@
 
 namespace Spatie\LaravelData\Concerns;
 
+use Illuminate\Support\Arr;
 use Spatie\LaravelData\Resolvers\EmptyDataResolver;
 
 trait EmptyData
 {
-    public static function empty(array $extra = [], mixed $replaceNullValuesWith = null, array $except = []): array
-    {
+    public static function empty(
+        array $extra = [],
+        mixed $replaceNullValuesWith = null,
+        ?array $except = null,
+        ?array $only = null,
+    ): array {
         $emptyData = app(EmptyDataResolver::class)->execute(static::class, $extra, $replaceNullValuesWith);
-        if (count($except) === 0) {
-            return $emptyData;
+
+        if ($only !== null) {
+            $emptyData = Arr::only($emptyData, $only);
         }
 
-        return array_diff_key($emptyData, array_flip($except));
+        if ($except !== null) {
+            $emptyData = Arr::except($emptyData, $except);
+        }
+
+        return $emptyData;
     }
 }
