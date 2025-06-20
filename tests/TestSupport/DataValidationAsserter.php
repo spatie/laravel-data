@@ -15,7 +15,6 @@ use Spatie\LaravelData\Normalizers\ArrayNormalizer;
 use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
 use Spatie\LaravelData\Resolvers\DataValidatorResolver;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
-use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Validation\DataRules;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
@@ -165,14 +164,14 @@ class DataValidationAsserter
 
         $normalizedProperties = $pipeline->normalize($payload);
 
-        $resolvedDataClass = app(DataConfig::class)->getDataClass($this->dataClass);
+        $creationContext = CreationContextFactory::createFromConfig($this->dataClass)->get();
 
-        $normalizedProperties = $pipeline->transformNormalizedToArray($normalizedProperties, $resolvedDataClass);
+        $normalizedProperties = $pipeline->transformNormalizedToArray($normalizedProperties, $creationContext);
 
         return $pipeline->runPipelineOnNormalizedValue(
             $payload,
             $normalizedProperties,
-            CreationContextFactory::createFromConfig($this->dataClass)->get()
+            $creationContext
         );
     }
 }
