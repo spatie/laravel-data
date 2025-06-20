@@ -103,7 +103,7 @@ interface IterableItemCast
 }
 ```
 
-The `castIterableItem` method is called for each item in an array or Collection when being cast, you can check the `iterableItemType` property of `DataPorperty->Type` to get the type the items should be transformed into.
+The `castIterableItem` method is called for each item in an array or Collection when being cast, you can check the `iterableItemType` property of `DataProperty->Type` to get the type the items should be transformed into.
 
 ## Combining casts and transformers
 
