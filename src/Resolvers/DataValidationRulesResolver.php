@@ -21,6 +21,9 @@ use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class DataValidationRulesResolver
 {
+    /** @var array<string, array|false> Cache of static validation rules. False means not cacheable. */
+    protected array $staticRulesCache = [];
+
     public function __construct(
         protected DataConfig $dataConfig,
         protected RuleNormalizer $ruleAttributesResolver,
@@ -237,22 +240,55 @@ class DataValidationRulesResolver
         ValidationPath $propertyPath,
         DataRules $dataRules,
     ): void {
-        // For static rules (no dynamic rules() method), directly generate rules per item
-        foreach ($collectionPayload as $collectionItemKey => $collectionItemValue) {
-            $itemPath = $propertyPath->property($collectionItemKey);
+        $cacheKey = $nestedDataClass->name;
 
-            if (! is_array($collectionItemValue)) {
-                $dataRules->add($itemPath, ['array']);
-                continue;
+        // Check if we've already determined cacheability for this class
+        if (! array_key_exists($cacheKey, $this->staticRulesCache)) {
+            if ($this->canSafelyCacheRules($nestedDataClass)) {
+                // Generate static rules once for caching
+                $staticRules = $this->generateStaticRules($nestedDataClass);
+                $this->staticRulesCache[$cacheKey] = $staticRules;
+            } else {
+                // Mark as not cacheable
+                $this->staticRulesCache[$cacheKey] = false;
             }
+        }
 
-            // Directly execute rule generation for this specific item and path
-            $this->execute(
-                $nestedDataClass->name,
-                $fullPayload,
-                $itemPath,
-                $dataRules
-            );
+        $cachedRules = $this->staticRulesCache[$cacheKey];
+
+        if ($cachedRules !== false) {
+            // Use cached static rules
+            foreach ($collectionPayload as $collectionItemKey => $collectionItemValue) {
+                $itemPath = $propertyPath->property($collectionItemKey);
+
+                if (! is_array($collectionItemValue)) {
+                    $dataRules->add($itemPath, ['array']);
+                    continue;
+                }
+
+                // Apply cached rules with proper path adjustment
+                foreach ($cachedRules as $ruleKey => $ruleValue) {
+                    $adjustedPath = $itemPath->property($ruleKey);
+                    $dataRules->add($adjustedPath, $ruleValue);
+                }
+            }
+        } else {
+            // Fallback to full context-aware rule generation
+            foreach ($collectionPayload as $collectionItemKey => $collectionItemValue) {
+                $itemPath = $propertyPath->property($collectionItemKey);
+
+                if (! is_array($collectionItemValue)) {
+                    $dataRules->add($itemPath, ['array']);
+                    continue;
+                }
+
+                $this->execute(
+                    $nestedDataClass->name,
+                    $fullPayload,
+                    $itemPath,
+                    $dataRules
+                );
+            }
         }
     }
 
@@ -364,5 +400,64 @@ class DataValidationRulesResolver
             $rules->all(),
             $path
         );
+    }
+
+    protected function canSafelyCacheRules(DataClass $dataClass): bool
+    {
+        // Very conservative approach - only cache if ALL properties are safe
+        foreach ($dataClass->properties as $property) {
+            // Check for common validation attributes that might cause context dependencies
+            $potentiallyUnsafeAttributes = [
+                'Spatie\LaravelData\Attributes\Validation\RequiredIf',
+                'Spatie\LaravelData\Attributes\Validation\RequiredUnless',
+                'Spatie\LaravelData\Attributes\Validation\RequiredWith',
+                'Spatie\LaravelData\Attributes\Validation\Same',
+                'Spatie\LaravelData\Attributes\Validation\Different',
+                'Spatie\LaravelData\Attributes\Validation\ConfirmedIf',
+                'Spatie\LaravelData\Attributes\Validation\AcceptedIf',
+                'Spatie\LaravelData\Attributes\Validation\DeclinedIf',
+                'Spatie\LaravelData\Attributes\Validation\ProhibitedIf',
+                'Spatie\LaravelData\Attributes\Validation\ProhibitedUnless',
+                'Spatie\LaravelData\Attributes\Validation\ExcludeIf',
+                'Spatie\LaravelData\Attributes\Validation\ExcludeUnless',
+            ];
+
+            // If any potentially unsafe validation attributes exist, don't cache
+            foreach ($potentiallyUnsafeAttributes as $attributeClass) {
+                if ($property->attributes->has($attributeClass)) {
+                    return false;
+                }
+            }
+
+            // Don't cache if property is morphable - complex logic
+            if ($property->morphable) {
+                return false;
+            }
+
+            // Don't cache nested data objects/collections - they may have their own complex rules
+            if ($property->type->kind->isDataObject() || $property->type->kind->isDataCollectable()) {
+                return false;
+            }
+        }
+
+        // Don't cache abstract or morphable classes
+        if ($dataClass->isAbstract || $dataClass->propertyMorphable) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function generateStaticRules(DataClass $dataClass): array
+    {
+        // Generate rules using an empty payload and root path to get only structural rules
+        $rules = $this->execute(
+            $dataClass->name,
+            [], // Empty payload - only structural rules, no context dependencies
+            ValidationPath::create(),
+            DataRules::create()
+        );
+
+        return $rules;
     }
 }
