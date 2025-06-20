@@ -53,6 +53,7 @@
     },
     "scripts" : {
         "analyse" : "vendor/bin/phpstan analyse",
+        "baseline" : "vendor/bin/phpstan analyse --generate-baseline",
         "test" : "./vendor/bin/pest --no-coverage",
         "test-coverage" : "vendor/bin/pest --coverage-html coverage",
         "format" : "vendor/bin/php-cs-fixer fix --allow-risky=yes",
