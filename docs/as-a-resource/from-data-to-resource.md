@@ -170,6 +170,14 @@ SongData::empty([
 ]);
 ```
 
+Or filter the properties that should be included in the empty response:
+
+```php
+SongData::empty(only: ['name']); // Will only return the `name` property
+
+SongData::empty(except: ['name']); // Will return the `artist` property
+```
+
 ## Response status code
 
 When a resource is being returned from a controller, the status code of the response will automatically be set to `201 CREATED` when Laravel data detects that the request's method is `POST`.  In all other cases, `200 OK` will be returned.

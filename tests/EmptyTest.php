@@ -54,15 +54,14 @@ it('can overwrite properties in an empty version of a data object', function () 
     ]);
 });
 
-it('can remove properties in an empty version of a data object', function () {
+it('can use except to filter out properties in an empty version of a data object', function () {
     expect(MultiData::empty(except: ['second']))
         ->toHaveKey('first')
-    ->not->toHaveKey('second');
+        ->not->toHaveKey('second');
+});
 
-    expect(MultiData::empty(extra: ['second' => 'Ruben'], except:['first']))
-        ->toHaveKey('second')
+it('can use obly to filter out properties in an empty version of a data object', function () {
+    expect(MultiData::empty(only: ['second']))
         ->not->toHaveKey('first')
-        ->toMatchArray([
-            'second' => 'Ruben',
-        ]);
+        ->toHaveKey('second');
 });
