@@ -14,7 +14,7 @@ class DataEloquentCast implements CastsAttributes
     protected DataConfig $dataConfig;
 
     public function __construct(
-        /** @var class-string<\Spatie\LaravelData\Contracts\BaseData> $dataClass */
+        /** @var class-string<BaseData&TransformableData> $dataClass */
         protected string $dataClass,
         /** @var string[] $arguments */
         protected array $arguments = []
@@ -22,7 +22,7 @@ class DataEloquentCast implements CastsAttributes
         $this->dataConfig = app(DataConfig::class);
     }
 
-    public function get($model, string $key, $value, array $attributes): ?BaseData
+    public function get($model, string $key, $value, array $attributes): BaseData|TransformableData|null
     {
         if (is_string($value) && in_array('encrypted', $this->arguments)) {
             $value = Crypt::decryptString($value);
@@ -39,7 +39,7 @@ class DataEloquentCast implements CastsAttributes
         $payload = json_decode($value, true, flags: JSON_THROW_ON_ERROR);
 
         if ($this->isAbstractClassCast()) {
-            /** @var class-string<BaseData> $dataClass */
+            /** @var class-string<BaseData&TransformableData> $dataClass */
             $dataClass = $this->dataConfig->morphMap->getMorphedDataClass($payload['type']) ?? $payload['type'];
 
             return $dataClass::from($payload['data']);
@@ -80,6 +80,11 @@ class DataEloquentCast implements CastsAttributes
         }
 
         return $value;
+    }
+
+    public function compare($model, string $key, $firstValue, $secondValue): bool
+    {
+        return $this->get($model, $key, $firstValue, [])->toArray() === $this->get($model, $key, $secondValue, [])->toArray();
     }
 
     protected function isAbstractClassCast(): bool

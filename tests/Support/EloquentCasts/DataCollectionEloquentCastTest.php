@@ -15,11 +15,14 @@ use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCustomCollectionCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithJson;
+use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataCollection;
 
 beforeEach(function () {
     DummyModelWithCasts::migrate();
+    DummyModelWithJson::migrate();
 });
 
 it('can save a data collection', function () {
@@ -245,3 +248,20 @@ it('can load and save an abstract property-morphable data collection', function 
         ->toBeInstanceOf(TestCollectionCastPropertyMorphableDataB::class)
         ->b->toBe('bar');
 });
+
+
+it('can correctly detect if the attribute is dirty', function () {
+    // Set a raw JSON string with spaces in it to mimic database behavior
+    $model = new DummyModelWithJson();
+    $model->setRawAttributes(['data_collection' => '[{"second": "Second", "first": "First"}, {"first": "Third", "second": "Fourth"}]']);
+    $model->save();
+
+    $model->data_collection = [
+        new MultiData('First', 'Second'),
+        new MultiData('Third', 'Fourth'),
+    ];
+
+    expect($model->getRawOriginal('data_collection'))->toBe('[{"second": "Second", "first": "First"}, {"first": "Third", "second": "Fourth"}]')
+        ->and($model->getAttributes()['data_collection'])->toBe('[{"first":"First","second":"Second"},{"first":"Third","second":"Fourth"}]')
+        ->and($model->isDirty('data_collection'))->toBeFalse();
+})->skip(fn() => version_compare(app()->version(), '12.18.0', '<'));
