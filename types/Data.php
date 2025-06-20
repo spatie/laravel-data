@@ -2,11 +2,11 @@
 
 /** @noinspection PhpExpressionResultUnusedInspection */
 
-use Spatie\LaravelData\Support\Creation\CreationContextFactory;
+use function PHPStan\Testing\assertType;
+
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDto;
 use Spatie\LaravelData\Tests\Fakes\SimpleResource;
-use function PHPStan\Testing\assertType;
 
 $data = SimpleData::from('Hello World');
 assertType(SimpleData::class, $data);
