@@ -6,8 +6,8 @@ use Exception;
 
 class CannotCastEnum extends Exception
 {
-    public static function create(string $type, mixed $value): self
+    public static function create(string $type, mixed $value, string $propertyName): self
     {
-        return new self("Could not cast enum: `{$value}` into a `{$type}`");
+        return new self("Could not cast enum (`{$propertyName}`): `{$value}` into a `{$type}`");
     }
 }
