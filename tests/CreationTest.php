@@ -36,6 +36,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\DataPipe;
+use Spatie\LaravelData\Exceptions\CannotCreateAbstractClass;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Lazy;
@@ -1792,5 +1793,11 @@ describe('property-morphable creation tests', function () {
             ->variant->toEqual(TestPropertyMorphableEnum::A)
             ->a->toEqual('foo')
             ->enum->toEqual(DummyBackedEnum::FOO);
+    });
+
+    it('will throw an exception when a property morphable data class is not found', function () {
+        expect(fn () => TestAbstractPropertyMorphableData::from([
+            'variant' => 'c',
+        ]))->toThrow(CannotCreateAbstractClass::class);
     });
 });
