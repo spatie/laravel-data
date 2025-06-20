@@ -5,6 +5,8 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
+use Spatie\LaravelData\Exceptions\CannotCreateAbstractClass;
+use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataConfig;
@@ -46,11 +48,18 @@ class DataFromSomethingResolver
 
         $dataClass = $this->dataConfig->getDataClass($class);
 
-        if ($morphDataClass = $this->dataMorphClassResolver->execute($dataClass, $normalizedPayloads)) {
-            $pipeline = $this->dataConfig->getResolvedDataPipeline($morphDataClass);
+        if ($dataClass->isAbstract === true && $dataClass->propertyMorphable === true) {
+            $morphDataClass = $this->dataMorphClassResolver->execute($dataClass, array_map(
+                fn (Normalized|array $normalized) => $pipeline->transformNormalizedToArray($normalized, $creationContext),
+                $normalizedPayloads
+            ));
 
-            $creationContext->dataClass = $morphDataClass;
-            $class = $morphDataClass;
+            $this->replaceDataClassWithMorphedVersion(
+                $morphDataClass,
+                $pipeline,
+                $creationContext,
+                $class
+            );
         }
 
         $properties = $this->runPipeline(
@@ -61,6 +70,21 @@ class DataFromSomethingResolver
         );
 
         return $this->dataFromArrayResolver->execute($class, $properties);
+    }
+
+    protected function replaceDataClassWithMorphedVersion(
+        ?string $morphDataClass,
+        ResolvedDataPipeline &$pipeline,
+        CreationContext $creationContext,
+        string &$class,
+    ) {
+        if ($morphDataClass === null) {
+            throw CannotCreateAbstractClass::morphClassWasNotResolved(originalClass: $class);
+        }
+
+        $pipeline = $this->dataConfig->getResolvedDataPipeline($morphDataClass);
+        $creationContext->dataClass = $morphDataClass;
+        $class = $morphDataClass;
     }
 
     protected function createFromCustomCreationMethod(
@@ -121,6 +145,9 @@ class DataFromSomethingResolver
         return $class::$methodName(...$payloads);
     }
 
+    /**
+     * @param array<array<string, mixed>|Normalized> $normalizedPayloads
+     */
     protected function runPipeline(
         CreationContext $creationContext,
         ResolvedDataPipeline $pipeline,
