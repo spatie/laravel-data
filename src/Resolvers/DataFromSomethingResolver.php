@@ -77,7 +77,7 @@ class DataFromSomethingResolver
         ResolvedDataPipeline &$pipeline,
         CreationContext $creationContext,
         string &$class,
-    ) {
+    ): void {
         if ($morphDataClass === null) {
             throw CannotCreateAbstractClass::morphClassWasNotResolved(originalClass: $class);
         }

@@ -1761,7 +1761,7 @@ describe('property-morphable creation tests', function () {
         abstract class TestAbstractPropertyMorphableDefaultData extends Data implements PropertyMorphableData
         {
             public function __construct(
-                #[\Spatie\LaravelData\Attributes\PropertyForMorph]
+                #[PropertyForMorph]
                 public TestPropertyMorphableEnum $variant = TestPropertyMorphableEnum::A,
             ) {
             }
