@@ -257,7 +257,7 @@ it('can correctly detect if the attribute is dirty', function () {
 
     $model->data->first = 'First2';
     expect($model->isDirty('data'))->toBeTrue();
-})->skip(fn() => version_compare(app()->version(), '12.18.0', '<'));
+})->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
 
 it('can correctly detect if the attribute is dirty with null values', function () {
     $model = new DummyModelWithJson();
@@ -268,4 +268,4 @@ it('can correctly detect if the attribute is dirty with null values', function (
     expect($model->getRawOriginal('data'))->toBe(null)
         ->and($model->getAttributes()['data'])->toBe('{"first":"First","second":"Second"}')
         ->and($model->isDirty('data'))->toBeTrue();
-})->skip(fn() => version_compare(app()->version(), '12.18.0', '<'));
+})->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
