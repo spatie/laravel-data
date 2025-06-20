@@ -16,6 +16,9 @@ class DataMorphClassResolver
     ) {
     }
 
+    /**
+     * @param array<array<string, mixed>> $normalizedPayloads
+     */
     public function execute(
         DataClass $dataClass,
         array $normalizedPayloads,

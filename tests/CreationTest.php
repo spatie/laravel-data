@@ -23,6 +23,7 @@ use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\PropertyForMorph;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithCastable;
@@ -71,6 +72,7 @@ use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
+use Spatie\LaravelData\Tests\Normalizers\NormalizedNormalizer;
 
 it('can use default types to create data objects', function () {
     $data = ComplicatedData::from([
@@ -1496,7 +1498,6 @@ it('can use auto lazy to construct a data object with property promotion', funct
 });
 
 
-
 it('can create a data object with inertia deferred properties', function () {
     $dataClass = new class () extends Data {
         public InertiaDeferred|string $deferred;
@@ -1572,7 +1573,9 @@ it('can use class level auto deferred to construct a inertia deferred property',
     class AutoDeferredData extends Data
     {
         public InertiaDeferred|string $string;
-    };
+    }
+
+    ;
 
     $data = AutoDeferredData::from(['string' => 'Deferred Value']);
 
@@ -1587,12 +1590,14 @@ describe('property-morphable creation tests', function () {
     {
         case A = 'a';
         case B = 'b';
-    };
+    }
+
+    ;
 
     abstract class TestAbstractPropertyMorphableData extends Data implements PropertyMorphableData
     {
         public function __construct(
-            #[\Spatie\LaravelData\Attributes\PropertyForMorph]
+            #[PropertyForMorph]
             public TestPropertyMorphableEnum $variant
         ) {
         }
@@ -1706,5 +1711,48 @@ describe('property-morphable creation tests', function () {
             ->toBeInstanceOf(TestPropertyMorphableDataB::class)
             ->variant->toEqual(TestPropertyMorphableEnum::B)
             ->b->toEqual('bar');
+    });
+
+    it('will only normalize payloads when a property morphable data class is selected', function () {
+        abstract class TestMorphableDataWithSpecialNormalizerAbstract extends Data implements PropertyMorphableData
+        {
+            public function __construct(
+                #[PropertyForMorph]
+                public string $type,
+            ) {
+            }
+
+            public static function morph(array $properties): ?string
+            {
+                return match ($properties['type']) {
+                    'specific' => TestMorphableDataWithSpecialNormalizerSpecific::class,
+                    default => null,
+                };
+            }
+
+            public static function normalizers(): array
+            {
+                return [NormalizedNormalizer::class];
+            }
+        }
+
+        class TestMorphableDataWithSpecialNormalizerSpecific extends TestMorphableDataWithSpecialNormalizerAbstract
+        {
+            public function __construct(
+                public string $name,
+            ) {
+                parent::__construct('specific');
+            }
+        }
+
+        $data = TestMorphableDataWithSpecialNormalizerAbstract::from([
+            'type' => 'specific',
+            'name' => 'Hello World',
+        ]);
+
+        expect($data)
+            ->toBeInstanceOf(TestMorphableDataWithSpecialNormalizerSpecific::class)
+            ->name->toEqual('Hello World')
+            ->type->toEqual('specific');
     });
 });

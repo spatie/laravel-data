@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
+use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataConfig;
@@ -46,7 +47,12 @@ class DataFromSomethingResolver
 
         $dataClass = $this->dataConfig->getDataClass($class);
 
-        if ($morphDataClass = $this->dataMorphClassResolver->execute($dataClass, $normalizedPayloads)) {
+        if ($dataClass->isAbstract === true && $dataClass->propertyMorphable === true) {
+            $morphDataClass = $this->dataMorphClassResolver->execute($dataClass, array_map(
+                fn (Normalized|array $normalized) => $pipeline->transformNormalizedToArray($normalized, $creationContext),
+                $normalizedPayloads
+            ));
+
             $pipeline = $this->dataConfig->getResolvedDataPipeline($morphDataClass);
 
             $creationContext->dataClass = $morphDataClass;
@@ -121,6 +127,9 @@ class DataFromSomethingResolver
         return $class::$methodName(...$payloads);
     }
 
+    /**
+     * @param array<array<string, mixed>|Normalized> $normalizedPayloads
+     */
     protected function runPipeline(
         CreationContext $creationContext,
         ResolvedDataPipeline $pipeline,
