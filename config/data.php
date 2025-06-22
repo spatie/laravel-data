@@ -29,6 +29,12 @@ return [
          * ignore the value being passed into the computed property and recalculate it.
          */
         'ignore_exception_when_trying_to_set_computed_property_value' => false,
+
+        /*
+         * When enabled, the package will expand attributes that use dot notation
+         * to access nested array values (e.g., 'user.name' will access $array['user']['name']).
+         */
+        'expand_dot_notation' => false,
     ],
 
     /*
