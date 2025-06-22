@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Support\TypeScriptTransformer;
 
+use Illuminate\Support\Arr;
 use phpDocumentor\Reflection\Fqsen;
 use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\Types\Array_;
@@ -55,9 +56,9 @@ class DataTypeScriptTransformer extends DtoTransformer
 
         $isOptional = $dataClass->attributes->has(TypeScriptOptional::class);
 
-        return array_reduce(
+        $results = array_reduce(
             $this->resolveProperties($class),
-            function (string $carry, ReflectionProperty $property) use ($isOptional, $dataClass, $missingSymbols) {
+            function (array $carry, ReflectionProperty $property) use ($isOptional, $dataClass, $missingSymbols) {
                 /** @var \Spatie\LaravelData\Support\DataProperty $dataProperty */
                 $dataProperty = $dataClass->properties[$property->getName()];
 
@@ -88,16 +89,26 @@ class DataTypeScriptTransformer extends DtoTransformer
 
                 $propertyName = $dataProperty->outputMappedName ?? $dataProperty->name;
 
-                if (! preg_match('/^[$_a-zA-Z][$_a-zA-Z0-9]*$/', $propertyName)) {
-                    $propertyName = "'{$propertyName}'";
+                if (config('data.features.expand_dot_notation') && str_contains($propertyName, '.')) {
+                    Arr::set(
+                        $carry,
+                        $propertyName,
+                        $isOptional
+                            ? "?: {$transformed}"
+                            : ": {$transformed}",
+                    );
+                } else {
+                    $carry[$propertyName] = $isOptional
+                        ? "?: {$transformed}"
+                        : ": {$transformed}";
                 }
 
-                return $isOptional
-                    ? "{$carry}{$propertyName}?: {$transformed};".PHP_EOL
-                    : "{$carry}{$propertyName}: {$transformed};".PHP_EOL;
+                return $carry;
             },
-            ''
+            []
         );
+
+        return $this->arrayToTypeScript($results);
     }
 
     protected function resolveTypeForProperty(
@@ -188,5 +199,24 @@ class DataTypeScriptTransformer extends DtoTransformer
                 'prev_cursor_url' => new Nullable(new String_()),
             ]),
         ]);
+    }
+
+    protected function arrayToTypeScript(array $array): string
+    {
+        $carry = '';
+
+        foreach ($array as $propertyName => $value) {
+            if (! preg_match('/^[$_a-zA-Z][$_a-zA-Z0-9]*$/', $propertyName)) {
+                $propertyName = "'{$propertyName}'";
+            }
+
+            if (is_array($value)) {
+                $carry .= "{$propertyName}: {".PHP_EOL.$this->arrayToTypeScript($value).'};'.PHP_EOL;
+            } else {
+                $carry .= "{$propertyName}{$value};".PHP_EOL;
+            }
+        }
+
+        return $carry;
     }
 }

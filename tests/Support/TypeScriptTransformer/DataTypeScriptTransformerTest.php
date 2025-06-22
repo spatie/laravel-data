@@ -340,3 +340,65 @@ it('supports converting nullable types to optional properties', function () {
     expect($transformer->canTransform($reflection))->toBeTrue();
     assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
 });
+
+it('handles dotted property names with expand_dot_notation disabled', function () {
+    $config = TypeScriptTransformerConfig::create();
+    config()->set('data.features.expand_dot_notation', false);
+
+    $data = new class ('hello', 'world') extends Data {
+        public function __construct(
+            #[MapOutputName('user.name')]
+            public string $userName,
+            #[MapOutputName('user.profile.bio')]
+            public string $userBio,
+        ) {
+        }
+    };
+
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass($data);
+
+    expect($transformer->canTransform($reflection))->toBeTrue();
+    $this->assertEquals(
+        <<<TXT
+        {
+        'user.name': string;
+        'user.profile.bio': string;
+        }
+        TXT,
+        $transformer->transform($reflection, 'DataObject')->transformed
+    );
+});
+
+it('handles dotted property names with expand_dot_notation enabled', function () {
+    $config = TypeScriptTransformerConfig::create();
+    config()->set('data.features.expand_dot_notation', true);
+
+    $data = new class ('hello', 'world') extends Data {
+        public function __construct(
+            #[MapOutputName('user.name')]
+            public string $userName,
+            #[MapOutputName('user.profile.bio')]
+            public string $userBio,
+        ) {
+        }
+    };
+
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass($data);
+
+    expect($transformer->canTransform($reflection))->toBeTrue();
+    $this->assertEquals(
+        <<<TXT
+        {
+        user: {
+        name: string;
+        profile: {
+        bio: string;
+        };
+        };
+        }
+        TXT,
+        $transformer->transform($reflection, 'DataObject')->transformed
+    );
+});

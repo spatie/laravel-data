@@ -128,3 +128,53 @@ class DataObject extends Data
     }
 }
 ```
+
+### Dotted Notation Expansion
+
+When using the `MapOutputName` or `MapName` attributes with dot notation (e.g., 'user.name'), the TypeScript transformer will respect the `expand_dot_notation` configuration setting:
+
+```php
+class UserData extends Data
+{
+    public function __construct(
+        #[MapOutputName('user.name')]
+        public string $name,
+        #[MapOutputName('user.profile.bio')]
+        public string $userBio,
+    ) {
+    }
+}
+```
+
+With `expand_dot_notation` disabled (default), this will generate:
+
+```tsx
+{
+    'user.name': string;
+    'user.profile.bio': string;
+}
+```
+
+When you enable `expand_dot_notation` in your `config/data.php` file:
+
+```php
+'features' => [
+    // Other features...
+    'expand_dot_notation' => true,
+],
+```
+
+The same data object will generate a nested TypeScript interface:
+
+```tsx
+{
+    user: {
+        name: string;
+        profile: {
+            bio: string;
+        };
+    };
+}
+```
+
+This ensures that your TypeScript interfaces match the structure of your JSON output when using dotted notation expansion.
