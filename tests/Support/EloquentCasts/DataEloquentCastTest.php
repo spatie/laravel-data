@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
+use Spatie\LaravelData\Support\EloquentCasts\DataEloquentCast;
 use function Pest\Laravel\assertDatabaseHas;
 
 use Spatie\LaravelData\Contracts\PropertyMorphableData;
@@ -269,3 +270,39 @@ it('can correctly detect if the attribute is dirty with null values', function (
         ->and($model->getAttributes()['data'])->toBe('{"first":"First","second":"Second"}')
         ->and($model->isDirty('data'))->toBeTrue();
 })->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
+
+it('can update a model where the cast is initially null', function () {
+    $model = DummyModelWithCasts::create([
+        'data' => null,
+    ]);
+
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data' => null,
+    ]);
+
+    $model->update([
+        'data' => new SimpleData('Test')
+    ]);
+
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data' => json_encode(['string' => 'Test']),
+    ]);
+});
+
+it('can update a model where the cast is initially not null', function () {
+    $model = DummyModelWithCasts::create([
+        'data' => new SimpleData('Test'),
+    ]);
+
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data' => json_encode(['string' => 'Test']),
+    ]);
+
+    $model->update([
+        'data' => null
+    ]);
+
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data' => null,
+    ]);
+});
