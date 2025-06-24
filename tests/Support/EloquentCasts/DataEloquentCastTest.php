@@ -280,7 +280,7 @@ it('can update a model where the cast is initially null', function () {
     ]);
 
     $model->update([
-        'data' => new SimpleData('Test')
+        'data' => new SimpleData('Test'),
     ]);
 
     assertDatabaseHas(DummyModelWithCasts::class, [
@@ -298,7 +298,7 @@ it('can update a model where the cast is initially not null', function () {
     ]);
 
     $model->update([
-        'data' => null
+        'data' => null,
     ]);
 
     assertDatabaseHas(DummyModelWithCasts::class, [
