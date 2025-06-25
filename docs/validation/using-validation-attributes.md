@@ -20,7 +20,8 @@ class SongData extends Data
 
 These rules will be merged together with the rules that are inferred from the data object.
 
-So it is not required to add the `required` and `string` rule, these will be added automatically. The rules for the above data object will look like this:
+So it is not required to add the `required` and `string` rule, these will be added automatically. The rules for the
+above data object will look like this:
 
 ```php
 [
@@ -29,11 +30,12 @@ So it is not required to add the `required` and `string` rule, these will be add
 ]
 ```
 
-For each Laravel validation rule we've got a matching validation attribute, you can find a list of them [here](/docs/laravel-data/v4/advanced-usage/validation-attributes).
+For each Laravel validation rule we've got a matching validation attribute, you can find a list of
+them [here](/docs/laravel-data/v4/advanced-usage/validation-attributes).
 
 ## Referencing route parameters
 
-Sometimes you need a value within your validation attribute which is a route parameter. 
+Sometimes you need a value within your validation attribute which is a route parameter.
 Like the example below where the id should be unique ignoring the current id:
 
 ```php
@@ -61,6 +63,99 @@ class SongData extends Data
     }
 }
 ```
+
+## Referencing the current authenticated user
+
+If you need to reference the current authenticated user in your validation attributes, you can use the
+`AuthenticatedUserReference`:
+
+```php
+use Spatie\LaravelData\Support\Validation\References\AuthenticatedUserReference;
+
+class UserData extends Data
+{
+    public function __construct(
+        public string $name,
+        #[Unique('users', 'email', ignore: new AuthenticatedUserReference())]
+        public string $email,
+    ) {   
+    }
+}
+```
+
+When you need to reference a specific property of the authenticated user, you can do so like this:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        #[Max(new AuthenticatedUserReference('max_song_title_length'))]
+        public string $title,
+    ) {
+    }
+}
+```
+
+Using a different guard than the default one can be done by passing the guard name to the constructor:
+
+```php
+class UserData extends Data
+{
+    public function __construct(
+        public string $name,
+        #[Unique('users', 'email', ignore: new AuthenticatedUserReference(guard: 'api'))]
+        public string $email,
+    ) {   
+    }
+}
+```
+
+## Referencing container dependencies
+
+If you need to reference a container dependency in your validation attributes, you can use the `ContainerReference`:
+
+```php
+use Spatie\LaravelData\Support\Validation\References\ContainerReference;
+
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[Max(new ContainerReference('max_song_title_length'))]
+        public string $artist,
+    ) {
+    }
+}
+```
+
+It might be more useful to use a property of the container dependency, which can be done like this:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[Max(new ContainerReference(SongSettings::class, 'max_song_title_length'))]
+        public string $artist,
+    ) {
+    }
+}
+```
+
+When your dependency requires specific parameters, you can pass them along:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[Max(new ContainerReference(SongSettings::class, 'max_song_title_length', parameters: ['repository' => 'redis']))]
+        public string $artist,
+    ) {
+    }
+}
+```
+
 
 ## Referencing other fields
 
@@ -148,7 +243,8 @@ public string $property
 
 ## Creating your validation attribute
 
-It is possible to create your own validation attribute by extending the `CustomValidationAttribute` class, this class has a `getRules` method that returns the rules that should be applied to the property.
+It is possible to create your own validation attribute by extending the `CustomValidationAttribute` class, this class
+has a `getRules` method that returns the rules that should be applied to the property.
 
 ```php
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
@@ -164,4 +260,5 @@ class CustomRule extends CustomValidationAttribute
 }
 ```
 
-Quick note: you can only use these rules as an attribute, not as a class rule within the static `rules` method of the data class.
+Quick note: you can only use these rules as an attribute, not as a class rule within the static `rules` method of the
+data class.

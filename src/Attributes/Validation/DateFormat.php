@@ -4,14 +4,14 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
-use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class DateFormat extends StringValidationAttribute
 {
     protected string|array $format;
 
-    public function __construct(string|array|RouteParameterReference ...$format)
+    public function __construct(string|array|ExternalReference ...$format)
     {
         $this->format = Arr::flatten($format);
     }

@@ -3,9 +3,8 @@
 namespace Spatie\LaravelData\Support\Validation\References;
 
 use Spatie\LaravelData\Exceptions\CannotResolveRouteParameterReference;
-use Stringable;
 
-class RouteParameterReference implements Stringable
+class RouteParameterReference implements ExternalReference
 {
     public function __construct(
         public readonly string $routeParameter,
@@ -37,10 +36,5 @@ class RouteParameterReference implements Stringable
         }
 
         return $value;
-    }
-
-    public function __toString(): string
-    {
-        return $this->getValue();
     }
 }

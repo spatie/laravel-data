@@ -979,6 +979,12 @@ public string $closure;
 
 #[Unique('users', ignore: 5)]
 public string $closure;
+
+#[Unique('users', ignore: new AuthenticatedUserReference())]
+public string $closure;
+
+#[Unique('posts', ignore: new RouteParameterReference('post'))]
+public string $closure;
 ```
 
 ## Uppercase
