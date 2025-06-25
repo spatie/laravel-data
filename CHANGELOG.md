@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.17.0 - 2025-06-25
+
+### What's Changed
+
+* Add support for external validation attribute references by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1051
+
+### Breaking changes
+
+- While technically not breaking, some changes were made inside the validation attributes. You can check it here: https://github.com/spatie/laravel-data/pull/1051 in the headsup section.
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.16.1...4.17.0
+
 ## 4.16.1 - 2025-06-24
 
 ### What's Changed
@@ -141,6 +153,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -151,6 +164,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -187,6 +201,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
