@@ -6,18 +6,18 @@ use Attribute;
 use Closure;
 use Exception;
 use Illuminate\Validation\Rules\Exists as BaseExists;
-use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Exists extends ObjectValidationAttribute
 {
     public function __construct(
-        protected null|string|RouteParameterReference $table = null,
-        protected null|string|RouteParameterReference $column = 'NULL',
-        protected null|string|RouteParameterReference $connection = null,
-        protected bool|RouteParameterReference $withoutTrashed = false,
-        protected string|RouteParameterReference $deletedAtColumn = 'deleted_at',
+        protected null|string|ExternalReference $table = null,
+        protected null|string|ExternalReference $column = 'NULL',
+        protected null|string|ExternalReference $connection = null,
+        protected bool|ExternalReference $withoutTrashed = false,
+        protected string|ExternalReference $deletedAtColumn = 'deleted_at',
         protected ?Closure $where = null,
         protected ?BaseExists $rule = null,
     ) {
@@ -32,11 +32,11 @@ class Exists extends ObjectValidationAttribute
             return $this->rule;
         }
 
-        $table = $this->normalizePossibleRouteReferenceParameter($this->table);
-        $column = $this->normalizePossibleRouteReferenceParameter($this->column);
-        $connection = $this->normalizePossibleRouteReferenceParameter($this->connection);
-        $withoutTrashed = $this->normalizePossibleRouteReferenceParameter($this->withoutTrashed);
-        $deletedAtColumn = $this->normalizePossibleRouteReferenceParameter($this->deletedAtColumn);
+        $table = $this->normalizePossibleExternalReferenceParameter($this->table);
+        $column = $this->normalizePossibleExternalReferenceParameter($this->column);
+        $connection = $this->normalizePossibleExternalReferenceParameter($this->connection);
+        $withoutTrashed = $this->normalizePossibleExternalReferenceParameter($this->withoutTrashed);
+        $deletedAtColumn = $this->normalizePossibleExternalReferenceParameter($this->deletedAtColumn);
 
         $rule = new BaseExists(
             $connection ? "{$connection}.{$table}" : $table,

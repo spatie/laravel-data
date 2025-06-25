@@ -4,8 +4,8 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use BackedEnum;
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
-use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class DeclinedIf extends StringValidationAttribute
@@ -14,7 +14,7 @@ class DeclinedIf extends StringValidationAttribute
 
     public function __construct(
         string|FieldReference $field,
-        protected string|bool|int|float|BackedEnum|RouteParameterReference $value,
+        protected string|bool|int|float|BackedEnum|ExternalReference $value,
     ) {
         $this->field = $this->parseFieldReference($field);
     }

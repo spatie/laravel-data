@@ -4,14 +4,14 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use Illuminate\Support\Arr;
-use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class StartsWith extends StringValidationAttribute
 {
     protected string|array $values;
 
-    public function __construct(string | array | RouteParameterReference ...$values)
+    public function __construct(string|array|ExternalReference ...$values)
     {
         $this->values = Arr::flatten($values);
     }
