@@ -21,7 +21,7 @@ use Spatie\LaravelData\Support\Validation\ValidationPath;
  */
 trait ValidateableData
 {
-    public static function validate(Arrayable|array $payload): Arrayable|array
+    public static function validate(Arrayable|array $payload, array $mappedProperties = []): Arrayable|array
     {
         $validator = DataContainer::get()->dataValidatorResolver()->execute(
             static::class,
@@ -31,6 +31,7 @@ trait ValidateableData
         return DataContainer::get()->validatedPayloadResolver()->execute(
             static::class,
             $validator,
+            $mappedProperties,
         );
     }
 

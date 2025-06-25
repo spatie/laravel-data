@@ -2,6 +2,9 @@
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Validation\ValidationException;
+use Spatie\LaravelData\Attributes\MapInputName;
+use Spatie\LaravelData\Attributes\Validation\Between;
+use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\BaseData;
 use Spatie\LaravelData\Concerns\ContextableData;
@@ -78,3 +81,24 @@ it('can use data as an Resource', function () {
         'validate',
     ]);
 })->skip('Fix test for Laravel 12');
+
+it('bla', function () {
+    class Page extends Data
+    {
+        #[Min(1)]
+        #[MapInputName('page.number')]
+        public int $number = 1;
+
+        #[Between(1, 200)]
+        #[MapInputName('page.size')]
+        public int $size = 10;
+    }
+
+    // no error
+    $page = Page::validateAndCreate([
+        'size' => 300,
+    ]);
+
+    // 300
+    dd($page->size);
+});

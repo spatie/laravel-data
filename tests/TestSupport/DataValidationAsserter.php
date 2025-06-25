@@ -41,8 +41,11 @@ class DataValidationAsserter
 
     public function assertOk(array $payload): self
     {
+        ['piped' => $piped, 'mappedProperties' => $mappedProperties] = $this->pipePayload($payload);
+
         $this->dataClass::validate(
-            $this->pipePayload($payload)
+            $piped,
+            $mappedProperties,
         );
 
         expect(true)->toBeTrue();
@@ -55,8 +58,11 @@ class DataValidationAsserter
         ?array $errors = null
     ): self {
         try {
+            ['piped' => $piped, 'mappedProperties' => $mappedProperties] = $this->pipePayload($payload);
+
             $this->dataClass::validate(
-                $this->pipePayload($payload)
+                $piped,
+                $mappedProperties,
             );
         } catch (ValidationException $exception) {
             expect(true)->toBeTrue();
@@ -79,7 +85,7 @@ class DataValidationAsserter
     ): self {
         $inferredRules = app(DataValidationRulesResolver::class)->execute(
             $this->dataClass,
-            $this->pipePayload($payload),
+            $this->pipePayload($payload)['piped'],
             ValidationPath::create(),
             DataRules::create(),
         );
@@ -94,8 +100,11 @@ class DataValidationAsserter
     public function assertRedirect(array $payload, string $redirect): self
     {
         try {
+            ['piped' => $piped, 'mappedProperties' => $mappedProperties] = $this->pipePayload($payload);
+
             $this->dataClass::validate(
-                $this->pipePayload($payload)
+                $piped,
+                $mappedProperties
             );
         } catch (ValidationException $exception) {
             expect($exception->redirectTo)->toBe($redirect);
@@ -111,9 +120,9 @@ class DataValidationAsserter
     public function assertErrorBag(array $payload, string $errorBag): self
     {
         try {
-            $this->dataClass::validate(
-                $this->pipePayload($payload)
-            );
+            ['piped' => $piped, 'mappedProperties' => $mappedProperties] = $this->pipePayload($payload);
+
+            $this->dataClass::validate($piped, $mappedProperties);
         } catch (ValidationException $exception) {
             expect($exception->errorBag)->toBe($errorBag);
 
@@ -145,7 +154,7 @@ class DataValidationAsserter
     ): self {
         $validator = app(DataValidatorResolver::class)->execute(
             $this->dataClass,
-            $this->pipePayload($payload),
+            $this->pipePayload($payload)['piped'],
         );
 
         expect($validator->customAttributes)->toEqual($attributes);
@@ -153,6 +162,7 @@ class DataValidationAsserter
         return $this;
     }
 
+    /** @return array{piped: array, mappedProperties: array} */
     private function pipePayload(array $payload): array
     {
         $pipeline = app(DataPipeline::class)
@@ -168,10 +178,12 @@ class DataValidationAsserter
 
         $normalizedProperties = $pipeline->transformNormalizedToArray($normalizedProperties, $creationContext);
 
-        return $pipeline->runPipelineOnNormalizedValue(
+        $piped = $pipeline->runPipelineOnNormalizedValue(
             $payload,
             $normalizedProperties,
             $creationContext
         );
+
+        return ['piped' => $piped, 'mappedProperties' => $creationContext->mappedProperties];
     }
 }

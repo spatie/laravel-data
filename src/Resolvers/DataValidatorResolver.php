@@ -29,7 +29,7 @@ class DataValidatorResolver
             $dataClass,
             $payload,
             ValidationPath::create(),
-            DataRules::create()
+            DataRules::create(),
         );
 
         ['messages' => $messages, 'attributes' => $attributes] = $this->dataValidationMessagesAndAttributesResolver->execute(

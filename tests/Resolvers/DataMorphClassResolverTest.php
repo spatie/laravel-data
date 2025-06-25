@@ -43,7 +43,9 @@ it('can resolve morph class based on properties', function () {
         {
             return $properties['type'];
         }
-    };
+    }
+
+    ;
 
     $morph = app(DataMorphClassResolver::class)->execute(
         app(DataConfig::class)->getDataClass(TestAbstractMorphableData::class),
@@ -60,18 +62,28 @@ it('can resolve morph class with mapped input names', function () {
         #[MapInputName('type_for_morph')]
         public string $type;
 
-        public static function morph(array $properties): string
+        public static function morph(array $properties): ?string
         {
-            return $properties['type'];
+            return match ($properties['type']) {
+                'post' => TestAbstractMorphableDataWithMappedInputNameChild::class,
+                default => null
+            };
         }
-    };
+    }
 
-    $morph = app(DataMorphClassResolver::class)->execute(
-        app(DataConfig::class)->getDataClass(TestAbstractMorphableDataWithMappedInputName::class),
-        [['type_for_morph' => 'post']]
-    );
+    class TestAbstractMorphableDataWithMappedInputNameChild extends TestAbstractMorphableDataWithMappedInputName
+    {
+        public string $name;
+    }
 
-    expect($morph)->toBe('post');
+    $data = TestAbstractMorphableDataWithMappedInputName::from([
+        'type_for_morph' => 'post',
+        'name' => 'Test Name',
+    ]);
+
+    expect($data)->toBeInstanceOf(TestAbstractMorphableDataWithMappedInputNameChild::class)
+        ->type->toBe('post')
+        ->name->toBe('Test Name');
 });
 
 it('can resolve morph class with backed enum type', function () {
@@ -84,7 +96,9 @@ it('can resolve morph class with backed enum type', function () {
         {
             return $properties['type']->value;
         }
-    };
+    }
+
+    ;
 
     $morph = app(DataMorphClassResolver::class)->execute(
         app(DataConfig::class)->getDataClass(TestAbstractMorphableDataWithBackedEnum::class),

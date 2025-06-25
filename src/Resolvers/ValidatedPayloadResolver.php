@@ -9,14 +9,24 @@ use Spatie\LaravelData\Contracts\ValidateableData;
 
 class ValidatedPayloadResolver
 {
+    public function __construct(
+        protected MappedValidationExceptionResolver $mappedValidationExceptionResolver
+    ) {
+    }
+
     /** @param class-string<ValidateableData&BaseData> $dataClass */
     public function execute(
         string $dataClass,
-        Validator $validator
+        Validator $validator,
+        array $mappedProperties,
     ): array {
         try {
             $validator->validate();
         } catch (ValidationException $exception) {
+            if (count($mappedProperties) !== 0) {
+                $this->mappedValidationExceptionResolver->execute($exception, $mappedProperties);
+            }
+
             if (method_exists($dataClass, 'redirect')) {
                 $exception->redirectTo(app()->call([$dataClass, 'redirect']));
             }

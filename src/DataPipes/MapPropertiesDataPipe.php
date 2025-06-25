@@ -28,8 +28,13 @@ class MapPropertiesDataPipe implements DataPipe
                 continue;
             }
 
+            if ($dataProperty->inputMappedName === $dataProperty->name) {
+                continue;
+            }
+
             $properties[$dataProperty->name] = Arr::get($properties, $dataProperty->inputMappedName);
-            //            Arr::forget($properties, $dataProperty->inputMappedName);
+
+            unset($properties[$dataProperty->inputMappedName]);
 
             $this->addPropertyMappingToCreationContext(
                 $creationContext,
@@ -47,6 +52,13 @@ class MapPropertiesDataPipe implements DataPipe
         $depth = count($creationContext->currentPath);
 
         $mappedProperties = &$creationContext->mappedProperties;
+
+        $original = implode('.', $creationContext->currentPath + [$property->name]);
+        $mapped = implode('.', $creationContext->currentPath + [$property->inputMappedName]);
+
+        $mappedProperties[$original] = $mapped;
+
+        return;
 
         for ($i = 0; $i < $depth + 1; $i++) {
             if ($i === $depth) {

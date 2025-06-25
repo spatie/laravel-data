@@ -7,7 +7,7 @@ use Illuminate\Validation\Validator;
 
 interface ValidateableData
 {
-    public static function validate(Arrayable|array $payload): Arrayable|array;
+    public static function validate(Arrayable|array $payload, array $mappedProperties = []): Arrayable|array;
 
     /**
      * @return static
