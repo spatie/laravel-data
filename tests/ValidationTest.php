@@ -8,12 +8,14 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\Rules\In as LaravelIn;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
+use function Pest\Laravel\actingAs;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
@@ -46,6 +48,8 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\ValidationStrategy;
+use Spatie\LaravelData\Support\Validation\References\AuthenticatedUserReference;
+use Spatie\LaravelData\Support\Validation\References\ContainerReference;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
@@ -54,6 +58,7 @@ use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DataWithReferenceFieldValidationAttribute;
 use Spatie\LaravelData\Tests\Fakes\DummyDataWithContextOverwrittenValidationRules;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\FakeAuthenticatable;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
@@ -1550,6 +1555,40 @@ it('can reference route models with a property as values within rules', function
     ]);
 });
 
+it('can reference the current logged in user as values within rules', function () {
+    actingAs($user = new FakeAuthenticatable());
+
+    $dataClass = new class () extends Data {
+        #[Unique('users', ignore: new AuthenticatedUserReference())]
+        public int $property;
+    };
+
+    expect($dataClass::getValidationRules([]))->toEqual([
+        'property' => [
+            'required',
+            'numeric',
+            Rule::unique('users')->ignore($user),
+        ],
+    ]);
+});
+
+it('can reference a container dependency as values within rules', function () {
+    app()->bind('max-allowed-size', fn () => 100);
+
+    $dataClass = new class () extends Data {
+        #[Max(value: new ContainerReference('max-allowed-size'))]
+        public int $property;
+    };
+
+    DataValidationAsserter::for($dataClass)->assertRules([
+        'property' => [
+            'required',
+            'numeric',
+            'max:100',
+        ],
+    ]);
+});
+
 it('can set the validator to stop on the first failure', function () {
     $dataClass = new class () extends Data {
         #[Min(10)]
@@ -2613,7 +2652,9 @@ describe('property-morphable validation tests', function () {
     {
         case A = 'a';
         case B = 'b';
-    };
+    }
+
+    ;
 
     abstract class TestValidationAbstractPropertyMorphableData extends Data implements PropertyMorphableData
     {
@@ -2699,7 +2740,9 @@ describe('property-morphable validation tests', function () {
                 public ?DataCollection $nestedCollection,
             ) {
             }
-        };
+        }
+
+        ;
 
         DataValidationAsserter::for(TestValidationNestedPropertyMorphableData::class)
             ->assertErrors([
