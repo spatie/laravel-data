@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
+use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
@@ -15,26 +16,49 @@ class MappedValidationExceptionResolver
             return $exception;
         }
 
-        dd($mappedProperties);
+        $messages = $exception->validator->errors();
 
-        $messageBag = $exception->validator->errors();
+        foreach ($messages->getMessages() as $key => $messagesList) {
+            foreach ($mappedProperties as $original => $mapped) {
+                if ($key === $original) {
+                    $this->mapEntryInMessageBag(
+                        $messages,
+                        original: $key,
+                        mapped: $mapped,
+                        messagesList: $messagesList
+                    );
 
-        $messages = $messageBag->getMessages();
+                    continue;
+                }
 
-        $newMessages = [];
+                if (str_starts_with($key, "{$original}.")) {
+                    $newKey = str_replace("{$original}.", "{$mapped}.", $key);
 
-        foreach ($mappedProperties as $original => $mapped) {
-            if (! array_key_exists($original, $messages)) {
-                continue;
+                    $this->mapEntryInMessageBag(
+                        $messages,
+                        original: $key,
+                        mapped: $newKey,
+                        messagesList: $messagesList
+                    );
+
+                    continue;
+                }
             }
-
-            $messageBag->forget($original);
-
-            $newMessages[$mapped] = $messages[$original];
         }
 
-        $messageBag->merge($newMessages);
-
         return $exception;
+    }
+
+    protected function mapEntryInMessageBag(
+        MessageBag $messageBag,
+        string $original,
+        string $mapped,
+        array $messagesList
+    ): void {
+        foreach ($messagesList as $message) {
+            $messageBag->add($mapped, $message);
+        }
+
+        $messageBag->forget($original);
     }
 }

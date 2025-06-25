@@ -2,9 +2,6 @@
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Validation\ValidationException;
-use Spatie\LaravelData\Attributes\MapInputName;
-use Spatie\LaravelData\Attributes\Validation\Between;
-use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Concerns\AppendableData;
 use Spatie\LaravelData\Concerns\BaseData;
 use Spatie\LaravelData\Concerns\ContextableData;
@@ -62,11 +59,13 @@ it('can use data as an DTO', function () {
     expect($dto)->toBeInstanceOf(SimpleDto::class)
         ->toBeInstanceOf(Dto::class)
         ->not()->toBeInstanceOf(Data::class)
-        ->not()->toHaveMethods(['toArray', 'toJson', 'toResponse', 'all', 'include', 'exclude', 'only', 'except', 'transform', 'with', 'jsonSerialize'])
         ->and($dto->string)->toEqual('Hello World');
 
+    expect($dto::class)
+        ->not()->toHaveMethods(['toArray', 'toJson', 'toResponse', 'all', 'include', 'exclude', 'only', 'except', 'transform', 'with', 'jsonSerialize']);
+
     expect(fn () => SimpleDto::validate(['string' => null]))->toThrow(ValidationException::class);
-})->skip('Fix test for Laravel 12');
+});
 
 it('can use data as an Resource', function () {
     $resource = SimpleResource::from('Hello World');
@@ -74,31 +73,9 @@ it('can use data as an Resource', function () {
     expect($resource)->toBeInstanceOf(SimpleResource::class)
         ->toBeInstanceOf(Resource::class)
         ->not()->toBeInstanceOf(Data::class)
-        ->toHaveMethods(['toArray', 'toJson', 'toResponse', 'all', 'include', 'exclude', 'only', 'except', 'transform', 'with', 'jsonSerialize'])
         ->and($resource->string)->toEqual('Hello World');
 
-    expect($resource)->not()->toHaveMethods([
-        'validate',
-    ]);
-})->skip('Fix test for Laravel 12');
-
-it('bla', function () {
-    class Page extends Data
-    {
-        #[Min(1)]
-        #[MapInputName('page.number')]
-        public int $number = 1;
-
-        #[Between(1, 200)]
-        #[MapInputName('page.size')]
-        public int $size = 10;
-    }
-
-    // no error
-    $page = Page::validateAndCreate([
-        'size' => 300,
-    ]);
-
-    // 300
-    dd($page->size);
+    expect($resource::class)
+        ->toHaveMethods(['toArray', 'toJson', 'toResponse', 'all', 'include', 'exclude', 'only', 'except', 'transform', 'with', 'jsonSerialize'])
+        ->not()->toHaveMethods(['validate']);
 });

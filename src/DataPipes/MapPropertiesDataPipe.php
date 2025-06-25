@@ -49,8 +49,6 @@ class MapPropertiesDataPipe implements DataPipe
         CreationContext $creationContext,
         DataProperty $property
     ): void {
-        $depth = count($creationContext->currentPath);
-
         $mappedProperties = &$creationContext->mappedProperties;
 
         $original = implode('.', $creationContext->currentPath + [$property->name]);
@@ -59,6 +57,8 @@ class MapPropertiesDataPipe implements DataPipe
         $mappedProperties[$original] = $mapped;
 
         return;
+
+        $depth = count($creationContext->currentPath);
 
         for ($i = 0; $i < $depth + 1; $i++) {
             if ($i === $depth) {

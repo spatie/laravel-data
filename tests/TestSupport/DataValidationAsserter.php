@@ -55,7 +55,8 @@ class DataValidationAsserter
 
     public function assertErrors(
         array $payload,
-        ?array $errors = null
+        ?array $errors = null,
+        ?array $errorKeys = null,
     ): self {
         try {
             ['piped' => $piped, 'mappedProperties' => $mappedProperties] = $this->pipePayload($payload);
@@ -69,6 +70,10 @@ class DataValidationAsserter
 
             if ($errors !== null) {
                 expect($exception->errors())->toBe($errors);
+            }
+
+            if ($errorKeys !== null) {
+                expect($exception->errors())->toHaveKeys($errorKeys);
             }
 
             return $this;
@@ -88,6 +93,7 @@ class DataValidationAsserter
             $this->pipePayload($payload)['piped'],
             ValidationPath::create(),
             DataRules::create(),
+            useMappedPropertyNames: true,
         );
 
         $parser = new ValidationRuleParser($payload);
