@@ -1606,11 +1606,21 @@ it('handles parsing except from request with mapped output name', function () {
         'id' => 1,
         'amount' => 1000,
         'any_string' => 'test',
-        'child' => SimpleChildDataWithMappedOutputName::from([
-            'id' => 2,
-            'amount' => 2000,
-        ]),
+        'child' => new SimpleChildDataWithMappedOutputName(
+            id: 2,
+            amount: 2000
+        ),
     ]);
+
+    //    $dataclass = SimpleDataWithMappedOutputName::from([
+    //        'id' => 1,
+    //        'amount' => 1000,
+    //        'any_string' => 'test',
+    //        'child' => SimpleChildDataWithMappedOutputName::from([
+    //            'id' => 2,
+    //            'amount' => 2000,
+    //        ]),
+    //    ]);
 
     $request = request()->merge(['except' => ['paid_amount', 'any_string', 'child.child_amount']]);
 
