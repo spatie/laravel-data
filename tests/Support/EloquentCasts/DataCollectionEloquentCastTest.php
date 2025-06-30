@@ -249,7 +249,6 @@ it('can load and save an abstract property-morphable data collection', function 
         ->b->toBe('bar');
 });
 
-
 it('can correctly detect if the attribute is dirty', function () {
     // Set a raw JSON string with spaces in it to mimic database behavior
     $model = new DummyModelWithJson();
@@ -265,3 +264,38 @@ it('can correctly detect if the attribute is dirty', function () {
         ->and($model->getAttributes()['data_collection'])->toBe('[{"first":"First","second":"Second"},{"first":"Third","second":"Fourth"}]')
         ->and($model->isDirty('data_collection'))->toBeFalse();
 })->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
+
+it('can update a model where the cast is initially null', function () {
+    $model = new DummyModelWithCasts();
+    $model->setRawAttributes(['data_collection' => null]);
+    $model->save();
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data_collection' => null,
+    ]);
+
+    $model->update([
+        'data_collection' => \Illuminate\Support\Collection::make([new SimpleData('Test')]),
+    ]);
+
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data_collection' => json_encode([['string' => 'Test']]),
+    ]);
+});
+
+it('can update a model where the cast is initially not null', function () {
+    $model = DummyModelWithCasts::create([
+        'data_collection' => \Illuminate\Support\Collection::make([new SimpleData('Test')]),
+    ]);
+
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data_collection' => json_encode([['string' => 'Test']]),
+    ]);
+
+    $model->update([
+        'data_collection' => null,
+    ]);
+
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data_collection' => null,
+    ]);
+});
