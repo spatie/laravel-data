@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
+use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
@@ -9,6 +10,7 @@ class DataValidationMessagesAndAttributesResolver
 {
     public function __construct(
         protected DataConfig $dataConfig,
+        protected DataMorphClassResolver $dataMorphClassResolver,
     ) {
     }
 
@@ -19,6 +21,21 @@ class DataValidationMessagesAndAttributesResolver
         array $nestingChain = [],
     ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
+
+        if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
+            $payload = $path->isRoot()
+                ? $fullPayload
+                : Arr::get($fullPayload, $path->get(), []);
+
+            $morphedClass = $this->dataMorphClassResolver->execute(
+                $dataClass,
+                [$payload],
+            );
+
+            $dataClass = $morphedClass
+                ? $this->dataConfig->getDataClass($morphedClass)
+                : $dataClass;
+        }
 
         $messages = [];
         $attributes = [];
@@ -72,8 +89,8 @@ class DataValidationMessagesAndAttributesResolver
         $messages = array_merge(...$messages);
         $attributes = array_merge(...$attributes);
 
-        if (method_exists($class, 'messages')) {
-            $messages = collect(app()->call([$class, 'messages']))
+        if (method_exists($dataClass->name, 'messages')) {
+            $messages = collect(app()->call([$dataClass->name, 'messages']))
                 ->keyBy(
                     fn (mixed $messages, string $key) => ! str_contains($key, '.') && is_string($messages)
                         ? $path->property("*.{$key}")->get()
@@ -83,8 +100,8 @@ class DataValidationMessagesAndAttributesResolver
                 ->all();
         }
 
-        if (method_exists($class, 'attributes')) {
-            $attributes = collect(app()->call([$class, 'attributes']))
+        if (method_exists($dataClass->name, 'attributes')) {
+            $attributes = collect(app()->call([$dataClass->name, 'attributes']))
                 ->keyBy(fn (mixed $messages, string $key) => $path->property($key)->get())
                 ->merge($attributes)
                 ->all();

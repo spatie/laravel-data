@@ -2731,4 +2731,81 @@ describe('property-morphable validation tests', function () {
                 'nestedCollection' => [['variant' => 'a', 'a' => 'foo', 'enum' => 'foo'], ['variant' => 'b', 'b' => 'bar']],
             ]);
     });
+
+    it('can validate property-morphable data with custom messages and attributes', function () {
+        abstract class TestValidationCustomMessageAbstractPropertyMorphableData extends Data implements PropertyMorphableData
+        {
+            public function __construct(
+                #[PropertyForMorph]
+                public TestValidationPropertyMorphableEnum $variant,
+                #[Max(1)]
+                public int $abstract_integer,
+                public string $abstract_string,
+            ) {
+            }
+
+            public static function morph(array $properties): ?string
+            {
+                return match ($properties['variant']) {
+                    TestValidationPropertyMorphableEnum::A => TestValidationCustomMessagePropertyMorphableDataA::class,
+                    default => null,
+                };
+            }
+
+            public static function messages()
+            {
+                return [
+                    'abstract_integer.max' => 'Abstract class integer test message.',
+                ];
+            }
+
+            public static function attributes()
+            {
+                return [
+                    'abstract_string' => '[Abstract String]',
+                ];
+            }
+        }
+
+        class TestValidationCustomMessagePropertyMorphableDataA extends TestValidationCustomMessageAbstractPropertyMorphableData
+        {
+            public function __construct(
+                int $abstract_integer,
+                string $abstract_string,
+                #[Max(1)]
+                public int $concrete_integer,
+                public string $concrete_string,
+            ) {
+                parent::__construct(TestValidationPropertyMorphableEnum::A, $abstract_integer, $abstract_string);
+            }
+
+            public static function messages()
+            {
+                return [
+                    ...parent::messages(),
+                    'concrete_integer.max' => 'Concrete class integer test message.',
+                ];
+            }
+
+            public static function attributes()
+            {
+                return [
+                    ...parent::attributes(),
+                    'concrete_string' => '[Concrete String]',
+                ];
+            }
+        }
+
+        DataValidationAsserter::for(TestValidationCustomMessageAbstractPropertyMorphableData::class)
+            ->assertErrors([
+                'variant' => 'a',
+                'abstract_integer' => 2,
+                'concrete_integer' => 2,
+            ], [
+                'concrete_integer' => ['Concrete class integer test message.'],
+                'concrete_string' => ['The [Concrete String] field is required.'],
+                'abstract_integer' => ['Abstract class integer test message.'],
+                'abstract_string' => ['The [Abstract String] field is required.'],
+            ]);
+    });
 });
