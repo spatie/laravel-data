@@ -1,0 +1,25 @@
+<?php
+
+namespace Spatie\LaravelData\Tests\Fakes;
+
+use Spatie\LaravelData\Data;
+
+class SimpleDataWithUnicodeCharséÄöü extends Data
+{
+    public function __construct(
+        public string $string
+    ) {
+    }
+
+    public static function fromString(string $string): self
+    {
+        return new self($string);
+    }
+
+    public function toUserDefinedToArray(): array
+    {
+        return [
+            'string' => $this->string,
+        ];
+    }
+}
