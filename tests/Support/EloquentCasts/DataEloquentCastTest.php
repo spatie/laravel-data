@@ -270,6 +270,30 @@ it('can correctly detect if the attribute is dirty with null values', function (
         ->and($model->isDirty('data'))->toBeTrue();
 })->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
 
+it('flags the attribute as dirty when it is encrypted and there are previous encryption keys', function () {
+    config()->set('app.previous_keys', ['base64:'.base64_encode(random_bytes(32))]);
+
+    $model = new DummyModelWithEncryptedCasts();
+    $model->data = new SimpleData('First');
+    $model->save();
+
+    $model->data = $model->data;
+
+    expect($model->getRawOriginal('data'))->not->toBe($model->getAttributes()['data'])
+        ->and($model->isDirty('data'))->toBeTrue();
+})->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
+
+it('does not flag the attribute as dirty when it is encrypted and there are no previous encryption keys', function () {
+    $model = new DummyModelWithEncryptedCasts();
+    $model->data = new SimpleData('First');
+    $model->save();
+
+    $model->data = $model->data;
+
+    expect($model->getRawOriginal('data'))->not->toBe($model->getAttributes()['data'])
+        ->and($model->isDirty('data'))->toBeFalse();
+})->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
+
 it('can update a model where the cast is initially null', function () {
     $model = DummyModelWithCasts::create([
         'data' => null,
