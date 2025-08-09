@@ -33,7 +33,8 @@ class DataValidationRulesResolver
         string $class,
         array $fullPayload,
         ValidationPath $path,
-        DataRules $dataRules
+        DataRules $dataRules,
+        bool $useMappedPropertyNames = false,
     ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
 
@@ -55,7 +56,13 @@ class DataValidationRulesResolver
         $withoutValidationProperties = [];
 
         foreach ($dataClass->properties as $dataProperty) {
-            $propertyPath = $path->property($dataProperty->inputMappedName ?? $dataProperty->name);
+            $propertyName = $useMappedPropertyNames
+                ? $dataProperty->inputMappedName ?? $dataProperty->name
+                : $dataProperty->name;
+
+            $propertyPath = $path->property(
+                $propertyName
+            );
 
             if ($this->shouldSkipPropertyValidation($dataProperty, $fullPayload, $propertyPath)) {
                 $withoutValidationProperties[] = $dataProperty->name;
@@ -69,7 +76,7 @@ class DataValidationRulesResolver
                     $fullPayload,
                     $path,
                     $propertyPath,
-                    $dataRules
+                    $dataRules,
                 );
 
                 continue;
@@ -209,7 +216,7 @@ class DataValidationRulesResolver
                 $dataProperty->type->dataClass,
                 $fullPayload,
                 ValidationPath::create($attribute),
-                DataRules::create()
+                DataRules::create(),
             );
 
             return collect($rules)->keyBy(

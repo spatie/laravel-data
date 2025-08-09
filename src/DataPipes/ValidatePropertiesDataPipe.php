@@ -25,7 +25,7 @@ class ValidatePropertiesDataPipe implements DataPipe
             return $properties;
         }
 
-        ($class->name)::validate($properties);
+        ($class->name)::validate($properties, $creationContext->mappedProperties);
 
         $creationContext->validationStrategy = ValidationStrategy::AlreadyRan;
 
