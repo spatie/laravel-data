@@ -11,7 +11,7 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 /**
- * @method static array rules(ValidationContext $context=null)
+ * @method static array rules(?ValidationContext $context = null)
  * @method static array messages(...$args)
  * @method static array attributes(...$args)
  * @method static bool stopOnFirstFailure()
