@@ -9,14 +9,21 @@ use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Support\DataConfig;
 
+/**
+ * @template TData of (BaseData&TransformableData)
+ *
+ * @implements CastsAttributes<TData|null,TData|array|null>
+ */
 class DataEloquentCast implements CastsAttributes
 {
     protected DataConfig $dataConfig;
 
+    /**
+     * @param class-string<TData> $dataClass $dataClass
+     * @param string[] $arguments
+     */
     public function __construct(
-        /** @var class-string<BaseData&TransformableData> $dataClass */
         protected string $dataClass,
-        /** @var string[] $arguments */
         protected array $arguments = []
     ) {
         $this->dataConfig = app(DataConfig::class);
@@ -39,7 +46,7 @@ class DataEloquentCast implements CastsAttributes
         $payload = json_decode($value, true, flags: JSON_THROW_ON_ERROR);
 
         if ($this->isAbstractClassCast()) {
-            /** @var class-string<BaseData&TransformableData> $dataClass */
+            /** @var class-string<TData> $dataClass */
             $dataClass = $this->dataConfig->morphMap->getMorphedDataClass($payload['type']) ?? $payload['type'];
 
             return $dataClass::from($payload['data']);
@@ -82,6 +89,10 @@ class DataEloquentCast implements CastsAttributes
         return $value;
     }
 
+    /**
+     * @param TData|null $firstValue
+     * @param TData|null $secondValue
+     */
     public function compare($model, string $key, $firstValue, $secondValue): bool
     {
         return $this->get($model, $key, $firstValue, [])?->toArray() === $this->get($model, $key, $secondValue, [])?->toArray();
