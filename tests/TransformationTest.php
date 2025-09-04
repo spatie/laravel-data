@@ -334,7 +334,29 @@ it('can transform a paginated data collection', function () {
     $collection = new PaginatedDataCollection(SimpleData::class, $paginator);
 
     expect($collection)->toBeInstanceOf(PaginatedDataCollection::class);
-    assertMatchesJsonSnapshot($collection->toJson());
+
+    $output = $collection->toArray();
+
+    expect($output)->toHaveKeys(['data', 'links', 'meta']);
+
+    expect($output['data'])->toHaveCount(15);
+    expect($output['data'][0])->toBe(['string' => 'Item 1']);
+    expect($output['data'][14])->toBe(['string' => 'Item 15']);
+
+    expect($output['links'])->toHaveCount(9);
+
+    expect($output['meta'])
+        ->toHaveKey('current_page', 1)
+        ->toHaveKey('first_page_url', '/?page=1')
+        ->toHaveKey('from', 1)
+        ->toHaveKey('last_page', 7)
+        ->toHaveKey('last_page_url', '/?page=7')
+        ->toHaveKey('next_page_url', '/?page=2')
+        ->toHaveKey('path', '/')
+        ->toHaveKey('per_page', 15)
+        ->toHaveKey('prev_page_url', null)
+        ->toHaveKey('to', 15)
+        ->toHaveKey('total', 100);
 });
 
 it('can transform a paginated cursor data collection', function () {
