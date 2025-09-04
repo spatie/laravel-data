@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.17.1 - 2025-09-04
+
+### What's Changed
+
+* Fix issue where toArray() is called on null collections by @oddvalue in https://github.com/spatie/laravel-data/pull/1054
+* Update the annotations in the Eloquent casts
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.17.0...4.17.1
+
 ## 4.17.0 - 2025-06-25
 
 ### What's Changed
@@ -154,6 +163,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -164,6 +174,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -201,6 +212,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
