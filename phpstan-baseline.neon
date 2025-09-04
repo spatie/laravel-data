@@ -379,6 +379,30 @@ parameters:
 			path: src/Support/DataConfig.php
 
 		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Support/EloquentCasts/DataCollectionEloquentCast.php
+
+		-
+			message: '#^Instanceof between array and Illuminate\\Contracts\\Support\\Arrayable will always evaluate to false\.$#'
+			identifier: instanceof.alwaysFalse
+			count: 1
+			path: src/Support/EloquentCasts/DataCollectionEloquentCast.php
+
+		-
+			message: '#^Instanceof between iterable\<TData of Spatie\\LaravelData\\Contracts\\BaseData&Spatie\\LaravelData\\Contracts\\TransformableData\>&TDataCollection of Spatie\\LaravelData\\DataCollection and Spatie\\LaravelData\\Contracts\\TransformableData will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Support/EloquentCasts/DataCollectionEloquentCast.php
+
+		-
+			message: '#^Instanceof between Spatie\\LaravelData\\Contracts\\BaseData&Spatie\\LaravelData\\Contracts\\TransformableData and Spatie\\LaravelData\\Contracts\\TransformableData will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Support/EloquentCasts/DataEloquentCast.php
+
+		-
 			message: '#^Call to function method_exists\(\) with ReflectionClass and ''isReadOnly'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
