@@ -442,10 +442,7 @@ dataset('attributes', function () {
         expected: 'uppercase',
     );
 
-    yield fixature(
-        attribute: new Url(),
-        expected: 'url',
-    );
+    yield from urlAttributes();
 
     yield fixature(
         attribute: new Ulid(),
@@ -489,6 +486,29 @@ function acceptedIfAttributes(): Generator
         attribute: new AcceptedIf('value', DummyBackedEnum::FOO),
         expected: 'accepted_if:value,foo',
         expectCreatedAttribute: new AcceptedIf('value', 'foo')
+    );
+}
+
+function urlAttributes(): Generator
+{
+    yield fixature(
+        attribute: new Url(),
+        expected: 'url',
+    );
+
+    yield fixature(
+        attribute: new Url('http'),
+        expected: 'url:http',
+    );
+
+    yield fixature(
+        attribute: new Url(['http', 'https']),
+        expected: 'url:http,https',
+    );
+
+    yield fixature(
+        attribute: new Url('http', 'https'),
+        expected: 'url:http,https',
     );
 }
 
