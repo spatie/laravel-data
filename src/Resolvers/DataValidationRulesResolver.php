@@ -200,6 +200,69 @@ class DataValidationRulesResolver
             shouldBePresent: true
         );
 
+        $collectionPayload = Arr::get($fullPayload, $propertyPath->get());
+
+        // If collection payload is null or not an array, no nested rules needed
+        if (! is_array($collectionPayload)) {
+            return;
+        }
+
+        $nestedDataClass = $this->dataConfig->getDataClass($dataProperty->type->dataClass);
+
+        // Optimization: If nested class has NO dynamic rules method, use direct approach
+        if (! $nestedDataClass->hasDynamicValidationRules) {
+            $this->resolveStaticCollectionRules(
+                $nestedDataClass,
+                $collectionPayload,
+                $fullPayload,
+                $propertyPath,
+                $dataRules
+            );
+
+            return;
+        }
+
+        $this->resolveDynamicCollectionRules(
+            $dataProperty,
+            $fullPayload,
+            $propertyPath,
+            $dataRules
+        );
+    }
+
+    protected function resolveStaticCollectionRules(
+        DataClass $nestedDataClass,
+        array $collectionPayload,
+        array $fullPayload,
+        ValidationPath $propertyPath,
+        DataRules $dataRules,
+    ): void {
+        // For static rules (no dynamic rules() method), directly generate rules per item
+        foreach ($collectionPayload as $collectionItemKey => $collectionItemValue) {
+            $itemPath = $propertyPath->property($collectionItemKey);
+
+            if (! is_array($collectionItemValue)) {
+                $dataRules->add($itemPath, ['array']);
+                continue;
+            }
+
+            // Directly execute rule generation for this specific item and path
+            $this->execute(
+                $nestedDataClass->name,
+                $fullPayload,
+                $itemPath,
+                $dataRules
+            );
+        }
+    }
+
+    protected function resolveDynamicCollectionRules(
+        DataProperty $dataProperty,
+        array $fullPayload,
+        ValidationPath $propertyPath,
+        DataRules $dataRules,
+    ): void {
+        // Use Rule::forEach for dynamic rules (classes with rules() method)
         $dataRules->addCollection($propertyPath, Rule::forEach(function (mixed $value, mixed $attribute) use ($fullPayload, $dataProperty) {
             if (! is_array($value)) {
                 return ['array'];
