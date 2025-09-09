@@ -1498,7 +1498,6 @@ it('can use auto lazy to construct a data object with property promotion', funct
         ->each()->toBeInstanceOf(FakeNestedModelData::class);
 });
 
-
 it('can create a data object with inertia deferred properties', function () {
     $dataClass = new class () extends Data {
         public InertiaDeferred|string $deferred;
@@ -1585,6 +1584,118 @@ it('can use class level auto deferred to construct a inertia deferred property',
     expect($data->all()['string']())->toBe('Deferred Value');
 });
 
+it('can create a data object with inertia deferred properties with a group as Inertia::defer argument', function () {
+    $dataClass = new class () extends Data {
+        public InertiaDeferred|string $deferredWithGroup;
+
+        public function __construct()
+        {
+        }
+    };
+
+    $data = $dataClass::from([
+        "deferredWithGroup" => Lazy::inertiaDeferred(Inertia::defer(fn () => 'Deferred Value', 'deferred-group')),
+    ]);
+
+    expect($data->deferredWithGroup)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->all()['deferredWithGroup'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
+    expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
+
+});
+
+it('can create a data object with inertia deferred properties with a group as Lazy::inertiaDeferred argument', function () {
+    $dataClass = new class () extends Data {
+        public InertiaDeferred|string $deferredWithGroup;
+
+        public function __construct()
+        {
+        }
+    };
+
+    $data = $dataClass::from([
+        "deferredWithGroup" => Lazy::inertiaDeferred(Inertia::defer(fn () => 'Deferred Value'), 'deferred-group'),
+    ]);
+
+    expect($data->deferredWithGroup)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->all()['deferredWithGroup'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
+    expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
+
+});
+
+it('can create a data object with inertia deferred closure with a group', function () {
+    $dataClass = new class () extends Data {
+        public InertiaDeferred|string $deferredWithGroup;
+
+        public function __construct()
+        {
+        }
+    };
+
+    $data = $dataClass::from([
+        "deferredWithGroup" => Lazy::inertiaDeferred(fn () => 'Deferred Value', 'deferred-group'),
+    ]);
+
+    expect($data->deferredWithGroup)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->all()['deferredWithGroup'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
+    expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
+
+});
+
+it('can create a data object with inertia deferred value with a group', function () {
+    $dataClass = new class () extends Data {
+        public InertiaDeferred|string $deferredWithGroup;
+
+        public function __construct()
+        {
+        }
+    };
+
+    $data = $dataClass::from([
+        "deferredWithGroup" => Lazy::inertiaDeferred('Deferred Value', 'deferred-group'),
+    ]);
+
+    expect($data->deferredWithGroup)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->all()['deferredWithGroup'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
+    expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
+
+});
+
+it('can use auto deferred to construct a inertia deferred property with a group', function () {
+    $dataClass = new class () extends Data {
+        #[AutoInertiaDeferred('deferred-group')]
+        public InertiaDeferred|string $deferredWithGroup;
+    };
+
+    $data = $dataClass::from(['deferredWithGroup' => 'Deferred Value']);
+
+    expect($data->deferredWithGroup)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->all()['deferredWithGroup'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
+    expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
+
+});
+
+it('can use class level auto deferred to construct a inertia deferred property with a group', function () {
+    #[AutoInertiaDeferred('deferred-group')]
+    class AutoDeferredDataWithGroup extends Data
+    {
+        public InertiaDeferred|string $deferredWithGroup;
+    }
+
+    ;
+
+    $data = AutoDeferredDataWithGroup::from(['deferredWithGroup' => 'Deferred Value']);
+
+    expect($data->deferredWithGroup)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->all()['deferredWithGroup'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
+    expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
+
+});
 
 describe('property-morphable creation tests', function () {
     enum TestPropertyMorphableEnum: string
