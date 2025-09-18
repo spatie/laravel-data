@@ -6,8 +6,16 @@ use Attribute;
 use Closure;
 use Exception;
 use Illuminate\Validation\Rules\Unique as BaseUnique;
+use InvalidArgumentException;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereNotConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereNullConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereNotNullConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereInConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereNotInConstraint;
 use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
+use Spatie\LaravelData\Support\Validation\Constraints\DatabaseConstraint;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Unique extends ObjectValidationAttribute
@@ -20,7 +28,7 @@ class Unique extends ObjectValidationAttribute
         protected null|string|ExternalReference $ignoreColumn = null,
         protected bool|ExternalReference $withoutTrashed = false,
         protected string|ExternalReference $deletedAtColumn = 'deleted_at',
-        protected ?Closure $where = null,
+        protected null|Closure|DatabaseConstraint|array $where = null,
         protected ?BaseUnique $rule = null
     ) {
         if ($table === null && $rule === null) {
@@ -56,7 +64,20 @@ class Unique extends ObjectValidationAttribute
         }
 
         if ($this->where) {
-            $rule->where($this->where);
+            $constraints = is_array($this->where) ? $this->where : [$this->where];
+
+            foreach ($constraints as $constraint) {
+                match (true) {
+                    $constraint instanceof Closure => $rule->where($constraint),
+                    $constraint instanceof WhereConstraint => $rule->where(...$constraint->toArray()),
+                    $constraint instanceof WhereNotConstraint => $rule->whereNot(...$constraint->toArray()),
+                    $constraint instanceof WhereNullConstraint => $rule->whereNull(...$constraint->toArray()),
+                    $constraint instanceof WhereNotNullConstraint => $rule->whereNotNull(...$constraint->toArray()),
+                    $constraint instanceof WhereInConstraint => $rule->whereIn(...$constraint->toArray()),
+                    $constraint instanceof WhereNotInConstraint => $rule->whereNotIn(...$constraint->toArray()),
+                    default => throw new InvalidArgumentException('Each where item must be a DatabaseConstraint or Closure'),
+                };
+            }
         }
 
         return $rule;
