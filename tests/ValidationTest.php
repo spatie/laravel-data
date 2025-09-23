@@ -13,10 +13,6 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\Rules\In as LaravelIn;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
-
-use function Pest\Laravel\mock;
-use function PHPUnit\Framework\assertFalse;
-
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
@@ -64,6 +60,8 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\Fakes\Support\FakeInjectable;
 use Spatie\LaravelData\Tests\Fakes\ValidationAttributes\PassThroughCustomValidationAttribute;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
+use function Pest\Laravel\mock;
+use function PHPUnit\Framework\assertFalse;
 
 it('can validate a string', function () {
     $dataClass = new class () extends Data {
@@ -1315,7 +1313,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
                 && $context->fullPayload['property'] === 'Root'
                 && $context->path->equals('nested.data');
 
-            if (! $correct) {
+            if (!$correct) {
                 throw new Exception('Should not end up here');
             }
 
@@ -1333,7 +1331,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
                 && $context->fullPayload['property'] === 'Root'
                 && $context->path->equals('nested.collection.0.nested');
 
-            if (! $correct) {
+            if (!$correct) {
                 throw new Exception('Should not end up here');
             }
 
@@ -1352,7 +1350,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
                 && $context->fullPayload['property'] === 'Root'
                 && $context->path->equals('nested.collection.0.collection.0');
 
-            if (! $correct) {
+            if (!$correct) {
                 throw new Exception('Should not end up here');
             }
 
@@ -1375,7 +1373,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
                 && $context->fullPayload['property'] === 'Root'
                 && $context->path->equals('nested.collection.0');
 
-            if (! $correct) {
+            if (!$correct) {
                 throw new Exception('Should not end up here');
             }
 
@@ -1398,7 +1396,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
                 && $context->fullPayload['property'] === 'Root'
                 && $context->path->equals('nested');
 
-            if (! $correct) {
+            if (!$correct) {
                 throw new Exception('Should not end up here');
             }
 
@@ -1417,7 +1415,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
                 && $context->fullPayload['property'] === 'Root'
                 && $context->path->isRoot();
 
-            if (! $correct) {
+            if (!$correct) {
                 throw new Exception('Should not end up here');
             }
 
@@ -1496,7 +1494,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
                 ],
             ];
         }
@@ -1505,7 +1503,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
         ],
     ]);
 });
@@ -1518,7 +1516,7 @@ it('can reference route parameters as values within rules', function () {
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('post_id')->andReturns('69');
-    $this->app->bind('request', fn () => $requestMock);
+    $this->app->bind('request', fn() => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1539,7 +1537,7 @@ it('can reference route models with a property as values within rules', function
     $requestMock->expects('route')->with('post')->andReturns(new DummyModel([
         'id' => 69,
     ]));
-    $this->app->bind('request', fn () => $requestMock);
+    $this->app->bind('request', fn() => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -2064,7 +2062,7 @@ it('can resolve validation dependencies for redirect url', function () {
 });
 
 it('can manually set the redirect route', function () {
-    Route::get('/never-given-up', fn () => 'Never gonna give you up')->name('never-given-up');
+    Route::get('/never-given-up', fn() => 'Never gonna give you up')->name('never-given-up');
 
     $data = new class () extends Data {
         public string $name;
@@ -2084,7 +2082,7 @@ it('can manually set the redirect route', function () {
 it('can resolve validation dependencies for redirect route', function () {
     FakeInjectable::setup('Rick Astley');
 
-    Route::get('/never-given-up', fn () => 'Never gonna give you up')->name('never-given-up');
+    Route::get('/never-given-up', fn() => 'Never gonna give you up')->name('never-given-up');
 
     $data = new class () extends Data {
         public string $name;
@@ -2482,7 +2480,7 @@ it('is possible to define the validation strategy for each data object globally 
 
     config()->set('data.validation_strategy', ValidationStrategy::Always->value);
 
-    expect(fn () => $dataClass::from(['string' => 'Nowp']))
+    expect(fn() => $dataClass::from(['string' => 'Nowp']))
         ->toThrow(ValidationException::class);
 });
 
@@ -2493,7 +2491,8 @@ it('handles validation with mapped attributes', function () {
         public function __construct(
             #[Required]
             public readonly int $someProperty,
-        ) {
+        )
+        {
         }
     }
 
@@ -2549,13 +2548,14 @@ it('it will merge validation rules', function () {
     {
         public function __construct(
             #[Max(10)]
-            public string $array_rules,
+            public string                        $array_rules,
             #[Max(10)]
-            public string $string_rules,
+            public string                        $string_rules,
             #[WithoutValidation]
-            public string $without_validation,
+            public string                        $without_validation,
             public TestNestedDataWithMergedRules $nested
-        ) {
+        )
+        {
         }
 
         public static function rules(): array
@@ -2613,14 +2613,15 @@ describe('property-morphable validation tests', function () {
     {
         case A = 'a';
         case B = 'b';
-    };
+    }
 
     abstract class TestValidationAbstractPropertyMorphableData extends Data implements PropertyMorphableData
     {
         public function __construct(
             #[PropertyForMorph]
             public TestValidationPropertyMorphableEnum $variant,
-        ) {
+        )
+        {
         }
 
         public static function morph(array $properties): ?string
@@ -2697,9 +2698,12 @@ describe('property-morphable validation tests', function () {
             public function __construct(
                 /** @var TestValidationAbstractPropertyMorphableData[] */
                 public ?DataCollection $nestedCollection,
-            ) {
+            )
+            {
             }
-        };
+        }
+
+        ;
 
         DataValidationAsserter::for(TestValidationNestedPropertyMorphableData::class)
             ->assertErrors([
@@ -2739,9 +2743,10 @@ describe('property-morphable validation tests', function () {
                 #[PropertyForMorph]
                 public TestValidationPropertyMorphableEnum $variant,
                 #[Max(1)]
-                public int $abstract_integer,
-                public string $abstract_string,
-            ) {
+                public int                                 $abstract_integer,
+                public string                              $abstract_string,
+            )
+            {
             }
 
             public static function morph(array $properties): ?string
@@ -2770,12 +2775,13 @@ describe('property-morphable validation tests', function () {
         class TestValidationCustomMessagePropertyMorphableDataA extends TestValidationCustomMessageAbstractPropertyMorphableData
         {
             public function __construct(
-                int $abstract_integer,
-                string $abstract_string,
+                int           $abstract_integer,
+                string        $abstract_string,
                 #[Max(1)]
-                public int $concrete_integer,
+                public int    $concrete_integer,
                 public string $concrete_string,
-            ) {
+            )
+            {
                 parent::__construct(TestValidationPropertyMorphableEnum::A, $abstract_integer, $abstract_string);
             }
 
@@ -2796,7 +2802,7 @@ describe('property-morphable validation tests', function () {
             }
         }
 
-        DataValidationAsserter::for(TestValidationCustomMessageAbstractPropertyMorphableData::class)
+        DataValidationAsserter::for(TestValidationCustomMessagePropertyMorphableDataA::class)
             ->assertErrors([
                 'variant' => 'a',
                 'abstract_integer' => 2,
@@ -2806,6 +2812,143 @@ describe('property-morphable validation tests', function () {
                 'concrete_string' => ['The [Concrete String] field is required.'],
                 'abstract_integer' => ['Abstract class integer test message.'],
                 'abstract_string' => ['The [Abstract String] field is required.'],
+            ]);
+    });
+
+    it('can validate collections of property-morphable data with custom messages and attributes', function () {
+        class TestCustomMessagesInCollectionOfPropertyMorphableData extends Data
+        {
+            public function __construct(
+
+                /**
+                 * @var array<TestCustomMessageOfPropertyMorphableData>
+                 */
+                public array $items,
+            )
+            {
+            }
+        }
+
+        abstract class TestCustomMessageOfPropertyMorphableData extends Data implements PropertyMorphableData
+        {
+            public function __construct(
+                #[PropertyForMorph]
+                public TestValidationPropertyMorphableEnum $variant,
+                #[Max(1)]
+                public int                                 $abstract_integer,
+                public string                              $abstract_string,
+            )
+            {
+            }
+
+            public static function morph(array $properties): ?string
+            {
+                return match ($properties['variant']) {
+                    TestValidationPropertyMorphableEnum::A => TestCustomMessagePropertyMorphableDataA::class,
+                    TestValidationPropertyMorphableEnum::B => TestCustomMessagePropertyMorphableDataB::class,
+                    default => null,
+                };
+            }
+
+            public static function messages()
+            {
+                return [
+                    'abstract_integer.max' => 'Abstract class integer test message.',
+                ];
+            }
+
+            public static function attributes()
+            {
+                return [
+                    'abstract_string' => '[Abstract String]',
+                ];
+            }
+        }
+
+        class TestCustomMessagePropertyMorphableDataA extends TestCustomMessageOfPropertyMorphableData
+        {
+            public function __construct(
+                int           $abstract_integer,
+                string        $abstract_string,
+                #[Max(1)]
+                public int    $concrete_integer,
+                public string $concrete_string,
+            )
+            {
+                parent::__construct(TestValidationPropertyMorphableEnum::A, $abstract_integer, $abstract_string);
+            }
+
+            public static function messages()
+            {
+                return [
+                    ...parent::messages(),
+                    'concrete_integer.max' => 'Concrete class A integer test message.',
+                ];
+            }
+
+            public static function attributes()
+            {
+                return [
+                    ...parent::attributes(),
+                    'concrete_string' => '[Concrete String A]',
+                ];
+            }
+        }
+
+        class TestCustomMessagePropertyMorphableDataB extends TestCustomMessageOfPropertyMorphableData
+        {
+            public function __construct(
+                int           $abstract_integer,
+                string        $abstract_string,
+                #[Max(1)]
+                public int    $concrete_integer,
+                public string $concrete_string,
+            )
+            {
+                parent::__construct(TestValidationPropertyMorphableEnum::B, $abstract_integer, $abstract_string);
+            }
+
+            public static function messages()
+            {
+                return [
+                    ...parent::messages(),
+                    'abstract_integer.max' => 'Concrete Class B override of Abstract class integer test message.',
+                    'concrete_integer.max' => 'Concrete class B integer test message.',
+                ];
+            }
+
+            public static function attributes()
+            {
+                return [
+                    ...parent::attributes(),
+                    'concrete_string' => '[Concrete String B]',
+                ];
+            }
+        }
+
+
+        DataValidationAsserter::for(TestCustomMessagesInCollectionOfPropertyMorphableData::class)
+            ->assertErrors([
+                'items' => [
+                    [
+                        'variant' => 'a',
+                        'abstract_integer' => 2,
+                        'concrete_integer' => 2,
+                    ],
+                    [
+                        'variant' => 'b',
+                        'abstract_integer' => 2,
+                        'concrete_integer' => 2,
+                    ],
+                ]], [
+                'items.0.concrete_integer' => ['Concrete class A integer test message.'],
+                'items.0.concrete_string' => ['The [Concrete String A] field is required.'],
+                'items.0.abstract_integer' => ['Abstract class integer test message.'],
+                'items.0.abstract_string' => ['The [Abstract String] field is required.'],
+                'items.1.concrete_integer' => ['Concrete class B integer test message.'],
+                'items.1.concrete_string' => ['The [Concrete String B] field is required.'],
+                'items.1.abstract_integer' => ['Concrete Class B override of Abstract class integer test message.'],
+                'items.1.abstract_string' => ['The [Abstract String] field is required.'],
             ]);
     });
 });
