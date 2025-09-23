@@ -13,6 +13,10 @@ use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\Rules\In as LaravelIn;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
+
+use function Pest\Laravel\mock;
+use function PHPUnit\Framework\assertFalse;
+
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\MapInputName;
 use Spatie\LaravelData\Attributes\MapName;
@@ -60,8 +64,6 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\Fakes\Support\FakeInjectable;
 use Spatie\LaravelData\Tests\Fakes\ValidationAttributes\PassThroughCustomValidationAttribute;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
-use function Pest\Laravel\mock;
-use function PHPUnit\Framework\assertFalse;
 
 it('can validate a string', function () {
     $dataClass = new class () extends Data {
@@ -1313,7 +1315,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
                 && $context->fullPayload['property'] === 'Root'
                 && $context->path->equals('nested.data');
 
-            if (!$correct) {
+            if (! $correct) {
                 throw new Exception('Should not end up here');
             }
 
@@ -1331,7 +1333,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
                 && $context->fullPayload['property'] === 'Root'
                 && $context->path->equals('nested.collection.0.nested');
 
-            if (!$correct) {
+            if (! $correct) {
                 throw new Exception('Should not end up here');
             }
 
@@ -1350,7 +1352,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
                 && $context->fullPayload['property'] === 'Root'
                 && $context->path->equals('nested.collection.0.collection.0');
 
-            if (!$correct) {
+            if (! $correct) {
                 throw new Exception('Should not end up here');
             }
 
@@ -1373,7 +1375,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
                 && $context->fullPayload['property'] === 'Root'
                 && $context->path->equals('nested.collection.0');
 
-            if (!$correct) {
+            if (! $correct) {
                 throw new Exception('Should not end up here');
             }
 
@@ -1396,7 +1398,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
                 && $context->fullPayload['property'] === 'Root'
                 && $context->path->equals('nested');
 
-            if (!$correct) {
+            if (! $correct) {
                 throw new Exception('Should not end up here');
             }
 
@@ -1415,7 +1417,7 @@ it('correctly_injects_context_in_the_rules_method', function () {
                 && $context->fullPayload['property'] === 'Root'
                 && $context->path->isRoot();
 
-            if (!$correct) {
+            if (! $correct) {
                 throw new Exception('Should not end up here');
             }
 
@@ -1494,7 +1496,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn(Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
                 ],
             ];
         }
@@ -1503,7 +1505,7 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn(Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
         ],
     ]);
 });
@@ -1516,7 +1518,7 @@ it('can reference route parameters as values within rules', function () {
 
     $requestMock = mock(Request::class);
     $requestMock->expects('route')->with('post_id')->andReturns('69');
-    $this->app->bind('request', fn() => $requestMock);
+    $this->app->bind('request', fn () => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -1537,7 +1539,7 @@ it('can reference route models with a property as values within rules', function
     $requestMock->expects('route')->with('post')->andReturns(new DummyModel([
         'id' => 69,
     ]));
-    $this->app->bind('request', fn() => $requestMock);
+    $this->app->bind('request', fn () => $requestMock);
 
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
@@ -2062,7 +2064,7 @@ it('can resolve validation dependencies for redirect url', function () {
 });
 
 it('can manually set the redirect route', function () {
-    Route::get('/never-given-up', fn() => 'Never gonna give you up')->name('never-given-up');
+    Route::get('/never-given-up', fn () => 'Never gonna give you up')->name('never-given-up');
 
     $data = new class () extends Data {
         public string $name;
@@ -2082,7 +2084,7 @@ it('can manually set the redirect route', function () {
 it('can resolve validation dependencies for redirect route', function () {
     FakeInjectable::setup('Rick Astley');
 
-    Route::get('/never-given-up', fn() => 'Never gonna give you up')->name('never-given-up');
+    Route::get('/never-given-up', fn () => 'Never gonna give you up')->name('never-given-up');
 
     $data = new class () extends Data {
         public string $name;
@@ -2480,7 +2482,7 @@ it('is possible to define the validation strategy for each data object globally 
 
     config()->set('data.validation_strategy', ValidationStrategy::Always->value);
 
-    expect(fn() => $dataClass::from(['string' => 'Nowp']))
+    expect(fn () => $dataClass::from(['string' => 'Nowp']))
         ->toThrow(ValidationException::class);
 });
 
@@ -2491,8 +2493,7 @@ it('handles validation with mapped attributes', function () {
         public function __construct(
             #[Required]
             public readonly int $someProperty,
-        )
-        {
+        ) {
         }
     }
 
@@ -2554,8 +2555,7 @@ it('it will merge validation rules', function () {
             #[WithoutValidation]
             public string                        $without_validation,
             public TestNestedDataWithMergedRules $nested
-        )
-        {
+        ) {
         }
 
         public static function rules(): array
@@ -2620,8 +2620,7 @@ describe('property-morphable validation tests', function () {
         public function __construct(
             #[PropertyForMorph]
             public TestValidationPropertyMorphableEnum $variant,
-        )
-        {
+        ) {
         }
 
         public static function morph(array $properties): ?string
@@ -2698,8 +2697,7 @@ describe('property-morphable validation tests', function () {
             public function __construct(
                 /** @var TestValidationAbstractPropertyMorphableData[] */
                 public ?DataCollection $nestedCollection,
-            )
-            {
+            ) {
             }
         }
 
@@ -2745,8 +2743,7 @@ describe('property-morphable validation tests', function () {
                 #[Max(1)]
                 public int                                 $abstract_integer,
                 public string                              $abstract_string,
-            )
-            {
+            ) {
             }
 
             public static function morph(array $properties): ?string
@@ -2780,8 +2777,7 @@ describe('property-morphable validation tests', function () {
                 #[Max(1)]
                 public int    $concrete_integer,
                 public string $concrete_string,
-            )
-            {
+            ) {
                 parent::__construct(TestValidationPropertyMorphableEnum::A, $abstract_integer, $abstract_string);
             }
 
@@ -2824,8 +2820,7 @@ describe('property-morphable validation tests', function () {
                  * @var array<TestCustomMessageOfPropertyMorphableData>
                  */
                 public array $items,
-            )
-            {
+            ) {
             }
         }
 
@@ -2837,8 +2832,7 @@ describe('property-morphable validation tests', function () {
                 #[Max(1)]
                 public int                                 $abstract_integer,
                 public string                              $abstract_string,
-            )
-            {
+            ) {
             }
 
             public static function morph(array $properties): ?string
@@ -2873,8 +2867,7 @@ describe('property-morphable validation tests', function () {
                 #[Max(1)]
                 public int    $concrete_integer,
                 public string $concrete_string,
-            )
-            {
+            ) {
                 parent::__construct(TestValidationPropertyMorphableEnum::A, $abstract_integer, $abstract_string);
             }
 
@@ -2903,8 +2896,7 @@ describe('property-morphable validation tests', function () {
                 #[Max(1)]
                 public int    $concrete_integer,
                 public string $concrete_string,
-            )
-            {
+            ) {
                 parent::__construct(TestValidationPropertyMorphableEnum::B, $abstract_integer, $abstract_string);
             }
 

@@ -84,7 +84,7 @@ class DataValidationMessagesAndAttributesResolver
                             [$item],
                         );
 
-                        if (!$morphedClass) {
+                        if (! $morphedClass) {
                             continue;
                         }
 
