@@ -27,10 +27,10 @@ class DataValidationMessagesAndAttributesResolver
                 ? $fullPayload
                 : Arr::get($fullPayload, $path->get(), []);
 
-            $morphedClass = $this->dataMorphClassResolver->execute(
+            $morphedClass = $payload ? $this->dataMorphClassResolver->execute(
                 $dataClass,
                 [$payload],
-            );
+            ) : null;
 
             $dataClass = $morphedClass
                 ? $this->dataConfig->getDataClass($morphedClass)
