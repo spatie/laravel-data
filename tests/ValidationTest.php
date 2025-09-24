@@ -2928,6 +2928,11 @@ describe('property-morphable validation tests', function () {
                         'concrete_integer' => 2,
                     ],
                     [
+                        'variant' => 'invalid',
+                        'abstract_integer' => 2,
+                        'concrete_integer' => 2,
+                    ],
+                    [
                         'variant' => 'b',
                         'abstract_integer' => 2,
                         'concrete_integer' => 2,
@@ -2937,10 +2942,18 @@ describe('property-morphable validation tests', function () {
                 'items.0.concrete_string' => ['The [Concrete String A] field is required.'],
                 'items.0.abstract_integer' => ['Abstract class integer test message.'],
                 'items.0.abstract_string' => ['The [Abstract String] field is required.'],
-                'items.1.concrete_integer' => ['Concrete class B integer test message.'],
-                'items.1.concrete_string' => ['The [Concrete String B] field is required.'],
-                'items.1.abstract_integer' => ['Concrete Class B override of Abstract class integer test message.'],
+
+                'items.1.variant' => [
+                    'The selected items.1.variant is invalid.',
+                    'The selected items.1.variant is invalid for morph.',
+                ],
+                'items.1.abstract_integer' => ['Abstract class integer test message.'],
                 'items.1.abstract_string' => ['The [Abstract String] field is required.'],
+
+                'items.2.concrete_integer' => ['Concrete class B integer test message.'],
+                'items.2.concrete_string' => ['The [Concrete String B] field is required.'],
+                'items.2.abstract_integer' => ['Concrete Class B override of Abstract class integer test message.'],
+                'items.2.abstract_string' => ['The [Abstract String] field is required.'],
             ]);
     });
 });

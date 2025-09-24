@@ -9,16 +9,16 @@ use Spatie\LaravelData\Support\Validation\ValidationPath;
 class DataValidationMessagesAndAttributesResolver
 {
     public function __construct(
-        protected DataConfig $dataConfig,
+        protected DataConfig             $dataConfig,
         protected DataMorphClassResolver $dataMorphClassResolver,
     ) {
     }
 
     public function execute(
-        string $class,
-        array $fullPayload,
+        string         $class,
+        array          $fullPayload,
         ValidationPath $path,
-        array $nestingChain = [],
+        array          $nestingChain = [],
     ): array {
         $dataClass = $this->dataConfig->getDataClass($class);
 
@@ -78,6 +78,7 @@ class DataValidationMessagesAndAttributesResolver
 
                 if ($collectedDataClass->isAbstract && $collectedDataClass->propertyMorphable) {
                     $items = Arr::get($fullPayload, $propertyPath->get(), []);
+
                     foreach ($items as $index => $item) {
                         $morphedClass = $this->dataMorphClassResolver->execute(
                             $collectedDataClass,
@@ -85,7 +86,7 @@ class DataValidationMessagesAndAttributesResolver
                         );
 
                         if (! $morphedClass) {
-                            continue;
+                            $morphedClass = $dataProperty->type->dataClass;
                         }
 
                         $collected = $this->execute(
