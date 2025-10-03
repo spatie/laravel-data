@@ -1389,9 +1389,7 @@ it('can handle custom transformation contexts', function () {
         new CustomTransformationContext(),
     );
 
-    foreach ($visibleFields as $visibleField) {
-        if ($visibleField instanceof TransformationContext) {
-            expect($visibleField)->toBeInstanceOf(CustomTransformationContext::class);
-        }
-    }
+    expect($visibleFields['single'])->toBeInstanceOf(CustomTransformationContext::class);
+    expect($visibleFields['nested'])->toBeInstanceOf(CustomTransformationContext::class);
+    expect($visibleFields['collection'])->toBeInstanceOf(CustomTransformationContext::class);
 });
