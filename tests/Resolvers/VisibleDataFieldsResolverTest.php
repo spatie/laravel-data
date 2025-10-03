@@ -1379,7 +1379,9 @@ it('can combine all the partials', function () {
 it('can handle custom transformation contexts', function () {
     $data = VisibleFieldsData::instance();
 
-    class CustomTransformationContext extends TransformationContext {};
+    class CustomTransformationContext extends TransformationContext
+    {
+    };
 
     $visibleFields = app(VisibleDataFieldsResolver::class)->execute(
         $data,
