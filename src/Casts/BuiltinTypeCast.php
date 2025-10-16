@@ -38,14 +38,14 @@ class BuiltinTypeCast implements Cast, IterableItemCast
 
     protected function castToBool(mixed $value): bool
     {
-        if (is_string($value)) {
-            return match (strtolower($value)) {
-                'true' => true,
-                'false' => false,
-                default => (bool) $value,
-            };
+        if (! is_string($value)) {
+            return (bool) $value;
         }
 
-        return (bool) $value;
+        return match (strtolower($value)) {
+            'true' => true,
+            'false' => false,
+            default => (bool) $value,
+        };
     }
 }

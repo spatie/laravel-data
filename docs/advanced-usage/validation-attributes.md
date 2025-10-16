@@ -1005,6 +1005,11 @@ public string $closure;
 public string $closure; 
 ```
 
+```php
+#[Url(['http', 'https'])]
+public string $closure;
+```
+
 ## Ulid
 
 [Docs](https://laravel.com/docs/validation#rule-ulid)

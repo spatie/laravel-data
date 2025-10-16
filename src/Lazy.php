@@ -38,9 +38,9 @@ abstract class Lazy
         return new InertiaLazy($value);
     }
 
-    public static function inertiaDeferred(mixed $value): InertiaDeferred
+    public static function inertiaDeferred(mixed $value, ?string $group = null): InertiaDeferred
     {
-        return new InertiaDeferred($value);
+        return new InertiaDeferred($value, $group);
     }
 
     public static function closure(Closure $closure): ClosureLazy

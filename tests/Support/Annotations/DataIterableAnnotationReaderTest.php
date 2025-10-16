@@ -8,6 +8,7 @@ use Spatie\LaravelData\Tests\Fakes\CollectionNonDataAnnotationsData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Error;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithUnicodeCharséÄöü;
 
 it(
     'can get the data class for a data collection by annotation',
@@ -34,6 +35,11 @@ it(
 
     yield 'propertyD' => [
         'propertyD', // property
+        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+    ];
+
+    yield 'propertyE' => [
+        'propertyE', // property
         new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
 
@@ -86,6 +92,11 @@ it(
         'propertyU', // property
         new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
+
+    yield 'propertyV' => [
+        'propertyV', // property
+        new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true), // expected
+    ];
 });
 
 it('can get the data class for a data collection by class annotation', function () {
@@ -99,6 +110,7 @@ it('can get the data class for a data collection by class annotation', function 
         'propertyR' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyR'),
         'propertyS' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyS'),
         'propertyT' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyT'),
+        'propertyW' => new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'propertyW'),
     ]);
 });
 
@@ -117,6 +129,10 @@ it('can get data class for a data collection by method annotation', function () 
         'paramJ' => new DataIterableAnnotation(SimpleData::class, isData: true, keyType: 'int', property: 'paramJ'),
         'paramI' => new DataIterableAnnotation(SimpleData::class, isData: true, keyType: 'int', property: 'paramI'),
         'paramK' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramK'),
+        'paramL' => new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'paramL'),
+        'paramM' => new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'paramM'),
+        'paramN' => new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'paramN'),
+        'paramO' => new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'paramO'),
     ]);
 });
 

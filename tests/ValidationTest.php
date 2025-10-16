@@ -2742,8 +2742,6 @@ describe('property-morphable validation tests', function () {
             }
         }
 
-        ;
-
         DataValidationAsserter::for(TestValidationNestedPropertyMorphableData::class)
             ->assertErrors([
                 'nestedCollection' => [[]],
