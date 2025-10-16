@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rules\NotIn as BaseNotIn;
-use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
@@ -15,7 +15,7 @@ class NotIn extends ObjectValidationAttribute
 
     protected array $values;
 
-    public function __construct(array|string|BaseNotIn|RouteParameterReference ...$values)
+    public function __construct(array|string|BaseNotIn|ExternalReference ...$values)
     {
         $this->values = $values;
     }
@@ -31,7 +31,7 @@ class NotIn extends ObjectValidationAttribute
         }
 
         $this->values = array_map(
-            fn (string|RouteParameterReference $value) => $this->normalizePossibleRouteReferenceParameter($value),
+            fn (string|ExternalReference $value) => $this->normalizePossibleExternalReferenceParameter($value),
             Arr::flatten($this->values)
         );
 

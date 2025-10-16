@@ -4,8 +4,8 @@ namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
 use BackedEnum;
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
-use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class ExcludeIf extends StringValidationAttribute
@@ -13,8 +13,8 @@ class ExcludeIf extends StringValidationAttribute
     protected FieldReference $field;
 
     public function __construct(
-        string|FieldReference                                              $field,
-        protected string|int|float|bool|BackedEnum|RouteParameterReference $value
+        string|FieldReference $field,
+        protected string|int|float|bool|BackedEnum|ExternalReference $value
     ) {
         $this->field = $this->parseFieldReference($field);
     }

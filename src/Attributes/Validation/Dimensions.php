@@ -6,20 +6,20 @@ use Attribute;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Dimensions as BaseDimensions;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
-use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Dimensions extends ObjectValidationAttribute
 {
     public function __construct(
-        protected null|int|RouteParameterReference $minWidth = null,
-        protected null|int|RouteParameterReference $minHeight = null,
-        protected null|int|RouteParameterReference $maxWidth = null,
-        protected null|int|RouteParameterReference $maxHeight = null,
-        protected null|float|string|RouteParameterReference $ratio = null,
-        protected null|int|RouteParameterReference $width = null,
-        protected null|int|RouteParameterReference $height = null,
+        protected null|int|ExternalReference $minWidth = null,
+        protected null|int|ExternalReference $minHeight = null,
+        protected null|int|ExternalReference $maxWidth = null,
+        protected null|int|ExternalReference $maxHeight = null,
+        protected null|float|string|ExternalReference $ratio = null,
+        protected null|int|ExternalReference $width = null,
+        protected null|int|ExternalReference $height = null,
         protected null|BaseDimensions $rule = null,
     ) {
         if (
@@ -42,13 +42,13 @@ class Dimensions extends ObjectValidationAttribute
             return $this->rule;
         }
 
-        $minWidth = $this->normalizePossibleRouteReferenceParameter($this->minWidth);
-        $minHeight = $this->normalizePossibleRouteReferenceParameter($this->minHeight);
-        $maxWidth = $this->normalizePossibleRouteReferenceParameter($this->maxWidth);
-        $maxHeight = $this->normalizePossibleRouteReferenceParameter($this->maxHeight);
-        $ratio = $this->normalizePossibleRouteReferenceParameter($this->ratio);
-        $width = $this->normalizePossibleRouteReferenceParameter($this->width);
-        $height = $this->normalizePossibleRouteReferenceParameter($this->height);
+        $minWidth = $this->normalizePossibleExternalReferenceParameter($this->minWidth);
+        $minHeight = $this->normalizePossibleExternalReferenceParameter($this->minHeight);
+        $maxWidth = $this->normalizePossibleExternalReferenceParameter($this->maxWidth);
+        $maxHeight = $this->normalizePossibleExternalReferenceParameter($this->maxHeight);
+        $ratio = $this->normalizePossibleExternalReferenceParameter($this->ratio);
+        $width = $this->normalizePossibleExternalReferenceParameter($this->width);
+        $height = $this->normalizePossibleExternalReferenceParameter($this->height);
 
         $rule = new BaseDimensions();
 

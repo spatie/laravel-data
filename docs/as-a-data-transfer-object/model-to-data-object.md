@@ -78,9 +78,11 @@ the model:
 ```php
 class Artist extends Model
 {
-    public function getFullNameAttribute(): string
+    protected function fullName(): Attribute
     {
-        return $this->first_name . ' ' . $this->last_name;
+        return Attribute::make(
+            get: fn () => $this->first_name . ' ' . $this->last_name,
+        );
     }
 }
 ```

@@ -6,22 +6,22 @@ use Attribute;
 use Closure;
 use Exception;
 use Illuminate\Validation\Rules\Unique as BaseUnique;
-use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Unique extends ObjectValidationAttribute
 {
     public function __construct(
-        protected null|string|RouteParameterReference $table = null,
-        protected null|string|RouteParameterReference $column = 'NULL',
-        protected null|string|RouteParameterReference $connection = null,
-        protected null|string|RouteParameterReference $ignore = null,
-        protected null|string|RouteParameterReference $ignoreColumn = null,
-        protected bool|RouteParameterReference        $withoutTrashed = false,
-        protected string|RouteParameterReference      $deletedAtColumn = 'deleted_at',
-        protected ?Closure                            $where = null,
-        protected ?BaseUnique                         $rule = null
+        protected null|string|ExternalReference $table = null,
+        protected null|string|ExternalReference $column = 'NULL',
+        protected null|string|ExternalReference $connection = null,
+        protected null|string|ExternalReference $ignore = null,
+        protected null|string|ExternalReference $ignoreColumn = null,
+        protected bool|ExternalReference $withoutTrashed = false,
+        protected string|ExternalReference $deletedAtColumn = 'deleted_at',
+        protected ?Closure $where = null,
+        protected ?BaseUnique $rule = null
     ) {
         if ($table === null && $rule === null) {
             throw new Exception('Could not create unique validation rule, either table or a rule is required');
@@ -34,13 +34,13 @@ class Unique extends ObjectValidationAttribute
             return $this->rule;
         }
 
-        $table = $this->normalizePossibleRouteReferenceParameter($this->table);
-        $column = $this->normalizePossibleRouteReferenceParameter($this->column);
-        $connection = $this->normalizePossibleRouteReferenceParameter($this->connection);
-        $ignore = $this->normalizePossibleRouteReferenceParameter($this->ignore);
-        $ignoreColumn = $this->normalizePossibleRouteReferenceParameter($this->ignoreColumn);
-        $withoutTrashed = $this->normalizePossibleRouteReferenceParameter($this->withoutTrashed);
-        $deletedAtColumn = $this->normalizePossibleRouteReferenceParameter($this->deletedAtColumn);
+        $table = $this->normalizePossibleExternalReferenceParameter($this->table);
+        $column = $this->normalizePossibleExternalReferenceParameter($this->column);
+        $connection = $this->normalizePossibleExternalReferenceParameter($this->connection);
+        $ignore = $this->normalizePossibleExternalReferenceParameter($this->ignore);
+        $ignoreColumn = $this->normalizePossibleExternalReferenceParameter($this->ignoreColumn);
+        $withoutTrashed = $this->normalizePossibleExternalReferenceParameter($this->withoutTrashed);
+        $deletedAtColumn = $this->normalizePossibleExternalReferenceParameter($this->deletedAtColumn);
 
         $rule = new BaseUnique(
             $connection ? "{$connection}.{$table}" : $table,
