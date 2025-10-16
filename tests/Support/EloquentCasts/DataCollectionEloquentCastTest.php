@@ -15,6 +15,7 @@ use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCustomCollectionCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithEncryptedCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithJson;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
@@ -262,6 +263,36 @@ it('can correctly detect if the attribute is dirty', function () {
 
     expect($model->getRawOriginal('data_collection'))->toBe('[{"second": "Second", "first": "First"}, {"first": "Third", "second": "Fourth"}]')
         ->and($model->getAttributes()['data_collection'])->toBe('[{"first":"First","second":"Second"},{"first":"Third","second":"Fourth"}]')
+        ->and($model->isDirty('data_collection'))->toBeFalse();
+})->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
+
+it('flags the attribute as dirty when it is encrypted and there are previous encryption keys', function () {
+    config()->set('app.previous_keys', ['base64:'.base64_encode(random_bytes(32))]);
+
+    $model = new DummyModelWithEncryptedCasts();
+    $model->data_collection = [
+        new SimpleData('First'),
+        new SimpleData('Second'),
+    ];
+    $model->save();
+
+    $model->data_collection = $model->data_collection;
+
+    expect($model->getRawOriginal('data_collection'))->not->toBe($model->getAttributes()['data_collection'])
+        ->and($model->isDirty('data_collection'))->toBeTrue();
+})->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
+
+it('does not flag the attribute as dirty when it is encrypted and there are no previous encryption keys', function () {
+    $model = new DummyModelWithEncryptedCasts();
+    $model->data_collection = [
+        new SimpleData('First'),
+        new SimpleData('Second'),
+    ];
+    $model->save();
+
+    $model->data_collection = $model->data_collection;
+
+    expect($model->getRawOriginal('data_collection'))->not->toBe($model->getAttributes()['data_collection'])
         ->and($model->isDirty('data_collection'))->toBeFalse();
 })->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
 
