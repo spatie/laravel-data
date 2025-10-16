@@ -15,6 +15,7 @@ use Spatie\LaravelData\DataCollection;
  * @property \Spatie\LaravelData\Tests\Fakes\SimpleData[] $propertyR
  * @property array<SimpleData> $propertyS
  * @property \Illuminate\Support\Collection<\Spatie\LaravelData\Tests\Fakes\SimpleData>|null $propertyT
+ * @property \Illuminate\Support\Collection<\Spatie\LaravelData\Tests\Fakes\SimpleDataWithUnicodeCharséÄöü>|null $propertyW
  */
 class CollectionDataAnnotationsData
 {
@@ -73,6 +74,11 @@ class CollectionDataAnnotationsData
     /** @var \Illuminate\Support\Collection<\Spatie\LaravelData\Tests\Fakes\SimpleData>|null */
     public ?array $propertyU;
 
+    /** @var \Illuminate\Support\Collection<\Spatie\LaravelData\Tests\Fakes\SimpleDataWithUnicodeCharséÄöü>|null */
+    public ?array $propertyV;
+
+    public ?array $propertyW;
+
     /**
      * @param \Spatie\LaravelData\Tests\Fakes\SimpleData[]|null $paramA
      * @param null|\Spatie\LaravelData\Tests\Fakes\SimpleData[] $paramB
@@ -85,6 +91,10 @@ class CollectionDataAnnotationsData
      * @param array<int,SimpleData> $paramJ
      * @param array<int, SimpleData> $paramI
      * @param \Spatie\LaravelData\DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleData>|null $paramK
+     * @param \Spatie\LaravelData\DataCollection<\Spatie\LaravelData\Tests\Fakes\SimpleDataWithUnicodeCharséÄöü>|null $paramL
+     * @param Collection<\Spatie\LaravelData\Tests\Fakes\SimpleDataWithUnicodeCharséÄöü>|null $paramM
+     * @param array<\Spatie\LaravelData\Tests\Fakes\SimpleDataWithUnicodeCharséÄöü>|null $paramN
+     * @param \Spatie\LaravelData\Tests\Fakes\SimpleDataWithUnicodeCharséÄöü[]|null $paramO
      */
     public function method(
         array $paramA,
@@ -97,6 +107,10 @@ class CollectionDataAnnotationsData
         array $paramJ,
         array $paramI,
         ?array $paramK,
+        ?DataCollection $paramL,
+        ?Collection $paramM,
+        ?array $paramN,
+        ?array $paramO
     ) {
 
     }
