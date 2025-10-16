@@ -9,6 +9,7 @@ use Spatie\LaravelData\Exceptions\CannotCreateAbstractClass;
 use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
+use Spatie\LaravelData\Support\Creation\ValidationStrategy;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\ResolvedDataPipeline;
 
@@ -128,7 +129,7 @@ class DataFromSomethingResolver
         $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
 
         foreach ($payloads as $payload) {
-            if ($payload instanceof Request) {
+            if ($payload instanceof Request && ($creationContext->validationStrategy !== ValidationStrategy::Disabled)) {
                 // Solely for the purpose of validation
                 $pipeline->execute($payload, $creationContext);
             }
