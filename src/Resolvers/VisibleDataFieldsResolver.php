@@ -38,15 +38,14 @@ class VisibleDataFieldsResolver
             }
 
             if ($next === true) {
-                $fields[$field] = new TransformationContext(
-                    $transformationContext->transformValues,
-                    $transformationContext->mapPropertyNames,
-                    $transformationContext->wrapExecutionType,
-                    $transformationContext->transformers,
-                    depth: $transformationContext->depth + 1,
-                    maxDepth: $transformationContext->maxDepth,
-                    throwWhenMaxDepthReached: $transformationContext->throwWhenMaxDepthReached,
-                );
+                $fieldTransFormationContext = clone $transformationContext;
+                $fieldTransFormationContext->depth++;
+                $fieldTransFormationContext->includePartials = null;
+                $fieldTransFormationContext->excludePartials = null;
+                $fieldTransFormationContext->onlyPartials = null;
+                $fieldTransFormationContext->exceptPartials = null;
+
+                $fields[$field] = $fieldTransFormationContext;
             }
         }
 
