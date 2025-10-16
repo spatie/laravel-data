@@ -93,6 +93,7 @@ class DataClassFactory
             validateable: $reflectionClass->implementsInterface(ValidateableData::class),
             wrappable: $reflectionClass->implementsInterface(WrappableData::class),
             emptyData: $reflectionClass->implementsInterface(EmptyData::class),
+            hasDynamicValidationRules: method_exists($reflectionClass->name, 'rules'),
             attributes: $attributes,
             dataIterablePropertyAnnotations: $dataIterablePropertyAnnotations,
             allowedRequestIncludes: new LazyDataStructureProperty(fn (): ?array => $responsable ? $name::allowedRequestIncludes() : null),

@@ -27,6 +27,7 @@ class DataClass
         public readonly bool $validateable,
         public readonly bool $wrappable,
         public readonly bool $emptyData,
+        public readonly bool $hasDynamicValidationRules,
         public readonly DataAttributesCollection $attributes,
         public readonly array $dataIterablePropertyAnnotations,
         public DataStructureProperty $allowedRequestIncludes,
