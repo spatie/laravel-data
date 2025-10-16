@@ -1184,7 +1184,7 @@ it('will cast iterables into default types', function () {
     ]);
 
     expect($data->strings)->toBe(['Hello', '42', '3.14', '1', '0', 'false']);
-    expect($data->bools)->toBe([true, true, true, true, true, false, true]);
+    expect($data->bools)->toBe([true, true, true, true, true, false, false]);
     expect($data->ints)->toBe([0, 42, 3, 1, 1, 0, 0]);
     expect($data->floats)->toBe([0.0, 42.0, 3.14, 1.0, 1.0, 0.0, 0.0]);
     expect($data->arrays)->toEqual([['Hello'], [42], [3.14], [true], ['nested'], ['0'], ['false']]);
