@@ -20,7 +20,9 @@ class InertiaDeferred extends ConditionalLazy
 
         parent::__construct(fn () => true, $callback);
 
-        $this->group = $value instanceof DeferProp && $value->group()!=='default' ? $value->group() : $group;
+        $this->group = $value instanceof DeferProp && $value->group() !== 'default'
+            ? $value->group()
+            : $group;
     }
 
     public function resolve(): DeferProp
