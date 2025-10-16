@@ -62,6 +62,7 @@ use Spatie\LaravelData\Tests\Fakes\DataWithArgumentCountErrorException;
 use Spatie\LaravelData\Tests\Fakes\EnumData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\FakeNestedModelData;
+use Spatie\LaravelData\Tests\Fakes\FakeNormalizer;
 use Spatie\LaravelData\Tests\Fakes\ModelData;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
@@ -73,7 +74,6 @@ use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
-use Spatie\LaravelData\Tests\Normalizers\NormalizedNormalizer;
 
 it('can use default types to create data objects', function () {
     $data = ComplicatedData::from([
@@ -1759,7 +1759,7 @@ describe('property-morphable creation tests', function () {
 
             public static function normalizers(): array
             {
-                return [NormalizedNormalizer::class];
+                return [FakeNormalizer::returnsArrayItem()];
             }
         }
 

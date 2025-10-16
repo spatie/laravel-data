@@ -86,7 +86,9 @@ class ResolvedDataPipeline
             : $this->dataClass;
 
         foreach ($dataClassToNormalize->properties as $property) {
-            $name = $property->inputMappedName ?? $property->name;
+            $name = $creationContext->mapPropertyNames && $property->inputMappedName
+                ? $property->inputMappedName
+                : $property->name;
 
             $value = $normalized->getProperty($name, $property);
 
