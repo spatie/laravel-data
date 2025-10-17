@@ -3,7 +3,6 @@
 namespace Spatie\LaravelData\Support\Factories;
 
 use Exception;
-use phpDocumentor\Reflection\Types\Compound;
 use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionMethod;
