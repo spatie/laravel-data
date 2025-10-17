@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support\Factories;
 
 use Exception;
+use phpDocumentor\Reflection\Types\Compound;
 use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionMethod;
@@ -245,7 +246,7 @@ class DataTypeFactory
 
     /**
      * @return array{
-     *      type: NamedType,
+     *      type: NamedType|UnionType,
      *      isMixed: bool,
      *      kind: DataTypeKind,
      *      dataClass: ?string,
@@ -341,11 +342,41 @@ class DataTypeFactory
         if (
             $iterableItemType === null
             && $typeable instanceof ReflectionProperty
-            && $annotation = $this->iterableAnnotationReader->getForProperty($typeable)
+            && $annotations = $this->iterableAnnotationReader->getAllForProperty($typeable)
         ) {
-            $isData = $annotation->isData;
-            $iterableItemType = $annotation->type;
-            $iterableKeyType = $annotation->keyType;
+            if (count($annotations) == 1) {
+                $isData = $annotations[0]->isData;
+                $iterableItemType = $annotations[0]->type;
+                $iterableKeyType = $annotations[0]->keyType;
+            } elseif (count($annotations) > 1) {
+                $iterableItemType = join('|', array_unique(array_column($annotations, 'type')));
+                $iterableKeyType = join('|', array_unique(array_column($annotations, 'keyType')));
+                return [
+                    'type' => new UnionType(
+                        array_map(
+                            fn (DataIterableAnnotation $annotation) => new NamedType(
+                                name: $name,
+                                builtIn: $builtIn,
+                                acceptedTypes: $acceptedTypes,
+                                kind: $annotation->isData ? $kind->getDataRelatedEquivalent() : $kind,
+                                dataClass: $annotation->isData ? $annotation->type : null,
+                                dataCollectableClass: $annotation->isData ? $name : null,
+                                iterableClass: $name,
+                                iterableItemType: $annotation->type,
+                                iterableKeyType: $annotation->keyType,
+                            ),
+                            $annotations,
+                        )
+                    ),
+                    'isMixed' => $isMixed,
+                    'kind' => $kind,
+                    'dataClass' => null,
+                    'dataCollectableClass' => null,
+                    'iterableClass' => $name,
+                    'iterableItemType' => $iterableItemType,
+                    'iterableKeyType' => $iterableKeyType,
+                ];
+            }
         }
 
         if (

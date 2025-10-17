@@ -28,7 +28,15 @@ class DataIterableAnnotationReader
 
     public function getForProperty(ReflectionProperty $property): ?DataIterableAnnotation
     {
-        return Arr::first($this->get($property));
+        /** Also {@see resolveDataClass()}. */
+        $annotations = $this->get($property);
+        return Arr::first($annotations, fn (DataIterableAnnotation $a) => $a->isData) ?? Arr::first($annotations);
+    }
+
+    /** @return DataIterableAnnotation[] */
+    public function getAllForProperty(ReflectionProperty $property): array
+    {
+        return $this->get($property);
     }
 
     /** @return array<string, DataIterableAnnotation> */
@@ -116,14 +124,15 @@ class DataIterableAnnotationReader
             $parameter = $collectionMatches['parameter'][$index];
             $key = $collectionMatches['key'][$index];
 
-            $resolvedTuple = $this->resolveDataClass($reflection, $dataClass);
-
-            $annotations[] = new DataIterableAnnotation(
-                type: $resolvedTuple['type'],
-                isData: $resolvedTuple['isData'],
-                keyType: empty($key) ? 'array-key' : $key,
-                property: empty($parameter) ? null : $parameter
-            );
+            $types = $this->resolveTypes($reflection, $dataClass);
+            foreach ($types as $resolvedTuple) {
+                $annotations[] = new DataIterableAnnotation(
+                    type: $resolvedTuple['type'],
+                    isData: $resolvedTuple['isData'],
+                    keyType: empty($key) ? 'array-key' : $key,
+                    property: empty($parameter) ? null : $parameter
+                );
+            }
         }
 
         return $annotations;
@@ -136,61 +145,64 @@ class DataIterableAnnotationReader
         ReflectionProperty|ReflectionClass|ReflectionMethod $reflection,
         string $class
     ): array {
-        if (str_contains($class, '|')) {
-            $possibleNonDataType = null;
-
-            foreach (explode('|', $class) as $explodedClass) {
-                $resolvedTuple = $this->resolveDataClass($reflection, $explodedClass);
-
-                if ($resolvedTuple['isData']) {
-                    return $resolvedTuple;
-                }
-
-                $possibleNonDataType = $resolvedTuple['type'];
-            }
-
-            return [
-                'type' => $possibleNonDataType,
-                'isData' => false,
-            ];
-        }
-
-        if (in_array($class, ['int', 'string', 'bool', 'float', 'array', 'object', 'callable', 'iterable', 'mixed'])) {
-            return [
-                'type' => $class,
-                'isData' => false,
-            ];
-        }
-
-        $class = ltrim($class, '\\');
-
-        if (is_subclass_of($class, BaseData::class)) {
-            return [
-                'type' => $class,
-                'isData' => true,
-            ];
-        }
-
-        $fcqn = $this->resolveFcqn($reflection, $class);
-
-        if (is_subclass_of($fcqn, BaseData::class)) {
-            return [
-                'type' => $fcqn,
-                'isData' => true,
-            ];
-        }
-
-        if (class_exists($fcqn)) {
-            return [
-                'type' => $fcqn,
-                'isData' => false,
-            ];
-        }
-
-        return [
+        $types = $this->resolveTypes($reflection, $class);
+        /** Also {@see getForProperty()}. */
+        return Arr::first($types, fn (array $type) => $type['isData']) ?? Arr::first($types) ?? [
             'type' => $class,
             'isData' => false,
         ];
+    }
+
+    /**
+     * @return array{type: string, isData: bool}[]
+     */
+    protected function resolveTypes(
+        ReflectionProperty|ReflectionClass|ReflectionMethod $reflection,
+        string $class
+    ): array {
+        $types = [];
+        foreach (explode('|', $class) as $explodedClass) {
+            if (in_array($explodedClass, ['int', 'string', 'bool', 'float', 'array', 'object', 'callable', 'iterable', 'mixed'])) {
+                $types[] = [
+                    'type' => $explodedClass,
+                    'isData' => false,
+                ];
+                continue;
+            }
+
+            $explodedClass = ltrim($explodedClass, '\\');
+            if (is_subclass_of($explodedClass, BaseData::class)) {
+                $types[] = [
+                    'type' => $explodedClass,
+                    'isData' => true,
+                ];
+                continue;
+            }
+
+            $fcqn = $this->resolveFcqn($reflection, $explodedClass);
+            if (is_subclass_of($fcqn, BaseData::class)) {
+                $types[] = [
+                    'type' => $fcqn,
+                    'isData' => true,
+                ];
+                continue;
+            }
+
+            if (class_exists($fcqn)) {
+                $types[] = [
+                    'type' => $fcqn,
+                    'isData' => false,
+                ];
+                continue;
+            }
+
+            $types[] = [
+                'type' => $explodedClass,
+                'isData' => false,
+            ];
+        }
+
+        return $types;
     }
 
     protected function resolveFcqn(

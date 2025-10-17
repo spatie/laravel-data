@@ -6,6 +6,7 @@ use phpDocumentor\Reflection\Fqsen;
 use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Boolean;
+use phpDocumentor\Reflection\Types\Collection;
 use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Nullable;
