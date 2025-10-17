@@ -12,6 +12,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\Rules\In as LaravelIn;
+use Illuminate\Validation\Rules\Unique as LaravelUnique;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
@@ -48,6 +49,12 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\ValidationStrategy;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereInConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereNotConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereNotInConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereNotNullConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereNullConstraint;
 use Spatie\LaravelData\Support\Validation\References\AuthenticatedUserReference;
 use Spatie\LaravelData\Support\Validation\References\ContainerReference;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
@@ -1513,6 +1520,240 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
             (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
         ],
     ]);
+});
+
+it('can use database constraints with Exists validation', function () {
+    $dataClass = new class () extends Data {
+        public int $property;
+
+        public static function rules(): array
+        {
+            return [
+                'property' => [
+                    new Exists('users', where: [
+                        new WhereConstraint('status', 'active'),
+                        new WhereNotConstraint('deleted_at', null),
+                    ]),
+                ],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)->assertRules([
+        'property' => [
+            (new LaravelExists('users'))
+                ->where('status', 'active')
+                ->whereNot('deleted_at', null),
+        ],
+    ]);
+});
+
+
+it('can use multiple database constraints with Exists validation', function () {
+    $dataClass = new class () extends Data {
+        public int $userId;
+
+        public static function rules(): array
+        {
+            return [
+                'userId' => [
+                    new Exists('users', where: [
+                        new WhereConstraint('active', true),
+                        new WhereNotConstraint('name', 'Unlucky'),
+                        new WhereInConstraint('role', ['admin', 'user']),
+                        new WhereNotInConstraint('type', ['guest', 'temp']),
+                        new WhereNullConstraint('deleted_at'),
+                        new WhereNotNullConstraint('email_verified_at'),
+                    ]),
+                ],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)->assertRules([
+        'userId' => [
+            (new LaravelExists('users'))
+                ->where('active', true)
+                ->whereNot('name', 'Unlucky')
+                ->whereIn('role', ['admin', 'user'])
+                ->whereNotIn('type', ['guest', 'temp'])
+                ->whereNull('deleted_at')
+                ->whereNotNull('email_verified_at'),
+        ],
+    ]);
+});
+
+it('can combine database constraints with closure constraints in Exists validation', function () {
+    $dataClass = new class () extends Data {
+        public int $userId;
+
+        public static function rules(): array
+        {
+            return [
+                'userId' => [
+                    new Exists('users', where: [
+                        new WhereConstraint('active', true),
+                        fn ($query) => $query->where('created_at', '>', now()->subYear()),
+                    ]),
+                ],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)->assertRules([
+        'userId' => [
+            (new LaravelExists('users'))
+                ->where('active', true)
+                ->where(fn ($query) => $query->where('created_at', '>', now()->subYear())),
+        ],
+    ]);
+});
+
+it('throws exception for invalid database constraint in Exists validation', function () {
+    $dataClass = new class () extends Data {
+        public int $userId;
+
+        public static function rules(): array
+        {
+            return [
+                'userId' => [
+                    new Exists('users', where: ['invalid_constraint']),
+                ],
+            ];
+        }
+    };
+
+    expect(fn () => $dataClass::getValidationRules([]))->toThrow(\InvalidArgumentException::class, 'Each where item must be a DatabaseConstraint or Closure');
+});
+
+it('can use database constraints with Unique validation', function () {
+    $dataClass = new class () extends Data {
+        public string $email;
+
+        public static function rules(): array
+        {
+            return [
+                'email' => [
+                    new Unique('users', where: [
+                        new WhereConstraint('active', true),
+                        new WhereNotConstraint('deleted_at', null),
+                    ]),
+                ],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)->assertRules([
+        'email' => [
+            (new LaravelUnique('users'))
+                ->where('active', true)
+                ->whereNot('deleted_at', null),
+        ],
+    ]);
+});
+
+it('can use multiple database constraints with Unique validation', function () {
+    $dataClass = new class () extends Data {
+        public string $email;
+
+        public static function rules(): array
+        {
+            return [
+                'email' => [
+                    new Unique('users', where: [
+                        new WhereConstraint('active', true),
+                        new WhereNotConstraint('name', 'Unlucky'),
+                        new WhereInConstraint('role', ['admin', 'user']),
+                        new WhereNotInConstraint('type', ['guest', 'temp']),
+                        new WhereNullConstraint('deleted_at'),
+                        new WhereNotNullConstraint('email_verified_at'),
+                    ]),
+                ],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)->assertRules([
+        'email' => [
+            (new LaravelUnique('users'))
+                ->where('active', true)
+                ->whereNot('name', 'Unlucky')
+                ->whereIn('role', ['admin', 'user'])
+                ->whereNotIn('type', ['guest', 'temp'])
+                ->whereNull('deleted_at')
+                ->whereNotNull('email_verified_at'),
+        ],
+    ]);
+});
+
+it('can combine database constraints with closure constraints in Unique validation', function () {
+    $dataClass = new class () extends Data {
+        public string $email;
+
+        public static function rules(): array
+        {
+            return [
+                'email' => [
+                    new Unique('users', where: [
+                        new WhereConstraint('active', true),
+                        fn (Builder $query) => $query->where('created_at', '>', now()->subYear()),
+                    ]),
+                ],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)->assertRules([
+        'email' => [
+            (new LaravelUnique('users'))
+                ->where('active', true)
+                ->where(fn (Builder $query) => $query->where('created_at', '>', now()->subYear())),
+        ],
+    ]);
+});
+
+it('can use database constraints with Unique validation while maintaining ignore functionality', function () {
+    $dataClass = new class () extends Data {
+        public string $email;
+
+        public static function rules(): array
+        {
+            return [
+                'email' => [
+                    new Unique('users', ignore: 5, where: [
+                        new WhereConstraint('active', true),
+                        new WhereNullConstraint('deleted_at'),
+                    ]),
+                ],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)->assertRules([
+        'email' => [
+            (new LaravelUnique('users'))
+                ->ignore(5)
+                ->where('active', true)
+                ->whereNull('deleted_at'),
+        ],
+    ]);
+});
+
+it('throws exception for invalid database constraint in Unique validation', function () {
+    $dataClass = new class () extends Data {
+        public string $email;
+
+        public static function rules(): array
+        {
+            return [
+                'email' => [
+                    new Unique('users', where: ['invalid_constraint']),
+                ],
+            ];
+        }
+    };
+
+    expect(fn () => $dataClass::getValidationRules([]))->toThrow(\InvalidArgumentException::class, 'Each where item must be a DatabaseConstraint or Closure');
 });
 
 it('can reference route parameters as values within rules', function () {
