@@ -257,6 +257,19 @@ class ProductData extends Data
 }
 ```
 
+The following database constraints are available:
+
+- `WhereConstraint`
+- `WhereNotConstraint`
+- `WhereNullConstraint`
+- `WhereNotNullConstraint`
+- `WhereInConstraint`
+- `WhereNotInConstraint`
+
+All constraint parameters support `ExternalReference` objects for dynamic values.
+
+
+
 ## Rule attribute
 
 One special attribute is the `Rule` attribute. With it, you can write rules just like you would when creating a custom
