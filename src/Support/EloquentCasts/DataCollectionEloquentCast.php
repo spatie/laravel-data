@@ -122,6 +122,10 @@ class DataCollectionEloquentCast implements CastsAttributes
      */
     public function compare($model, string $key, $firstValue, $secondValue): bool
     {
+        if (in_array('encrypted', $this->arguments) && ! empty(Crypt::getPreviousKeys())) {
+            return false;
+        }
+
         return $this->get($model, $key, $firstValue, [])?->toArray() === $this->get($model, $key, $secondValue, [])?->toArray();
     }
 

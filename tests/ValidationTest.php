@@ -2483,6 +2483,42 @@ it('can validate a payload for a data object and create one using a magic from m
     assertFalse(true, 'We should not end up here');
 });
 
+it('can validate and create a data object with magic method that does not contain a request param', function () {
+    $dataClass = new class () extends Data {
+        public string $string;
+
+        public static function fromArray(array $data): self
+        {
+            $self = new self();
+
+            $self->string = strtoupper($data['string']);
+
+            return $self;
+
+        }
+    };
+
+    $data = $dataClass::validateAndCreate(
+        ['string' => 'hello world'],
+    );
+
+    expect($data)
+        ->string->toBe('HELLO WORLD')
+        ->string->not()->toBe('hello world');
+
+    try {
+        SimpleData::validateAndCreate([]);
+    } catch (ValidationException $exception) {
+        expect($exception->errors())->toMatchArray([
+            'string' => [__('validation.required', ['attribute' => 'string'])],
+        ]);
+
+        return;
+    }
+
+    assertFalse(true, 'We should not end up here');
+});
+
 it('can the validation rules for a data object', function () {
     expect(MultiData::getValidationRules([]))->toEqual([
         'first' => ['required', 'string'],
@@ -2982,8 +3018,6 @@ describe('property-morphable validation tests', function () {
             ) {
             }
         }
-
-        ;
 
         DataValidationAsserter::for(TestValidationNestedPropertyMorphableData::class)
             ->assertErrors([

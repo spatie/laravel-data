@@ -1375,3 +1375,21 @@ it('can combine all the partials', function () {
         ],
     ]);
 });
+
+it('can handle custom transformation contexts', function () {
+    $data = VisibleFieldsData::instance();
+
+    class CustomTransformationContext extends TransformationContext
+    {
+    };
+
+    $visibleFields = app(VisibleDataFieldsResolver::class)->execute(
+        $data,
+        app(DataConfig::class)->getDataClass($data::class),
+        new CustomTransformationContext(),
+    );
+
+    expect($visibleFields['single'])->toBeInstanceOf(CustomTransformationContext::class);
+    expect($visibleFields['nested'])->toBeInstanceOf(CustomTransformationContext::class);
+    expect($visibleFields['collection'])->toBeInstanceOf(CustomTransformationContext::class);
+});
