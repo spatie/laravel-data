@@ -2,15 +2,22 @@
 
 namespace Spatie\LaravelData\Support\Validation\Constraints;
 
-class WhereNotConstraint implements DatabaseConstraint
+use Illuminate\Contracts\Support\Arrayable;
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
+use UnitEnum;
+
+class WhereNotConstraint extends DatabaseConstraint
 {
     public function __construct(
-        public readonly mixed $column,
-        public readonly mixed $value,
+        public readonly string|ExternalReference $column,
+        public readonly Arrayable|UnitEnum|array|string|ExternalReference $value,
     ) {}
 
     public function toArray(): array
     {
-        return [$this->column, $this->value];
+        return [
+            $this->normalizePossibleExternalReferenceParameter($this->column),
+            $this->normalizePossibleExternalReferenceParameter($this->value),
+        ];
     }
 }

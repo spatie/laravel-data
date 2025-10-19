@@ -2,14 +2,18 @@
 
 namespace Spatie\LaravelData\Support\Validation\Constraints;
 
-class WhereNullConstraint implements DatabaseConstraint
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
+
+class WhereNullConstraint extends DatabaseConstraint
 {
     public function __construct(
-        public readonly mixed $column,
+        public readonly string|ExternalReference $column,
     ) {}
 
     public function toArray(): array
     {
-        return [$this->column];
+        return [
+            $this->normalizePossibleExternalReferenceParameter($this->column),
+        ];
     }
 }

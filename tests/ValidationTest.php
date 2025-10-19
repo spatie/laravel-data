@@ -1532,7 +1532,7 @@ it('can use database constraints with Exists validation', function () {
                 'property' => [
                     new Exists('users', where: [
                         new WhereConstraint('status', 'active'),
-                        new WhereNotConstraint('deleted_at', null),
+                        new WhereNullConstraint('deleted_at'),
                     ]),
                 ],
             ];
@@ -1543,7 +1543,7 @@ it('can use database constraints with Exists validation', function () {
         'property' => [
             (new LaravelExists('users'))
                 ->where('status', 'active')
-                ->whereNot('deleted_at', null),
+                ->whereNull('deleted_at'),
         ],
     ]);
 });
@@ -1636,7 +1636,7 @@ it('can use database constraints with Unique validation', function () {
                 'email' => [
                     new Unique('users', where: [
                         new WhereConstraint('active', true),
-                        new WhereNotConstraint('deleted_at', null),
+                        new WhereNullConstraint('deleted_at'),
                     ]),
                 ],
             ];
@@ -1647,7 +1647,7 @@ it('can use database constraints with Unique validation', function () {
         'email' => [
             (new LaravelUnique('users'))
                 ->where('active', true)
-                ->whereNot('deleted_at', null),
+                ->whereNull('deleted_at'),
         ],
     ]);
 });
@@ -1741,19 +1741,32 @@ it('can use database constraints with Unique validation while maintaining ignore
 
 it('throws exception for invalid database constraint in Unique validation', function () {
     $dataClass = new class () extends Data {
+        #[Unique('users', where: ['invalid_constraint'])]
         public string $email;
-
-        public static function rules(): array
-        {
-            return [
-                'email' => [
-                    new Unique('users', where: ['invalid_constraint']),
-                ],
-            ];
-        }
     };
 
     expect(fn () => $dataClass::getValidationRules([]))->toThrow(\InvalidArgumentException::class, 'Each where item must be a DatabaseConstraint or Closure');
+});
+
+it('can use external reference as database constraint value', function () {
+    $dataClass = new class () extends Data {
+        #[Unique('users', where: [
+            new WhereConstraint('is_active', new RouteParameterReference('active'))
+        ])]
+        public string $email;
+    };
+
+    $requestMock = mock(Request::class);
+    $requestMock->expects('route')->with('active')->andReturns(true);
+    $this->app->bind('request', fn () => $requestMock);
+
+    DataValidationAsserter::for($dataClass)->assertRules([
+        'email' => [
+            'required',
+            'string',
+            'unique:users,NULL,NULL,id,is_active,"1"',
+        ],
+    ]);
 });
 
 it('can reference route parameters as values within rules', function () {
