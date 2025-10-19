@@ -1722,7 +1722,7 @@ it('can use database constraints with Unique validation while maintaining ignore
                 'email' => [
                     new Unique('users', ignore: 5, where: [
                         new WhereConstraint('active', true),
-                        new WhereNullConstraint('deleted_at'),
+                        new WhereNotConstraint('deleted_at', null),
                     ]),
                 ],
             ];
@@ -1734,7 +1734,7 @@ it('can use database constraints with Unique validation while maintaining ignore
             (new LaravelUnique('users'))
                 ->ignore(5)
                 ->where('active', true)
-                ->whereNull('deleted_at'),
+                ->whereNot('deleted_at', null),
         ],
     ]);
 });
