@@ -348,6 +348,17 @@ class DataTypeFactory
                 $iterableItemType = $annotations[0]->type;
                 $iterableKeyType = $annotations[0]->keyType;
             } elseif (count($annotations) > 1) {
+                // $isData = false;
+                // $dataClass = null;
+                // $dataCollectableClass = null;
+                // foreach ($annotations as $annotation) {
+                //     if ($annotation->isData) {
+                //         $isData = true;
+                //         $dataClass = $annotation->type;
+                //         $dataCollectableClass = $name;
+                //         break;
+                //     }
+                // }
                 $iterableItemType = join('|', array_unique(array_column($annotations, 'type')));
                 $iterableKeyType = join('|', array_unique(array_column($annotations, 'keyType')));
                 return [
@@ -368,9 +379,9 @@ class DataTypeFactory
                         )
                     ),
                     'isMixed' => $isMixed,
-                    'kind' => $kind,
-                    'dataClass' => null,
-                    'dataCollectableClass' => null,
+                    'kind' => $kind, // $isData ? $kind->getDataRelatedEquivalent() : $kind,
+                    'dataClass' => null, // $dataClass,
+                    'dataCollectableClass' => null, // $dataCollectableClass,
                     'iterableClass' => $name,
                     'iterableItemType' => $iterableItemType,
                     'iterableKeyType' => $iterableKeyType,

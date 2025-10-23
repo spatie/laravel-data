@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -32,7 +34,13 @@ function assertMatchesSnapshot($actual, ?Driver $driver = null): void
 it('can convert a data object to Typescript', function () {
     $config = TypeScriptTransformerConfig::create();
 
-    $data = new class (null, Optional::create(), 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn () => 'Lazy'), Lazy::closure(fn () => 'Lazy'), SimpleData::from('Simple data'), SimpleData::collect([], DataCollection::class), SimpleData::collect([], DataCollection::class), SimpleData::collect([], DataCollection::class), collect([6, new SimpleData('simp')]), [6, new SimpleData('simpler')]) extends Data {
+    $foo = new class () extends Model {
+        protected $attributes = [
+            'id' => 123,
+        ];
+    };
+
+    $data = new class (null, Optional::create(), 42, true, 'Hello world', 3.14, ['the', 'meaning', 'of', 'life'], Lazy::create(fn () => 'Lazy'), Lazy::closure(fn () => 'Lazy'), SimpleData::from('Simple data'), SimpleData::collect([], DataCollection::class), SimpleData::collect([], DataCollection::class), SimpleData::collect([], DataCollection::class), collect([6, new SimpleData('simp')]), new EloquentCollection([$foo]), [6, new SimpleData('simpler')]) extends Data {
         public function __construct(
             public null|int $nullable,
             public Optional|int $undefineable,
@@ -53,6 +61,8 @@ it('can convert a data object to Typescript', function () {
             public DataCollection $dataCollectionWithAttribute,
             /** @var Collection<int, \Spatie\LaravelData\Tests\Fakes\SimpleData|int> */
             public Collection $collectionWithUnion,
+            /** @var Collection<int, \Spatie\LaravelData\Tests\Fakes\SimpleData>|array<int> */
+            public EloquentCollection|array $collectionOrArrayWithUnion,
             /** @var array<int, \Spatie\LaravelData\Tests\Fakes\SimpleData|int> */
             public array $arrayWithUnion,
         ) {

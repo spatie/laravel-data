@@ -44,7 +44,7 @@ class CollectionDataAnnotationsData
     public DataCollection $propertyH;
 
     /** @var SimpleData */
-    public DataCollection $propertyI; // FAIL
+    public DataCollection $propertyI;
 
     public DataCollection $propertyJ;
 

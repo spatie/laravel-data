@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotation;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotationReader;
@@ -65,7 +66,7 @@ it(
 
     yield 'propertyI' => [ // Invalid definition
         'propertyI', // property
-        null, // expected
+        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
     ];
 
     yield 'propertyJ' => [ // No definition
@@ -248,6 +249,8 @@ it('will always prefer the data version of the annotation in unions', function (
     $dataClass = new class () extends Data {
         /** @var array<string|Spatie\LaravelData\Tests\Fakes\SimpleData> */
         public array $property;
+        /** @var Collection<int, string|Spatie\LaravelData\Tests\Fakes\SimpleData> */
+        public Collection $collection;
     };
 
     $annotations = app(DataIterableAnnotationReader::class)->getForProperty(
@@ -255,6 +258,12 @@ it('will always prefer the data version of the annotation in unions', function (
     );
 
     expect($annotations)->toEqual(new DataIterableAnnotation(SimpleData::class, isData: true));
+
+    $annotations = app(DataIterableAnnotationReader::class)->getForProperty(
+        new ReflectionProperty($dataClass::class, 'collection')
+    );
+
+    expect($annotations)->toEqual(new DataIterableAnnotation(SimpleData::class, isData: true, keyType: 'array-key'));
 });
 
 it('will recognize default PHP types', function (string $type) {
@@ -291,7 +300,7 @@ it('will recognize default PHP types', function (string $type) {
         app(DataIterableAnnotationReader::class)->getForProperty(
             new ReflectionProperty($dataClass::class, $type)
         )
-    )->toEqual(new DataIterableAnnotation($type, isData: false));
+    )->toEqual(new DataIterableAnnotation(str_replace(['array', 'iterable'], 'mixed', $type), isData: false));
 })->with([
     'string' => ['string'],
     'int' => ['int'],
