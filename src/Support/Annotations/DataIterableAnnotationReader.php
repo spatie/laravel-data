@@ -62,7 +62,7 @@ class DataIterableAnnotationReader
             return [];
         }
 
-        $hasType = preg_match_all('/(?:@property(?:-read)?|@var|@param)\s*(.+)\s*(\$[a-zA-Z_][a-zA-Z0-9_]*)?.*$/uim', $comment, $matches);
+        $hasType = preg_match_all('/(?:@var|@param|@property(?:-read)?)\s+((?:\\\*[a-z_][a-z0-9_\-]*)*(?:\s*<\s*(?1)(?:\s*,\s*(?1))?\s*>)?(?:\s*\|\s*(?1))?)(?:\s*(\$[a-z_][a-z0-9_]*))?/im', $comment, $matches);
         if (! $hasType) {
             return [];
         }
@@ -72,24 +72,37 @@ class DataIterableAnnotationReader
             $property = empty($matches[2][$index]) ? null : ltrim($matches[2][$index], '$');
             $type = (new TypeResolver())->resolve($type); // , (new ContextFactory())->createFromReflector($reflection));
 
-            /** @return Type[] */
-            $commentTypeToDataStrings = function (Type $type) use (&$commentTypeToDataStrings): array {
+            $getOriginalKeyType = function(AbstractList $type): ?Type {
+                $list = new class($type) extends AbstractList {
+                    public function __construct(AbstractList $victim) {
+                        parent::__construct($victim->valueType, $victim->keyType);
+                    }
+                    public function getOriginalKeyType(): ?Type {
+                        return $this->keyType;
+                    }
+                };
+
+                return $list->getOriginalKeyType();
+            };
+            /** @return string[] */
+            $commentToValueTypeStrings = function (Type $type, ?Type $key) use ($getOriginalKeyType, &$commentToValueTypeStrings): array {
                 if ($type instanceof Compound) {
-                    return array_merge(...array_map(fn (Type $t) => $commentTypeToDataStrings($t), iterator_to_array($type)));
+                    return array_merge(...array_map(fn (Type $t) => $commentToValueTypeStrings($t, $key), iterator_to_array($type)));
                 } elseif ($type instanceof AbstractList) {
-                    return $commentTypeToDataStrings($type->getValueType());
+                    return $commentToValueTypeStrings($type->getValueType(), $getOriginalKeyType($type));
                 } elseif ($type instanceof Nullable) {
-                    return $commentTypeToDataStrings($type->getActualType());
+                    return $commentToValueTypeStrings($type->getActualType(), $key);
                 } else {
-                    return [(string) $type];
+                    return [[(string) $type, $key === null ? 'array-key' : (string) $key]];
                 }
             };
-            $typeStrings = $commentTypeToDataStrings($type);
-            foreach ($typeStrings as $typeString) {
+            $typeStrings = $commentToValueTypeStrings($type, null);
+            foreach ($typeStrings as [$typeString, $keyString]) {
                 if (in_array($typeString, ['int', 'string', 'bool', 'float', 'array', 'object', 'callable', 'iterable', 'mixed'])) {
                     $annotations[] = new DataIterableAnnotation(
                         type: $typeString,
                         isData: false,
+                        keyType: $keyString,
                         property: $property,
                     );
 
@@ -101,6 +114,7 @@ class DataIterableAnnotationReader
                     $annotations[] = new DataIterableAnnotation(
                         type: $typeString,
                         isData: true,
+                        keyType: $keyString,
                         property: $property,
                     );
 
@@ -112,6 +126,7 @@ class DataIterableAnnotationReader
                     $annotations[] = new DataIterableAnnotation(
                         type: $fcqn,
                         isData: is_subclass_of($fcqn, BaseData::class),
+                        keyType: $keyString,
                         property: $property,
                     );
 
@@ -121,6 +136,7 @@ class DataIterableAnnotationReader
                 $annotations[] = new DataIterableAnnotation(
                     type: $typeString,
                     isData: false,
+                    keyType: $keyString,
                     property: $property,
                 );
             }

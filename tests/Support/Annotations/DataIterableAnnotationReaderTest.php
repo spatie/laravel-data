@@ -263,7 +263,7 @@ it('will always prefer the data version of the annotation in unions', function (
         new ReflectionProperty($dataClass::class, 'collection')
     );
 
-    expect($annotations)->toEqual(new DataIterableAnnotation(SimpleData::class, isData: true, keyType: 'array-key'));
+    expect($annotations)->toEqual(new DataIterableAnnotation(SimpleData::class, isData: true, keyType: 'int'));
 });
 
 it('will recognize default PHP types', function (string $type) {
