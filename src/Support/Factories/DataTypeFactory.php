@@ -17,7 +17,6 @@ use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Annotations\CollectionAnnotationReader;
-use Spatie\LaravelData\Support\Annotations\DataIterableAnnotation;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotationReader;
 use Spatie\LaravelData\Support\DataAttributesCollection;
 use Spatie\LaravelData\Support\DataPropertyType;
@@ -331,7 +330,7 @@ class DataTypeFactory
 
         if (
             $iterableItemType === null
-            && !empty($classDefinedDataIterableAnnotations)
+            && ! empty($classDefinedDataIterableAnnotations)
         ) {
             if (count($classDefinedDataIterableAnnotations) == 1) {
                 $isData = $classDefinedDataIterableAnnotations[0]->isData;
@@ -347,7 +346,7 @@ class DataTypeFactory
         if (
             $iterableItemType === null
             && $typeable instanceof ReflectionProperty
-            && !empty($annotations = $this->iterableAnnotationReader->getForProperty($typeable))
+            && ! empty($annotations = $this->iterableAnnotationReader->getForProperty($typeable))
         ) {
             if (count($annotations) == 1) {
                 $isData = $annotations[0]->isData;
@@ -390,9 +389,9 @@ class DataTypeFactory
             return [
                 'type' => new UnionType($types),
                 'isMixed' => $isMixed,
-                'kind' => $kind, // $isData ? $kind->getDataRelatedEquivalent() : $kind,
-                'dataClass' => null, // $dataClass,
-                'dataCollectableClass' => null, // $dataCollectableClass,
+                'kind' => $kind,
+                'dataClass' => null,
+                'dataCollectableClass' => null,
                 'iterableClass' => $name,
                 'iterableItemType' => join('|', array_unique($iterableItemType)),
                 'iterableKeyType' => join('|', array_unique($iterableKeyType)),

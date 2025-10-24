@@ -59,7 +59,6 @@ class DataIterableAnnotationReader
             return [];
         }
 
-        // $hasType = preg_match_all('/(?:@var|@param|@property(?:-read)?)\s+(\??\s*(?:\\\*[a-z_][a-z0-9_\-]*)*(?:\s*<\s*(?1)(?:\s*,\s*(?1))?\s*>)?(?:\s*\[\s*\])?(?:\s*\|\s*(?1))?)(?:\s*(\$[a-z_][a-z0-9_]*))?/im', $comment, $matches);
         $hasType = preg_match_all('/(?:@var|@param|@property(?:-read)?)(.+)/uim', $comment, $matches);
         if (! $hasType) {
             return [];
@@ -68,40 +67,42 @@ class DataIterableAnnotationReader
         $annotations = [];
         foreach ($matches[1] as $match) {
             [$valueTypeString, $propertyName] = explode('$', $match, 2) + [1 => null];
+
             $type = tap(new TypeResolver(), function (TypeResolver $t) {
                 $t->addKeyword('array', ArrayWithoutMixedDefault::class);
                 $t->addKeyword('iterable', IterableWithoutMixedDefault::class);
             })->resolve($valueTypeString);
 
-            $getOriginalKeyType = function (AbstractList $type): ?Type {
+            $getKeyTypeWithoutDefault = static function (AbstractList $type): ?Type {
                 return(new class ($type) extends AbstractList {
                     public function __construct(AbstractList $victim)
                     {
                         parent::__construct($victim->valueType, $victim->keyType);
                     }
-                    public function getOriginalKeyType(): ?Type
+                    public function getKeyTypeWithoutDefault(): ?Type
                     {
                         return $this->keyType;
                     }
-                })->getOriginalKeyType();
+                })->getKeyTypeWithoutDefault();
             };
+
             /** @return string[] */
-            $getValueTypeStrings = function (Type $type, ?Type $key) use ($getOriginalKeyType, &$getValueTypeStrings): array {
+            $getValueTypeStrings = static function (Type $type, ?Type $key) use ($getKeyTypeWithoutDefault, &$getValueTypeStrings): array {
                 if ($type instanceof Compound) {
                     return array_merge(...array_map(fn (Type $t) => $getValueTypeStrings($t, $key), iterator_to_array($type)));
                 } elseif ($type instanceof ArrayWithoutMixedDefault || $type instanceof IterableWithoutMixedDefault) {
-                    // If is array without `<>` definition (defaults to mixed), then cast to array, not mixed.
                     return $type->getOriginalValueType() === null
                         ? [[(string) $type, $key === null ? 'array-key' : (string) $key]]
-                        : $getValueTypeStrings($type->getOriginalValueType(), $getOriginalKeyType($type));
+                        : $getValueTypeStrings($type->getOriginalValueType(), $getKeyTypeWithoutDefault($type));
                 } elseif ($type instanceof AbstractList) {
-                    return $getValueTypeStrings($type->getValueType(), $getOriginalKeyType($type));
+                    return $getValueTypeStrings($type->getValueType(), $getKeyTypeWithoutDefault($type));
                 } elseif ($type instanceof Nullable) {
                     return $getValueTypeStrings($type->getActualType(), $key);
                 } else {
                     return [[(string) $type, $key === null ? 'array-key' : (string) $key]];
                 }
             };
+
             $valueTypeStrings = $getValueTypeStrings($type, null);
             foreach ($valueTypeStrings as [$valueTypeString, $keyString]) {
                 $valueTypeString = ltrim($valueTypeString, '\\');

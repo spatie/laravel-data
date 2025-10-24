@@ -4,10 +4,11 @@ namespace Spatie\LaravelData\Support\Annotations\PhpDocumentorTypes;
 
 use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\Types\AbstractList;
+use phpDocumentor\Reflection\Types\Iterable_;
 use phpDocumentor\Reflection\Types\Mixed_;
 
 /**
- * Can't extend {@see \phpDocumentor\Reflection\Types\Iterable_} because it's final.
+ * Can't extend {@see Iterable_} because it's final.
  */
 class IterableWithoutMixedDefault extends AbstractList
 {
@@ -28,6 +29,7 @@ class IterableWithoutMixedDefault extends AbstractList
         return $this->originalValueType;
     }
 
+    /** Based on {@see Iterable_::__toString()}. */
     public function __toString(): string
     {
         if ($this->keyType) {
