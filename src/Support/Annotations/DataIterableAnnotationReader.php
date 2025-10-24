@@ -67,6 +67,7 @@ class DataIterableAnnotationReader
         $annotations = [];
         foreach ($matches[1] as $match) {
             [$valueTypeString, $propertyName] = explode('$', $match, 2) + [1 => null];
+            $propertyName === null or $propertyName = explode(' ', $propertyName, 2)[0];
 
             $type = tap(new TypeResolver(), function (TypeResolver $t) {
                 $t->addKeyword('array', ArrayWithoutMixedDefault::class);
