@@ -13,7 +13,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataWithUnicodeCharséÄöü;
 
 it(
     'can get the data class for a data collection by annotation',
-    function (string $property, ?DataIterableAnnotation $expected) {
+    function (string $property, array $expected) {
         $annotations = app(DataIterableAnnotationReader::class)->getForProperty(new ReflectionProperty(CollectionDataAnnotationsData::class, $property));
 
         expect($annotations)->toEqual($expected);
@@ -21,125 +21,180 @@ it(
 )->with(function () {
     yield 'propertyA' => [
         'propertyA', // property
-        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+        [new DataIterableAnnotation(SimpleData::class, isData: true)], // expected
     ];
 
     yield 'propertyB' => [
         'propertyB', // property
-        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+        [
+            new DataIterableAnnotation(SimpleData::class, isData: true),
+            new DataIterableAnnotation('null', isData: false),
+        ], // expected
     ];
 
     yield 'propertyC' => [
         'propertyC', // property
-        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+        [
+            new DataIterableAnnotation(SimpleData::class, isData: true),
+            new DataIterableAnnotation('null', isData: false),
+        ], // expected
     ];
 
     yield 'propertyD' => [
         'propertyD', // property
-        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+        [new DataIterableAnnotation(SimpleData::class, isData: true)], // expected
     ];
 
     yield 'propertyE' => [
         'propertyE', // property
-        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+        [new DataIterableAnnotation(SimpleData::class, isData: true)], // expected
     ];
 
     yield 'propertyE' => [
         'propertyE', // property
-        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+        [new DataIterableAnnotation(SimpleData::class, isData: true)], // expected
     ];
 
     yield 'propertyF' => [
         'propertyF', // property
-        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+        [new DataIterableAnnotation(SimpleData::class, isData: true)], // expected
     ];
 
     yield 'propertyG' => [
         'propertyG', // property
-        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+        [new DataIterableAnnotation(SimpleData::class, isData: true)], // expected
     ];
 
     yield 'propertyH' => [ // Attribute
         'propertyH', // property
-        null, // expected
+        [], // expected
     ];
 
     yield 'propertyI' => [ // Invalid definition
         'propertyI', // property
-        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+        [new DataIterableAnnotation(SimpleData::class, isData: true)], // expected
     ];
 
     yield 'propertyJ' => [ // No definition
         'propertyJ', // property
-        null, // expected
+        [], // expected
     ];
 
     yield 'propertyK' => [
         'propertyK', // property
-        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+        [new DataIterableAnnotation(SimpleData::class, isData: true)], // expected
     ];
 
     yield 'propertyL' => [
         'propertyL', // property
-        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+        [new DataIterableAnnotation(SimpleData::class, isData: true)], // expected
     ];
 
     yield 'propertyM' => [
         'propertyM', // property
-        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+        [new DataIterableAnnotation(SimpleData::class, isData: true)], // expected
     ];
 
     yield 'propertyU' => [
         'propertyU', // property
-        new DataIterableAnnotation(SimpleData::class, isData: true), // expected
+        [
+            new DataIterableAnnotation(SimpleData::class, isData: true),
+            new DataIterableAnnotation('null', isData: false),
+        ], // expected
     ];
 
     yield 'propertyV' => [
         'propertyV', // property
-        new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true), // expected
+        [
+            new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true),
+            new DataIterableAnnotation('null', isData: false),
+    ], // expected
     ];
 });
 
 it('can get the data class for a data collection by class annotation', function () {
     $annotations = app(DataIterableAnnotationReader::class)->getForClass(new ReflectionClass(CollectionDataAnnotationsData::class));
 
-    expect($annotations)->toEqualCanonicalizing([
-        'propertyN' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyN'),
-        'propertyO' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyO'),
-        'propertyP' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyP'),
-        'propertyQ' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyQ'),
-        'propertyR' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyR'),
-        'propertyS' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyS'),
-        'propertyT' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyT'),
-        'propertyW' => new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'propertyW'),
+    expect($annotations)->toEqual([
+        'propertyN' => [new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyN')],
+        'propertyO' => [new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyO')],
+        'propertyP' => [new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyP')],
+        'propertyQ' => [new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyQ')],
+        'propertyR' => [new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyR')],
+        'propertyS' => [new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyS')],
+        'propertyT' => [
+            new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyT'),
+            new DataIterableAnnotation('null', isData: false, property: 'propertyT'),
+        ],
+        'propertyW' => [
+            new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'propertyW'),
+            new DataIterableAnnotation('null', isData: false, property: 'propertyW'),
+        ],
     ]);
 });
 
 it('can get data class for a data collection by method annotation', function () {
     $annotations = app(DataIterableAnnotationReader::class)->getForMethod(new ReflectionMethod(CollectionDataAnnotationsData::class, 'method'));
 
-    expect($annotations)->toEqualCanonicalizing([
-        'paramA' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramA'),
-        'paramB' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramB'),
-        'paramC' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramC'),
-        'paramD' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramD'),
-        'paramE' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramE'),
-        'paramF' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramF'),
-        'paramG' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramG'),
-        'paramH' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramH'),
-        'paramJ' => new DataIterableAnnotation(SimpleData::class, isData: true, keyType: 'int', property: 'paramJ'),
-        'paramI' => new DataIterableAnnotation(SimpleData::class, isData: true, keyType: 'int', property: 'paramI'),
-        'paramK' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramK'),
-        'paramL' => new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'paramL'),
-        'paramM' => new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'paramM'),
-        'paramN' => new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'paramN'),
-        'paramO' => new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'paramO'),
+    expect($annotations)->toEqual([ // Canonicalizing([
+        'paramA' => [
+            new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramA'),
+            new DataIterableAnnotation('null', isData: false, property: 'paramA'),
+        ],
+        'paramB' => [
+            new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramB'),
+            new DataIterableAnnotation('null', isData: false, property: 'paramB'),
+        ],
+        'paramC' => [
+            new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramC'),
+        ],
+        'paramD' => [
+            new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramD'),
+        ],
+        'paramE' => [
+            new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramE'),
+        ],
+        'paramF' => [
+            new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramF'),
+        ],
+        'paramG' => [
+            new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramG'),
+        ],
+        'paramH' => [
+            new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramH'),
+        ],
+        'paramI' => [
+            new DataIterableAnnotation(SimpleData::class, isData: true, keyType: 'int', property: 'paramI'),
+        ],
+        'paramJ' => [
+            new DataIterableAnnotation(SimpleData::class, isData: true, keyType: 'int', property: 'paramJ'),
+        ],
+        'paramK' => [
+            new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramK'),
+            new DataIterableAnnotation('null', isData: false, property: 'paramK'),
+        ],
+        'paramL' => [
+            new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'paramL'),
+            new DataIterableAnnotation('null', isData: false, property: 'paramL'),
+        ],
+        'paramM' => [
+            new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'paramM'),
+            new DataIterableAnnotation('null', isData: false, property: 'paramM'),
+        ],
+        'paramN' => [
+            new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'paramN'),
+            new DataIterableAnnotation('null', isData: false, property: 'paramN'),
+        ],
+        'paramO' => [
+            new DataIterableAnnotation(SimpleDataWithUnicodeCharséÄöü::class, isData: true, property: 'paramO'),
+            new DataIterableAnnotation('null', isData: false, property: 'paramO'),
+        ],
     ]);
 });
 
 it(
     'can get the iterable class for a collection by annotation',
-    function (string $property, ?DataIterableAnnotation $expected) {
+    function (string $property, array $expected) {
         $annotations = app(DataIterableAnnotationReader::class)->getForProperty(new ReflectionProperty(CollectionNonDataAnnotationsData::class, $property));
 
         expect($annotations)->toEqual($expected);
@@ -147,101 +202,138 @@ it(
 )->with(function () {
     yield 'propertyA' => [
         'propertyA', // property
-        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
+        [new DataIterableAnnotation(DummyBackedEnum::class, isData: false)], // expected
     ];
 
     yield 'propertyB' => [
         'propertyB', // property
-        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
+        [
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false),
+            new DataIterableAnnotation('null', isData: false),
+        ], // expected
     ];
 
     yield 'propertyC' => [
         'propertyC', // property
-        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
+        [
+            new DataIterableAnnotation('null', isData: false),
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false),
+    ], // expected
     ];
 
     yield 'propertyD' => [
         'propertyD', // property
-        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
+        [new DataIterableAnnotation(DummyBackedEnum::class, isData: false)], // expected
     ];
 
     yield 'propertyE' => [
         'propertyE', // property
-        new DataIterableAnnotation('string', isData: false), // expected
+        [new DataIterableAnnotation('string', isData: false)], // expected
     ];
 
     yield 'propertyF' => [
         'propertyF', // property
-        new DataIterableAnnotation('string', isData: false), // expected
+        [new DataIterableAnnotation('string', isData: false)], // expected
     ];
 
     yield 'propertyG' => [
         'propertyG', // property
-        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
+        [new DataIterableAnnotation(DummyBackedEnum::class, isData: false)], // expected
     ];
 
     yield 'propertyH' => [ // Invalid
         'propertyH', // property
-        null, // expected
+        [new DataIterableAnnotation(DummyBackedEnum::class, isData: false)], // expected
     ];
 
     yield 'propertyI' => [ // No definition
         'propertyI', // property
-        null, // expected
+        [], // expected
     ];
 
     yield 'propertyJ' => [
         'propertyJ', // property
-        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
+        [new DataIterableAnnotation(DummyBackedEnum::class, isData: false)], // expected
     ];
 
     yield 'propertyK' => [
         'propertyK', // property
-        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
+        [new DataIterableAnnotation(DummyBackedEnum::class, isData: false)], // expected
     ];
 
     yield 'propertyL' => [
         'propertyL', // property
-        new DataIterableAnnotation(DummyBackedEnum::class, isData: false), // expected
+        [new DataIterableAnnotation(DummyBackedEnum::class, isData: false)], // expected
     ];
 
     yield 'propertyP' => [
         'propertyP', // property
-        new DataIterableAnnotation(Error::class, isData: true), // expected
+        [new DataIterableAnnotation(Error::class, isData: true)], // expected
     ];
 
     yield 'propertyR' => [
         'propertyR', // property
-        new DataIterableAnnotation(Error::class, isData: true), // expected
+        [
+            new DataIterableAnnotation(Error::class, isData: true),
+            new DataIterableAnnotation('null', isData: false),
+        ], // expected
     ];
 });
 
 it('can get the iterable class for a collection by class annotation', function () {
     $annotations = app(DataIterableAnnotationReader::class)->getForClass(new ReflectionClass(CollectionNonDataAnnotationsData::class));
 
-    expect($annotations)->toEqualCanonicalizing([
-        'propertyM' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyM'),
-        'propertyN' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyN'),
-        'propertyO' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyO'),
-        'propertyQ' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyQ'),
+    expect($annotations)->toEqual([
+        'propertyM' => [new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyM')],
+        'propertyN' => [new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyN')],
+        'propertyO' => [new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyO')],
+        'propertyQ' => [
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyQ'),
+            new DataIterableAnnotation('null', isData: false, property: 'propertyQ'),
+        ],
     ]);
 });
 
 it('can get iterable class for a data by method annotation', function () {
     $annotations = app(DataIterableAnnotationReader::class)->getForMethod(new ReflectionMethod(CollectionNonDataAnnotationsData::class, 'method'));
 
-    expect($annotations)->toEqualCanonicalizing([
-        'paramA' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramA'),
-        'paramB' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramB'),
-        'paramC' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramC'),
-        'paramD' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramD'),
-        'paramE' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramE'),
-        'paramF' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramF'),
-        'paramG' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramG'),
-        'paramH' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramH'),
-        'paramJ' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, keyType: 'int', property: 'paramJ'),
-        'paramI' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, keyType: 'int', property: 'paramI'),
-        'paramK' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramK'),
+    expect($annotations)->toEqual([
+        'paramA' => [
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramA'),
+            new DataIterableAnnotation('null', isData: false, property: 'paramA'),
+        ],
+        'paramB' => [
+            new DataIterableAnnotation('null', isData: false, property: 'paramB'),
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramB'),
+        ],
+        'paramC' => [
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramC'),
+        ],
+        'paramD' => [
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramD'),
+        ],
+        'paramE' => [
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramE'),
+        ],
+        'paramF' => [
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramF'),
+        ],
+        'paramG' => [
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramG'),
+        ],
+        'paramH' => [
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramH'),
+        ],
+        'paramJ' => [
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false, keyType: 'int', property: 'paramJ'),
+        ],
+        'paramI' => [
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false, keyType: 'int', property: 'paramI'),
+        ],
+        'paramK' => [
+            new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramK'),
+            new DataIterableAnnotation('null', isData: false, property: 'paramK'),
+        ],
     ]);
 });
 
@@ -257,13 +349,19 @@ it('will always prefer the data version of the annotation in unions', function (
         new ReflectionProperty($dataClass::class, 'property')
     );
 
-    expect($annotations)->toEqual(new DataIterableAnnotation(SimpleData::class, isData: true));
+    expect($annotations)->toEqual([
+        new DataIterableAnnotation(SimpleData::class, isData: true),
+        new DataIterableAnnotation('string', isData: false),
+    ]);
 
     $annotations = app(DataIterableAnnotationReader::class)->getForProperty(
         new ReflectionProperty($dataClass::class, 'collection')
     );
 
-    expect($annotations)->toEqual(new DataIterableAnnotation(SimpleData::class, isData: true, keyType: 'int'));
+    expect($annotations)->toEqual([
+        new DataIterableAnnotation(SimpleData::class, isData: true, keyType: 'int'),
+        new DataIterableAnnotation('string', isData: false, keyType: 'int'),
+    ]);
 });
 
 it('will recognize default PHP types', function (string $type) {
@@ -300,7 +398,7 @@ it('will recognize default PHP types', function (string $type) {
         app(DataIterableAnnotationReader::class)->getForProperty(
             new ReflectionProperty($dataClass::class, $type)
         )
-    )->toEqual(new DataIterableAnnotation(str_replace(['array', 'iterable'], 'mixed', $type), isData: false));
+    )->toEqual([new DataIterableAnnotation($type, isData: false)]);
 })->with([
     'string' => ['string'],
     'int' => ['int'],
@@ -341,7 +439,7 @@ it('can recognize the key of an iterable', function (
         app(DataIterableAnnotationReader::class)->getForProperty(
             new ReflectionProperty($dataClass::class, $property)
         )
-    )->toEqual(new DataIterableAnnotation('float', isData: false, keyType: $keyType));
+    )->toEqual([new DataIterableAnnotation('float', isData: false, keyType: $keyType)]);
 })->with([
     ['propertyA', 'string'], // string key
     ['propertyB', 'int'], // int key
