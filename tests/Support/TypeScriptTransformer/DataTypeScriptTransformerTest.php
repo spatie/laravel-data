@@ -3,6 +3,8 @@
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\MapDotExpandedOutputName;
+use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\Data;
@@ -341,9 +343,8 @@ it('supports converting nullable types to optional properties', function () {
     assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
 });
 
-it('handles dotted property names with expand_dot_notation disabled', function () {
+it('handles dotted property names without expand', function () {
     $config = TypeScriptTransformerConfig::create();
-    config()->set('data.features.expand_dot_notation', false);
 
     $data = new class ('hello', 'world') extends Data {
         public function __construct(
@@ -370,16 +371,17 @@ it('handles dotted property names with expand_dot_notation disabled', function (
     );
 });
 
-it('handles dotted property names with expand_dot_notation enabled', function () {
+it('handles dotted property names with expand', function () {
     $config = TypeScriptTransformerConfig::create();
-    config()->set('data.features.expand_dot_notation', true);
 
-    $data = new class ('hello', 'world') extends Data {
+    $data = new class ('hello', 'world', 'description') extends Data {
         public function __construct(
-            #[MapOutputName('user.name')]
+            #[MapDotExpandedOutputName('user.name')]
             public string $userName,
-            #[MapOutputName('user.profile.bio')]
+            #[MapName('user.profile.bio', expandDotNotation: true)]
             public string $userBio,
+            #[MapOutputName('user.profile.description', expandDotNotation: true)]
+            public string $userDescription,
         ) {
         }
     };
@@ -395,6 +397,7 @@ it('handles dotted property names with expand_dot_notation enabled', function ()
         name: string;
         profile: {
         bio: string;
+        description: string;
         };
         };
         }

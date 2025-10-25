@@ -89,7 +89,7 @@ class DataTypeScriptTransformer extends DtoTransformer
 
                 $propertyName = $dataProperty->outputMappedName ?? $dataProperty->name;
 
-                if (config('data.features.expand_dot_notation') && str_contains($propertyName, '.')) {
+                if ($dataProperty->expandDotNotation && str_contains($propertyName, '.')) {
                     Arr::set(
                         $carry,
                         $propertyName,

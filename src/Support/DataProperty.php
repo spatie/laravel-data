@@ -25,6 +25,7 @@ class DataProperty
         public readonly ?Transformer $transformer,
         public readonly ?string $inputMappedName,
         public readonly ?string $outputMappedName,
+        public readonly bool $expandDotNotation,
         public readonly DataAttributesCollection $attributes,
     ) {
     }

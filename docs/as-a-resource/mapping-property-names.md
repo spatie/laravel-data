@@ -85,89 +85,50 @@ The package has a set of default mappers available, you can find them [here](/do
 
 ## Expanding Dotted Notation
 
-When using `MapOutputName` or `MapName` with dot notation (e.g., 'user.name'), by default the package will keep the dotted notation as-is in the output:
+By default, dotted notation in property names (e.g., 'user.name') is kept as-is in the output. You can enable expansion to create nested arrays using **four different approaches**:
 
 ```php
 class UserData extends Data
 {
     public function __construct(
-        #[MapOutputName('user.name')]
+        // 1. MapDotExpandedOutputName - output only, cleaner syntax
+        #[MapDotExpandedOutputName('user.profile.name')]
         public string $name,
+        
+        // 2. MapDotExpandedName - input & output, cleaner syntax
+        #[MapDotExpandedName('user.profile.email')]
+        public string $email,
+        
+        // 3. MapOutputName with parameter - output only, explicit
+        #[MapOutputName('user.settings.theme', expandDotNotation: true)]
+        public string $theme,
+        
+        // 4. MapName with parameter - input & output, explicit
+        #[MapName('user.settings.language', expandDotNotation: true)]
+        public string $language,
     ) {
     }
 }
 ```
 
-When transformed, this will result in:
-
-```php
-[
-    'user.name' => 'John Doe',
-]
-```
-
-However, you can enable the expansion of dotted notation to create nested arrays by setting the `expand_dot_notation` feature flag to `true` in your `config/data.php` file:
-
-```php
-'features' => [
-    // Other features...
-    'expand_dot_notation' => true,
-],
-```
-
-With this feature enabled, the same data object will transform to:
+All four approaches transform to nested arrays:
 
 ```php
 [
     'user' => [
-        'name' => 'John Doe',
-    ],
-]
-```
-
-This feature is particularly useful when you need to generate nested JSON structures from flat data objects or when integrating with APIs that expect nested data.
-
-### Example with Nested Data
-
-Consider a more complex example:
-
-```php
-class OrderData extends Data
-{
-    public function __construct(
-        #[MapOutputName('order.id')]
-        public int $id,
-        #[MapOutputName('order.customer.name')]
-        public string $customerName,
-        #[MapOutputName('order.items')]
-        public array $items,
-    ) {
-    }
-}
-```
-
-With `expand_dot_notation` disabled (default):
-
-```php
-[
-    'order.id' => 1234,
-    'order.customer.name' => 'Jane Smith',
-    'order.items' => ['item1', 'item2'],
-]
-```
-
-With `expand_dot_notation` enabled:
-
-```php
-[
-    'order' => [
-        'id' => 1234,
-        'customer' => [
-            'name' => 'Jane Smith',
+        'profile' => [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
         ],
-        'items' => ['item1', 'item2'],
+        'settings' => [
+            'theme' => 'dark',
+            'language' => 'en',
+        ],
     ],
 ]
 ```
 
-This feature uses Laravel's `Arr::set()` method internally to expand the dotted notation into nested arrays.
+**Choosing the right attribute:**
+- Use `MapDotExpandedOutputName` or `MapOutputName(..., expandDotNotation: true)` for output-only transformation
+- Use `MapDotExpandedName` or `MapName(..., expandDotNotation: true)` for both input mapping and output transformation
+- Dedicated attributes provide cleaner syntax; parameter-based approach offers more flexibility
