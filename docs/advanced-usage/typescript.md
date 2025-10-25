@@ -131,50 +131,45 @@ class DataObject extends Data
 
 ### Dotted Notation Expansion
 
-When using the `MapOutputName` or `MapName` attributes with dot notation (e.g., 'user.name'), the TypeScript transformer will respect the `expand_dot_notation` configuration setting:
+By default, dotted notation in property names is kept as-is in TypeScript. You can expand it into nested interfaces using the same **four approaches** as in data transformation:
 
 ```php
 class UserData extends Data
 {
     public function __construct(
-        #[MapOutputName('user.name')]
+        // 1. MapDotExpandedOutputName - output only
+        #[MapDotExpandedOutputName('user.profile.name')]
         public string $name,
-        #[MapOutputName('user.profile.bio')]
-        public string $userBio,
+        
+        // 2. MapDotExpandedName - input & output
+        #[MapDotExpandedName('user.profile.email')]
+        public string $email,
+        
+        // 3. MapOutputName with parameter - output only
+        #[MapOutputName('user.settings.theme', expandDotNotation: true)]
+        public string $theme,
+        
+        // 4. MapName with parameter - input & output
+        #[MapName('user.settings.language', expandDotNotation: true)]
+        public string $language,
     ) {
     }
 }
 ```
 
-With `expand_dot_notation` disabled (default), this will generate:
-
-```tsx
-{
-    'user.name': string;
-    'user.profile.bio': string;
-}
-```
-
-When you enable `expand_dot_notation` in your `config/data.php` file:
-
-```php
-'features' => [
-    // Other features...
-    'expand_dot_notation' => true,
-],
-```
-
-The same data object will generate a nested TypeScript interface:
+This generates nested TypeScript interfaces:
 
 ```tsx
 {
     user: {
-        name: string;
         profile: {
-            bio: string;
+            name: string;
+            email: string;
+        };
+        settings: {
+            theme: string;
+            language: string;
         };
     };
 }
 ```
-
-This ensures that your TypeScript interfaces match the structure of your JSON output when using dotted notation expansion.
