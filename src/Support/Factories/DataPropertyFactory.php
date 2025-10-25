@@ -59,6 +59,8 @@ class DataPropertyFactory
             default => null,
         };
 
+        $expandDotNotation = $mappers['expandDotNotation'];
+
         if (! $reflectionProperty->isPromoted()) {
             $hasDefaultValue = $reflectionProperty->hasDefaultValue();
             $defaultValue = $hasDefaultValue ? $reflectionProperty->getDefaultValue() : null;
@@ -94,6 +96,7 @@ class DataPropertyFactory
             transformer: ($attributes->first(WithTransformer::class) ?? $attributes->first(WithCastAndTransformer::class))?->get(),
             inputMappedName: $inputMappedName,
             outputMappedName: $outputMappedName,
+            expandDotNotation: $expandDotNotation,
             attributes: $attributes,
         );
     }
