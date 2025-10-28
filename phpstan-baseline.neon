@@ -79,6 +79,30 @@ parameters:
 			path: src/Attributes/Validation/ValidationAttribute.php
 
 		-
+			message: '#^Call to function is_a\(\) with arguments class\-string\<Spatie\\LaravelData\\Casts\\Cast\>, ''Spatie\\\\LaravelData\\\\Casts\\\\Cast'' and true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Attributes/WithCast.php
+
+		-
+			message: '#^Call to function is_a\(\) with arguments class\-string\<Spatie\\LaravelData\\Casts\\Cast&Spatie\\LaravelData\\Transformers\\Transformer\>, ''Spatie\\\\LaravelData\\\\Transformers\\\\Transformer'' and true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Attributes/WithCastAndTransformer.php
+
+		-
+			message: '#^Call to function is_a\(\) with arguments class\-string\<Spatie\\LaravelData\\Casts\\Castable\>, ''Spatie\\\\LaravelData\\\\Casts\\\\Castable'' and true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Attributes/WithCastable.php
+
+		-
+			message: '#^Call to function is_a\(\) with arguments class\-string\<Spatie\\LaravelData\\Transformers\\Transformer\>, ''Spatie\\\\LaravelData\\\\Transformers\\\\Transformer'' and true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Attributes/WithTransformer.php
+
+		-
 			message: '#^Call to an undefined method DateTimeInterface\:\:setTimezone\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -217,18 +241,6 @@ parameters:
 			path: src/LaravelDataServiceProvider.php
 
 		-
-			message: '#^Access to an undefined property Spatie\\LaravelData\\Normalizers\\Normalized\\NormalizedModel\:\:\$attributesProperty\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Normalizers/Normalized/NormalizedModel.php
-
-		-
-			message: '#^Access to an undefined property Spatie\\LaravelData\\Normalizers\\Normalized\\NormalizedModel\:\:\$castsProperty\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Normalizers/Normalized/NormalizedModel.php
-
-		-
 			message: '#^Call to function method_exists\(\) with Illuminate\\Database\\Eloquent\\Model and ''hasAttribute'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -241,14 +253,14 @@ parameters:
 			path: src/PaginatedDataCollection.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\Paginator\:\:through\(\)\.$#'
-			identifier: method.notFound
-			count: 2
+			message: '#^Method Spatie\\LaravelData\\PaginatedDataCollection\:\:through\(\) should return static\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\) but returns \$this\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
+			identifier: return.type
+			count: 1
 			path: src/PaginatedDataCollection.php
 
 		-
-			message: '#^Method Spatie\\LaravelData\\PaginatedDataCollection\:\:through\(\) should return static\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\) but returns \$this\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
-			identifier: return.type
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Contracts\\Pagination\\Paginator\<\(int\|string\),mixed\>\:\:through\(\) expects callable\(mixed\)\: mixed, Closure\(TValue, TKey\)\: TValue given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/PaginatedDataCollection.php
 
@@ -365,6 +377,30 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: src/Support/DataConfig.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Support/EloquentCasts/DataCollectionEloquentCast.php
+
+		-
+			message: '#^Instanceof between array and Illuminate\\Contracts\\Support\\Arrayable will always evaluate to false\.$#'
+			identifier: instanceof.alwaysFalse
+			count: 1
+			path: src/Support/EloquentCasts/DataCollectionEloquentCast.php
+
+		-
+			message: '#^Instanceof between iterable\<TData of Spatie\\LaravelData\\Contracts\\BaseData&Spatie\\LaravelData\\Contracts\\TransformableData\>&TDataCollection of Spatie\\LaravelData\\DataCollection and Spatie\\LaravelData\\Contracts\\TransformableData will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Support/EloquentCasts/DataCollectionEloquentCast.php
+
+		-
+			message: '#^Instanceof between Spatie\\LaravelData\\Contracts\\BaseData&Spatie\\LaravelData\\Contracts\\TransformableData and Spatie\\LaravelData\\Contracts\\TransformableData will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Support/EloquentCasts/DataEloquentCast.php
 
 		-
 			message: '#^Call to function method_exists\(\) with ReflectionClass and ''isReadOnly'' will always evaluate to true\.$#'

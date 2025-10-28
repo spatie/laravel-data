@@ -8,12 +8,14 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists as LaravelExists;
 use Illuminate\Validation\Rules\In as LaravelIn;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
+use function Pest\Laravel\actingAs;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
 
@@ -46,6 +48,8 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\ValidationStrategy;
+use Spatie\LaravelData\Support\Validation\References\AuthenticatedUserReference;
+use Spatie\LaravelData\Support\Validation\References\ContainerReference;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
@@ -54,6 +58,7 @@ use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DataWithReferenceFieldValidationAttribute;
 use Spatie\LaravelData\Tests\Fakes\DummyDataWithContextOverwrittenValidationRules;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\FakeAuthenticatable;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
@@ -1550,6 +1555,40 @@ it('can reference route models with a property as values within rules', function
     ]);
 });
 
+it('can reference the current logged in user as values within rules', function () {
+    actingAs($user = new FakeAuthenticatable());
+
+    $dataClass = new class () extends Data {
+        #[Unique('users', ignore: new AuthenticatedUserReference())]
+        public int $property;
+    };
+
+    expect($dataClass::getValidationRules([]))->toEqual([
+        'property' => [
+            'required',
+            'numeric',
+            Rule::unique('users')->ignore($user),
+        ],
+    ]);
+});
+
+it('can reference a container dependency as values within rules', function () {
+    app()->bind('max-allowed-size', fn () => 100);
+
+    $dataClass = new class () extends Data {
+        #[Max(value: new ContainerReference('max-allowed-size'))]
+        public int $property;
+    };
+
+    DataValidationAsserter::for($dataClass)->assertRules([
+        'property' => [
+            'required',
+            'numeric',
+            'max:100',
+        ],
+    ]);
+});
+
 it('can set the validator to stop on the first failure', function () {
     $dataClass = new class () extends Data {
         #[Min(10)]
@@ -2192,6 +2231,42 @@ it('can validate a payload for a data object and create one using a magic from m
 
     try {
         SimpleData::validateAndCreate(new Request());
+    } catch (ValidationException $exception) {
+        expect($exception->errors())->toMatchArray([
+            'string' => [__('validation.required', ['attribute' => 'string'])],
+        ]);
+
+        return;
+    }
+
+    assertFalse(true, 'We should not end up here');
+});
+
+it('can validate and create a data object with magic method that does not contain a request param', function () {
+    $dataClass = new class () extends Data {
+        public string $string;
+
+        public static function fromArray(array $data): self
+        {
+            $self = new self();
+
+            $self->string = strtoupper($data['string']);
+
+            return $self;
+
+        }
+    };
+
+    $data = $dataClass::validateAndCreate(
+        ['string' => 'hello world'],
+    );
+
+    expect($data)
+        ->string->toBe('HELLO WORLD')
+        ->string->not()->toBe('hello world');
+
+    try {
+        SimpleData::validateAndCreate([]);
     } catch (ValidationException $exception) {
         expect($exception->errors())->toMatchArray([
             'string' => [__('validation.required', ['attribute' => 'string'])],
@@ -2963,6 +3038,45 @@ describe('property-morphable validation tests', function () {
                 'items.2.concrete_string' => ['The [Concrete String B] field is required.'],
                 'items.2.abstract_integer' => ['Concrete Class B override of Abstract class integer test message.'],
                 'items.2.abstract_string' => ['The [Abstract String] field is required.'],
+            ]);
+    });
+
+    it('can validate property-morphable data with a default', function () {
+        abstract class TestValidationAbstractPropertyMorphableDefaultData extends Data implements PropertyMorphableData
+        {
+            #[\Spatie\LaravelData\Attributes\PropertyForMorph]
+            public TestValidationPropertyMorphableEnum $variant = TestValidationPropertyMorphableEnum::A;
+
+            public static function morph(array $properties): ?string
+            {
+                return match ($properties['variant'] ?? null) {
+                    TestValidationPropertyMorphableEnum::A => TestValidationPropertyMorphableDefaultDataA::class,
+                    default => null,
+                };
+            }
+        }
+
+        class TestValidationPropertyMorphableDefaultDataA extends TestValidationAbstractPropertyMorphableDefaultData
+        {
+            public function __construct(public string $a, public DummyBackedEnum $enum)
+            {
+                $this->variant = TestValidationPropertyMorphableEnum::A;
+            }
+        }
+
+        DataValidationAsserter::for(TestValidationAbstractPropertyMorphableDefaultData::class)
+            ->assertErrors([], [
+                'a' => ['The a field is required.'],
+                'enum' => ['The enum field is required.'],
+            ])
+            ->assertOk([
+                'a' => 'foo',
+                'enum' => 'foo',
+            ])
+            ->assertOk([
+                'variant' => 'a',
+                'a' => 'foo',
+                'enum' => 'foo',
             ]);
     });
 });

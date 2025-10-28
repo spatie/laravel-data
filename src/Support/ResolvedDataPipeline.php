@@ -2,16 +2,18 @@
 
 namespace Spatie\LaravelData\Support;
 
+use Spatie\LaravelData\DataPipes\DataPipe;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\Normalizers\Normalized\UnknownProperty;
+use Spatie\LaravelData\Normalizers\Normalizer;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 
 class ResolvedDataPipeline
 {
     /**
-     * @param array<\Spatie\LaravelData\Normalizers\Normalizer> $normalizers
-     * @param array<\Spatie\LaravelData\DataPipes\DataPipe> $pipes
+     * @param array<Normalizer> $normalizers
+     * @param array<DataPipe> $pipes
      */
     public function __construct(
         protected array $normalizers,
@@ -24,10 +26,15 @@ class ResolvedDataPipeline
     {
         $normalizedValue = $this->normalize($value);
 
+        $normalizedValue = $this->transformNormalizedToArray(
+            $normalizedValue,
+            $creationContext,
+        );
+
         return $this->runPipelineOnNormalizedValue($value, $normalizedValue, $creationContext);
     }
 
-    public function normalize(mixed $value): array
+    public function normalize(mixed $value): array|Normalized
     {
         $properties = null;
 
@@ -43,19 +50,17 @@ class ResolvedDataPipeline
             throw CannotCreateData::noNormalizerFound($this->dataClass->name, $value);
         }
 
-        if (! is_array($properties)) {
-            $properties = $this->transformNormalizedToArray($properties);
-        }
-
         return $properties;
     }
 
     public function runPipelineOnNormalizedValue(
         mixed $value,
-        array $normalizedValue,
+        array|Normalized $normalizedValue,
         CreationContext $creationContext
     ): array {
-        $properties = ($this->dataClass->name)::prepareForPipeline($normalizedValue);
+        $properties = ($this->dataClass->name)::prepareForPipeline(
+            $this->transformNormalizedToArray($normalizedValue, $creationContext)
+        );
 
         foreach ($this->pipes as $pipe) {
             $piped = $pipe->handle($value, $this->dataClass, $properties, $creationContext);
@@ -66,12 +71,24 @@ class ResolvedDataPipeline
         return $properties;
     }
 
-    protected function transformNormalizedToArray(Normalized $normalized): array
-    {
+    public function transformNormalizedToArray(
+        Normalized|array $normalized,
+        CreationContext $creationContext,
+    ): array {
+        if (! $normalized instanceof Normalized) {
+            return $normalized;
+        }
+
         $properties = [];
 
-        foreach ($this->dataClass->properties as $property) {
-            $name = $property->inputMappedName ?? $property->name;
+        $dataClassToNormalize = $creationContext->dataClass !== $this->dataClass->name
+            ? app(DataConfig::class)->getDataClass($creationContext->dataClass)
+            : $this->dataClass;
+
+        foreach ($dataClassToNormalize->properties as $property) {
+            $name = $creationContext->mapPropertyNames && $property->inputMappedName
+                ? $property->inputMappedName
+                : $property->name;
 
             $value = $normalized->getProperty($name, $property);
 

@@ -5,21 +5,21 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Exception;
 use Illuminate\Validation\Rules\Password as BasePassword;
-use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Password extends ObjectValidationAttribute
 {
     public function __construct(
-        protected int|RouteParameterReference $min = 12,
-        protected bool|RouteParameterReference $letters = false,
-        protected bool|RouteParameterReference $mixedCase = false,
-        protected bool|RouteParameterReference $numbers = false,
-        protected bool|RouteParameterReference $symbols = false,
-        protected bool|RouteParameterReference $uncompromised = false,
-        protected int|RouteParameterReference $uncompromisedThreshold = 0,
-        protected bool|RouteParameterReference $default = false,
+        protected int|ExternalReference $min = 12,
+        protected bool|ExternalReference $letters = false,
+        protected bool|ExternalReference $mixedCase = false,
+        protected bool|ExternalReference $numbers = false,
+        protected bool|ExternalReference $symbols = false,
+        protected bool|ExternalReference $uncompromised = false,
+        protected int|ExternalReference $uncompromisedThreshold = 0,
+        protected bool|ExternalReference $default = false,
         protected ?BasePassword $rule = null,
     ) {
 
@@ -31,14 +31,14 @@ class Password extends ObjectValidationAttribute
             return $this->rule;
         }
 
-        $min = $this->normalizePossibleRouteReferenceParameter($this->min);
-        $letters = $this->normalizePossibleRouteReferenceParameter($this->letters);
-        $mixedCase = $this->normalizePossibleRouteReferenceParameter($this->mixedCase);
-        $numbers = $this->normalizePossibleRouteReferenceParameter($this->numbers);
-        $symbols = $this->normalizePossibleRouteReferenceParameter($this->symbols);
-        $uncompromised = $this->normalizePossibleRouteReferenceParameter($this->uncompromised);
-        $uncompromisedThreshold = $this->normalizePossibleRouteReferenceParameter($this->uncompromisedThreshold);
-        $default = $this->normalizePossibleRouteReferenceParameter($this->default);
+        $min = $this->normalizePossibleExternalReferenceParameter($this->min);
+        $letters = $this->normalizePossibleExternalReferenceParameter($this->letters);
+        $mixedCase = $this->normalizePossibleExternalReferenceParameter($this->mixedCase);
+        $numbers = $this->normalizePossibleExternalReferenceParameter($this->numbers);
+        $symbols = $this->normalizePossibleExternalReferenceParameter($this->symbols);
+        $uncompromised = $this->normalizePossibleExternalReferenceParameter($this->uncompromised);
+        $uncompromisedThreshold = $this->normalizePossibleExternalReferenceParameter($this->uncompromisedThreshold);
+        $default = $this->normalizePossibleExternalReferenceParameter($this->default);
 
         if ($default && $this->rule === null) {
             return BasePassword::default();

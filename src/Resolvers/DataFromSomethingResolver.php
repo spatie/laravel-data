@@ -5,8 +5,11 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Enums\CustomCreationMethodType;
+use Spatie\LaravelData\Exceptions\CannotCreateAbstractClass;
+use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\CreationContext;
+use Spatie\LaravelData\Support\Creation\ValidationStrategy;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\ResolvedDataPipeline;
 
@@ -41,16 +44,23 @@ class DataFromSomethingResolver
         $normalizedPayloads = [];
 
         foreach ($payloads as $i => $payload) {
-            $normalizedPayloads[$i] = $pipeline->normalize($payload);
+            $normalizedPayloads[$i] = $pipeline->normalize($payload ?? []);
         }
 
         $dataClass = $this->dataConfig->getDataClass($class);
 
-        if ($morphDataClass = $this->dataMorphClassResolver->execute($dataClass, $normalizedPayloads)) {
-            $pipeline = $this->dataConfig->getResolvedDataPipeline($morphDataClass);
+        if ($dataClass->isAbstract === true && $dataClass->propertyMorphable === true) {
+            $morphDataClass = $this->dataMorphClassResolver->execute($dataClass, array_map(
+                fn (Normalized|array $normalized) => $pipeline->transformNormalizedToArray($normalized, $creationContext),
+                $normalizedPayloads
+            ));
 
-            $creationContext->dataClass = $morphDataClass;
-            $class = $morphDataClass;
+            $this->replaceDataClassWithMorphedVersion(
+                $morphDataClass,
+                $pipeline,
+                $creationContext,
+                $class
+            );
         }
 
         $properties = $this->runPipeline(
@@ -61,6 +71,21 @@ class DataFromSomethingResolver
         );
 
         return $this->dataFromArrayResolver->execute($class, $properties);
+    }
+
+    protected function replaceDataClassWithMorphedVersion(
+        ?string $morphDataClass,
+        ResolvedDataPipeline &$pipeline,
+        CreationContext $creationContext,
+        string &$class,
+    ): void {
+        if ($morphDataClass === null) {
+            throw CannotCreateAbstractClass::morphClassWasNotResolved(originalClass: $class);
+        }
+
+        $pipeline = $this->dataConfig->getResolvedDataPipeline($morphDataClass);
+        $creationContext->dataClass = $morphDataClass;
+        $class = $morphDataClass;
     }
 
     protected function createFromCustomCreationMethod(
@@ -104,7 +129,7 @@ class DataFromSomethingResolver
         $pipeline = $this->dataConfig->getResolvedDataPipeline($class);
 
         foreach ($payloads as $payload) {
-            if ($payload instanceof Request) {
+            if ($payload instanceof Request && ($creationContext->validationStrategy !== ValidationStrategy::Disabled)) {
                 // Solely for the purpose of validation
                 $pipeline->execute($payload, $creationContext);
             }
@@ -121,6 +146,9 @@ class DataFromSomethingResolver
         return $class::$methodName(...$payloads);
     }
 
+    /**
+     * @param array<array<string, mixed>|Normalized> $normalizedPayloads
+     */
     protected function runPipeline(
         CreationContext $creationContext,
         ResolvedDataPipeline $pipeline,

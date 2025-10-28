@@ -164,10 +164,14 @@ class DataValidationAsserter
 
         $normalizedProperties = $pipeline->normalize($payload);
 
+        $creationContext = CreationContextFactory::createFromConfig($this->dataClass)->get();
+
+        $normalizedProperties = $pipeline->transformNormalizedToArray($normalizedProperties, $creationContext);
+
         return $pipeline->runPipelineOnNormalizedValue(
             $payload,
             $normalizedProperties,
-            CreationContextFactory::createFromConfig($this->dataClass)->get()
+            $creationContext
         );
     }
 }

@@ -361,6 +361,12 @@ public string $closure;
 ```php
 #[Enum(ChannelType::class)]
 public string $closure;
+
+#[Enum(ChannelType::class, only: [ChannelType::Email])]
+public string $closure;
+
+#[Enum(ChannelType::class, except: [ChannelType::Email])]
+public string $closure;
 ```
 
 ## ExcludeIf
@@ -973,6 +979,12 @@ public string $closure;
 
 #[Unique('users', ignore: 5)]
 public string $closure;
+
+#[Unique('users', ignore: new AuthenticatedUserReference())]
+public string $closure;
+
+#[Unique('posts', ignore: new RouteParameterReference('post'))]
+public string $closure;
 ```
 
 ## Uppercase
@@ -991,6 +1003,11 @@ public string $closure;
 ```php
 #[Url]
 public string $closure; 
+```
+
+```php
+#[Url(['http', 'https'])]
+public string $closure;
 ```
 
 ## Ulid

@@ -41,7 +41,7 @@ We store this `PostData` object as `app/Data/PostData.php`, so we have all our d
 
 Tip: you can also quickly make a data object using the CLI: `php artisan make:data Post`, it will create a file `app/Data/PostData.php`.
 
-We can now create this a `PostData` object just like any plain PHP object:
+We can now create a `PostData` object just like any plain PHP object:
 
 ```php
 $post = new PostData(
@@ -85,7 +85,7 @@ PostData::from(Post::findOrFail($id));
 
 ## Using requests
 
-Let's say we have a Laravel request coming from the front with these properties. Our controller would then validate these properties, and then it would store them in a model; this can be done as such:
+Let's say we have a Laravel request coming from the frontend with these properties. Our controller would then validate these properties, and then it would store them in a model; this can be done as such:
 
 ```php
 class DataController

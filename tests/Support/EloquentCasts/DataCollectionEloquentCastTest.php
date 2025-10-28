@@ -15,11 +15,15 @@ use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCustomCollectionCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithEncryptedCasts;
+use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithJson;
+use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataCollection;
 
 beforeEach(function () {
     DummyModelWithCasts::migrate();
+    DummyModelWithJson::migrate();
 });
 
 it('can save a data collection', function () {
@@ -244,4 +248,85 @@ it('can load and save an abstract property-morphable data collection', function 
     expect($model->data_collection[1])
         ->toBeInstanceOf(TestCollectionCastPropertyMorphableDataB::class)
         ->b->toBe('bar');
+});
+
+it('can correctly detect if the attribute is dirty', function () {
+    // Set a raw JSON string with spaces in it to mimic database behavior
+    $model = new DummyModelWithJson();
+    $model->setRawAttributes(['data_collection' => '[{"second": "Second", "first": "First"}, {"first": "Third", "second": "Fourth"}]']);
+    $model->save();
+
+    $model->data_collection = [
+        new MultiData('First', 'Second'),
+        new MultiData('Third', 'Fourth'),
+    ];
+
+    expect($model->getRawOriginal('data_collection'))->toBe('[{"second": "Second", "first": "First"}, {"first": "Third", "second": "Fourth"}]')
+        ->and($model->getAttributes()['data_collection'])->toBe('[{"first":"First","second":"Second"},{"first":"Third","second":"Fourth"}]')
+        ->and($model->isDirty('data_collection'))->toBeFalse();
+})->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
+
+it('flags the attribute as dirty when it is encrypted and there are previous encryption keys', function () {
+    config()->set('app.previous_keys', ['base64:'.base64_encode(random_bytes(32))]);
+
+    $model = new DummyModelWithEncryptedCasts();
+    $model->data_collection = [
+        new SimpleData('First'),
+        new SimpleData('Second'),
+    ];
+    $model->save();
+
+    $model->data_collection = $model->data_collection;
+
+    expect($model->getRawOriginal('data_collection'))->not->toBe($model->getAttributes()['data_collection'])
+        ->and($model->isDirty('data_collection'))->toBeTrue();
+})->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
+
+it('does not flag the attribute as dirty when it is encrypted and there are no previous encryption keys', function () {
+    $model = new DummyModelWithEncryptedCasts();
+    $model->data_collection = [
+        new SimpleData('First'),
+        new SimpleData('Second'),
+    ];
+    $model->save();
+
+    $model->data_collection = $model->data_collection;
+
+    expect($model->getRawOriginal('data_collection'))->not->toBe($model->getAttributes()['data_collection'])
+        ->and($model->isDirty('data_collection'))->toBeFalse();
+})->skip(fn () => version_compare(app()->version(), '12.18.0', '<'));
+
+it('can update a model where the cast is initially null', function () {
+    $model = new DummyModelWithCasts();
+    $model->setRawAttributes(['data_collection' => null]);
+    $model->save();
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data_collection' => null,
+    ]);
+
+    $model->update([
+        'data_collection' => \Illuminate\Support\Collection::make([new SimpleData('Test')]),
+    ]);
+
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data_collection' => json_encode([['string' => 'Test']]),
+    ]);
+});
+
+it('can update a model where the cast is initially not null', function () {
+    $model = DummyModelWithCasts::create([
+        'data_collection' => \Illuminate\Support\Collection::make([new SimpleData('Test')]),
+    ]);
+
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data_collection' => json_encode([['string' => 'Test']]),
+    ]);
+
+    $model->update([
+        'data_collection' => null,
+    ]);
+
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'data_collection' => null,
+    ]);
 });

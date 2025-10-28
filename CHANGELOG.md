@@ -2,6 +2,93 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.18.0 - 2025-10-16
+
+### What's Changed
+
+* Update issue template by @AlexVanderbist in https://github.com/spatie/laravel-data/pull/1080
+* Improve validate performance by @cyppe in https://github.com/spatie/laravel-data/pull/1043
+* can get the data class for a data collection by annotation with unicode characters by @it4need in https://github.com/spatie/laravel-data/pull/1048
+* Allow re-encrypting attributes when app uses previous keys by @JaZo in https://github.com/spatie/laravel-data/pull/1049
+* [feat] Added group to Inertia defer by @giusepetroso in https://github.com/spatie/laravel-data/pull/1056
+* Add KebabCaseMapper by @hrsa in https://github.com/spatie/laravel-data/pull/1060
+* feat: support BackedEnum to BackedEnum casting in EnumCast by @gigerIT in https://github.com/spatie/laravel-data/pull/1067
+* feat(validation): add protocol support to Url attribute by @wouter90 in https://github.com/spatie/laravel-data/pull/1068
+* Fix TransformableData docblocks by @cosmastech in https://github.com/spatie/laravel-data/pull/1069
+* Bump actions/checkout from 4 to 5 by @dependabot[bot] in https://github.com/spatie/laravel-data/pull/1074
+* Bump stefanzweifel/git-auto-commit-action from 6 to 7 by @dependabot[bot] in https://github.com/spatie/laravel-data/pull/1093
+* FIX Inconsistency between documentation and PHPDoc for rules()  by @davidoskay in https://github.com/spatie/laravel-data/pull/1075
+* BuiltinTypeCast true and false strings to bool by @Chemaclass in https://github.com/spatie/laravel-data/pull/1092
+* fix: clone transformation context instead of creating a new one by @iamrgroot in https://github.com/spatie/laravel-data/pull/1091
+* Fix #1057 by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1095
+* Fix 1058 by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1096
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.17.1...4.18.0
+
+## 4.17.1 - 2025-09-04
+
+### What's Changed
+
+* Fix issue where toArray() is called on null collections by @oddvalue in https://github.com/spatie/laravel-data/pull/1054
+* Update the annotations in the Eloquent casts
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.17.0...4.17.1
+
+## 4.17.0 - 2025-06-25
+
+### What's Changed
+
+* Add support for external validation attribute references by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1051
+
+### Breaking changes
+
+- While technically not breaking, some changes were made inside the validation attributes. You can check it here: https://github.com/spatie/laravel-data/pull/1051 in the headsup section.
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.16.1...4.17.0
+
+## 4.16.1 - 2025-06-24
+
+### What's Changed
+
+* Fix issue where toArray() is called on null by @mdietger in https://github.com/spatie/laravel-data/pull/1046
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.16.0...4.16.1
+
+## 4.16.0 - 2025-06-20
+
+### What's Changed
+
+* Add return type annotations to TransformableData trait by @cyppe in https://github.com/spatie/laravel-data/pull/1000
+* Add the possibibilty to except key for empty data generation by @thoresuenert in https://github.com/spatie/laravel-data/pull/1035
+* Enhance CannotCastEnum exception message to include property name by @rajmundtoth0 in https://github.com/spatie/laravel-data/pull/1039
+* Fix issue in pr 1007 by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1041
+* Implement the compare method on the eloquent casts to improve the isDirty check  by @SanderSander in https://github.com/spatie/laravel-data/pull/1033
+* Add support for default values on properties for morph by @bentleyo in https://github.com/spatie/laravel-data/pull/1017
+* Fix problem with dynamic properties
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.15.3...4.16.0
+
+## 4.15.3 - 2025-06-19
+
+- Add support for only and except in enum rule
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.15.2...4.15.3
+
+## 4.15.2 - 2025-06-12
+
+- Fix: CannotCreateData exception when AutoWhenLoadedLazy relationship is not loaded  (#1009)
+- Fix: Inertia deferred properties not being that flexible
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.15.1...4.15.2
+
+## 4.15.1 - 2025-04-10
+
+### What's Changed
+
+* Fix #997 by @bentleyo in https://github.com/spatie/laravel-data/pull/998
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.15.0...4.15.1
+
 ## 4.15.0 - 2025-04-09
 
 ### What's Changed
@@ -93,6 +180,14 @@ SongData::factory()
 
 
 
+
+
+
+
+
+
+
+
 ```
 #### Injecting property values
 
@@ -103,6 +198,14 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -134,6 +237,14 @@ class SongData extends Data
         ];
     }
 }
+
+
+
+
+
+
+
+
 
 
 

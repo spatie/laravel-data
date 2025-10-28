@@ -23,6 +23,7 @@ use Spatie\LaravelData\Attributes\AutoLazy;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\PropertyForMorph;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Attributes\WithCastable;
@@ -35,6 +36,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\DataPipeline;
 use Spatie\LaravelData\DataPipes\DataPipe;
+use Spatie\LaravelData\Exceptions\CannotCreateAbstractClass;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Lazy;
@@ -60,6 +62,7 @@ use Spatie\LaravelData\Tests\Fakes\DataWithArgumentCountErrorException;
 use Spatie\LaravelData\Tests\Fakes\EnumData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\FakeNestedModelData;
+use Spatie\LaravelData\Tests\Fakes\FakeNormalizer;
 use Spatie\LaravelData\Tests\Fakes\ModelData;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
@@ -179,6 +182,17 @@ it("won't cast a property that is already in the correct type", function () {
             SimpleData::from('you'),
             SimpleData::from('up'),
         ]));
+});
+
+it('allows creating data objects from null', function () {
+    $dataClass = new class () extends Data {
+        public ?string $name;
+    };
+
+    $data = $dataClass::from(null);
+
+    expect($data->name)
+        ->toBeNull();
 });
 
 it('allows creating data objects using Lazy', function () {
@@ -1170,7 +1184,7 @@ it('will cast iterables into default types', function () {
     ]);
 
     expect($data->strings)->toBe(['Hello', '42', '3.14', '1', '0', 'false']);
-    expect($data->bools)->toBe([true, true, true, true, true, false, true]);
+    expect($data->bools)->toBe([true, true, true, true, true, false, false]);
     expect($data->ints)->toBe([0, 42, 3, 1, 1, 0, 0]);
     expect($data->floats)->toBe([0.0, 42.0, 3.14, 1.0, 1.0, 0.0, 0.0]);
     expect($data->arrays)->toEqual([['Hello'], [42], [3.14], [true], ['nested'], ['0'], ['false']]);
@@ -1458,10 +1472,37 @@ it('can use auto lazy to construct a when loaded lazy with a manual defined rela
         ->each()->toBeInstanceOf(FakeNestedModelData::class);
 });
 
+it('can use auto lazy to construct a data object with property promotion', function () {
+    $dataClass = new class ([]) extends Data {
+        /**
+         * @param array<int, Spatie\LaravelData\Tests\Fakes\FakeNestedModelData> $fakeNestedModels
+         */
+        public function __construct(
+            #[AutoWhenLoadedLazy]
+            public array|Lazy $fakeNestedModels
+        ) {
+        }
+    };
 
-it('can create a data object with deferred properties', function () {
+    $model = FakeModel::factory()
+        ->has(FakeNestedModel::factory()->count(2))
+        ->create();
+
+    expect($dataClass::from($model)->all())->toBeEmpty();
+
+    $model->load('fakeNestedModels');
+
+    expect($dataClass::from($model)->all()['fakeNestedModels'])
+        ->toBeArray()
+        ->toHaveCount(2)
+        ->each()->toBeInstanceOf(FakeNestedModelData::class);
+});
+
+it('can create a data object with inertia deferred properties', function () {
     $dataClass = new class () extends Data {
         public InertiaDeferred|string $deferred;
+
+        public InertiaDeferred|string $deferredWithGroup;
 
         public function __construct()
         {
@@ -1470,49 +1511,120 @@ it('can create a data object with deferred properties', function () {
 
     $data = $dataClass::from([
         "deferred" => Lazy::inertiaDeferred(Inertia::defer(fn () => 'Deferred Value')),
+        "deferredWithGroup" => Lazy::inertiaDeferred(Inertia::defer(fn () => 'Deferred Value', 'deferred-group')),
     ]);
 
     expect($data->deferred)->toBeInstanceOf(InertiaDeferred::class);
-    expect($data->deferred->resolve()())->toBe('Deferred Value');
+    expect($data->all()['deferred'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['deferred']())->toBe('Deferred Value');
+
+    expect($data->deferredWithGroup)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->all()['deferredWithGroup'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
+    expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
 });
 
-it('can use auto deferred to construct a deferred property', function () {
+it('can create a data object with inertia deferred closure', function () {
+    $dataClass = new class () extends Data {
+        public InertiaDeferred|string $deferred;
+
+        public InertiaDeferred|string $deferredWithGroup;
+
+        public function __construct()
+        {
+        }
+    };
+
+    $data = $dataClass::from([
+        "deferred" => Lazy::inertiaDeferred(fn () => 'Deferred Value'),
+        "deferredWithGroup" => Lazy::inertiaDeferred(fn () => 'Deferred Value', 'deferred-group'),
+    ]);
+
+    expect($data->deferred)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->all()['deferred'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['deferred']())->toBe('Deferred Value');
+
+    expect($data->deferredWithGroup)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->all()['deferredWithGroup'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
+    expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
+
+});
+
+it('can create a data object with inertia deferred value', function () {
+    $dataClass = new class () extends Data {
+        public InertiaDeferred|string $deferred;
+
+        public InertiaDeferred|string $deferredWithGroup;
+
+        public function __construct()
+        {
+        }
+    };
+
+    $data = $dataClass::from([
+        "deferred" => Lazy::inertiaDeferred('Deferred Value'),
+        "deferredWithGroup" => Lazy::inertiaDeferred('Deferred Value', 'deferred-group'),
+    ]);
+
+    expect($data->deferred)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->all()['deferred'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['deferred']())->toBe('Deferred Value');
+
+    expect($data->deferredWithGroup)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->all()['deferredWithGroup'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
+    expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
+});
+
+it('can use auto deferred to construct a inertia deferred property', function () {
     $dataClass = new class () extends Data {
         #[AutoInertiaDeferred]
         public InertiaDeferred|string $string;
+
+        #[AutoInertiaDeferred('deferred-group')]
+        public InertiaDeferred|string $deferredWithGroup;
     };
 
-    $data = $dataClass::from(['string' => 'Deferred Value']);
+    $data = $dataClass::from(['string' => 'Deferred Value', 'deferredWithGroup' => 'Deferred Value']);
 
     expect($data->string)->toBeInstanceOf(InertiaDeferred::class);
-    expect($data->toArray()['string'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['string'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['string']())->toBe('Deferred Value');
+
+    expect($data->deferredWithGroup)->toBeInstanceOf(InertiaDeferred::class);
+    expect($data->all()['deferredWithGroup'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
+    expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
 });
 
-it('can use class level auto deferred to construct a deferred property', function () {
+it('can use class level auto deferred to construct a inertia deferred property', function () {
     #[AutoInertiaDeferred]
     class AutoDeferredData extends Data
     {
         public InertiaDeferred|string $string;
-    };
+    }
 
     $data = AutoDeferredData::from(['string' => 'Deferred Value']);
 
     expect($data->string)->toBeInstanceOf(InertiaDeferred::class);
-    expect($data->toArray()['string'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['string'])->toBeInstanceOf(DeferProp::class);
+    expect($data->all()['string']())->toBe('Deferred Value');
 });
-
 
 describe('property-morphable creation tests', function () {
     enum TestPropertyMorphableEnum: string
     {
         case A = 'a';
         case B = 'b';
-    };
+    }
+
+    ;
 
     abstract class TestAbstractPropertyMorphableData extends Data implements PropertyMorphableData
     {
         public function __construct(
-            #[\Spatie\LaravelData\Attributes\PropertyForMorph]
+            #[PropertyForMorph]
             public TestPropertyMorphableEnum $variant
         ) {
         }
@@ -1626,5 +1738,92 @@ describe('property-morphable creation tests', function () {
             ->toBeInstanceOf(TestPropertyMorphableDataB::class)
             ->variant->toEqual(TestPropertyMorphableEnum::B)
             ->b->toEqual('bar');
+    });
+
+    it('will only normalize payloads when a property morphable data class is selected', function () {
+        abstract class TestMorphableDataWithSpecialNormalizerAbstract extends Data implements PropertyMorphableData
+        {
+            public function __construct(
+                #[PropertyForMorph]
+                public string $type,
+            ) {
+            }
+
+            public static function morph(array $properties): ?string
+            {
+                return match ($properties['type']) {
+                    'specific' => TestMorphableDataWithSpecialNormalizerSpecific::class,
+                    default => null,
+                };
+            }
+
+            public static function normalizers(): array
+            {
+                return [FakeNormalizer::returnsArrayItem()];
+            }
+        }
+
+        class TestMorphableDataWithSpecialNormalizerSpecific extends TestMorphableDataWithSpecialNormalizerAbstract
+        {
+            public function __construct(
+                public string $name,
+            ) {
+                parent::__construct('specific');
+            }
+        }
+
+        $data = TestMorphableDataWithSpecialNormalizerAbstract::from([
+            'type' => 'specific',
+            'name' => 'Hello World',
+        ]);
+
+        expect($data)
+            ->toBeInstanceOf(TestMorphableDataWithSpecialNormalizerSpecific::class)
+            ->name->toEqual('Hello World')
+            ->type->toEqual('specific');
+    });
+
+    it('will allow property-morphable data to be created from a default', function () {
+        abstract class TestAbstractPropertyMorphableDefaultData extends Data implements PropertyMorphableData
+        {
+            public function __construct(
+                #[PropertyForMorph]
+                public TestPropertyMorphableEnum $variant = TestPropertyMorphableEnum::A,
+            ) {
+            }
+
+            public static function morph(array $properties): ?string
+            {
+                return match ($properties['variant'] ?? null) {
+                    TestPropertyMorphableEnum::A => TestPropertyMorphableDefaultDataA::class,
+                    default => null,
+                };
+            }
+        }
+
+        class TestPropertyMorphableDefaultDataA extends TestAbstractPropertyMorphableDefaultData
+        {
+            public function __construct(public string $a, public DummyBackedEnum $enum)
+            {
+                parent::__construct(TestPropertyMorphableEnum::A);
+            }
+        }
+
+        $dataA = TestAbstractPropertyMorphableDefaultData::from([
+            'a' => 'foo',
+            'enum' => 'foo',
+        ]);
+
+        expect($dataA)
+            ->toBeInstanceOf(TestPropertyMorphableDefaultDataA::class)
+            ->variant->toEqual(TestPropertyMorphableEnum::A)
+            ->a->toEqual('foo')
+            ->enum->toEqual(DummyBackedEnum::FOO);
+    });
+
+    it('will throw an exception when a property morphable data class is not found', function () {
+        expect(fn () => TestAbstractPropertyMorphableData::from([
+            'variant' => 'c',
+        ]))->toThrow(CannotCreateAbstractClass::class);
     });
 });

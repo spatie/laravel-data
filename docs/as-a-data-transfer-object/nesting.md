@@ -161,4 +161,6 @@ class AlbumData extends Data
 }
 ```
 
-This was the old way to define the type of data objects that will be stored within a collection. It is still supported, but we recommend using the annotation.
+This was the old way to define the type of data objects that will be stored within a collection. It is still supported, but we recommend using the annotation since static analyzers and IDEs will have better support for that.
+
+```php

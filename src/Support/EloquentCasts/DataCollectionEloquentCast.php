@@ -12,10 +12,21 @@ use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Support\DataConfig;
 
+/**
+ * @template TData of (BaseData&TransformableData)
+ * @template TDataCollection of DataCollection
+ *
+ * @implements CastsAttributes<TDataCollection<TData>|null,TDataCollection<TData>|array|null>
+ */
 class DataCollectionEloquentCast implements CastsAttributes
 {
     protected DataConfig $dataConfig;
 
+    /**
+     * @param class-string<TData> $dataClass
+     * @param class-string<TDataCollection> $dataCollectionClass
+     * @param array<string> $arguments
+     */
     public function __construct(
         protected string $dataClass,
         protected string $dataCollectionClass = DataCollection::class,
@@ -103,6 +114,19 @@ class DataCollectionEloquentCast implements CastsAttributes
         }
 
         return $dataCollection;
+    }
+
+    /**
+     * @param TDataCollection<TData>|null $firstValue
+     * @param TDataCollection<TData>|null $secondValue
+     */
+    public function compare($model, string $key, $firstValue, $secondValue): bool
+    {
+        if (in_array('encrypted', $this->arguments) && ! empty(Crypt::getPreviousKeys())) {
+            return false;
+        }
+
+        return $this->get($model, $key, $firstValue, [])?->toArray() === $this->get($model, $key, $secondValue, [])?->toArray();
     }
 
     protected function isAbstractClassCast(): bool

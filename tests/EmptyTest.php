@@ -5,6 +5,7 @@ use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Tests\Fakes\MultiData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 it('can get the empty version of a data object', function () {
@@ -51,4 +52,16 @@ it('can overwrite properties in an empty version of a data object', function () 
     expect(SimpleData::empty(['string' => 'Ruben']))->toMatchArray([
         'string' => 'Ruben',
     ]);
+});
+
+it('can use except to filter out properties in an empty version of a data object', function () {
+    expect(MultiData::empty(except: ['second']))
+        ->toHaveKey('first')
+        ->not->toHaveKey('second');
+});
+
+it('can use obly to filter out properties in an empty version of a data object', function () {
+    expect(MultiData::empty(only: ['second']))
+        ->not->toHaveKey('first')
+        ->toHaveKey('second');
 });

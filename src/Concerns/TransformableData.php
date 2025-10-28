@@ -14,6 +14,7 @@ use Spatie\LaravelData\Support\Transformation\TransformationContextFactory;
 
 trait TransformableData
 {
+    /** @return array<string, mixed> */
     public function transform(
         null|TransformationContextFactory|TransformationContext $transformationContext = null,
     ): array {
@@ -39,11 +40,13 @@ trait TransformableData
         return $resolver->execute($this, $transformationContext);
     }
 
+    /** @return array<array-key, mixed> */
     public function all(): array
     {
         return $this->transform(TransformationContextFactory::create()->withValueTransformation(false));
     }
 
+    /** @return array<array-key, mixed> */
     public function toArray(): array
     {
         return $this->transform();
@@ -54,6 +57,7 @@ trait TransformableData
         return json_encode($this->transform(), $options);
     }
 
+    /** @return array<array-key, mixed> */
     public function jsonSerialize(): array
     {
         return $this->transform();

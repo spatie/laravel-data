@@ -219,11 +219,22 @@ dataset('attributes', function () {
     );
 
     yield fixature(
-        attribute: new Enum('enum_class'),
-        expected: new EnumRule('enum_class'),
-        expectCreatedAttribute: new Enum(new EnumRule('enum_class'))
+        attribute: new Enum(DummyBackedEnum::class),
+        expected: new EnumRule(DummyBackedEnum::class),
+        expectCreatedAttribute: new Enum(new EnumRule(DummyBackedEnum::class))
     );
 
+    yield fixature(
+        attribute: new Enum(DummyBackedEnum::class, only: [DummyBackedEnum::FOO]),
+        expected: (new EnumRule(DummyBackedEnum::class))->only([DummyBackedEnum::FOO]),
+        expectCreatedAttribute: new Enum((new EnumRule(DummyBackedEnum::class))->only(DummyBackedEnum::FOO))
+    );
+
+    yield fixature(
+        attribute: new Enum(DummyBackedEnum::class, except: [DummyBackedEnum::FOO]),
+        expected: (new EnumRule(DummyBackedEnum::class))->except([DummyBackedEnum::FOO]),
+        expectCreatedAttribute: new Enum((new EnumRule(DummyBackedEnum::class))->except(DummyBackedEnum::FOO))
+    );
 
     yield fixature(
         attribute: new ExcludeIf('field', true),
@@ -431,10 +442,7 @@ dataset('attributes', function () {
         expected: 'uppercase',
     );
 
-    yield fixature(
-        attribute: new Url(),
-        expected: 'url',
-    );
+    yield from urlAttributes();
 
     yield fixature(
         attribute: new Ulid(),
@@ -478,6 +486,29 @@ function acceptedIfAttributes(): Generator
         attribute: new AcceptedIf('value', DummyBackedEnum::FOO),
         expected: 'accepted_if:value,foo',
         expectCreatedAttribute: new AcceptedIf('value', 'foo')
+    );
+}
+
+function urlAttributes(): Generator
+{
+    yield fixature(
+        attribute: new Url(),
+        expected: 'url',
+    );
+
+    yield fixature(
+        attribute: new Url('http'),
+        expected: 'url:http',
+    );
+
+    yield fixature(
+        attribute: new Url(['http', 'https']),
+        expected: 'url:http,https',
+    );
+
+    yield fixature(
+        attribute: new Url('http', 'https'),
+        expected: 'url:http,https',
     );
 }
 

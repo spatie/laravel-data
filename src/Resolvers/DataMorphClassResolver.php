@@ -16,6 +16,9 @@ class DataMorphClassResolver
     ) {
     }
 
+    /**
+     * @param array<array<string, mixed>> $normalizedPayloads
+     */
     public function execute(
         DataClass $dataClass,
         array $normalizedPayloads,
@@ -56,6 +59,15 @@ class DataMorphClassResolver
 
                     break;
                 }
+            }
+
+            if ($dataProperty->hasDefaultValue) {
+                $morphProperties[$dataProperty->name] = $this->normalizeValue(
+                    $dataProperty,
+                    $dataProperty->defaultValue,
+                );
+
+                continue;
             }
 
             if ($found === false) {

@@ -59,11 +59,12 @@ it('can use data as an DTO', function () {
     expect($dto)->toBeInstanceOf(SimpleDto::class)
         ->toBeInstanceOf(Dto::class)
         ->not()->toBeInstanceOf(Data::class)
-        ->not()->toHaveMethods(['toArray', 'toJson', 'toResponse', 'all', 'include', 'exclude', 'only', 'except', 'transform', 'with', 'jsonSerialize'])
         ->and($dto->string)->toEqual('Hello World');
 
+    expect(get_class_methods($dto))->not()->toContain('toArray', 'toJson', 'toResponse', 'all', 'include', 'exclude', 'only', 'except', 'transform', 'with', 'jsonSerialize');
+
     expect(fn () => SimpleDto::validate(['string' => null]))->toThrow(ValidationException::class);
-})->skip('Fix test for Laravel 12');
+});
 
 it('can use data as an Resource', function () {
     $resource = SimpleResource::from('Hello World');
@@ -71,10 +72,9 @@ it('can use data as an Resource', function () {
     expect($resource)->toBeInstanceOf(SimpleResource::class)
         ->toBeInstanceOf(Resource::class)
         ->not()->toBeInstanceOf(Data::class)
-        ->toHaveMethods(['toArray', 'toJson', 'toResponse', 'all', 'include', 'exclude', 'only', 'except', 'transform', 'with', 'jsonSerialize'])
         ->and($resource->string)->toEqual('Hello World');
 
-    expect($resource)->not()->toHaveMethods([
-        'validate',
-    ]);
-})->skip('Fix test for Laravel 12');
+    expect(get_class_methods($resource))->toContain('toArray', 'toJson', 'toResponse', 'all', 'include', 'exclude', 'only', 'except', 'transform', 'with', 'jsonSerialize');
+
+    expect(get_class_methods($resource))->not()->toContain('validate');
+});

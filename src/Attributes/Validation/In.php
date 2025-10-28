@@ -5,7 +5,7 @@ namespace Spatie\LaravelData\Attributes\Validation;
 use Attribute;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rules\In as BaseIn;
-use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
@@ -16,7 +16,7 @@ class In extends ObjectValidationAttribute
     private array $values;
 
     public function __construct(
-        array|string|BaseIn|RouteParameterReference ...$values
+        array|string|BaseIn|ExternalReference ...$values
     ) {
         $this->values = $values;
     }
@@ -32,7 +32,7 @@ class In extends ObjectValidationAttribute
         }
 
         $this->values = array_map(
-            fn (string|RouteParameterReference $value) => $this->normalizePossibleRouteReferenceParameter($value),
+            fn (string|ExternalReference $value) => $this->normalizePossibleExternalReferenceParameter($value),
             Arr::flatten($this->values)
         );
 

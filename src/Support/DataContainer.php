@@ -101,5 +101,7 @@ class DataContainer
         $this->dataCollectableFromSomethingResolver = null;
         $this->dataClassFactory = null;
         $this->decoupledPartialResolver = null;
+        $this->dataValidatorResolver = null;
+        $this->validatedPayloadResolver = null;
     }
 }

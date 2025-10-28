@@ -78,9 +78,11 @@ the model:
 ```php
 class Artist extends Model
 {
-    public function getFullNameAttribute(): string
+    protected function fullName(): Attribute
     {
-        return $this->first_name . ' ' . $this->last_name;
+        return Attribute::make(
+            get: fn () => $this->first_name . ' ' . $this->last_name,
+        );
     }
 }
 ```
@@ -253,3 +255,7 @@ $song = SongData::from(Song::find(1));
 
 We'll end up in an infinite loop, since the `SongData` class will try to load the `ArtistData` class, which will try to
 load the `SongData` class, and so on.
+
+## Missing attributes
+
+When a model is missing attributes and `preventAccessingMissingAttributes` is enabled for a model the `MissingAttributeException` won't be thrown when creating a data object with a property that can be null or Optional.

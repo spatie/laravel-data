@@ -12,16 +12,21 @@ use Spatie\LaravelData\Support\Lazy\ConditionalLazy;
 class AutoWhenLoadedLazy extends AutoLazy
 {
     public function __construct(
-        public ?string $relation = null,
+        protected ?string $relation = null,
     ) {
     }
 
     public function build(Closure $castValue, mixed $payload, DataProperty $property, mixed $value): ConditionalLazy
     {
-        $relation = $this->relation ?? $property->name;
+        $relation = $this->forRelation($property);
 
         return Lazy::when(fn () => $payload->relationLoaded($relation), fn () => $castValue(
             $payload->getRelation($relation)
         ));
+    }
+
+    public function forRelation(DataProperty $property): ?string
+    {
+        return $this->relation ?? $property->name;
     }
 }

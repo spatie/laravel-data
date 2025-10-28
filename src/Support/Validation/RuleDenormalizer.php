@@ -12,8 +12,8 @@ use Spatie\LaravelData\Attributes\Validation\CustomValidationAttribute;
 use Spatie\LaravelData\Attributes\Validation\ObjectValidationAttribute;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\StringValidationAttribute;
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
-use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 
 class RuleDenormalizer
 {
@@ -114,7 +114,7 @@ class RuleDenormalizer
             return $parameter->getValue($path);
         }
 
-        if ($parameter instanceof RouteParameterReference) {
+        if ($parameter instanceof ExternalReference) {
             return $this->normalizeRuleParameter($parameter->getValue(), $path);
         }
 

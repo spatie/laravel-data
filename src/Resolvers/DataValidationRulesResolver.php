@@ -188,6 +188,65 @@ class DataValidationRulesResolver
             shouldBePresent: true
         );
 
+        $collectionPayload = Arr::get($fullPayload, $propertyPath->get());
+
+        if (! is_array($collectionPayload)) {
+            return;
+        }
+
+        $itemDataClass = $this->dataConfig->getDataClass($dataProperty->type->dataClass);
+
+        if (! $itemDataClass->hasDynamicValidationRules) {
+            $this->resolveStaticCollectionRules(
+                $itemDataClass,
+                $collectionPayload,
+                $fullPayload,
+                $propertyPath,
+                $dataRules
+            );
+
+            return;
+        }
+
+        $this->resolveDynamicCollectionRules(
+            $dataProperty,
+            $fullPayload,
+            $propertyPath,
+            $dataRules
+        );
+    }
+
+    protected function resolveStaticCollectionRules(
+        DataClass $itemDataClass,
+        array $collectionPayload,
+        array $fullPayload,
+        ValidationPath $propertyPath,
+        DataRules $dataRules,
+    ): void {
+        foreach ($collectionPayload as $key => $value) {
+            $itemPath = $propertyPath->property($key);
+
+            if (! is_array($value)) {
+                $dataRules->add($itemPath, ['array']);
+
+                continue;
+            }
+
+            $this->execute(
+                $itemDataClass->name,
+                $fullPayload,
+                $itemPath,
+                $dataRules
+            );
+        }
+    }
+
+    protected function resolveDynamicCollectionRules(
+        DataProperty $dataProperty,
+        array $fullPayload,
+        ValidationPath $propertyPath,
+        DataRules $dataRules,
+    ): void {
         $dataRules->addCollection($propertyPath, Rule::forEach(function (mixed $value, mixed $attribute) use ($fullPayload, $dataProperty) {
             if (! is_array($value)) {
                 return ['array'];

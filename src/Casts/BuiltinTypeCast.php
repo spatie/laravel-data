@@ -28,11 +28,24 @@ class BuiltinTypeCast implements Cast, IterableItemCast
     protected function runCast(mixed $value): mixed
     {
         return match ($this->type) {
-            'bool' => (bool) $value,
+            'bool' => $this->castToBool($value),
             'int' => (int) $value,
             'float' => (float) $value,
             'array' => (array) $value,
             'string' => (string) $value,
+        };
+    }
+
+    protected function castToBool(mixed $value): bool
+    {
+        if (! is_string($value)) {
+            return (bool) $value;
+        }
+
+        return match (strtolower($value)) {
+            'true' => true,
+            'false' => false,
+            default => (bool) $value,
         };
     }
 }
