@@ -123,7 +123,11 @@ class DataValidationMessagesAndAttributesResolver
             return;
         }
 
-        $items = Arr::get($fullPayload, $propertyPath->get(), []);
+        $items = Arr::get($fullPayload, $propertyPath->get());
+
+        if (! is_array($items)) {
+            return;
+        }
 
         foreach ($items as $index => $item) {
             $morphedClass = $this->dataMorphClassResolver->execute(
