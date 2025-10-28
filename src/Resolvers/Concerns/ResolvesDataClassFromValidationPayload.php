@@ -25,11 +25,7 @@ trait ResolvesDataClassFromValidationPayload
 
         $payload = $path->isRoot()
             ? $fullPayload
-            : Arr::get($fullPayload, $path->get(), []);
-
-        if (empty($payload)) {
-            return $dataClass;
-        }
+            : Arr::get($fullPayload, $path->get()) ?? [];
 
         $morphedClass = $dataMorphClassResolver->execute(
             $dataClass,
