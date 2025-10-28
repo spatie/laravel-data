@@ -4,7 +4,9 @@ namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Resolvers\Concerns\ResolvesDataClassFromValidationPayload;
+use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class DataValidationMessagesAndAttributesResolver
@@ -62,44 +64,15 @@ class DataValidationMessagesAndAttributesResolver
                     continue;
                 }
 
-                $collectedDataClass = $this->dataConfig->getDataClass($dataProperty->type->dataClass);
-
-                if ($collectedDataClass->isAbstract && $collectedDataClass->propertyMorphable) {
-                    $items = Arr::get($fullPayload, $propertyPath->get(), []);
-
-                    foreach ($items as $index => $item) {
-                        $morphedClass = $this->dataMorphClassResolver->execute(
-                            $collectedDataClass,
-                            [$item],
-                        );
-
-                        if (! $morphedClass) {
-                            $morphedClass = $dataProperty->type->dataClass;
-                        }
-
-                        $collected = $this->execute(
-                            $morphedClass,
-                            $fullPayload,
-                            $propertyPath->property($index),
-                            [...$nestingChain, $dataProperty->type->dataClass, $morphedClass],
-                        );
-
-                        $messages[] = $collected['messages'];
-                        $attributes[] = $collected['attributes'];
-                    }
-
-                } else {
-                    $collected = $this->execute(
-                        $dataProperty->type->dataClass,
-                        $fullPayload,
-                        $propertyPath->property('*'),
-                        [...$nestingChain, $dataProperty->type->dataClass],
-                    );
-
-                    $messages[] = $collected['messages'];
-                    $attributes[] = $collected['attributes'];
-
-                }
+                $this->resolveCollectableMessagesAndAttributes(
+                    $fullPayload,
+                    $dataProperty,
+                    $propertyPath,
+                    $this->dataConfig->getDataClass($dataProperty->type->dataClass),
+                    $nestingChain,
+                    $messages,
+                    $attributes
+                );
             }
         }
 
@@ -125,5 +98,52 @@ class DataValidationMessagesAndAttributesResolver
         }
 
         return ['messages' => $messages, 'attributes' => $attributes];
+    }
+
+    protected function resolveCollectableMessagesAndAttributes(
+        array $fullPayload,
+        DataProperty $dataProperty,
+        ValidationPath $propertyPath,
+        DataClass $collectedDataClass,
+        array $nestingChain,
+        array &$messages,
+        array &$attributes,
+    ): void {
+        if (! $collectedDataClass->isAbstract || ! $collectedDataClass->propertyMorphable) {
+            $collected = $this->execute(
+                $dataProperty->type->dataClass,
+                $fullPayload,
+                $propertyPath->property('*'),
+                [...$nestingChain, $dataProperty->type->dataClass],
+            );
+
+            $messages[] = $collected['messages'];
+            $attributes[] = $collected['attributes'];
+
+            return;
+        }
+
+        $items = Arr::get($fullPayload, $propertyPath->get(), []);
+
+        foreach ($items as $index => $item) {
+            $morphedClass = $this->dataMorphClassResolver->execute(
+                $collectedDataClass,
+                [$item],
+            );
+
+            if (! $morphedClass) {
+                $morphedClass = $dataProperty->type->dataClass;
+            }
+
+            $collected = $this->execute(
+                $morphedClass,
+                $fullPayload,
+                $propertyPath->property($index),
+                [...$nestingChain, $dataProperty->type->dataClass, $morphedClass],
+            );
+
+            $messages[] = $collected['messages'];
+            $attributes[] = $collected['attributes'];
+        }
     }
 }
