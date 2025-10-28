@@ -2691,6 +2691,17 @@ describe('property-morphable validation tests', function () {
             ]);
     });
 
+    it('allows nullable property-morphable data', function () {
+        DataValidationAsserter::for(new class () extends Data {
+            public ?TestValidationAbstractPropertyMorphableData $morphable;
+        })
+            ->assertOk([])
+            ->assertOk(['morphable' => null])
+            ->assertErrors(['morphable' => []], [
+                'morphable.variant' => ['The morphable.variant field is required.'],
+            ]);
+    });
+
     it('can validate nested property-morphable data', function () {
         class TestValidationNestedPropertyMorphableData extends Data
         {
