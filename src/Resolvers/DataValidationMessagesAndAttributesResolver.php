@@ -25,10 +25,31 @@ class DataValidationMessagesAndAttributesResolver
         ValidationPath $path,
         array          $nestingChain = [],
     ): array {
-        $dataClass = $this->dataClassFromValidationPayload($this->dataConfig, $this->dataMorphClassResolver, $class, $fullPayload, $path);
-
         $messages = [];
         $attributes = [];
+
+        $dataClass = $this->dataConfig->getDataClass($class);
+
+        // For property-morphable data we need paths without wildcards to resolve the correct class
+        if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
+            if ($path->containsWildcards()) {
+                foreach ($path->matchingWildcardPayloadValidationPaths($fullPayload) as $resolvedPath) {
+                    $nested = $this->execute(
+                        $class,
+                        $fullPayload,
+                        $resolvedPath,
+                        $nestingChain,
+                    );
+
+                    $messages[] = $nested['messages'];
+                    $attributes[] = $nested['attributes'];
+                }
+
+                return ['messages' => $messages, 'attributes' => $attributes];
+            } else {
+                $dataClass = $this->dataClassFromValidationPayload($this->dataConfig, $this->dataMorphClassResolver, $class, $fullPayload, $path);
+            }
+        }
 
         foreach ($dataClass->properties as $dataProperty) {
             $propertyPath = $path->property($dataProperty->inputMappedName ?? $dataProperty->name);
