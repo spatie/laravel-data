@@ -30,8 +30,8 @@ class DataValidationMessagesAndAttributesResolver
 
         $dataClass = $this->dataConfig->getDataClass($class);
 
-        // For property-morphable data we need paths without wildcards to resolve the correct class
         if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
+            // For property-morphable data we need paths without wildcards to resolve the correct class
             if ($path->containsWildcards()) {
                 foreach ($path->matchingWildcardPayloadValidationPaths($fullPayload) as $resolvedPath) {
                     $nested = $this->execute(
@@ -45,10 +45,13 @@ class DataValidationMessagesAndAttributesResolver
                     $attributes[] = $nested['attributes'];
                 }
 
+                $messages = array_merge(...$messages);
+                $attributes = array_merge(...$attributes);
+
                 return ['messages' => $messages, 'attributes' => $attributes];
-            } else {
-                $dataClass = $this->dataClassFromValidationPayload($this->dataConfig, $this->dataMorphClassResolver, $class, $fullPayload, $path);
             }
+
+            $dataClass = $this->dataClassFromValidationPayload($this->dataConfig, $this->dataMorphClassResolver, $class, $fullPayload, $path);
         }
 
         foreach ($dataClass->properties as $dataProperty) {

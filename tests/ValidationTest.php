@@ -3079,4 +3079,95 @@ describe('property-morphable validation tests', function () {
                 'enum' => 'foo',
             ]);
     });
+
+    it('can validate property-morphable data inside an array of static data', function () {
+        abstract class Vehicle extends Data implements PropertyMorphableData
+        {
+            public function __construct(
+                #[PropertyForMorph]
+                public string $type,
+            ) {
+            }
+
+            public static function morph(array $properties): ?string
+            {
+                return match ($properties['type']) {
+                    'car' => Car::class,
+                    'truck' => Truck::class,
+                    default => null,
+                };
+            }
+        }
+
+        class Car extends Vehicle
+        {
+            public function __construct(
+                public string $make,
+                public string $model,
+            ) {
+                parent::__construct('car');
+            }
+
+            public static function messages()
+            {
+                return [
+                    'make.required' => 'Car make required test.',
+                ];
+            }
+
+            public static function attributes()
+            {
+                return [
+                    'model' => '[MODEL]',
+                ];
+            }
+        }
+
+        class Truck extends Vehicle
+        {
+            public function __construct(
+                public float $payload_capacity,
+            ) {
+                parent::__construct('truck');
+            }
+        }
+
+        class Garage extends Data
+        {
+            public function __construct(
+                public ?Vehicle $vehicle,
+            ) {
+            }
+        }
+
+        class Region extends Data
+        {
+            public function __construct(
+                /** @var Garage[] */
+                public array $garages,
+            ) {
+            }
+        }
+
+        DataValidationAsserter::for(Region::class)
+            ->assertOk([
+                'garages' => [
+                    ['vehicle' => ['type' => 'car', 'make' => 'Toyota', 'model' => 'Corolla']],
+                    ['vehicle' => null],
+                    ['vehicle' => ['type' => 'truck', 'payload_capacity' => 1500.5]],
+                ],
+            ])
+            ->assertErrors([
+                'garages' => [
+                    ['vehicle' => ['type' => 'car']],
+                    ['vehicle' => ['type' => 'truck']],
+                    ['vehicle' => ['type' => 'hobby_horse']],
+                ],
+            ], [
+                'garages.0.vehicle.make' => ['Car make required test.'],
+                'garages.0.vehicle.model' => ['The [MODEL] field is required.'],
+                'garages.1.vehicle.payload_capacity' => ['The garages.1.vehicle.payload capacity field is required.'],
+                'garages.2.vehicle.type' => ['The selected garages.2.vehicle.type is invalid for morph.'],
+            ]);
+    });
 });
