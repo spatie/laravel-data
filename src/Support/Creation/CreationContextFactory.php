@@ -43,30 +43,30 @@ class CreationContextFactory
     ): self {
         $config ??= config('data');
 
-        return new self(
-            dataClass: $dataClass,
-            validationStrategy: ValidationStrategy::from($config['validation_strategy']),
-            mapPropertyNames: true,
-            disableMagicalCreation: false,
-            useOptionalValues: true,
-            ignoredMagicalMethods: null,
-            casts: null,
-        );
+        return app(static::class, [
+            'dataClass' => $dataClass,
+            'validationStrategy' => ValidationStrategy::from($config['validation_strategy']),
+            'mapPropertyNames' => true,
+            'disableMagicalCreation' => false,
+            'useOptionalValues' => true,
+            'ignoredMagicalMethods' => null,
+            'casts' => null,
+        ]);
     }
 
     public static function createFromCreationContext(
         string $dataClass,
         CreationContext $creationContext,
     ): self {
-        return new self(
-            dataClass: $dataClass,
-            validationStrategy: $creationContext->validationStrategy,
-            mapPropertyNames: $creationContext->mapPropertyNames,
-            disableMagicalCreation: $creationContext->disableMagicalCreation,
-            useOptionalValues: $creationContext->useOptionalValues,
-            ignoredMagicalMethods: $creationContext->ignoredMagicalMethods,
-            casts: $creationContext->casts,
-        );
+        return app(static::class, [
+            'dataClass' => $dataClass,
+            'validationStrategy' => $creationContext->validationStrategy,
+            'mapPropertyNames' => $creationContext->mapPropertyNames,
+            'disableMagicalCreation' => $creationContext->disableMagicalCreation,
+            'useOptionalValues' => $creationContext->useOptionalValues,
+            'ignoredMagicalMethods' => $creationContext->ignoredMagicalMethods,
+            'casts' => $creationContext->casts,
+        ]);
     }
 
     public function validationStrategy(ValidationStrategy $validationStrategy): self
@@ -186,17 +186,17 @@ class CreationContextFactory
 
     public function get(): CreationContext
     {
-        return new CreationContext(
-            dataClass: $this->dataClass,
-            mappedProperties: [],
-            currentPath: [],
-            validationStrategy: $this->validationStrategy,
-            mapPropertyNames: $this->mapPropertyNames,
-            disableMagicalCreation: $this->disableMagicalCreation,
-            useOptionalValues: $this->useOptionalValues,
-            ignoredMagicalMethods: $this->ignoredMagicalMethods,
-            casts: $this->casts,
-        );
+        return app(CreationContext::class, [
+            'dataClass' => $this->dataClass,
+            'mappedProperties' => [],
+            'currentPath' => [],
+            'validationStrategy' => $this->validationStrategy,
+            'mapPropertyNames' => $this->mapPropertyNames,
+            'disableMagicalCreation' => $this->disableMagicalCreation,
+            'useOptionalValues' => $this->useOptionalValues,
+            'ignoredMagicalMethods' => $this->ignoredMagicalMethods,
+            'casts' => $this->casts,
+        ]);
     }
 
     /**

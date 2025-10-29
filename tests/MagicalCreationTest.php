@@ -431,3 +431,38 @@ it('can only collect arrays/collections/paginators', function () {
 
     expect(fn () => SimpleData::collect($storage))->toThrow(Exception::class, 'Unable to normalize items');
 });
+
+it('can create data custom makeWithContext method', function () {
+    $data = new class ('') extends Data {
+        public function __construct(public string $string)
+        {
+        }
+
+        public static function makeWithContext(CreationContext $context, string $string): static
+        {
+            return new self($string . ' Wide Web: ' . $context->validationStrategy->name);
+        }
+
+        public static function make(string $string): static
+        {
+            return new self($string . ' Wide Web');
+        }
+    };
+
+    expect($data::from(['string' => 'Hello World']))->toEqual(new $data('Hello World Wide Web: OnlyRequests'));
+});
+
+it('can create data custom make method', function () {
+    $data = new class ('') extends Data {
+        public function __construct(public string $string)
+        {
+        }
+
+        public static function make(string $string): static
+        {
+            return new self($string . ' Wide Web');
+        }
+    };
+
+    expect($data::from(['string' => 'Hello World']))->toEqual(new $data('Hello World Wide Web'));
+});
