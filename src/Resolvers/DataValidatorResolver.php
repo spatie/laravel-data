@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Validator;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\ValidateableData;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\Validation\DataRules;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
@@ -22,6 +23,7 @@ class DataValidatorResolver
     public function execute(
         string $dataClass,
         Arrayable|array $payload,
+        ?CreationContext $context = null,
     ): Validator {
         $payload = $payload instanceof Arrayable ? $payload->toArray() : $payload;
 
@@ -49,7 +51,7 @@ class DataValidatorResolver
             $validator->stopOnFirstFailure(app()->call([$dataClass, 'stopOnFirstFailure']));
         }
 
-        $dataClass::withValidator($validator);
+        $dataClass::withValidator($validator, $context);
 
         return $validator;
     }

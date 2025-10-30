@@ -25,7 +25,8 @@ class ValidatePropertiesDataPipe implements DataPipe
             return $properties;
         }
 
-        ($class->name)::validate($properties);
+        // Should we replace $properties with the returned validated properties?
+        ($class->name)::validate($properties, $creationContext);
 
         $creationContext->validationStrategy = ValidationStrategy::AlreadyRan;
 

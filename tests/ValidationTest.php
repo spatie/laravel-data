@@ -15,6 +15,7 @@ use Illuminate\Validation\Rules\In as LaravelIn;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
@@ -2144,7 +2145,7 @@ it('can manually specify the validator', function () {
     $dataClass = new class () extends Data {
         public string $property;
 
-        public static function withValidator(Validator $validator): void
+        public static function withValidator(Validator $validator, ?CreationContext $context = null): void
         {
             $validator->setRules([]);
         }
