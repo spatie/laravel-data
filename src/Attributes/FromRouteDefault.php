@@ -29,10 +29,6 @@ class FromRouteDefault implements InjectsPropertyValue
 
         $route = $payload->route();
 
-        if ($route === null) {
-            return Skipped::create();
-        }
-
         // Only get from route defaults
         $defaults = $route->defaults;
 
