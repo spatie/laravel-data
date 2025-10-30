@@ -135,6 +135,71 @@ class SongData extends Data {
 
 Here, `$slug` will be `never-gonna-give-you-up` even though the route parameter value is `never`.
 
+## Filling properties from route defaults
+
+The `FromRouteDefault` attribute allows filling properties from route default values set via Laravel's `->defaults()` method. This is useful for route grouping and middleware logic where you need to access default values that aren't part of the URL.
+
+```php
+Route::get('/songs/archived', [SongController::class, 'index'])
+    ->defaults('status', 'archived');
+
+class SongData extends Data {
+    #[FromRouteDefault('status')]
+    public string $status;
+}
+```
+
+Here, the `$status` property will be filled with `'archived'` from the route defaults.
+
+### Combining with route parameters
+
+You can stack `FromRouteParameter` and `FromRouteDefault` attributes to create a fallback behavior. The first attribute that finds a value will be used:
+
+```php
+Route::get('/songs/{status}', [SongController::class, 'index'])
+    ->defaults('status', 'published');
+
+class SongData extends Data {
+    #[FromRouteParameter('status')]
+    #[FromRouteDefault('status')]
+    public string $status;
+}
+```
+
+When accessing `/songs/archived`, the `$status` property will be `'archived'` (from the route parameter). For a route without a `{status}` parameter, it would fall back to `'published'` from the route defaults.
+
+### Working with enums
+
+Route defaults work seamlessly with enum values:
+
+```php
+enum SongStatus: string {
+    case PUBLISHED = 'published';
+    case ARCHIVED = 'archived';
+}
+
+Route::get('/songs/archived', [SongController::class, 'index'])
+    ->defaults('status', SongStatus::ARCHIVED);
+
+class SongData extends Data {
+    #[FromRouteDefault('status')]
+    public SongStatus $status;
+}
+```
+
+### Controlling payload replacement
+
+Like `FromRouteParameter`, the `FromRouteDefault` attribute supports the `replaceWhenPresentInPayload` flag:
+
+```php
+class SongData extends Data {
+    #[FromRouteDefault('status', replaceWhenPresentInPayload: false)]
+    public string $status;
+}
+```
+
+When set to `false`, values from the request payload will take priority over route defaults.
+
 ## Filling properties from the authenticated user
 
 The `FromCurrentUser` attribute allows filling properties with values from the authenticated user.
