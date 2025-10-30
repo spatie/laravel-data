@@ -390,7 +390,7 @@ class DataTypeFactory
                 'type' => new UnionType($types),
                 'isMixed' => $isMixed,
                 'kind' => $kind,
-                'dataClass' => null,
+                'dataClass' => join('|', array_unique($iterableItemType)),
                 'dataCollectableClass' => null,
                 'iterableClass' => $name,
                 'iterableItemType' => join('|', array_unique($iterableItemType)),

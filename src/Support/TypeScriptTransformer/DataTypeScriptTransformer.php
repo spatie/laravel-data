@@ -4,6 +4,7 @@ namespace Spatie\LaravelData\Support\TypeScriptTransformer;
 
 use phpDocumentor\Reflection\Fqsen;
 use phpDocumentor\Reflection\Type;
+use phpDocumentor\Reflection\TypeResolver;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Boolean;
 use phpDocumentor\Reflection\Types\Compound;
@@ -138,8 +139,19 @@ class DataTypeScriptTransformer extends DtoTransformer
             default => new Compound([new String_(), new Integer()]),
         };
 
+        $classes = explode('|', $class);
+
+        $typeResolver = new TypeResolver();
+
+        if (count($classes) == 1) {
+            return new Array_(
+                $typeResolver->resolve($class),
+                $keyType
+            );
+        }
+
         return new Array_(
-            new Object_(new Fqsen("\\{$class}")),
+            new Compound(array_map(fn ($class) => $typeResolver->resolve($class), $classes)),
             $keyType
         );
     }
