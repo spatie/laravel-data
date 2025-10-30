@@ -15,7 +15,6 @@ use Illuminate\Validation\Rules\In as LaravelIn;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
-use Spatie\LaravelData\Support\Creation\CreationContext;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\mock;
 use function PHPUnit\Framework\assertFalse;
@@ -48,6 +47,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\Creation\ValidationStrategy;
 use Spatie\LaravelData\Support\Validation\References\AuthenticatedUserReference;
 use Spatie\LaravelData\Support\Validation\References\ContainerReference;
@@ -893,7 +893,7 @@ it('can overwrite collection class rules', function () {
             return [
                 'collection' => ['array', 'min:1', 'max:2'],
                 // TODO: should we allow this, how to handle this?
-//                'collection.*.string' => ['required', 'string', 'min:100'],
+                //       'collection.*.string' => ['required', 'string', 'min:100'],
             ];
         }
     };
@@ -2625,11 +2625,11 @@ it('it will merge validation rules', function () {
     {
         public function __construct(
             #[Max(10)]
-            public string $array_rules,
+            public string                        $array_rules,
             #[Max(10)]
-            public string $string_rules,
+            public string                        $string_rules,
             #[WithoutValidation]
-            public string $without_validation,
+            public string                        $without_validation,
             public TestNestedDataWithMergedRules $nested
         ) {
         }
@@ -2848,4 +2848,46 @@ describe('property-morphable validation tests', function () {
                 'enum' => 'foo',
             ]);
     });
+});
+
+it('can access the validator if desired', function () {
+    class DataWithValidator extends Data
+    {
+        protected ?Validator $validator = null;
+
+        public function __construct(
+            public string $property,
+        ) {
+        }
+
+        public function validator(): ?Validator
+        {
+            return $this->validator;
+        }
+
+        public static function withValidator(Validator $validator, ?CreationContext $context = null): void
+        {
+            if ($context) {
+                $context->validator = $validator;
+            }
+        }
+
+        public static function makeWithContext(CreationContext $context, ...$properties): static
+        {
+            $data = new static(...$context->validator->validated());
+            $data->validator = $context->validator;
+
+            return $data;
+        }
+    };
+
+    $this->app->bind(CreationContext::class, fn ($app, $params) => new class (...$params) extends CreationContext {
+        public ?Validator $validator = null;
+    });
+
+    $request = Request::create('hello', 'POST', ['property' => 'foo', 'unvalidated' => 'bar']);
+    $data = DataWithValidator::from($request);
+    expect($data->validator())->toBeInstanceOf(Validator::class);
+    expect($data->property)->toBe('foo');
+    expect($data)->not()->toHaveProperty('unvalidated');
 });
