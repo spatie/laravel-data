@@ -67,7 +67,7 @@ it('can convert a data object to Typescript', function () {
             public EloquentCollection|array $collectionOrArrayWithUnion,
             /** @var array<int, \Spatie\LaravelData\Tests\Fakes\SimpleData|int> */
             public array $arrayWithUnion,
-            /** @var array{id: int, name: string}[] Note `array{id: int, name: string}[]` does not work */
+            /** @var array{id: int, name: string}[] Could also be `array<int, array{id: int, name: string}>` */
              public array $arrayWithStruct,
         ) {
         }
