@@ -121,7 +121,11 @@ class DataIterableAnnotationReader
 
                 static $ignoredClasses = [Lazy::class, Optional::class];
 
-                $fcqn = $this->resolveFcqn($reflection, $valueTypeString);
+                try {
+                    $fcqn = $this->resolveFcqn($reflection, $valueTypeString);
+                } catch (\InvalidArgumentException $e) {
+                    $fcqn = null;
+                }
                 if (class_exists($fcqn)) {
                     if (! in_array($fcqn, $ignoredClasses) && ! array_any($ignoredClasses, fn ($ignoredClass) => is_subclass_of($fcqn, $ignoredClass))) {
                         $annotations[] = new DataIterableAnnotation(

@@ -16,4 +16,5 @@ dataCollectionWithAttribute: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}
 collectionWithUnion: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%} | number>;
 collectionOrArrayWithUnion: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}> | Array<number>;
 arrayWithUnion: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%} | number>;
+arrayWithStruct: Array<{id:number;name:string;}>;
 }
