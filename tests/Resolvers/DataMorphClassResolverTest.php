@@ -108,7 +108,7 @@ it('can resolve morph class with backed enum type using default value', function
 
     $morph = app(DataMorphClassResolver::class)->execute(
         app(DataConfig::class)->getDataClass(TestAbstractMorphableDataWithDefaultValue::class),
-        [['type' => DummyBackedEnum::BOO]]
+        [[]]
     );
 
     expect($morph)->toBe(DummyBackedEnum::BOO->value);
