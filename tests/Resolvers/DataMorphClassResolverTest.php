@@ -93,3 +93,44 @@ it('can resolve morph class with backed enum type', function () {
 
     expect($morph)->toBe(DummyBackedEnum::FOO->value);
 });
+
+it('can resolve morph class with backed enum type using default value', function () {
+    abstract class TestAbstractMorphableDataWithDefaultValue extends Data implements PropertyMorphableData
+    {
+        #[PropertyForMorph]
+        public DummyBackedEnum $type = DummyBackedEnum::BOO;
+
+        public static function morph(array $properties): ?string
+        {
+            return $properties['type']->value;
+        }
+    };
+
+    $morph = app(DataMorphClassResolver::class)->execute(
+        app(DataConfig::class)->getDataClass(TestAbstractMorphableDataWithDefaultValue::class),
+        [[]]
+    );
+
+    expect($morph)->toBe(DummyBackedEnum::BOO->value);
+});
+
+
+it('can resolve morph class with backed enum type ignoring default value', function () {
+    abstract class TestAbstractMorphableDataWithNullableBackedEnum extends Data implements PropertyMorphableData
+    {
+        #[PropertyForMorph]
+        public ?DummyBackedEnum $type = null;
+
+        public static function morph(array $properties): ?string
+        {
+            return $properties['type']?->value;
+        }
+    };
+
+    $morph = app(DataMorphClassResolver::class)->execute(
+        app(DataConfig::class)->getDataClass(TestAbstractMorphableDataWithNullableBackedEnum::class),
+        [['type' => DummyBackedEnum::FOO]]
+    );
+
+    expect($morph)->toBe(DummyBackedEnum::FOO->value);
+});
