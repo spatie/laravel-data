@@ -61,7 +61,7 @@ class DataPropertyFactory
 
         if (! $reflectionProperty->isPromoted()) {
             $hasDefaultValue = $reflectionProperty->hasDefaultValue();
-            $defaultValue = $reflectionProperty->getDefaultValue();
+            $defaultValue = $hasDefaultValue ? $reflectionProperty->getDefaultValue() : null;
         }
 
         if ($hasDefaultValue && $defaultValue instanceof Optional) {
