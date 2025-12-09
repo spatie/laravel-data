@@ -85,7 +85,7 @@ class PaginatedDataCollection implements Responsable, BaseDataCollectableContrac
      */
     public function data(): array
     {
-        return $this->items->itmes();
+        return $this->items->items();
     }
 
     public static function castUsing(array $arguments)
