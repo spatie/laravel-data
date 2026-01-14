@@ -70,7 +70,7 @@ class DataFromSomethingResolver
             $normalizedPayloads
         );
 
-        return $this->dataFromArrayResolver->execute($class, $properties);
+        return $this->dataFromArrayResolver->execute($class, $properties, $creationContext);
     }
 
     protected function replaceDataClassWithMorphedVersion(

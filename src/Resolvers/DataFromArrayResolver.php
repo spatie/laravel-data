@@ -7,6 +7,7 @@ use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
 use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataParameter;
@@ -26,11 +27,11 @@ class DataFromArrayResolver
      *
      * @return TData
      */
-    public function execute(string $class, array $properties): BaseData
+    public function execute(string $class, array $properties, CreationContext $creationContext): BaseData
     {
         $dataClass = $this->dataConfig->getDataClass($class);
 
-        $data = $this->createData($dataClass, $properties);
+        $data = $this->createData($dataClass, $properties, $creationContext);
 
         foreach ($dataClass->properties as $property) {
             if (
@@ -72,11 +73,16 @@ class DataFromArrayResolver
     protected function createData(
         DataClass $dataClass,
         array $properties,
+        CreationContext $creationContext,
     ) {
         $constructorParameters = $dataClass->constructorMethod?->parameters;
 
         if ($constructorParameters === null) {
-            return new $dataClass->name();
+            return match (true) {
+                method_exists($dataClass->name, 'makeWithContext') => $dataClass->name::makeWithContext($creationContext),
+                method_exists($dataClass->name, 'make') => $dataClass->name::make(),
+                default => new $dataClass->name(),
+            };
         }
 
         $parameters = [];
@@ -94,7 +100,11 @@ class DataFromArrayResolver
         }
 
         try {
-            return new $dataClass->name(...$parameters);
+            return match (true) {
+                method_exists($dataClass->name, 'makeWithContext') => $dataClass->name::makeWithContext($creationContext, ...$parameters),
+                method_exists($dataClass->name, 'make') => $dataClass->name::make(...$parameters),
+                default => new $dataClass->name(...$parameters),
+            };
         } catch (ArgumentCountError $error) {
             if ($this->isAnyParameterMissing($dataClass, array_keys($parameters))) {
                 throw CannotCreateData::constructorMissingParameters(
