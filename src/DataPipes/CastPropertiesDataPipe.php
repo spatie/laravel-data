@@ -15,6 +15,7 @@ use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Types\CombinationType;
+use Spatie\LaravelData\Support\Types\UnionType;
 
 class CastPropertiesDataPipe implements DataPipe
 {
@@ -222,24 +223,30 @@ class CastPropertiesDataPipe implements DataPipe
     ): ?IterableItemCast {
         $firstItem = $values[array_key_first($values)];
 
-        foreach ($creationContext->casts?->findCastsForIterableType($property->type->iterableItemType) ?? [] as $possibleCast) {
-            $casted = $possibleCast->castIterableItem($property, $firstItem, $properties, $creationContext);
+        $iterableItemTypes = $property->type->type instanceof UnionType
+            ? array_column($property->type->type->types, 'iterableItemType')
+            : [$property->type->iterableItemType];
 
-            if (! $casted instanceof Uncastable) {
-                return $possibleCast;
+        foreach ($iterableItemTypes as $iterableItemType) {
+            foreach ($creationContext->casts?->findCastsForIterableType($iterableItemType) ?? [] as $possibleCast) {
+                $casted = $possibleCast->castIterableItem($property, $firstItem, $properties, $creationContext);
+
+                if (! $casted instanceof Uncastable) {
+                    return $possibleCast;
+                }
             }
-        }
 
-        foreach ($this->dataConfig->casts->findCastsForIterableType($property->type->iterableItemType) as $possibleCast) {
-            $casted = $possibleCast->castIterableItem($property, $firstItem, $properties, $creationContext);
+            foreach ($this->dataConfig->casts->findCastsForIterableType($iterableItemType) as $possibleCast) {
+                $casted = $possibleCast->castIterableItem($property, $firstItem, $properties, $creationContext);
 
-            if (! $casted instanceof Uncastable) {
-                return $possibleCast;
+                if (! $casted instanceof Uncastable) {
+                    return $possibleCast;
+                }
             }
-        }
 
-        if (in_array($property->type->iterableItemType, ['bool', 'int', 'float', 'array', 'string'])) {
-            return new BuiltinTypeCast($property->type->iterableItemType);
+            if (in_array($iterableItemType, ['bool', 'int', 'float', 'array', 'string'])) {
+                return new BuiltinTypeCast($iterableItemType);
+            }
         }
 
         return null;
