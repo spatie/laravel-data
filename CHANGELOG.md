@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.19.0 - 2026-01-19
+
+### What's Changed
+
+* [fix] DataMorphClassResolver: skip default value applying if morph property was resolved by @litvintroll in https://github.com/spatie/laravel-data/pull/1101
+* Fix dependency issue by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1136
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.18.0...4.19.0
+
 ## 4.18.0 - 2025-10-16
 
 ### What's Changed
@@ -188,6 +197,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -198,6 +208,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -237,6 +248,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
