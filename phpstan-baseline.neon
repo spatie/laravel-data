@@ -121,7 +121,7 @@ parameters:
 			path: src/Concerns/WithDeprecatedCollectionMethod.php
 
 		-
-			message: '#^Method Spatie\\LaravelData\\CursorPaginatedDataCollection\:\:through\(\) should return static\(Spatie\\LaravelData\\CursorPaginatedDataCollection\<TKey of \(int\|string\), TValue\>\) but returns \$this\(Spatie\\LaravelData\\CursorPaginatedDataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
+			message: '#^Method Spatie\\LaravelData\\CursorPaginatedDataCollection\:\:through\(\) should return static\(Spatie\\LaravelData\\CursorPaginatedDataCollection\<TKey of \(int\|string\), TValue\>\) but returns static\(Spatie\\LaravelData\\CursorPaginatedDataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
 			identifier: return.type
 			count: 1
 			path: src/CursorPaginatedDataCollection.php
@@ -193,7 +193,7 @@ parameters:
 			path: src/Data.php
 
 		-
-			message: '#^Method Spatie\\LaravelData\\DataCollection\:\:values\(\) should return static\(Spatie\\LaravelData\\DataCollection\<int, TValue\>\) but returns \$this\(Spatie\\LaravelData\\DataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
+			message: '#^Method Spatie\\LaravelData\\DataCollection\:\:values\(\) should return static\(Spatie\\LaravelData\\DataCollection\<int, TValue\>\) but returns static\(Spatie\\LaravelData\\DataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
 			identifier: return.type
 			count: 1
 			path: src/DataCollection.php
@@ -253,7 +253,7 @@ parameters:
 			path: src/PaginatedDataCollection.php
 
 		-
-			message: '#^Method Spatie\\LaravelData\\PaginatedDataCollection\:\:through\(\) should return static\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\) but returns \$this\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
+			message: '#^Method Spatie\\LaravelData\\PaginatedDataCollection\:\:through\(\) should return static\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\) but returns static\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
 			identifier: return.type
 			count: 1
 			path: src/PaginatedDataCollection.php
