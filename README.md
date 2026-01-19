@@ -68,6 +68,17 @@ We invest a lot of resources into creating [best in class open source packages](
 
 We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
 
+
+## Installation
+
+You can install the package via composer:
+
+```bash
+composer require spatie/laravel-data
+```
+
+Read the installation notes on the docs site: [https://spatie.be/docs/laravel-data/v4/installation-setup](https://spatie.be/docs/laravel-data/v4/installation-setup/).
+
 ## Documentation
 
 You will find full documentation on the dedicated [documentation](https://spatie.be/docs/laravel-data/v4/introduction) site.
