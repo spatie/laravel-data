@@ -201,8 +201,11 @@ it('allows creating data objects using Lazy', function () {
     ]);
 
     expect($data->simple)
-        ->toBeInstanceOf(Lazy::class)
-        ->toEqual(Lazy::create(fn () => SimpleData::from('Hello')));
+        ->toBeInstanceOf(Lazy::class);
+
+    expect($data->simple->resolve())
+        ->toBeInstanceOf(SimpleData::class)
+        ->string->toEqual('Hello');
 });
 
 it('can set a custom cast', function () {
