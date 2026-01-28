@@ -40,9 +40,9 @@ class RequestQueryStringPartialsResolver
 
         $partials = new PartialsCollection();
 
-        $partialStrings = is_array($request->get($parameter))
-            ? $request->get($parameter)
-            : explode(',', $request->get($parameter));
+        $partialStrings = is_array($request->input($parameter))
+            ? $request->input($parameter)
+            : explode(',', $request->input($parameter));
 
         foreach ($partialStrings as $partialString) {
             $partial = Partial::create($partialString);
