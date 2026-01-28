@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.19.1 - 2026-01-28
+
+### What's Changed
+
+* Fix deprecation warning for ReflectionProperty::getDefaultValue() by @evan-burrell in https://github.com/spatie/laravel-data/pull/1142
+* Fix: Deprication warning for symfony/http-foundation 7.4 by @GameBear64 in https://github.com/spatie/laravel-data/pull/1140
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.19.0...4.19.1
+
 ## 4.19.0 - 2026-01-19
 
 ### What's Changed
@@ -198,6 +207,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -208,6 +218,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -248,6 +259,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
