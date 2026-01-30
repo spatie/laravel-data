@@ -83,7 +83,12 @@ class TransformedDataResolver
                 $name = $property->outputMappedName;
             }
 
-            $payload[$name] = $value;
+            if ($property->expandDotNotation) {
+                Arr::set($payload, $name, $value);
+            }
+            else {
+                $payload[$name] = $value;
+            }
         }
 
         return $payload;
