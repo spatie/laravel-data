@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Validation\Rule;
@@ -70,6 +71,11 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\Fakes\Support\FakeInjectable;
 use Spatie\LaravelData\Tests\Fakes\ValidationAttributes\PassThroughCustomValidationAttribute;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
+
+class TestValidationDataWithCollectionNestedDataWithFieldReference extends Data
+{
+    public DataWithReferenceFieldValidationAttribute $nested;
+}
 
 it('can validate a string', function () {
     $dataClass = new class () extends Data {
@@ -650,15 +656,75 @@ test('can use a reference to another field in a collection', function () {
         );
 });
 
-test('can use a reference to another field in a collection with nested data', function () {
-    class TestValidationDataWithCollectionNestedDataWithFieldReference extends Data
-    {
-        public DataWithReferenceFieldValidationAttribute $nested;
-    }
-
+test('can use a reference to another field in a data collection with nested data', function () {
     $dataClass = new class () extends Data {
         #[DataCollectionOf(TestValidationDataWithCollectionNestedDataWithFieldReference::class)]
         public DataCollection $collection;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'collection' => [
+                ['nested' => ['check_string' => '0']],
+            ],
+        ])
+        ->assertErrors([
+            'collection' => [
+                ['nested' => ['check_string' => '1']],
+            ],
+        ])
+        ->assertRules(
+            rules: [
+                'collection' => ['present', 'array'],
+                'collection.0.nested' => ['required', 'array'],
+                'collection.0.nested.check_string' => ['boolean'],
+                'collection.0.nested.string' => ['string', 'required_if:collection.0.nested.check_string,1'],
+            ],
+            payload: [
+                'collection' => [
+                    ['nested' => ['check_string' => '1']],
+                ],
+            ]
+        );
+});
+
+test('can use a reference to another field in a collection with nested data', function () {
+    $dataClass = new class () extends Data {
+        /** @var Collection<int, TestValidationDataWithCollectionNestedDataWithFieldReference> */
+        public Collection $collection;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'collection' => [
+                ['nested' => ['check_string' => '0']],
+            ],
+        ])
+        ->assertErrors([
+            'collection' => [
+                ['nested' => ['check_string' => '1']],
+            ],
+        ])
+        ->assertRules(
+            rules: [
+                'collection' => ['present', 'array'],
+                'collection.0.nested' => ['required', 'array'],
+                'collection.0.nested.check_string' => ['boolean'],
+                'collection.0.nested.string' => ['string', 'required_if:collection.0.nested.check_string,1'],
+            ],
+            payload: [
+                'collection' => [
+                    ['nested' => ['check_string' => '1']],
+                ],
+            ]
+        );
+});
+
+test('can use a reference to another field in an array with nested data', function () {
+
+    $dataClass = new class () extends Data {
+        /** @var array<int, TestValidationDataWithCollectionNestedDataWithFieldReference> */
+        public array $collection;
     };
 
     DataValidationAsserter::for($dataClass)
