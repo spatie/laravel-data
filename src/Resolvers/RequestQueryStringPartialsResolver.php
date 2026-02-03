@@ -57,7 +57,7 @@ class RequestQueryStringPartialsResolver
                 continue;
             }
 
-            $partials->attach(new Partial($partialSegments, permanent: false, condition: null));
+            $partials->offsetSet(new Partial($partialSegments, permanent: false, condition: null));
         }
 
         return $partials;

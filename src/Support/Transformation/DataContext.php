@@ -59,7 +59,7 @@ class DataContext
                 $partial = $decoupledPartialResolver->execute($partial);
 
                 if ($partial !== null) {
-                    $this->includePartials->attach($partial);
+                    $this->includePartials->offsetSet($partial);
                 }
             }
         }
@@ -71,7 +71,7 @@ class DataContext
                 $partial = $decoupledPartialResolver->execute($partial);
 
                 if ($partial !== null) {
-                    $this->excludePartials->attach($partial);
+                    $this->excludePartials->offsetSet($partial);
                 }
             }
         }
@@ -83,7 +83,7 @@ class DataContext
                 $partial = $decoupledPartialResolver->execute($partial);
 
                 if ($partial !== null) {
-                    $this->onlyPartials->attach($partial);
+                    $this->onlyPartials->offsetSet($partial);
                 }
             }
         }
@@ -95,7 +95,7 @@ class DataContext
                 $partial = $decoupledPartialResolver->execute($partial);
 
                 if ($partial !== null) {
-                    $this->exceptPartials->attach($partial);
+                    $this->exceptPartials->offsetSet($partial);
                 }
             }
         }
@@ -112,11 +112,11 @@ class DataContext
 
         foreach ($partials as $partial) {
             if ($partial->isRequired($data)) {
-                $requiredPartials->attach($partial->reset());
+                $requiredPartials->offsetSet($partial->reset());
             }
 
             if (! $partial->permanent) {
-                $partialsToDetach->attach($partial);
+                $partialsToDetach->offsetSet($partial);
             }
         }
 
