@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Concerns;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Validation\Validator;
 use Spatie\LaravelData\Resolvers\DataValidationRulesResolver;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataContainer;
 use Spatie\LaravelData\Support\Validation\DataRules;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
@@ -21,29 +22,31 @@ use Spatie\LaravelData\Support\Validation\ValidationPath;
  */
 trait ValidateableData
 {
-    public static function validate(Arrayable|array $payload): Arrayable|array
+    public static function validate(Arrayable|array $payload, ?CreationContext $context = null): Arrayable|array
     {
         $validator = DataContainer::get()->dataValidatorResolver()->execute(
             static::class,
             $payload,
+            $context,
         );
 
         return DataContainer::get()->validatedPayloadResolver()->execute(
             static::class,
             $validator,
+            $context,
         );
     }
 
-    public static function validateAndCreate(Arrayable|array $payload): static
+    public static function validateAndCreate(Arrayable|array $payload, ?CreationContext $context = null): static
     {
-        static::validate($payload);
+        static::validate($payload, $context);
 
         return static::factory()
             ->withoutValidation()
             ->from($payload);
     }
 
-    public static function withValidator(Validator $validator): void
+    public static function withValidator(Validator $validator, ?CreationContext $context = null): void
     {
     }
 
