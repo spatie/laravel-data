@@ -6,7 +6,7 @@ weight: 10
 > Livewire is a full-stack framework for Laravel that makes building dynamic interfaces simple without leaving the
 > comfort of Laravel.
 
-Laravel Data works excellently with [Laravel Livewire](https://laravel-livewire.com).
+Laravel Data works excellently with [Laravel Livewire](https://livewire.laravel.com/).
 
 You can use a data object as one of the properties of your Livewire component as such:
 
