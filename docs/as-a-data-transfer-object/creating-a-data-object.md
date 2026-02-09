@@ -41,7 +41,7 @@ class Song extends Model
 You can create a data object from such a model like this:
 
 ```php
-SongData::from(Song::firstOrFail($id));
+SongData::from(Song::findOrFail($id));
 ```
 
 The package will find the required properties within the model and use them to construct the data object.
