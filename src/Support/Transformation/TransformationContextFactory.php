@@ -45,7 +45,7 @@ class TransformationContextFactory
 
             foreach ($this->includePartials as $include) {
                 if ($include->isRequired($data)) {
-                    $includePartials->attach($include->reset());
+                    $includePartials->offsetSet($include->reset());
                 }
             }
         }
@@ -57,7 +57,7 @@ class TransformationContextFactory
 
             foreach ($this->excludePartials as $exclude) {
                 if ($exclude->isRequired($data)) {
-                    $excludePartials->attach($exclude->reset());
+                    $excludePartials->offsetSet($exclude->reset());
                 }
             }
         }
@@ -69,7 +69,7 @@ class TransformationContextFactory
 
             foreach ($this->onlyPartials as $only) {
                 if ($only->isRequired($data)) {
-                    $onlyPartials->attach($only->reset());
+                    $onlyPartials->offsetSet($only->reset());
                 }
             }
         }
@@ -81,7 +81,7 @@ class TransformationContextFactory
 
             foreach ($this->exceptPartials as $except) {
                 if ($except->isRequired($data)) {
-                    $exceptPartials->attach($except->reset());
+                    $exceptPartials->offsetSet($except->reset());
                 }
             }
         }
