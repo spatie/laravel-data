@@ -11,5 +11,10 @@ closureLazy: string;
 simpleData: {%Spatie\LaravelData\Tests\Fakes\SimpleData%};
 dataCollection: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
 dataCollectionAlternative: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
+dataCollectionUnion: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%} | number>;
 dataCollectionWithAttribute: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
+collectionWithUnion: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%} | number>;
+collectionOrArrayWithUnion: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}> | Array<number>;
+arrayWithUnion: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%} | number>;
+arrayWithStruct: Array<{id:number;name:string;}>;
 }
