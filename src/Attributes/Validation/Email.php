@@ -12,16 +12,24 @@ use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 class Email extends StringValidationAttribute
 {
     public const RfcValidation = 'rfc';
+
     public const NoRfcWarningsValidation = 'strict';
+
     public const DnsCheckValidation = 'dns';
+
     public const SpoofCheckValidation = 'spoof';
+
     public const FilterEmailValidation = 'filter';
 
     protected array $modes;
 
-    public function __construct(array|string|ExternalReference ...$modes)
-    {
-        $this->modes = Arr::flatten($modes);
+    public function __construct(
+        array|string|ExternalReference ...$modes,
+    ) {
+        $extracted = $this->extractContextFromVariadicValues($modes);
+
+        $this->modes = Arr::flatten($extracted['values']);
+        $this->context = $extracted['context'];
     }
 
     public static function keyword(): string
@@ -40,7 +48,7 @@ class Email extends StringValidationAttribute
                 self::SpoofCheckValidation,
                 self::FilterEmailValidation,
             ]))
-            ->whenEmpty(fn () => throw CannotBuildValidationRule::create("Email validation rule needs at least one valid mode."))
+            ->whenEmpty(fn () => throw CannotBuildValidationRule::create('Email validation rule needs at least one valid mode.'))
             ->all();
     }
 }

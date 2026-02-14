@@ -11,9 +11,13 @@ class ArrayType extends StringValidationAttribute
 {
     protected array $keys;
 
-    public function __construct(array|string|ExternalReference ...$keys)
-    {
-        $this->keys = Arr::flatten($keys);
+    public function __construct(
+        array|string|ExternalReference ...$keys,
+    ) {
+        $extracted = $this->extractContextFromVariadicValues($keys);
+
+        $this->keys = Arr::flatten($extracted['values']);
+        $this->context = $extracted['context'];
     }
 
     public static function keyword(): string
