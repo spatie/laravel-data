@@ -10,8 +10,11 @@ use Spatie\LaravelData\Support\Validation\ValidationPath;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Required extends ObjectValidationAttribute implements RequiringRule
 {
-    public function __construct(protected ?RequiredIf $rule = null)
-    {
+    public function __construct(
+        protected ?RequiredIf $rule = null,
+        array|string|null $context = null,
+    ) {
+        $this->context = $context;
     }
 
     public function getRule(ValidationPath $path): object|string
@@ -26,6 +29,6 @@ class Required extends ObjectValidationAttribute implements RequiringRule
 
     public static function create(string ...$parameters): static
     {
-        return new static();
+        return new static;
     }
 }

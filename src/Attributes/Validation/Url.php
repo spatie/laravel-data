@@ -12,9 +12,12 @@ class Url extends StringValidationAttribute
     protected array $protocols;
 
     public function __construct(
-        string|array|ExternalReference ...$protocols
+        string|array|ExternalReference ...$protocols,
     ) {
-        $this->protocols = Arr::flatten($protocols);
+        $extracted = $this->extractContextFromVariadicValues($protocols);
+
+        $this->protocols = Arr::flatten($extracted['values']);
+        $this->context = $extracted['context'];
     }
 
     public static function keyword(): string

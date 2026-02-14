@@ -17,6 +17,7 @@ use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataContainer;
+use Spatie\LaravelData\Support\Validation\ValidationContextManager;
 
 /**
  * @template TData
@@ -24,7 +25,7 @@ use Spatie\LaravelData\Support\DataContainer;
 class CreationContextFactory
 {
     /**
-     * @param class-string<TData> $dataClass
+     * @param  class-string<TData>  $dataClass
      */
     public function __construct(
         public string $dataClass,
@@ -34,8 +35,8 @@ class CreationContextFactory
         public bool $useOptionalValues,
         public ?array $ignoredMagicalMethods,
         public ?GlobalCastsCollection $casts,
-    ) {
-    }
+        public ?string $validationContext = null,
+    ) {}
 
     public static function createFromConfig(
         string $dataClass,
@@ -152,8 +153,7 @@ class CreationContextFactory
     }
 
     /**
-     * @param string $castable
-     * @param Cast|class-string<Cast> $cast
+     * @param  Cast|class-string<Cast>  $cast
      */
     public function withCast(
         string $castable,
@@ -162,7 +162,7 @@ class CreationContextFactory
         $cast = is_string($cast) ? app($cast) : $cast;
 
         if ($this->casts === null) {
-            $this->casts = new GlobalCastsCollection();
+            $this->casts = new GlobalCastsCollection;
         }
 
         $this->casts->add($castable, $cast);
@@ -180,6 +180,13 @@ class CreationContextFactory
         }
 
         $this->casts->merge($casts);
+
+        return $this;
+    }
+
+    public function withValidationContext(?string $context): self
+    {
+        $this->validationContext = $context;
 
         return $this;
     }
@@ -204,19 +211,40 @@ class CreationContextFactory
      */
     public function from(mixed ...$payloads)
     {
-        return DataContainer::get()->dataFromSomethingResolver()->execute(
-            $this->dataClass,
-            $this->get(),
-            ...$payloads
-        );
+        $previousContext = null;
+        $contextWasSet = false;
+
+        if ($this->validationContext !== null) {
+            $manager = app(ValidationContextManager::class);
+            $previousContext = $manager->getContext();
+            $manager->setContext($this->validationContext);
+            $contextWasSet = true;
+        }
+
+        try {
+            return DataContainer::get()->dataFromSomethingResolver()->execute(
+                $this->dataClass,
+                $this->get(),
+                ...$payloads
+            );
+        } finally {
+            if ($contextWasSet) {
+                $manager = app(ValidationContextManager::class);
+
+                if ($previousContext !== null) {
+                    $manager->setContext($previousContext);
+                } else {
+                    $manager->clearContext();
+                }
+            }
+        }
     }
 
     /**
      * @template TCollectKey of array-key
      * @template TCollectValue
      *
-     * @param Collection<TCollectKey, TCollectValue>|EloquentCollection<TCollectKey, TCollectValue>|LazyCollection<TCollectKey, TCollectValue>|Enumerable|array<TCollectKey, TCollectValue>|AbstractPaginator|PaginatorContract|AbstractCursorPaginator|CursorPaginatorContract|DataCollection<TCollectKey, TCollectValue> $items
-     *
+     * @param  Collection<TCollectKey, TCollectValue>|EloquentCollection<TCollectKey, TCollectValue>|LazyCollection<TCollectKey, TCollectValue>|Enumerable|array<TCollectKey, TCollectValue>|AbstractPaginator|PaginatorContract|AbstractCursorPaginator|CursorPaginatorContract|DataCollection<TCollectKey, TCollectValue>  $items
      * @return ($into is 'array' ? array<TCollectKey, TData> : ($into is class-string<EloquentCollection> ? Collection<TCollectKey, TData> : ($into is class-string<Collection> ? Collection<TCollectKey, TData> : ($into is class-string<LazyCollection> ? LazyCollection<TCollectKey, TData> : ($into is class-string<DataCollection> ? DataCollection<TCollectKey, TData> : ($into is class-string<PaginatedDataCollection> ? PaginatedDataCollection<TCollectKey, TData> : ($into is class-string<CursorPaginatedDataCollection> ? CursorPaginatedDataCollection<TCollectKey, TData> : ($items is EloquentCollection ? Collection<TCollectKey, TData> : ($items is Collection ? Collection<TCollectKey, TData> : ($items is LazyCollection ? LazyCollection<TCollectKey, TData> : ($items is Enumerable ? Enumerable<TCollectKey, TData> : ($items is array ? array<TCollectKey, TData> : ($items is AbstractPaginator ? AbstractPaginator : ($items is PaginatorContract ? PaginatorContract : ($items is AbstractCursorPaginator ? AbstractCursorPaginator : ($items is CursorPaginatorContract ? CursorPaginatorContract : ($items is DataCollection ? DataCollection<TCollectKey, TData> : ($items is CursorPaginator ? CursorPaginatedDataCollection<TCollectKey, TData> : ($items is Paginator ? PaginatedDataCollection<TCollectKey, TData> : DataCollection<TCollectKey, TData>)))))))))))))))))))
      */
     public function collect(

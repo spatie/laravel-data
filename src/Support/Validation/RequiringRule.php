@@ -2,6 +2,4 @@
 
 namespace Spatie\LaravelData\Support\Validation;
 
-interface RequiringRule
-{
-}
+interface RequiringRule {}

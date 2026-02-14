@@ -14,9 +14,11 @@ class AcceptedIf extends StringValidationAttribute
 
     public function __construct(
         string|FieldReference $field,
-        protected string|bool|int|float|BackedEnum|ExternalReference $value
+        protected string|bool|int|float|BackedEnum|ExternalReference $value,
+        array|string|null $context = null,
     ) {
         $this->field = $this->parseFieldReference($field);
+        $this->context = $context;
     }
 
     public static function keyword(): string

@@ -14,9 +14,13 @@ class Rule extends ValidationRule
     /** @var array<string|array|ValidationRule|RuleContract|InvokableRuleContract|ValidationRuleContract> */
     protected array $rules = [];
 
-    public function __construct(string|array|ValidationRule|RuleContract|InvokableRuleContract|ValidationRuleContract ...$rules)
-    {
-        $this->rules = $rules;
+    public function __construct(
+        string|array|ValidationRule|RuleContract|InvokableRuleContract|ValidationRuleContract ...$rules,
+    ) {
+        $extracted = $this->extractContextFromVariadicValues($rules);
+
+        $this->rules = $extracted['values'];
+        $this->context = $extracted['context'];
     }
 
     public function get(): array

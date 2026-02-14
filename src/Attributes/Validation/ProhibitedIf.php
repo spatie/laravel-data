@@ -17,10 +17,13 @@ class ProhibitedIf extends StringValidationAttribute
 
     public function __construct(
         string|FieldReference $field,
-        array|string|BackedEnum|ExternalReference ...$values
+        array|string|BackedEnum|ExternalReference ...$values,
     ) {
+        $extracted = $this->extractContextFromVariadicValues($values);
+
         $this->field = $this->parseFieldReference($field);
-        $this->values = Arr::flatten($values);
+        $this->values = Arr::flatten($extracted['values']);
+        $this->context = $extracted['context'];
     }
 
     public static function keyword(): string
