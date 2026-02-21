@@ -17,8 +17,8 @@ use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
-use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 /**
  * @return \Spatie\LaravelData\Support\DataProperty;
