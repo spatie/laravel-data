@@ -18,6 +18,7 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 
 /**
  * @return \Spatie\LaravelData\Support\DataProperty;
@@ -126,13 +127,13 @@ it('has support for rules that cannot be converted to string', function () {
     $rules = $this->inferrer->handle(
         $dataProperty,
         PropertyRules::create()->add(
-            new \Spatie\LaravelData\Attributes\Validation\Enum(new BaseEnum('SomeClass'))
+            new \Spatie\LaravelData\Attributes\Validation\Enum(new BaseEnum(DummyBackedEnum::class))
         ),
         new ValidationContext([], [], ValidationPath::create(null))
     );
 
     expect(app(RuleDenormalizer::class)->execute($rules->all(), ValidationPath::create()))->toEqualCanonicalizing([
-        'required', new BaseEnum('SomeClass'),
+        'required', new BaseEnum(DummyBackedEnum::class),
     ]);
 });
 

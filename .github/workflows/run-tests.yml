@@ -51,6 +51,11 @@ jobs:
           echo "::add-matcher::${{ runner.tool_cache }}/php.json"
           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
+      - name: Remove packages not supporting Laravel 13
+        if: matrix.laravel == '13.*'
+        run: |
+          composer remove --dev inertiajs/inertia-laravel livewire/livewire pestphp/pest-plugin-livewire spatie/laravel-typescript-transformer --no-interaction --no-update
+
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
