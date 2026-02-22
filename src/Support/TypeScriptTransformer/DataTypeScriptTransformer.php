@@ -14,6 +14,7 @@ use phpDocumentor\Reflection\Types\String_;
 use ReflectionClass;
 use ReflectionProperty;
 use RuntimeException;
+use Spatie\Attributes\Attributes;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Enums\DataTypeKind;
 use Spatie\LaravelData\Support\DataConfig;
@@ -67,7 +68,11 @@ class DataTypeScriptTransformer extends DtoTransformer
                     return $carry;
                 }
 
-                $isHidden = ! empty($property->getAttributes(Hidden::class));
+                $isHidden = Attributes::onProperty(
+                    $property->getDeclaringClass()->getName(),
+                    $property->getName(),
+                    Hidden::class,
+                ) !== null;
 
                 if ($isHidden) {
                     return $carry;

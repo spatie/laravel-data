@@ -26,6 +26,7 @@
         "illuminate/contracts": "^10.0|^11.0|^12.0|^13.0",
         "phpdocumentor/reflection": "^6.0",
         "spatie/laravel-package-tools": "^1.9.0",
+        "spatie/php-attribute-reader": "^1.0",
         "spatie/php-structure-discoverer": "^2.0"
     },
     "require-dev": {
