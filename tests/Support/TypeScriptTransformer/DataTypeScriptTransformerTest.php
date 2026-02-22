@@ -23,6 +23,12 @@ use Spatie\TypeScriptTransformer\Attributes\Hidden as TypeScriptHidden;
 use Spatie\TypeScriptTransformer\Attributes\Optional as TypeScriptOptional;
 use Spatie\TypeScriptTransformer\TypeScriptTransformerConfig;
 
+beforeEach(function () {
+    if (! class_exists(TypeScriptTransformerConfig::class)) {
+        $this->markTestSkipped('spatie/typescript-transformer is not installed');
+    }
+});
+
 function assertMatchesSnapshot($actual, ?Driver $driver = null): void
 {
     baseAssertMatchesSnapshot(str_replace('\\r\\n', '\\n', $actual), $driver);

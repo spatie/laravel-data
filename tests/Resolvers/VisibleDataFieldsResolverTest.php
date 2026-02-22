@@ -234,7 +234,7 @@ it('always transforms deferred inertia data to inertia deferred props', function
     };
 
     expect($dataClass::create('Freek')->toArray()['name'])->toBeInstanceOf(DeferProp::class);
-});
+})->skip(! class_exists(\Inertia\Inertia::class), 'Inertia is not installed');
 
 it('always transforms closure lazy into closures for inertia', function () {
     $dataClass = new class () extends Data {

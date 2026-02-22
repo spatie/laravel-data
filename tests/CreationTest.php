@@ -1525,7 +1525,7 @@ it('can create a data object with inertia deferred properties', function () {
     expect($data->all()['deferredWithGroup'])->toBeInstanceOf(DeferProp::class);
     expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
     expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
-});
+})->skip(! class_exists(\Inertia\Inertia::class), 'Inertia is not installed');
 
 it('can create a data object with inertia deferred closure', function () {
     $dataClass = new class () extends Data {
@@ -1552,7 +1552,7 @@ it('can create a data object with inertia deferred closure', function () {
     expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
     expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
 
-});
+})->skip(! class_exists(\Inertia\Inertia::class), 'Inertia is not installed');
 
 it('can create a data object with inertia deferred value', function () {
     $dataClass = new class () extends Data {
@@ -1578,7 +1578,7 @@ it('can create a data object with inertia deferred value', function () {
     expect($data->all()['deferredWithGroup'])->toBeInstanceOf(DeferProp::class);
     expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
     expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
-});
+})->skip(! class_exists(\Inertia\Inertia::class), 'Inertia is not installed');
 
 it('can use auto deferred to construct a inertia deferred property', function () {
     $dataClass = new class () extends Data {
@@ -1599,7 +1599,7 @@ it('can use auto deferred to construct a inertia deferred property', function ()
     expect($data->all()['deferredWithGroup'])->toBeInstanceOf(DeferProp::class);
     expect($data->all()['deferredWithGroup']())->toBe('Deferred Value');
     expect($data->all()['deferredWithGroup']->group())->toBe('deferred-group');
-});
+})->skip(! class_exists(\Inertia\Inertia::class), 'Inertia is not installed');
 
 it('can use class level auto deferred to construct a inertia deferred property', function () {
     #[AutoInertiaDeferred]
@@ -1613,7 +1613,7 @@ it('can use class level auto deferred to construct a inertia deferred property',
     expect($data->string)->toBeInstanceOf(InertiaDeferred::class);
     expect($data->all()['string'])->toBeInstanceOf(DeferProp::class);
     expect($data->all()['string']())->toBe('Deferred Value');
-});
+})->skip(! class_exists(\Inertia\Inertia::class), 'Inertia is not installed');
 
 describe('property-morphable creation tests', function () {
     enum TestPropertyMorphableEnum: string

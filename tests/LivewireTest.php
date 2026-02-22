@@ -36,6 +36,10 @@ it('works with livewire', function () {
 
 describe('synth tests', function () {
     beforeEach(function () {
+        if (! class_exists(LivewireServiceProvider::class)) {
+            $this->markTestSkipped('Livewire is not installed');
+        }
+
         app()->register(LivewireServiceProvider::class);
 
         Livewire::propertySynthesizer(LivewireDataSynth::class);
