@@ -17,6 +17,8 @@ use Spatie\LaravelData\Tests\Fakes\Livewire\NestedDataComponent;
 use Spatie\LaravelData\Tests\Fakes\Livewire\SimpleDataComponent;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
+uses()->group('livewire');
+
 it('works with livewire', function () {
     $class = new class ('') extends Data {
         use WireableData;
