@@ -33,7 +33,7 @@ trait ContextableData
                 }
 
                 foreach ($this->includeProperties() as $key => $value) {
-                    $includePartials->attach(Partial::fromMethodDefinedKeyAndValue($key, $value));
+                    $includePartials->offsetSet(Partial::fromMethodDefinedKeyAndValue($key, $value));
                 }
 
                 if (! empty($this->excludeProperties())) {
@@ -41,7 +41,7 @@ trait ContextableData
                 }
 
                 foreach ($this->excludeProperties() as $key => $value) {
-                    $excludePartials->attach(Partial::fromMethodDefinedKeyAndValue($key, $value));
+                    $excludePartials->offsetSet(Partial::fromMethodDefinedKeyAndValue($key, $value));
                 }
 
                 if (! empty($this->onlyProperties())) {
@@ -49,7 +49,7 @@ trait ContextableData
                 }
 
                 foreach ($this->onlyProperties() as $key => $value) {
-                    $onlyPartials->attach(Partial::fromMethodDefinedKeyAndValue($key, $value));
+                    $onlyPartials->offsetSet(Partial::fromMethodDefinedKeyAndValue($key, $value));
                 }
 
                 if (! empty($this->exceptProperties())) {
@@ -57,7 +57,7 @@ trait ContextableData
                 }
 
                 foreach ($this->exceptProperties() as $key => $value) {
-                    $exceptPartials->attach(Partial::fromMethodDefinedKeyAndValue($key, $value));
+                    $exceptPartials->offsetSet(Partial::fromMethodDefinedKeyAndValue($key, $value));
                 }
             }
 
