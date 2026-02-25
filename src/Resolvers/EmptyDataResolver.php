@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Resolvers;
 
+use Illuminate\Support\Arr;
 use Spatie\LaravelData\Concerns\EmptyData;
 use Spatie\LaravelData\Exceptions\DataPropertyCanOnlyHaveOneType;
 use Spatie\LaravelData\Support\DataConfig;
@@ -24,10 +25,14 @@ class EmptyDataResolver
         foreach ($dataClass->properties as $property) {
             $name = $property->outputMappedName ?? $property->name;
 
-            if ($property->hasDefaultValue) {
-                $payload[$name] = $property->defaultValue;
+            $value = $property->hasDefaultValue
+                ? $property->defaultValue
+                : ($extra[$property->name] ?? $this->getValueForProperty($property, $defaultReturnValue));
+
+            if ($property->expandDotNotation) {
+                Arr::set($payload, $name, $value);
             } else {
-                $payload[$name] = $extra[$property->name] ?? $this->getValueForProperty($property, $defaultReturnValue);
+                $payload[$name] = $value;
             }
         }
 

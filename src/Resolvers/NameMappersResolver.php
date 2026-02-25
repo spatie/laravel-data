@@ -26,6 +26,7 @@ class NameMappersResolver
         return [
             'inputNameMapper' => $this->resolveInputNameMapper($attributes),
             'outputNameMapper' => $this->resolveOutputNameMapper($attributes),
+            'expandDotNotation' => $this->resolveExpandDotNotation($attributes),
         ];
     }
 
@@ -93,5 +94,14 @@ class NameMappersResolver
         }
 
         return $this->resolveMapperClass($value);
+    }
+
+    protected function resolveExpandDotNotation(
+        DataAttributesCollection $attributes
+    ): bool {
+        $mapper = $attributes->first(MapOutputName::class)
+            ?? $attributes->first(MapName::class);
+
+        return $mapper->expandDotNotation ?? false;
     }
 }

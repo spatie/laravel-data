@@ -128,3 +128,48 @@ class DataObject extends Data
     }
 }
 ```
+
+### Dotted Notation Expansion
+
+By default, dotted notation in property names is kept as-is in TypeScript. You can expand it into nested interfaces using the same **four approaches** as in data transformation:
+
+```php
+class UserData extends Data
+{
+    public function __construct(
+        // 1. MapDotExpandedOutputName - output only
+        #[MapDotExpandedOutputName('user.profile.name')]
+        public string $name,
+        
+        // 2. MapDotExpandedName - input & output
+        #[MapDotExpandedName('user.profile.email')]
+        public string $email,
+        
+        // 3. MapOutputName with parameter - output only
+        #[MapOutputName('user.settings.theme', expandDotNotation: true)]
+        public string $theme,
+        
+        // 4. MapName with parameter - input & output
+        #[MapName('user.settings.language', expandDotNotation: true)]
+        public string $language,
+    ) {
+    }
+}
+```
+
+This generates nested TypeScript interfaces:
+
+```tsx
+{
+    user: {
+        profile: {
+            name: string;
+            email: string;
+        };
+        settings: {
+            theme: string;
+            language: string;
+        };
+    };
+}
+```

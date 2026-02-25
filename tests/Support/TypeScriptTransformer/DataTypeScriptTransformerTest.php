@@ -3,6 +3,8 @@
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Attributes\MapDotExpandedOutputName;
+use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\Data;
@@ -339,4 +341,67 @@ it('supports converting nullable types to optional properties', function () {
 
     expect($transformer->canTransform($reflection))->toBeTrue();
     assertMatchesSnapshot($transformer->transform($reflection, 'DataObject')->transformed);
+});
+
+it('handles dotted property names without expand', function () {
+    $config = TypeScriptTransformerConfig::create();
+
+    $data = new class ('hello', 'world') extends Data {
+        public function __construct(
+            #[MapOutputName('user.name')]
+            public string $userName,
+            #[MapOutputName('user.profile.bio')]
+            public string $userBio,
+        ) {
+        }
+    };
+
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass($data);
+
+    expect($transformer->canTransform($reflection))->toBeTrue();
+    $this->assertEquals(
+        <<<TXT
+        {
+        'user.name': string;
+        'user.profile.bio': string;
+        }
+        TXT,
+        $transformer->transform($reflection, 'DataObject')->transformed
+    );
+});
+
+it('handles dotted property names with expand', function () {
+    $config = TypeScriptTransformerConfig::create();
+
+    $data = new class ('hello', 'world', 'description') extends Data {
+        public function __construct(
+            #[MapDotExpandedOutputName('user.name')]
+            public string $userName,
+            #[MapName('user.profile.bio', expandDotNotation: true)]
+            public string $userBio,
+            #[MapOutputName('user.profile.description', expandDotNotation: true)]
+            public string $userDescription,
+        ) {
+        }
+    };
+
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass($data);
+
+    expect($transformer->canTransform($reflection))->toBeTrue();
+    $this->assertEquals(
+        <<<TXT
+        {
+        user: {
+        name: string;
+        profile: {
+        bio: string;
+        description: string;
+        };
+        };
+        }
+        TXT,
+        $transformer->transform($reflection, 'DataObject')->transformed
+    );
 });
