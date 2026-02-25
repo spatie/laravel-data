@@ -25,6 +25,7 @@ use Spatie\TypeScriptTransformer\Attributes\Optional as TypeScriptOptional;
 use Spatie\TypeScriptTransformer\Structures\MissingSymbolsCollection;
 use Spatie\TypeScriptTransformer\TypeProcessors\DtoCollectionTypeProcessor;
 use Spatie\TypeScriptTransformer\TypeProcessors\ReplaceDefaultsTypeProcessor;
+use Spatie\TypeScriptTransformer\TypeReflectors\TypeReflector;
 use Spatie\TypeScriptTransformer\Types\StructType;
 
 class DataTypeScriptTransformer extends DtoTransformer
@@ -111,6 +112,22 @@ class DataTypeScriptTransformer extends DtoTransformer
                 $missingSymbols,
                 ...$this->typeProcessors()
             );
+        }
+
+        if ($type = TypeReflector::new($property)->reflectionFromAttribute()) {
+            foreach ($this->typeProcessors() as $processor) {
+                $type = $processor->process(
+                    $type,
+                    $property,
+                    $missingSymbols
+                );
+                if ($type === null) {
+                    break;
+                }
+            }
+            if ($type !== null) {
+                return $type;
+            }
         }
 
         $collectionType = match ($dataProperty->type->kind) {
