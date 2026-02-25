@@ -1,0 +1,58 @@
+{
+    "data": [
+        {
+            "string": "Item 1"
+        },
+        {
+            "string": "Item 2"
+        },
+        {
+            "string": "Item 3"
+        },
+        {
+            "string": "Item 4"
+        },
+        {
+            "string": "Item 5"
+        },
+        {
+            "string": "Item 6"
+        },
+        {
+            "string": "Item 7"
+        },
+        {
+            "string": "Item 8"
+        },
+        {
+            "string": "Item 9"
+        },
+        {
+            "string": "Item 10"
+        },
+        {
+            "string": "Item 11"
+        },
+        {
+            "string": "Item 12"
+        },
+        {
+            "string": "Item 13"
+        },
+        {
+            "string": "Item 14"
+        },
+        {
+            "string": "Item 15"
+        }
+    ],
+    "links": [],
+    "meta": {
+        "path": "/",
+        "per_page": 15,
+        "next_cursor": "eyJfcG9pbnRzVG9OZXh0SXRlbXMiOnRydWV9",
+        "next_page_url": "/?cursor=eyJfcG9pbnRzVG9OZXh0SXRlbXMiOnRydWV9",
+        "prev_cursor": null,
+        "prev_page_url": null
+    }
+}
