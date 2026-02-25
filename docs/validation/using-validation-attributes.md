@@ -222,6 +222,54 @@ The rules will now look like this:
 ]
 ```
 
+## Using database constraints
+
+When using `Exists` and `Unique` validation attributes, you can add database constraints to validate against specific conditions:
+
+```php
+class UserData extends Data
+{
+    public function __construct(
+        #[Exists('users', where: new WhereConstraint('active', true))]
+        public int $user_id,
+        
+        #[Unique('users', 'email', where: new WhereNullConstraint('deleted_at'))]
+        public string $email,
+    ) {
+    }
+}
+```
+
+You can also combine multiple constraints:
+
+```php
+class ProductData extends Data
+{
+    public function __construct(
+        #[Unique('products', 'sku', where: [
+            new WhereConstraint('active', true),
+            new WhereInConstraint('type', ['physical', 'digital']),
+            new WhereNullConstraint('deleted_at'),
+        ])]
+        public string $sku,
+    ) {
+    }
+}
+```
+
+The following database constraints are available:
+
+- `WhereConstraint`
+- `WhereNotConstraint`
+- `WhereNullConstraint`
+- `WhereNotNullConstraint`
+- `WhereInConstraint`
+- `WhereNotInConstraint`
+
+All constraint parameters support `ExternalReference` objects for dynamic values.
+
+
+
 ## Rule attribute
 
 One special attribute is the `Rule` attribute. With it, you can write rules just like you would when creating a custom

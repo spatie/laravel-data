@@ -6,12 +6,16 @@ use Attribute;
 use Closure;
 use Exception;
 use Illuminate\Validation\Rules\Unique as BaseUnique;
+use Spatie\LaravelData\Attributes\Concerns\AppliesDatabaseConstraints;
 use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
+use Spatie\LaravelData\Support\Validation\Constraints\DatabaseConstraint;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Unique extends ObjectValidationAttribute
 {
+    use AppliesDatabaseConstraints;
+
     public function __construct(
         protected null|string|ExternalReference $table = null,
         protected null|string|ExternalReference $column = 'NULL',
@@ -20,7 +24,7 @@ class Unique extends ObjectValidationAttribute
         protected null|string|ExternalReference $ignoreColumn = null,
         protected bool|ExternalReference $withoutTrashed = false,
         protected string|ExternalReference $deletedAtColumn = 'deleted_at',
-        protected ?Closure $where = null,
+        protected null|Closure|DatabaseConstraint|array $where = null,
         protected ?BaseUnique $rule = null
     ) {
         if ($table === null && $rule === null) {
@@ -56,7 +60,7 @@ class Unique extends ObjectValidationAttribute
         }
 
         if ($this->where) {
-            $rule->where($this->where);
+            $this->applyDatabaseConstraints($rule, $this->where);
         }
 
         return $rule;

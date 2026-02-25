@@ -98,6 +98,12 @@ use Spatie\LaravelData\Attributes\Validation\Uppercase;
 use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Exceptions\CannotBuildValidationRule;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereInConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereNotConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereNotInConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereNotNullConstraint;
+use Spatie\LaravelData\Support\Validation\Constraints\WhereNullConstraint;
 use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 
@@ -865,6 +871,86 @@ function existsAttributes(): Generator
         expected: (new BaseExists('users', 'email'))->withoutTrashed('deleted_when'),
         expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'email'))->withoutTrashed('deleted_when'))
     );
+
+    yield fixature(
+        attribute: new Exists('users', 'id', where: new WhereConstraint('active', true)),
+        expected: (new BaseExists('users', 'id'))->where('active', true),
+        expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'id'))->where('active', true))
+    );
+
+    yield fixature(
+        attribute: new Exists('users', 'email', where: new WhereNotConstraint('name', 'Unlucky')),
+        expected: (new BaseExists('users', 'email'))->whereNot('name', 'Unlucky'),
+        expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'email'))->whereNot('name', 'Unlucky'))
+    );
+
+    yield fixature(
+        attribute: new Exists('users', 'id', where: new WhereInConstraint('role', ['admin', 'user'])),
+        expected: (new BaseExists('users', 'id'))->whereIn('role', ['admin', 'user']),
+        expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'id'))->whereIn('role', ['admin', 'user']))
+    );
+
+    yield fixature(
+        attribute: new Exists('users', 'id', where: new WhereNotInConstraint('status', ['banned', 'suspended'])),
+        expected: (new BaseExists('users', 'id'))->whereNotIn('status', ['banned', 'suspended']),
+        expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'id'))->whereNotIn('status', ['banned', 'suspended']))
+    );
+
+    yield fixature(
+        attribute: new Exists('users', 'id', where: new WhereNotNullConstraint('email_verified_at')),
+        expected: (new BaseExists('users', 'id'))->whereNotNull('email_verified_at'),
+        expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'id'))->whereNotNull('email_verified_at'))
+    );
+
+    yield fixature(
+        attribute: new Exists('users', 'id', where: [
+            new WhereConstraint('active', true),
+            new WhereNotConstraint('name', 'Unlucky'),
+            new WhereInConstraint('role', ['admin', 'user']),
+            new WhereNotInConstraint('status', ['banned', 'suspended']),
+            new WhereNullConstraint('deleted_at'),
+            new WhereNotNullConstraint('email_verified_at'),
+        ]),
+        expected: (new BaseExists('users', 'id'))
+            ->where('active', true)
+            ->whereNot('name', 'Unlucky')
+            ->whereIn('role', ['admin', 'user'])
+            ->whereNotIn('status', ['banned', 'suspended'])
+            ->whereNull('deleted_at')
+            ->whereNotNull('email_verified_at'),
+        expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'id'))
+            ->where('active', true)
+            ->whereNot('name', 'Unlucky')
+            ->whereIn('role', ['admin', 'user'])
+            ->whereNotIn('status', ['banned', 'suspended'])
+            ->whereNull('deleted_at')
+            ->whereNotNull('email_verified_at'))
+    );
+
+    yield fixature(
+        attribute: new Exists('users', 'id', where: [
+            new WhereConstraint('active', true),
+            $closure,
+        ]),
+        expected: (new BaseExists('users', 'id'))
+            ->where('active', true)
+            ->where($closure),
+        expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'id'))
+            ->where('active', true)
+            ->where($closure))
+    );
+
+    yield fixature(
+        attribute: new Exists('users', 'id', where: []),
+        expected: new BaseExists('users', 'id'),
+        expectCreatedAttribute: new Exists(rule: new BaseExists('users', 'id'))
+    );
+
+    yield fixature(
+        attribute: new Exists('users', 'id', where: ['fake']),
+        expected: '',
+        exception: InvalidArgumentException::class,
+    );
 }
 
 function inAttributes(): Generator
@@ -1247,5 +1333,94 @@ function uniqueAttributes(): Generator
         attribute: new Unique('users', 'email', where: $closure),
         expected: (new BaseUnique('users', 'email'))->where($closure),
         expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->where($closure))
+    );
+
+    yield fixature(
+        attribute: new Unique('users', 'email', where: new WhereConstraint('active', true)),
+        expected: (new BaseUnique('users', 'email'))->where('active', true),
+        expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->where('active', true))
+    );
+    
+    yield fixature(
+        attribute: new Unique('users', 'email', where: new WhereNotConstraint('name', 'Unlucky')),
+        expected: (new BaseUnique('users', 'email'))->whereNot('name', 'Unlucky'),
+        expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->whereNot('name', 'Unlucky'))
+    );
+
+    yield fixature(
+        attribute: new Unique('users', 'email', where: [
+            new WhereConstraint('active', true),
+            new WhereNullConstraint('deleted_at'),
+        ]),
+        expected: (new BaseUnique('users', 'email'))->where('active', true)->whereNull('deleted_at'),
+        expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->where('active', true)->whereNull('deleted_at'))
+    );
+
+    yield fixature(
+        attribute: new Unique('users', 'email', where: new WhereInConstraint('role', ['admin', 'user'])),
+        expected: (new BaseUnique('users', 'email'))->whereIn('role', ['admin', 'user']),
+        expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->whereIn('role', ['admin', 'user']))
+    );
+
+    yield fixature(
+        attribute: new Unique('users', 'email', where: new WhereNotInConstraint('status', ['banned', 'suspended'])),
+        expected: (new BaseUnique('users', 'email'))->whereNotIn('status', ['banned', 'suspended']),
+        expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->whereNotIn('status', ['banned', 'suspended']))
+    );
+
+    yield fixature(
+        attribute: new Unique('users', 'email', where: new WhereNotNullConstraint('email_verified_at')),
+        expected: (new BaseUnique('users', 'email'))->whereNotNull('email_verified_at'),
+        expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->whereNotNull('email_verified_at'))
+    );
+
+    yield fixature(
+        attribute: new Unique('users', 'email', where: [
+            new WhereConstraint('active', true),
+            new WhereNotConstraint('name', 'Unlucky'),
+            new WhereInConstraint('role', ['admin', 'user']),
+            new WhereNotInConstraint('status', ['banned', 'suspended']),
+            new WhereNullConstraint('deleted_at'),
+            new WhereNotNullConstraint('email_verified_at'),
+        ]),
+        expected: (new BaseUnique('users', 'email'))
+            ->where('active', true)
+            ->whereNot('name', 'Unlucky')
+            ->whereIn('role', ['admin', 'user'])
+            ->whereNotIn('status', ['banned', 'suspended'])
+            ->whereNull('deleted_at')
+            ->whereNotNull('email_verified_at'),
+        expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))
+            ->where('active', true)
+            ->whereNot('name', 'Unlucky')
+            ->whereIn('role', ['admin', 'user'])
+            ->whereNotIn('status', ['banned', 'suspended'])
+            ->whereNull('deleted_at')
+            ->whereNotNull('email_verified_at'))
+    );
+
+    yield fixature(
+        attribute: new Unique('users', 'email', where: [
+            new WhereConstraint('active', true),
+            $closure,
+        ]),
+        expected: (new BaseUnique('users', 'email'))
+            ->where('active', true)
+            ->where($closure),
+        expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))
+            ->where('active', true)
+            ->where($closure))
+    );
+
+    yield fixature(
+        attribute: new Unique('users', 'email', where: []),
+        expected: new BaseUnique('users', 'email'),
+        expectCreatedAttribute: new Unique(rule: new BaseUnique('users', 'email'))
+    );
+
+    yield fixature(
+        attribute: new Unique('users', 'email', where: ['fake']),
+        expected: '',
+        exception: InvalidArgumentException::class,
     );
 }
