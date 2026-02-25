@@ -32,7 +32,7 @@ class In extends ObjectValidationAttribute
         }
 
         $this->values = array_map(
-            fn (string|ExternalReference $value) => $this->normalizePossibleExternalReferenceParameter($value),
+            fn (mixed $value) => $this->normalizePossibleExternalReferenceParameter($value),
             Arr::flatten($this->values)
         );
 
