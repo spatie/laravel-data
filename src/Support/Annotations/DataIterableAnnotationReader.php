@@ -2,13 +2,21 @@
 
 namespace Spatie\LaravelData\Support\Annotations;
 
-use Illuminate\Support\Arr;
 use phpDocumentor\Reflection\FqsenResolver;
+use phpDocumentor\Reflection\Type;
+use phpDocumentor\Reflection\TypeResolver;
+use phpDocumentor\Reflection\Types\AbstractList;
+use phpDocumentor\Reflection\Types\Compound;
+use phpDocumentor\Reflection\Types\Nullable;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Resolvers\ContextResolver;
+use Spatie\LaravelData\Support\Annotations\PhpDocumentorTypes\ArrayWithoutMixedDefault;
+use Spatie\LaravelData\Support\Annotations\PhpDocumentorTypes\IterableWithoutMixedDefault;
 
 /**
  * @note To myself, always use the fully qualified class names in pest tests when using anonymous classes
@@ -20,21 +28,26 @@ class DataIterableAnnotationReader
     ) {
     }
 
-    /** @return array<string, DataIterableAnnotation> */
+    /** @return array<string, DataIterableAnnotation[]> */
     public function getForClass(ReflectionClass $class): array
     {
-        return collect($this->get($class))->keyBy(fn (DataIterableAnnotation $annotation) => $annotation->property)->all();
+        return collect($this->get($class))
+            ->groupBy(fn (DataIterableAnnotation $annotation) => $annotation->property)
+            ->toArray();
     }
 
-    public function getForProperty(ReflectionProperty $property): ?DataIterableAnnotation
+    /** @return DataIterableAnnotation[] */
+    public function getForProperty(ReflectionProperty $property): array
     {
-        return Arr::first($this->get($property));
+        return $this->get($property);
     }
 
-    /** @return array<string, DataIterableAnnotation> */
+    /** @return array<string, DataIterableAnnotation[]> */
     public function getForMethod(ReflectionMethod $method): array
     {
-        return collect($this->get($method))->keyBy(fn (DataIterableAnnotation $annotation) => $annotation->property)->all();
+        return collect($this->get($method))
+            ->groupBy(fn (DataIterableAnnotation $annotation) => $annotation->property)
+            ->toArray();
     }
 
     /** @return DataIterableAnnotation[] */
@@ -42,155 +55,104 @@ class DataIterableAnnotationReader
         ReflectionProperty|ReflectionClass|ReflectionMethod $reflection
     ): array {
         $comment = $reflection->getDocComment();
-
         if ($comment === false) {
             return [];
         }
 
-        $comment = str_replace('?', '', $comment);
-
-        $kindPattern = '(?:@property|@var|@param)\s*';
-        $fqsenPattern = '[\\\\\\p{L}0-9_\|]+';
-        $typesPattern = '[\\\\\\p{L}0-9_\\|\\[\\]]+';
-        $keyPattern = '(?<key>int|string|int\|string|string\|int|array-key)';
-        $parameterPattern = '\s*\$?(?<parameter>[\\p{L}0-9_]+)?';
-
-        preg_match_all(
-            "/{$kindPattern}(?<types>{$typesPattern}){$parameterPattern}/ui",
-            $comment,
-            $arrayMatches,
-        );
-
-        preg_match_all(
-            "/{$kindPattern}(?<collectionClass>{$fqsenPattern})<(?:{$keyPattern}\s*?,\s*?)?(?<dataClass>{$fqsenPattern})>(?:{$typesPattern})*{$parameterPattern}/ui",
-            $comment,
-            $collectionMatches,
-        );
-
-        return [
-            ...$this->resolveArrayAnnotations($reflection, $arrayMatches),
-            ...$this->resolveCollectionAnnotations($reflection, $collectionMatches),
-        ];
-    }
-
-    protected function resolveArrayAnnotations(
-        ReflectionProperty|ReflectionClass|ReflectionMethod $reflection,
-        array $arrayMatches
-    ): array {
-        $annotations = [];
-
-        foreach ($arrayMatches['types'] as $index => $types) {
-            $parameter = $arrayMatches['parameter'][$index];
-
-            $arrayType = Arr::first(
-                explode('|', $types),
-                fn (string $type) => str_contains($type, '[]'),
-            );
-
-            if (empty($arrayType)) {
-                continue;
-            }
-
-            $resolvedTuple = $this->resolveDataClass(
-                $reflection,
-                str_replace('[]', '', $arrayType)
-            );
-
-            $annotations[] = new DataIterableAnnotation(
-                type: $resolvedTuple['type'],
-                isData: $resolvedTuple['isData'],
-                property: empty($parameter) ? null : $parameter
-            );
+        $hasType = preg_match_all('/(?:@var|@param|@property(?:-read)?)(.+)/uim', $comment, $matches);
+        if (! $hasType) {
+            return [];
         }
 
-        return $annotations;
-    }
-
-    protected function resolveCollectionAnnotations(
-        ReflectionProperty|ReflectionClass|ReflectionMethod $reflection,
-        array $collectionMatches
-    ): array {
         $annotations = [];
+        foreach ($matches[1] as $match) {
+            [$valueTypeString, $propertyName] = explode('$', $match, 2) + [1 => null];
+            // See https://www.php.net/manual/en/language.variables.basics.php
+            empty($propertyName) or $propertyName = preg_split('/[^a-z0-9_]/i', $propertyName, 2)[0];
 
-        foreach ($collectionMatches['dataClass'] as $index => $dataClass) {
-            $parameter = $collectionMatches['parameter'][$index];
-            $key = $collectionMatches['key'][$index];
+            $type = tap(new TypeResolver(), function (TypeResolver $t) {
+                $t->addKeyword('array', ArrayWithoutMixedDefault::class);
+                $t->addKeyword('iterable', IterableWithoutMixedDefault::class);
+            })->resolve($valueTypeString);
 
-            $resolvedTuple = $this->resolveDataClass($reflection, $dataClass);
+            $getKeyTypeWithoutDefault = static function (AbstractList $type): ?Type {
+                return(new class ($type) extends AbstractList {
+                    public function __construct(AbstractList $victim)
+                    {
+                        parent::__construct($victim->valueType, $victim->keyType);
+                    }
+                    public function getKeyTypeWithoutDefault(): ?Type
+                    {
+                        return $this->keyType;
+                    }
+                })->getKeyTypeWithoutDefault();
+            };
 
-            $annotations[] = new DataIterableAnnotation(
-                type: $resolvedTuple['type'],
-                isData: $resolvedTuple['isData'],
-                keyType: empty($key) ? 'array-key' : $key,
-                property: empty($parameter) ? null : $parameter
-            );
-        }
+            /** @return string[] */
+            $getValueTypeStrings = static function (Type $type, ?Type $key) use ($getKeyTypeWithoutDefault, &$getValueTypeStrings): array {
+                if ($type instanceof Compound) {
+                    return array_merge(...array_map(fn (Type $t) => $getValueTypeStrings($t, $key), iterator_to_array($type)));
+                } elseif ($type instanceof ArrayWithoutMixedDefault || $type instanceof IterableWithoutMixedDefault) {
+                    return $type->getOriginalValueType() === null
+                        ? [[(string) $type, $key === null ? 'array-key' : (string) $key]]
+                        : $getValueTypeStrings($type->getOriginalValueType(), $getKeyTypeWithoutDefault($type));
+                } elseif ($type instanceof AbstractList) {
+                    return $getValueTypeStrings($type->getValueType(), $getKeyTypeWithoutDefault($type));
+                } elseif ($type instanceof Nullable) {
+                    return $getValueTypeStrings($type->getActualType(), $key);
+                } else {
+                    return [[(string) $type, $key === null ? 'array-key' : (string) $key]];
+                }
+            };
 
-        return $annotations;
-    }
+            $valueTypeStrings = $getValueTypeStrings($type, null);
+            foreach ($valueTypeStrings as [$valueTypeString, $keyString]) {
+                $valueTypeString = ltrim($valueTypeString, '\\');
+                if (is_subclass_of($valueTypeString, BaseData::class)) {
+                    $annotations[] = new DataIterableAnnotation(
+                        type: $valueTypeString,
+                        isData: true,
+                        keyType: $keyString,
+                        property: $propertyName,
+                    );
 
-    /**
-     * @return array{type: string, isData: bool}
-     */
-    protected function resolveDataClass(
-        ReflectionProperty|ReflectionClass|ReflectionMethod $reflection,
-        string $class
-    ): array {
-        if (str_contains($class, '|')) {
-            $possibleNonDataType = null;
-
-            foreach (explode('|', $class) as $explodedClass) {
-                $resolvedTuple = $this->resolveDataClass($reflection, $explodedClass);
-
-                if ($resolvedTuple['isData']) {
-                    return $resolvedTuple;
+                    continue;
                 }
 
-                $possibleNonDataType = $resolvedTuple['type'];
+                static $ignoredClasses = [Lazy::class, Optional::class];
+
+                try {
+                    $fcqn = $this->resolveFcqn($reflection, $valueTypeString);
+                } catch (\InvalidArgumentException $e) {
+                    $fcqn = null;
+                }
+                if (class_exists($fcqn)) {
+                    if (! in_array($fcqn, $ignoredClasses) && ! array_any($ignoredClasses, fn ($ignoredClass) => is_subclass_of($fcqn, $ignoredClass))) {
+                        $annotations[] = new DataIterableAnnotation(
+                            type: $fcqn,
+                            isData: is_subclass_of($fcqn, BaseData::class),
+                            keyType: $keyString,
+                            property: $propertyName,
+                        );
+                    }
+
+                    continue;
+                }
+
+                if (! in_array($valueTypeString, $ignoredClasses) && ! array_any($ignoredClasses, fn ($ignoredClass) => is_subclass_of($valueTypeString, $ignoredClass))) {
+                    $annotations[] = new DataIterableAnnotation(
+                        type: $valueTypeString,
+                        isData: false,
+                        keyType: $keyString,
+                        property: $propertyName,
+                    );
+                }
             }
-
-            return [
-                'type' => $possibleNonDataType,
-                'isData' => false,
-            ];
         }
 
-        if (in_array($class, ['int', 'string', 'bool', 'float', 'array', 'object', 'callable', 'iterable', 'mixed'])) {
-            return [
-                'type' => $class,
-                'isData' => false,
-            ];
-        }
+        usort($annotations, fn (DataIterableAnnotation $a, DataIterableAnnotation $b) => $b->isData <=> $a->isData);
 
-        $class = ltrim($class, '\\');
-
-        if (is_subclass_of($class, BaseData::class)) {
-            return [
-                'type' => $class,
-                'isData' => true,
-            ];
-        }
-
-        $fcqn = $this->resolveFcqn($reflection, $class);
-
-        if (is_subclass_of($fcqn, BaseData::class)) {
-            return [
-                'type' => $fcqn,
-                'isData' => true,
-            ];
-        }
-
-        if (class_exists($fcqn)) {
-            return [
-                'type' => $fcqn,
-                'isData' => false,
-            ];
-        }
-
-        return [
-            'type' => $class,
-            'isData' => false,
-        ];
+        return $annotations;
     }
 
     protected function resolveFcqn(

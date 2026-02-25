@@ -44,7 +44,7 @@ class CollectionDataAnnotationsData
     public DataCollection $propertyH;
 
     /** @var SimpleData */
-    public DataCollection $propertyI; // FAIL
+    public DataCollection $propertyI;
 
     public DataCollection $propertyJ;
 
@@ -80,7 +80,7 @@ class CollectionDataAnnotationsData
     public ?array $propertyW;
 
     /**
-     * @param \Spatie\LaravelData\Tests\Fakes\SimpleData[]|null $paramA
+     * @param \Spatie\LaravelData\Tests\Fakes\SimpleData[]|null $paramA with some text
      * @param null|\Spatie\LaravelData\Tests\Fakes\SimpleData[] $paramB
      * @param  ?\Spatie\LaravelData\Tests\Fakes\SimpleData[] $paramC
      * @param ?\Spatie\LaravelData\Tests\Fakes\SimpleData[] $paramD

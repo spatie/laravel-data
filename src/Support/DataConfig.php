@@ -59,6 +59,7 @@ class DataConfig
 
     public function getDataClass(string $class): DataClass
     {
+        $class = explode('|', $class)[0];
         return $this->dataClasses[$class] ??= DataContainer::get()->dataClassFactory()->build(new ReflectionClass($class));
     }
 
