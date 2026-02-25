@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.20.0 - 2026-02-25
+
+- Laravel 13 support
+- Livewire 4 support
+- Dropped PHP 8.1 support
+
 ## 4.19.1 - 2026-01-28
 
 ### What's Changed
@@ -208,6 +214,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -218,6 +225,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -259,6 +267,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
