@@ -11,9 +11,13 @@ class MimeTypes extends StringValidationAttribute
 {
     protected array $mimeTypes;
 
-    public function __construct(string|array|ExternalReference ...$mimeTypes)
-    {
-        $this->mimeTypes = Arr::flatten($mimeTypes);
+    public function __construct(
+        string|array|ExternalReference ...$mimeTypes,
+    ) {
+        $extracted = $this->extractContextFromVariadicValues($mimeTypes);
+
+        $this->mimeTypes = Arr::flatten($extracted['values']);
+        $this->context = $extracted['context'];
     }
 
     public static function keyword(): string

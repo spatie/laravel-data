@@ -10,10 +10,14 @@ use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 class Distinct extends StringValidationAttribute
 {
     public const Strict = 'strict';
+
     public const IgnoreCase = 'ignore_case';
 
-    public function __construct(protected null|string|ExternalReference $mode = null)
-    {
+    public function __construct(
+        protected null|string|ExternalReference $mode = null,
+        array|string|null $context = null,
+    ) {
+        $this->context = $context;
     }
 
     public static function keyword(): string

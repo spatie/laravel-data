@@ -11,9 +11,13 @@ class DateFormat extends StringValidationAttribute
 {
     protected string|array $format;
 
-    public function __construct(string|array|ExternalReference ...$format)
-    {
-        $this->format = Arr::flatten($format);
+    public function __construct(
+        string|array|ExternalReference ...$format,
+    ) {
+        $extracted = $this->extractContextFromVariadicValues($format);
+
+        $this->format = Arr::flatten($extracted['values']);
+        $this->context = $extracted['context'];
     }
 
     public static function keyword(): string

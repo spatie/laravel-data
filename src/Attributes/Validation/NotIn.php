@@ -15,9 +15,13 @@ class NotIn extends ObjectValidationAttribute
 
     protected array $values;
 
-    public function __construct(array|string|BaseNotIn|ExternalReference ...$values)
-    {
-        $this->values = $values;
+    public function __construct(
+        array|string|BaseNotIn|ExternalReference ...$values,
+    ) {
+        $extracted = $this->extractContextFromVariadicValues($values);
+
+        $this->values = $extracted['values'];
+        $this->context = $extracted['context'];
     }
 
     public function getRule(ValidationPath $path): object|string
@@ -35,7 +39,7 @@ class NotIn extends ObjectValidationAttribute
             Arr::flatten($this->values)
         );
 
-        return  new BaseNotIn($this->values);
+        return new BaseNotIn($this->values);
     }
 
     public static function keyword(): string
