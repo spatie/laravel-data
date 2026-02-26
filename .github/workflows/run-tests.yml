@@ -9,8 +9,8 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-latest]
-        php: [8.1, 8.2, 8.3, 8.4, 8.5]
-        laravel: [10.*, 11.*, 12.*]
+        php: [8.2, 8.3, 8.4, 8.5]
+        laravel: [10.*, 11.*, 12.*, 13.*]
         stability: [prefer-lowest, prefer-stable]
         include:
           - laravel: 10.*
@@ -19,17 +19,17 @@ jobs:
             testbench: ^9.16
           - laravel: 12.*
             testbench: ^10.9
+          - laravel: 13.*
+            testbench: ^11.0
         exclude:
-          - php: 8.1
-            laravel: 11.*
-          - php: 8.1
-            laravel: 12.*
           - php: 8.2
             laravel: 12.*
           - php: 8.4
             laravel: 10.*
           - php: 8.5
             laravel: 11.*
+          - php: 8.2
+            laravel: 13.*
           - php: 8.5
             laravel: 10.*
 
@@ -51,10 +51,14 @@ jobs:
           echo "::add-matcher::${{ runner.tool_cache }}/php.json"
           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
+      - name: Remove Livewire
+        if: startsWith(matrix.laravel, '13.')
+        run: composer remove livewire/livewire pestphp/pest-plugin-livewire --dev --no-interaction --no-update
+
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: Execute tests
-        run: vendor/bin/pest --enforce-time-limit --fail-on-risky
+        run: vendor/bin/pest --enforce-time-limit --fail-on-risky ${{ startsWith(matrix.laravel, '13.') && '--exclude-group=livewire' || '' }}
