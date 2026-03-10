@@ -27,7 +27,7 @@ class EmptyDataResolver
             if ($property->hasDefaultValue) {
                 $payload[$name] = $property->defaultValue;
             } else {
-                $payload[$name] = $extra[$property->name] ?? $this->getValueForProperty($property, $defaultReturnValue);
+                $payload[$name] = array_key_exists($property->name, $extra) ? $extra[$property->name] : $this->getValueForProperty($property, $defaultReturnValue);
             }
         }
 
