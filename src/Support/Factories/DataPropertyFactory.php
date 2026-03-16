@@ -75,7 +75,11 @@ class DataPropertyFactory
             $autoLazy = $classAutoLazy;
         }
 
-        $computed = $attributes->has(Computed::class);
+        $computed =
+            $attributes->has(Computed::class) ||
+            /** @phpstan-ignore function.alreadyNarrowedType (`isVirtual()` doesn't exist in PHP versions earlier than 8.4) */
+            (method_exists($reflectionProperty, 'isVirtual') &&
+                $reflectionProperty->isVirtual());
 
         return new DataProperty(
             name: $reflectionProperty->name,

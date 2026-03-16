@@ -13,9 +13,6 @@ use Illuminate\Validation\ValidationException;
 use Inertia\DeferProp;
 use Inertia\Inertia;
 use Inertia\LazyProp;
-
-use function Pest\Laravel\postJson;
-
 use Spatie\LaravelData\Attributes\AutoClosureLazy;
 use Spatie\LaravelData\Attributes\AutoInertiaDeferred;
 use Spatie\LaravelData\Attributes\AutoInertiaLazy;
@@ -73,7 +70,10 @@ use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithFullNameVirtualProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
+
+use function Pest\Laravel\postJson;
 
 it('can use default types to create data objects', function () {
     $data = ComplicatedData::from([
@@ -727,6 +727,33 @@ it('can have a computed value when creating the data object', function () {
     expect(fn () => $dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Ruben Versieck']))
         ->toThrow(CannotSetComputedValue::class);
 });
+
+it('can have a virtual property when creating the data object', function () {
+    expect(SimpleDataWithFullNameVirtualProperty::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Something to Be Ignored']))
+        ->first_name->toBe('Ruben')
+        ->last_name->toBe('Van Assche')
+        ->full_name->toBe('Ruben Van Assche');
+
+    expect(SimpleDataWithFullNameVirtualProperty::validateAndCreate(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Something to Be Ignored']))
+        ->first_name->toBe('Ruben')
+        ->last_name->toBe('Van Assche')
+        ->full_name->toBe('Ruben Van Assche');
+
+    config()->set('data.features.ignore_exception_when_trying_to_set_computed_property_value', false);
+
+    expect(SimpleDataWithFullNameVirtualProperty::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche']))
+        ->first_name->toBe('Ruben')
+        ->last_name->toBe('Van Assche')
+        ->full_name->toBe('Ruben Van Assche');
+
+    expect(SimpleDataWithFullNameVirtualProperty::validateAndCreate(['first_name' => 'Ruben', 'last_name' => 'Van Assche']))
+        ->first_name->toBe('Ruben')
+        ->last_name->toBe('Van Assche')
+        ->full_name->toBe('Ruben Van Assche');
+
+    expect(fn () => SimpleDataWithFullNameVirtualProperty::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Ruben Versieck']))
+        ->toThrow(CannotSetComputedValue::class);
+})->skipOnPhp('<8.4');
 
 it('can have a nullable computed value', function () {
     $dataObject = new class ('', '') extends Data {
