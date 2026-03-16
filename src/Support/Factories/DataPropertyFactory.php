@@ -75,11 +75,10 @@ class DataPropertyFactory
             $autoLazy = $classAutoLazy;
         }
 
-        $computed =
-            $attributes->has(Computed::class) ||
-            /** @phpstan-ignore function.alreadyNarrowedType (`isVirtual()` doesn't exist in PHP versions earlier than 8.4) */
-            (method_exists($reflectionProperty, 'isVirtual') &&
-                $reflectionProperty->isVirtual());
+        /** @phpstan-ignore function.alreadyNarrowedType (`isVirtual()` doesn't exist in PHP versions earlier than 8.4) */
+        $isVirtual = method_exists($reflectionProperty, 'isVirtual') && $reflectionProperty->isVirtual();
+
+        $computed = $attributes->has(Computed::class) || $isVirtual;
 
         return new DataProperty(
             name: $reflectionProperty->name,
@@ -90,6 +89,7 @@ class DataPropertyFactory
             hidden: $attributes->has(Hidden::class),
             isPromoted: $reflectionProperty->isPromoted(),
             isReadonly: $reflectionProperty->isReadOnly(),
+            isVirtual: $isVirtual,
             morphable: $attributes->has(PropertyForMorph::class),
             autoLazy: $autoLazy,
             hasDefaultValue: $hasDefaultValue,
