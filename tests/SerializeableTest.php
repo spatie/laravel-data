@@ -7,6 +7,8 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\Lazy\DefaultLazy;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithBackedProperty;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithVirtualProperty;
 
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
@@ -42,6 +44,33 @@ it('can serialize and unserialize a data object with additional data', function 
     expect($unserialized->string)->toEqual('Hello world');
     expect($unserialized->getAdditionalData())->toEqual(['int' => 69]);
 });
+
+it('can serialize and unserialize a data object with virtual properties', function () {
+    $object = new SimpleDataWithVirtualProperty();
+
+    $serialized = serialize($object);
+
+    assertMatchesSnapshot($serialized);
+
+    $unserialized = unserialize($serialized);
+
+    expect($unserialized)->toBeInstanceOf(SimpleDataWithVirtualProperty::class);
+    expect($unserialized->string)->toEqual($object->string);
+})->skipOnPhp('<8.4');
+
+it('can serialize and unserialize a data object with backed properties', function () {
+    $object = new SimpleDataWithBackedProperty();
+    $object->string = 'Hello world';
+
+    $serialized = serialize($object);
+
+    assertMatchesSnapshot($serialized);
+
+    $unserialized = unserialize($serialized);
+
+    expect($unserialized)->toBeInstanceOf(SimpleDataWithBackedProperty::class);
+    expect($unserialized->string)->toEqual($object->string);
+})->skipOnPhp('<8.4');
 
 it('can serialize and unserialize a data collection', function () {
     $collection = new DataCollection(SimpleData::class, ['A', 'B']);

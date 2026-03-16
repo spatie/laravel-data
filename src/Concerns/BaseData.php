@@ -88,6 +88,7 @@ trait BaseData
 
         return $dataClass
             ->properties
+            ->reject(fn (DataProperty $property) => $property->isVirtual)
             ->map(fn (DataProperty $property) => $property->name)
             ->when($dataClass->appendable, fn (Collection $properties) => $properties->push('_additional'))
             ->when(property_exists($this, '_dataContext'), fn (Collection $properties) => $properties->push('_dataContext'))
