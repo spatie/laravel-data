@@ -6,13 +6,15 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\ValidateableData;
+use Spatie\LaravelData\Support\Creation\CreationContext;
 
 class ValidatedPayloadResolver
 {
     /** @param class-string<ValidateableData&BaseData> $dataClass */
     public function execute(
         string $dataClass,
-        Validator $validator
+        Validator $validator,
+        ?CreationContext $context = null,
     ): array {
         try {
             $validator->validate();
