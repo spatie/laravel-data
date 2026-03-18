@@ -21,8 +21,9 @@ class Password extends ObjectValidationAttribute
         protected int|ExternalReference $uncompromisedThreshold = 0,
         protected bool|ExternalReference $default = false,
         protected ?BasePassword $rule = null,
+        array|string|null $context = null,
     ) {
-
+        $this->context = $context;
     }
 
     public function getRule(ValidationPath $path): object|string

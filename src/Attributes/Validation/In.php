@@ -16,9 +16,12 @@ class In extends ObjectValidationAttribute
     private array $values;
 
     public function __construct(
-        array|string|BaseIn|ExternalReference ...$values
+        array|string|BaseIn|ExternalReference ...$values,
     ) {
-        $this->values = $values;
+        $extracted = $this->extractContextFromVariadicValues($values);
+
+        $this->values = $extracted['values'];
+        $this->context = $extracted['context'];
     }
 
     public function getRule(ValidationPath $path): object|string

@@ -17,13 +17,15 @@ class RequiredUnless extends StringValidationAttribute implements RequiringRule
     protected string|array $values;
 
     public function __construct(
-        string|FieldReference                                $field,
-        null|array|string|BackedEnum|ExternalReference ...$values
+        string|FieldReference $field,
+        null|array|string|BackedEnum|ExternalReference ...$values,
     ) {
-        $this->field = $this->parseFieldReference($field);
-        $this->values = Arr::flatten($values);
-    }
+        $extracted = $this->extractContextFromVariadicValues($values);
 
+        $this->field = $this->parseFieldReference($field);
+        $this->values = Arr::flatten($extracted['values']);
+        $this->context = $extracted['context'];
+    }
 
     public static function keyword(): string
     {
