@@ -52,4 +52,43 @@ class ValidationPath implements Stringable
     {
         return $this->get();
     }
+
+    public function containsWildcards(): bool
+    {
+        return in_array('*', $this->path, true);
+    }
+
+    /**
+     * @param array $fullPayload
+     * @return array<array-key,self>
+     */
+    public function matchingWildcardPayloadValidationPaths(array $fullPayload): array
+    {
+        return $this->expandPath($this->path, $fullPayload);
+    }
+
+    protected function expandPath(array $remainingSegments, mixed $payload, array $resolvedSegments = []): array
+    {
+        if (empty($remainingSegments)) {
+            return [new self($resolvedSegments)];
+        }
+
+        $segment = array_shift($remainingSegments);
+
+        if ($segment === '*') {
+            $results = [];
+            foreach (array_keys($payload) as $key) {
+                $child = $payload[$key] ?? [];
+                array_push($results, ...$this->expandPath($remainingSegments, $child, array_merge($resolvedSegments, [$key])));
+            }
+
+            return $results;
+        }
+
+        if (array_key_exists($segment, $payload)) {
+            return $this->expandPath($remainingSegments, $payload[$segment], array_merge($resolvedSegments, [$segment]));
+        }
+
+        return [];
+    }
 }
