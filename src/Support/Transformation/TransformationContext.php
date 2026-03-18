@@ -43,7 +43,7 @@ class TransformationContext implements Stringable
         }
 
         foreach ($partials as $partial) {
-            $this->includePartials->attach($partial);
+            $this->includePartials->offsetSet($partial);
         }
     }
 
@@ -54,7 +54,7 @@ class TransformationContext implements Stringable
         }
 
         foreach ($partials as $partial) {
-            $this->excludePartials->attach($partial);
+            $this->excludePartials->offsetSet($partial);
         }
     }
 
@@ -65,7 +65,7 @@ class TransformationContext implements Stringable
         }
 
         foreach ($partials as $partial) {
-            $this->onlyPartials->attach($partial);
+            $this->onlyPartials->offsetSet($partial);
         }
     }
 
@@ -76,7 +76,7 @@ class TransformationContext implements Stringable
         }
 
         foreach ($partials as $partial) {
-            $this->exceptPartials->attach($partial);
+            $this->exceptPartials->offsetSet($partial);
         }
     }
 
