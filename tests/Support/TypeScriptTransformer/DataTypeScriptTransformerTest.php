@@ -16,6 +16,7 @@ use Spatie\LaravelData\Support\TypeScriptTransformer\DataTypeScriptTransformer;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
+use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 use function Spatie\Snapshots\assertMatchesSnapshot as baseAssertMatchesSnapshot;
 
 use Spatie\Snapshots\Driver;
@@ -317,6 +318,29 @@ it('will transform a collection with int key as an array', function () {
         <<<TXT
         {
         collection: Array<{%Spatie\LaravelData\Tests\Fakes\SimpleData%}>;
+        }
+        TXT,
+        $transformer->transform($reflection, 'DataObject')->transformed
+    );
+});
+
+it('should respect TypeScriptTransformableAttribute even with isDataCollectable', function () {
+    $config = TypeScriptTransformerConfig::create();
+
+    $data = new class () extends Data {
+        /** @var array<int, \Spatie\LaravelData\Tests\Fakes\SimpleData> */
+        #[LiteralTypeScriptType("CustomType")]
+        public array $collection;
+    };
+
+    $transformer = new DataTypeScriptTransformer($config);
+    $reflection = new ReflectionClass($data);
+
+    $this->assertTrue($transformer->canTransform($reflection));
+    $this->assertEquals(
+        <<<TXT
+        {
+        collection: CustomType;
         }
         TXT,
         $transformer->transform($reflection, 'DataObject')->transformed
