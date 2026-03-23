@@ -37,7 +37,7 @@ class CollectionNonDataAnnotationsData
     public array $propertyG;
 
     /** @var DummyBackedEnum */
-    public array $propertyH; // FAIL
+    public array $propertyH;
 
     public array $propertyI;
 

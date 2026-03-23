@@ -17,7 +17,6 @@ use Spatie\LaravelData\Exceptions\CannotFindDataClass;
 use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Annotations\CollectionAnnotationReader;
-use Spatie\LaravelData\Support\Annotations\DataIterableAnnotation;
 use Spatie\LaravelData\Support\Annotations\DataIterableAnnotationReader;
 use Spatie\LaravelData\Support\DataAttributesCollection;
 use Spatie\LaravelData\Support\DataPropertyType;
@@ -41,14 +40,14 @@ class DataTypeFactory
         ReflectionClass|string $class,
         ReflectionProperty|ReflectionParameter|string $typeable,
         ?DataAttributesCollection $attributes = null,
-        ?DataIterableAnnotation $classDefinedDataIterableAnnotation = null,
+        ?array $classDefinedDataIterableAnnotations = null,
     ): DataPropertyType {
         $properties = $this->infer(
             reflectionType: $reflectionType,
             class: $class,
             typeable: $typeable,
             attributes: $attributes,
-            classDefinedDataIterableAnnotation: $classDefinedDataIterableAnnotation,
+            classDefinedDataIterableAnnotations: $classDefinedDataIterableAnnotations,
             inferForProperty: true,
         );
 
@@ -77,7 +76,7 @@ class DataTypeFactory
             class: $class,
             typeable: $typeable,
             attributes: null,
-            classDefinedDataIterableAnnotation: null,
+            classDefinedDataIterableAnnotations: null,
             inferForProperty: false,
         );
 
@@ -101,7 +100,7 @@ class DataTypeFactory
             class: $class,
             typeable: $type,
             attributes: null,
-            classDefinedDataIterableAnnotation: null,
+            classDefinedDataIterableAnnotations: null,
             inferForProperty: false,
         );
 
@@ -132,7 +131,7 @@ class DataTypeFactory
         ReflectionClass|string $class,
         ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
         ?DataAttributesCollection $attributes,
-        ?DataIterableAnnotation $classDefinedDataIterableAnnotation,
+        ?array $classDefinedDataIterableAnnotations,
         bool $inferForProperty,
     ): array {
         if ($reflectionType === null) {
@@ -145,7 +144,7 @@ class DataTypeFactory
                 $class,
                 $typeable,
                 $attributes,
-                $classDefinedDataIterableAnnotation,
+                $classDefinedDataIterableAnnotations,
                 $inferForProperty,
             );
         }
@@ -156,7 +155,7 @@ class DataTypeFactory
                 $class,
                 $typeable,
                 $attributes,
-                $classDefinedDataIterableAnnotation,
+                $classDefinedDataIterableAnnotations,
                 $inferForProperty,
             );
         }
@@ -225,7 +224,7 @@ class DataTypeFactory
         ReflectionClass|string $class,
         ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
         ?DataAttributesCollection $attributes,
-        ?DataIterableAnnotation $classDefinedDataIterableAnnotation,
+        ?array $classDefinedDataIterableAnnotations,
         bool $inferForProperty,
     ): array {
         return [
@@ -235,7 +234,7 @@ class DataTypeFactory
                 $class,
                 $typeable,
                 $attributes,
-                $classDefinedDataIterableAnnotation,
+                $classDefinedDataIterableAnnotations,
                 $inferForProperty,
             ),
             'isOptional' => false,
@@ -245,7 +244,7 @@ class DataTypeFactory
 
     /**
      * @return array{
-     *      type: NamedType,
+     *      type: NamedType|UnionType,
      *      isMixed: bool,
      *      kind: DataTypeKind,
      *      dataClass: ?string,
@@ -261,7 +260,7 @@ class DataTypeFactory
         ReflectionClass|string $class,
         ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
         ?DataAttributesCollection $attributes,
-        ?DataIterableAnnotation $classDefinedDataIterableAnnotation,
+        ?array $classDefinedDataIterableAnnotations,
         bool $inferForProperty,
     ): array {
         if ($name === 'self' || $name === 'static') {
@@ -331,21 +330,33 @@ class DataTypeFactory
 
         if (
             $iterableItemType === null
-            && $classDefinedDataIterableAnnotation
+            && ! empty($classDefinedDataIterableAnnotations)
         ) {
-            $isData = $classDefinedDataIterableAnnotation->isData;
-            $iterableItemType = $classDefinedDataIterableAnnotation->type;
-            $iterableKeyType = $classDefinedDataIterableAnnotation->keyType;
+            if (count($classDefinedDataIterableAnnotations) == 1) {
+                $isData = $classDefinedDataIterableAnnotations[0]->isData;
+                $iterableItemType = $classDefinedDataIterableAnnotations[0]->type;
+                $iterableKeyType = $classDefinedDataIterableAnnotations[0]->keyType;
+            } else {
+                $isData = array_column($classDefinedDataIterableAnnotations, 'isData');
+                $iterableItemType = array_column($classDefinedDataIterableAnnotations, 'type');
+                $iterableKeyType = array_column($classDefinedDataIterableAnnotations, 'keyType');
+            }
         }
 
         if (
             $iterableItemType === null
             && $typeable instanceof ReflectionProperty
-            && $annotation = $this->iterableAnnotationReader->getForProperty($typeable)
+            && ! empty($annotations = $this->iterableAnnotationReader->getForProperty($typeable))
         ) {
-            $isData = $annotation->isData;
-            $iterableItemType = $annotation->type;
-            $iterableKeyType = $annotation->keyType;
+            if (count($annotations) == 1) {
+                $isData = $annotations[0]->isData;
+                $iterableItemType = $annotations[0]->type;
+                $iterableKeyType = $annotations[0]->keyType;
+            } else {
+                $isData = array_column($annotations, 'isData');
+                $iterableItemType = array_column($annotations, 'type');
+                $iterableKeyType = array_column($annotations, 'keyType');
+            }
         }
 
         if (
@@ -357,6 +368,34 @@ class DataTypeFactory
             $isData = $annotation->isData;
             $iterableItemType = $annotation->type;
             $iterableKeyType = $annotation->keyType;
+        }
+
+        if (is_array($isData)) {
+            $types = [];
+            foreach ($isData as $i => $iD) {
+                $types[] = new NamedType(
+                    name: $name,
+                    builtIn: $builtIn,
+                    acceptedTypes: $acceptedTypes,
+                    kind: $iD ? $kind->getDataRelatedEquivalent() : $kind,
+                    dataClass: $iD ? $iterableItemType[$i] : null,
+                    dataCollectableClass: $iD ? $name : null,
+                    iterableClass: $name,
+                    iterableItemType: $iterableItemType[$i],
+                    iterableKeyType: $iterableKeyType[$i],
+                );
+            }
+
+            return [
+                'type' => new UnionType($types),
+                'isMixed' => $isMixed,
+                'kind' => $kind,
+                'dataClass' => join('|', array_unique($iterableItemType)),
+                'dataCollectableClass' => null,
+                'iterableClass' => $name,
+                'iterableItemType' => join('|', array_unique($iterableItemType)),
+                'iterableKeyType' => join('|', array_unique($iterableKeyType)),
+            ];
         }
 
         $kind = $isData
@@ -408,7 +447,7 @@ class DataTypeFactory
         ReflectionClass|string $class,
         ReflectionMethod|ReflectionProperty|ReflectionParameter|string $typeable,
         ?DataAttributesCollection $attributes,
-        ?DataIterableAnnotation $classDefinedDataIterableAnnotation,
+        ?array $classDefinedDataIterableAnnotations,
         bool $inferForProperty,
     ): array {
         $isMixed = false;
@@ -432,7 +471,7 @@ class DataTypeFactory
                     $class,
                     $typeable,
                     $attributes,
-                    $classDefinedDataIterableAnnotation,
+                    $classDefinedDataIterableAnnotations,
                     $inferForProperty
                 );
 
@@ -477,7 +516,7 @@ class DataTypeFactory
                 $class,
                 $typeable,
                 $attributes,
-                $classDefinedDataIterableAnnotation,
+                $classDefinedDataIterableAnnotations,
                 $inferForProperty
             );
 

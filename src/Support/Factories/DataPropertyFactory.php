@@ -32,7 +32,7 @@ class DataPropertyFactory
         mixed $defaultValue = null,
         ?NameMapper $classInputNameMapper = null,
         ?NameMapper $classOutputNameMapper = null,
-        ?DataIterableAnnotation $classDefinedDataIterableAnnotation = null,
+        ?array $classDefinedDataIterableAnnotations = null,
         ?AutoLazy $classAutoLazy = null,
     ): DataProperty {
         $attributes = DataAttributesCollectionFactory::buildFromReflectionProperty($reflectionProperty);
@@ -42,7 +42,7 @@ class DataPropertyFactory
             $reflectionClass,
             $reflectionProperty,
             $attributes,
-            $classDefinedDataIterableAnnotation
+            $classDefinedDataIterableAnnotations
         );
 
         $mappers = NameMappersResolver::create()->execute($attributes);
