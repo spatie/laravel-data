@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.20.1 - 2026-03-18
+
+- Fix an issue where the reflection dependency could not be resolved correctly
+
 ## 4.20.0 - 2026-02-25
 
 - Laravel 13 support
@@ -215,6 +219,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -225,6 +230,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -267,6 +273,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
