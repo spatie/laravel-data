@@ -7,8 +7,7 @@ use Spatie\LaravelData\Lazy;
 use Spatie\LaravelData\Support\Lazy\DefaultLazy;
 use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithBackedProperty;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithVirtualProperty;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithPropertyHooks;
 
 use function Spatie\Snapshots\assertMatchesSnapshot;
 
@@ -46,7 +45,7 @@ it('can serialize and unserialize a data object with additional data', function 
 });
 
 it('can serialize and unserialize a data object with virtual properties', function () {
-    $object = new SimpleDataWithVirtualProperty();
+    $object = new SimpleDataWithPropertyHooks();
 
     $serialized = serialize($object);
 
@@ -54,13 +53,13 @@ it('can serialize and unserialize a data object with virtual properties', functi
 
     $unserialized = unserialize($serialized);
 
-    expect($unserialized)->toBeInstanceOf(SimpleDataWithVirtualProperty::class);
-    expect($unserialized->string)->toEqual($object->string);
+    expect($unserialized)->toBeInstanceOf(SimpleDataWithPropertyHooks::class);
+    expect($unserialized->virtual)->toEqual($object->virtual);
 })->skipOnPhp('<8.4');
 
 it('can serialize and unserialize a data object with backed properties', function () {
-    $object = new SimpleDataWithBackedProperty();
-    $object->string = 'Hello world';
+    $object = new SimpleDataWithPropertyHooks();
+    $object->backed = 'Hello world';
 
     $serialized = serialize($object);
 
@@ -68,8 +67,8 @@ it('can serialize and unserialize a data object with backed properties', functio
 
     $unserialized = unserialize($serialized);
 
-    expect($unserialized)->toBeInstanceOf(SimpleDataWithBackedProperty::class);
-    expect($unserialized->string)->toEqual($object->string);
+    expect($unserialized)->toBeInstanceOf(SimpleDataWithPropertyHooks::class);
+    expect($unserialized->backed)->toEqual($object->backed);
 })->skipOnPhp('<8.4');
 
 it('can serialize and unserialize a data collection', function () {

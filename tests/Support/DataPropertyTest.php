@@ -21,8 +21,7 @@ use Spatie\LaravelData\Support\Factories\DataPropertyFactory;
 use Spatie\LaravelData\Tests\Fakes\CastTransformers\FakeCastTransformer;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithBackedProperty;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithVirtualProperty;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithPropertyHooks;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 function resolveHelper(
@@ -184,13 +183,13 @@ it('can check if a property is computed', function () {
 
 it('can check if a virtual property is computed', function () {
     expect(
-        resolveHelper(class: new SimpleDataWithVirtualProperty(), propertyName: 'string')->computed
+        resolveHelper(class: new SimpleDataWithPropertyHooks(), propertyName: 'virtual')->computed
     )->toBeTrue();
 })->skipOnPhp('<8.4');
 
 it('does not mark a backed property as computed', function () {
     expect(
-        resolveHelper(class: new SimpleDataWithBackedProperty(), propertyName: 'string')->computed
+        resolveHelper(class: new SimpleDataWithPropertyHooks(), propertyName: 'backed')->computed
     )->toBeFalse();
 })->skipOnPhp('<8.4');
 

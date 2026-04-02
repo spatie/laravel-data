@@ -73,8 +73,8 @@ use Spatie\LaravelData\Tests\Fakes\NestedLazyData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
-use Spatie\LaravelData\Tests\Fakes\SimpleDataWithFullNameVirtualProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithPropertyHooks;
 
 it('can use default types to create data objects', function () {
     $data = ComplicatedData::from([
@@ -730,29 +730,21 @@ it('can have a computed value when creating the data object', function () {
 });
 
 it('can have a virtual property when creating the data object', function () {
-    expect(SimpleDataWithFullNameVirtualProperty::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Something to Be Ignored']))
-        ->first_name->toBe('Ruben')
-        ->last_name->toBe('Van Assche')
-        ->full_name->toBe('Ruben Van Assche');
+    expect(SimpleDataWithPropertyHooks::from(['constructorProperty' => 'test', 'virtual' => 'Something to Be Ignored']))
+        ->virtual->toBe('virtual');
 
-    expect(SimpleDataWithFullNameVirtualProperty::validateAndCreate(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Something to Be Ignored']))
-        ->first_name->toBe('Ruben')
-        ->last_name->toBe('Van Assche')
-        ->full_name->toBe('Ruben Van Assche');
+    expect(SimpleDataWithPropertyHooks::validateAndCreate(['constructorProperty' => 'test', 'virtual' => 'Something to Be Ignored']))
+        ->virtual->toBe('virtual');
 
     config()->set('data.features.ignore_exception_when_trying_to_set_computed_property_value', false);
 
-    expect(SimpleDataWithFullNameVirtualProperty::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche']))
-        ->first_name->toBe('Ruben')
-        ->last_name->toBe('Van Assche')
-        ->full_name->toBe('Ruben Van Assche');
+    expect(SimpleDataWithPropertyHooks::from(['constructorProperty' => 'test']))
+        ->virtual->toBe('virtual');
 
-    expect(SimpleDataWithFullNameVirtualProperty::validateAndCreate(['first_name' => 'Ruben', 'last_name' => 'Van Assche']))
-        ->first_name->toBe('Ruben')
-        ->last_name->toBe('Van Assche')
-        ->full_name->toBe('Ruben Van Assche');
+    expect(SimpleDataWithPropertyHooks::validateAndCreate(['constructorProperty' => 'test']))
+        ->virtual->toBe('virtual');
 
-    expect(fn () => SimpleDataWithFullNameVirtualProperty::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Ruben Versieck']))
+    expect(fn () => SimpleDataWithPropertyHooks::from(['constructorProperty' => 'test', 'virtual' => 'other']))
         ->toThrow(CannotSetComputedValue::class);
 })->skipOnPhp('<8.4');
 
