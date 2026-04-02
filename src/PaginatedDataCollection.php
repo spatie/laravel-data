@@ -72,6 +72,7 @@ class PaginatedDataCollection implements Responsable, BaseDataCollectableContrac
         return $clone;
     }
 
+    /** @return Paginator<TKey, TValue> */
     public function items(): Paginator
     {
         return $this->items;
