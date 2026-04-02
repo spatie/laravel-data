@@ -44,6 +44,7 @@ A data property represents a single property within a data object.
 - `hidden` will the property be hidden when transforming the data object
 - `isPromoted` is the property constructor promoted
 - `isReadOnly` is the property read only
+- `isVirtual` is the property virtual
 - `hasDefaultValue` has the property a default value
 - `defaultValue` the default value of the property
 - `cast` the cast assigned to the property
