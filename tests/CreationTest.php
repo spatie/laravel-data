@@ -13,6 +13,9 @@ use Illuminate\Validation\ValidationException;
 use Inertia\DeferProp;
 use Inertia\Inertia;
 use Inertia\LazyProp;
+
+use function Pest\Laravel\postJson;
+
 use Spatie\LaravelData\Attributes\AutoClosureLazy;
 use Spatie\LaravelData\Attributes\AutoInertiaDeferred;
 use Spatie\LaravelData\Attributes\AutoInertiaLazy;
@@ -72,8 +75,6 @@ use Spatie\LaravelData\Tests\Fakes\NestedModelData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithFullNameVirtualProperty;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
-
-use function Pest\Laravel\postJson;
 
 it('can use default types to create data objects', function () {
     $data = ComplicatedData::from([
