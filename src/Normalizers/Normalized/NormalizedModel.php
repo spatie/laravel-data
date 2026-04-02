@@ -24,31 +24,34 @@ class NormalizedModel implements Normalized
 
     public function getProperty(string $name, DataProperty $dataProperty): mixed
     {
-        $propertyName = $name;
-
-        if (array_key_exists($propertyName, $this->properties)) {
-            $value = $this->properties[$propertyName];
-        } else {
-            $value = $this->fetchNewProperty($propertyName, $dataProperty);
-
-            if ($value instanceof UnknownProperty && $this->model::$snakeAttributes) {
-                $snakeName = Str::snake($name);
-
-                if ($snakeName !== $name) {
-                    $value = $this->fetchNewProperty($snakeName, $dataProperty);
-
-                    if (! $value instanceof UnknownProperty) {
-                        $propertyName = $snakeName;
-                    }
-                }
-            }
-        }
+        $value = $this->resolvePropertyValue($name, $dataProperty);
 
         if ($value === null && ! $dataProperty->type->isNullable) {
             return UnknownProperty::create();
         }
 
         return $value;
+    }
+
+    protected function resolvePropertyValue(string $name, DataProperty $dataProperty): mixed
+    {
+        if (array_key_exists($name, $this->properties)) {
+            return $this->properties[$name];
+        }
+
+        $value = $this->fetchNewProperty($name, $dataProperty);
+
+        if (! $value instanceof UnknownProperty || ! $this->model::$snakeAttributes) {
+            return $value;
+        }
+
+        $snakeName = Str::snake($name);
+
+        if ($snakeName === $name) {
+            return $value;
+        }
+
+        return $this->fetchNewProperty($snakeName, $dataProperty);
     }
 
     protected function fetchNewProperty(string $name, DataProperty $dataProperty): mixed
