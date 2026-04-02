@@ -2,6 +2,20 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.21.0 - 2026-04-02
+
+### What's Changed
+
+* Bump dependabot/fetch-metadata from 2.5.0 to 3.0.0 by @dependabot[bot] in https://github.com/spatie/laravel-data/pull/1167
+* fix: truncate nanoseconds for dates with timezone offsets by @ralphjsmit in https://github.com/spatie/laravel-data/pull/1160
+* Fix NormalizedModel not resolving non-snake-cased model attributes by @isaackaara in https://github.com/spatie/laravel-data/pull/1159
+* fix(EmptyDataResolver): allow null overwrites by @vaishnavyogesh in https://github.com/spatie/laravel-data/pull/1161
+* Fix deprecation warning for 'SplObjectStorage::attach' by @jelledruut in https://github.com/spatie/laravel-data/pull/1145
+* Improve virtual property support by @jivanf in https://github.com/spatie/laravel-data/pull/1164
+* fix DataTypeScriptTransformer cursor paginator properties by @UltraWelfare in https://github.com/spatie/laravel-data/pull/1098
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.20.1...4.21.0
+
 ## 4.20.1 - 2026-03-18
 
 - Fix an issue where the reflection dependency could not be resolved correctly
@@ -220,6 +234,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -230,6 +245,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -273,6 +289,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
