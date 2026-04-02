@@ -191,3 +191,9 @@ it('has support for mapping property names', function () {
         public string $property;
     }, propertyName: 'other_property');
 });
+
+it('can overwrite empty value to null for a property with multiple types', function () {
+    assertEmptyPropertyValue(null, new class () {
+        public int|string|null $property;
+    }, ['property' => null]);
+});
