@@ -47,6 +47,12 @@ class DataObject extends Data
 }
 ```
 
+## typescript-transformer v3
+
+We recently launched [typescript-transformer v3](https://spatie.be/docs/typescript-transformer/v3) which has extensive documentation on how to use it with laravel-data. We strongly urge you to upgrade to v3, support for v2 will be deprecated soon. Check out the [installation and setup guide](https://spatie.be/docs/typescript-transformer/v3/laravel/installation-and-setup) to get started, and the [laravel-data integration guide](https://spatie.be/docs/typescript-transformer/v3/laravel/laravel-data) for detailed instructions.
+
+The instructions below are for typescript-transformer v2 and will be removed in a future version.
+
 ## Installation of extra package
 
 First, you must install the spatie/laravel-typescript-transformer into your project.
@@ -71,7 +77,7 @@ If you're using the `DtoTransformer` provided by the package, then be sure to pu
 Annotate each data object that you want to transform to Typescript with a `/** @typescript */` annotation or
 a `#[TypeScript]` attribute.
 
-To [generate the typescript file](https://spatie.be/docs/typescript-transformer/v4/laravel/executing-the-transform-command)
+To [generate the typescript file](https://spatie.be/docs/typescript-transformer/v2/laravel/executing-the-transform-command)
 , run this command:
 
 ```php
