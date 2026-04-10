@@ -1,14 +1,21 @@
 <?php
 
-namespace Spatie\LaravelData\Resolvers\Concerns;
+namespace Spatie\LaravelData\Resolvers;
 
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\DataClass;
+use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
-trait ResolvesDataClassFromValidationPayload
+class DataClassFromValidationPayloadResolver
 {
-    public function dataClassFromValidationPayload(
+    public function __construct(
+        protected DataConfig $dataConfig,
+        protected DataMorphClassResolver $dataMorphClassResolver,
+    ) {
+    }
+
+    public function execute(
         string $class,
         array $fullPayload,
         ValidationPath $path,

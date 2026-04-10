@@ -8,7 +8,6 @@ use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Attributes\MergeValidationRules;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Present;
-use Spatie\LaravelData\Resolvers\Concerns\ResolvesDataClassFromValidationPayload;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
@@ -22,13 +21,12 @@ use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class DataValidationRulesResolver
 {
-    use ResolvesDataClassFromValidationPayload;
-
     public function __construct(
         protected DataConfig $dataConfig,
         protected RuleNormalizer $ruleAttributesResolver,
         protected RuleDenormalizer $ruleDenormalizer,
         protected DataMorphClassResolver $dataMorphClassResolver,
+        protected DataClassFromValidationPayloadResolver $dataClassFromValidationPayloadResolver,
     ) {
     }
 
@@ -38,7 +36,7 @@ class DataValidationRulesResolver
         ValidationPath $path,
         DataRules $dataRules
     ): array {
-        $dataClass = $this->dataClassFromValidationPayload($class, $fullPayload, $path);
+        $dataClass = $this->dataClassFromValidationPayloadResolver->execute($class, $fullPayload, $path);
 
         $withoutValidationProperties = [];
 
