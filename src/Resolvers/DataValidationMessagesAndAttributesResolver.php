@@ -30,27 +30,11 @@ class DataValidationMessagesAndAttributesResolver
 
         $dataClass = $this->dataConfig->getDataClass($class);
 
+        if ($dataClass->isAbstract && $dataClass->propertyMorphable && $path->containsWildcards()) {
+            return $this->resolveWildcardMessagesAndAttributes($class, $fullPayload, $path, $nestingChain);
+        }
+
         if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
-            // For property-morphable data we need paths without wildcards to resolve the correct class
-            if ($path->containsWildcards()) {
-                foreach ($path->matchingWildcardPayloadValidationPaths($fullPayload) as $resolvedPath) {
-                    $nested = $this->execute(
-                        $class,
-                        $fullPayload,
-                        $resolvedPath,
-                        $nestingChain,
-                    );
-
-                    $messages[] = $nested['messages'];
-                    $attributes[] = $nested['attributes'];
-                }
-
-                $messages = array_merge(...$messages);
-                $attributes = array_merge(...$attributes);
-
-                return ['messages' => $messages, 'attributes' => $attributes];
-            }
-
             $dataClass = $this->dataClassFromValidationPayload($class, $fullPayload, $path);
         }
 
@@ -173,5 +157,32 @@ class DataValidationMessagesAndAttributesResolver
             $messages[] = $collected['messages'];
             $attributes[] = $collected['attributes'];
         }
+    }
+
+    protected function resolveWildcardMessagesAndAttributes(
+        string $class,
+        array $fullPayload,
+        ValidationPath $path,
+        array $nestingChain,
+    ): array {
+        $messages = [];
+        $attributes = [];
+
+        foreach ($path->matchingWildcardPayloadValidationPaths($fullPayload) as $resolvedPath) {
+            $nested = $this->execute(
+                $class,
+                $fullPayload,
+                $resolvedPath,
+                $nestingChain,
+            );
+
+            $messages[] = $nested['messages'];
+            $attributes[] = $nested['attributes'];
+        }
+
+        return [
+            'messages' => array_merge(...$messages),
+            'attributes' => array_merge(...$attributes),
+        ];
     }
 }
