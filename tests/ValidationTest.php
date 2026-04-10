@@ -54,11 +54,13 @@ use Spatie\LaravelData\Support\Validation\References\ContainerReference;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
+use Spatie\LaravelData\Tests\Fakes\AbstractPropertyMorphableData;
 use Spatie\LaravelData\Tests\Fakes\CircData;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DataWithReferenceFieldValidationAttribute;
 use Spatie\LaravelData\Tests\Fakes\DummyDataWithContextOverwrittenValidationRules;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\Enums\PropertyMorphableEnum;
 use Spatie\LaravelData\Tests\Fakes\FakeAuthenticatable;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
@@ -2690,48 +2692,8 @@ it('it will merge validation rules', function () {
 });
 
 describe('property-morphable validation tests', function () {
-    enum TestValidationPropertyMorphableEnum: string
-    {
-        case A = 'a';
-        case B = 'b';
-    }
-
-    abstract class TestValidationAbstractPropertyMorphableData extends Data implements PropertyMorphableData
-    {
-        public function __construct(
-            #[PropertyForMorph]
-            public TestValidationPropertyMorphableEnum $variant,
-        ) {
-        }
-
-        public static function morph(array $properties): ?string
-        {
-            return match ($properties['variant']) {
-                TestValidationPropertyMorphableEnum::A => TestValidationPropertyMorphableDataA::class,
-                TestValidationPropertyMorphableEnum::B => TestValidationPropertyMorphableDataB::class,
-                default => null,
-            };
-        }
-    }
-
-    class TestValidationPropertyMorphableDataA extends TestValidationAbstractPropertyMorphableData
-    {
-        public function __construct(public string $a, public DummyBackedEnum $enum)
-        {
-            parent::__construct(TestValidationPropertyMorphableEnum::A);
-        }
-    }
-
-    class TestValidationPropertyMorphableDataB extends TestValidationAbstractPropertyMorphableData
-    {
-        public function __construct(public string $b)
-        {
-            parent::__construct(TestValidationPropertyMorphableEnum::B);
-        }
-    }
-
     it('can validate property-morphable data', function () {
-        DataValidationAsserter::for(TestValidationAbstractPropertyMorphableData::class)
+        DataValidationAsserter::for(AbstractPropertyMorphableData::class)
             ->assertErrors([], [
                 'variant' => ['The variant field is required.'],
             ])
@@ -2774,7 +2736,7 @@ describe('property-morphable validation tests', function () {
 
     it('allows nullable property-morphable data', function () {
         DataValidationAsserter::for(new class () extends Data {
-            public ?TestValidationAbstractPropertyMorphableData $morphable;
+            public ?AbstractPropertyMorphableData $morphable;
         })
             ->assertOk([])
             ->assertOk(['morphable' => null])
@@ -2787,7 +2749,7 @@ describe('property-morphable validation tests', function () {
         class TestValidationNestedPropertyMorphableData extends Data
         {
             public function __construct(
-                /** @var TestValidationAbstractPropertyMorphableData[] */
+                /** @var AbstractPropertyMorphableData[] */
                 public ?DataCollection $nestedCollection,
             ) {
             }
@@ -2829,7 +2791,7 @@ describe('property-morphable validation tests', function () {
         {
             public function __construct(
                 #[PropertyForMorph]
-                public TestValidationPropertyMorphableEnum $variant,
+                public PropertyMorphableEnum $variant,
                 #[Max(1)]
                 public int $abstract_integer,
                 public string $abstract_string,
@@ -2839,7 +2801,7 @@ describe('property-morphable validation tests', function () {
             public static function morph(array $properties): ?string
             {
                 return match ($properties['variant']) {
-                    TestValidationPropertyMorphableEnum::A => TestValidationCustomMessagePropertyMorphableDataA::class,
+                    PropertyMorphableEnum::A => TestValidationCustomMessagePropertyMorphableDataA::class,
                     default => null,
                 };
             }
@@ -2868,7 +2830,7 @@ describe('property-morphable validation tests', function () {
                 public int $concrete_integer,
                 public string $concrete_string,
             ) {
-                parent::__construct(TestValidationPropertyMorphableEnum::A, $abstract_integer, $abstract_string);
+                parent::__construct(PropertyMorphableEnum::A, $abstract_integer, $abstract_string);
             }
 
             public static function messages()
@@ -2917,7 +2879,7 @@ describe('property-morphable validation tests', function () {
         {
             public function __construct(
                 #[PropertyForMorph]
-                public TestValidationPropertyMorphableEnum $variant,
+                public PropertyMorphableEnum $variant,
                 #[Max(1)]
                 public int $abstract_integer,
                 public string $abstract_string,
@@ -2927,8 +2889,8 @@ describe('property-morphable validation tests', function () {
             public static function morph(array $properties): ?string
             {
                 return match ($properties['variant']) {
-                    TestValidationPropertyMorphableEnum::A => TestCustomMessagePropertyMorphableDataA::class,
-                    TestValidationPropertyMorphableEnum::B => TestCustomMessagePropertyMorphableDataB::class,
+                    PropertyMorphableEnum::A => TestCustomMessagePropertyMorphableDataA::class,
+                    PropertyMorphableEnum::B => TestCustomMessagePropertyMorphableDataB::class,
                     default => null,
                 };
             }
@@ -2957,7 +2919,7 @@ describe('property-morphable validation tests', function () {
                 public int $concrete_integer,
                 public string $concrete_string,
             ) {
-                parent::__construct(TestValidationPropertyMorphableEnum::A, $abstract_integer, $abstract_string);
+                parent::__construct(PropertyMorphableEnum::A, $abstract_integer, $abstract_string);
             }
 
             public static function messages()
@@ -2986,7 +2948,7 @@ describe('property-morphable validation tests', function () {
                 public int $concrete_integer,
                 public string $concrete_string,
             ) {
-                parent::__construct(TestValidationPropertyMorphableEnum::B, $abstract_integer, $abstract_string);
+                parent::__construct(PropertyMorphableEnum::B, $abstract_integer, $abstract_string);
             }
 
             public static function messages()
@@ -3049,12 +3011,12 @@ describe('property-morphable validation tests', function () {
         abstract class TestValidationAbstractPropertyMorphableDefaultData extends Data implements PropertyMorphableData
         {
             #[\Spatie\LaravelData\Attributes\PropertyForMorph]
-            public TestValidationPropertyMorphableEnum $variant = TestValidationPropertyMorphableEnum::A;
+            public PropertyMorphableEnum $variant = PropertyMorphableEnum::A;
 
             public static function morph(array $properties): ?string
             {
                 return match ($properties['variant'] ?? null) {
-                    TestValidationPropertyMorphableEnum::A => TestValidationPropertyMorphableDefaultDataA::class,
+                    PropertyMorphableEnum::A => TestValidationPropertyMorphableDefaultDataA::class,
                     default => null,
                 };
             }
@@ -3064,7 +3026,7 @@ describe('property-morphable validation tests', function () {
         {
             public function __construct(public string $a, public DummyBackedEnum $enum)
             {
-                $this->variant = TestValidationPropertyMorphableEnum::A;
+                $this->variant = PropertyMorphableEnum::A;
             }
         }
 

@@ -5,12 +5,11 @@ use Illuminate\Support\Facades\DB;
 
 use function Pest\Laravel\assertDatabaseHas;
 
-use Spatie\LaravelData\Contracts\PropertyMorphableData;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractData;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
+use Spatie\LaravelData\Tests\Fakes\AbstractPropertyMorphableData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCustomCollectionCasts;
@@ -18,6 +17,8 @@ use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithEncryptedCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithJson;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
+use Spatie\LaravelData\Tests\Fakes\PropertyMorphableDataA;
+use Spatie\LaravelData\Tests\Fakes\PropertyMorphableDataB;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataCollection;
 
@@ -180,43 +181,9 @@ it('can use an abstract data collection with multiple children', function () {
 });
 
 it('can load and save an abstract property-morphable data collection', function () {
-    abstract class TestCollectionCastAbstractPropertyMorphableData extends Data implements PropertyMorphableData
-    {
-        public function __construct(
-            #[\Spatie\LaravelData\Attributes\PropertyForMorph]
-            public string $variant
-        ) {
-        }
-
-        public static function morph(array $properties): ?string
-        {
-            return match ($properties['variant'] ?? null) {
-                'a' => TestCollectionCastPropertyMorphableDataA::class,
-                'b' => TestCollectionCastPropertyMorphableDataB::class,
-                default => null,
-            };
-        }
-    }
-
-    class TestCollectionCastPropertyMorphableDataA extends TestCollectionCastAbstractPropertyMorphableData
-    {
-        public function __construct(public string $a, public DummyBackedEnum $enum)
-        {
-            parent::__construct('a');
-        }
-    }
-
-    class TestCollectionCastPropertyMorphableDataB extends TestCollectionCastAbstractPropertyMorphableData
-    {
-        public function __construct(public string $b)
-        {
-            parent::__construct('b');
-        }
-    }
-
     $modelClass = new class () extends Model {
         protected $casts = [
-            'data_collection' => SimpleDataCollection::class.':'.TestCollectionCastAbstractPropertyMorphableData::class,
+            'data_collection' => SimpleDataCollection::class.':'.AbstractPropertyMorphableData::class,
         ];
 
         protected $table = 'dummy_model_with_casts';
@@ -224,8 +191,8 @@ it('can load and save an abstract property-morphable data collection', function 
         public $timestamps = false;
     };
 
-    $abstractA = new TestCollectionCastPropertyMorphableDataA('foo', DummyBackedEnum::FOO);
-    $abstractB = new TestCollectionCastPropertyMorphableDataB('bar');
+    $abstractA = new PropertyMorphableDataA('foo', DummyBackedEnum::FOO);
+    $abstractB = new PropertyMorphableDataB('bar');
 
     $modelId = $modelClass::create([
         'data_collection' => [$abstractA, $abstractB],
@@ -241,12 +208,12 @@ it('can load and save an abstract property-morphable data collection', function 
     $model = $modelClass::find($modelId);
 
     expect($model->data_collection[0])
-        ->toBeInstanceOf(TestCollectionCastPropertyMorphableDataA::class)
+        ->toBeInstanceOf(PropertyMorphableDataA::class)
         ->a->toBe('foo')
         ->enum->toBe(DummyBackedEnum::FOO);
 
     expect($model->data_collection[1])
-        ->toBeInstanceOf(TestCollectionCastPropertyMorphableDataB::class)
+        ->toBeInstanceOf(PropertyMorphableDataB::class)
         ->b->toBe('bar');
 });
 
