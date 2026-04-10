@@ -73,13 +73,16 @@ class ValidationPath implements Stringable
             return [new self($resolvedSegments)];
         }
 
+        if (! is_array($payload)) {
+            return [];
+        }
+
         $segment = array_shift($remainingSegments);
 
         if ($segment === '*') {
             $results = [];
             foreach (array_keys($payload) as $key) {
-                $child = $payload[$key] ?? [];
-                array_push($results, ...$this->expandPath($remainingSegments, $child, array_merge($resolvedSegments, [$key])));
+                array_push($results, ...$this->expandPath($remainingSegments, $payload[$key], array_merge($resolvedSegments, [$key])));
             }
 
             return $results;

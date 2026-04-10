@@ -14,16 +14,16 @@ class DataValidationMessagesAndAttributesResolver
     use ResolvesDataClassFromValidationPayload;
 
     public function __construct(
-        protected DataConfig             $dataConfig,
+        protected DataConfig $dataConfig,
         protected DataMorphClassResolver $dataMorphClassResolver,
     ) {
     }
 
     public function execute(
-        string         $class,
-        array          $fullPayload,
+        string $class,
+        array $fullPayload,
         ValidationPath $path,
-        array          $nestingChain = [],
+        array $nestingChain = [],
     ): array {
         $messages = [];
         $attributes = [];
@@ -51,7 +51,7 @@ class DataValidationMessagesAndAttributesResolver
                 return ['messages' => $messages, 'attributes' => $attributes];
             }
 
-            $dataClass = $this->dataClassFromValidationPayload($this->dataConfig, $this->dataMorphClassResolver, $class, $fullPayload, $path);
+            $dataClass = $this->dataClassFromValidationPayload($class, $fullPayload, $path);
         }
 
         foreach ($dataClass->properties as $dataProperty) {

@@ -38,7 +38,7 @@ class DataValidationRulesResolver
         ValidationPath $path,
         DataRules $dataRules
     ): array {
-        $dataClass = $this->dataClassFromValidationPayload($this->dataConfig, $this->dataMorphClassResolver, $class, $fullPayload, $path);
+        $dataClass = $this->dataClassFromValidationPayload($class, $fullPayload, $path);
 
         $withoutValidationProperties = [];
 

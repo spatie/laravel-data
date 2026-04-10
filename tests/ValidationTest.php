@@ -2624,11 +2624,11 @@ it('it will merge validation rules', function () {
     {
         public function __construct(
             #[Max(10)]
-            public string                        $array_rules,
+            public string $array_rules,
             #[Max(10)]
-            public string                        $string_rules,
+            public string $string_rules,
             #[WithoutValidation]
-            public string                        $without_validation,
+            public string $without_validation,
             public TestNestedDataWithMergedRules $nested
         ) {
         }
@@ -2825,8 +2825,8 @@ describe('property-morphable validation tests', function () {
                 #[PropertyForMorph]
                 public TestValidationPropertyMorphableEnum $variant,
                 #[Max(1)]
-                public int                                 $abstract_integer,
-                public string                              $abstract_string,
+                public int $abstract_integer,
+                public string $abstract_string,
             ) {
             }
 
@@ -2856,10 +2856,10 @@ describe('property-morphable validation tests', function () {
         class TestValidationCustomMessagePropertyMorphableDataA extends TestValidationCustomMessageAbstractPropertyMorphableData
         {
             public function __construct(
-                int           $abstract_integer,
-                string        $abstract_string,
+                int $abstract_integer,
+                string $abstract_string,
                 #[Max(1)]
-                public int    $concrete_integer,
+                public int $concrete_integer,
                 public string $concrete_string,
             ) {
                 parent::__construct(TestValidationPropertyMorphableEnum::A, $abstract_integer, $abstract_string);
@@ -2899,7 +2899,6 @@ describe('property-morphable validation tests', function () {
         class TestCustomMessagesInCollectionOfPropertyMorphableData extends Data
         {
             public function __construct(
-
                 /**
                  * @var array<TestCustomMessageOfPropertyMorphableData>
                  */
@@ -2914,8 +2913,8 @@ describe('property-morphable validation tests', function () {
                 #[PropertyForMorph]
                 public TestValidationPropertyMorphableEnum $variant,
                 #[Max(1)]
-                public int                                 $abstract_integer,
-                public string                              $abstract_string,
+                public int $abstract_integer,
+                public string $abstract_string,
             ) {
             }
 
@@ -2946,10 +2945,10 @@ describe('property-morphable validation tests', function () {
         class TestCustomMessagePropertyMorphableDataA extends TestCustomMessageOfPropertyMorphableData
         {
             public function __construct(
-                int           $abstract_integer,
-                string        $abstract_string,
+                int $abstract_integer,
+                string $abstract_string,
                 #[Max(1)]
-                public int    $concrete_integer,
+                public int $concrete_integer,
                 public string $concrete_string,
             ) {
                 parent::__construct(TestValidationPropertyMorphableEnum::A, $abstract_integer, $abstract_string);
@@ -2975,10 +2974,10 @@ describe('property-morphable validation tests', function () {
         class TestCustomMessagePropertyMorphableDataB extends TestCustomMessageOfPropertyMorphableData
         {
             public function __construct(
-                int           $abstract_integer,
-                string        $abstract_string,
+                int $abstract_integer,
+                string $abstract_string,
                 #[Max(1)]
-                public int    $concrete_integer,
+                public int $concrete_integer,
                 public string $concrete_string,
             ) {
                 parent::__construct(TestValidationPropertyMorphableEnum::B, $abstract_integer, $abstract_string);
@@ -3001,7 +3000,6 @@ describe('property-morphable validation tests', function () {
                 ];
             }
         }
-
 
         DataValidationAsserter::for(TestCustomMessagesInCollectionOfPropertyMorphableData::class)
             ->assertErrors([
@@ -3080,8 +3078,8 @@ describe('property-morphable validation tests', function () {
             ]);
     });
 
-    it('can validate property-morphable data inside an array of static data', function () {
-        abstract class Vehicle extends Data implements PropertyMorphableData
+    it('can validate property-morphable data inside an array of non-morphable data', function () {
+        abstract class TestValidationNestedMorphableAbstractData extends Data implements PropertyMorphableData
         {
             public function __construct(
                 #[PropertyForMorph]
@@ -3092,82 +3090,82 @@ describe('property-morphable validation tests', function () {
             public static function morph(array $properties): ?string
             {
                 return match ($properties['type']) {
-                    'car' => Car::class,
-                    'truck' => Truck::class,
+                    'a' => TestValidationNestedMorphableDataA::class,
+                    'b' => TestValidationNestedMorphableDataB::class,
                     default => null,
                 };
             }
         }
 
-        class Car extends Vehicle
+        class TestValidationNestedMorphableDataA extends TestValidationNestedMorphableAbstractData
         {
             public function __construct(
-                public string $make,
-                public string $model,
+                public string $a_string,
+                public string $a_other_string,
             ) {
-                parent::__construct('car');
+                parent::__construct('a');
             }
 
             public static function messages()
             {
                 return [
-                    'make.required' => 'Car make required test.',
+                    'a_string.required' => 'Data A string required test.',
                 ];
             }
 
             public static function attributes()
             {
                 return [
-                    'model' => '[MODEL]',
+                    'a_other_string' => '[A Other String]',
                 ];
             }
         }
 
-        class Truck extends Vehicle
+        class TestValidationNestedMorphableDataB extends TestValidationNestedMorphableAbstractData
         {
             public function __construct(
-                public float $payload_capacity,
+                public float $b_float,
             ) {
-                parent::__construct('truck');
+                parent::__construct('b');
             }
         }
 
-        class Garage extends Data
+        class TestValidationNestedMorphableWrapperData extends Data
         {
             public function __construct(
-                public ?Vehicle $vehicle,
-            ) {
-            }
-        }
-
-        class Region extends Data
-        {
-            public function __construct(
-                /** @var Garage[] */
-                public array $garages,
+                public ?TestValidationNestedMorphableAbstractData $morphable,
             ) {
             }
         }
 
-        DataValidationAsserter::for(Region::class)
+        class TestValidationNestedMorphableCollectionData extends Data
+        {
+            public function __construct(
+                /** @var TestValidationNestedMorphableWrapperData[] */
+                public array $items,
+            ) {
+            }
+        }
+
+        DataValidationAsserter::for(TestValidationNestedMorphableCollectionData::class)
             ->assertOk([
-                'garages' => [
-                    ['vehicle' => ['type' => 'car', 'make' => 'Toyota', 'model' => 'Corolla']],
-                    ['vehicle' => null],
-                    ['vehicle' => ['type' => 'truck', 'payload_capacity' => 1500.5]],
+                'items' => [
+                    ['morphable' => ['type' => 'a', 'a_string' => 'foo', 'a_other_string' => 'bar']],
+                    ['morphable' => null],
+                    ['morphable' => ['type' => 'b', 'b_float' => 1500.5]],
                 ],
             ])
             ->assertErrors([
-                'garages' => [
-                    ['vehicle' => ['type' => 'car']],
-                    ['vehicle' => ['type' => 'truck']],
-                    ['vehicle' => ['type' => 'hobby_horse']],
+                'items' => [
+                    ['morphable' => ['type' => 'a']],
+                    ['morphable' => ['type' => 'b']],
+                    ['morphable' => ['type' => 'invalid']],
                 ],
             ], [
-                'garages.0.vehicle.make' => ['Car make required test.'],
-                'garages.0.vehicle.model' => ['The [MODEL] field is required.'],
-                'garages.1.vehicle.payload_capacity' => ['The garages.1.vehicle.payload capacity field is required.'],
-                'garages.2.vehicle.type' => ['The selected garages.2.vehicle.type is invalid for morph.'],
+                'items.0.morphable.a_string' => ['Data A string required test.'],
+                'items.0.morphable.a_other_string' => ['The [A Other String] field is required.'],
+                'items.1.morphable.b_float' => ['The items.1.morphable.b float field is required.'],
+                'items.2.morphable.type' => ['The selected items.2.morphable.type is invalid for morph.'],
             ]);
     });
 });
