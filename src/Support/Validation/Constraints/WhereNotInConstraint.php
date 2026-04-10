@@ -11,13 +11,14 @@ class WhereNotInConstraint extends DatabaseConstraint
     public function __construct(
         public readonly string|ExternalReference $column,
         public readonly Arrayable|BackedEnum|array|ExternalReference $values,
-    ) {}
+    ) {
+    }
 
-    public function toArray(): array
+    public function apply(object $rule): void
     {
-        return [
+        $rule->whereNotIn(
             $this->normalizePossibleExternalReferenceParameter($this->column),
             $this->normalizePossibleExternalReferenceParameter($this->values),
-        ];
+        );
     }
 }

@@ -13,11 +13,11 @@ class WhereConstraint extends DatabaseConstraint
     ) {
     }
 
-    public function toArray(): array
+    public function apply(object $rule): void
     {
-        return [
+        $rule->where(
             $this->normalizePossibleExternalReferenceParameter($this->column),
             $this->normalizePossibleExternalReferenceParameter($this->value),
-        ];
+        );
     }
 }

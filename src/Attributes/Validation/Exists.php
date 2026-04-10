@@ -7,15 +7,16 @@ use Closure;
 use Exception;
 use Illuminate\Validation\Rules\Exists as BaseExists;
 use Spatie\LaravelData\Attributes\Concerns\AppliesDatabaseConstraints;
+use Spatie\LaravelData\Support\Validation\Constraints\DatabaseConstraint;
 use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
-use Spatie\LaravelData\Support\Validation\Constraints\DatabaseConstraint;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Exists extends ObjectValidationAttribute
 {
     use AppliesDatabaseConstraints;
 
+    /** @param null|Closure|DatabaseConstraint|array<int, DatabaseConstraint|Closure> $where */
     public function __construct(
         protected null|string|ExternalReference $table = null,
         protected null|string|ExternalReference $column = 'NULL',

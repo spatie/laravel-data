@@ -897,6 +897,12 @@ function existsAttributes(): Generator
     );
 
     yield fixature(
+        attribute: new Exists('users', 'id', where: new WhereNullConstraint('deleted_at')),
+        expected: (new BaseExists('users', 'id'))->whereNull('deleted_at'),
+        expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'id'))->whereNull('deleted_at'))
+    );
+
+    yield fixature(
         attribute: new Exists('users', 'id', where: new WhereNotNullConstraint('email_verified_at')),
         expected: (new BaseExists('users', 'id'))->whereNotNull('email_verified_at'),
         expectCreatedAttribute: new Exists(rule: (new BaseExists('users', 'id'))->whereNotNull('email_verified_at'))
@@ -1340,7 +1346,7 @@ function uniqueAttributes(): Generator
         expected: (new BaseUnique('users', 'email'))->where('active', true),
         expectCreatedAttribute: new Unique(rule: (new BaseUnique('users', 'email'))->where('active', true))
     );
-    
+
     yield fixature(
         attribute: new Unique('users', 'email', where: new WhereNotConstraint('name', 'Unlucky')),
         expected: (new BaseUnique('users', 'email'))->whereNot('name', 'Unlucky'),

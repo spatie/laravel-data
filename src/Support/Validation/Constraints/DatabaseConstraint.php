@@ -2,10 +2,14 @@
 
 namespace Spatie\LaravelData\Support\Validation\Constraints;
 
-use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\Unique;
 use Spatie\LaravelData\Attributes\Concerns\NormalizesExternalReferences;
 
-abstract class DatabaseConstraint implements Arrayable
+abstract class DatabaseConstraint
 {
     use NormalizesExternalReferences;
+
+    /** @param Exists|Unique $rule */
+    abstract public function apply(object $rule): void;
 }
