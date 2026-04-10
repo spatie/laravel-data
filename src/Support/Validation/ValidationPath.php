@@ -64,10 +64,10 @@ class ValidationPath implements Stringable
      */
     public function matchingWildcardPayloadValidationPaths(array $fullPayload): array
     {
-        return $this->expandPath($this->path, $fullPayload);
+        return $this->expandWildcardPath($this->path, $fullPayload);
     }
 
-    protected function expandPath(array $remainingSegments, mixed $payload, array $resolvedSegments = []): array
+    protected function expandWildcardPath(array $remainingSegments, mixed $payload, array $resolvedSegments = []): array
     {
         if (empty($remainingSegments)) {
             return [new self($resolvedSegments)];
@@ -82,14 +82,14 @@ class ValidationPath implements Stringable
         if ($segment === '*') {
             $results = [];
             foreach (array_keys($payload) as $key) {
-                array_push($results, ...$this->expandPath($remainingSegments, $payload[$key], array_merge($resolvedSegments, [$key])));
+                array_push($results, ...$this->expandWildcardPath($remainingSegments, $payload[$key], array_merge($resolvedSegments, [$key])));
             }
 
             return $results;
         }
 
         if (array_key_exists($segment, $payload)) {
-            return $this->expandPath($remainingSegments, $payload[$segment], array_merge($resolvedSegments, [$segment]));
+            return $this->expandWildcardPath($remainingSegments, $payload[$segment], array_merge($resolvedSegments, [$segment]));
         }
 
         return [];
