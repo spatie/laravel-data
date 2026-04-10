@@ -181,6 +181,18 @@ parameters:
 			path: src/PaginatedDataCollection.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Container\\Container\:\:call\(\) expects \(callable\(\)\: mixed\)\|string, array\{class\-string, ''attributes''\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resolvers/DataValidationMessagesAndAttributesResolver.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Container\\Container\:\:call\(\) expects \(callable\(\)\: mixed\)\|string, array\{class\-string, ''messages''\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resolvers/DataValidationMessagesAndAttributesResolver.php
+
+		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Container\\Container\:\:call\(\) expects \(callable\(\)\: mixed\)\|string, array\{class\-string, ''rules''\} given\.$#'
 			identifier: argument.type
 			count: 1

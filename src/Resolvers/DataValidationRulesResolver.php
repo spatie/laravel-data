@@ -26,6 +26,7 @@ class DataValidationRulesResolver
         protected RuleNormalizer $ruleAttributesResolver,
         protected RuleDenormalizer $ruleDenormalizer,
         protected DataMorphClassResolver $dataMorphClassResolver,
+        protected DataClassFromValidationPayloadResolver $dataClassFromValidationPayloadResolver,
     ) {
     }
 
@@ -35,22 +36,7 @@ class DataValidationRulesResolver
         ValidationPath $path,
         DataRules $dataRules
     ): array {
-        $dataClass = $this->dataConfig->getDataClass($class);
-
-        if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
-            $payload = $path->isRoot()
-                ? $fullPayload
-                : Arr::get($fullPayload, $path->get(), []);
-
-            $morphedClass = $this->dataMorphClassResolver->execute(
-                $dataClass,
-                [$payload],
-            );
-
-            $dataClass = $morphedClass
-                ? $this->dataConfig->getDataClass($morphedClass)
-                : $dataClass;
-        }
+        $dataClass = $this->dataClassFromValidationPayloadResolver->execute($class, $fullPayload, $path);
 
         $withoutValidationProperties = [];
 
