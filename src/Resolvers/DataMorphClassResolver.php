@@ -61,13 +61,13 @@ class DataMorphClassResolver
                 }
             }
 
-            if ($dataProperty->hasDefaultValue) {
+            if ($found === false && $dataProperty->hasDefaultValue) {
                 $morphProperties[$dataProperty->name] = $this->normalizeValue(
                     $dataProperty,
                     $dataProperty->defaultValue,
                 );
 
-                continue;
+                $found = true;
             }
 
             if ($found === false) {

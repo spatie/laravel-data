@@ -183,9 +183,9 @@ class DataTypeScriptTransformer extends DtoTransformer
                 'path' => new String_(),
                 'per_page' => new Integer(),
                 'next_cursor' => new Nullable(new String_()),
-                'next_cursor_url' => new Nullable(new String_()),
+                'next_page_url' => new Nullable(new String_()),
                 'prev_cursor' => new Nullable(new String_()),
-                'prev_cursor_url' => new Nullable(new String_()),
+                'prev_page_url' => new Nullable(new String_()),
             ]),
         ]);
     }

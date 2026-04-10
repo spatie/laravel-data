@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Tests;
 
+use Closure;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Application;
@@ -1496,21 +1497,26 @@ it('will reduce attribute rules to Laravel rules in the end', function () {
     $dataClass = new class () extends Data {
         public int $property;
 
+        public static Closure $where;
+
         public static function rules(): array
         {
             return [
                 'property' => [
                     new IntegerType(),
-                    new Exists('table', where: fn (Builder $builder) => $builder->is_admin),
+                    new Exists('table', where: self::$where),
                 ],
             ];
         }
     };
 
+    // Otherwise Pest is complaining that the closures aren't the same
+    $dataClass::$where = fn (Builder $builder) => $builder->is_admin;
+
     DataValidationAsserter::for($dataClass)->assertRules([
         'property' => [
             'integer',
-            (new LaravelExists('table'))->where(fn (Builder $builder) => $builder->is_admin),
+            (new LaravelExists('table'))->where($dataClass::$where),
         ],
     ]);
 });
