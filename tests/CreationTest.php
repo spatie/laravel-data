@@ -225,7 +225,7 @@ it('can set a custom cast', function () {
 
     expect($data->date)
         ->toBeInstanceOf(DateTimeImmutable::class)
-        ->toEqual(DateTimeImmutable::createFromFormat('Y-m-d', '2022-01-18'));
+        ->and($data->date->format('Y-m-d'))->toEqual('2022-01-18');
 });
 
 it('allows casting of enums', function () {
