@@ -6,7 +6,7 @@ laravel-data's mapping attributes (`MapInputName`, `MapOutputName`, `MapName`) a
 
 This adds an optional **scope** parameter. Fully backward compatible — mappings without scope always apply. Mappings with scope only apply when that scope is active.
 
-The scope system uses a `Scope` class with two dimensions: `key` (which layer — used by mapping) and `context` (which action — usable by future features like validation contexts from PR #1149).
+The scope system uses a `Scope` class with two dimensions: `key` (which layer — used by mapping) and `context` (which action — usable by future features like validation contexts from PR #1149). All scopes carry both dimensions; built-in scopes (`EloquentScope`, `RequestScope`, `ResourceScope`) extend `Scope` directly with a fixed key.
 
 ## API Design
 
@@ -46,6 +46,10 @@ UserData::factory()->withScope(new RequestScope('store'))->from($request);
 // Mapping matches on key='request'
 // Validation (future) matches on context='store'
 
+// Multiple scopes with array syntax (replaces ApiScope inheritance matching)
+#[MapInputName('displayName', scope: [RequestScope::class, ResourceScope::class])]
+public string $displayName;
+
 // No scope = always applies (backward compatible)
 #[MapInputName('something')]
 ```
@@ -60,17 +64,20 @@ class Scope
 {
     public function __construct(
         public readonly string $key,
+        public readonly ?string $context = null,
     ) {}
 }
 ```
+
+All scopes carry both `key` (which layer) and `context` (which action). Context lives on the base class so every scope can use it — not just API-related ones.
 
 **New file:** `src/Support/Scopes/EloquentScope.php`
 ```php
 class EloquentScope extends Scope
 {
-    public function __construct()
+    public function __construct(?string $context = null)
     {
-        parent::__construct(self::getScopeKey());
+        parent::__construct(static::getScopeKey(), $context);
     }
 
     public static function getScopeKey(): string
@@ -80,14 +87,13 @@ class EloquentScope extends Scope
 }
 ```
 
-**New file:** `src/Support/Scopes/ApiScope.php` — base for all API-related scopes, carries context:
+**New file:** `src/Support/Scopes/ApiScope.php` — base for request/resource scopes:
 ```php
 class ApiScope extends Scope
 {
-    public function __construct(
-        public readonly ?string $context = null,
-    ) {
-        parent::__construct(self::getScopeKey());
+    public function __construct(?string $context = null)
+    {
+        parent::__construct(static::getScopeKey(), $context);
     }
 
     public static function getScopeKey(): string
@@ -97,34 +103,18 @@ class ApiScope extends Scope
 }
 ```
 
+Uses `static::getScopeKey()` (late static binding) so subclasses automatically get their own key.
+
 **New file:** `src/Support/Scopes/RequestScope.php`
 ```php
 class RequestScope extends ApiScope
 {
-    public function __construct(?string $context = null)
-    {
-        parent::__construct($context);
-        // Override key from parent
-    }
-
     public static function getScopeKey(): string
     {
         return 'request';
     }
 }
 ```
-
-Note: since `ApiScope` constructor calls `self::getScopeKey()`, and PHP's `self` is resolved at definition time (not runtime), `RequestScope` needs to set its own key. Adjust constructors to use `static::getScopeKey()` or pass key explicitly:
-
-```php
-// ApiScope
-public function __construct(public readonly ?string $context = null)
-{
-    parent::__construct(static::getScopeKey());
-}
-```
-
-With `static::` (late static binding), subclasses automatically get their own key.
 
 **New file:** `src/Support/Scopes/ResourceScope.php`
 ```php
@@ -139,32 +129,26 @@ class ResourceScope extends ApiScope
 
 **Class hierarchy:**
 ```
-Scope (concrete, custom key, no context)
+Scope (concrete, custom key + context)
 ├── EloquentScope (key='eloquent')
-└── ApiScope (key='api', has context)
-    ├── RequestScope (key='request', inherits context)
-    └── ResourceScope (key='resource', inherits context)
+└── ApiScope (key='api')
+    ├── RequestScope (key='request')
+    └── ResourceScope (key='resource')
 ```
 
-**Inheritance-based matching** — a mapping for `ApiScope` matches `RequestScope` and `ResourceScope` too:
+**Inheritance-based matching** — a mapping for `ApiScope` matches `RequestScope` and `ResourceScope` too (via `scopeKeyHierarchy` in `DataProperty`, see Step 3):
 ```php
 #[MapName(SnakeCaseMapper::class, scope: ApiScope::class)]     // matches api, request, resource
 #[MapInputName('special', scope: RequestScope::class)]          // only matches request (more specific)
 ```
 
-**Context** lives on `ApiScope` and flows to children:
+**Context** is available on all scopes:
 ```php
 new RequestScope('store')   // key='request', context='store'
 new ResourceScope('admin')  // key='resource', context='admin'
-new ApiScope('store')       // key='api', context='store'
-new EloquentScope()         // key='eloquent', no context
-new Scope('stripe')         // key='stripe', custom, no context
-```
-
-Checking scopes without magic strings:
-```php
-if ($scope->key === EloquentScope::getScopeKey()) { ... }
-if ($scope instanceof ApiScope) { $scope->context; }  // context available on all API scopes
+new EloquentScope()         // key='eloquent', context=null
+new Scope('stripe')         // key='stripe', context=null
+new Scope('stripe', 'webhook')  // key='stripe', context='webhook'
 ```
 
 ### Step 2: Update mapping attributes
@@ -324,10 +308,76 @@ Same pattern for `resolveOutputNameMapper`.
 
 **New scoped methods** (native array functions):
 - Iterate `$attributes->all(MapInputName::class)`, filter non-null `scope`
-- For each scope in `$attr->scopes`, resolve class-strings to instances (`is_string($s) ? new $s() : $s`), extract `->key`, resolve the mapper and store keyed by scope key
+- For each scope in `$attr->scopes`, resolve class-strings to instances (`is_string($s) ? new $s() : $s`), extract `->key`, resolve the mapper via `$this->resolveMapper()` and store keyed by scope key
 - Same for `MapName`, `MapOutputName`
-- Config fallback: `data.name_mapping_strategy.scoped.{key}.input/output`
+- **Important:** the scoped resolver methods must also respect `$this->ignoredMappers`. `DataClassFactory` creates the resolver with `ignoredMappers: [ProvidedNameMapper::class]` for class-level attributes — scoped class-level mappers need the same filtering
 - Return `array<string, NameMapper>` keyed by scope key
+
+**Config fallback for scoped mappers:**
+
+```php
+protected function resolveScopedInputNameMappers(DataAttributesCollection $attributes): array
+{
+    $mappers = [];
+
+    foreach ($attributes->all(MapInputName::class) as $attr) {
+        if ($attr->scopes === null) {
+            continue;
+        }
+
+        foreach ($attr->scopes as $scope) {
+            $resolved = is_string($scope) ? new $scope() : $scope;
+            $mapper = $this->resolveMapper($attr->input);
+
+            if ($mapper !== null) {
+                $mappers[$resolved->key] = $mapper;
+            }
+        }
+    }
+
+    foreach ($attributes->all(MapName::class) as $attr) {
+        if ($attr->scopes === null) {
+            continue;
+        }
+
+        foreach ($attr->scopes as $scope) {
+            $resolved = is_string($scope) ? new $scope() : $scope;
+
+            if (! array_key_exists($resolved->key, $mappers)) {
+                $mapper = $this->resolveMapper($attr->input);
+
+                if ($mapper !== null) {
+                    $mappers[$resolved->key] = $mapper;
+                }
+            }
+        }
+    }
+
+    // Config fallback for keys not already resolved from attributes
+    $scopedConfig = config('data.name_mapping_strategy.scoped', []);
+
+    foreach ($scopedConfig as $key => $strategies) {
+        if (! array_key_exists($key, $mappers) && isset($strategies['input'])) {
+            $mapper = $this->resolveMapperClass($strategies['input']);
+
+            foreach ($this->ignoredMappers as $ignoredMapper) {
+                if ($mapper instanceof $ignoredMapper) {
+                    $mapper = null;
+                    break;
+                }
+            }
+
+            if ($mapper !== null) {
+                $mappers[$key] = $mapper;
+            }
+        }
+    }
+
+    return $mappers;
+}
+```
+
+Same pattern for `resolveScopedOutputNameMappers` (using `$attr->output` and `$strategies['output']`).
 
 ### Step 5: Update `DataPropertyFactory`
 
@@ -347,15 +397,17 @@ After resolving defaults, resolve scoped names and pass to `DataProperty` constr
 
 In `resolveProperties()`, pass scoped class-level mappers from `$mappers` array to `propertyFactory->build()`.
 
-### Step 7: Create `ScopeSuggestingNormalizer` interface on normalizers
+### Step 7: Create `ScopeSuggestingNormalizer` interface + update `normalize()` return
 
 **New file:** `src/Normalizers/ScopeSuggestingNormalizer.php`
 ```php
 interface ScopeSuggestingNormalizer
 {
-    public function suggestedScope(): Scope;
+    public static function suggestedScope(): Scope;
 }
 ```
+
+Static because a normalizer always suggests the same scope — it's a class-level property.
 
 **File:** `src/Normalizers/ModelNormalizer.php`
 ```php
@@ -363,7 +415,7 @@ class ModelNormalizer implements Normalizer, ScopeSuggestingNormalizer
 {
     // ...existing normalize()...
 
-    public function suggestedScope(): Scope
+    public static function suggestedScope(): Scope
     {
         return new EloquentScope();
     }
@@ -376,29 +428,31 @@ class FormRequestNormalizer implements Normalizer, ScopeSuggestingNormalizer
 {
     // ...existing normalize()...
 
-    public function suggestedScope(): Scope
+    public static function suggestedScope(): Scope
     {
         return new RequestScope();
     }
 }
 ```
 
-**File:** `src/Support/ResolvedDataPipeline.php` — track matched normalizer:
+**File:** `src/Support/ResolvedDataPipeline.php` — return a tuple instead of storing mutable state (pipeline instances are cached and shared via `DataConfig::getResolvedDataPipeline()`):
 ```php
-public ?Normalizer $lastMatchedNormalizer = null;
-
-public function normalize(mixed $value): array|Normalized
+/** @return array{array|Normalized, Normalizer} */
+public function normalize(mixed $value): array
 {
     foreach ($this->normalizers as $normalizer) {
         $properties = $normalizer->normalize($value);
+
         if ($properties !== null) {
-            $this->lastMatchedNormalizer = $normalizer;
-            break;
+            return [$properties, $normalizer];
         }
     }
-    // ...rest unchanged
+
+    throw CannotCreateData::noNormalizerFound($this->dataClass->name, $value);
 }
 ```
+
+All callers of `normalize()` must destructure the tuple. The `execute()` method already passes normalized data separately to `runPipelineOnNormalizedValue()`, so the change is contained to where `normalize()` is called directly.
 
 ### Step 8: Add `scope` to CreationContext + Factory
 
@@ -446,26 +500,22 @@ Update `get()` to pass `scope`.
 
 **File:** `src/Resolvers/DataFromSomethingResolver.php`
 
-Add new method:
-```php
-protected function automaticallyResolveMapScope(
-    CreationContext $creationContext,
-    ResolvedDataPipeline $pipeline,
-): void {
-    if ($creationContext->scope !== null) {
-        return;
-    }
+Update the normalization loop in `execute()` to destructure the tuple and auto-detect scope from the **first** normalizer that implements `ScopeSuggestingNormalizer`:
 
-    if ($pipeline->lastMatchedNormalizer instanceof ScopeSuggestingNormalizer) {
-        $creationContext->scope = $pipeline->lastMatchedNormalizer->suggestedScope();
+```php
+$normalizedPayloads = [];
+
+foreach ($payloads as $i => $payload) {
+    [$normalized, $normalizer] = $pipeline->normalize($payload ?? []);
+    $normalizedPayloads[$i] = $normalized;
+
+    if ($creationContext->scope === null && $normalizer instanceof ScopeSuggestingNormalizer) {
+        $creationContext->scope = $normalizer::suggestedScope();
     }
 }
 ```
 
-Call in `execute()` after normalization (after line 48), before any pipeline runs:
-```php
-$this->automaticallyResolveMapScope($creationContext, $pipeline);
-```
+Uses the first match because the primary payload (e.g., a Model) comes first — secondary payloads (e.g., extra arrays) shouldn't override the scope.
 
 Note: when user explicitly sets scope with context (e.g., `new RequestScope('store')`), auto-detection is skipped because `$creationContext->scope !== null`. The context survives.
 
@@ -478,11 +528,22 @@ $name = $creationContext->mapPropertyNames
     : $property->name;
 ```
 
-**`src/DataPipes/MapPropertiesDataPipe.php`**:
+Also update `execute()` to destructure the tuple from `normalize()`:
+```php
+[$normalizedValue, $normalizer] = $this->normalize($value);
+```
+
+**`src/DataPipes/MapPropertiesDataPipe.php`** — `handle()` (line 23):
 ```php
 $inputMappedName = $dataProperty->resolveInputMappedName($creationContext->scope);
 if ($inputMappedName === null) { continue; }
 ```
+
+Also update `addPropertyMappingToCreationContext()` (lines 58, 61) — currently uses `$property->inputMappedName` directly:
+```php
+$mappedProperties['_mappings'][$property->name] = $property->resolveInputMappedName($creationContext->scope);
+```
+Pass `$creationContext` into this method (currently only receives `$property`).
 
 **`src/Resolvers/TransformedDataResolver.php`** (line 82+):
 ```php
@@ -502,6 +563,26 @@ $name = $dataProperty->resolveInputMappedName($creationContext->scope) ?: $dataP
 **`src/DataPipes/FillRouteParameterPropertiesDataPipe.php`** (line 34):
 ```php
 $name = $dataProperty->resolveInputMappedName($creationContext->scope) ?: $dataProperty->name;
+```
+
+**`src/Resolvers/RequestQueryStringPartialsResolver.php`** (line 148+) — resolve with `RequestScope` since this resolver only runs for request query strings:
+```php
+protected function resolveField(string $field, DataClass $dataClass): ?string
+{
+    if ($dataClass->properties->has($field)) {
+        return $field;
+    }
+
+    $requestScope = new RequestScope();
+
+    foreach ($dataClass->properties as $property) {
+        if ($property->resolveOutputMappedName($requestScope) === $field) {
+            return $property->name;
+        }
+    }
+
+    return null;
+}
 ```
 
 ### Step 12: Auto-detect Resource scope on response
@@ -533,7 +614,9 @@ $json = json_encode($value->transform(
 ));
 ```
 
-**File:** `src/Support/EloquentCasts/DataCollectionEloquentCast.php` — same pattern.
+Also update the abstract class cast path in `set()` (line 81) which uses `$item->toJson()` — apply the same `TransformationContextFactory` with `EloquentScope`.
+
+**File:** `src/Support/EloquentCasts/DataCollectionEloquentCast.php` — same pattern, scope on both regular and abstract class paths.
 
 ### Step 14: Update config
 
@@ -550,6 +633,13 @@ $json = json_encode($value->transform(
     ],
 ],
 ```
+
+**Resolution order** (per property, per scope key):
+1. Property-level scoped attribute (`#[MapInputName('x', scope: EloquentScope::class)]`) — wins if present
+2. Class-level scoped attribute (`#[MapName(SnakeCaseMapper::class, scope: EloquentScope::class)]`) — applied via `$classScopedInputNameMappers` in `DataPropertyFactory`
+3. Config fallback (`data.name_mapping_strategy.scoped.eloquent.input`) — only if no attribute matched for this scope key
+
+This mirrors the existing unscoped resolution: property attribute > class attribute > config default. Scoped and unscoped resolution are independent — a scoped mapping doesn't suppress the unscoped default and vice versa.
 
 ### Step 15: Tests
 
@@ -580,9 +670,9 @@ $json = json_encode($value->transform(
   - Custom scopes (`new Scope('stripe')`)
   - Auto-detection (Model → Eloquent, Request → Request, toResponse → Resource)
   - Scope context for validation (store, update, etc.)
-  - Inheritance matching (ApiScope matches Request + Resource)
+  - Inheritance matching (ApiScope matches Request + Resource) and array syntax for multiple scopes
+  - Config-based scoped defaults
   - Using scopes with mapping attributes
-  - Using scopes with validation rules
 - `docs/as-a-data-transfer-object/mapping-property-names.md` — Link to scopes doc, brief examples
 - `docs/as-a-resource/mapping-property-names.md` — Link to scopes doc, brief examples
 
@@ -619,38 +709,39 @@ Since `RequestScope extends ApiScope`, a validation rule scoped to `ApiScope('st
 ## Files Summary
 
 **New (6):**
-- `src/Support/Scopes/Scope.php`
+- `src/Support/Scopes/Scope.php` (key + context)
 - `src/Support/Scopes/EloquentScope.php`
 - `src/Support/Scopes/ApiScope.php`
 - `src/Support/Scopes/RequestScope.php` (extends ApiScope)
 - `src/Support/Scopes/ResourceScope.php` (extends ApiScope)
 - `src/Normalizers/ScopeSuggestingNormalizer.php`
 
-**Modified (~19):**
+**Modified (~20):**
 | File | Change |
 |------|--------|
 | `src/Attributes/MapInputName.php` | scope, IS_REPEATABLE |
 | `src/Attributes/MapOutputName.php` | scope, IS_REPEATABLE |
 | `src/Attributes/MapName.php` | scope, IS_REPEATABLE |
 | `src/Support/DataProperty.php` | scoped arrays + resolve methods |
-| `src/Resolvers/NameMappersResolver.php` | scoped resolution, native arrays |
+| `src/Resolvers/NameMappersResolver.php` | scoped resolution + config fallback, respect ignoredMappers |
 | `src/Support/Factories/DataPropertyFactory.php` | resolve scoped names |
 | `src/Support/Factories/DataClassFactory.php` | pass scoped class mappers |
-| `src/Normalizers/ModelNormalizer.php` | implement ScopeSuggestingNormalizer |
-| `src/Normalizers/FormRequestNormalizer.php` | implement ScopeSuggestingNormalizer |
-| `src/Resolvers/DataFromSomethingResolver.php` | automaticallyResolveMapScope() |
+| `src/Normalizers/ModelNormalizer.php` | implement ScopeSuggestingNormalizer (static) |
+| `src/Normalizers/FormRequestNormalizer.php` | implement ScopeSuggestingNormalizer (static) |
+| `src/Resolvers/DataFromSomethingResolver.php` | auto-detect scope from normalize() tuple |
 | `src/Support/Creation/CreationContext.php` | add scope |
 | `src/Support/Creation/CreationContextFactory.php` | add withScope() |
 | `src/Support/Transformation/TransformationContext.php` | add scope |
 | `src/Support/Transformation/TransformationContextFactory.php` | add withScope() |
-| `src/DataPipes/MapPropertiesDataPipe.php` | resolveInputMappedName(scope) |
+| `src/DataPipes/MapPropertiesDataPipe.php` | resolveInputMappedName(scope) + addPropertyMappingToCreationContext |
 | `src/DataPipes/InjectPropertyValuesPipe.php` | resolveInputMappedName(scope) |
 | `src/DataPipes/FillRouteParameterPropertiesDataPipe.php` | resolveInputMappedName(scope) |
-| `src/Support/ResolvedDataPipeline.php` | scope-aware name resolution |
+| `src/Support/ResolvedDataPipeline.php` | normalize() returns tuple, scope-aware name resolution |
 | `src/Resolvers/TransformedDataResolver.php` | resolveOutputMappedName(scope) |
+| `src/Resolvers/RequestQueryStringPartialsResolver.php` | scope-aware output name resolution with RequestScope |
 | `src/Concerns/ResponsableData.php` | withScope(ResourceScope) |
-| `src/Support/EloquentCasts/DataEloquentCast.php` | EloquentScope |
-| `src/Support/EloquentCasts/DataCollectionEloquentCast.php` | EloquentScope |
+| `src/Support/EloquentCasts/DataEloquentCast.php` | EloquentScope on get/set + abstract class path |
+| `src/Support/EloquentCasts/DataCollectionEloquentCast.php` | EloquentScope on get/set + abstract class path |
 | `config/data.php` | scoped config key |
 
 **Unchanged** (use default mapping, no scope context):
