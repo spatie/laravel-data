@@ -74,6 +74,7 @@ use Spatie\LaravelData\Tests\Fakes\NestedModelCollectionData;
 use Spatie\LaravelData\Tests\Fakes\NestedModelData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithPropertyHooks;
 
 it('can use default types to create data objects', function () {
     $data = ComplicatedData::from([
@@ -201,8 +202,11 @@ it('allows creating data objects using Lazy', function () {
     ]);
 
     expect($data->simple)
-        ->toBeInstanceOf(Lazy::class)
-        ->toEqual(Lazy::create(fn () => SimpleData::from('Hello')));
+        ->toBeInstanceOf(Lazy::class);
+
+    expect($data->simple->resolve())
+        ->toBeInstanceOf(SimpleData::class)
+        ->string->toEqual('Hello');
 });
 
 it('can set a custom cast', function () {
@@ -724,6 +728,25 @@ it('can have a computed value when creating the data object', function () {
     expect(fn () => $dataObject::from(['first_name' => 'Ruben', 'last_name' => 'Van Assche', 'full_name' => 'Ruben Versieck']))
         ->toThrow(CannotSetComputedValue::class);
 });
+
+it('can have a virtual property when creating the data object', function () {
+    expect(SimpleDataWithPropertyHooks::from(['constructorProperty' => 'test', 'virtual' => 'Something to Be Ignored']))
+        ->virtual->toBe('virtual');
+
+    expect(SimpleDataWithPropertyHooks::validateAndCreate(['constructorProperty' => 'test', 'virtual' => 'Something to Be Ignored']))
+        ->virtual->toBe('virtual');
+
+    config()->set('data.features.ignore_exception_when_trying_to_set_computed_property_value', false);
+
+    expect(SimpleDataWithPropertyHooks::from(['constructorProperty' => 'test']))
+        ->virtual->toBe('virtual');
+
+    expect(SimpleDataWithPropertyHooks::validateAndCreate(['constructorProperty' => 'test']))
+        ->virtual->toBe('virtual');
+
+    expect(fn () => SimpleDataWithPropertyHooks::from(['constructorProperty' => 'test', 'virtual' => 'other']))
+        ->toThrow(CannotSetComputedValue::class);
+})->skipOnPhp('<8.4');
 
 it('can have a nullable computed value', function () {
     $dataObject = new class ('', '') extends Data {

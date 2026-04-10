@@ -2,6 +2,48 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.21.0 - 2026-04-02
+
+### What's Changed
+
+* Bump dependabot/fetch-metadata from 2.5.0 to 3.0.0 by @dependabot[bot] in https://github.com/spatie/laravel-data/pull/1167
+* fix: truncate nanoseconds for dates with timezone offsets by @ralphjsmit in https://github.com/spatie/laravel-data/pull/1160
+* Fix NormalizedModel not resolving non-snake-cased model attributes by @isaackaara in https://github.com/spatie/laravel-data/pull/1159
+* fix(EmptyDataResolver): allow null overwrites by @vaishnavyogesh in https://github.com/spatie/laravel-data/pull/1161
+* Fix deprecation warning for 'SplObjectStorage::attach' by @jelledruut in https://github.com/spatie/laravel-data/pull/1145
+* Improve virtual property support by @jivanf in https://github.com/spatie/laravel-data/pull/1164
+* fix DataTypeScriptTransformer cursor paginator properties by @UltraWelfare in https://github.com/spatie/laravel-data/pull/1098
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.20.1...4.21.0
+
+## 4.20.1 - 2026-03-18
+
+- Fix an issue where the reflection dependency could not be resolved correctly
+
+## 4.20.0 - 2026-02-25
+
+- Laravel 13 support
+- Livewire 4 support
+- Dropped PHP 8.1 support
+
+## 4.19.1 - 2026-01-28
+
+### What's Changed
+
+* Fix deprecation warning for ReflectionProperty::getDefaultValue() by @evan-burrell in https://github.com/spatie/laravel-data/pull/1142
+* Fix: Deprication warning for symfony/http-foundation 7.4 by @GameBear64 in https://github.com/spatie/laravel-data/pull/1140
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.19.0...4.19.1
+
+## 4.19.0 - 2026-01-19
+
+### What's Changed
+
+* [fix] DataMorphClassResolver: skip default value applying if morph property was resolved by @litvintroll in https://github.com/spatie/laravel-data/pull/1101
+* Fix dependency issue by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1136
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.18.0...4.19.0
+
 ## 4.18.0 - 2025-10-16
 
 ### What's Changed
@@ -188,6 +230,11 @@ SongData::factory()
 
 
 
+
+
+
+
+
 ```
 #### Injecting property values
 
@@ -198,6 +245,11 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
+
+
+
+
 
 
 
@@ -237,6 +289,11 @@ class SongData extends Data
         ];
     }
 }
+
+
+
+
+
 
 
 

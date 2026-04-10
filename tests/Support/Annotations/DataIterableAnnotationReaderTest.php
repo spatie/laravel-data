@@ -102,7 +102,7 @@ it(
 it('can get the data class for a data collection by class annotation', function () {
     $annotations = app(DataIterableAnnotationReader::class)->getForClass(new ReflectionClass(CollectionDataAnnotationsData::class));
 
-    expect($annotations)->toEqualCanonicalizing([
+    expect($annotations)->toEqual([
         'propertyN' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyN'),
         'propertyO' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyO'),
         'propertyP' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'propertyP'),
@@ -117,7 +117,7 @@ it('can get the data class for a data collection by class annotation', function 
 it('can get data class for a data collection by method annotation', function () {
     $annotations = app(DataIterableAnnotationReader::class)->getForMethod(new ReflectionMethod(CollectionDataAnnotationsData::class, 'method'));
 
-    expect($annotations)->toEqualCanonicalizing([
+    expect($annotations)->toEqual([
         'paramA' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramA'),
         'paramB' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramB'),
         'paramC' => new DataIterableAnnotation(SimpleData::class, isData: true, property: 'paramC'),
@@ -218,7 +218,7 @@ it(
 it('can get the iterable class for a collection by class annotation', function () {
     $annotations = app(DataIterableAnnotationReader::class)->getForClass(new ReflectionClass(CollectionNonDataAnnotationsData::class));
 
-    expect($annotations)->toEqualCanonicalizing([
+    expect($annotations)->toEqual([
         'propertyM' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyM'),
         'propertyN' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyN'),
         'propertyO' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'propertyO'),
@@ -229,7 +229,7 @@ it('can get the iterable class for a collection by class annotation', function (
 it('can get iterable class for a data by method annotation', function () {
     $annotations = app(DataIterableAnnotationReader::class)->getForMethod(new ReflectionMethod(CollectionNonDataAnnotationsData::class, 'method'));
 
-    expect($annotations)->toEqualCanonicalizing([
+    expect($annotations)->toEqual([
         'paramA' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramA'),
         'paramB' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramB'),
         'paramC' => new DataIterableAnnotation(DummyBackedEnum::class, isData: false, property: 'paramC'),

@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Call to function is_subclass_of\(\) with class\-string\<Spatie\\LaravelData\\Contracts\\BaseData\> and ''Spatie\\\\LaravelData\\\\Contracts\\\\BaseData'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/Attributes/DataCollectionOf.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1
@@ -73,12 +67,6 @@ parameters:
 			path: src/Attributes/Validation/Unique.php
 
 		-
-			message: '#^Parameter \#2 \$array of function implode expects array\<string\>, array\<object\|string\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Attributes/Validation/ValidationAttribute.php
-
-		-
 			message: '#^Call to function is_a\(\) with arguments class\-string\<Spatie\\LaravelData\\Casts\\Cast\>, ''Spatie\\\\LaravelData\\\\Casts\\\\Cast'' and true will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -121,33 +109,9 @@ parameters:
 			path: src/Concerns/WithDeprecatedCollectionMethod.php
 
 		-
-			message: '#^Method Spatie\\LaravelData\\CursorPaginatedDataCollection\:\:through\(\) should return static\(Spatie\\LaravelData\\CursorPaginatedDataCollection\<TKey of \(int\|string\), TValue\>\) but returns \$this\(Spatie\\LaravelData\\CursorPaginatedDataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
+			message: '#^Method Spatie\\LaravelData\\CursorPaginatedDataCollection\:\:through\(\) should return static\(Spatie\\LaravelData\\CursorPaginatedDataCollection\<TKey of \(int\|string\), TValue\>\) but returns static\(Spatie\\LaravelData\\CursorPaginatedDataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
 			identifier: return.type
 			count: 1
-			path: src/CursorPaginatedDataCollection.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$exceptPartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/CursorPaginatedDataCollection.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$excludePartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/CursorPaginatedDataCollection.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$includePartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/CursorPaginatedDataCollection.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$onlyPartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
 			path: src/CursorPaginatedDataCollection.php
 
 		-
@@ -169,57 +133,9 @@ parameters:
 			path: src/Data.php
 
 		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$exceptPartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/Data.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$excludePartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/Data.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$includePartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/Data.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$onlyPartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/Data.php
-
-		-
-			message: '#^Method Spatie\\LaravelData\\DataCollection\:\:values\(\) should return static\(Spatie\\LaravelData\\DataCollection\<int, TValue\>\) but returns \$this\(Spatie\\LaravelData\\DataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
+			message: '#^Method Spatie\\LaravelData\\DataCollection\:\:values\(\) should return static\(Spatie\\LaravelData\\DataCollection\<int, TValue\>\) but returns static\(Spatie\\LaravelData\\DataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
 			identifier: return.type
 			count: 1
-			path: src/DataCollection.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$exceptPartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/DataCollection.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$excludePartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/DataCollection.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$includePartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/DataCollection.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$onlyPartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
 			path: src/DataCollection.php
 
 		-
@@ -253,7 +169,7 @@ parameters:
 			path: src/PaginatedDataCollection.php
 
 		-
-			message: '#^Method Spatie\\LaravelData\\PaginatedDataCollection\:\:through\(\) should return static\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\) but returns \$this\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
+			message: '#^Method Spatie\\LaravelData\\PaginatedDataCollection\:\:through\(\) should return static\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\) but returns static\(Spatie\\LaravelData\\PaginatedDataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
 			identifier: return.type
 			count: 1
 			path: src/PaginatedDataCollection.php
@@ -262,30 +178,6 @@ parameters:
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Contracts\\Pagination\\Paginator\<\(int\|string\),mixed\>\:\:through\(\) expects callable\(mixed\)\: mixed, Closure\(TValue, TKey\)\: TValue given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/PaginatedDataCollection.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$exceptPartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/PaginatedDataCollection.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$excludePartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/PaginatedDataCollection.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$includePartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/PaginatedDataCollection.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$onlyPartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
 			path: src/PaginatedDataCollection.php
 
 		-
@@ -349,30 +241,6 @@ parameters:
 			path: src/Resource.php
 
 		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$exceptPartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/Resource.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$excludePartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/Resource.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$includePartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/Resource.php
-
-		-
-			message: '#^Property object\{includePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, excludePartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, onlyPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null, exceptPartials\: Spatie\\LaravelData\\Support\\Partials\\PartialsCollection\|null\}\:\:\$onlyPartials is not writable\.$#'
-			identifier: assign.propertyReadOnly
-			count: 3
-			path: src/Resource.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1
@@ -397,7 +265,7 @@ parameters:
 			path: src/Support/EloquentCasts/DataCollectionEloquentCast.php
 
 		-
-			message: '#^Instanceof between Spatie\\LaravelData\\Contracts\\BaseData&Spatie\\LaravelData\\Contracts\\TransformableData and Spatie\\LaravelData\\Contracts\\TransformableData will always evaluate to true\.$#'
+			message: '#^Instanceof between TData of Spatie\\LaravelData\\Contracts\\BaseData&Spatie\\LaravelData\\Contracts\\TransformableData and Spatie\\LaravelData\\Contracts\\TransformableData will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
 			path: src/Support/EloquentCasts/DataEloquentCast.php
@@ -407,6 +275,18 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: src/Support/Factories/DataClassFactory.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between false and false will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: src/Support/Factories/DataTypeFactory.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Support/Factories/DataTypeFactory.php
 
 		-
 			message: '#^Template type T is declared as covariant, but occurs in invariant position in property Spatie\\LaravelData\\Support\\LazyDataStructureProperty\:\:\$value\.$#'

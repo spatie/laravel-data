@@ -40,7 +40,7 @@ class DateTimeInterfaceCast implements Cast, IterableItemCast
 
         // Truncate nanoseconds to microseconds (first 6 digits)
         if (is_string($value)) {
-            $value = preg_replace('/\.(\d{6})\d*Z$/', '.$1Z', $value);
+            $value = preg_replace('/(\.\d{6})\d+/', '$1', $value);
         }
 
         /** @var DateTimeInterface|null $datetime */

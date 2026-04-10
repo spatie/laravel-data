@@ -341,3 +341,58 @@ it('can cast date times with nanosecond precision by truncating nanoseconds to m
         )
     )->toEqual(new DateTimeImmutable('2024-12-02T16:20:15.969827247Z'));
 });
+
+it('can cast date times with nanosecond precision and a timezone offset by truncating nanoseconds to microseconds', function (string $date, string $format) {
+    $caster = new DateTimeInterfaceCast($format);
+
+    $class = new class () {
+        public Carbon $carbon;
+
+        public CarbonImmutable $carbonImmutable;
+
+        public DateTime $dateTime;
+
+        public DateTimeImmutable $dateTimeImmutable;
+    };
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'carbon'),
+            $date,
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new Carbon($date));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'carbonImmutable'),
+            $date,
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new CarbonImmutable($date));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'dateTime'),
+            $date,
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new DateTime($date));
+
+    expect(
+        $caster->cast(
+            FakeDataStructureFactory::property($class, 'dateTimeImmutable'),
+            $date,
+            [],
+            CreationContextFactory::createFromConfig($class::class)->get()
+        )
+    )->toEqual(new DateTimeImmutable($date));
+})->with([
+    'positive offset, 7 digits' => ['2026-03-10T09:55:56.9918655+01:00', "Y-m-d\TH:i:s.uP"],
+    'negative offset, 7 digits' => ['2026-03-10T09:55:56.9918655-05:00', "Y-m-d\TH:i:s.uP"],
+    'zero offset, 9 digits' => ['2026-03-10T09:55:56.969827247+00:00', "Y-m-d\TH:i:s.uP"],
+    'Z suffix, 7 digits' => ['2026-03-10T09:55:56.9918655Z', "Y-m-d\TH:i:s.u\Z"],
+]);

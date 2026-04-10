@@ -15,7 +15,7 @@ class PartialsCollection extends SplObjectStorage implements Stringable
         $collection = new self();
 
         foreach ($partials as $partial) {
-            $collection->attach($partial);
+            $collection->offsetSet($partial);
         }
 
         return $collection;
@@ -69,7 +69,7 @@ class PartialsCollection extends SplObjectStorage implements Stringable
         $collection = new self();
 
         foreach ($this as $partial) {
-            $collection->attach(clone $partial);
+            $collection->offsetSet(clone $partial);
         }
 
         return $collection;
