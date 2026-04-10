@@ -24,34 +24,17 @@ class NormalizedModel implements Normalized
 
     public function getProperty(string $name, DataProperty $dataProperty): mixed
     {
-        $value = $this->resolvePropertyValue($name, $dataProperty);
+        $propertyName = $this->model::$snakeAttributes ? Str::snake($name) : $name;
+
+        $value = array_key_exists($propertyName, $this->properties)
+            ? $this->properties[$propertyName]
+            : $this->fetchNewProperty($propertyName, $dataProperty);
 
         if ($value === null && ! $dataProperty->type->isNullable) {
             return UnknownProperty::create();
         }
 
         return $value;
-    }
-
-    protected function resolvePropertyValue(string $name, DataProperty $dataProperty): mixed
-    {
-        if (array_key_exists($name, $this->properties)) {
-            return $this->properties[$name];
-        }
-
-        $value = $this->fetchNewProperty($name, $dataProperty);
-
-        if (! $value instanceof UnknownProperty || ! $this->model::$snakeAttributes) {
-            return $value;
-        }
-
-        $snakeName = Str::snake($name);
-
-        if ($snakeName === $name) {
-            return $value;
-        }
-
-        return $this->fetchNewProperty($snakeName, $dataProperty);
     }
 
     protected function fetchNewProperty(string $name, DataProperty $dataProperty): mixed

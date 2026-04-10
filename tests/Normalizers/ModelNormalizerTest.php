@@ -230,16 +230,3 @@ it('can create a data property for a model attribute which fetches a relation th
         ->accessor_using_relation
         ->toEqual($data->accessor_using_relation);
 });
-
-it('can resolve non-snake-cased model attributes', function () {
-    $dataClass = new class () extends Data {
-        public string $MyField;
-    };
-
-    $model = new FakeModel();
-    $model->MyField = 'test';
-
-    $data = $dataClass::from($model);
-
-    expect($data->MyField)->toEqual('test');
-});
