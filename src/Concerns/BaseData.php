@@ -60,6 +60,11 @@ trait BaseData
         return CreationContextFactory::createFromConfig(static::class);
     }
 
+    public static function withContext(?string $context): CreationContextFactory
+    {
+        return static::factory()->withValidationContext($context);
+    }
+
     public static function normalizers(): array
     {
         return config('data.normalizers');

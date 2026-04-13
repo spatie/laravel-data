@@ -11,9 +11,13 @@ class Mimes extends StringValidationAttribute
 {
     protected array $mimes;
 
-    public function __construct(string|array|ExternalReference ...$mimes)
-    {
-        $this->mimes = Arr::flatten($mimes);
+    public function __construct(
+        string|array|ExternalReference ...$mimes,
+    ) {
+        $extracted = $this->extractContextFromVariadicValues($mimes);
+
+        $this->mimes = Arr::flatten($extracted['values']);
+        $this->context = $extracted['context'];
     }
 
     public static function keyword(): string

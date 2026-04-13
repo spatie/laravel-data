@@ -14,9 +14,12 @@ use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Validation\DataRules;
 use Spatie\LaravelData\Support\Validation\EnsurePropertyMorphable;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
+use Spatie\LaravelData\Support\Validation\RequiringRule;
 use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Spatie\LaravelData\Support\Validation\RuleNormalizer;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
+use Spatie\LaravelData\Support\Validation\ValidationContextManager;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 class DataValidationRulesResolver
@@ -26,6 +29,7 @@ class DataValidationRulesResolver
         protected RuleNormalizer $ruleAttributesResolver,
         protected RuleDenormalizer $ruleDenormalizer,
         protected DataMorphClassResolver $dataMorphClassResolver,
+        protected ValidationContextManager $validationContextManager,
         protected DataClassFromValidationPayloadResolver $dataClassFromValidationPayloadResolver,
     ) {
     }
@@ -96,7 +100,25 @@ class DataValidationRulesResolver
         }
 
         if ($dataProperty->hasDefaultValue && Arr::has($fullPayload, $propertyPath->get()) === false) {
+            // Check if there's a requiring rule that applies to the current context
+            if ($this->hasRequiringRuleForCurrentContext($dataProperty)) {
+                return false;
+            }
+
             return true;
+        }
+
+        return false;
+    }
+
+    protected function hasRequiringRuleForCurrentContext(DataProperty $dataProperty): bool
+    {
+        $currentContext = $this->validationContextManager->getContext();
+
+        foreach ($dataProperty->attributes->all(RequiringRule::class) as $rule) {
+            if ($rule instanceof ValidationRule && $rule->appliesToContext($currentContext)) {
+                return true;
+            }
         }
 
         return false;
@@ -289,7 +311,6 @@ class DataValidationRulesResolver
         $dataRules->add($propertyPath, $toplevelRules);
     }
 
-
     protected function resolveOverwrittenRules(
         DataClass $class,
         array $fullPayload,
@@ -304,7 +325,8 @@ class DataValidationRulesResolver
         $validationContext = new ValidationContext(
             $path->isRoot() ? $fullPayload : Arr::get($fullPayload, $path->get(), []),
             $fullPayload,
-            $path
+            $path,
+            $this->validationContextManager->getContext(),
         );
 
         $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $validationContext]);
@@ -335,7 +357,8 @@ class DataValidationRulesResolver
         $context = new ValidationContext(
             $path->isRoot() ? $fullPayload : Arr::get($fullPayload, $path->get(), null),
             $fullPayload,
-            $path
+            $path,
+            $this->validationContextManager->getContext(),
         );
 
         foreach ($this->dataConfig->ruleInferrers as $inferrer) {
