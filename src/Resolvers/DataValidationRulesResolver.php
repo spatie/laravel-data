@@ -16,6 +16,7 @@ use Spatie\LaravelData\Support\Validation\EnsurePropertyMorphable;
 use Spatie\LaravelData\Support\Validation\PropertyRules;
 use Spatie\LaravelData\Support\Validation\RequiringRule;
 use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
+use Spatie\LaravelData\Support\Validation\ValidationRule;
 use Spatie\LaravelData\Support\Validation\RuleNormalizer;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 use Spatie\LaravelData\Support\Validation\ValidationContextManager;
@@ -115,7 +116,7 @@ class DataValidationRulesResolver
         $currentContext = $this->validationContextManager->getContext();
 
         foreach ($dataProperty->attributes->all(RequiringRule::class) as $rule) {
-            if ($rule->appliesToContext($currentContext)) {
+            if ($rule instanceof ValidationRule && $rule->appliesToContext($currentContext)) {
                 return true;
             }
         }
