@@ -21,7 +21,7 @@ trait ForwardsToPartialsDefinition
         $partialsCollection = $this->getPartialsContainer()->includePartials ??= new PartialsCollection();
 
         foreach ($includes as $include) {
-            $partialsCollection->attach(Partial::create($include));
+            $partialsCollection->offsetSet(Partial::create($include));
         }
 
         return $this;
@@ -32,7 +32,7 @@ trait ForwardsToPartialsDefinition
         $partialsCollection = $this->getPartialsContainer()->includePartials ??= new PartialsCollection();
 
         foreach ($includes as $include) {
-            $partialsCollection->attach(Partial::create($include, permanent: true));
+            $partialsCollection->offsetSet(Partial::create($include, permanent: true));
         }
 
         return $this;
@@ -43,7 +43,7 @@ trait ForwardsToPartialsDefinition
         $partialsCollection = $this->getPartialsContainer()->excludePartials ??= new PartialsCollection();
 
         foreach ($excludes as $exclude) {
-            $partialsCollection->attach(Partial::create($exclude));
+            $partialsCollection->offsetSet(Partial::create($exclude));
         }
 
         return $this;
@@ -54,7 +54,7 @@ trait ForwardsToPartialsDefinition
         $partialsCollection = $this->getPartialsContainer()->excludePartials ??= new PartialsCollection();
 
         foreach ($excludes as $exclude) {
-            $partialsCollection->attach(Partial::create($exclude, permanent: true));
+            $partialsCollection->offsetSet(Partial::create($exclude, permanent: true));
         }
 
         return $this;
@@ -65,7 +65,7 @@ trait ForwardsToPartialsDefinition
         $partialsCollection = $this->getPartialsContainer()->onlyPartials ??= new PartialsCollection();
 
         foreach ($only as $onlyDefinition) {
-            $partialsCollection->attach(Partial::create($onlyDefinition));
+            $partialsCollection->offsetSet(Partial::create($onlyDefinition));
         }
 
         return $this;
@@ -76,7 +76,7 @@ trait ForwardsToPartialsDefinition
         $partialsCollection = $this->getPartialsContainer()->onlyPartials ??= new PartialsCollection();
 
         foreach ($only as $onlyDefinition) {
-            $partialsCollection->attach(Partial::create($onlyDefinition, permanent: true));
+            $partialsCollection->offsetSet(Partial::create($onlyDefinition, permanent: true));
         }
 
         return $this;
@@ -87,7 +87,7 @@ trait ForwardsToPartialsDefinition
         $partialsCollection = $this->getPartialsContainer()->exceptPartials ??= new PartialsCollection();
 
         foreach ($except as $exceptDefinition) {
-            $partialsCollection->attach(Partial::create($exceptDefinition));
+            $partialsCollection->offsetSet(Partial::create($exceptDefinition));
         }
 
         return $this;
@@ -98,7 +98,7 @@ trait ForwardsToPartialsDefinition
         $partialsCollection = $this->getPartialsContainer()->exceptPartials ??= new PartialsCollection();
 
         foreach ($except as $exceptDefinition) {
-            $partialsCollection->attach(Partial::create($exceptDefinition, permanent: true));
+            $partialsCollection->offsetSet(Partial::create($exceptDefinition, permanent: true));
         }
 
         return $this;
@@ -109,9 +109,9 @@ trait ForwardsToPartialsDefinition
         $partialsCollection = $this->getPartialsContainer()->includePartials ??= new PartialsCollection();
 
         if (is_callable($condition)) {
-            $partialsCollection->attach(Partial::createConditional($include, $condition, permanent: $permanent));
+            $partialsCollection->offsetSet(Partial::createConditional($include, $condition, permanent: $permanent));
         } elseif ($condition === true) {
-            $partialsCollection->attach(Partial::create($include, permanent: $permanent));
+            $partialsCollection->offsetSet(Partial::create($include, permanent: $permanent));
         }
 
         return $this;
@@ -122,9 +122,9 @@ trait ForwardsToPartialsDefinition
         $partialsCollection = $this->getPartialsContainer()->excludePartials ??= new PartialsCollection();
 
         if (is_callable($condition)) {
-            $partialsCollection->attach(Partial::createConditional($exclude, $condition, permanent: $permanent));
+            $partialsCollection->offsetSet(Partial::createConditional($exclude, $condition, permanent: $permanent));
         } elseif ($condition === true) {
-            $partialsCollection->attach(Partial::create($exclude, permanent: $permanent));
+            $partialsCollection->offsetSet(Partial::create($exclude, permanent: $permanent));
         }
 
         return $this;
@@ -135,9 +135,9 @@ trait ForwardsToPartialsDefinition
         $partialsCollection = $this->getPartialsContainer()->onlyPartials ??= new PartialsCollection();
 
         if (is_callable($condition)) {
-            $partialsCollection->attach(Partial::createConditional($only, $condition, permanent: $permanent));
+            $partialsCollection->offsetSet(Partial::createConditional($only, $condition, permanent: $permanent));
         } elseif ($condition === true) {
-            $partialsCollection->attach(Partial::create($only, permanent: $permanent));
+            $partialsCollection->offsetSet(Partial::create($only, permanent: $permanent));
         }
 
         return $this;
@@ -148,9 +148,9 @@ trait ForwardsToPartialsDefinition
         $partialsCollection = $this->getPartialsContainer()->exceptPartials ??= new PartialsCollection();
 
         if (is_callable($condition)) {
-            $partialsCollection->attach(Partial::createConditional($except, $condition, permanent: $permanent));
+            $partialsCollection->offsetSet(Partial::createConditional($except, $condition, permanent: $permanent));
         } elseif ($condition === true) {
-            $partialsCollection->attach(Partial::create($except, permanent: $permanent));
+            $partialsCollection->offsetSet(Partial::create($except, permanent: $permanent));
         }
 
         return $this;

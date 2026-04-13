@@ -3,10 +3,12 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Attribute;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rules\In as BaseIn;
 use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
+use UnitEnum;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class In extends ObjectValidationAttribute
@@ -16,7 +18,7 @@ class In extends ObjectValidationAttribute
     private array $values;
 
     public function __construct(
-        array|string|BaseIn|ExternalReference ...$values,
+        array|Arrayable|string|UnitEnum|BaseIn|ExternalReference ...$values,
     ) {
         $extracted = $this->extractContextFromVariadicValues($values);
 
@@ -35,7 +37,7 @@ class In extends ObjectValidationAttribute
         }
 
         $this->values = array_map(
-            fn (string|ExternalReference $value) => $this->normalizePossibleExternalReferenceParameter($value),
+            fn (string|UnitEnum|ExternalReference $value) => $this->normalizePossibleExternalReferenceParameter($value),
             Arr::flatten($this->values)
         );
 

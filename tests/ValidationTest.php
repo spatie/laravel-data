@@ -54,11 +54,13 @@ use Spatie\LaravelData\Support\Validation\References\ContainerReference;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\References\RouteParameterReference;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
+use Spatie\LaravelData\Tests\Fakes\AbstractPropertyMorphableData;
 use Spatie\LaravelData\Tests\Fakes\CircData;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\DataWithReferenceFieldValidationAttribute;
 use Spatie\LaravelData\Tests\Fakes\DummyDataWithContextOverwrittenValidationRules;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\Enums\PropertyMorphableEnum;
 use Spatie\LaravelData\Tests\Fakes\FakeAuthenticatable;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\MultiData;
@@ -2690,50 +2692,8 @@ it('it will merge validation rules', function () {
 });
 
 describe('property-morphable validation tests', function () {
-    enum TestValidationPropertyMorphableEnum: string
-    {
-        case A = 'a';
-        case B = 'b';
-    }
-
-    ;
-
-    abstract class TestValidationAbstractPropertyMorphableData extends Data implements PropertyMorphableData
-    {
-        public function __construct(
-            #[PropertyForMorph]
-            public TestValidationPropertyMorphableEnum $variant,
-        ) {
-        }
-
-        public static function morph(array $properties): ?string
-        {
-            return match ($properties['variant']) {
-                TestValidationPropertyMorphableEnum::A => TestValidationPropertyMorphableDataA::class,
-                TestValidationPropertyMorphableEnum::B => TestValidationPropertyMorphableDataB::class,
-                default => null,
-            };
-        }
-    }
-
-    class TestValidationPropertyMorphableDataA extends TestValidationAbstractPropertyMorphableData
-    {
-        public function __construct(public string $a, public DummyBackedEnum $enum)
-        {
-            parent::__construct(TestValidationPropertyMorphableEnum::A);
-        }
-    }
-
-    class TestValidationPropertyMorphableDataB extends TestValidationAbstractPropertyMorphableData
-    {
-        public function __construct(public string $b)
-        {
-            parent::__construct(TestValidationPropertyMorphableEnum::B);
-        }
-    }
-
     it('can validate property-morphable data', function () {
-        DataValidationAsserter::for(TestValidationAbstractPropertyMorphableData::class)
+        DataValidationAsserter::for(AbstractPropertyMorphableData::class)
             ->assertErrors([], [
                 'variant' => ['The variant field is required.'],
             ])
@@ -2774,11 +2734,22 @@ describe('property-morphable validation tests', function () {
             ]);
     });
 
+    it('allows nullable property-morphable data', function () {
+        DataValidationAsserter::for(new class () extends Data {
+            public ?AbstractPropertyMorphableData $morphable;
+        })
+            ->assertOk([])
+            ->assertOk(['morphable' => null])
+            ->assertErrors(['morphable' => []], [
+                'morphable.variant' => ['The morphable.variant field is required.'],
+            ]);
+    });
+
     it('can validate nested property-morphable data', function () {
         class TestValidationNestedPropertyMorphableData extends Data
         {
             public function __construct(
-                /** @var TestValidationAbstractPropertyMorphableData[] */
+                /** @var AbstractPropertyMorphableData[] */
                 public ?DataCollection $nestedCollection,
             ) {
             }
@@ -2815,16 +2786,237 @@ describe('property-morphable validation tests', function () {
             ]);
     });
 
+    it('can validate property-morphable data with custom messages and attributes', function () {
+        abstract class TestValidationCustomMessageAbstractPropertyMorphableData extends Data implements PropertyMorphableData
+        {
+            public function __construct(
+                #[PropertyForMorph]
+                public PropertyMorphableEnum $variant,
+                #[Max(1)]
+                public int $abstract_integer,
+                public string $abstract_string,
+            ) {
+            }
+
+            public static function morph(array $properties): ?string
+            {
+                return match ($properties['variant']) {
+                    PropertyMorphableEnum::A => TestValidationCustomMessagePropertyMorphableDataA::class,
+                    default => null,
+                };
+            }
+
+            public static function messages()
+            {
+                return [
+                    'abstract_integer.max' => 'Abstract class integer test message.',
+                ];
+            }
+
+            public static function attributes()
+            {
+                return [
+                    'abstract_string' => '[Abstract String]',
+                ];
+            }
+        }
+
+        class TestValidationCustomMessagePropertyMorphableDataA extends TestValidationCustomMessageAbstractPropertyMorphableData
+        {
+            public function __construct(
+                int $abstract_integer,
+                string $abstract_string,
+                #[Max(1)]
+                public int $concrete_integer,
+                public string $concrete_string,
+            ) {
+                parent::__construct(PropertyMorphableEnum::A, $abstract_integer, $abstract_string);
+            }
+
+            public static function messages()
+            {
+                return [
+                    ...parent::messages(),
+                    'concrete_integer.max' => 'Concrete class integer test message.',
+                ];
+            }
+
+            public static function attributes()
+            {
+                return [
+                    ...parent::attributes(),
+                    'concrete_string' => '[Concrete String]',
+                ];
+            }
+        }
+
+        DataValidationAsserter::for(TestValidationCustomMessagePropertyMorphableDataA::class)
+            ->assertErrors([
+                'variant' => 'a',
+                'abstract_integer' => 2,
+                'concrete_integer' => 2,
+            ], [
+                'concrete_integer' => ['Concrete class integer test message.'],
+                'concrete_string' => ['The [Concrete String] field is required.'],
+                'abstract_integer' => ['Abstract class integer test message.'],
+                'abstract_string' => ['The [Abstract String] field is required.'],
+            ]);
+    });
+
+    it('can validate collections of property-morphable data with custom messages and attributes', function () {
+        class TestCustomMessagesInCollectionOfPropertyMorphableData extends Data
+        {
+            public function __construct(
+                /**
+                 * @var array<TestCustomMessageOfPropertyMorphableData>
+                 */
+                public array $items,
+            ) {
+            }
+        }
+
+        abstract class TestCustomMessageOfPropertyMorphableData extends Data implements PropertyMorphableData
+        {
+            public function __construct(
+                #[PropertyForMorph]
+                public PropertyMorphableEnum $variant,
+                #[Max(1)]
+                public int $abstract_integer,
+                public string $abstract_string,
+            ) {
+            }
+
+            public static function morph(array $properties): ?string
+            {
+                return match ($properties['variant']) {
+                    PropertyMorphableEnum::A => TestCustomMessagePropertyMorphableDataA::class,
+                    PropertyMorphableEnum::B => TestCustomMessagePropertyMorphableDataB::class,
+                    default => null,
+                };
+            }
+
+            public static function messages()
+            {
+                return [
+                    'abstract_integer.max' => 'Abstract class integer test message.',
+                ];
+            }
+
+            public static function attributes()
+            {
+                return [
+                    'abstract_string' => '[Abstract String]',
+                ];
+            }
+        }
+
+        class TestCustomMessagePropertyMorphableDataA extends TestCustomMessageOfPropertyMorphableData
+        {
+            public function __construct(
+                int $abstract_integer,
+                string $abstract_string,
+                #[Max(1)]
+                public int $concrete_integer,
+                public string $concrete_string,
+            ) {
+                parent::__construct(PropertyMorphableEnum::A, $abstract_integer, $abstract_string);
+            }
+
+            public static function messages()
+            {
+                return [
+                    ...parent::messages(),
+                    'concrete_integer.max' => 'Concrete class A integer test message.',
+                ];
+            }
+
+            public static function attributes()
+            {
+                return [
+                    ...parent::attributes(),
+                    'concrete_string' => '[Concrete String A]',
+                ];
+            }
+        }
+
+        class TestCustomMessagePropertyMorphableDataB extends TestCustomMessageOfPropertyMorphableData
+        {
+            public function __construct(
+                int $abstract_integer,
+                string $abstract_string,
+                #[Max(1)]
+                public int $concrete_integer,
+                public string $concrete_string,
+            ) {
+                parent::__construct(PropertyMorphableEnum::B, $abstract_integer, $abstract_string);
+            }
+
+            public static function messages()
+            {
+                return [
+                    ...parent::messages(),
+                    'abstract_integer.max' => 'Concrete Class B override of Abstract class integer test message.',
+                    'concrete_integer.max' => 'Concrete class B integer test message.',
+                ];
+            }
+
+            public static function attributes()
+            {
+                return [
+                    ...parent::attributes(),
+                    'concrete_string' => '[Concrete String B]',
+                ];
+            }
+        }
+
+        DataValidationAsserter::for(TestCustomMessagesInCollectionOfPropertyMorphableData::class)
+            ->assertErrors([
+                'items' => [
+                    [
+                        'variant' => 'a',
+                        'abstract_integer' => 2,
+                        'concrete_integer' => 2,
+                    ],
+                    [
+                        'variant' => 'invalid',
+                        'abstract_integer' => 2,
+                        'concrete_integer' => 2,
+                    ],
+                    [
+                        'variant' => 'b',
+                        'abstract_integer' => 2,
+                        'concrete_integer' => 2,
+                    ],
+                ]], [
+                'items.0.concrete_integer' => ['Concrete class A integer test message.'],
+                'items.0.concrete_string' => ['The [Concrete String A] field is required.'],
+                'items.0.abstract_integer' => ['Abstract class integer test message.'],
+                'items.0.abstract_string' => ['The [Abstract String] field is required.'],
+
+                'items.1.variant' => [
+                    'The selected items.1.variant is invalid.',
+                    'The selected items.1.variant is invalid for morph.',
+                ],
+                'items.1.abstract_integer' => ['Abstract class integer test message.'],
+                'items.1.abstract_string' => ['The [Abstract String] field is required.'],
+
+                'items.2.concrete_integer' => ['Concrete class B integer test message.'],
+                'items.2.concrete_string' => ['The [Concrete String B] field is required.'],
+                'items.2.abstract_integer' => ['Concrete Class B override of Abstract class integer test message.'],
+                'items.2.abstract_string' => ['The [Abstract String] field is required.'],
+            ]);
+    });
+
     it('can validate property-morphable data with a default', function () {
         abstract class TestValidationAbstractPropertyMorphableDefaultData extends Data implements PropertyMorphableData
         {
             #[\Spatie\LaravelData\Attributes\PropertyForMorph]
-            public TestValidationPropertyMorphableEnum $variant = TestValidationPropertyMorphableEnum::A;
+            public PropertyMorphableEnum $variant = PropertyMorphableEnum::A;
 
             public static function morph(array $properties): ?string
             {
                 return match ($properties['variant'] ?? null) {
-                    TestValidationPropertyMorphableEnum::A => TestValidationPropertyMorphableDefaultDataA::class,
+                    PropertyMorphableEnum::A => TestValidationPropertyMorphableDefaultDataA::class,
                     default => null,
                 };
             }
@@ -2834,7 +3026,7 @@ describe('property-morphable validation tests', function () {
         {
             public function __construct(public string $a, public DummyBackedEnum $enum)
             {
-                $this->variant = TestValidationPropertyMorphableEnum::A;
+                $this->variant = PropertyMorphableEnum::A;
             }
         }
 
@@ -2851,6 +3043,97 @@ describe('property-morphable validation tests', function () {
                 'variant' => 'a',
                 'a' => 'foo',
                 'enum' => 'foo',
+            ]);
+    });
+
+    it('can validate property-morphable data inside an array of non-morphable data', function () {
+        abstract class TestValidationNestedMorphableAbstractData extends Data implements PropertyMorphableData
+        {
+            public function __construct(
+                #[PropertyForMorph]
+                public string $type,
+            ) {
+            }
+
+            public static function morph(array $properties): ?string
+            {
+                return match ($properties['type']) {
+                    'a' => TestValidationNestedMorphableDataA::class,
+                    'b' => TestValidationNestedMorphableDataB::class,
+                    default => null,
+                };
+            }
+        }
+
+        class TestValidationNestedMorphableDataA extends TestValidationNestedMorphableAbstractData
+        {
+            public function __construct(
+                public string $a_string,
+                public string $a_other_string,
+            ) {
+                parent::__construct('a');
+            }
+
+            public static function messages()
+            {
+                return [
+                    'a_string.required' => 'Data A string required test.',
+                ];
+            }
+
+            public static function attributes()
+            {
+                return [
+                    'a_other_string' => '[A Other String]',
+                ];
+            }
+        }
+
+        class TestValidationNestedMorphableDataB extends TestValidationNestedMorphableAbstractData
+        {
+            public function __construct(
+                public float $b_float,
+            ) {
+                parent::__construct('b');
+            }
+        }
+
+        class TestValidationNestedMorphableWrapperData extends Data
+        {
+            public function __construct(
+                public ?TestValidationNestedMorphableAbstractData $morphable,
+            ) {
+            }
+        }
+
+        class TestValidationNestedMorphableCollectionData extends Data
+        {
+            public function __construct(
+                /** @var TestValidationNestedMorphableWrapperData[] */
+                public array $items,
+            ) {
+            }
+        }
+
+        DataValidationAsserter::for(TestValidationNestedMorphableCollectionData::class)
+            ->assertOk([
+                'items' => [
+                    ['morphable' => ['type' => 'a', 'a_string' => 'foo', 'a_other_string' => 'bar']],
+                    ['morphable' => null],
+                    ['morphable' => ['type' => 'b', 'b_float' => 1500.5]],
+                ],
+            ])
+            ->assertErrors([
+                'items' => [
+                    ['morphable' => ['type' => 'a']],
+                    ['morphable' => ['type' => 'b']],
+                    ['morphable' => ['type' => 'invalid']],
+                ],
+            ], [
+                'items.0.morphable.a_string' => ['Data A string required test.'],
+                'items.0.morphable.a_other_string' => ['The [A Other String] field is required.'],
+                'items.1.morphable.b_float' => ['The items.1.morphable.b float field is required.'],
+                'items.2.morphable.type' => ['The selected items.2.morphable.type is invalid for morph.'],
             ]);
     });
 });

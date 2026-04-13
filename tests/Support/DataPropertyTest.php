@@ -21,6 +21,7 @@ use Spatie\LaravelData\Support\Factories\DataPropertyFactory;
 use Spatie\LaravelData\Tests\Fakes\CastTransformers\FakeCastTransformer;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Spatie\LaravelData\Tests\Fakes\SimpleDataWithPropertyHooks;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 function resolveHelper(
@@ -28,8 +29,9 @@ function resolveHelper(
     bool $hasDefaultValue = false,
     mixed $defaultValue = null,
     ?AutoLazy $classAutoLazy = null,
+    string $propertyName = 'property'
 ): DataProperty {
-    $reflectionProperty = new ReflectionProperty($class, 'property');
+    $reflectionProperty = new ReflectionProperty($class, $propertyName);
     $reflectionClass = new ReflectionClass($class);
 
     return app(DataPropertyFactory::class)->build(
@@ -178,6 +180,18 @@ it('can check if a property is computed', function () {
         })->computed
     )->toBeTrue();
 });
+
+it('can check if a virtual property is computed', function () {
+    expect(
+        resolveHelper(class: new SimpleDataWithPropertyHooks(), propertyName: 'virtual')->computed
+    )->toBeTrue();
+})->skipOnPhp('<8.4');
+
+it('does not mark a backed property as computed', function () {
+    expect(
+        resolveHelper(class: new SimpleDataWithPropertyHooks(), propertyName: 'backed')->computed
+    )->toBeFalse();
+})->skipOnPhp('<8.4');
 
 it('can check if a property is hidden', function () {
     expect(

@@ -181,6 +181,18 @@ parameters:
 			path: src/PaginatedDataCollection.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Container\\Container\:\:call\(\) expects \(callable\(\)\: mixed\)\|string, array\{class\-string, ''attributes''\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resolvers/DataValidationMessagesAndAttributesResolver.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Container\\Container\:\:call\(\) expects \(callable\(\)\: mixed\)\|string, array\{class\-string, ''messages''\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Resolvers/DataValidationMessagesAndAttributesResolver.php
+
+		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Container\\Container\:\:call\(\) expects \(callable\(\)\: mixed\)\|string, array\{class\-string, ''rules''\} given\.$#'
 			identifier: argument.type
 			count: 1
@@ -265,7 +277,7 @@ parameters:
 			path: src/Support/EloquentCasts/DataCollectionEloquentCast.php
 
 		-
-			message: '#^Instanceof between Spatie\\LaravelData\\Contracts\\BaseData&Spatie\\LaravelData\\Contracts\\TransformableData and Spatie\\LaravelData\\Contracts\\TransformableData will always evaluate to true\.$#'
+			message: '#^Instanceof between TData of Spatie\\LaravelData\\Contracts\\BaseData&Spatie\\LaravelData\\Contracts\\TransformableData and Spatie\\LaravelData\\Contracts\\TransformableData will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
 			path: src/Support/EloquentCasts/DataEloquentCast.php
@@ -275,6 +287,18 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: src/Support/Factories/DataClassFactory.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between false and false will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: src/Support/Factories/DataTypeFactory.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: src/Support/Factories/DataTypeFactory.php
 
 		-
 			message: '#^Template type T is declared as covariant, but occurs in invariant position in property Spatie\\LaravelData\\Support\\LazyDataStructureProperty\:\:\$value\.$#'
