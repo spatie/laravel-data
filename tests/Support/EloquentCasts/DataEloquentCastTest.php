@@ -13,6 +13,7 @@ use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithEncryptedCasts;
@@ -309,6 +310,16 @@ it('can update a model where the cast is initially null', function () {
 
     assertDatabaseHas(DummyModelWithCasts::class, [
         'data' => json_encode(['string' => 'Test']),
+    ]);
+});
+
+it('can save a data object with lazy properties which get resolved', function () {
+    DummyModelWithCasts::create([
+        'lazy_data' => LazyData::fromString('Test'),
+    ]);
+
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'lazy_data' => json_encode(['name' => 'Test']),
     ]);
 });
 
