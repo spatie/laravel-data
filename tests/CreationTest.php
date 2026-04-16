@@ -790,6 +790,32 @@ it('can have a nullable computed value', function () {
         ->upper_name->toBeNull(); // Case conflicts with DefaultsPipe, ignoring it for now
 });
 
+it('can have an optional computed value', function () {
+    $dataObject = new class ('') extends Data {
+        #[Computed]
+        public string|Optional|null $upper_name;
+
+        public function __construct(
+            public string|Optional $name = new Optional(),
+        ) {
+            $this->upper_name = $name instanceof Optional ? null : strtoupper($name);
+        }
+    };
+
+    config()->set('data.features.ignore_exception_when_trying_to_set_computed_property_value', false);
+
+    expect($dataObject::from(['name' => 'Ruben']))
+        ->name->toBe('Ruben')
+        ->upper_name->toBe('RUBEN');
+
+    expect($dataObject::from([]))
+        ->name->toBeInstanceOf(Optional::class)
+        ->upper_name->toBeNull();
+
+    expect(fn () => $dataObject::from(['name' => 'Ruben', 'upper_name' => 'RUBEN']))
+        ->toThrow(CannotSetComputedValue::class);
+});
+
 it('throws a readable exception message when the constructor fails', function (
     array $data,
     string $message,
