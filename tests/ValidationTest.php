@@ -938,6 +938,35 @@ it('can overwrite collection class rules', function () {
         ]);
 });
 
+it('can overwrite collection item rules with wildcard rules', function () {
+    // https://github.com/spatie/laravel-data/issues/1121
+    $dataClass = new class () extends Data {
+        /** @var array<SimpleData> */
+        public array $years;
+
+        public static function rules(): array
+        {
+            return [
+                'years' => ['required', 'array'],
+                'years.*' => ['date_format:Y', 'required'],
+            ];
+        }
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk(['years' => ['2025']])
+        ->assertErrors(['years' => ['not-a-year']])
+        ->assertRules([
+            'years' => ['required', 'array'],
+        ], payload: [])
+        ->assertRules([
+            'years' => ['required', 'array'],
+            'years.0' => ['date_format:Y', 'required'],
+        ], payload: [
+            'years' => ['2025'],
+        ]);
+});
+
 /**
  * Complex Examples
  */

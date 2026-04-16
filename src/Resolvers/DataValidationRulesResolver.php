@@ -49,13 +49,48 @@ class DataValidationRulesResolver
                 continue;
             }
 
-            if ($dataProperty->type->kind->isDataObject() || $dataProperty->type->kind->isDataCollectable()) {
-                $this->resolveDataSpecificRules(
+            $isOptionalAndEmpty = $dataProperty->type->isOptional && Arr::has($fullPayload, $propertyPath->get()) === false;
+            $isNullableAndEmpty = $dataProperty->type->isNullable && Arr::get($fullPayload, $propertyPath->get()) === null;
+
+            if ($dataProperty->type->kind->isDataRelated() && ($isOptionalAndEmpty || $isNullableAndEmpty)) {
+                $this->resolveToplevelRules(
                     $dataProperty,
                     $fullPayload,
                     $path,
                     $propertyPath,
                     $dataRules
+                );
+
+                continue;
+            }
+
+            if ($dataProperty->type->kind->isDataObject()) {
+                $this->resolveToplevelRules(
+                    $dataProperty,
+                    $fullPayload,
+                    $path,
+                    $propertyPath,
+                    $dataRules
+                );
+
+                $this->execute(
+                    $dataProperty->type->dataClass,
+                    $fullPayload,
+                    $propertyPath,
+                    $dataRules,
+                );
+
+                continue;
+            }
+
+            if ($dataProperty->type->kind->isDataCollectable()) {
+                $this->resolveDataCollectionSpecificRules(
+                    $dataClass,
+                    $dataProperty,
+                    $fullPayload,
+                    $path,
+                    $propertyPath,
+                    $dataRules,
                 );
 
                 continue;
@@ -102,75 +137,8 @@ class DataValidationRulesResolver
         return false;
     }
 
-    protected function resolveDataSpecificRules(
-        DataProperty $dataProperty,
-        array $fullPayload,
-        ValidationPath $path,
-        ValidationPath $propertyPath,
-        DataRules $dataRules,
-    ): void {
-        $isOptionalAndEmpty = $dataProperty->type->isOptional && Arr::has($fullPayload, $propertyPath->get()) === false;
-        $isNullableAndEmpty = $dataProperty->type->isNullable && Arr::get($fullPayload, $propertyPath->get()) === null;
-
-        if ($isOptionalAndEmpty || $isNullableAndEmpty) {
-            $this->resolveToplevelRules(
-                $dataProperty,
-                $fullPayload,
-                $path,
-                $propertyPath,
-                $dataRules
-            );
-
-            return;
-        }
-
-        if ($dataProperty->type->kind->isDataObject()) {
-            $this->resolveDataObjectSpecificRules(
-                $dataProperty,
-                $fullPayload,
-                $path,
-                $propertyPath,
-                $dataRules
-            );
-
-            return;
-        }
-
-        if ($dataProperty->type->kind->isDataCollectable()) {
-            $this->resolveDataCollectionSpecificRules(
-                $dataProperty,
-                $fullPayload,
-                $path,
-                $propertyPath,
-                $dataRules
-            );
-        }
-    }
-
-    protected function resolveDataObjectSpecificRules(
-        DataProperty $dataProperty,
-        array $fullPayload,
-        ValidationPath $path,
-        ValidationPath $propertyPath,
-        DataRules $dataRules,
-    ): void {
-        $this->resolveToplevelRules(
-            $dataProperty,
-            $fullPayload,
-            $path,
-            $propertyPath,
-            $dataRules
-        );
-
-        $this->execute(
-            $dataProperty->type->dataClass,
-            $fullPayload,
-            $propertyPath,
-            $dataRules,
-        );
-    }
-
     protected function resolveDataCollectionSpecificRules(
+        DataClass $dataClass,
         DataProperty $dataProperty,
         array $fullPayload,
         ValidationPath $path,
@@ -194,7 +162,7 @@ class DataValidationRulesResolver
 
         $itemDataClass = $this->dataConfig->getDataClass($dataProperty->type->dataClass);
 
-        if (! $itemDataClass->hasDynamicValidationRules) {
+        if (! $itemDataClass->hasDynamicValidationRules && ! $dataClass->hasDynamicValidationRules) {
             $this->resolveStaticCollectionRules(
                 $itemDataClass,
                 $collectionPayload,
@@ -297,7 +265,7 @@ class DataValidationRulesResolver
         DataRules $dataRules,
         array $withoutValidationProperties
     ): void {
-        if (! method_exists($class->name, 'rules')) {
+        if (! $class->hasDynamicValidationRules) {
             return;
         }
 
