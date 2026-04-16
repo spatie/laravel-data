@@ -2,6 +2,20 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.22.0 - 2026-04-16
+
+### What's Changed
+
+* Add support for custom validation messages and attributes when using property morphable by @bentleyo in https://github.com/spatie/laravel-data/pull/1055
+* [feat] Add database constraints for validation annotations by @Klaas058 in https://github.com/spatie/laravel-data/pull/1085
+* Revert validateAndCreate change that broke prepareForPipeline by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1175
+* Inline data specific rules and fix wildcard collection rule overrides by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1176
+* Add required validation rule to bool properties by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1177
+* Include lazy properties when storing data via Eloquent casts by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1178
+* Fix CannotSetComputedValue for optional computed properties by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1179
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.21.0...4.22.0
+
 ## 4.21.0 - 2026-04-02
 
 ### What's Changed
@@ -235,6 +249,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -245,6 +260,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -289,6 +305,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
