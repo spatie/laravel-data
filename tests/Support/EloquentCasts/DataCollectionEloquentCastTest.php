@@ -11,6 +11,7 @@ use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataA;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractDataB;
 use Spatie\LaravelData\Tests\Fakes\AbstractPropertyMorphableData;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithCustomCollectionCasts;
 use Spatie\LaravelData\Tests\Fakes\Models\DummyModelWithDefaultCasts;
@@ -215,6 +216,22 @@ it('can load and save an abstract property-morphable data collection', function 
     expect($model->data_collection[1])
         ->toBeInstanceOf(PropertyMorphableDataB::class)
         ->b->toBe('bar');
+});
+
+it('can save a data collection with lazy properties which get resolved', function () {
+    DummyModelWithCasts::create([
+        'lazy_data_collection' => LazyData::collect([
+            LazyData::fromString('Hello'),
+            LazyData::fromString('World'),
+        ], DataCollection::class),
+    ]);
+
+    assertDatabaseHas(DummyModelWithCasts::class, [
+        'lazy_data_collection' => json_encode([
+            ['name' => 'Hello'],
+            ['name' => 'World'],
+        ]),
+    ]);
 });
 
 it('can correctly detect if the attribute is dirty', function () {

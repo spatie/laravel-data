@@ -7,13 +7,16 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Tests\Fakes\AbstractData\AbstractData;
+use Spatie\LaravelData\Tests\Fakes\LazyData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 class DummyModelWithCasts extends Model
 {
     protected $casts = [
         'data' => SimpleData::class,
+        'lazy_data' => LazyData::class,
         'data_collection' => DataCollection::class.':'.SimpleData::class,
+        'lazy_data_collection' => DataCollection::class.':'.LazyData::class,
         'abstract_data' => AbstractData::class,
         'abstract_collection' => DataCollection::class . ':' . AbstractData::class,
     ];
@@ -26,7 +29,9 @@ class DummyModelWithCasts extends Model
             $blueprint->increments('id');
 
             $blueprint->text('data')->nullable();
+            $blueprint->text('lazy_data')->nullable();
             $blueprint->text('data_collection')->nullable();
+            $blueprint->text('lazy_data_collection')->nullable();
             $blueprint->text('abstract_data')->nullable();
             $blueprint->text('abstract_collection')->nullable();
         });

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Crypt;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Contracts\BaseDataCollectable;
+use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Exceptions\CannotCastData;
@@ -90,6 +91,10 @@ class DataCollectionEloquentCast implements CastsAttributes
             if ($isAbstractClassCast && $item instanceof TransformableData) {
                 $class = get_class($item);
 
+                if ($item instanceof IncludeableData) {
+                    $item->include('*');
+                }
+
                 return [
                     'type' => $this->dataConfig->morphMap->getDataClassAlias($class) ?? $class,
                     'data' => json_decode(json: $item->toJson(), associative: true, flags: JSON_THROW_ON_ERROR),
@@ -106,6 +111,8 @@ class DataCollectionEloquentCast implements CastsAttributes
         }
 
         $dataCollection = new ($this->dataCollectionClass)($this->dataClass, $data);
+
+        $dataCollection->include('*');
 
         $dataCollection = $dataCollection->toJson();
 

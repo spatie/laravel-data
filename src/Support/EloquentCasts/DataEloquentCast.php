@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Support\EloquentCasts;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Support\Facades\Crypt;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\IncludeableData;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Exceptions\CannotCastData;
 use Spatie\LaravelData\Support\DataConfig;
@@ -73,6 +74,10 @@ class DataEloquentCast implements CastsAttributes
 
         if (! $value instanceof TransformableData) {
             throw CannotCastData::shouldBeTransformableData($model::class, $key);
+        }
+
+        if ($value instanceof IncludeableData) {
+            $value->include('*');
         }
 
         $value = $isAbstractClassCast
