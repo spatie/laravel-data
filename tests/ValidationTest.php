@@ -1759,7 +1759,7 @@ it('throws exception for invalid database constraint in Unique validation', func
 it('can use external reference as database constraint value', function () {
     $dataClass = new class () extends Data {
         #[Unique('users', where: [
-            new WhereConstraint('is_active', new RouteParameterReference('active'))
+            new WhereConstraint('is_active', new RouteParameterReference('active')),
         ])]
         public string $email;
     };
