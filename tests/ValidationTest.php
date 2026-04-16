@@ -135,8 +135,10 @@ it('can validate a bool', function () {
 
     DataValidationAsserter::for($dataClass)
         ->assertOk(['property' => true])
+        ->assertOk(['property' => false])
+        ->assertErrors([])
         ->assertRules([
-            'property' => ['boolean'],
+            'property' => ['required', 'boolean'],
         ]);
 });
 
@@ -273,12 +275,6 @@ it('will never add extra require rules when not required', function () {
     ]);
 
     DataValidationAsserter::for(new class () extends Data {
-        public bool $property;
-    })->assertRules([
-        'property' => ['boolean'],
-    ]);
-
-    DataValidationAsserter::for(new class () extends Data {
         #[RequiredWith('other')]
         public string $property;
     })->assertRules([
@@ -304,7 +300,7 @@ it('is possible to have multiple required rules', function () {
     })->assertRules([
         'property' => ['string', 'required_unless:is_required', 'required_with:make_required'],
         'make_required' => ['required', 'string'],
-        'is_required' => ['boolean'],
+        'is_required' => ['required', 'boolean'],
     ]);
 })->skip('Add a new ruleinferrer to rule them all and make these cases better');
 
@@ -439,7 +435,7 @@ it('can write custom rules based upon payloads', function () {
     DataValidationAsserter::for($dataClass)
         ->assertRules(
             rules: [
-                'strict' => ['boolean'],
+                'strict' => ['required', 'boolean'],
                 'property' => ['in:strict'],
                 'mapped_property' => ['in:strict'],
             ],
@@ -449,7 +445,7 @@ it('can write custom rules based upon payloads', function () {
         )
         ->assertRules(
             rules: [
-                'strict' => ['boolean'],
+                'strict' => ['required', 'boolean'],
                 'property' => ['required', 'string'],
                 'mapped_property' => ['required', 'string'],
             ],
@@ -597,7 +593,7 @@ test('can use a reference to another field in data', function () {
         ])
         ->assertRules(
             rules: [
-                'check_string' => ['boolean'],
+                'check_string' => ['required', 'boolean'],
                 'string' => ['string', 'required_if:check_string,1'],
             ],
             payload: [
@@ -621,7 +617,7 @@ test('can use a reference to another field in nested data', function () {
         ->assertRules(
             rules: [
                 'nested' => ['required', 'array'],
-                'nested.check_string' => ['boolean'],
+                'nested.check_string' => ['required', 'boolean'],
                 'nested.string' => ['string', 'required_if:nested.check_string,1'],
             ],
             payload: [
@@ -650,7 +646,7 @@ test('can use a reference to another field in a collection', function () {
         ->assertRules(
             rules: [
                 'collection' => ['present', 'array'],
-                'collection.0.check_string' => ['boolean'],
+                'collection.0.check_string' => ['required', 'boolean'],
                 'collection.0.string' => ['string', 'required_if:collection.0.check_string,1'],
             ],
             payload: [
@@ -685,7 +681,7 @@ test('can use a reference to another field in a collection with nested data', fu
             rules: [
                 'collection' => ['present', 'array'],
                 'collection.0.nested' => ['required', 'array'],
-                'collection.0.nested.check_string' => ['boolean'],
+                'collection.0.nested.check_string' => ['required', 'boolean'],
                 'collection.0.nested.string' => ['string', 'required_if:collection.0.nested.check_string,1'],
             ],
             payload: [
@@ -720,7 +716,7 @@ it('can reference to the root validated object in nested data', function () {
         ])
         ->assertRules(
             rules: [
-                'check_string' => ['boolean'],
+                'check_string' => ['required', 'boolean'],
                 'nested' => ['required', 'array'],
                 'nested.string' => ['string', 'required_if:check_string,1'],
             ],
