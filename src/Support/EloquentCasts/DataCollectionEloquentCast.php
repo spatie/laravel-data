@@ -112,9 +112,7 @@ class DataCollectionEloquentCast implements CastsAttributes
 
         $dataCollection = new ($this->dataCollectionClass)($this->dataClass, $data);
 
-        if ($dataCollection instanceof IncludeableData) {
-            $dataCollection->include('*');
-        }
+        $dataCollection->include('*');
 
         $dataCollection = $dataCollection->toJson();
 
