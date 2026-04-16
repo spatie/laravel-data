@@ -42,13 +42,13 @@ class Dimensions extends ObjectValidationAttribute
             return $this->rule;
         }
 
-        $minWidth = $this->parseExternalReference($this->minWidth);
-        $minHeight = $this->parseExternalReference($this->minHeight);
-        $maxWidth = $this->parseExternalReference($this->maxWidth);
-        $maxHeight = $this->parseExternalReference($this->maxHeight);
-        $ratio = $this->parseExternalReference($this->ratio);
-        $width = $this->parseExternalReference($this->width);
-        $height = $this->parseExternalReference($this->height);
+        $minWidth = $this->normalizePossibleExternalReferenceParameter($this->minWidth);
+        $minHeight = $this->normalizePossibleExternalReferenceParameter($this->minHeight);
+        $maxWidth = $this->normalizePossibleExternalReferenceParameter($this->maxWidth);
+        $maxHeight = $this->normalizePossibleExternalReferenceParameter($this->maxHeight);
+        $ratio = $this->normalizePossibleExternalReferenceParameter($this->ratio);
+        $width = $this->normalizePossibleExternalReferenceParameter($this->width);
+        $height = $this->normalizePossibleExternalReferenceParameter($this->height);
 
         $rule = new BaseDimensions();
 

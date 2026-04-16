@@ -33,7 +33,7 @@ class NotIn extends ObjectValidationAttribute
         }
 
         $this->values = array_map(
-            fn (string|UnitEnum|ExternalReference $value) => $this->parseExternalReference($value),
+            fn (string|UnitEnum|ExternalReference $value) => $this->normalizePossibleExternalReferenceParameter($value),
             Arr::flatten($this->values)
         );
 

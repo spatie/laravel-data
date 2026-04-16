@@ -65,7 +65,7 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
             : new FieldReference($reference);
     }
 
-    protected function parseExternalReference(mixed $parameter): mixed
+    protected function normalizePossibleExternalReferenceParameter(mixed $parameter): mixed
     {
         return $parameter instanceof ExternalReference ? $parameter->getValue() : $parameter;
     }
