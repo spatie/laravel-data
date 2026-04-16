@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Tests\TestSupport;
 
+use Illuminate\Validation\Rules\DatabaseRule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\ValidationRuleParser;
 
@@ -86,7 +87,17 @@ class DataValidationAsserter
 
         $parser = new ValidationRuleParser($payload);
 
-        expect($parser->explode($inferredRules)->rules)->toEqual($rules);
+        $normalizeDatabaseRules = fn (array $rules) => array_map(fn ($fieldRules) => array_map(function ($rule) {
+            if (is_object($rule) && in_array(DatabaseRule::class, trait_uses_recursive($rule)) && $rule->queryCallbacks()) {
+                // We cannot compare closures
+
+                return (string) $rule;
+            }
+
+            return $rule;
+        }, $fieldRules), $rules);
+
+        expect($normalizeDatabaseRules($parser->explode($inferredRules)->rules))->toEqual($normalizeDatabaseRules($rules));
 
         return $this;
     }

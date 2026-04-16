@@ -6,19 +6,24 @@ use Attribute;
 use Closure;
 use Exception;
 use Illuminate\Validation\Rules\Exists as BaseExists;
+use Spatie\LaravelData\Attributes\Concerns\AppliesDatabaseConstraints;
+use Spatie\LaravelData\Support\Validation\Constraints\DatabaseConstraint;
 use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Exists extends ObjectValidationAttribute
 {
+    use AppliesDatabaseConstraints;
+
+    /** @param null|Closure|DatabaseConstraint|array<int, DatabaseConstraint|Closure> $where */
     public function __construct(
         protected null|string|ExternalReference $table = null,
         protected null|string|ExternalReference $column = 'NULL',
         protected null|string|ExternalReference $connection = null,
         protected bool|ExternalReference $withoutTrashed = false,
         protected string|ExternalReference $deletedAtColumn = 'deleted_at',
-        protected ?Closure $where = null,
+        protected null|Closure|DatabaseConstraint|array $where = null,
         protected ?BaseExists $rule = null,
     ) {
         if ($rule === null && $table === null) {
@@ -48,7 +53,7 @@ class Exists extends ObjectValidationAttribute
         }
 
         if ($this->where) {
-            $rule->where($this->where);
+            $this->applyDatabaseConstraints($rule, $this->where);
         }
 
         return $rule;

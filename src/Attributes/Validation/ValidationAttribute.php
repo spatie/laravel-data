@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Attributes\Validation;
 
 use Carbon\Carbon;
+use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 use Spatie\LaravelData\Support\Validation\References\FieldReference;
 use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
 use Spatie\LaravelData\Support\Validation\ValidationPath;
@@ -62,5 +63,10 @@ abstract class ValidationAttribute extends ValidationRule implements Stringable
         return $reference instanceof FieldReference
             ? $reference
             : new FieldReference($reference);
+    }
+
+    protected function normalizePossibleExternalReferenceParameter(mixed $parameter): mixed
+    {
+        return $parameter instanceof ExternalReference ? $parameter->getValue() : $parameter;
     }
 }
