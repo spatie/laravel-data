@@ -84,7 +84,7 @@ it("won't add a required rule when a property already contains a required object
 });
 
 it(
-    "won't add a required rule when a property already contains a boolean rule",
+    "will add a required rule when a property contains a boolean rule",
     function () {
         $dataProperty = getProperty(new class () extends Data {
             public string $string;
@@ -97,7 +97,7 @@ it(
         );
 
         expect(app(RuleDenormalizer::class)->execute($rules->all(), ValidationPath::create()))
-            ->toEqualCanonicalizing([new BooleanType()]);
+            ->toEqualCanonicalizing(['required', 'boolean']);
     }
 );
 
