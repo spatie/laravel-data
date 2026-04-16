@@ -55,6 +55,13 @@ class DataFromArrayResolver
                 continue; // Nullable properties get assigned null by default
             }
 
+            if ($property->computed
+                && $property->type->isOptional
+                && $properties[$property->name] instanceof Optional
+            ) {
+                continue; // Optional properties get assigned Optional by default
+            }
+
             if ($property->computed) {
                 if (! config('data.features.ignore_exception_when_trying_to_set_computed_property_value')) {
                     throw CannotSetComputedValue::create($property);
