@@ -31,14 +31,14 @@ class Password extends ObjectValidationAttribute
             return $this->rule;
         }
 
-        $min = $this->normalizePossibleExternalReferenceParameter($this->min);
-        $letters = $this->normalizePossibleExternalReferenceParameter($this->letters);
-        $mixedCase = $this->normalizePossibleExternalReferenceParameter($this->mixedCase);
-        $numbers = $this->normalizePossibleExternalReferenceParameter($this->numbers);
-        $symbols = $this->normalizePossibleExternalReferenceParameter($this->symbols);
-        $uncompromised = $this->normalizePossibleExternalReferenceParameter($this->uncompromised);
-        $uncompromisedThreshold = $this->normalizePossibleExternalReferenceParameter($this->uncompromisedThreshold);
-        $default = $this->normalizePossibleExternalReferenceParameter($this->default);
+        $min = $this->parseExternalReference($this->min);
+        $letters = $this->parseExternalReference($this->letters);
+        $mixedCase = $this->parseExternalReference($this->mixedCase);
+        $numbers = $this->parseExternalReference($this->numbers);
+        $symbols = $this->parseExternalReference($this->symbols);
+        $uncompromised = $this->parseExternalReference($this->uncompromised);
+        $uncompromisedThreshold = $this->parseExternalReference($this->uncompromisedThreshold);
+        $default = $this->parseExternalReference($this->default);
 
         if ($default && $this->rule === null) {
             return BasePassword::default();

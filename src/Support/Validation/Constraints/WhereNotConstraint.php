@@ -15,8 +15,8 @@ class WhereNotConstraint extends DatabaseConstraint
     public function apply(object $rule): void
     {
         $rule->whereNot(
-            $this->normalizePossibleExternalReferenceParameter($this->column),
-            $this->normalizePossibleExternalReferenceParameter($this->value),
+            $this->parseExternalReference($this->column),
+            $this->parseExternalReference($this->value),
         );
     }
 }

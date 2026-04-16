@@ -39,13 +39,13 @@ class Unique extends ObjectValidationAttribute
             return $this->rule;
         }
 
-        $table = $this->normalizePossibleExternalReferenceParameter($this->table);
-        $column = $this->normalizePossibleExternalReferenceParameter($this->column);
-        $connection = $this->normalizePossibleExternalReferenceParameter($this->connection);
-        $ignore = $this->normalizePossibleExternalReferenceParameter($this->ignore);
-        $ignoreColumn = $this->normalizePossibleExternalReferenceParameter($this->ignoreColumn);
-        $withoutTrashed = $this->normalizePossibleExternalReferenceParameter($this->withoutTrashed);
-        $deletedAtColumn = $this->normalizePossibleExternalReferenceParameter($this->deletedAtColumn);
+        $table = $this->parseExternalReference($this->table);
+        $column = $this->parseExternalReference($this->column);
+        $connection = $this->parseExternalReference($this->connection);
+        $ignore = $this->parseExternalReference($this->ignore);
+        $ignoreColumn = $this->parseExternalReference($this->ignoreColumn);
+        $withoutTrashed = $this->parseExternalReference($this->withoutTrashed);
+        $deletedAtColumn = $this->parseExternalReference($this->deletedAtColumn);
 
         $rule = new BaseUnique(
             $connection ? "{$connection}.{$table}" : $table,

@@ -14,7 +14,7 @@ class WhereNotNullConstraint extends DatabaseConstraint
     public function apply(object $rule): void
     {
         $rule->whereNotNull(
-            $this->normalizePossibleExternalReferenceParameter($this->column),
+            $this->parseExternalReference($this->column),
         );
     }
 }
