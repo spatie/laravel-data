@@ -3,6 +3,7 @@
 use Inertia\DeferProp;
 use Inertia\Inertia;
 use Inertia\LazyProp;
+use Inertia\OptionalProp;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Hidden;
 use Spatie\LaravelData\Data;
@@ -215,7 +216,9 @@ it('always transforms lazy inertia data to inertia lazy props', function () {
         }
     };
 
-    expect($dataClass::create('Freek')->toArray()['name'])->toBeInstanceOf(LazyProp::class);
+    $expected = class_exists(LazyProp::class) ? LazyProp::class : OptionalProp::class;
+
+    expect($dataClass::create('Freek')->toArray()['name'])->toBeInstanceOf($expected);
 })->skip('Re-enable test after Inertia supports Laravel 12');
 
 it('always transforms deferred inertia data to inertia deferred props', function () {

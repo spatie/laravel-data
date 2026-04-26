@@ -13,6 +13,7 @@ use Illuminate\Validation\ValidationException;
 use Inertia\DeferProp;
 use Inertia\Inertia;
 use Inertia\LazyProp;
+use Inertia\OptionalProp;
 
 use function Pest\Laravel\postJson;
 
@@ -1466,8 +1467,10 @@ it('can use auto lazy to construct an inertia lazy', function () {
 
     $data = $dataClass::from(['string' => 'Hello World']);
 
+    $expected = class_exists(LazyProp::class) ? LazyProp::class : OptionalProp::class;
+
     expect($data->string)->toBeInstanceOf(InertiaLazy::class);
-    expect($data->toArray()['string'])->toBeInstanceOf(LazyProp::class);
+    expect($data->toArray()['string'])->toBeInstanceOf($expected);
 })->skip('Re-enable test after Inertia supports Laravel 12');
 
 it('can use auto lazy to construct a closure lazy', function () {
