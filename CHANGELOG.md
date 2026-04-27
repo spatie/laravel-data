@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.22.1 - 2026-04-27
+
+### What's Changed
+
+* Support Inertia v3 by falling back to OptionalProp by @jessegall in https://github.com/spatie/laravel-data/pull/1181
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.22.0...4.22.1
+
 ## 4.22.0 - 2026-04-16
 
 ### What's Changed
@@ -250,6 +258,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -260,6 +269,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -305,6 +315,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
