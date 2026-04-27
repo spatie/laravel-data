@@ -19,6 +19,12 @@ parameters:
 			path: src/Attributes/Validation/Exclude.php
 
 		-
+			message: '#^Instanceof between Spatie\\LaravelData\\Support\\Validation\\Constraints\\DatabaseConstraint and Spatie\\LaravelData\\Support\\Validation\\Constraints\\DatabaseConstraint will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Attributes/Validation/Exists.php
+
+		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1
@@ -59,6 +65,12 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: src/Attributes/Validation/StringValidationAttribute.php
+
+		-
+			message: '#^Instanceof between Spatie\\LaravelData\\Support\\Validation\\Constraints\\DatabaseConstraint and Spatie\\LaravelData\\Support\\Validation\\Constraints\\DatabaseConstraint will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Attributes/Validation/Unique.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -295,6 +307,12 @@ parameters:
 			path: src/Support/Factories/DataTypeFactory.php
 
 		-
+			message: '#^Method Spatie\\LaravelData\\Support\\Lazy\\InertiaLazy\:\:resolve\(\) has invalid return type Inertia\\LazyProp\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Support/Lazy/InertiaLazy.php
+
+		-
 			message: '#^Template type T is declared as covariant, but occurs in invariant position in property Spatie\\LaravelData\\Support\\LazyDataStructureProperty\:\:\$value\.$#'
 			identifier: generics.variance
 			count: 1
@@ -347,12 +365,6 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: src/Transformers/DateTimeInterfaceTransformer.php
-
-		-
-			message: '#^Instanceof between Spatie\\LaravelData\\Support\\Validation\\Constraints\\DatabaseConstraint and Spatie\\LaravelData\\Support\\Validation\\Constraints\\DatabaseConstraint will always evaluate to true\.$#'
-			identifier: instanceof.alwaysTrue
-			count: 2
-			path: src/Attributes/Concerns/AppliesDatabaseConstraints.php
 
 		-
 			message: '#^Trait Spatie\\LaravelData\\WithData is used zero times and is not analysed\.$#'
