@@ -21,6 +21,7 @@ use Spatie\LaravelData\Attributes\AutoClosureLazy;
 use Spatie\LaravelData\Attributes\AutoInertiaDeferred;
 use Spatie\LaravelData\Attributes\AutoInertiaLazy;
 use Spatie\LaravelData\Attributes\AutoLazy;
+use Spatie\LaravelData\Attributes\AutoWhenAppendedLazy;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
@@ -1552,6 +1553,57 @@ it('can use auto lazy to construct a data object with property promotion', funct
         ->toBeArray()
         ->toHaveCount(2)
         ->each()->toBeInstanceOf(FakeNestedModelData::class);
+});
+
+it('can use auto lazy to construct a when appended lazy', function () {
+    $dataClass = new class () extends Data {
+        #[AutoWhenAppendedLazy]
+        public string|Lazy $accessor;
+    };
+
+    $model = FakeModel::factory()->create();
+
+    expect($dataClass::from($model)->all())->toBeEmpty();
+
+    $model->append('accessor');
+
+    expect($dataClass::from($model)->all()['accessor'])
+        ->toEqual("accessor_{$model->string}");
+});
+
+it('can use auto lazy to construct a when appended lazy with a manual defined accessor', function () {
+    $dataClass = new class () extends Data {
+        #[AutoWhenAppendedLazy('accessor')]
+        public string|Lazy $custom_name;
+    };
+
+    $model = FakeModel::factory()->create();
+
+    expect($dataClass::from($model)->all())->toBeEmpty();
+
+    $model->append('accessor');
+
+    expect($dataClass::from($model)->all()['custom_name'])
+        ->toEqual("accessor_{$model->string}");
+});
+
+it('can use auto lazy to construct a data object with property promotion and when appended lazy', function () {
+    $dataClass = new class ('') extends Data {
+        public function __construct(
+            #[AutoWhenAppendedLazy]
+            public string|Lazy $accessor
+        ) {
+        }
+    };
+
+    $model = FakeModel::factory()->create();
+
+    expect($dataClass::from($model)->all())->toBeEmpty();
+
+    $model->append('accessor');
+
+    expect($dataClass::from($model)->all()['accessor'])
+        ->toEqual("accessor_{$model->string}");
 });
 
 it('can create a data object with inertia deferred properties', function () {

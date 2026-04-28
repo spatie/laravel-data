@@ -3,6 +3,7 @@
 use Spatie\LaravelData\Attributes\AutoClosureLazy;
 use Spatie\LaravelData\Attributes\AutoInertiaLazy;
 use Spatie\LaravelData\Attributes\AutoLazy;
+use Spatie\LaravelData\Attributes\AutoWhenAppendedLazy;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Attributes\Computed;
 use Spatie\LaravelData\Attributes\Hidden;
@@ -236,6 +237,13 @@ it('can check if a property is auto-lazy', function () {
         })->autoLazy
     )->toBeInstanceOf(AutoWhenLoadedLazy::class);
 
+    expect(
+        resolveHelper(new class () {
+            #[AutoWhenAppendedLazy('accessor')]
+            public string|Lazy $property;
+        })->autoLazy
+    )->toBeInstanceOf(AutoWhenAppendedLazy::class);
+    
     expect(
         resolveHelper(new class () {
             #[AutoClosureLazy]
