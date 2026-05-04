@@ -10,8 +10,11 @@ use Spatie\LaravelData\Support\Validation\References\FieldReference;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class After extends StringValidationAttribute
 {
-    public function __construct(protected string|DateTimeInterface|FieldReference|ExternalReference $date)
-    {
+    public function __construct(
+        protected string|DateTimeInterface|FieldReference|ExternalReference $date,
+        array|string|null $context = null,
+    ) {
+        $this->context = $context;
     }
 
     public static function keyword(): string

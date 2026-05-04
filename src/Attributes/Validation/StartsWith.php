@@ -11,9 +11,13 @@ class StartsWith extends StringValidationAttribute
 {
     protected string|array $values;
 
-    public function __construct(string|array|ExternalReference ...$values)
-    {
-        $this->values = Arr::flatten($values);
+    public function __construct(
+        string|array|ExternalReference ...$values,
+    ) {
+        $extracted = $this->extractContextFromVariadicValues($values);
+
+        $this->values = Arr::flatten($extracted['values']);
+        $this->context = $extracted['context'];
     }
 
     public static function keyword(): string

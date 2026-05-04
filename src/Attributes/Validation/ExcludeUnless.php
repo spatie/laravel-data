@@ -13,12 +13,13 @@ class ExcludeUnless extends StringValidationAttribute
     protected FieldReference $field;
 
     public function __construct(
-        string|FieldReference                                              $field,
-        protected string|int|float|bool|BackedEnum|ExternalReference $value
+        string|FieldReference $field,
+        protected string|int|float|bool|BackedEnum|ExternalReference $value,
+        array|string|null $context = null,
     ) {
         $this->field = $this->parseFieldReference($field);
+        $this->context = $context;
     }
-
 
     public static function keyword(): string
     {

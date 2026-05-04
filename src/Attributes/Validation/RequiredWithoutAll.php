@@ -12,11 +12,16 @@ class RequiredWithoutAll extends StringValidationAttribute implements RequiringR
 {
     protected array $fields;
 
-    public function __construct(array|string|FieldReference ...$fields)
-    {
-        foreach (Arr::flatten($fields) as $field) {
+    public function __construct(
+        array|string|FieldReference ...$fields,
+    ) {
+        $extracted = $this->extractContextFromVariadicValues($fields);
+
+        foreach (Arr::flatten($extracted['values']) as $field) {
             $this->fields[] = $field instanceof FieldReference ? $field : new FieldReference($field);
         }
+
+        $this->context = $extracted['context'];
     }
 
     public static function keyword(): string

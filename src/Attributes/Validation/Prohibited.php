@@ -9,8 +9,11 @@ use Spatie\LaravelData\Support\Validation\ValidationPath;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Prohibited extends ObjectValidationAttribute
 {
-    public function __construct(protected ?ProhibitedIf $rule = null)
-    {
+    public function __construct(
+        protected ?ProhibitedIf $rule = null,
+        array|string|null $context = null,
+    ) {
+        $this->context = $context;
     }
 
     public function getRule(ValidationPath $path): object|string
@@ -25,6 +28,6 @@ class Prohibited extends ObjectValidationAttribute
 
     public static function create(string ...$parameters): static
     {
-        return new static();
+        return new static;
     }
 }

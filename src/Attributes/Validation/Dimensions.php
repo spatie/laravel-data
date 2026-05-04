@@ -20,7 +20,8 @@ class Dimensions extends ObjectValidationAttribute
         protected null|float|string|ExternalReference $ratio = null,
         protected null|int|ExternalReference $width = null,
         protected null|int|ExternalReference $height = null,
-        protected null|BaseDimensions $rule = null,
+        protected ?BaseDimensions $rule = null,
+        array|string|null $context = null,
     ) {
         if (
             $minWidth === null
@@ -34,6 +35,7 @@ class Dimensions extends ObjectValidationAttribute
         ) {
             throw CannotBuildValidationRule::create('You must specify one of width, height, minWidth, minHeight, maxWidth, maxHeight, ratio or a dimensions rule.');
         }
+        $this->context = $context;
     }
 
     public function getRule(ValidationPath $path): object|string
@@ -50,7 +52,7 @@ class Dimensions extends ObjectValidationAttribute
         $width = $this->normalizePossibleExternalReferenceParameter($this->width);
         $height = $this->normalizePossibleExternalReferenceParameter($this->height);
 
-        $rule = new BaseDimensions();
+        $rule = new BaseDimensions;
 
         if ($minWidth !== null) {
             $rule->minWidth($minWidth);

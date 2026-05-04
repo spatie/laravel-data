@@ -12,8 +12,10 @@ class ExcludeWithout extends StringValidationAttribute
 
     public function __construct(
         string|FieldReference $field,
+        array|string|null $context = null,
     ) {
         $this->field = $this->parseFieldReference($field);
+        $this->context = $context;
     }
 
     public static function keyword(): string

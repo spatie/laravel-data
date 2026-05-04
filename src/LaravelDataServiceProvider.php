@@ -3,6 +3,8 @@
 namespace Spatie\LaravelData;
 
 use Livewire\Livewire;
+use ReflectionMethod;
+use Spatie\LaravelData\Attributes\DataValidationContext;
 use Spatie\LaravelData\Commands\DataMakeCommand;
 use Spatie\LaravelData\Commands\DataStructuresCacheCommand;
 use Spatie\LaravelData\Contracts\BaseData;
@@ -11,6 +13,7 @@ use Spatie\LaravelData\Support\Caching\DataStructureCache;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\Livewire\LivewireDataCollectionSynth;
 use Spatie\LaravelData\Support\Livewire\LivewireDataSynth;
+use Spatie\LaravelData\Support\Validation\ValidationContextManager;
 use Spatie\LaravelData\Support\VarDumper\VarDumperManager;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -46,10 +49,14 @@ class LaravelDataServiceProvider extends PackageServiceProvider
 
         $this->app->singleton(ContextResolver::class);
 
+        $this->app->singleton(ValidationContextManager::class);
+
         $this->app->beforeResolving(BaseData::class, function ($class, $parameters, $app) {
             if ($app->has($class)) {
                 return;
             }
+
+            $this->resolveValidationContextFromRoute($app);
 
             $app->bind(
                 $class,
@@ -68,6 +75,38 @@ class LaravelDataServiceProvider extends PackageServiceProvider
         Livewire::propertySynthesizer(LivewireDataCollectionSynth::class);
     }
 
+    protected function resolveValidationContextFromRoute($app): void
+    {
+        $route = $app['request']->route();
+
+        if ($route === null) {
+            return;
+        }
+
+        $action = $route->getAction('uses');
+
+        if (! is_string($action) || ! str_contains($action, '@')) {
+            return;
+        }
+
+        [$controller, $method] = explode('@', $action);
+
+        if (! class_exists($controller) || ! method_exists($controller, $method)) {
+            return;
+        }
+
+        $reflectionMethod = new ReflectionMethod($controller, $method);
+        $attributes = $reflectionMethod->getAttributes(DataValidationContext::class);
+
+        if (empty($attributes)) {
+            return;
+        }
+
+        $contextAttribute = $attributes[0]->newInstance();
+
+        $app->make(ValidationContextManager::class)->setContext($contextAttribute->context);
+    }
+
     public function packageBooted(): void
     {
         $enableVarDumperCaster = match (config('data.var_dumper_caster_mode')) {
@@ -77,7 +116,7 @@ class LaravelDataServiceProvider extends PackageServiceProvider
         };
 
         if ($enableVarDumperCaster) {
-            (new VarDumperManager())->initialize();
+            (new VarDumperManager)->initialize();
         }
 
         if (method_exists($this, 'optimizes')) {

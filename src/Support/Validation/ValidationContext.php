@@ -8,6 +8,6 @@ class ValidationContext
         public mixed $payload,
         public mixed $fullPayload,
         public ValidationPath $path,
-    ) {
-    }
+        public ?string $contextName = null,
+    ) {}
 }

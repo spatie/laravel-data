@@ -26,11 +26,13 @@ class Unique extends ObjectValidationAttribute
         protected bool|ExternalReference $withoutTrashed = false,
         protected string|ExternalReference $deletedAtColumn = 'deleted_at',
         protected null|Closure|DatabaseConstraint|array $where = null,
-        protected ?BaseUnique $rule = null
+        protected ?BaseUnique $rule = null,
+        array|string|null $context = null,
     ) {
         if ($table === null && $rule === null) {
             throw new Exception('Could not create unique validation rule, either table or a rule is required');
         }
+        $this->context = $context;
     }
 
     public function getRule(ValidationPath $path): object|string

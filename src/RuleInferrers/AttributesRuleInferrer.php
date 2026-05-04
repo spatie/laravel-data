@@ -13,9 +13,7 @@ use Spatie\LaravelData\Support\Validation\ValidationRule;
 
 class AttributesRuleInferrer implements RuleInferrer
 {
-    public function __construct(protected RuleNormalizer $rulesDenormalizer)
-    {
-    }
+    public function __construct(protected RuleNormalizer $rulesDenormalizer) {}
 
     public function handle(
         DataProperty $property,
@@ -23,6 +21,10 @@ class AttributesRuleInferrer implements RuleInferrer
         ValidationContext $context,
     ): PropertyRules {
         foreach ($property->attributes->all(ValidationRule::class) as $rule) {
+            if (! $rule->appliesToContext($context->contextName)) {
+                continue;
+            }
+
             if ($rule instanceof Present && $rules->hasType(RequiringRule::class)) {
                 $rules->removeType(RequiringRule::class);
             }

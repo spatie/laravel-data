@@ -25,10 +25,12 @@ class Exists extends ObjectValidationAttribute
         protected string|ExternalReference $deletedAtColumn = 'deleted_at',
         protected null|Closure|DatabaseConstraint|array $where = null,
         protected ?BaseExists $rule = null,
+        array|string|null $context = null,
     ) {
         if ($rule === null && $table === null) {
             throw new Exception('Could not make exists rule since a table or rule is required');
         }
+        $this->context = $context;
     }
 
     public function getRule(ValidationPath $path): object|string
