@@ -2,6 +2,48 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.23.0 - 2026-05-08
+
+A round of bug fixes for validation rules, install resolution, and rule overrides.
+
+### Run `rules()` overrides regardless of property defaults (#1187)
+
+Properties with a default value were silently dropping rules declared in the `rules()` method when the property was missing from the payload, so conditional rules like `required`, `required_if`, and `prohibited_if` never fired. The skip in `DataValidationRulesResolver` was originally there to stop auto-generated rules from rejecting empty payloads on all-default data classes (#441), but it also short-circuited explicit overrides.
+
+Overrides are now resolved upfront, and the default-value skip only applies when no override exists for that property. `#[WithoutValidation]` no longer suppresses an override for the same key. If you wrote `rules()`, you own them. Thanks @rubenvanassche.
+
+### Fix install conflict on PHP 8.4 with Pest installed (#1186)
+
+`composer require spatie/laravel-data` failed when Pest was already installed, because Pest's chain pulls `phpdocumentor/reflection-docblock 6.0.3` while the `phpdocumentor/reflection ^6.0` meta package hard-pinned `reflection-docblock ^5`. The meta package is now dropped in favour of direct dependencies on the three sub-packages we use, with widened constraints:
+
+```diff
+-        "phpdocumentor/reflection" : "^6.0",
++        "phpdocumentor/type-resolver" : "^1.7 || ^2.0",
++        "phpdocumentor/reflection-common" : "^2.2",
++        "phpdocumentor/reflection-docblock" : "^5.3 || ^6.0",
+
+```
+The phpDocumentor APIs we call are identical across both majors, so no code changes are required. Thanks @rubenvanassche.
+
+### Allow float values for `Min`, `Max` and `Size` validation attributes (#1185)
+
+The constructors typed their value as `int|ExternalReference`, and because those classes don't declare strict types, PHP silently coerced floats to int. `#[Min(0.01)]` became `min:0`, letting `0` pass validation, even though Laravel's validator accepts floats for these rules. Types are now widened to `int|float|ExternalReference`, mirroring `MultipleOf`:
+
+```php
+#[Min(0.01), Max(99.99)]
+public float $price;
+
+```
+Digit-count rules (`Digits`, `MinDigits`, `MaxDigits`, `DigitsBetween`) and `Password` length stay `int`. Thanks @rubenvanassche.
+
+### What's Changed
+
+* Allow float values for Min, Max and Size validation attributes by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1185
+* Fix install conflict on PHP 8.4 with Pest installed by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1186
+* Run rules() overrides regardless of property defaults by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1187
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.22.1...4.23.0
+
 ## 4.22.1 - 2026-04-27
 
 ### What's Changed
@@ -259,6 +301,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -269,6 +312,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -315,6 +359,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
