@@ -8,7 +8,7 @@ use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Min extends StringValidationAttribute
 {
-    public function __construct(protected int|ExternalReference $value)
+    public function __construct(protected int|float|ExternalReference $value)
     {
     }
 

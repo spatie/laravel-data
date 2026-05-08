@@ -367,6 +367,11 @@ dataset('attributes', function () {
     );
 
     yield fixature(
+        attribute: new Max(10.5),
+        expected: 'max:10.5',
+    );
+
+    yield fixature(
         attribute: new MaxDigits(10),
         expected: 'max_digits:10',
     );
@@ -374,6 +379,11 @@ dataset('attributes', function () {
     yield fixature(
         attribute: new Min(10),
         expected: 'min:10',
+    );
+
+    yield fixature(
+        attribute: new Min(0.01),
+        expected: 'min:0.01',
     );
 
     yield fixature(
@@ -429,6 +439,11 @@ dataset('attributes', function () {
     yield fixature(
         attribute: new Size(10),
         expected: 'size:10',
+    );
+
+    yield fixature(
+        attribute: new Size(0.5),
+        expected: 'size:0.5',
     );
 
     yield fixature(
