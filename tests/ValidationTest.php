@@ -2670,7 +2670,7 @@ it('wont validate default values when they are not provided', function () {
         ], ['default' => 'something']);
 });
 
-it('wont validate default values when they are not provided and rules are overwritten', function () {
+it('will validate default values when rules are overwritten', function () {
     $dataClass = new class () extends Data {
         public string $default = 'Hello World';
 
@@ -2683,11 +2683,13 @@ it('wont validate default values when they are not provided and rules are overwr
     };
 
     DataValidationAsserter::for($dataClass)
-        ->assertOk([])
+        ->assertErrors([])
         ->assertOk(['default' => 'Hi there in this world'])
         ->assertErrors(['default' => 'minimal'])
         ->assertErrors(['default' => null])
-        ->assertRules([], payload: [])
+        ->assertRules([
+            'default' => ['required', 'string', 'min:10'],
+        ], payload: [])
         ->assertRules([
             'default' => ['required', 'string', 'min:10'],
         ], ['default' => 'something']);
