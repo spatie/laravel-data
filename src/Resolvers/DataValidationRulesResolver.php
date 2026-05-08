@@ -38,14 +38,19 @@ class DataValidationRulesResolver
     ): array {
         $dataClass = $this->dataClassFromValidationPayloadResolver->execute($class, $fullPayload, $path);
 
-        $withoutValidationProperties = [];
+        $overwrittenRules = $this->resolveOverwrittenRules($dataClass, $fullPayload, $path);
 
         foreach ($dataClass->properties as $dataProperty) {
             $propertyPath = $path->property($dataProperty->inputMappedName ?? $dataProperty->name);
 
-            if ($this->shouldSkipPropertyValidation($dataProperty, $fullPayload, $propertyPath)) {
-                $withoutValidationProperties[] = $dataProperty->name;
+            if ($dataProperty->validate === false) {
+                continue;
+            }
 
+            if ($dataProperty->hasDefaultValue
+                && Arr::has($fullPayload, $propertyPath->get()) === false
+                && ! array_key_exists($dataProperty->name, $overwrittenRules)
+            ) {
                 continue;
             }
 
@@ -110,31 +115,14 @@ class DataValidationRulesResolver
             $dataRules->add($propertyPath, $rules);
         }
 
-        $this->resolveOverwrittenRules(
-            $dataClass,
-            $fullPayload,
+        $this->applyOverwrittenRules(
+            $overwrittenRules,
+            $dataClass->attributes->has(MergeValidationRules::class),
             $path,
             $dataRules,
-            $withoutValidationProperties
         );
 
         return $dataRules->rules;
-    }
-
-    protected function shouldSkipPropertyValidation(
-        DataProperty $dataProperty,
-        array $fullPayload,
-        ValidationPath $propertyPath,
-    ): bool {
-        if ($dataProperty->validate === false) {
-            return true;
-        }
-
-        if ($dataProperty->hasDefaultValue && Arr::has($fullPayload, $propertyPath->get()) === false) {
-            return true;
-        }
-
-        return false;
     }
 
     protected function resolveDataCollectionSpecificRules(
@@ -262,11 +250,9 @@ class DataValidationRulesResolver
         DataClass $class,
         array $fullPayload,
         ValidationPath $path,
-        DataRules $dataRules,
-        array $withoutValidationProperties
-    ): void {
+    ): array {
         if (! $class->hasDynamicValidationRules) {
-            return;
+            return [];
         }
 
         $validationContext = new ValidationContext(
@@ -275,14 +261,16 @@ class DataValidationRulesResolver
             $path
         );
 
-        $overwrittenRules = app()->call([$class->name, 'rules'], ['context' => $validationContext]);
-        $shouldMergeRules = $class->attributes->has(MergeValidationRules::class);
+        return app()->call([$class->name, 'rules'], ['context' => $validationContext]);
+    }
 
+    protected function applyOverwrittenRules(
+        array $overwrittenRules,
+        bool $shouldMergeRules,
+        ValidationPath $path,
+        DataRules $dataRules,
+    ): void {
         foreach ($overwrittenRules as $key => $rules) {
-            if (in_array($key, $withoutValidationProperties)) {
-                continue;
-            }
-
             $rules = collect(Arr::wrap($rules))
                 ->map(fn (mixed $rule) => $this->ruleDenormalizer->execute($rule, $path))
                 ->flatten()
