@@ -154,17 +154,23 @@ class DataClassFactory
             return $reflectionClass->getDefaultProperties();
         }
 
-        $values = collect($constructorReflectionMethod->getParameters())
-            ->filter(fn (ReflectionParameter $parameter) => $parameter->isPromoted() && $parameter->isDefaultValueAvailable())
-            ->mapWithKeys(fn (ReflectionParameter $parameter) => [
-                $parameter->name => $parameter->getDefaultValue(),
-            ])
-            ->toArray();
+        // Promoted properties store their default on the constructor parameter, not the
+        // property declaration, so they are invisible to getDefaultProperties(). Walk up from
+        // the concrete class collecting them; first definition wins so closer ancestors take priority.
+        $promotedDefaults = [];
+        $class = $reflectionClass;
+        $constructor = $constructorReflectionMethod;
+        do {
+            foreach ($constructor?->getParameters() ?? [] as $parameter) {
+                if ($parameter->isPromoted() && $parameter->isDefaultValueAvailable() && ! array_key_exists($parameter->name, $promotedDefaults)) {
+                    $promotedDefaults[$parameter->name] = $parameter->getDefaultValue();
+                }
+            }
+            $class = $class->getParentClass();
+            $constructor = $class ? $class->getConstructor() : null;
+        } while ($class);
 
-        return array_merge(
-            $reflectionClass->getDefaultProperties(),
-            $values
-        );
+        return array_merge($reflectionClass->getDefaultProperties(), $promotedDefaults);
     }
 
     /**
