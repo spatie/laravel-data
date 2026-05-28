@@ -8,7 +8,8 @@ use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Support\Factories\DataClassFactory;
 
 it('can create a data class with defaults from promoted properties', function () {
-    class PromotedPropertyData extends Data {
+    class PromotedPropertyData extends Data
+    {
         public function __construct(
             public string $promotedProperty = 'hello',
             protected string $protectedPromotedProperty = 'hello',
@@ -30,7 +31,8 @@ it('can create a data class with defaults from promoted properties', function ()
 });
 
 it('can create a data class with defaults from inherited promoted properties', function () {
-    abstract class ParentNestedPromotedPropertyData extends Data {
+    abstract class ParentNestedPromotedPropertyData extends Data
+    {
         public function __construct(
             public string $promotedProperty = 'hello',
             public string $promotedPropertyWithOverride = 'hello',
@@ -38,7 +40,8 @@ it('can create a data class with defaults from inherited promoted properties', f
         }
     }
 
-    class NestedPromotedPropertyData extends ParentNestedPromotedPropertyData {
+    class NestedPromotedPropertyData extends ParentNestedPromotedPropertyData
+    {
         public function __construct(
             string $promotedProperty = 'hello from child',
             public string $promotedPropertyWithOverride = 'hello with override from child',
