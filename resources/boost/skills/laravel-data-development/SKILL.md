@@ -22,7 +22,7 @@ Keep skill content concrete enough that a Laravel developer would keep it in the
 
 ## Reference Files
 
-- `guidelines/core.blade.php`: conventions, review rules, and implementation guardrails.
+- `../../guidelines/core.blade.php`: conventions, review rules, and implementation guardrails.
 - `examples/examples.md`: concrete Laravel, Inertia, Vue, and Pest examples.
 - `references/references.md`: official links and syntax reminders.
 
