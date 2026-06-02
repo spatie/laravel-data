@@ -291,18 +291,18 @@ it('will never add extra require rules when not required', function () {
 
 it('is possible to have multiple required rules', function () {
     DataValidationAsserter::for(new class () extends Data {
-        #[RequiredUnless('is_required', false), RequiredWith('make_required')]
+        #[RequiredUnless('is_required', 'false'), RequiredWith('make_required')]
         public string $property;
 
         public string $make_required;
 
         public bool $is_required;
     })->assertRules([
-        'property' => ['string', 'required_unless:is_required', 'required_with:make_required'],
+        'property' => ['string', 'required_unless:is_required,false', 'required_with:make_required'],
         'make_required' => ['required', 'string'],
         'is_required' => ['required', 'boolean'],
     ]);
-})->skip('Add a new ruleinferrer to rule them all and make these cases better');
+});
 
 it('will take care of mapping', function () {
     DataValidationAsserter::for(new class () extends Data {
