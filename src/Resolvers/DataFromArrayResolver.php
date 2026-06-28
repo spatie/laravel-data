@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Resolvers;
 
 use ArgumentCountError;
+use ReflectionProperty;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Exceptions\CannotSetComputedValue;
@@ -35,7 +36,6 @@ class DataFromArrayResolver
         foreach ($dataClass->properties as $property) {
             if (
                 $property->isPromoted
-                || $property->isReadonly
                 || ! array_key_exists($property->name, $properties)
             ) {
                 continue;
@@ -68,6 +68,14 @@ class DataFromArrayResolver
                 }
 
                 continue; // Ignore the value being passed into the computed property and let it be recalculated
+            }
+
+            if ($property->isReadonly) {
+                if (! isset($data->{$property->name})) {
+                    (new ReflectionProperty($property->className, $property->name))->setValue($data, $properties[$property->name]);
+                }
+
+                continue;
             }
 
             $data->{$property->name} = $properties[$property->name];

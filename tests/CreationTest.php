@@ -80,6 +80,10 @@ use Spatie\LaravelData\Tests\Fakes\PropertyMorphableDataB;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithoutConstructor;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithPropertyHooks;
+use Spatie\LaravelData\Tests\Stubs\ArtistType;
+use Spatie\LaravelData\Tests\Stubs\Contract;
+use Spatie\LaravelData\Tests\Stubs\Musician;
+use Spatie\LaravelData\Tests\Stubs\Singer;
 
 it('can use default types to create data objects', function () {
     $data = ComplicatedData::from([
@@ -1839,5 +1843,62 @@ describe('property-morphable creation tests', function () {
         expect(fn () => AbstractPropertyMorphableData::from([
             'variant' => 'c',
         ]))->toThrow(CannotCreateAbstractClass::class);
+    });
+
+    it('will allow property-morphable data with readonly properties to be created', function () {
+        $contract = Contract::from([
+            'label' => ['name' => 'PIAS', 'country' => 'US'],
+            'artist' => ['type' => 'singer', 'name' => 'Rick Astley', 'voice' => 'tenor'],
+        ]);
+
+        expect($contract->artist)
+            ->toBeInstanceOf(Singer::class)
+            ->type->toEqual(ArtistType::Singer)
+            ->name->toEqual('Rick Astley')
+            ->voice->toEqual('tenor');
+
+        expect($contract->label)
+            ->name->toEqual('PIAS')
+            ->country->toEqual('US');
+
+        $contract = Contract::from([
+            'label' => ['name' => 'EMI', 'country' => 'UK'],
+            'artist' => ['type' => 'musician', 'name' => 'Freddie Mercury', 'instrument' => 'piano'],
+        ]);
+
+        expect($contract->artist)
+            ->toBeInstanceOf(Musician::class)
+            ->type->toEqual(ArtistType::Musician)
+            ->name->toEqual('Freddie Mercury')
+            ->instrument->toEqual('piano');
+    });
+
+    it('will allow property-morphable data with readonly properties to be created from JSON', function () {
+
+        $json = <<<JSON
+        {
+          "label": {
+            "name": "PIAS",
+            "country": "US"
+          },
+          "artist": {
+            "type": "singer",
+            "name": "Rick Astley",
+            "voice": "tenor"
+          }
+        }
+        JSON;
+
+        $contract = Contract::from($json);
+
+        expect($contract->artist)
+            ->toBeInstanceOf(Singer::class)
+            ->type->toEqual(ArtistType::Singer)
+            ->name->toEqual('Rick Astley')
+            ->voice->toEqual('tenor');
+
+        expect($contract->label)
+            ->name->toEqual('PIAS')
+            ->country->toEqual('US');
     });
 });
