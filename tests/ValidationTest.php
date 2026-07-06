@@ -856,6 +856,35 @@ it('will validate a nullable collection', function () {
         ]);
 });
 
+it('will validate a keyed collection whose keys contain dots', function () {
+    $dataClass = new class () extends Data {
+        /** @var array<string, SimpleData> */
+        #[DataCollectionOf(SimpleData::class)]
+        public array $collection;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'collection' => [
+                'key.with.dots' => ['string' => 'Never Gonna'],
+                'another.key' => ['string' => 'Give You Up'],
+            ],
+        ])
+        ->assertErrors([
+            'collection' => [
+                'key.with.dots' => ['other_string' => 'Hello World'],
+            ],
+        ])
+        ->assertRules([
+            'collection' => ['present', 'array'],
+            'collection.key\.with\.dots.string' => ['required', 'string'],
+        ], [
+            'collection' => [
+                'key.with.dots' => [],
+            ],
+        ]);
+});
+
 it('will validate an optional collection', function () {
     $dataClass = new class () extends Data {
         #[DataCollectionOf(SimpleData::class)]
