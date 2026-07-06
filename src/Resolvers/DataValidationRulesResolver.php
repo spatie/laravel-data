@@ -178,7 +178,7 @@ class DataValidationRulesResolver
         DataRules $dataRules,
     ): void {
         foreach ($collectionPayload as $key => $value) {
-            $itemPath = $propertyPath->property($key);
+            $itemPath = $propertyPath->property(str_replace('.', '\.', $key));
 
             if (! is_array($value)) {
                 $dataRules->add($itemPath, ['array']);
