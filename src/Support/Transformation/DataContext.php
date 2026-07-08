@@ -15,6 +15,7 @@ class DataContext
         public ?PartialsCollection $onlyPartials,
         public ?PartialsCollection $exceptPartials,
         public ?Wrap $wrap = null,
+        public ?int $responseStatus = null,
     ) {
     }
 
@@ -133,6 +134,7 @@ class DataContext
             'onlyPartials' => $this->onlyPartials?->toSerializedArray(),
             'exceptPartials' => $this->exceptPartials?->toSerializedArray(),
             'wrap' => $this->wrap?->toSerializedArray(),
+            'responseStatus' => $this->responseStatus,
         ];
     }
 
@@ -154,6 +156,7 @@ class DataContext
             wrap: $content['wrap']
                 ? Wrap::fromSerializedArray($content['wrap'])
                 : null,
+            responseStatus: $content['responseStatus'] ?? null,
         );
     }
 }

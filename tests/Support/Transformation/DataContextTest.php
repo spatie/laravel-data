@@ -22,6 +22,7 @@ it('can serialize and deserialize a data context', function () {
         onlyPartials: null,
         exceptPartials: null,
         wrap: new Wrap(type: WrapType::Defined, key: 'key'),
+        responseStatus: 202,
     );
 
     $serializable = $context->toSerializedArray();
@@ -38,7 +39,8 @@ it('can serialize and deserialize a data context', function () {
         ->excludePartials->toBeNull()
         ->onlyPartials->toBeNull()
         ->exceptPartials->toBeNull()
-        ->wrap->toEqual($context->wrap);
+        ->wrap->toEqual($context->wrap)
+        ->responseStatus->toBe(202);
 
     $partials = $deserialized->includePartials->toArray();
     $expectedPartials = $context->includePartials->toArray();

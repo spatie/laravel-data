@@ -11,6 +11,7 @@ use function Pest\Laravel\postJson;
 
 use Spatie\LaravelData\Attributes\WithoutValidation;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithExplicitValidationRuleAttributeData;
 
@@ -65,6 +66,67 @@ it('is possible to overwrite the status response code', function () {
     ])
         ->assertStatus(301)
         ->assertJson(['string' => 'Hello']);
+});
+
+it('can set a response status code on a data instance', function () {
+    Route::post('/example-route', function () {
+        return SimpleData::from(request()->input('string'))->responseStatus(202);
+    });
+
+    postJson('/example-route', [
+        'string' => 'Hello',
+    ])
+        ->assertStatus(202)
+        ->assertJson(['string' => 'Hello']);
+});
+
+it('can define a default response status code on a data class', function () {
+    Route::post('/example-route', function () {
+        return new class (request()->input('string')) extends SimpleData {
+            public function defaultResponseStatus(): int
+            {
+                return 202;
+            }
+        };
+    });
+
+    postJson('/example-route', [
+        'string' => 'Hello',
+    ])
+        ->assertStatus(202)
+        ->assertJson(['string' => 'Hello']);
+});
+
+it('will prefer a response status code set on a data instance over a default response status code', function () {
+    Route::post('/example-route', function () {
+        $data = new class (request()->input('string')) extends SimpleData {
+            public function defaultResponseStatus(): int
+            {
+                return 202;
+            }
+        };
+
+        return $data->responseStatus(418);
+    });
+
+    postJson('/example-route', [
+        'string' => 'Hello',
+    ])
+        ->assertStatus(418)
+        ->assertJson(['string' => 'Hello']);
+});
+
+it('can set a response status code on a data collection', function () {
+    Route::post('/example-route', function () {
+        return SimpleData::collect(['Hello', 'World'], DataCollection::class)->responseStatus(202);
+    });
+
+    postJson('/example-route')
+        ->assertStatus(202)
+        ->assertJson([
+            ['string' => 'Hello'],
+            ['string' => 'World'],
+        ]);
 });
 
 it('can fail validation', function () {
