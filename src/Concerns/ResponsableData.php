@@ -63,8 +63,19 @@ trait ResponsableData
         );
     }
 
+    public function responseStatus(int $statusCode): static
+    {
+        $this->getDataContext()->responseStatus = $statusCode;
+
+        return $this;
+    }
+
     protected function calculateResponseStatus(Request $request): int
     {
+        if ($this->getDataContext()->responseStatus !== null) {
+            return $this->getDataContext()->responseStatus;
+        }
+
         return $request->isMethod(Request::METHOD_POST) ? Response::HTTP_CREATED : Response::HTTP_OK;
     }
 

@@ -13,6 +13,8 @@ interface ResponsableData extends Responsable
      */
     public function toResponse($request);
 
+    public function responseStatus(int $statusCode);
+
     public static function allowedRequestIncludes(): ?array;
 
     public static function allowedRequestExcludes(): ?array;
