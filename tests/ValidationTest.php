@@ -3382,3 +3382,96 @@ describe('property-morphable validation tests', function () {
             ]);
     });
 });
+
+describe('property-morphable data inheriting a default value', function () {
+    abstract class TestMorphableDefaultValueData extends Data implements PropertyMorphableData
+    {
+        public function __construct(
+            #[PropertyForMorph]
+            public string $type,
+            public bool $example_bool = true,
+        ) {
+        }
+
+        public static function morph(array $properties): ?string
+        {
+            return match ($properties['type'] ?? null) {
+                'inherited' => TestInheritedMorphableDefaultValueData::class,
+                'promoted' => TestPromotedMorphableDefaultValueData::class,
+                default => null,
+            };
+        }
+    }
+
+    class TestInheritedMorphableDefaultValueData extends TestMorphableDefaultValueData
+    {
+        public function __construct(bool $example_bool = true)
+        {
+            parent::__construct(type: 'inherited', example_bool: $example_bool);
+        }
+    }
+
+    class TestPromotedMorphableDefaultValueData extends TestMorphableDefaultValueData
+    {
+        public function __construct(public bool $example_bool = true)
+        {
+            parent::__construct(type: 'promoted', example_bool: $example_bool);
+        }
+    }
+
+    it('can validate a child promoting the inherited property', function () {
+        expect(TestPromotedMorphableDefaultValueData::validate(['type' => 'promoted']))
+            ->toEqual(['type' => 'promoted']);
+    });
+
+    it('can validate a child not promoting the inherited property', function () {
+        expect(TestInheritedMorphableDefaultValueData::validate(['type' => 'inherited']))
+            ->toEqual(['type' => 'inherited']);
+    });
+});
+
+describe('plain data inheriting a default value', function () {
+    it('can validate a child not promoting the inherited property', function () {
+        abstract class TestBaseDefaultValueData extends Data
+        {
+            public function __construct(
+                public bool $some_flag = true,
+            ) {
+            }
+        }
+
+        class TestInheritedDefaultValueData extends TestBaseDefaultValueData
+        {
+            public function __construct(bool $some_flag = true)
+            {
+                parent::__construct(some_flag: $some_flag);
+            }
+        }
+
+        expect(TestInheritedDefaultValueData::validate([]))
+            ->toEqual([]);
+    });
+});
+
+describe('plain data inheriting a string default value', function () {
+    it('can validate a child not promoting the inherited property', function () {
+        abstract class TestBaseStringDefaultData extends Data
+        {
+            public function __construct(
+                public string $some_string = 'default',
+            ) {
+            }
+        }
+
+        class TestInheritedStringDefaultData extends TestBaseStringDefaultData
+        {
+            public function __construct(string $some_string = 'default')
+            {
+                parent::__construct(some_string: $some_string);
+            }
+        }
+
+        expect(TestInheritedStringDefaultData::validate([]))
+            ->toEqual([]);
+    });
+});
