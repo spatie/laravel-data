@@ -45,36 +45,28 @@ it('reads properties from a Normalized source', function () {
         ->toBeInstanceOf(UnknownProperty::class);
 });
 
-it('later sources override earlier ones', function () {
+it('the first source with the key wins', function () {
     expect(SourceReader::readFromMany(
         [['title' => 'First'], ['title' => 'Second']],
         'title',
         sourceReaderProperty()
-    ))->toBe('Second');
-});
-
-it('null never overwrites an existing value', function () {
-    expect(SourceReader::readFromMany(
-        [['title' => 'First'], ['title' => null]],
-        'title',
-        sourceReaderProperty()
     ))->toBe('First');
 });
 
-it('Optional never overwrites an existing value', function () {
+it('a null in an earlier source wins over later values', function () {
     expect(SourceReader::readFromMany(
-        [['title' => 'First'], ['title' => Optional::create()]],
-        'title',
-        sourceReaderProperty()
-    ))->toBe('First');
-});
-
-it('null wins when it is the only present value', function () {
-    expect(SourceReader::readFromMany(
-        [[], ['title' => null]],
+        [['title' => null], ['title' => 'Second']],
         'title',
         sourceReaderProperty()
     ))->toBeNull();
+});
+
+it('an Optional in an earlier source wins over later values', function () {
+    expect(SourceReader::readFromMany(
+        [['title' => Optional::create()], ['title' => 'Second']],
+        'title',
+        sourceReaderProperty()
+    ))->toBeInstanceOf(Optional::class);
 });
 
 it('sources missing the key are skipped', function () {

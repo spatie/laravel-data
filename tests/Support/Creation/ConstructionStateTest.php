@@ -6,7 +6,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 function makeConstructionState(): ConstructionState
 {
-    return new ConstructionState(
+    return ConstructionState::create(
         CreationContextFactory::createFromConfig(SimpleData::class)->get(),
         SimpleData::class,
     );
@@ -15,7 +15,7 @@ function makeConstructionState(): ConstructionState
 it('writes payload values at the root', function () {
     $state = makeConstructionState();
 
-    $state->writePayload('title', 'Hello');
+    $state->writeValue('title', 'Hello');
 
     expect($state->payload())->toBe(['title' => 'Hello']);
 });
@@ -23,9 +23,9 @@ it('writes payload values at the root', function () {
 it('writes payload values for nested properties under their source keys', function () {
     $state = makeConstructionState();
 
-    $state->writePayload('title', 'Hello');
+    $state->writeValue('title', 'Hello');
     $state->enterProperty('author', 'writer');
-    $state->writePayload('name', 'Ruben');
+    $state->writeValue('name', 'Ruben');
     $state->leave();
 
     expect($state->payload())->toBe([
@@ -38,11 +38,11 @@ it('writes payload values inside collection indices', function () {
     $state = makeConstructionState();
 
     $state->enterProperty('posts');
-    $state->enterIndex(0);
-    $state->writePayload('title', 'First');
+    $state->enterItem(0);
+    $state->writeValue('title', 'First');
     $state->leave();
-    $state->enterIndex(1);
-    $state->writePayload('title', 'Second');
+    $state->enterItem(1);
+    $state->writeValue('title', 'Second');
     $state->leave();
     $state->leave();
 
@@ -58,16 +58,16 @@ it('reads and checks payload values at the current path', function () {
     $state = makeConstructionState();
 
     $state->enterProperty('author', 'writer');
-    $state->writePayload('name', 'Ruben');
+    $state->writeValue('name', 'Ruben');
 
-    expect($state->hasPayload('name'))->toBeTrue()
-        ->and($state->getPayload('name'))->toBe('Ruben')
-        ->and($state->hasPayload('missing'))->toBeFalse()
-        ->and($state->getPayload('missing'))->toBeNull();
+    expect($state->hasValue('name'))->toBeTrue()
+        ->and($state->getValue('name'))->toBe('Ruben')
+        ->and($state->hasValue('missing'))->toBeFalse()
+        ->and($state->getValue('missing'))->toBeNull();
 
     $state->leave();
 
-    expect($state->hasPayload('name'))->toBeFalse();
+    expect($state->hasValue('name'))->toBeFalse();
 });
 
 it('builds dot paths from payload segments', function () {
@@ -82,7 +82,7 @@ it('builds dot paths from payload segments', function () {
 
     $state->leave();
     $state->enterProperty('posts');
-    $state->enterIndex(0);
+    $state->enterItem(0);
 
     expect($state->dotPath('title'))->toBe('posts.0.title')
         ->and($state->depth())->toBe(2);
@@ -100,20 +100,20 @@ it('records mappings on the current structure node', function () {
     ]);
 });
 
-it('resolves source keys through mappings, defaulting to the property name', function () {
+it('resolves original keys through mappings, defaulting to the property name', function () {
     $state = makeConstructionState();
 
     $state->recordMapping('author', 'writer');
 
-    expect($state->sourceKey('author'))->toBe('writer')
-        ->and($state->sourceKey('title'))->toBe('title');
+    expect($state->originalKey('author'))->toBe('writer')
+        ->and($state->originalKey('title'))->toBe('title');
 });
 
 it('creates one structure node per data property, ignoring collection indices', function () {
     $state = makeConstructionState();
 
     $state->enterProperty('posts');
-    $state->enterIndex(3);
+    $state->enterItem(3);
     $state->recordMapping('title', 'post_title');
     $state->leave();
     $state->leave();
@@ -143,12 +143,12 @@ it('sets and reads node classes for nested nodes', function () {
         ->and($state->structure()['children']['author']['class'])->toBe(SimpleData::class);
 });
 
-it('reading sourceKey on an unvisited path creates no structure nodes', function () {
+it('reading originalKey on an unvisited path creates no structure nodes', function () {
     $state = makeConstructionState();
 
     $state->enterProperty('author');
 
-    expect($state->sourceKey('name'))->toBe('name');
+    expect($state->originalKey('name'))->toBe('name');
 
     $state->leave();
 

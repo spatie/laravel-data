@@ -11,23 +11,32 @@ class ConstructionState
     /** @var array<int, array{payloadKey: string|int, structureKey: ?string, isIndex: bool}> */
     protected array $path = [];
 
-    public function __construct(
+    private function __construct(
         public readonly CreationContext $creationContext,
         string $class,
     ) {
-        $this->structure = static::newNode($class);
+        $this->structure = [
+            'class' => $class,
+            'mappings' => [],
+            'children' => [],
+        ];
     }
 
-    public function enterProperty(string $name, ?string $sourceKey = null): void
+    public static function create(CreationContext $creationContext, string $class): self
+    {
+        return new self($creationContext, $class);
+    }
+
+    public function enterProperty(string $property, ?string $mappedKey = null): void
     {
         $this->path[] = [
-            'payloadKey' => $sourceKey ?? $name,
-            'structureKey' => $name,
+            'payloadKey' => $mappedKey ?? $property,
+            'structureKey' => $property,
             'isIndex' => false,
         ];
     }
 
-    public function enterIndex(string|int $index): void
+    public function enterItem(string|int $index): void
     {
         $this->path[] = [
             'payloadKey' => $index,
@@ -60,23 +69,33 @@ class ConstructionState
         return implode('.', $segments);
     }
 
-    public function writePayload(string|int $key, mixed $value): void
+    public function writeValue(string|int $key, mixed $value): void
     {
-        $slot = &$this->payloadSlot();
+        $slot = &$this->payload;
+
+        foreach ($this->path as $segment) {
+            $pathKey = $segment['payloadKey'];
+
+            if (! array_key_exists($pathKey, $slot) || ! is_array($slot[$pathKey])) {
+                $slot[$pathKey] = [];
+            }
+
+            $slot = &$slot[$pathKey];
+        }
 
         $slot[$key] = $value;
     }
 
-    public function hasPayload(string|int $key): bool
+    public function hasValue(string|int $key): bool
     {
-        $slot = $this->currentPayload();
+        $slot = $this->payloadAtCurrentPath();
 
         return is_array($slot) && array_key_exists($key, $slot);
     }
 
-    public function getPayload(string|int $key): mixed
+    public function getValue(string|int $key): mixed
     {
-        $slot = $this->currentPayload();
+        $slot = $this->payloadAtCurrentPath();
 
         if (! is_array($slot) || ! array_key_exists($key, $slot)) {
             return null;
@@ -90,16 +109,16 @@ class ConstructionState
         return $this->payload;
     }
 
-    public function recordMapping(string $property, string $sourceKey): void
+    public function recordMapping(string $property, string $mappedKey): void
     {
-        $node = &$this->structureNode();
+        $node = &$this->ensureStructureNodeAtCurrentPath();
 
-        $node['mappings'][$property] = $sourceKey;
+        $node['mappings'][$property] = $mappedKey;
     }
 
-    public function sourceKey(string $property): string
+    public function originalKey(string $property): string
     {
-        $node = $this->findStructureNode();
+        $node = $this->structureNodeAtCurrentPath();
 
         if ($node === null) {
             return $property;
@@ -110,14 +129,14 @@ class ConstructionState
 
     public function setNodeClass(string $class): void
     {
-        $node = &$this->structureNode();
+        $node = &$this->ensureStructureNodeAtCurrentPath();
 
         $node['class'] = $class;
     }
 
     public function nodeClass(): ?string
     {
-        $node = $this->findStructureNode();
+        $node = $this->structureNodeAtCurrentPath();
 
         if ($node === null) {
             return null;
@@ -131,7 +150,7 @@ class ConstructionState
         return $this->structure;
     }
 
-    protected function currentPayload(): mixed
+    protected function payloadAtCurrentPath(): mixed
     {
         $slot = $this->payload;
 
@@ -148,24 +167,7 @@ class ConstructionState
         return $slot;
     }
 
-    protected function &payloadSlot(): array
-    {
-        $slot = &$this->payload;
-
-        foreach ($this->path as $segment) {
-            $key = $segment['payloadKey'];
-
-            if (! array_key_exists($key, $slot) || ! is_array($slot[$key])) {
-                $slot[$key] = [];
-            }
-
-            $slot = &$slot[$key];
-        }
-
-        return $slot;
-    }
-
-    protected function findStructureNode(): ?array
+    protected function structureNodeAtCurrentPath(): ?array
     {
         $node = $this->structure;
 
@@ -186,7 +188,7 @@ class ConstructionState
         return $node;
     }
 
-    protected function &structureNode(): array
+    protected function &ensureStructureNodeAtCurrentPath(): array
     {
         $node = &$this->structure;
 
@@ -198,21 +200,16 @@ class ConstructionState
             $key = $segment['structureKey'];
 
             if (! array_key_exists($key, $node['children'])) {
-                $node['children'][$key] = static::newNode(null);
+                $node['children'][$key] = [
+                    'class' => null,
+                    'mappings' => [],
+                    'children' => [],
+                ];
             }
 
             $node = &$node['children'][$key];
         }
 
         return $node;
-    }
-
-    protected static function newNode(?string $class): array
-    {
-        return [
-            'class' => $class,
-            'mappings' => [],
-            'children' => [],
-        ];
     }
 }
