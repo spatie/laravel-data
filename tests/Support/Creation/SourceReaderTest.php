@@ -2,6 +2,7 @@
 
 use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\Normalizers\Normalized\UnknownProperty;
+use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Creation\SourceReader;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
@@ -42,4 +43,52 @@ it('reads properties from a Normalized source', function () {
     expect(SourceReader::read($normalized, 'title', sourceReaderProperty()))->toBe('Hello')
         ->and(SourceReader::read($normalized, 'missing', sourceReaderProperty()))
         ->toBeInstanceOf(UnknownProperty::class);
+});
+
+it('later sources override earlier ones', function () {
+    expect(SourceReader::readFromMany(
+        [['title' => 'First'], ['title' => 'Second']],
+        'title',
+        sourceReaderProperty()
+    ))->toBe('Second');
+});
+
+it('null never overwrites an existing value', function () {
+    expect(SourceReader::readFromMany(
+        [['title' => 'First'], ['title' => null]],
+        'title',
+        sourceReaderProperty()
+    ))->toBe('First');
+});
+
+it('Optional never overwrites an existing value', function () {
+    expect(SourceReader::readFromMany(
+        [['title' => 'First'], ['title' => Optional::create()]],
+        'title',
+        sourceReaderProperty()
+    ))->toBe('First');
+});
+
+it('null wins when it is the only present value', function () {
+    expect(SourceReader::readFromMany(
+        [[], ['title' => null]],
+        'title',
+        sourceReaderProperty()
+    ))->toBeNull();
+});
+
+it('sources missing the key are skipped', function () {
+    expect(SourceReader::readFromMany(
+        [['title' => 'First'], []],
+        'title',
+        sourceReaderProperty()
+    ))->toBe('First');
+});
+
+it('returns the UnknownProperty sentinel when no source has the key', function () {
+    expect(SourceReader::readFromMany(
+        [[], []],
+        'title',
+        sourceReaderProperty()
+    ))->toBeInstanceOf(UnknownProperty::class);
 });
