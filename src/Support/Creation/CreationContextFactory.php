@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Support\Creation;
 
+use Closure;
 use Illuminate\Contracts\Pagination\CursorPaginator as CursorPaginatorContract;
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -34,6 +35,7 @@ class CreationContextFactory
         public bool $useOptionalValues,
         public ?array $ignoredMagicalMethods,
         public ?GlobalCastsCollection $casts,
+        public array $prepareData = [],
     ) {
     }
 
@@ -51,6 +53,7 @@ class CreationContextFactory
             useOptionalValues: true,
             ignoredMagicalMethods: null,
             casts: null,
+            prepareData: [],
         );
     }
 
@@ -66,6 +69,7 @@ class CreationContextFactory
             useOptionalValues: $creationContext->useOptionalValues,
             ignoredMagicalMethods: $creationContext->ignoredMagicalMethods,
             casts: $creationContext->casts,
+            prepareData: $creationContext->prepareData,
         );
     }
 
@@ -184,6 +188,13 @@ class CreationContextFactory
         return $this;
     }
 
+    public function prepareData(Closure $closure): static
+    {
+        $this->prepareData[] = $closure;
+
+        return $this;
+    }
+
     public function get(): CreationContext
     {
         return new CreationContext(
@@ -196,6 +207,7 @@ class CreationContextFactory
             useOptionalValues: $this->useOptionalValues,
             ignoredMagicalMethods: $this->ignoredMagicalMethods,
             casts: $this->casts,
+            prepareData: $this->prepareData,
         );
     }
 

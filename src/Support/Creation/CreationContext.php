@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Support\Creation;
 
+use Closure;
 use Illuminate\Contracts\Pagination\CursorPaginator as CursorPaginatorContract;
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -37,6 +38,8 @@ class CreationContext
         public readonly bool $useOptionalValues,
         public readonly ?array $ignoredMagicalMethods,
         public readonly ?GlobalCastsCollection $casts,
+        /** @var array<int, Closure(mixed, string, string): mixed> */
+        public readonly array $prepareData = [],
     ) {
     }
 
