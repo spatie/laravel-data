@@ -2,8 +2,12 @@
 
 namespace Spatie\LaravelData\Support\Creation\Actions;
 
+use Illuminate\Pagination\AbstractCursorPaginator;
+use Illuminate\Pagination\AbstractPaginator;
 use Spatie\LaravelData\Attributes\InjectsPropertyValue;
 use Spatie\LaravelData\Exceptions\CannotCreateAbstractClass;
+use Spatie\LaravelData\Exceptions\CannotCreateData;
+use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\Normalizers\Normalized\UnknownProperty;
 use Spatie\LaravelData\Normalizers\Normalizer;
 use Spatie\LaravelData\Resolvers\DataMorphClassResolver;
@@ -43,6 +47,7 @@ class FillAction
 
         if ($sources === []) {
             $sources = [[]];
+            $payloads = [[]];
         }
 
         $this->fillNode(
@@ -55,16 +60,20 @@ class FillAction
         return $state;
     }
 
+    /**
+     * @param array<int, array|Normalized> $sources
+     * @param array<int, mixed> $rawPayloads
+     */
     protected function fillNode(
         ConstructionState $state,
         DataClass $dataClass,
         array $sources,
         array $rawPayloads
     ): void {
-        $sources = $this->applyPrepareDataHooks($state, $dataClass->name, $sources);
+        $sources = $this->applyPrepareDataHooks($state, $dataClass->name, $sources, $rawPayloads);
 
         if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
-            $dataClass = $this->resolveMorphedDataClass($dataClass, $sources);
+            $dataClass = $this->resolveMorphedDataClass($state, $dataClass, $sources);
         }
 
         $state->setNodeClass($dataClass->name);
@@ -98,8 +107,14 @@ class FillAction
         }
     }
 
-    protected function resolveMorphedDataClass(DataClass $dataClass, array $sources): DataClass
-    {
+    /**
+     * @param array<int, array|Normalized> $sources
+     */
+    protected function resolveMorphedDataClass(
+        ConstructionState $state,
+        DataClass $dataClass,
+        array $sources
+    ): DataClass {
         $morphProperties = [];
 
         foreach ($dataClass->properties as $property) {
@@ -107,11 +122,7 @@ class FillAction
                 continue;
             }
 
-            $value = SourceReader::readFromMany($sources, $property->name, $property);
-
-            if ($value instanceof UnknownProperty && $property->inputMappedName !== null) {
-                $value = SourceReader::readFromMany($sources, $property->inputMappedName, $property);
-            }
+            [$value] = $this->readValue($state, $property, $sources);
 
             if (! $value instanceof UnknownProperty) {
                 $morphProperties[$property->name] = $value;
@@ -128,6 +139,8 @@ class FillAction
     }
 
     /**
+     * @param array<int, array|Normalized> $sources
+     *
      * @return array{0: mixed, 1: string}
      */
     protected function readValue(
@@ -162,28 +175,40 @@ class FillAction
         return [UnknownProperty::create(), $mappedKey ?? $property->name];
     }
 
+    /**
+     * @param array<int, array|Normalized> $sources
+     * @param array<int, mixed> $rawPayloads
+     *
+     * @return array<int, array|Normalized>
+     */
     protected function applyPrepareDataHooks(
         ConstructionState $state,
         string $class,
-        array $sources
+        array $sources,
+        array $rawPayloads
     ): array {
         if ($state->creationContext->prepareData === []) {
             return $sources;
         }
 
-        foreach ($sources as $index => $source) {
-            $value = $source;
+        foreach ($rawPayloads as $index => $rawPayload) {
+            $value = $rawPayload;
 
             foreach ($state->creationContext->prepareData as $hook) {
                 $value = $hook($value, $class, $state->dotPath());
             }
 
-            $sources[$index] = SourceResolver::resolve($class, $value, $this->normalizers);
+            if ($value !== $rawPayload) {
+                $sources[$index] = SourceResolver::resolve($class, $value, $this->normalizers);
+            }
         }
 
         return $sources;
     }
 
+    /**
+     * @param array<int, mixed> $rawPayloads
+     */
     protected function applyInjection(
         ConstructionState $state,
         DataProperty $property,
@@ -235,12 +260,26 @@ class FillAction
             return;
         }
 
+        if ($value === null || (! is_array($value) && ! is_object($value) && ! is_string($value))) {
+            $state->writeValue($originalKey, $value);
+
+            return;
+        }
+
+        try {
+            $source = SourceResolver::resolve($nestedClass, $value, $this->normalizers);
+        } catch (CannotCreateData) {
+            $state->writeValue($originalKey, $value);
+
+            return;
+        }
+
+        $state->writeValue($originalKey, []);
+
         $state->enterProperty(
             $property->name,
             $originalKey === $property->name ? null : $originalKey
         );
-
-        $source = SourceResolver::resolve($nestedClass, $value, $this->normalizers);
 
         $this->fillNode(
             $state,
@@ -261,11 +300,19 @@ class FillAction
         /** @var class-string $itemClass */
         $itemClass = $property->type->dataClass;
 
+        if ($value instanceof AbstractPaginator || $value instanceof AbstractCursorPaginator) {
+            $state->writeValue($originalKey, $value);
+
+            return;
+        }
+
         if (! is_iterable($value)) {
             $state->writeValue($originalKey, $value);
 
             return;
         }
+
+        $state->writeValue($originalKey, []);
 
         $state->enterProperty(
             $property->name,
@@ -283,9 +330,21 @@ class FillAction
                 continue;
             }
 
-            $state->enterItem($index);
+            if ($item === null || (! is_array($item) && ! is_object($item) && ! is_string($item))) {
+                $state->writeValue($index, $item);
 
-            $source = SourceResolver::resolve($itemClass, $item, $this->normalizers);
+                continue;
+            }
+
+            try {
+                $source = SourceResolver::resolve($itemClass, $item, $this->normalizers);
+            } catch (CannotCreateData) {
+                $state->writeValue($index, $item);
+
+                continue;
+            }
+
+            $state->enterItem($index);
 
             $this->fillNode($state, $itemDataClass, [$source], [$item]);
 

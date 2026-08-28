@@ -385,3 +385,93 @@ it('records divergent morph classes per collection item', function () {
             ],
         ]);
 });
+
+it('keeps empty collections in the payload', function () {
+    $state = fillAction()->execute(fillContext(fillCollectionDataClass()), [
+        ['items' => []],
+    ]);
+
+    expect($state->payload())->toBe(['items' => []]);
+});
+
+it('keeps nested objects with no recognized keys in the payload', function () {
+    $state = fillAction()->execute(fillContext(NestedData::class), [
+        ['simple' => ['unknownKey' => 'x']],
+    ]);
+
+    expect($state->payload())->toBe(['simple' => []]);
+});
+
+it('writes explicit null nested values as is', function () {
+    $state = fillAction()->execute(fillContext(NestedData::class), [
+        ['simple' => null],
+    ]);
+
+    expect($state->payload())->toBe(['simple' => null]);
+});
+
+it('writes non normalizable nested values as is', function () {
+    $state = fillAction()->execute(fillContext(NestedData::class), [
+        ['simple' => 123],
+    ]);
+
+    expect($state->payload())->toBe(['simple' => 123]);
+});
+
+it('enters nested json strings', function () {
+    $state = fillAction()->execute(fillContext(NestedData::class), [
+        ['simple' => '{"string":"Hello"}'],
+    ]);
+
+    expect($state->payload())->toBe(['simple' => ['string' => 'Hello']]);
+});
+
+it('writes non normalizable collection items as is', function () {
+    $state = fillAction()->execute(fillContext(fillCollectionDataClass()), [
+        ['items' => ['nonsense']],
+    ]);
+
+    expect($state->payload())->toBe(['items' => ['nonsense']]);
+});
+
+it('writes paginators as is', function () {
+    $paginator = new \Illuminate\Pagination\LengthAwarePaginator([['string' => 'a']], 1, 15);
+
+    $state = fillAction()->execute(fillContext(fillCollectionDataClass()), [
+        ['items' => $paginator],
+    ]);
+
+    expect($state->payload()['items'])->toBe($paginator);
+});
+
+it('prepareData hooks receive raw model sources', function () {
+    $model = new FakeModel();
+    $model->setRawAttributes(['string' => 'Hello']);
+
+    $receivedPayload = null;
+
+    $context = CreationContextFactory::createFromConfig(SimpleData::class)
+        ->prepareData(function (mixed $payload, string $class, string $path) use (&$receivedPayload) {
+            $receivedPayload = $payload;
+
+            return $payload;
+        })
+        ->get();
+
+    $state = fillAction()->execute($context, [$model]);
+
+    expect($receivedPayload)->toBeInstanceOf(FakeModel::class)
+        ->and($state->payload())->toBe(['string' => 'Hello']);
+});
+
+it('resolves morph classes for nested data object properties', function () {
+    $dataClass = new class () extends Data {
+        public ?AbstractPropertyMorphableData $morph = null;
+    };
+
+    $state = fillAction()->execute(fillContext($dataClass::class), [
+        ['morph' => ['variant' => 'a', 'a' => 'x', 'enum' => 'foo']],
+    ]);
+
+    expect($state->structure()['children']['morph']['class'])->toBe(PropertyMorphableDataA::class);
+});
