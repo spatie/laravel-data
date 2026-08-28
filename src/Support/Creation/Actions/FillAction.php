@@ -1,0 +1,136 @@
+<?php
+
+namespace Spatie\LaravelData\Support\Creation\Actions;
+
+use Spatie\LaravelData\Normalizers\Normalized\UnknownProperty;
+use Spatie\LaravelData\Normalizers\Normalizer;
+use Spatie\LaravelData\Resolvers\DataMorphClassResolver;
+use Spatie\LaravelData\Support\Creation\ConstructionState;
+use Spatie\LaravelData\Support\Creation\CreationContext;
+use Spatie\LaravelData\Support\Creation\SourceReader;
+use Spatie\LaravelData\Support\Creation\SourceResolver;
+use Spatie\LaravelData\Support\DataClass;
+use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Support\DataProperty;
+
+class FillAction
+{
+    /**
+     * @param array<int, Normalizer> $normalizers
+     */
+    public function __construct(
+        protected DataConfig $dataConfig,
+        protected DataMorphClassResolver $morphClassResolver,
+        protected array $normalizers,
+    ) {
+    }
+
+    /**
+     * @param array<int, mixed> $payloads
+     */
+    public function execute(CreationContext $creationContext, array $payloads): ConstructionState
+    {
+        $state = ConstructionState::create($creationContext, $creationContext->dataClass);
+
+        $sources = [];
+
+        foreach ($payloads as $payload) {
+            $sources[] = SourceResolver::resolve($creationContext->dataClass, $payload, $this->normalizers);
+        }
+
+        if ($sources === []) {
+            $sources = [[]];
+        }
+
+        $this->fillNode(
+            $state,
+            $this->dataConfig->getDataClass($creationContext->dataClass),
+            $sources,
+            $payloads
+        );
+
+        return $state;
+    }
+
+    protected function fillNode(
+        ConstructionState $state,
+        DataClass $dataClass,
+        array $sources,
+        array $rawPayloads
+    ): void {
+        $sources = $this->applyPrepareDataHooks($state, $dataClass->name, $sources);
+
+        $state->setNodeClass($dataClass->name);
+
+        foreach ($dataClass->properties as $property) {
+            [$value, $originalKey] = $this->readValue($state, $property, $sources);
+
+            if ($originalKey !== $property->name) {
+                $state->recordMapping($property->name, $originalKey);
+            }
+
+            if ($value instanceof UnknownProperty) {
+                continue;
+            }
+
+            $state->writeValue($originalKey, $value);
+        }
+    }
+
+    /**
+     * @return array{0: mixed, 1: string}
+     */
+    protected function readValue(
+        ConstructionState $state,
+        DataProperty $property,
+        array $sources
+    ): array {
+        $mappedKey = $state->creationContext->mapPropertyNames
+            ? $property->inputMappedName
+            : null;
+
+        if ($mappedKey === $property->name) {
+            $mappedKey = null;
+        }
+
+        foreach ($sources as $source) {
+            if ($mappedKey !== null) {
+                $value = SourceReader::read($source, $mappedKey, $property);
+
+                if (! $value instanceof UnknownProperty) {
+                    return [$value, $mappedKey];
+                }
+            }
+
+            $value = SourceReader::read($source, $property->name, $property);
+
+            if (! $value instanceof UnknownProperty) {
+                return [$value, $property->name];
+            }
+        }
+
+        return [UnknownProperty::create(), $mappedKey ?? $property->name];
+    }
+
+    protected function applyPrepareDataHooks(
+        ConstructionState $state,
+        string $class,
+        array $sources
+    ): array {
+        if ($state->creationContext->prepareData === []) {
+            return $sources;
+        }
+
+        foreach ($sources as $index => $source) {
+            $value = $source;
+
+            foreach ($state->creationContext->prepareData as $hook) {
+                $value = $hook($value, $class, $state->dotPath());
+            }
+
+            $sources[$index] = SourceResolver::resolve($class, $value, $this->normalizers);
+        }
+
+        return $sources;
+    }
+}
