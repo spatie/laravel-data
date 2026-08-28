@@ -16,6 +16,7 @@ use Spatie\LaravelData\Tests\Fakes\FillTestInjectable;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
 use Spatie\LaravelData\Tests\Fakes\MultiNestedData;
+use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\PropertyMorphableDataA;
 use Spatie\LaravelData\Tests\Fakes\PropertyMorphableDataB;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
