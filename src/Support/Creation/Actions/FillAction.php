@@ -77,6 +77,12 @@ class FillAction
                 continue;
             }
 
+            if ($property->type->kind->isDataObject()) {
+                $this->fillDataObjectProperty($state, $property, $value, $originalKey);
+
+                continue;
+            }
+
             $state->writeValue($originalKey, $value);
         }
     }
@@ -172,5 +178,37 @@ class FillAction
         }
 
         return $value;
+    }
+
+    protected function fillDataObjectProperty(
+        ConstructionState $state,
+        DataProperty $property,
+        mixed $value,
+        string $originalKey
+    ): void {
+        /** @var class-string $nestedClass */
+        $nestedClass = $property->type->dataClass;
+
+        if ($value instanceof $nestedClass) {
+            $state->writeValue($originalKey, $value);
+
+            return;
+        }
+
+        $state->enterProperty(
+            $property->name,
+            $originalKey === $property->name ? null : $originalKey
+        );
+
+        $source = SourceResolver::resolve($nestedClass, $value, $this->normalizers);
+
+        $this->fillNode(
+            $state,
+            $this->dataConfig->getDataClass($nestedClass),
+            [$source],
+            [$value]
+        );
+
+        $state->leave();
     }
 }

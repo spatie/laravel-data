@@ -9,6 +9,10 @@ use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
 use Spatie\LaravelData\Tests\Fakes\FillTestInjectable;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
+use Spatie\LaravelData\Tests\Fakes\NestedData;
+use Spatie\LaravelData\Tests\Fakes\FillNestedModelData;
+use Spatie\LaravelData\Tests\Fakes\FillFakeModelData;
+use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 
@@ -202,4 +206,71 @@ it('leaves the value absent when every injection attribute skips', function () {
     $state = fillAction()->execute(fillContext($dataClass::class), [[]]);
 
     expect($state->payload())->toBe([]);
+});
+
+it('fills nested data objects recursively', function () {
+    $state = fillAction()->execute(fillContext(NestedData::class), [
+        ['simple' => ['string' => 'Hello']],
+    ]);
+
+    expect($state->payload())->toBe(['simple' => ['string' => 'Hello']])
+        ->and($state->structure()['children'])->toBe([
+            'simple' => [
+                'class' => SimpleData::class,
+                'mappings' => [],
+                'children' => [],
+            ],
+        ]);
+});
+
+it('passes finished nested data instances through untouched', function () {
+    $simple = new SimpleData('Hello');
+
+    $state = fillAction()->execute(fillContext(NestedData::class), [
+        ['simple' => $simple],
+    ]);
+
+    expect($state->payload())->toBe(['simple' => $simple])
+        ->and($state->structure()['children'])->toBe([]);
+});
+
+it('fills nested data under mapped keys', function () {
+    $state = fillAction()->execute(fillContext(DataWithMapper::class), [
+        ['cased_property' => 'Hello', 'data_cased_property' => ['string' => 'Nested']],
+    ]);
+
+    expect($state->payload())->toBe([
+        'cased_property' => 'Hello',
+        'data_cased_property' => ['string' => 'Nested'],
+    ])
+        ->and($state->structure()['children']['dataCasedProperty']['class'])->toBe(SimpleData::class);
+});
+
+it('fires prepareData hooks per nested node', function () {
+    $context = CreationContextFactory::createFromConfig(NestedData::class)
+        ->prepareData(function (mixed $payload, string $class, string $path) {
+            if ($class === SimpleData::class) {
+                return ['string' => 'HOOKED'];
+            }
+
+            return $payload;
+        })
+        ->get();
+
+    $state = fillAction()->execute($context, [['simple' => ['string' => 'original']]]);
+
+    expect($state->payload())->toBe(['simple' => ['string' => 'HOOKED']]);
+});
+
+it('fills nested data from a model relation lazily', function () {
+    $related = new FakeModel();
+    $related->setRawAttributes(['string' => 'Hello']);
+
+    $model = new FakeNestedModel();
+    $model->setRelation('fakeModel', $related);
+
+    $state = fillAction()->execute(fillContext(FillNestedModelData::class), [$model]);
+
+    expect($state->payload())->toBe(['fakeModel' => ['string' => 'Hello']])
+        ->and($state->structure()['children']['fakeModel']['class'])->toBe(FillFakeModelData::class);
 });
