@@ -172,17 +172,18 @@ When a request is precognitive, the generated rule set is filtered to the keys i
 
 Hooks are plain array properties on `CreationContext`, one array of closures per hook type, each with a registration method on the factory that appends. This allows several hooks per point, for example one added by a package and one by the user. CreationContext is created once per `from()` call and survives the whole tree, so no container or registry abstraction is needed.
 
-Execution semantics: closures run in registration order. For transforming hooks (`prepareData`, `afterRules`, `afterValidation`, `beforeCreation`, `afterCreation`), each closure receives the previous closure's result. For `beforeRules`, the first closure returning non-null wins and inference is skipped; remaining closures do not run for that property.
+Execution semantics: closures run in registration order. For transforming hooks (`prepareData`, `beforeValidation`, `afterRules`, `afterValidation`, `beforeCreation`, `afterCreation`), each closure receives the previous closure's result. For `beforeRules`, the first closure returning non-null wins and inference is skipped; remaining closures do not run for that property.
 
 The v5 hook set, in flow order:
 
 1. `prepareData`: fires during Fill for the root and every nested data node. Receives the payload subtree, the class name, and the path. Returns the adjusted subtree.
-2. `beforeRules`: per property. Receives the property (DataProperty, path, payload value). Returns rules to skip inference for that property, or null to let inference run.
-3. `afterRules`: per property. Receives the inferred rules, may modify them.
-4. `withValidator`: receives the built Validator instance before it runs.
-5. `afterValidation`: receives the validated payload, may adjust it before Resolve absences. Mirrors `passedValidation()` on FormRequests.
-6. `beforeCreation`: fires per data node right before its constructor runs, during Instantiate. Receives the final property values (after casting) and the class name, may adjust the values.
-7. `afterCreation`: fires per data node right after construction. Receives the built object, may return a replacement.
+2. `beforeValidation`: fires once at the start of the Validate action, receiving the complete assembled payload, may adjust it. Runs before rule generation, since generated rules depend on the payload. Mirrors `prepareForValidation()` on FormRequests. Distinct from `prepareData`, which fires per node during Fill.
+3. `beforeRules`: per property. Receives the property (DataProperty, path, payload value). Returns rules to skip inference for that property, or null to let inference run.
+4. `afterRules`: per property. Receives the inferred rules, may modify them.
+5. `withValidator`: receives the built Validator instance before it runs.
+6. `afterValidation`: receives the validated payload, may adjust it before Resolve absences. Mirrors `passedValidation()` on FormRequests.
+7. `beforeCreation`: fires per data node right before its constructor runs, during Instantiate. Receives the final property values (after casting) and the class name, may adjust the values.
+8. `afterCreation`: fires per data node right after construction. Receives the built object, may return a replacement.
 
 Both creation hooks fire for the root and for nested data nodes, consistent with `prepareData`. They do not fire for objects built by magic methods or passed in as existing data objects; those subtrees are finished and the engine does not touch them.
 
