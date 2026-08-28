@@ -19,7 +19,6 @@ class ConstructionState
             'class' => $class,
             'mappings' => [],
             'children' => [],
-            'indexClasses' => [],
         ];
     }
 
@@ -245,7 +244,6 @@ class ConstructionState
                     'class' => null,
                     'mappings' => [],
                     'children' => [],
-                    'indexClasses' => [],
                 ];
             }
 

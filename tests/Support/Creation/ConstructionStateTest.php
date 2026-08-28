@@ -98,7 +98,6 @@ it('records mappings on the current structure node', function () {
         'class' => SimpleData::class,
         'mappings' => ['author' => 'writer'],
         'children' => [],
-        'indexClasses' => [],
     ]);
 });
 
@@ -128,10 +127,8 @@ it('creates one structure node per data property, ignoring collection indices', 
                 'class' => null,
                 'mappings' => ['title' => 'post_title'],
                 'children' => [],
-                'indexClasses' => [],
             ],
         ],
-        'indexClasses' => [],
     ]);
 });
 
