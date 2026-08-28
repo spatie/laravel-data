@@ -2,6 +2,7 @@
 
 use Spatie\LaravelData\Support\Creation\ConstructionState;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
+use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 function makeConstructionState(): ConstructionState
@@ -97,6 +98,7 @@ it('records mappings on the current structure node', function () {
         'class' => SimpleData::class,
         'mappings' => ['author' => 'writer'],
         'children' => [],
+        'indexClasses' => [],
     ]);
 });
 
@@ -126,8 +128,10 @@ it('creates one structure node per data property, ignoring collection indices', 
                 'class' => null,
                 'mappings' => ['title' => 'post_title'],
                 'children' => [],
+                'indexClasses' => [],
             ],
         ],
+        'indexClasses' => [],
     ]);
 });
 
@@ -165,4 +169,84 @@ it('reading nodeClass on an unvisited path creates no structure nodes', function
     $state->leave();
 
     expect($state->structure()['children'])->toBe([]);
+});
+
+it('returns the current values at the current path', function () {
+    $state = makeConstructionState();
+
+    expect($state->currentValues())->toBe([]);
+
+    $state->writeValue('title', 'Hello');
+
+    expect($state->currentValues())->toBe(['title' => 'Hello']);
+
+    $state->enterProperty('author', 'writer');
+
+    expect($state->currentValues())->toBe([]);
+
+    $state->writeValue('name', 'Ruben');
+
+    expect($state->currentValues())->toBe(['name' => 'Ruben']);
+});
+
+it('records divergent item classes on the shared node', function () {
+    $state = makeConstructionState();
+
+    $state->enterProperty('items');
+    $state->setNodeClass(SimpleData::class);
+
+    $state->enterItem(0);
+    $state->setNodeClass(SimpleData::class);
+    $state->leave();
+
+    $state->enterItem(1);
+    $state->setNodeClass(NestedData::class);
+    $state->leave();
+
+    $state->leave();
+
+    expect($state->structure()['children']['items'])->toBe([
+        'class' => SimpleData::class,
+        'mappings' => [],
+        'children' => [],
+        'indexClasses' => [1 => NestedData::class],
+    ]);
+});
+
+it('nodeClass on an item falls back to the shared class', function () {
+    $state = makeConstructionState();
+
+    $state->enterProperty('items');
+    $state->setNodeClass(SimpleData::class);
+    $state->enterItem(0);
+
+    expect($state->nodeClass())->toBe(SimpleData::class);
+
+    $state->setNodeClass(NestedData::class);
+
+    expect($state->nodeClass())->toBe(NestedData::class);
+
+    $state->leave();
+
+    expect($state->nodeClass())->toBe(SimpleData::class);
+});
+
+it('writes values under string item keys', function () {
+    $state = makeConstructionState();
+
+    $state->enterProperty('items');
+    $state->enterItem('foo');
+    $state->writeValue('title', 'Hello');
+    $state->leave();
+    $state->leave();
+
+    expect($state->payload())->toBe(['items' => ['foo' => ['title' => 'Hello']]]);
+});
+
+it('builds dot paths ending in integer zero', function () {
+    $state = makeConstructionState();
+
+    $state->enterProperty('posts');
+
+    expect($state->dotPath(0))->toBe('posts.0');
 });

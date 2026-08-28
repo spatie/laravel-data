@@ -19,6 +19,7 @@ class ConstructionState
             'class' => $class,
             'mappings' => [],
             'children' => [],
+            'indexClasses' => [],
         ];
     }
 
@@ -109,6 +110,17 @@ class ConstructionState
         return $this->payload;
     }
 
+    public function currentValues(): array
+    {
+        $slot = $this->payloadAtCurrentPath();
+
+        if (! is_array($slot)) {
+            return [];
+        }
+
+        return $slot;
+    }
+
     public function recordMapping(string $property, string $mappedKey): void
     {
         $node = &$this->ensureStructureNodeAtCurrentPath();
@@ -129,7 +141,19 @@ class ConstructionState
 
     public function setNodeClass(string $class): void
     {
+        $itemIndex = $this->currentItemIndex();
+
         $node = &$this->ensureStructureNodeAtCurrentPath();
+
+        if ($itemIndex !== null) {
+            if ($node['class'] === $class) {
+                return;
+            }
+
+            $node['indexClasses'][$itemIndex] = $class;
+
+            return;
+        }
 
         $node['class'] = $class;
     }
@@ -142,7 +166,24 @@ class ConstructionState
             return null;
         }
 
+        $itemIndex = $this->currentItemIndex();
+
+        if ($itemIndex !== null) {
+            return $node['indexClasses'][$itemIndex] ?? $node['class'];
+        }
+
         return $node['class'];
+    }
+
+    protected function currentItemIndex(): string|int|null
+    {
+        $last = $this->path[count($this->path) - 1] ?? null;
+
+        if ($last === null || $last['isIndex'] === false) {
+            return null;
+        }
+
+        return $last['payloadKey'];
     }
 
     public function structure(): array
@@ -204,6 +245,7 @@ class ConstructionState
                     'class' => null,
                     'mappings' => [],
                     'children' => [],
+                    'indexClasses' => [],
                 ];
             }
 
