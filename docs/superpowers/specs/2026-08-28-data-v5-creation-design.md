@@ -8,7 +8,7 @@ Date: 2026-08-28
 v5 is a focused major release. It changes how data objects are created, nothing else. Four goals:
 
 1. Remove the data pipeline. A fixed sequence of actions builds data objects. Users extend through hooks, not through custom pipes.
-2. The actions work on an intermediate representation: a payload array holding the data and a structure array holding metadata (source keys for mapped properties, the class at each level, cast decisions).
+2. The actions work on an intermediate representation: a payload array holding the data and a structure array holding metadata (original keys for mapped properties, the class at each level, cast decisions).
 3. Fix validation with mapped keys. Today a client can send the unmapped property name and its value reaches the object without being validated. Validation error keys are also inconsistent between inferred rules and user overrides.
 4. Make creation faster. Replace the serialize-to-cache-store mechanism for DataClass structures with generated PHP files, one autoloadable class per data class, written by a deploy command and kept hot by OPcache.
 
@@ -41,7 +41,7 @@ One mutable state object, working name `ConstructionState`, carries everything t
 * `payload`: a nested array shaped like the data. Collections use concrete indices (`posts.0.title`).
 * `structure`: a nested array shaped like the class tree, deliberately compact. One node per data object, not per property. A node holds:
   * a class reference (class-string) for the data object at that level. For morphable classes this is the concrete class picked by morph resolution, which is payload-dependent and expensive to re-derive.
-  * `mappings`: property name to source key, only for properties where the two differ. This decision is made once during Fill and reused everywhere. It cannot be safely re-derived later: after validation, `validated()` prunes keys, so re-checking the payload could give a different answer than Fill got.
+  * `mappings`: property name to original key (the wire key the value came from), only for properties where the two differ. This decision is made once during Fill and reused everywhere. It cannot be safely re-derived later: after validation, `validated()` prunes keys, so re-checking the payload could give a different answer than Fill got.
   * `children`: nodes for nested data properties, keyed by property name. A collection property gets one shared item node. When morphable collection items resolve to different classes, the item node holds per-index class references.
 
 Everything else is inferred at the moment it is needed from the payload plus the DataClass: whether a value is present (`array_key_exists`), whether an absent property has a default (the DataClass knows), which cast applies (the Cast action decides and applies in one go), and whether a subtree is already finished (the payload value is an instance of the target class). The structure stores only what is payload-dependent and expensive or unsafe to re-derive.
@@ -60,8 +60,8 @@ A fixed, hardcoded sequence of action classes with plain `execute()` methods, ca
    * The method returns anything else: the value becomes the node's source and the flow continues normally, including validation. This is "option A" from the original notes, generalized: an array is the common case, but a `Normalized`, a model, or anything the normalizer chain accepts works identically, since Fill reads from sources. The returned value does not go through magic method matching again, so a method returning a payload of its own accepted type cannot loop. Returning null to mean "try the next method" is not supported; `accepts()` stays the single source of truth for matching.
 3. **Normalize.** Resolve the root sources (section 6). Arrays stay arrays, requests, Arrayables, and JSON become plain arrays once, models become `NormalizedModel`, custom normalizers run with first non-null winning. No payload becomes an empty array, several payloads become a source list.
 4. **Resolve morph.** For abstract property-morphable classes, pick the concrete class before anything property-related happens.
-5. **Fill.** Walk the DataClass properties and build the full payload and structure trees, depth first. Per property: read the value (mapping rules in section 7, recording the source key in the node's mappings when it differs from the property name), run injection attributes, and recurse into nested data objects and collections (section 8). Defaults are not written into the payload; they are resolved after validation. The `prepareData` hook fires for the root and for every nested data node before its properties are filled. After Fill, no other step discovers new properties.
-6. **Validate.** Only if the strategy says so. One action generates rules for the whole tree (section 10), hooks run, one validator runs. On success, `$validator->validated()` becomes the payload going forward. On failure, the exception is rethrown with error keys in source-key space (which is already what the validator produces, see section 10).
+5. **Fill.** Walk the DataClass properties and build the full payload and structure trees, depth first. Per property: read the value (mapping rules in section 7, recording the original key in the node's mappings when it differs from the property name), run injection attributes, and recurse into nested data objects and collections (section 8). Defaults are not written into the payload; they are resolved after validation. The `prepareData` hook fires for the root and for every nested data node before its properties are filled. After Fill, no other step discovers new properties.
+6. **Validate.** Only if the strategy says so. One action generates rules for the whole tree (section 10), hooks run, one validator runs. On success, `$validator->validated()` becomes the payload going forward. On failure, the exception is rethrown with error keys in original-key space (which is already what the validator produces, see section 10).
 7. **Resolve absences.** One rule for every property slot without a value in the current payload, whether never sent, skipped, or removed by an `exclude_*` rule: use the PHP default if there is one, else Optional if the type allows it, else null if nullable and auto-null applies (section 9), else leave it missing and let Instantiate throw a clear error. Properties that were deliberately not validated keep their value from the Fill payload.
 8. **Cast.** Walk the properties and run the cast decision per value. Cast precedence matches v4: property attribute cast, then creation context casts, then global casts. Nested data objects are not built here, only their scalar leaves are cast.
 9. **Instantiate.** Build objects bottom up, nested objects first, straight into constructors. The `beforeCreation` and `afterCreation` hooks fire per data node (section 11). Skipped entirely when the context says CreateData off. That is how `validate()` works and where precognition stops.
@@ -81,11 +81,11 @@ Nesting needs no path bookkeeping. When Fill hits a nested property on a model s
 
 Normalization happens per node, at the moment Fill recurses into it. A nested Arrayable or JSON string is converted to a plain array immediately at that point; there is no reason to defer or wrap it. Only models get a wrapper, because a model is the only source where eager conversion is both lossy and expensive. One small `NormalizedModel` per nested model is the only allocation, and it buys never touching relations or attributes the data class does not declare. For the common model case (validation off), Fill only materializes declared properties into the payload array.
 
-Name translation inside `NormalizedModel` stays an implementation detail in v5, exactly as in v4: when the model uses snake cased attributes, `getProperty('createdAt')` reads the `created_at` attribute. This is not part of the mapping system and records no source key; model reads stay keyed by property name downstream. When mapping scopes land in a later release (specs/mapping-scopes.md), this hardcoded translation becomes a configurable per-source mapper sitting at the same seam, the property read on a source.
+Name translation inside `NormalizedModel` stays an implementation detail in v5, exactly as in v4: when the model uses snake cased attributes, `getProperty('createdAt')` reads the `created_at` attribute. This is not part of the mapping system and records no original key; model reads stay keyed by property name downstream. When mapping scopes land in a later release (specs/mapping-scopes.md), this hardcoded translation becomes a configurable per-source mapper sitting at the same seam, the property read on a source.
 
 Two classes from the original v5 notes are not built. `EmptyNormalized`: an empty array does the job. `MultiNormalized`: multi-payload is a plain source list, and it exists only at the root. `from($a, $b)` is the single place where multiple payloads enter, and they mostly exist to feed magic methods with multiple values, which are matched in step 2 before any of this runs.
 
-When no magic method matched, the source list collapses at the first property read. Per top-level property, Fill picks the winning source (later payloads win, null and Optional never overwrite, presence checked lazily per source) and takes its value wholesale. From that point down everything is single-source. This matches v4 exactly: v4 ran the pipeline once per payload and shallow-merged the resulting property arrays, so a property's value always came wholesale from one payload. There is no cross-source deep merging, in v4 or in v5. The lazy per-property winner pick gives the same semantics as an eager normalize-and-merge without materializing model sources.
+When no magic method matched, the source list collapses at the first property read. Per top-level property, Fill picks the winning source (the first payload that has the key wins, presence checked lazily per source) and takes its value wholesale. From that point down everything is single-source. There is no cross-source deep merging. This is a deliberate breaking change from v4: v4 ran the pipeline once per payload and shallow-merged the results with later payloads overriding earlier ones, plus a special case where null and Optional never overwrote an existing value. That precedence order and the special case were finicky; v5 replaces both with one rule, the first payload that contains the key supplies its value, even when that value is null or Optional. The lazy per-property winner pick also means sources after the first hit are never read, which keeps model sources untouched.
 
 The `Normalized` interface, the `Normalizer` interface, and the `data.normalizers` config stay unchanged.
 
@@ -96,7 +96,7 @@ Reading a property value from the payload happens exactly once, during Fill, wit
 1. The mapped key, if the property has one and the key is present. Mapped always wins.
 2. Otherwise the property name itself. Using the property name stays valid.
 
-Whichever key supplied the value is recorded in the node's mappings as the source key. Everything downstream (rules, messages, attributes, error keys, `validated()` extraction) uses the source key and nothing else. When neither key is present, the mapped key is recorded as the canonical source key, so a `required` error points at the key the client was supposed to send.
+Whichever key supplied the value is recorded in the node's mappings as the original key. Everything downstream (rules, messages, attributes, error keys, `validated()` extraction) uses the original key and nothing else. When neither key is present, the mapped key is recorded as the canonical original key, so a `required` error points at the key the client was supposed to send.
 
 This fixes the v4 bug where `MapPropertiesDataPipe` copies the mapped key onto the property name, leaves both keys in the payload, and validation rules only cover the mapped key. In v5 the value that reaches the object is always the value that was validated, under the key it was validated with.
 
@@ -142,7 +142,7 @@ The requiring-rule principle: inference only fills empty slots.
 
 ### Key spaces
 
-Users write `rules()`, `messages()`, and `attributes()` in property-name space, the names they see in their class. The generator translates them to source keys via the structure before anything reaches Laravel. Inferred rules are generated in source-key space directly. Validation errors therefore leave the validator keyed by what the client actually sent. The structure supports translating keys in both directions where needed.
+Users write `rules()`, `messages()`, and `attributes()` in property-name space, the names they see in their class. The generator translates them to original keys via the structure before anything reaches Laravel. Inferred rules are generated in original-key space directly. Validation errors therefore leave the validator keyed by what the client actually sent. The structure supports translating keys in both directions where needed.
 
 ### Collections
 
@@ -166,7 +166,7 @@ Users write `rules()`, `messages()`, and `attributes()` in property-name space, 
 
 ### Precognition
 
-When a request is precognitive, the generated rule set is filtered to the keys in the Precognition-Validate-Only header (in source-key space, what the client sends), the validator runs, and the flow stops before Resolve absences. No object is built.
+When a request is precognitive, the generated rule set is filtered to the keys in the Precognition-Validate-Only header (in original-key space, what the client sends), the validator runs, and the flow stops before Resolve absences. No object is built.
 
 ## 11. Hooks
 
@@ -243,6 +243,7 @@ The generated-class approach still has to prove itself in practice (autoloader r
 * Static `withValidator()` is removed, replaced by the factory hook.
 * `prepareForPipeline()` is removed, replaced by an array-returning magic method or the `prepareData` hook.
 * Magic methods no longer trigger automatic validation for Request payloads. If a magic method builds the object, validation is its responsibility. Returning anything other than the finished data object (an array, a `Normalized`, a model) opts back into the normal flow including validation.
+* Multi-payload creation (`from($a, $b)`) changes precedence: the first payload that contains a key supplies its value, even when that value is null or Optional. v4 let later payloads override earlier ones with a null/Optional exception. Code relying on "the request overrides the model" in `from($model, $request)` must flip the argument order.
 * `$validator->validated()` becomes the construction payload: exclusion rules now take effect, unvalidated extra keys no longer reach the object.
 * Validation of mapped properties: the value that reaches the object is always the value that was validated. Clients sending the unmapped property name get validated under that key.
 * `rules()`, `messages()`, and `attributes()` overrides are interpreted in property-name space and translated. v4 code that keyed overrides by mapped names must switch to property names.
@@ -266,7 +267,7 @@ Beyond the existing test suite (which covers unchanged behavior), the spec adds:
 * Auto-null matrix: config default, config strict, attribute overriding each, on both request and array payloads. In strict mode an absent nullable property without a default produces a validation error (`present`), never a construction error.
 * Magic methods: object return skips validation, array return gets validated, authorize runs in both cases, nested magic methods behave the same.
 * Precognition: rule filtering by header, no object built, correct 204 semantics through Laravel's machinery.
-* Normalization: nested model relations are read lazily and only for declared properties, `toArray()` is never called on a model tree, hidden attributes and stringified date casts do not leak into creation, multi-payload merge semantics match v4 (later payloads override, null and Optional never overwrite).
+* Normalization: nested model relations are read lazily and only for declared properties, `toArray()` is never called on a model tree, hidden attributes and stringified date casts do not leak into creation, multi-payload merge picks the first payload that has the key (breaking change from v4, which let later payloads override with a null/Optional exception).
 * Generated cache: version mismatch falls back to reflection, cached and uncached runs produce identical DataClass structures (a full equality assertion over the discovery set).
 
 ## 15. Implementation notes
