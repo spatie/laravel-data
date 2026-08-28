@@ -110,6 +110,10 @@ When a property is a data object or a collection of data objects, no new creatio
 * An existing data object: taken as finished. Later actions detect this because the payload value is an instance of the target class; no explicit marker is stored. No rules are generated for it, no casting happens on it.
 * A value a nested magic method accepts: option A applies. A return of the target class sits in the payload as a finished instance, unvalidated. Any other return (array, `Normalized`, model) becomes the subtree's source and gets validated and cast like a normal payload.
 
+Not every nested value is enterable. An explicit null, a scalar no normalizer accepts, or an unrecognized object is written into the payload as-is and left for validation or casting to reject later; Fill never throws on malformed nested values, since validation must still get its chance to run. JSON strings and models are enterable through the normalizer chain. Paginator instances are written as-is during Fill; how they are rebuilt into paginated collections is decided in the cast and collect plan. Entered containers always keep their key in the payload: an empty collection or a nested object with no recognized keys stays present as an empty array, so present-but-empty is never confused with absent.
+
+One known limitation: mappings are stored per node and shared across collection items. When divergent morphable item classes map the same property to different input keys, the last item wins. The validation plan must add a regression test for this case.
+
 `prepareForPipeline()` is removed. Its two replacements: a magic method that accepts an array and returns an array covers class-owned payload reshaping (same flow position, validation still runs afterward), and the `prepareData` hook covers call-site reshaping, firing per data node with the payload subtree, the class name, and the path.
 
 ## 9. Defaults, absence, and auto-null
@@ -176,7 +180,7 @@ Execution semantics: closures run in registration order. For transforming hooks 
 
 The v5 hook set, in flow order:
 
-1. `prepareData`: fires during Fill for the root and every nested data node. Receives the payload subtree, the class name, and the path. Returns the adjusted subtree.
+1. `prepareData`: fires during Fill for the root and every nested data node. Receives the raw payload subtree exactly as it was provided (an array, a model, a JSON string, never an internal normalized wrapper), plus the class name and the path. Returns the adjusted subtree; a changed value goes through normalization again.
 2. `beforeValidation`: fires once at the start of the Validate action, receiving the complete assembled payload, may adjust it. Runs before rule generation, since generated rules depend on the payload. Mirrors `prepareForValidation()` on FormRequests. Distinct from `prepareData`, which fires per node during Fill.
 3. `beforeRules`: per property. Receives the property (DataProperty, path, payload value). Returns rules to skip inference for that property, or null to let inference run.
 4. `afterRules`: per property. Receives the inferred rules, may modify them.
@@ -250,6 +254,7 @@ The generated-class approach still has to prove itself in practice (autoloader r
 * `data:cache-structures` is replaced by `data:cache` and `data:clear`. The cache store mechanism is gone.
 * The cast signature changes: a cast receives the DataProperty, the value, the ConstructionState (giving access to payload, structure, and current path), and the CreationContext. v4 passed the flat surrounding properties array; the state object replaces it.
 * The deprecated `FillRouteParameterPropertiesDataPipe` and the dead `CreationContext::$mappedProperties` structure are removed.
+* Injection attributes (`InjectsPropertyValue::resolve()`) receive a different `$properties` array: the node's values built so far, keyed by original keys only. v4 passed the complete flat array keyed by both mapped and property names. Built-in attributes ignore the parameter; custom attributes that read it must adapt.
 
 Not breaking: the entire transformation side, DataCollections, Optional, Lazy, computed properties, magic method matching semantics, `getValidationRules()`, `redirectUrl()`, `errorBag()`, rule attributes, casts and transformers as declared today.
 
