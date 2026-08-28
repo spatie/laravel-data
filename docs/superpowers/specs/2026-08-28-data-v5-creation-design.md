@@ -83,6 +83,8 @@ Normalization is lazy per node. When a value read from a parent is not yet an ar
 
 Two classes from the original v5 notes are not built. `EmptyNormalized`: an empty array does the job. `MultiNormalized`: multi-payload is a plain source list handled by Fill's property lookup, keeping v4 merge semantics (later payloads override earlier, null and Optional never overwrite). When recursing with multiple sources, the child sources are each parent source's value for that property, skipping sources that lack it. This gives per-subtree merging, which v4 approximated by running the whole pipeline once per payload and merging afterwards.
 
+Source lists can only originate at the root: `from($a, $b)` is the single place where multiple payloads enter. A single source always yields a single child source, and a list thins out while descending, collapsing to a single source as soon as only one parent source provides the property. The single-source path is the fast path and the one that runs nearly always.
+
 The `Normalized` interface, the `Normalizer` interface, and the `data.normalizers` config stay unchanged.
 
 ## 7. Mapping, the fix
