@@ -99,7 +99,11 @@ class ConstructionState
 
     public function sourceKey(string $property): string
     {
-        $node = &$this->structureNode();
+        $node = $this->findStructureNode();
+
+        if ($node === null) {
+            return $property;
+        }
 
         return $node['mappings'][$property] ?? $property;
     }
@@ -113,7 +117,11 @@ class ConstructionState
 
     public function nodeClass(): ?string
     {
-        $node = &$this->structureNode();
+        $node = $this->findStructureNode();
+
+        if ($node === null) {
+            return null;
+        }
 
         return $node['class'];
     }
@@ -155,6 +163,27 @@ class ConstructionState
         }
 
         return $slot;
+    }
+
+    protected function findStructureNode(): ?array
+    {
+        $node = $this->structure;
+
+        foreach ($this->path as $segment) {
+            if ($segment['isIndex']) {
+                continue;
+            }
+
+            $key = $segment['structureKey'];
+
+            if (! array_key_exists($key, $node['children'])) {
+                return null;
+            }
+
+            $node = $node['children'][$key];
+        }
+
+        return $node;
     }
 
     protected function &structureNode(): array

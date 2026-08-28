@@ -142,3 +142,27 @@ it('sets and reads node classes for nested nodes', function () {
     expect($state->nodeClass())->toBe(SimpleData::class)
         ->and($state->structure()['children']['author']['class'])->toBe(SimpleData::class);
 });
+
+it('reading sourceKey on an unvisited path creates no structure nodes', function () {
+    $state = makeConstructionState();
+
+    $state->enterProperty('author');
+
+    expect($state->sourceKey('name'))->toBe('name');
+
+    $state->leave();
+
+    expect($state->structure()['children'])->toBe([]);
+});
+
+it('reading nodeClass on an unvisited path creates no structure nodes', function () {
+    $state = makeConstructionState();
+
+    $state->enterProperty('author');
+
+    expect($state->nodeClass())->toBeNull();
+
+    $state->leave();
+
+    expect($state->structure()['children'])->toBe([]);
+});
