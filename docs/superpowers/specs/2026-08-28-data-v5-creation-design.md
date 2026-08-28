@@ -56,8 +56,8 @@ A fixed, hardcoded sequence of action classes with plain `execute()` methods, ca
 
 1. **Authorize.** If any payload is a Request and the validation strategy covers requests, call `authorize()`. This runs before the magic method exit on purpose. In v4 the validation hack meant `authorize()` effectively ran for Request payloads even when a magic method matched. Skipping it in v5 would silently drop an authorization check on upgrade, which is a security regression. Authorization always runs, magic method or not.
 2. **Magic method exit.** Match magic methods against the raw payloads (matching needs original types like Model or Request). Matching keeps the v4 semantics: arity plus type, positional and named payloads, first matching method in definition order wins, CreationContext parameters are injected and skipped during matching. Outcomes:
-   * The method returns a data object: done. No validation, no mapping, no casting.
-   * The method returns an array: that array becomes the payload and the flow continues normally, including validation. This is "option A" from the original notes.
+   * The method returns an instance of the target data class: done. No validation, no mapping, no casting.
+   * The method returns anything else: the value becomes the node's source and the flow continues normally, including validation. This is "option A" from the original notes, generalized: an array is the common case, but a `Normalized`, a model, or anything the normalizer chain accepts works identically, since Fill reads from sources. The returned value does not go through magic method matching again, so a method returning a payload of its own accepted type cannot loop. Returning null to mean "try the next method" is not supported; `accepts()` stays the single source of truth for matching.
 3. **Normalize.** Resolve the root sources (section 6). Arrays stay arrays, requests, Arrayables, and JSON become plain arrays once, models become `NormalizedModel`, custom normalizers run with first non-null winning. No payload becomes an empty array, several payloads become a source list.
 4. **Resolve morph.** For abstract property-morphable classes, pick the concrete class before anything property-related happens.
 5. **Fill.** Walk the DataClass properties and build the full payload and structure trees, depth first. Per property: read the value (mapping rules in section 7, recording the source key in the node's mappings when it differs from the property name), run injection attributes, and recurse into nested data objects and collections (section 8). Defaults are not written into the payload; they are resolved after validation. The `prepareData` hook fires for the root and for every nested data node before its properties are filled. After Fill, no other step discovers new properties.
@@ -106,7 +106,7 @@ When a property is a data object or a collection of data objects, no new creatio
 
 * An array, or a model relation through the normalizer: filled normally, recursion continues.
 * An existing data object: taken as finished. Later actions detect this because the payload value is an instance of the target class; no explicit marker is stored. No rules are generated for it, no casting happens on it.
-* A value a nested magic method accepts: option A applies. An array return flows into the subtree like a normal payload and gets validated and cast. A data object return sits in the payload as a finished instance, unvalidated.
+* A value a nested magic method accepts: option A applies. A return of the target class sits in the payload as a finished instance, unvalidated. Any other return (array, `Normalized`, model) becomes the subtree's source and gets validated and cast like a normal payload.
 
 `prepareForPipeline()` is removed. Its two replacements: a magic method that accepts an array and returns an array covers class-owned payload reshaping (same flow position, validation still runs afterward), and the `prepareData` hook covers call-site reshaping, firing per data node with the payload subtree, the class name, and the path.
 
@@ -237,7 +237,7 @@ The generated-class approach still has to prove itself in practice (autoloader r
 * All RuleInferrers and the `rule_inferrers` config key are removed. Custom inferrers migrate to `beforeRules` and `afterRules` hooks.
 * Static `withValidator()` is removed, replaced by the factory hook.
 * `prepareForPipeline()` is removed, replaced by an array-returning magic method or the `prepareData` hook.
-* Magic methods no longer trigger automatic validation for Request payloads. If a magic method builds the object, validation is its responsibility. Returning an array opts back into the normal flow including validation.
+* Magic methods no longer trigger automatic validation for Request payloads. If a magic method builds the object, validation is its responsibility. Returning anything other than the finished data object (an array, a `Normalized`, a model) opts back into the normal flow including validation.
 * `$validator->validated()` becomes the construction payload: exclusion rules now take effect, unvalidated extra keys no longer reach the object.
 * Validation of mapped properties: the value that reaches the object is always the value that was validated. Clients sending the unmapped property name get validated under that key.
 * `rules()`, `messages()`, and `attributes()` overrides are interpreted in property-name space and translated. v4 code that keyed overrides by mapped names must switch to property names.
