@@ -39,13 +39,12 @@ These items from the original v5 notes are explicitly out of scope:
 One mutable state object, working name `ConstructionState`, carries everything through a single creation flow. It owns:
 
 * `payload`: a nested array shaped like the data. Collections use concrete indices (`posts.0.title`).
-* `structure`: a nested array shaped like the class tree. One node per property. Collections get one shared item node describing the item class, without indices. Each property node records:
-  * the source key the value was taken from (for mapped properties),
-  * whether a value was present in the input,
-  * whether the property was absent but has a default,
-  * the data class at that level (for nested data nodes),
-  * whether the subtree is finished (built by a magic method or provided as an existing data object),
-  * the cast decision, filled in during the Cast action.
+* `structure`: a nested array shaped like the class tree, deliberately compact. One node per data object, not per property. A node holds:
+  * a class reference (class-string) for the data object at that level. For morphable classes this is the concrete class picked by morph resolution, which is payload-dependent and expensive to re-derive.
+  * `mappings`: property name to source key, only for properties where the two differ. This decision is made once during Fill and reused everywhere. It cannot be safely re-derived later: after validation, `validated()` prunes keys, so re-checking the payload could give a different answer than Fill got.
+  * `children`: nodes for nested data properties, keyed by property name. A collection property gets one shared item node. When morphable collection items resolve to different classes, the item node holds per-index class references.
+
+Everything else is inferred at the moment it is needed from the payload plus the DataClass: whether a value is present (`array_key_exists`), whether an absent property has a default (the DataClass knows), which cast applies (the Cast action decides and applies in one go), and whether a subtree is already finished (the payload value is an instance of the target class). The structure stores only what is payload-dependent and expensive or unsafe to re-derive.
 * `path`: the current position as an array of segments, not a dot string.
 * the `CreationContext`.
 
@@ -61,7 +60,7 @@ A fixed, hardcoded sequence of action classes with plain `execute()` methods, ca
    * The method returns an array: that array becomes the payload and the flow continues normally, including validation. This is "option A" from the original notes.
 3. **Normalize.** Wrap payloads. No payload becomes `EmptyNormalized`, several become `MultiNormalized`, a data object becomes a normalized wrapper, arrays and requests stay cheap.
 4. **Resolve morph.** For abstract property-morphable classes, pick the concrete class before anything property-related happens.
-5. **Fill.** Walk the DataClass properties and build the full payload and structure trees, depth first. Per property: read the value (mapping rules in section 6), run injection attributes, record absence and defaults in the structure (defaults are not written into the payload), and recurse into nested data objects and collections (section 7). The `prepareData` hook fires for the root and for every nested data node before its properties are filled. After Fill, no other step discovers new properties.
+5. **Fill.** Walk the DataClass properties and build the full payload and structure trees, depth first. Per property: read the value (mapping rules in section 6, recording the source key in the node's mappings when it differs from the property name), run injection attributes, and recurse into nested data objects and collections (section 7). Defaults are not written into the payload; they are resolved after validation. The `prepareData` hook fires for the root and for every nested data node before its properties are filled. After Fill, no other step discovers new properties.
 6. **Validate.** Only if the strategy says so. One action generates rules for the whole tree (section 9), hooks run, one validator runs. On success, `$validator->validated()` becomes the payload going forward. On failure, the exception is rethrown with error keys in source-key space (which is already what the validator produces, see section 9).
 7. **Resolve absences.** One rule for every property slot without a value in the current payload, whether never sent, skipped, or removed by an `exclude_*` rule: use the PHP default if there is one, else Optional if the type allows it, else null if nullable and auto-null applies (section 8), else leave it missing and let Instantiate throw a clear error. Properties that were deliberately not validated keep their value from the Fill payload.
 8. **Cast.** Walk the properties and run the cast decision per value. Cast precedence matches v4: property attribute cast, then creation context casts, then global casts. Nested data objects are not built here, only their scalar leaves are cast.
@@ -76,7 +75,7 @@ Reading a property value from the payload happens exactly once, during Fill, wit
 1. The mapped key, if the property has one and the key is present. Mapped always wins.
 2. Otherwise the property name itself. Using the property name stays valid.
 
-Whichever key supplied the value is recorded in the structure node as the source key. Everything downstream (rules, messages, attributes, error keys, `validated()` extraction) uses the source key and nothing else. When neither key is present, the mapped key is recorded as the canonical source key, so a `required` error points at the key the client was supposed to send.
+Whichever key supplied the value is recorded in the node's mappings as the source key. Everything downstream (rules, messages, attributes, error keys, `validated()` extraction) uses the source key and nothing else. When neither key is present, the mapped key is recorded as the canonical source key, so a `required` error points at the key the client was supposed to send.
 
 This fixes the v4 bug where `MapPropertiesDataPipe` copies the mapped key onto the property name, leaves both keys in the payload, and validation rules only cover the mapped key. In v5 the value that reaches the object is always the value that was validated, under the key it was validated with.
 
@@ -87,8 +86,8 @@ Support for multiple mapped keys per property is planned for a later release, no
 When a property is a data object or a collection of data objects, no new creation process starts. The Fill action pushes the property onto the path, creates the child structure node, and runs the same fill logic on the nested value. What a nested value can be:
 
 * An array, or a model relation through the normalizer: filled normally, recursion continues.
-* An existing data object: taken as finished. The subtree is marked done in the structure. No rules are generated for it, no casting happens on it.
-* A value a nested magic method accepts: option A applies. An array return flows into the subtree like a normal payload and gets validated and cast. A data object return marks the subtree finished and unvalidated.
+* An existing data object: taken as finished. Later actions detect this because the payload value is an instance of the target class; no explicit marker is stored. No rules are generated for it, no casting happens on it.
+* A value a nested magic method accepts: option A applies. An array return flows into the subtree like a normal payload and gets validated and cast. A data object return sits in the payload as a finished instance, unvalidated.
 
 `prepareForPipeline()` is removed. Its two replacements: a magic method that accepts an array and returns an array covers class-owned payload reshaping (same flow position, validation still runs afterward), and the `prepareData` hook covers call-site reshaping, firing per data node with the payload subtree, the class name, and the path.
 
@@ -155,7 +154,7 @@ Execution semantics: closures run in registration order. For transforming hooks 
 The v5 hook set, in flow order:
 
 1. `prepareData`: fires during Fill for the root and every nested data node. Receives the payload subtree, the class name, and the path. Returns the adjusted subtree.
-2. `beforeRules`: per property. Receives the property (structure node, path, payload value). Returns rules to skip inference for that property, or null to let inference run.
+2. `beforeRules`: per property. Receives the property (DataProperty, path, payload value). Returns rules to skip inference for that property, or null to let inference run.
 3. `afterRules`: per property. Receives the inferred rules, may modify them.
 4. `withValidator`: receives the built Validator instance before it runs.
 5. `afterValidation`: receives the validated payload, may adjust it before Resolve absences. Mirrors `passedValidation()` on FormRequests.
