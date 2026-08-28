@@ -83,6 +83,12 @@ class FillAction
                 continue;
             }
 
+            if ($property->type->kind->isDataCollectable()) {
+                $this->fillDataCollectionProperty($state, $property, $value, $originalKey);
+
+                continue;
+            }
+
             $state->writeValue($originalKey, $value);
         }
     }
@@ -208,6 +214,49 @@ class FillAction
             [$source],
             [$value]
         );
+
+        $state->leave();
+    }
+
+    protected function fillDataCollectionProperty(
+        ConstructionState $state,
+        DataProperty $property,
+        mixed $value,
+        string $originalKey
+    ): void {
+        /** @var class-string $itemClass */
+        $itemClass = $property->type->dataClass;
+
+        if (! is_iterable($value)) {
+            $state->writeValue($originalKey, $value);
+
+            return;
+        }
+
+        $state->enterProperty(
+            $property->name,
+            $originalKey === $property->name ? null : $originalKey
+        );
+
+        $state->setNodeClass($itemClass);
+
+        $itemDataClass = $this->dataConfig->getDataClass($itemClass);
+
+        foreach ($value as $index => $item) {
+            if ($item instanceof $itemClass) {
+                $state->writeValue($index, $item);
+
+                continue;
+            }
+
+            $state->enterItem($index);
+
+            $source = SourceResolver::resolve($itemClass, $item, $this->normalizers);
+
+            $this->fillNode($state, $itemDataClass, [$source], [$item]);
+
+            $state->leave();
+        }
 
         $state->leave();
     }

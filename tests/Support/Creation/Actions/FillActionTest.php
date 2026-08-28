@@ -1,5 +1,6 @@
 <?php
 
+use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Resolvers\DataMorphClassResolver;
 use Spatie\LaravelData\Support\Creation\Actions\FillAction;
@@ -13,6 +14,7 @@ use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\FillNestedModelData;
 use Spatie\LaravelData\Tests\Fakes\FillFakeModelData;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
+use Spatie\LaravelData\Tests\Fakes\MultiNestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 
@@ -273,4 +275,70 @@ it('fills nested data from a model relation lazily', function () {
 
     expect($state->payload())->toBe(['fakeModel' => ['string' => 'Hello']])
         ->and($state->structure()['children']['fakeModel']['class'])->toBe(FillFakeModelData::class);
+});
+
+function fillCollectionDataClass(): string
+{
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(SimpleData::class)]
+        public array $items = [];
+    };
+
+    return $dataClass::class;
+}
+
+it('fills data collections with per index recursion', function () {
+    $state = fillAction()->execute(fillContext(MultiNestedData::class), [[
+        'nested' => ['simple' => ['string' => 'a']],
+        'nestedCollection' => [
+            ['simple' => ['string' => 'b']],
+            ['simple' => ['string' => 'c']],
+        ],
+    ]]);
+
+    expect($state->payload())->toBe([
+        'nested' => ['simple' => ['string' => 'a']],
+        'nestedCollection' => [
+            ['simple' => ['string' => 'b']],
+            ['simple' => ['string' => 'c']],
+        ],
+    ])
+        ->and($state->structure()['children']['nestedCollection'])->toBe([
+            'class' => NestedData::class,
+            'mappings' => [],
+            'children' => [
+                'simple' => [
+                    'class' => SimpleData::class,
+                    'mappings' => [],
+                    'children' => [],
+                ],
+            ],
+        ]);
+});
+
+it('passes finished collection items through untouched', function () {
+    $finished = new SimpleData('a');
+
+    $state = fillAction()->execute(fillContext(fillCollectionDataClass()), [
+        ['items' => [$finished, ['string' => 'b']]],
+    ]);
+
+    expect($state->payload())->toBe(['items' => [$finished, ['string' => 'b']]]);
+});
+
+it('iterates Laravel collections as collection input', function () {
+    $state = fillAction()->execute(fillContext(fillCollectionDataClass()), [
+        ['items' => collect([['string' => 'a']])],
+    ]);
+
+    expect($state->payload())->toBe(['items' => [['string' => 'a']]])
+        ->and($state->structure()['children']['items']['class'])->toBe(SimpleData::class);
+});
+
+it('writes non iterable collection values as is', function () {
+    $state = fillAction()->execute(fillContext(fillCollectionDataClass()), [
+        ['items' => 'nonsense'],
+    ]);
+
+    expect($state->payload())->toBe(['items' => 'nonsense']);
 });
