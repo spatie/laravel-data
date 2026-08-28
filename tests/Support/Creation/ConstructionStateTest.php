@@ -87,3 +87,58 @@ it('builds dot paths from payload segments', function () {
     expect($state->dotPath('title'))->toBe('posts.0.title')
         ->and($state->depth())->toBe(2);
 });
+
+it('records mappings on the current structure node', function () {
+    $state = makeConstructionState();
+
+    $state->recordMapping('author', 'writer');
+
+    expect($state->structure())->toBe([
+        'class' => SimpleData::class,
+        'mappings' => ['author' => 'writer'],
+        'children' => [],
+    ]);
+});
+
+it('resolves source keys through mappings, defaulting to the property name', function () {
+    $state = makeConstructionState();
+
+    $state->recordMapping('author', 'writer');
+
+    expect($state->sourceKey('author'))->toBe('writer')
+        ->and($state->sourceKey('title'))->toBe('title');
+});
+
+it('creates one structure node per data property, ignoring collection indices', function () {
+    $state = makeConstructionState();
+
+    $state->enterProperty('posts');
+    $state->enterIndex(3);
+    $state->recordMapping('title', 'post_title');
+    $state->leave();
+    $state->leave();
+
+    expect($state->structure())->toBe([
+        'class' => SimpleData::class,
+        'mappings' => [],
+        'children' => [
+            'posts' => [
+                'class' => null,
+                'mappings' => ['title' => 'post_title'],
+                'children' => [],
+            ],
+        ],
+    ]);
+});
+
+it('sets and reads node classes for nested nodes', function () {
+    $state = makeConstructionState();
+
+    expect($state->nodeClass())->toBe(SimpleData::class);
+
+    $state->enterProperty('author', 'writer');
+    $state->setNodeClass(SimpleData::class);
+
+    expect($state->nodeClass())->toBe(SimpleData::class)
+        ->and($state->structure()['children']['author']['class'])->toBe(SimpleData::class);
+});

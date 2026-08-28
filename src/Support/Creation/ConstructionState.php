@@ -90,6 +90,39 @@ class ConstructionState
         return $this->payload;
     }
 
+    public function recordMapping(string $property, string $sourceKey): void
+    {
+        $node = &$this->structureNode();
+
+        $node['mappings'][$property] = $sourceKey;
+    }
+
+    public function sourceKey(string $property): string
+    {
+        $node = &$this->structureNode();
+
+        return $node['mappings'][$property] ?? $property;
+    }
+
+    public function setNodeClass(string $class): void
+    {
+        $node = &$this->structureNode();
+
+        $node['class'] = $class;
+    }
+
+    public function nodeClass(): ?string
+    {
+        $node = &$this->structureNode();
+
+        return $node['class'];
+    }
+
+    public function structure(): array
+    {
+        return $this->structure;
+    }
+
     protected function currentPayload(): mixed
     {
         $slot = $this->payload;
@@ -122,6 +155,27 @@ class ConstructionState
         }
 
         return $slot;
+    }
+
+    protected function &structureNode(): array
+    {
+        $node = &$this->structure;
+
+        foreach ($this->path as $segment) {
+            if ($segment['isIndex']) {
+                continue;
+            }
+
+            $key = $segment['structureKey'];
+
+            if (! array_key_exists($key, $node['children'])) {
+                $node['children'][$key] = static::newNode(null);
+            }
+
+            $node = &$node['children'][$key];
+        }
+
+        return $node;
     }
 
     protected static function newNode(?string $class): array
