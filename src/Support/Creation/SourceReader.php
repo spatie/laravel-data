@@ -1,0 +1,26 @@
+<?php
+
+namespace Spatie\LaravelData\Support\Creation;
+
+use Spatie\LaravelData\Normalizers\Normalized\Normalized;
+use Spatie\LaravelData\Normalizers\Normalized\UnknownProperty;
+use Spatie\LaravelData\Support\DataProperty;
+
+class SourceReader
+{
+    public static function read(
+        array|Normalized $source,
+        string|int $key,
+        DataProperty $property
+    ): mixed {
+        if ($source instanceof Normalized) {
+            return $source->getProperty((string) $key, $property);
+        }
+
+        if (! array_key_exists($key, $source)) {
+            return UnknownProperty::create();
+        }
+
+        return $source[$key];
+    }
+}
