@@ -79,7 +79,9 @@ Per node, a source is a plain array or a `Normalized` object. The root Fill call
 
 Nesting needs no path bookkeeping. When Fill hits a nested property on a model source, `getProperty()` returns the related model instance, and that instance becomes the child node's source. The position is implicit in the object reference being held; there is no path-from-root resolution.
 
-Normalization is lazy per node. When a value read from a parent is not yet an array or `Normalized` (a related model, a nested Arrayable, a JSON string in a column), the child node runs it through the same normalizer chain on demand. One small `NormalizedModel` per nested model is the only allocation, and it buys never touching relations or attributes the data class does not declare. For the common model case (validation off), Fill only materializes declared properties into the payload array.
+Normalization happens per node, at the moment Fill recurses into it. A nested Arrayable or JSON string is converted to a plain array immediately at that point; there is no reason to defer or wrap it. Only models get a wrapper, because a model is the only source where eager conversion is both lossy and expensive. One small `NormalizedModel` per nested model is the only allocation, and it buys never touching relations or attributes the data class does not declare. For the common model case (validation off), Fill only materializes declared properties into the payload array.
+
+Name translation inside `NormalizedModel` stays an implementation detail in v5, exactly as in v4: when the model uses snake cased attributes, `getProperty('createdAt')` reads the `created_at` attribute. This is not part of the mapping system and records no source key; model reads stay keyed by property name downstream. When mapping scopes land in a later release (specs/mapping-scopes.md), this hardcoded translation becomes a configurable per-source mapper sitting at the same seam, the property read on a source.
 
 Two classes from the original v5 notes are not built. `EmptyNormalized`: an empty array does the job. `MultiNormalized`: multi-payload is a plain source list, and it exists only at the root. `from($a, $b)` is the single place where multiple payloads enter, and they mostly exist to feed magic methods with multiple values, which are matched in step 2 before any of this runs.
 
@@ -123,6 +125,8 @@ Auto-null for nullable properties becomes configurable:
 * Default behavior is unchanged from v4: an absent value for a nullable property resolves to null.
 * A config option flips the default globally to strict mode (absent stays absent, users declare `= null` themselves). Strict mode fits JSON clients that send explicit nulls.
 * A class-level or property-level attribute overrides the config in either direction. The attribute wins over config so vendor packages shipping data classes can rely on their own declared behavior.
+* In strict mode, a nullable property without a default gets `present` plus `nullable` rules instead of `nullable` alone. An absent key then fails validation with a clear error instead of crashing at construction, which is where the failure belongs.
+* The global default may flip to strict in a later release. Both modes are symmetrical in the design, so flipping the default is a config change, nothing structural.
 
 ## 10. Validation
 
@@ -258,7 +262,7 @@ Beyond the existing test suite (which covers unchanged behavior), the spec adds:
 * Requiring rules: an explicit `RequiredIf` is never clobbered by inferred `required`; two explicit conditionals both survive.
 * Defaults: absent value with default constructs with the default and produces no validation error; provided value is fully validated; `rules()` overrides apply regardless of defaults (#1187 regression test).
 * GitHub issues as regression cases: #873, #647, #681, #1019.
-* Auto-null matrix: config default, config strict, attribute overriding each, on both request and array payloads.
+* Auto-null matrix: config default, config strict, attribute overriding each, on both request and array payloads. In strict mode an absent nullable property without a default produces a validation error (`present`), never a construction error.
 * Magic methods: object return skips validation, array return gets validated, authorize runs in both cases, nested magic methods behave the same.
 * Precognition: rule filtering by header, no object built, correct 204 semantics through Laravel's machinery.
 * Normalization: nested model relations are read lazily and only for declared properties, `toArray()` is never called on a model tree, hidden attributes and stringified date casts do not leak into creation, multi-payload merge semantics match v4 (later payloads override, null and Optional never overwrite).
