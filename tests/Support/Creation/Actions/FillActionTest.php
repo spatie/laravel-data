@@ -1,11 +1,13 @@
 <?php
 
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Resolvers\DataMorphClassResolver;
 use Spatie\LaravelData\Support\Creation\Actions\FillAction;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
+use Spatie\LaravelData\Tests\Fakes\FillTestInjectable;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
@@ -130,4 +132,74 @@ it('chains prepareData hooks in registration order', function () {
     $state = fillAction()->execute($context, [['string' => 'start']]);
 
     expect($state->payload())->toBe(['string' => 'start-one-two']);
+});
+
+it('injects a value when the payload does not provide one', function () {
+    $dataClass = new class ('') extends Data {
+        public function __construct(
+            #[FillTestInjectable(value: 'injected')]
+            public string $string,
+        ) {
+        }
+    };
+
+    $state = fillAction()->execute(fillContext($dataClass::class), [[]]);
+
+    expect($state->payload())->toBe(['string' => 'injected']);
+});
+
+it('replaces a present value when the attribute wants that', function () {
+    $dataClass = new class ('') extends Data {
+        public function __construct(
+            #[FillTestInjectable(value: 'injected', replace: true)]
+            public string $string,
+        ) {
+        }
+    };
+
+    $state = fillAction()->execute(fillContext($dataClass::class), [['string' => 'original']]);
+
+    expect($state->payload())->toBe(['string' => 'injected']);
+});
+
+it('keeps a present value when the attribute does not replace', function () {
+    $dataClass = new class ('') extends Data {
+        public function __construct(
+            #[FillTestInjectable(value: 'injected', replace: false)]
+            public string $string,
+        ) {
+        }
+    };
+
+    $state = fillAction()->execute(fillContext($dataClass::class), [['string' => 'original']]);
+
+    expect($state->payload())->toBe(['string' => 'original']);
+});
+
+it('falls through Skipped to the next injection attribute', function () {
+    $dataClass = new class ('') extends Data {
+        public function __construct(
+            #[FillTestInjectable(skip: true), FillTestInjectable(value: 'second')]
+            public string $string,
+        ) {
+        }
+    };
+
+    $state = fillAction()->execute(fillContext($dataClass::class), [[]]);
+
+    expect($state->payload())->toBe(['string' => 'second']);
+});
+
+it('leaves the value absent when every injection attribute skips', function () {
+    $dataClass = new class ('') extends Data {
+        public function __construct(
+            #[FillTestInjectable(skip: true)]
+            public string $string,
+        ) {
+        }
+    };
+
+    $state = fillAction()->execute(fillContext($dataClass::class), [[]]);
+
+    expect($state->payload())->toBe([]);
 });

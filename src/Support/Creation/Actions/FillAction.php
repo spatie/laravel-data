@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelData\Support\Creation\Actions;
 
+use Spatie\LaravelData\Attributes\InjectsPropertyValue;
 use Spatie\LaravelData\Normalizers\Normalized\UnknownProperty;
 use Spatie\LaravelData\Normalizers\Normalizer;
 use Spatie\LaravelData\Resolvers\DataMorphClassResolver;
@@ -12,6 +13,7 @@ use Spatie\LaravelData\Support\Creation\SourceResolver;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
+use Spatie\LaravelData\Support\Skipped;
 
 class FillAction
 {
@@ -68,6 +70,8 @@ class FillAction
             if ($originalKey !== $property->name) {
                 $state->recordMapping($property->name, $originalKey);
             }
+
+            $value = $this->applyInjection($state, $property, $value, $rawPayloads);
 
             if ($value instanceof UnknownProperty) {
                 continue;
@@ -132,5 +136,41 @@ class FillAction
         }
 
         return $sources;
+    }
+
+    protected function applyInjection(
+        ConstructionState $state,
+        DataProperty $property,
+        mixed $value,
+        array $rawPayloads
+    ): mixed {
+        $attributes = $property->attributes->all(InjectsPropertyValue::class);
+
+        if ($attributes === []) {
+            return $value;
+        }
+
+        foreach ($attributes as $attribute) {
+            if (! $attribute->shouldBeReplacedWhenPresentInPayload() && ! $value instanceof UnknownProperty) {
+                continue;
+            }
+
+            foreach (($rawPayloads === [] ? [null] : $rawPayloads) as $rawPayload) {
+                $resolved = $attribute->resolve(
+                    $property,
+                    $rawPayload,
+                    $state->currentValues(),
+                    $state->creationContext
+                );
+
+                if ($resolved === Skipped::create()) {
+                    continue;
+                }
+
+                return $resolved;
+            }
+        }
+
+        return $value;
     }
 }
