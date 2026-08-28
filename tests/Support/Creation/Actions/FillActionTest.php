@@ -2,19 +2,22 @@
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Exceptions\CannotCreateAbstractClass;
 use Spatie\LaravelData\Resolvers\DataMorphClassResolver;
 use Spatie\LaravelData\Support\Creation\Actions\FillAction;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\DataConfig;
+use Spatie\LaravelData\Tests\Fakes\AbstractPropertyMorphableData;
 use Spatie\LaravelData\Tests\Fakes\DataWithMapper;
+use Spatie\LaravelData\Tests\Fakes\FillFakeModelData;
+use Spatie\LaravelData\Tests\Fakes\FillNestedModelData;
 use Spatie\LaravelData\Tests\Fakes\FillTestInjectable;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
-use Spatie\LaravelData\Tests\Fakes\NestedData;
-use Spatie\LaravelData\Tests\Fakes\FillNestedModelData;
-use Spatie\LaravelData\Tests\Fakes\FillFakeModelData;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
 use Spatie\LaravelData\Tests\Fakes\MultiNestedData;
+use Spatie\LaravelData\Tests\Fakes\PropertyMorphableDataA;
+use Spatie\LaravelData\Tests\Fakes\PropertyMorphableDataB;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 use Spatie\LaravelData\Tests\Fakes\SimpleDataWithMappedProperty;
 
@@ -341,4 +344,43 @@ it('writes non iterable collection values as is', function () {
     ]);
 
     expect($state->payload())->toBe(['items' => 'nonsense']);
+});
+
+it('resolves the morph class at the root', function () {
+    $state = fillAction()->execute(fillContext(AbstractPropertyMorphableData::class), [
+        ['variant' => 'a', 'a' => 'foo', 'enum' => 'foo'],
+    ]);
+
+    expect($state->structure()['class'])->toBe(PropertyMorphableDataA::class)
+        ->and($state->payload())->toBe(['a' => 'foo', 'enum' => 'foo', 'variant' => 'a']);
+});
+
+it('throws when the morph class cannot be resolved', function () {
+    fillAction()->execute(fillContext(AbstractPropertyMorphableData::class), [[]]);
+})->throws(CannotCreateAbstractClass::class);
+
+it('records divergent morph classes per collection item', function () {
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(AbstractPropertyMorphableData::class)]
+        public array $items = [];
+    };
+
+    $state = fillAction()->execute(fillContext($dataClass::class), [[
+        'items' => [
+            ['variant' => 'a', 'a' => 'foo', 'enum' => 'foo'],
+            ['variant' => 'b', 'b' => 'bar'],
+        ],
+    ]]);
+
+    expect($state->structure()['children']['items']['class'])->toBe(AbstractPropertyMorphableData::class)
+        ->and($state->structure()['children']['items']['indexClasses'])->toBe([
+            0 => PropertyMorphableDataA::class,
+            1 => PropertyMorphableDataB::class,
+        ])
+        ->and($state->payload())->toBe([
+            'items' => [
+                ['a' => 'foo', 'enum' => 'foo', 'variant' => 'a'],
+                ['b' => 'bar', 'variant' => 'b'],
+            ],
+        ]);
 });

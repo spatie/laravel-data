@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support\Creation\Actions;
 
 use Spatie\LaravelData\Attributes\InjectsPropertyValue;
+use Spatie\LaravelData\Exceptions\CannotCreateAbstractClass;
 use Spatie\LaravelData\Normalizers\Normalized\UnknownProperty;
 use Spatie\LaravelData\Normalizers\Normalizer;
 use Spatie\LaravelData\Resolvers\DataMorphClassResolver;
@@ -62,6 +63,10 @@ class FillAction
     ): void {
         $sources = $this->applyPrepareDataHooks($state, $dataClass->name, $sources);
 
+        if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
+            $dataClass = $this->resolveMorphedDataClass($dataClass, $sources);
+        }
+
         $state->setNodeClass($dataClass->name);
 
         foreach ($dataClass->properties as $property) {
@@ -91,6 +96,35 @@ class FillAction
 
             $state->writeValue($originalKey, $value);
         }
+    }
+
+    protected function resolveMorphedDataClass(DataClass $dataClass, array $sources): DataClass
+    {
+        $morphProperties = [];
+
+        foreach ($dataClass->properties as $property) {
+            if (! $property->morphable) {
+                continue;
+            }
+
+            $value = SourceReader::readFromMany($sources, $property->name, $property);
+
+            if ($value instanceof UnknownProperty && $property->inputMappedName !== null) {
+                $value = SourceReader::readFromMany($sources, $property->inputMappedName, $property);
+            }
+
+            if (! $value instanceof UnknownProperty) {
+                $morphProperties[$property->name] = $value;
+            }
+        }
+
+        $morphedClass = $this->morphClassResolver->execute($dataClass, [$morphProperties]);
+
+        if ($morphedClass === null) {
+            throw CannotCreateAbstractClass::morphClassWasNotResolved(originalClass: $dataClass->name);
+        }
+
+        return $this->dataConfig->getDataClass($morphedClass);
     }
 
     /**
