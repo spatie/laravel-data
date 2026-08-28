@@ -72,7 +72,7 @@ A fixed, hardcoded sequence of action classes with plain `execute()` methods, ca
 
 Normalized objects are inputs to Fill and they die when Fill ends. The payload array is Fill's output; by validation time everything is a plain nested array.
 
-Per node, a source is one of: a plain array, a `Normalized` object, or a list of those (multi-payload). Fill reads one property at a time from its node's source:
+Per node, a source is a plain array or a `Normalized` object. The root Fill call receives a list of sources as its parameter, a list of one for the common single-payload case. The list length comes straight from `from(...$payloads)`'s argument list and is never inferred from array shape, so a payload that happens to be a numeric list can never be mistaken for multiple payloads. Below the root, every call passes exactly one source. Fill reads one property at a time from its node's source:
 
 * Plain array: key lookup. Requests, Arrayables, and JSON strings are converted to a plain array once at the root. No wrapper objects; an array is good enough there.
 * `Normalized`: `getProperty()` per property. `NormalizedModel` is the main user and stays, because `Model::toArray()` is wrong for creation, not just slow: it stringifies date casts, strips hidden attributes, and triggers appends. Lazy per-property access on raw attributes and loaded relations is the correct read.
