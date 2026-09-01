@@ -3,6 +3,8 @@
 namespace Spatie\LaravelData\Attributes;
 
 use Attribute;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\DataProperty;
@@ -21,15 +23,15 @@ class FromRouteParameter implements InjectsPropertyValue
 
     public function resolve(
         DataProperty $dataProperty,
-        mixed $payload,
-        array $properties,
         CreationContext $creationContext
     ): mixed {
-        if (! $payload instanceof Request) {
+        try {
+            $request = Container::getInstance()->make(Request::class);
+        } catch (BindingResolutionException) {
             return Skipped::create();
         }
 
-        $parameter = $payload->route($this->routeParameter);
+        $parameter = $request->route($this->routeParameter);
 
         if ($parameter === null) {
             return Skipped::create();

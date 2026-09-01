@@ -1,26 +1,30 @@
 <?php
 
-use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Normalizers\JsonNormalizer;
 use Spatie\LaravelData\Normalizers\ModelNormalizer;
 use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\Normalizers\Normalized\NormalizedModel;
 use Spatie\LaravelData\Normalizers\Normalized\UnknownProperty;
-use Spatie\LaravelData\Support\Creation\SourceReader;
-use Spatie\LaravelData\Support\Creation\SourceResolver;
+use Spatie\LaravelData\Normalizers\Normalized\UnNormalized;
+use Spatie\LaravelData\Support\Creation\Actions\NormalizePayloadAction;
 use Spatie\LaravelData\Support\DataProperty;
 use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeModel;
 use Spatie\LaravelData\Tests\Fakes\Models\FakeNestedModel;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
+function normalize(string $dataClass, mixed $value, array $normalizers): array|Normalized
+{
+    return (new NormalizePayloadAction($normalizers))->execute($value);
+}
+
 it('passes arrays through untouched', function () {
-    expect(SourceResolver::resolve(SimpleData::class, ['a' => 1], []))
+    expect(normalize(SimpleData::class, ['a' => 1], []))
         ->toBe(['a' => 1]);
 });
 
 it('turns null into an empty array', function () {
-    expect(SourceResolver::resolve(SimpleData::class, null, []))->toBe([]);
+    expect(normalize(SimpleData::class, null, []))->toBe([]);
 });
 
 it('passes Normalized objects through untouched', function () {
@@ -31,21 +35,29 @@ it('passes Normalized objects through untouched', function () {
         }
     };
 
-    expect(SourceResolver::resolve(SimpleData::class, $normalized, []))
+    expect(normalize(SimpleData::class, $normalized, []))
         ->toBe($normalized);
 });
 
 it('runs the normalizer chain, first non-null wins', function () {
-    expect(SourceResolver::resolve(
+    expect(normalize(
         SimpleData::class,
         '{"title": "Hello"}',
         [new ModelNormalizer(), new JsonNormalizer()]
     ))->toBe(['title' => 'Hello']);
 });
 
-it('throws when no normalizer accepts the value', function () {
-    SourceResolver::resolve(SimpleData::class, 42, [new JsonNormalizer()]);
-})->throws(CannotCreateData::class);
+it('returns the UnNormalized sentinel when no normalizer accepts the value', function () {
+    expect(normalize(SimpleData::class, 42, [new JsonNormalizer()]))
+        ->toBe(UnNormalized::$instance);
+});
+
+it('reads every property of an UnNormalized payload as unknown', function () {
+    $property = FakeDataStructureFactory::property(new SimpleData('hello'), 'string');
+
+    expect(UnNormalized::$instance->getProperty('string', $property))
+        ->toBe(UnknownProperty::$instance);
+});
 
 it('resolves a nested model read into a new NormalizedModel', function () {
     $related = new FakeModel();
@@ -58,17 +70,17 @@ it('resolves a nested model read into a new NormalizedModel', function () {
         public ?FakeModel $fakeModel = null;
     }, 'fakeModel');
 
-    $value = SourceReader::read(new NormalizedModel($model), 'fakeModel', $relationProperty);
+    [$value] = readProperty([new NormalizedModel($model)], $relationProperty);
 
     expect($value)->toBe($related);
 
-    $childSource = SourceResolver::resolve(SimpleData::class, $value, [new ModelNormalizer()]);
+    $childNormalized = normalize(SimpleData::class, $value, [new ModelNormalizer()]);
 
-    expect($childSource)->toBeInstanceOf(NormalizedModel::class);
+    expect($childNormalized)->toBeInstanceOf(NormalizedModel::class);
 
     $stringProperty = FakeDataStructureFactory::property(new class () {
         public ?string $string = null;
     }, 'string');
 
-    expect(SourceReader::read($childSource, 'string', $stringProperty))->toBe('Hello');
+    expect(readProperty([$childNormalized], $stringProperty))->toBe(['Hello', 'string']);
 });

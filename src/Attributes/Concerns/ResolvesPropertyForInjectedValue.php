@@ -13,14 +13,10 @@ trait ResolvesPropertyForInjectedValue
 
     public function resolvePropertyForInjectedValue(
         DataProperty $dataProperty,
-        mixed $payload,
-        array $properties,
         CreationContext $creationContext
     ): mixed {
         $injected = parent::resolve(
             $dataProperty,
-            $payload,
-            $properties,
             $creationContext
         );
 

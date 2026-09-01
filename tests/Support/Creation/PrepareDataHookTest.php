@@ -5,33 +5,33 @@ use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 it('registers prepareData hooks in order', function () {
     $context = CreationContextFactory::createFromConfig(SimpleData::class)
-        ->prepareData(fn (mixed $payload, string $class, string $path) => $payload.'-one')
-        ->prepareData(fn (mixed $payload, string $class, string $path) => $payload.'-two')
+        ->prepareDataHook(fn (array $payloads, string $class, string $path) => [$payloads[0].'-one'])
+        ->prepareDataHook(fn (array $payloads, string $class, string $path) => [$payloads[0].'-two'])
         ->get();
 
-    expect($context->prepareData)->toHaveCount(2);
+    expect($context->prepareDataHooks)->toHaveCount(2);
 
-    $value = 'start';
+    $payloads = ['start'];
 
-    foreach ($context->prepareData as $hook) {
-        $value = $hook($value, SimpleData::class, '');
+    foreach ($context->prepareDataHooks as $hook) {
+        $payloads = $hook($payloads, SimpleData::class, '');
     }
 
-    expect($value)->toBe('start-one-two');
+    expect($payloads)->toBe(['start-one-two']);
 });
 
 it('defaults to no prepareData hooks', function () {
     $context = CreationContextFactory::createFromConfig(SimpleData::class)->get();
 
-    expect($context->prepareData)->toBe([]);
+    expect($context->prepareDataHooks)->toBe([]);
 });
 
 it('copies prepareData hooks when deriving a factory from a context', function () {
     $context = CreationContextFactory::createFromConfig(SimpleData::class)
-        ->prepareData(fn (mixed $payload, string $class, string $path) => $payload)
+        ->prepareDataHook(fn (array $payloads, string $class, string $path) => $payloads)
         ->get();
 
     $derived = CreationContextFactory::createFromCreationContext(SimpleData::class, $context);
 
-    expect($derived->prepareData)->toHaveCount(1);
+    expect($derived->prepareDataHooks)->toHaveCount(1);
 });

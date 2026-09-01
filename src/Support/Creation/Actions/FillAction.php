@@ -5,16 +5,11 @@ namespace Spatie\LaravelData\Support\Creation\Actions;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Spatie\LaravelData\Attributes\InjectsPropertyValue;
-use Spatie\LaravelData\Exceptions\CannotCreateAbstractClass;
-use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\Normalizers\Normalized\UnknownProperty;
-use Spatie\LaravelData\Normalizers\Normalizer;
-use Spatie\LaravelData\Resolvers\DataMorphClassResolver;
+use Spatie\LaravelData\Normalizers\Normalized\UnNormalized;
 use Spatie\LaravelData\Support\Creation\ConstructionState;
 use Spatie\LaravelData\Support\Creation\CreationContext;
-use Spatie\LaravelData\Support\Creation\SourceReader;
-use Spatie\LaravelData\Support\Creation\SourceResolver;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
@@ -22,13 +17,11 @@ use Spatie\LaravelData\Support\Skipped;
 
 class FillAction
 {
-    /**
-     * @param array<int, Normalizer> $normalizers
-     */
     public function __construct(
         protected DataConfig $dataConfig,
-        protected DataMorphClassResolver $morphClassResolver,
-        protected array $normalizers,
+        protected NormalizePayloadAction $normalizePayloadAction,
+        protected ReadDataPropertyAction $readDataPropertyAction,
+        protected ResolveMorphedDataClassAction $resolveMorphedDataClassAction,
     ) {
     }
 
@@ -39,21 +32,16 @@ class FillAction
     {
         $state = ConstructionState::create($creationContext, $creationContext->dataClass);
 
-        $sources = [];
+        $normalized = [];
 
         foreach ($payloads as $payload) {
-            $sources[] = SourceResolver::resolve($creationContext->dataClass, $payload, $this->normalizers);
-        }
-
-        if ($sources === []) {
-            $sources = [[]];
-            $payloads = [[]];
+            $normalized[] = $this->normalizePayloadAction->execute($payload);
         }
 
         $this->fillNode(
             $state,
             $this->dataConfig->getDataClass($creationContext->dataClass),
-            $sources,
+            $normalized,
             $payloads
         );
 
@@ -61,31 +49,41 @@ class FillAction
     }
 
     /**
-     * @param array<int, array|Normalized> $sources
-     * @param array<int, mixed> $rawPayloads
+     * @param array<int, array|Normalized> $normalized
+     * @param array<int, mixed> $payloads
      */
     protected function fillNode(
         ConstructionState $state,
         DataClass $dataClass,
-        array $sources,
-        array $rawPayloads
+        array $normalized,
+        array $payloads
     ): void {
-        $sources = $this->applyPrepareDataHooks($state, $dataClass->name, $sources, $rawPayloads);
-
-        if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
-            $dataClass = $this->resolveMorphedDataClass($state, $dataClass, $sources);
+        foreach ($state->creationContext->prepareDataHooks as $hook) {
+            $normalized = array_values($hook($normalized, $dataClass->name, $state->dotPath(), $payloads));
         }
 
-        $state->setNodeClass($dataClass->name);
+        if ($dataClass->isAbstract && $dataClass->propertyMorphable) {
+            $dataClass = $this->resolveMorphedDataClassAction->execute(
+                $state->creationContext,
+                $dataClass,
+                $normalized
+            );
+        }
+
+        $state->setNodeClass($dataClass);
 
         foreach ($dataClass->properties as $property) {
-            [$value, $originalKey] = $this->readValue($state, $property, $sources);
+            [$value, $originalKey] = $this->readDataPropertyAction->execute(
+                $state->creationContext,
+                $property,
+                $normalized
+            );
 
             if ($originalKey !== $property->name) {
                 $state->recordMapping($property->name, $originalKey);
             }
 
-            $value = $this->applyInjection($state, $property, $value, $rawPayloads);
+            $value = $this->applyInjection($state, $property, $value);
 
             if ($value instanceof UnknownProperty) {
                 continue;
@@ -107,113 +105,10 @@ class FillAction
         }
     }
 
-    /**
-     * @param array<int, array|Normalized> $sources
-     */
-    protected function resolveMorphedDataClass(
-        ConstructionState $state,
-        DataClass $dataClass,
-        array $sources
-    ): DataClass {
-        $morphProperties = [];
-
-        foreach ($dataClass->properties as $property) {
-            if (! $property->morphable) {
-                continue;
-            }
-
-            [$value] = $this->readValue($state, $property, $sources);
-
-            if (! $value instanceof UnknownProperty) {
-                $morphProperties[$property->name] = $value;
-            }
-        }
-
-        $morphedClass = $this->morphClassResolver->execute($dataClass, [$morphProperties]);
-
-        if ($morphedClass === null) {
-            throw CannotCreateAbstractClass::morphClassWasNotResolved(originalClass: $dataClass->name);
-        }
-
-        return $this->dataConfig->getDataClass($morphedClass);
-    }
-
-    /**
-     * @param array<int, array|Normalized> $sources
-     *
-     * @return array{0: mixed, 1: string}
-     */
-    protected function readValue(
-        ConstructionState $state,
-        DataProperty $property,
-        array $sources
-    ): array {
-        $mappedKey = $state->creationContext->mapPropertyNames
-            ? $property->inputMappedName
-            : null;
-
-        if ($mappedKey === $property->name) {
-            $mappedKey = null;
-        }
-
-        foreach ($sources as $source) {
-            if ($mappedKey !== null) {
-                $value = SourceReader::read($source, $mappedKey, $property);
-
-                if (! $value instanceof UnknownProperty) {
-                    return [$value, $mappedKey];
-                }
-            }
-
-            $value = SourceReader::read($source, $property->name, $property);
-
-            if (! $value instanceof UnknownProperty) {
-                return [$value, $property->name];
-            }
-        }
-
-        return [UnknownProperty::create(), $mappedKey ?? $property->name];
-    }
-
-    /**
-     * @param array<int, array|Normalized> $sources
-     * @param array<int, mixed> $rawPayloads
-     *
-     * @return array<int, array|Normalized>
-     */
-    protected function applyPrepareDataHooks(
-        ConstructionState $state,
-        string $class,
-        array $sources,
-        array $rawPayloads
-    ): array {
-        if ($state->creationContext->prepareData === []) {
-            return $sources;
-        }
-
-        foreach ($rawPayloads as $index => $rawPayload) {
-            $value = $rawPayload;
-
-            foreach ($state->creationContext->prepareData as $hook) {
-                $value = $hook($value, $class, $state->dotPath());
-            }
-
-            if ($value !== $rawPayload) {
-                $sources[$index] = SourceResolver::resolve($class, $value, $this->normalizers);
-            }
-        }
-
-        return $sources;
-    }
-
-    /**
-     * @param array<int, mixed> $rawPayloads
-     */
     protected function applyInjection(
         ConstructionState $state,
         DataProperty $property,
-        mixed $value,
-        array $rawPayloads
+        mixed $value
     ): mixed {
         $attributes = $property->attributes->all(InjectsPropertyValue::class);
 
@@ -226,20 +121,13 @@ class FillAction
                 continue;
             }
 
-            foreach (($rawPayloads === [] ? [null] : $rawPayloads) as $rawPayload) {
-                $resolved = $attribute->resolve(
-                    $property,
-                    $rawPayload,
-                    $state->currentValues(),
-                    $state->creationContext
-                );
+            $resolved = $attribute->resolve($property, $state->creationContext);
 
-                if ($resolved === Skipped::create()) {
-                    continue;
-                }
-
-                return $resolved;
+            if ($resolved === Skipped::create()) {
+                continue;
             }
+
+            return $resolved;
         }
 
         return $value;
@@ -266,25 +154,20 @@ class FillAction
             return;
         }
 
-        try {
-            $source = SourceResolver::resolve($nestedClass, $value, $this->normalizers);
-        } catch (CannotCreateData) {
+        $normalizedPayload = $this->normalizePayloadAction->execute($value);
+
+        if ($normalizedPayload instanceof UnNormalized) {
             $state->writeValue($originalKey, $value);
 
             return;
         }
 
-        $state->writeValue($originalKey, []);
-
-        $state->enterProperty(
-            $property->name,
-            $originalKey === $property->name ? null : $originalKey
-        );
+        $state->enterProperty($property->name, $originalKey);
 
         $this->fillNode(
             $state,
             $this->dataConfig->getDataClass($nestedClass),
-            [$source],
+            [$normalizedPayload],
             [$value]
         );
 
@@ -312,16 +195,11 @@ class FillAction
             return;
         }
 
-        $state->writeValue($originalKey, []);
-
-        $state->enterProperty(
-            $property->name,
-            $originalKey === $property->name ? null : $originalKey
-        );
-
-        $state->setNodeClass($itemClass);
+        $state->enterProperty($property->name, $originalKey);
 
         $itemDataClass = $this->dataConfig->getDataClass($itemClass);
+
+        $state->setNodeClass($itemDataClass);
 
         foreach ($value as $index => $item) {
             if ($item instanceof $itemClass) {
@@ -336,9 +214,9 @@ class FillAction
                 continue;
             }
 
-            try {
-                $source = SourceResolver::resolve($itemClass, $item, $this->normalizers);
-            } catch (CannotCreateData) {
+            $normalizedPayload = $this->normalizePayloadAction->execute($item);
+
+            if ($normalizedPayload instanceof UnNormalized) {
                 $state->writeValue($index, $item);
 
                 continue;
@@ -346,7 +224,7 @@ class FillAction
 
             $state->enterItem($index);
 
-            $this->fillNode($state, $itemDataClass, [$source], [$item]);
+            $this->fillNode($state, $itemDataClass, [$normalizedPayload], [$item]);
 
             $state->leave();
         }

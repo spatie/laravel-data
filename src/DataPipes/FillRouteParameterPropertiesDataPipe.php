@@ -37,7 +37,7 @@ class FillRouteParameterPropertiesDataPipe implements DataPipe
                 continue;
             }
 
-            $value = $attribute->resolve($dataProperty, $payload, $properties, $creationContext);
+            $value = $attribute->resolve($dataProperty, $creationContext);
 
             if ($value === Skipped::create()) {
                 continue;

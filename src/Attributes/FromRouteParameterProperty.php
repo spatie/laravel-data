@@ -24,14 +24,10 @@ class FromRouteParameterProperty extends FromRouteParameter
 
     public function resolve(
         DataProperty $dataProperty,
-        mixed $payload,
-        array $properties,
         CreationContext $creationContext
     ): mixed {
         return $this->resolvePropertyForInjectedValue(
             $dataProperty,
-            $payload,
-            $properties,
             $creationContext
         );
     }

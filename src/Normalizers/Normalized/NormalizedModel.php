@@ -31,7 +31,7 @@ class NormalizedModel implements Normalized
             : $this->fetchNewProperty($propertyName, $dataProperty);
 
         if ($value === null && ! $dataProperty->type->isNullable) {
-            return UnknownProperty::create();
+            return UnknownProperty::$instance;
         }
 
         return $value;
@@ -64,7 +64,7 @@ class NormalizedModel implements Normalized
             }
         }
 
-        return $this->properties[$name] = UnknownProperty::create();
+        return $this->properties[$name] = UnknownProperty::$instance;
     }
 
 

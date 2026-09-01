@@ -2,6 +2,7 @@
 
 use Spatie\LaravelData\Support\Creation\ConstructionState;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
+use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\NestedData;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
@@ -138,7 +139,7 @@ it('sets and reads node classes for nested nodes', function () {
     expect($state->nodeClass())->toBe(SimpleData::class);
 
     $state->enterProperty('author', 'writer');
-    $state->setNodeClass(SimpleData::class);
+    $state->setNodeClass(app(DataConfig::class)->getDataClass(SimpleData::class));
 
     expect($state->nodeClass())->toBe(SimpleData::class)
         ->and($state->structure()['children']['author']['class'])->toBe(SimpleData::class);
@@ -168,36 +169,18 @@ it('reading nodeClass on an unvisited path creates no structure nodes', function
     expect($state->structure()['children'])->toBe([]);
 });
 
-it('returns the current values at the current path', function () {
-    $state = makeConstructionState();
-
-    expect($state->currentValues())->toBe([]);
-
-    $state->writeValue('title', 'Hello');
-
-    expect($state->currentValues())->toBe(['title' => 'Hello']);
-
-    $state->enterProperty('author', 'writer');
-
-    expect($state->currentValues())->toBe([]);
-
-    $state->writeValue('name', 'Ruben');
-
-    expect($state->currentValues())->toBe(['name' => 'Ruben']);
-});
-
 it('records divergent item classes on the shared node', function () {
     $state = makeConstructionState();
 
     $state->enterProperty('items');
-    $state->setNodeClass(SimpleData::class);
+    $state->setNodeClass(app(DataConfig::class)->getDataClass(SimpleData::class));
 
     $state->enterItem(0);
-    $state->setNodeClass(SimpleData::class);
+    $state->setNodeClass(app(DataConfig::class)->getDataClass(SimpleData::class));
     $state->leave();
 
     $state->enterItem(1);
-    $state->setNodeClass(NestedData::class);
+    $state->setNodeClass(app(DataConfig::class)->getDataClass(NestedData::class));
     $state->leave();
 
     $state->leave();
@@ -214,12 +197,12 @@ it('nodeClass on an item falls back to the shared class', function () {
     $state = makeConstructionState();
 
     $state->enterProperty('items');
-    $state->setNodeClass(SimpleData::class);
+    $state->setNodeClass(app(DataConfig::class)->getDataClass(SimpleData::class));
     $state->enterItem(0);
 
     expect($state->nodeClass())->toBe(SimpleData::class);
 
-    $state->setNodeClass(NestedData::class);
+    $state->setNodeClass(app(DataConfig::class)->getDataClass(NestedData::class));
 
     expect($state->nodeClass())->toBe(NestedData::class);
 

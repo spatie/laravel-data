@@ -15,6 +15,7 @@ use Illuminate\Support\Enumerable;
 use Illuminate\Support\LazyCollection;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
+use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataContainer;
@@ -38,8 +39,8 @@ class CreationContext
         public readonly bool $useOptionalValues,
         public readonly ?array $ignoredMagicalMethods,
         public readonly ?GlobalCastsCollection $casts,
-        /** @var array<int, Closure(mixed, string, string): mixed> */
-        public readonly array $prepareData = [],
+        /** @var array<int, Closure(array<int, array<string, mixed>|Normalized>, string, string, array<int, mixed>): array<int, array<string, mixed>|Normalized>> */
+        public readonly array $prepareDataHooks = [],
     ) {
     }
 

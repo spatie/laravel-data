@@ -2,6 +2,8 @@
 
 namespace Spatie\LaravelData\Support\Creation;
 
+use Spatie\LaravelData\Support\DataClass;
+
 class ConstructionState
 {
     protected array $payload = [];
@@ -34,6 +36,8 @@ class ConstructionState
             'structureKey' => $property,
             'isIndex' => false,
         ];
+
+        $this->ensurePayloadNodeAtCurrentPath();
     }
 
     public function enterItem(string|int $index): void
@@ -43,6 +47,23 @@ class ConstructionState
             'structureKey' => null,
             'isIndex' => true,
         ];
+
+        $this->ensurePayloadNodeAtCurrentPath();
+    }
+
+    protected function ensurePayloadNodeAtCurrentPath(): void
+    {
+        $slot = &$this->payload;
+
+        foreach ($this->path as $segment) {
+            $key = $segment['payloadKey'];
+
+            if (! array_key_exists($key, $slot) || ! is_array($slot[$key])) {
+                $slot[$key] = [];
+            }
+
+            $slot = &$slot[$key];
+        }
     }
 
     public function leave(): void
@@ -109,17 +130,6 @@ class ConstructionState
         return $this->payload;
     }
 
-    public function currentValues(): array
-    {
-        $slot = $this->payloadAtCurrentPath();
-
-        if (! is_array($slot)) {
-            return [];
-        }
-
-        return $slot;
-    }
-
     public function recordMapping(string $property, string $mappedKey): void
     {
         $node = &$this->ensureStructureNodeAtCurrentPath();
@@ -138,8 +148,10 @@ class ConstructionState
         return $node['mappings'][$property] ?? $property;
     }
 
-    public function setNodeClass(string $class): void
+    public function setNodeClass(DataClass $dataClass): void
     {
+        $class = $dataClass->name;
+
         $itemIndex = $this->currentItemIndex();
 
         $node = &$this->ensureStructureNodeAtCurrentPath();

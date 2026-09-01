@@ -22,7 +22,7 @@ test('it can get a route parameter', function () {
     expect($dataClass::from($requestMock)->property)->toBe('test');
 });
 
-it('wont replace a route parameter if the payload is not a request', function () {
+it('wont inject a route parameter when no request is available', function () {
     $dataClass = new class () extends Data {
         #[FromRouteParameter('parameter')]
         public string $property;

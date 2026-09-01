@@ -27,7 +27,7 @@ class TestFromInjectingParameter implements InjectsPropertyValue
     ) {
     }
 
-    public function resolve(DataProperty $dataProperty, mixed $payload, array $properties, CreationContext $creationContext): mixed
+    public function resolve(DataProperty $dataProperty, CreationContext $creationContext): mixed
     {
         return static::$payload[$this->parameter] ?? Skipped::create();
     }
@@ -51,12 +51,10 @@ class TestFromInjectingParameterProperty extends TestFromInjectingParameter
         parent::__construct($parameter, $replaceWhenPresentInBody);
     }
 
-    public function resolve(DataProperty $dataProperty, mixed $payload, array $properties, CreationContext $creationContext): mixed
+    public function resolve(DataProperty $dataProperty, CreationContext $creationContext): mixed
     {
         return $this->resolvePropertyForInjectedValue(
             $dataProperty,
-            $payload,
-            $properties,
             $creationContext
         );
     }

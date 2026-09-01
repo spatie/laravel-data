@@ -9,8 +9,6 @@ interface InjectsPropertyValue
 {
     public function resolve(
         DataProperty $dataProperty,
-        mixed $payload,
-        array $properties,
         CreationContext $creationContext
     ): mixed;
 

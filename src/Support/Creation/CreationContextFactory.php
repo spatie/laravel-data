@@ -16,6 +16,7 @@ use Illuminate\Support\LazyCollection;
 use Spatie\LaravelData\Casts\Cast;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataContainer;
 
@@ -35,7 +36,8 @@ class CreationContextFactory
         public bool $useOptionalValues,
         public ?array $ignoredMagicalMethods,
         public ?GlobalCastsCollection $casts,
-        public array $prepareData = [],
+        /** @var array<int, Closure(array<int, array<string, mixed>|Normalized>, string, string, array<int, mixed>): array<int, array<string, mixed>|Normalized>> */
+        public array $prepareDataHooks = [],
     ) {
     }
 
@@ -53,7 +55,7 @@ class CreationContextFactory
             useOptionalValues: true,
             ignoredMagicalMethods: null,
             casts: null,
-            prepareData: [],
+            prepareDataHooks: [],
         );
     }
 
@@ -69,7 +71,7 @@ class CreationContextFactory
             useOptionalValues: $creationContext->useOptionalValues,
             ignoredMagicalMethods: $creationContext->ignoredMagicalMethods,
             casts: $creationContext->casts,
-            prepareData: $creationContext->prepareData,
+            prepareDataHooks: $creationContext->prepareDataHooks,
         );
     }
 
@@ -188,9 +190,12 @@ class CreationContextFactory
         return $this;
     }
 
-    public function prepareData(Closure $closure): static
+    /**
+     * @param Closure(array<int, array<string, mixed>|Normalized> $normalized, string $class, string $path, array<int, mixed> $payloads): array<int, array<string, mixed>|Normalized> $closure
+     */
+    public function prepareDataHook(Closure $closure): static
     {
-        $this->prepareData[] = $closure;
+        $this->prepareDataHooks[] = $closure;
 
         return $this;
     }
@@ -207,7 +212,7 @@ class CreationContextFactory
             useOptionalValues: $this->useOptionalValues,
             ignoredMagicalMethods: $this->ignoredMagicalMethods,
             casts: $this->casts,
-            prepareData: $this->prepareData,
+            prepareDataHooks: $this->prepareDataHooks,
         );
     }
 

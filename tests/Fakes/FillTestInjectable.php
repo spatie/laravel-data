@@ -20,8 +20,6 @@ class FillTestInjectable implements InjectsPropertyValue
 
     public function resolve(
         DataProperty $dataProperty,
-        mixed $payload,
-        array $properties,
         CreationContext $creationContext
     ): mixed {
         if ($this->skip) {

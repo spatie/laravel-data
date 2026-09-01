@@ -92,7 +92,7 @@ class ResolvedDataPipeline
 
             $value = $normalized->getProperty($name, $property);
 
-            if ($value === UnknownProperty::create()) {
+            if ($value === UnknownProperty::$instance) {
                 continue;
             }
 

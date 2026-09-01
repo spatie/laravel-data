@@ -3,8 +3,11 @@
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Exceptions\CannotCreateAbstractClass;
-use Spatie\LaravelData\Resolvers\DataMorphClassResolver;
+use Spatie\LaravelData\Normalizers\Normalized\NormalizedModel;
 use Spatie\LaravelData\Support\Creation\Actions\FillAction;
+use Spatie\LaravelData\Support\Creation\Actions\NormalizePayloadAction;
+use Spatie\LaravelData\Support\Creation\Actions\ReadDataPropertyAction;
+use Spatie\LaravelData\Support\Creation\Actions\ResolveMorphedDataClassAction;
 use Spatie\LaravelData\Support\Creation\CreationContext;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Support\DataConfig;
@@ -26,8 +29,11 @@ function fillAction(): FillAction
 {
     return new FillAction(
         app(DataConfig::class),
-        app(DataMorphClassResolver::class),
-        array_map(fn (string $normalizer) => app($normalizer), config('data.normalizers')),
+        new NormalizePayloadAction(
+            array_map(fn (string $normalizer) => app($normalizer), config('data.normalizers')),
+        ),
+        new ReadDataPropertyAction(),
+        new ResolveMorphedDataClassAction(app(DataConfig::class), new ReadDataPropertyAction()),
     );
 }
 
@@ -45,6 +51,12 @@ it('fills scalar properties from an array payload', function () {
             'mappings' => [],
             'children' => [],
         ]);
+});
+
+it('leaves every property absent when a root payload cannot be normalized', function () {
+    $state = fillAction()->execute(fillContext(SimpleData::class), [42]);
+
+    expect($state->payload())->toBe([]);
 });
 
 it('fills nothing from an empty payload list', function () {
@@ -125,7 +137,9 @@ it('reads from a model source', function () {
 
 it('applies prepareData hooks before filling', function () {
     $context = CreationContextFactory::createFromConfig(SimpleData::class)
-        ->prepareData(fn (mixed $payload, string $class, string $path) => ['string' => strtoupper($payload['string'])])
+        ->prepareDataHook(fn (array $payloads, string $class, string $path) => [
+            ['string' => strtoupper($payloads[0]['string'])],
+        ])
         ->get();
 
     $state = fillAction()->execute($context, [['string' => 'hello']]);
@@ -135,13 +149,201 @@ it('applies prepareData hooks before filling', function () {
 
 it('chains prepareData hooks in registration order', function () {
     $context = CreationContextFactory::createFromConfig(SimpleData::class)
-        ->prepareData(fn (mixed $payload, string $class, string $path) => ['string' => $payload['string'].'-one'])
-        ->prepareData(fn (mixed $payload, string $class, string $path) => ['string' => $payload['string'].'-two'])
+        ->prepareDataHook(fn (array $payloads, string $class, string $path) => [
+            ['string' => $payloads[0]['string'].'-one'],
+        ])
+        ->prepareDataHook(fn (array $payloads, string $class, string $path) => [
+            ['string' => $payloads[0]['string'].'-two'],
+        ])
         ->get();
 
     $state = fillAction()->execute($context, [['string' => 'start']]);
 
     expect($state->payload())->toBe(['string' => 'start-one-two']);
+});
+
+it('hands every payload to a prepareData hook so it can merge them', function () {
+    $dataClass = new class ('', '') extends Data {
+        public function __construct(
+            public string $first,
+            public string $second,
+        ) {
+        }
+    };
+
+    $context = CreationContextFactory::createFromConfig($dataClass::class)
+        ->prepareDataHook(fn (array $payloads, string $class, string $path) => [array_merge(...$payloads)])
+        ->get();
+
+    $state = fillAction()->execute($context, [
+        ['first' => 'from first'],
+        ['first' => 'ignored', 'second' => 'from second'],
+    ]);
+
+    expect($state->payload())->toBe([
+        'first' => 'ignored',
+        'second' => 'from second',
+    ]);
+});
+
+it('fires prepareData hooks once for a single payload list', function () {
+    $calls = 0;
+
+    $context = CreationContextFactory::createFromConfig(SimpleData::class)
+        ->prepareDataHook(function (array $payloads, string $class, string $path) use (&$calls) {
+            $calls++;
+
+            return $payloads;
+        })
+        ->get();
+
+    fillAction()->execute($context, [['string' => 'one'], ['string' => 'two']]);
+
+    expect($calls)->toBe(1);
+});
+
+it('reindexes the payload list a prepareData hook returns', function () {
+    $context = CreationContextFactory::createFromConfig(SimpleData::class)
+        ->prepareDataHook(fn (array $payloads, string $class, string $path) => array_filter(
+            $payloads,
+            fn (array $payload) => array_key_exists('string', $payload)
+        ))
+        ->get();
+
+    $state = fillAction()->execute($context, [[], ['string' => 'second']]);
+
+    expect($state->payload())->toBe(['string' => 'second']);
+});
+
+it('leaves every property absent when a prepareData hook returns no payloads', function () {
+    $context = CreationContextFactory::createFromConfig(SimpleData::class)
+        ->prepareDataHook(fn (array $payloads, string $class, string $path) => [])
+        ->get();
+
+    $state = fillAction()->execute($context, [['string' => 'hello']]);
+
+    expect($state->payload())->toBe([]);
+});
+
+it('fires prepareData hooks with an empty list when nothing was given', function () {
+    $seen = null;
+
+    $context = CreationContextFactory::createFromConfig(SimpleData::class)
+        ->prepareDataHook(function (array $normalized, string $class, string $path) use (&$seen) {
+            $seen = $normalized;
+
+            return $normalized;
+        })
+        ->get();
+
+    fillAction()->execute($context, []);
+
+    expect($seen)->toBe([]);
+});
+
+it('lets a prepareData hook supply the payload when nothing was given', function () {
+    $context = CreationContextFactory::createFromConfig(SimpleData::class)
+        ->prepareDataHook(fn (array $normalized, string $class, string $path) => [['string' => 'from hook']])
+        ->get();
+
+    $state = fillAction()->execute($context, []);
+
+    expect($state->payload())->toBe(['string' => 'from hook']);
+});
+
+it('still injects values when no payload was given', function () {
+    $dataClass = new class ('') extends Data {
+        public function __construct(
+            #[FillTestInjectable(value: 'injected')]
+            public string $string,
+        ) {
+        }
+    };
+
+    $state = fillAction()->execute(fillContext($dataClass::class), []);
+
+    expect($state->payload())->toBe(['string' => 'injected']);
+});
+
+it('hands normalized sources to prepareData hooks untouched', function () {
+    $model = new FakeModel();
+    $model->setRawAttributes(['string' => 'Hello']);
+
+    $seen = null;
+
+    $context = CreationContextFactory::createFromConfig(FillFakeModelData::class)
+        ->prepareDataHook(function (array $payloads, string $class, string $path) use (&$seen) {
+            $seen = $payloads;
+
+            return $payloads;
+        })
+        ->get();
+
+    $state = fillAction()->execute($context, [$model]);
+
+    expect($seen[0])->toBeInstanceOf(NormalizedModel::class)
+        ->and($state->payload())->toBe(['string' => 'Hello']);
+});
+
+it('lets a prepareData hook replace a normalized source with an array', function () {
+    $model = new FakeModel();
+    $model->setRawAttributes(['string' => 'Hello']);
+
+    $context = CreationContextFactory::createFromConfig(FillFakeModelData::class)
+        ->prepareDataHook(fn (array $payloads, string $class, string $path) => [['string' => 'replaced']])
+        ->get();
+
+    $state = fillAction()->execute($context, [$model]);
+
+    expect($state->payload())->toBe(['string' => 'replaced']);
+});
+
+it('hands the original payloads to prepareData hooks alongside the sources', function () {
+    $model = new FakeModel();
+    $model->setRawAttributes(['string' => 'Hello']);
+
+    $seenOriginals = null;
+
+    $context = CreationContextFactory::createFromConfig(FillFakeModelData::class)
+        ->prepareDataHook(function (array $payloads, string $class, string $path, array $originals) use (&$seenOriginals) {
+            $seenOriginals = $originals;
+
+            return $payloads;
+        })
+        ->get();
+
+    fillAction()->execute($context, [$model]);
+
+    expect($seenOriginals)->toBe([$model]);
+});
+
+it('hands the original payload to prepareData hooks on nested nodes', function () {
+    $seen = [];
+
+    $context = CreationContextFactory::createFromConfig(NestedData::class)
+        ->prepareDataHook(function (array $payloads, string $class, string $path, array $originals) use (&$seen) {
+            $seen[$class] = $originals;
+
+            return $payloads;
+        })
+        ->get();
+
+    fillAction()->execute($context, [['simple' => ['string' => 'original']]]);
+
+    expect($seen[SimpleData::class])->toBe([['string' => 'original']]);
+});
+
+it('runs prepareData hooks before morph resolution so they can repair the discriminator', function () {
+    $context = CreationContextFactory::createFromConfig(AbstractPropertyMorphableData::class)
+        ->prepareDataHook(fn (array $payloads, string $class, string $path) => [
+            ['variant' => 'a', 'a' => $payloads[0]['kind']],
+        ])
+        ->get();
+
+    $state = fillAction()->execute($context, [['kind' => 'repaired']]);
+
+    expect($state->payload())->toBe(['a' => 'repaired', 'variant' => 'a'])
+        ->and($state->structure()['class'])->toBe(PropertyMorphableDataA::class);
 });
 
 it('injects a value when the payload does not provide one', function () {
@@ -254,12 +456,12 @@ it('fills nested data under mapped keys', function () {
 
 it('fires prepareData hooks per nested node', function () {
     $context = CreationContextFactory::createFromConfig(NestedData::class)
-        ->prepareData(function (mixed $payload, string $class, string $path) {
+        ->prepareDataHook(function (array $payloads, string $class, string $path) {
             if ($class === SimpleData::class) {
-                return ['string' => 'HOOKED'];
+                return [['string' => 'HOOKED']];
             }
 
-            return $payload;
+            return $payloads;
         })
         ->get();
 
@@ -394,6 +596,24 @@ it('keeps empty collections in the payload', function () {
     expect($state->payload())->toBe(['items' => []]);
 });
 
+it('keeps collection items with no recognized keys in the payload', function () {
+    $dataClass = new class () extends Data {
+        #[DataCollectionOf(SimpleData::class)]
+        public array $items = [];
+    };
+
+    $state = fillAction()->execute(fillContext($dataClass::class), [
+        ['items' => [['unknownKey' => 'x'], ['string' => 'ok']]],
+    ]);
+
+    expect($state->payload())->toBe([
+        'items' => [
+            [],
+            ['string' => 'ok'],
+        ],
+    ]);
+});
+
 it('keeps nested objects with no recognized keys in the payload', function () {
     $state = fillAction()->execute(fillContext(NestedData::class), [
         ['simple' => ['unknownKey' => 'x']],
@@ -442,26 +662,6 @@ it('writes paginators as is', function () {
     ]);
 
     expect($state->payload()['items'])->toBe($paginator);
-});
-
-it('prepareData hooks receive raw model sources', function () {
-    $model = new FakeModel();
-    $model->setRawAttributes(['string' => 'Hello']);
-
-    $receivedPayload = null;
-
-    $context = CreationContextFactory::createFromConfig(SimpleData::class)
-        ->prepareData(function (mixed $payload, string $class, string $path) use (&$receivedPayload) {
-            $receivedPayload = $payload;
-
-            return $payload;
-        })
-        ->get();
-
-    $state = fillAction()->execute($context, [$model]);
-
-    expect($receivedPayload)->toBeInstanceOf(FakeModel::class)
-        ->and($state->payload())->toBe(['string' => 'Hello']);
 });
 
 it('resolves morph classes for nested data object properties', function () {

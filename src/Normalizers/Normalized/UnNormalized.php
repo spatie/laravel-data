@@ -2,7 +2,9 @@
 
 namespace Spatie\LaravelData\Normalizers\Normalized;
 
-class UnknownProperty
+use Spatie\LaravelData\Support\DataProperty;
+
+class UnNormalized implements Normalized
 {
     public static self $instance;
 
@@ -14,6 +16,11 @@ class UnknownProperty
     {
         return self::$instance ??= new self();
     }
+
+    public function getProperty(string $name, DataProperty $dataProperty): mixed
+    {
+        return UnknownProperty::$instance;
+    }
 }
 
-UnknownProperty::create();
+UnNormalized::create();

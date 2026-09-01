@@ -1,21 +1,23 @@
 <?php
 
-namespace Spatie\LaravelData\Support\Creation;
+namespace Spatie\LaravelData\Support\Creation\Actions;
 
-use Spatie\LaravelData\Exceptions\CannotCreateData;
 use Spatie\LaravelData\Normalizers\Normalized\Normalized;
+use Spatie\LaravelData\Normalizers\Normalized\UnNormalized;
 use Spatie\LaravelData\Normalizers\Normalizer;
 
-class SourceResolver
+class NormalizePayloadAction
 {
     /**
      * @param array<int, Normalizer> $normalizers
      */
-    public static function resolve(
-        string $dataClass,
-        mixed $value,
-        array $normalizers
-    ): array|Normalized {
+    public function __construct(
+        protected array $normalizers,
+    ) {
+    }
+
+    public function execute(mixed $value): array|Normalized
+    {
         if ($value === null) {
             return [];
         }
@@ -28,7 +30,7 @@ class SourceResolver
             return $value;
         }
 
-        foreach ($normalizers as $normalizer) {
+        foreach ($this->normalizers as $normalizer) {
             $normalized = $normalizer->normalize($value);
 
             if ($normalized !== null) {
@@ -36,6 +38,6 @@ class SourceResolver
             }
         }
 
-        throw CannotCreateData::noNormalizerFound($dataClass, $value);
+        return UnNormalized::$instance;
     }
 }
