@@ -15,8 +15,8 @@ use Illuminate\Support\Enumerable;
 use Illuminate\Support\LazyCollection;
 use Spatie\LaravelData\Contracts\BaseData;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
-use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Normalizers\Normalized\Normalized;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Support\DataContainer;
 
