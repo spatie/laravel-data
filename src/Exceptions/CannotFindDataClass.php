@@ -18,8 +18,8 @@ class CannotFindDataClass extends Exception
         $class = $typeable->getDeclaringClass()->getName();
 
         $name = match (true) {
-            $typeable instanceof ReflectionMethod => "method `{$class}::{{$typeable->getName()}`",
-            $typeable instanceof ReflectionProperty => "property `{$class}::{{$typeable->getName()}`",
+            $typeable instanceof ReflectionMethod => "method `{$class}::{$typeable->getName()}`",
+            $typeable instanceof ReflectionProperty => "property `{$class}::{$typeable->getName()}`",
             $typeable instanceof ReflectionParameter => "parameter `{$class}::{$typeable->getDeclaringFunction()->getName()}::{$typeable->getName()}`",
         };
 

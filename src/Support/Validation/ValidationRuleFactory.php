@@ -35,6 +35,7 @@ use Spatie\LaravelData\Attributes\Validation\DoesntStartWith;
 use Spatie\LaravelData\Attributes\Validation\Email;
 use Spatie\LaravelData\Attributes\Validation\EndsWith;
 use Spatie\LaravelData\Attributes\Validation\Enum;
+use Spatie\LaravelData\Attributes\Validation\Exclude;
 use Spatie\LaravelData\Attributes\Validation\ExcludeIf;
 use Spatie\LaravelData\Attributes\Validation\ExcludeUnless;
 use Spatie\LaravelData\Attributes\Validation\ExcludeWith;
@@ -146,6 +147,7 @@ class ValidationRuleFactory
             DoesntStartWith::keyword() => DoesntStartWith::class,
             EndsWith::keyword() => EndsWith::class,
             Enum::keyword() => Enum::class,
+            Exclude::keyword() => Exclude::class,
             ExcludeIf::keyword() => ExcludeIf::class,
             ExcludeUnless::keyword() => ExcludeUnless::class,
             ExcludeWith::keyword() => ExcludeWith::class,

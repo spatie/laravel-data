@@ -38,6 +38,7 @@ use Spatie\LaravelData\Attributes\Validation\DoesntStartWith;
 use Spatie\LaravelData\Attributes\Validation\Email;
 use Spatie\LaravelData\Attributes\Validation\EndsWith;
 use Spatie\LaravelData\Attributes\Validation\Enum;
+use Spatie\LaravelData\Attributes\Validation\Exclude;
 use Spatie\LaravelData\Attributes\Validation\ExcludeIf;
 use Spatie\LaravelData\Attributes\Validation\ExcludeUnless;
 use Spatie\LaravelData\Attributes\Validation\ExcludeWith;
@@ -238,6 +239,12 @@ dataset('attributes', function () {
         attribute: new Enum(DummyBackedEnum::class, except: [DummyBackedEnum::FOO]),
         expected: (new EnumRule(DummyBackedEnum::class))->except([DummyBackedEnum::FOO]),
         expectCreatedAttribute: new Enum((new EnumRule(DummyBackedEnum::class))->except(DummyBackedEnum::FOO))
+    );
+
+    yield fixature(
+        attribute: new Exclude(),
+        expected: 'exclude',
+        expectCreatedAttribute: new Exclude()
     );
 
     yield fixature(

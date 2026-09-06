@@ -5,6 +5,7 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\LazyCollection;
+use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\LaravelData\Tests\Fakes\Collections\CustomCollection;
@@ -110,6 +111,21 @@ it('has array access', function () {
     unset($collection[4]);
 
     expect($collection)->toHaveCount(4);
+});
+
+it('casts offset set value to the collection data class', function () {
+    $collection = SimpleData::collect([
+        'A', 'B',
+    ], DataCollection::class);
+
+    $anonymousData = new class () extends Data {
+        public string $string = 'test';
+    };
+
+    $collection[1] = $anonymousData;
+
+    expect($collection[1])->toBeInstanceOf(SimpleData::class)
+        ->and($collection[1]->string)->toEqual('test');
 });
 
 it('can update data properties within a collection', function () {

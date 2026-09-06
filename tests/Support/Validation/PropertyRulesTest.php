@@ -31,6 +31,16 @@ it('can remove rules by type', function () {
     expect($collection->all())->toEqual([]);
 });
 
+it('can prepend multiple rules', function () {
+    $collection = PropertyRules::create()
+        ->add(new Min(10))
+        ->prepend(new Required(), new Prohibited());
+
+    expect($collection->all())->toMatchArray([
+        new Required(), new Prohibited(), new Min(10),
+    ]);
+});
+
 it('can remove rules by class', function () {
     $collection = PropertyRules::create()
         ->add(new Min(10))

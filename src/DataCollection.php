@@ -137,7 +137,7 @@ class DataCollection implements Responsable, BaseDataCollectableContract, Transf
             throw InvalidDataCollectionOperation::create();
         }
 
-        $value = $value instanceof BaseData
+        $value = $value instanceof $this->dataClass
             ? $value
             : $this->dataClass::from($value);
 

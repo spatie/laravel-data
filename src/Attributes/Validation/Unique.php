@@ -74,6 +74,6 @@ class Unique extends ObjectValidationAttribute
 
     public static function create(string ...$parameters): static
     {
-        return new static(rule: new BaseUnique($parameters[0], $parameters[1]));
+        return new static(rule: new BaseUnique($parameters[0], $parameters[1] ?? 'NULL'));
     }
 }

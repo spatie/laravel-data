@@ -32,7 +32,7 @@ class PropertyRules
     {
         $this->removeType(...$rules);
 
-        $this->rules = Arr::prepend($this->rules, ...$rules);
+        array_unshift($this->rules, ...$rules);
 
         return $this;
     }

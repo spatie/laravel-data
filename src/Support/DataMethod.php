@@ -53,21 +53,11 @@ class DataMethod
                 return false;
             }
 
-            if (! $parameterProvided && $parameter->hasDefaultValue) {
+            if (! $parameterProvided) {
                 continue;
             }
 
-            if (
-                $parameter instanceof DataProperty
-                && ! $parameter->type->acceptsValue($input[$index])
-            ) {
-                return false;
-            }
-
-            if (
-                $parameter instanceof DataParameter
-                && ! $parameter->type->acceptsValue($input[$index])
-            ) {
+            if (! $parameter->type->acceptsValue($input[$index])) {
                 return false;
             }
 
