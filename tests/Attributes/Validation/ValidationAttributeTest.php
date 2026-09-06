@@ -1,8 +1,19 @@
 <?php
 
 use Carbon\CarbonImmutable;
+use Spatie\LaravelData\Attributes\Validation\ArrayType;
+use Spatie\LaravelData\Attributes\Validation\Email;
+use Spatie\LaravelData\Attributes\Validation\Mimes;
+use Spatie\LaravelData\Attributes\Validation\MimeTypes;
+use Spatie\LaravelData\Attributes\Validation\Prohibits;
+use Spatie\LaravelData\Attributes\Validation\RequiredWith;
+use Spatie\LaravelData\Attributes\Validation\RequiredWithAll;
+use Spatie\LaravelData\Attributes\Validation\RequiredWithout;
+use Spatie\LaravelData\Attributes\Validation\RequiredWithoutAll;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\StringValidationAttribute;
+use Spatie\LaravelData\Attributes\Validation\Ulid;
+use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
 
 it('can get a string representation of rules', function () {
@@ -79,4 +90,29 @@ it('can normalize values', function ($input, $output) {
          [DummyBackedEnum::FOO, DummyBackedEnum::BOO],
         'foo,boo',
     ];
+});
+
+it('can use Ulid attribute on constructor promoted parameters', function () {
+    $class = new class ('01ARZ3NDEKTSV4RRFFQ69G5FAV') {
+        public function __construct(
+            #[Ulid]
+            public string $id,
+        ) {
+        }
+    };
+
+    expect($class->id)->toBe('01ARZ3NDEKTSV4RRFFQ69G5FAV');
+});
+
+it('can initialize validation attributes with default parameters without uninitialized property errors', function () {
+    expect((new RequiredWith())->parameters())->toBe([[]])
+        ->and((new RequiredWithout())->parameters())->toBe([[]])
+        ->and((new RequiredWithAll())->parameters())->toBe([[]])
+        ->and((new RequiredWithoutAll())->parameters())->toBe([[]])
+        ->and((new Prohibits())->parameters())->toBe([[]])
+        ->and((new Url())->parameters())->toBe([])
+        ->and((new ArrayType())->parameters())->toBe([])
+        ->and((new Mimes())->parameters())->toBe([[]])
+        ->and((new MimeTypes())->parameters())->toBe([[]])
+        ->and((new Email())->parameters())->toBe(['rfc']);
 });

@@ -4,7 +4,7 @@ namespace Spatie\LaravelData\Casts;
 
 class Uncastable
 {
-    public static Uncastable $instance;
+    private static ?self $instance = null;
 
     private function __construct()
     {

@@ -15,7 +15,7 @@ class NotIn extends ObjectValidationAttribute
 {
     protected ?BaseNotIn $rule = null;
 
-    protected array $values;
+    protected array $values = [];
 
     public function __construct(array|Arrayable|string|UnitEnum|BaseNotIn|ExternalReference ...$values)
     {

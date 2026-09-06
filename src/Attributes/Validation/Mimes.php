@@ -9,7 +9,7 @@ use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Mimes extends StringValidationAttribute
 {
-    protected array $mimes;
+    protected array $mimes = [];
 
     public function __construct(string|array|ExternalReference ...$mimes)
     {

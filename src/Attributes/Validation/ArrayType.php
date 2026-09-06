@@ -9,7 +9,7 @@ use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class ArrayType extends StringValidationAttribute
 {
-    protected array $keys;
+    protected array $keys = [];
 
     public function __construct(array|string|ExternalReference ...$keys)
     {

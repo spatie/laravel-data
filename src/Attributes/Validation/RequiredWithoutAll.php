@@ -10,7 +10,7 @@ use Spatie\LaravelData\Support\Validation\RequiringRule;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class RequiredWithoutAll extends StringValidationAttribute implements RequiringRule
 {
-    protected array $fields;
+    protected array $fields = [];
 
     public function __construct(array|string|FieldReference ...$fields)
     {

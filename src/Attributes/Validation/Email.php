@@ -17,7 +17,7 @@ class Email extends StringValidationAttribute
     public const SpoofCheckValidation = 'spoof';
     public const FilterEmailValidation = 'filter';
 
-    protected array $modes;
+    protected array $modes = [];
 
     public function __construct(array|string|ExternalReference ...$modes)
     {

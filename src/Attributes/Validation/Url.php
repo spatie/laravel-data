@@ -9,7 +9,7 @@ use Spatie\LaravelData\Support\Validation\References\ExternalReference;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_PARAMETER)]
 class Url extends StringValidationAttribute
 {
-    protected array $protocols;
+    protected array $protocols = [];
 
     public function __construct(
         string|array|ExternalReference ...$protocols
