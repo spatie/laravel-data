@@ -127,18 +127,6 @@ parameters:
 			path: src/CursorPaginatedDataCollection.php
 
 		-
-			message: '#^Call to function property_exists\(\) with \$this\(Spatie\\LaravelData\\Data\) and ''_dataContext'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/Data.php
-
-		-
-			message: '#^Instanceof between \*NEVER\* and Spatie\\LaravelData\\Contracts\\BaseDataCollectable will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: src/Data.php
-
-		-
 			message: '#^Method Spatie\\LaravelData\\Data\:\:__sleep\(\) should return array\<int, string\> but returns array\<string, mixed\>\.$#'
 			identifier: return.type
 			count: 1
@@ -239,18 +227,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: src/Resolvers/ValidatedPayloadResolver.php
-
-		-
-			message: '#^Call to function property_exists\(\) with \$this\(Spatie\\LaravelData\\Resource\) and ''_dataContext'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/Resource.php
-
-		-
-			message: '#^Instanceof between \*NEVER\* and Spatie\\LaravelData\\Contracts\\BaseDataCollectable will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: src/Resource.php
 
 		-
 			message: '#^Method Spatie\\LaravelData\\Resource\:\:__sleep\(\) should return array\<int, string\> but returns array\<string, mixed\>\.$#'

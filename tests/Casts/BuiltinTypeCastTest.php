@@ -36,3 +36,16 @@ it('can cast builtin types', function (string $type, mixed $input, mixed $expect
     'string types' => ['string', 42, '42'],
     'array types' => ['array', (object) ['key' => 'value'], ['key' => 'value']],
 ]);
+
+it('checks supported builtin types', function (string $type, bool $expected) {
+    expect(BuiltinTypeCast::supports($type))->toBe($expected);
+})->with([
+    ['bool', true],
+    ['int', true],
+    ['float', true],
+    ['array', true],
+    ['string', true],
+    ['object', false],
+    ['null', false],
+    ['mixed', false],
+]);

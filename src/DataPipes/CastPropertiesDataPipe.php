@@ -238,7 +238,7 @@ class CastPropertiesDataPipe implements DataPipe
             }
         }
 
-        if (in_array($property->type->iterableItemType, ['bool', 'int', 'float', 'array', 'string'])) {
+        if (BuiltinTypeCast::supports($property->type->iterableItemType)) {
             return new BuiltinTypeCast($property->type->iterableItemType);
         }
 

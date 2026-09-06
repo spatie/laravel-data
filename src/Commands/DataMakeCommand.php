@@ -30,14 +30,14 @@ class DataMakeCommand extends GeneratorCommand
 
     protected function getDefaultNamespace($rootNamespace): string
     {
-        $namespace = trim($this->option('namespace'), '\\');
+        $namespace = trim((string) $this->option('namespace'), '\\');
 
         return trim($rootNamespace . '\\' . $namespace, '\\');
     }
 
     protected function qualifyClass($name): string
     {
-        $suffix = trim($this->option('suffix'));
+        $suffix = trim((string) $this->option('suffix'));
         if (! empty($suffix) && ! Str::endsWith($name, $suffix)) {
             $name .= $suffix;
         }

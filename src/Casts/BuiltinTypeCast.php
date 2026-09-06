@@ -7,12 +7,31 @@ use Spatie\LaravelData\Support\DataProperty;
 
 class BuiltinTypeCast implements Cast, IterableItemCast
 {
+    public const TYPE_BOOL = 'bool';
+    public const TYPE_INT = 'int';
+    public const TYPE_FLOAT = 'float';
+    public const TYPE_ARRAY = 'array';
+    public const TYPE_STRING = 'string';
+
+    public const SUPPORTED_TYPES = [
+        self::TYPE_BOOL,
+        self::TYPE_INT,
+        self::TYPE_FLOAT,
+        self::TYPE_ARRAY,
+        self::TYPE_STRING,
+    ];
+
     /**
-     * @param 'bool'|'int'|'float'|'array'|'string' $type
+     * @param self::TYPE_* $type
      */
     public function __construct(
         protected string $type,
     ) {
+    }
+
+    public static function supports(string $type): bool
+    {
+        return in_array($type, self::SUPPORTED_TYPES, true);
     }
 
     public function cast(DataProperty $property, mixed $value, array $properties, CreationContext $context): mixed
@@ -28,11 +47,11 @@ class BuiltinTypeCast implements Cast, IterableItemCast
     protected function runCast(mixed $value): mixed
     {
         return match ($this->type) {
-            'bool' => $this->castToBool($value),
-            'int' => (int) $value,
-            'float' => (float) $value,
-            'array' => (array) $value,
-            'string' => (string) $value,
+            self::TYPE_BOOL => $this->castToBool($value),
+            self::TYPE_INT => (int) $value,
+            self::TYPE_FLOAT => (float) $value,
+            self::TYPE_ARRAY => (array) $value,
+            self::TYPE_STRING => (string) $value,
         };
     }
 
