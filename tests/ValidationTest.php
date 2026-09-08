@@ -793,6 +793,35 @@ it('will validate collection with explicit require', function () {
 });
 
 
+it('will validate a keyed collection whose keys contain dots', function () {
+    $dataClass = new class () extends Data {
+        /** @var array<string, SimpleData> */
+        #[DataCollectionOf(SimpleData::class)]
+        public array $translations;
+    };
+
+    DataValidationAsserter::for($dataClass)
+        ->assertOk([
+            'translations' => [
+                'en.greeting' => ['string' => 'hello'],
+                'es.greeting' => ['string' => 'hola'],
+            ],
+        ])
+        ->assertErrors([
+            'translations' => [
+                'en.greeting' => ['other_string' => 'wrong field'],
+            ],
+        ])
+        ->assertRules([
+            'translations' => ['present', 'array'],
+            'translations.en\.greeting.string' => ['required', 'string'],
+        ], [
+            'translations' => [
+                'en.greeting' => [],
+            ],
+        ]);
+});
+
 it('will validate a collection with extra attributes', function () {
     $dataClass = new class () extends Data {
         #[DataCollectionOf(SimpleDataWithExplicitValidationRuleAttributeData::class)]
