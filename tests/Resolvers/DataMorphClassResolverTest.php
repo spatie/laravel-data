@@ -9,7 +9,56 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Resolvers\DataMorphClassResolver;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\Enums\DummyUnitEnum;
 use Spatie\LaravelData\Tests\Fakes\SimpleData;
+use Stringable;
+
+it('can resolve morph class with unit enum type', function () {
+    abstract class TestAbstractMorphableDataWithUnitEnum extends Data implements PropertyMorphableData
+    {
+        #[PropertyForMorph]
+        public DummyUnitEnum $type;
+
+        public static function morph(array $properties): string
+        {
+            return $properties['type']->name;
+        }
+    };
+
+    $morph = app(DataMorphClassResolver::class)->execute(
+        app(DataConfig::class)->getDataClass(TestAbstractMorphableDataWithUnitEnum::class),
+        [['type' => DummyUnitEnum::FOO]]
+    );
+
+    expect($morph)->toBe(DummyUnitEnum::FOO->name);
+});
+
+it('can resolve morph class with stringable input', function () {
+    abstract class TestAbstractMorphableDataWithStringableInput extends Data implements PropertyMorphableData
+    {
+        #[PropertyForMorph]
+        public string $type;
+
+        public static function morph(array $properties): string
+        {
+            return $properties['type'];
+        }
+    };
+
+    $value = new class () implements Stringable {
+        public function __toString(): string
+        {
+            return 'user';
+        }
+    };
+
+    $morph = app(DataMorphClassResolver::class)->execute(
+        app(DataConfig::class)->getDataClass(TestAbstractMorphableDataWithStringableInput::class),
+        [['type' => $value]]
+    );
+
+    expect($morph)->toBe('user');
+});
 
 it('returns null for non abstract classes', function () {
     $morph = app(DataMorphClassResolver::class)->execute(

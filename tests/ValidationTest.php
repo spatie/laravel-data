@@ -79,6 +79,7 @@ use Spatie\LaravelData\Tests\Fakes\SimpleDataWithOverwrittenRules;
 use Spatie\LaravelData\Tests\Fakes\Support\FakeInjectable;
 use Spatie\LaravelData\Tests\Fakes\ValidationAttributes\PassThroughCustomValidationAttribute;
 use Spatie\LaravelData\Tests\TestSupport\DataValidationAsserter;
+use stdClass;
 
 it('can validate a string', function () {
     $dataClass = new class () extends Data {
@@ -2937,6 +2938,29 @@ it('it will merge validation rules', function () {
 });
 
 describe('property-morphable validation tests', function () {
+    it('validates invalid morph property types', function (mixed $value) {
+        DataValidationAsserter::for(AbstractPropertyMorphableData::class)
+            ->assertErrors(['variant' => $value], [
+                'variant' => [
+                    'The selected variant is invalid.',
+                    'The selected variant is invalid for morph.',
+                ],
+            ]);
+
+        DataValidationAsserter::for(new class () extends Data {
+            public AbstractPropertyMorphableData $nested;
+        })
+            ->assertErrors(['nested' => ['variant' => $value]], [
+                'nested.variant' => [
+                    'The selected nested.variant is invalid.',
+                    'The selected nested.variant is invalid for morph.',
+                ],
+            ]);
+    })->with([
+        'array' => [['a']],
+        'object' => [new stdClass()],
+    ]);
+
     it('can validate property-morphable data', function () {
         DataValidationAsserter::for(AbstractPropertyMorphableData::class)
             ->assertErrors([], [
