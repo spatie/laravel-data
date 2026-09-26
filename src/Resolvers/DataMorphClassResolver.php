@@ -7,6 +7,7 @@ use Spatie\LaravelData\Contracts\PropertyMorphableData;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataConfig;
 use Spatie\LaravelData\Support\DataProperty;
+use Stringable;
 use UnitEnum;
 
 class DataMorphClassResolver
@@ -85,7 +86,11 @@ class DataMorphClassResolver
         DataProperty $property,
         mixed $value,
     ): string|int|null|BackedEnum|UnitEnum {
-        if ($value === null) {
+        if (
+            $value === null
+            || is_array($value)
+            || (is_object($value) && ! $value instanceof UnitEnum && ! $value instanceof Stringable)
+        ) {
             return null;
         }
 
