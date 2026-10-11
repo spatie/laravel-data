@@ -21,6 +21,12 @@ This opens up possibilities to create collections of Eloquent models:
 SongData::collect(Song::all()); // return an Eloquent collection of SongData objects
 ```
 
+Keep in mind that an Eloquent collection is expected to contain models. Laravel (and packages built on top of it) may call model-only methods on it, such as `load`, `loadMissing` or `fresh`. These methods will fail on a collection of data objects. When you pass the result to code that might do this, collect into a regular Laravel collection instead:
+
+```php
+SongData::collect(Song::all(), Collection::class); // return a Laravel collection of SongData objects
+```
+
 Or use a paginator:
 
 ```php
