@@ -21,6 +21,15 @@ This opens up possibilities to create collections of Eloquent models:
 SongData::collect(Song::all()); // return an Eloquent collection of SongData objects
 ```
 
+Keep in mind that this Eloquent collection now contains data objects, not models. Code that treats it as a collection of
+models can fail. For example, eager loading relations on it with `loadMissing()` will call methods like
+`newQueryWithoutRelationships()` on the items, which data objects don't have. If you pass the result to such code, for
+example a package that builds API responses, ask for a regular Laravel collection instead:
+
+```php
+SongData::collect(Song::all(), Collection::class); // return a Laravel collection of SongData objects
+```
+
 Or use a paginator:
 
 ```php
