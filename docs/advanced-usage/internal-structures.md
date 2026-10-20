@@ -22,7 +22,7 @@ The DataClass represents the structure of a data object and has the following pr
 - `transformable` is the class implementing `TransformableData`
 - `validatable` is the class implementing `ValidatableData`
 - `wrappable` is the class implementing `WrappableData`
-- `emptyData` the the class implementing `EmptyData`
+- `emptyData` is the class implementing `EmptyData`
 - `attributes` a collection of resolved attributes assigned to the class
 - `dataCollectablePropertyAnnotations` the property annotations of the class used to infer the data collection type
 - `allowedRequestIncludes` the allowed request includes of the class
@@ -117,7 +117,7 @@ Represents a named PHP type with the following properties:
 - `kind` the `DataTypeKind` of the type (more on that later)
 - `dataClass` the data object class of the property or the data object class of the collection it collects
 - `dataCollectableClass` the collectable type of the data objects
-- `isCastable` wetter the type is a `Castable`
+- `isCastable` whether the type is a `Castable`
 
 ## UnionType / IntersectionType
 
