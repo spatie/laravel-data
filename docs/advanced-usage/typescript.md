@@ -51,6 +51,19 @@ class DataObject extends Data
 
 We recently launched [typescript-transformer v3](https://spatie.be/docs/typescript-transformer/v3) which has extensive documentation on how to use it with laravel-data. We strongly urge you to upgrade to v3, support for v2 will be deprecated soon. Check out the [installation and setup guide](https://spatie.be/docs/typescript-transformer/v3/laravel/installation-and-setup) to get started, and the [laravel-data integration guide](https://spatie.be/docs/typescript-transformer/v3/laravel/laravel-data) for detailed instructions.
 
+With v3, the laravel-data integration lives in laravel-typescript-transformer itself. Register its extension in your `TypeScriptTransformerServiceProvider` instead of the `DataTypeScriptTransformer` and `DataTypeScriptCollector` classes from this package, which only work with v2:
+
+```php
+use Spatie\LaravelTypeScriptTransformer\LaravelData\LaravelDataTypeScriptTransformerExtension;
+
+protected function configure(TypeScriptTransformerConfigFactory $config): void
+{
+    $config
+        ->extension(new LaravelDataTypeScriptTransformerExtension())
+        // ...
+}
+```
+
 The instructions below are for typescript-transformer v2 and will be removed in a future version.
 
 ## Installation of extra package
