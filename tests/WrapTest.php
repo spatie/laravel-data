@@ -10,6 +10,7 @@ use function Pest\Laravel\post;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\withoutExceptionHandling;
 
+use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Tests\Fakes\MultiNestedData;
@@ -244,6 +245,37 @@ it('will wrap responses which are data collections', function () {
                 ['string' => 'Hello World'],
                 ['string' => 'HELLO WORLD'],
             ],
+        ]);
+});
+
+it('will wrap nested data collections within root data collection', function () {
+    config()->set('data.wrap', 'wrap');
+
+    class RootCollectionWrappingItemData extends Data
+    {
+        public function __construct(
+            public string $name,
+            #[DataCollectionOf(SimpleData::class)]
+            public DataCollection $items,
+        ) {
+        }
+    }
+
+    expect(
+        RootCollectionWrappingItemData::collect([
+            ['name' => 'hello', 'items' => [['string' => 'hello'], ['string' => 'world']]],
+        ], DataCollection::class)->toResponse(\request())->getData(true)
+    )
+        ->toBe([
+            'wrap' => [[
+                'name' => 'hello',
+                'items' => [
+                    'wrap' => [
+                        ['string' => 'hello'],
+                        ['string' => 'world'],
+                    ],
+                ],
+            ]],
         ]);
 });
 
