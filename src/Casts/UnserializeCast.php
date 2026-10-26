@@ -7,8 +7,13 @@ use Spatie\LaravelData\Support\DataProperty;
 
 class UnserializeCast implements Cast
 {
+    /**
+     * @param bool $failSilently
+     * @param array<int, class-string>|bool $allowedClasses
+     */
     public function __construct(
         private readonly bool $failSilently = false,
+        private readonly array|bool $allowedClasses = true,
     ) {
     }
 
@@ -20,7 +25,7 @@ class UnserializeCast implements Cast
         }
 
         try {
-            return unserialize($value);
+            return unserialize($value, ['allowed_classes' => $this->allowedClasses]);
         } catch (\Throwable $e) {
             if ($this->failSilently) {
                 return Uncastable::create();
