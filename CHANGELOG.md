@@ -2,6 +2,43 @@
 
 All notable changes to `laravel-data` will be documented in this file.
 
+## 4.23.1 - 2026-10-26
+
+A new `allowedClasses` option for `UnserializeCast`, and a round of PHPStan fixes.
+
+### Add `allowedClasses` option to `UnserializeCast` (#1220)
+
+`UnserializeCast` called `unserialize()` without any restrictions, so every class in your application could be created from the serialized value. You can now limit which classes are allowed with the new `allowedClasses` option, which is passed to `unserialize()` as `allowed_classes`:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[WithCast(UnserializeCast::class, allowedClasses: [SongMetadata::class])]
+        public SongMetadata $metadata,
+    ) {
+    }
+}
+
+```
+Classes outside the list become a `__PHP_Incomplete_Class` object, and passing `false` only allows scalar values and arrays. The default stays `true`, so existing casts keep working as before. The cast is now also documented, including a note not to use it on user input.
+
+Thanks @rubenvanassche.
+
+### Fix PHPStan errors after PHPStan 2.3 update (#1221)
+
+PHPStan 2.3 stopped reporting a few errors that were in the baseline, which made the PHPStan workflow fail. The baseline is regenerated, a redundant check in `DataMethod` is removed, and the type assertion for cursor paginators is updated. There are no behaviour changes.
+
+Thanks @rubenvanassche.
+
+### What's Changed
+
+* Add allowedClasses option to UnserializeCast by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1220
+* Fix PHPStan errors after PHPStan 2.3 update by @rubenvanassche in https://github.com/spatie/laravel-data/pull/1221
+
+**Full Changelog**: https://github.com/spatie/laravel-data/compare/4.23.0...4.23.1
+
 ## 4.23.0 - 2026-05-08
 
 A round of bug fixes for validation rules, install resolution, and rule overrides.
@@ -22,6 +59,7 @@ Overrides are now resolved upfront, and the default-value skip only applies when
 +        "phpdocumentor/reflection-common" : "^2.2",
 +        "phpdocumentor/reflection-docblock" : "^5.3 || ^6.0",
 
+
 ```
 The phpDocumentor APIs we call are identical across both majors, so no code changes are required. Thanks @rubenvanassche.
 
@@ -32,6 +70,7 @@ The constructors typed their value as `int|ExternalReference`, and because those
 ```php
 #[Min(0.01), Max(99.99)]
 public float $price;
+
 
 ```
 Digit-count rules (`Digits`, `MinDigits`, `MaxDigits`, `DigitsBetween`) and `Password` length stay `int`. Thanks @rubenvanassche.
@@ -302,6 +341,7 @@ SongData::factory()
 
 
 
+
 ```
 #### Injecting property values
 
@@ -312,6 +352,7 @@ class SongData extends Data {
     #[FromAuthenticatedUser]
     public UserData $user;
 }
+
 
 
 
@@ -359,6 +400,7 @@ class SongData extends Data
         ];
     }
 }
+
 
 
 
