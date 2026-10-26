@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Concerns;
 
 use Spatie\LaravelData\Contracts\IncludeableData as IncludeableDataContract;
+use Spatie\LaravelData\Contracts\ResponsableData as ResponsableDataContract;
 use Spatie\LaravelData\Contracts\WrappableData as WrappableDataContract;
 use Spatie\LaravelData\Support\Partials\Partial;
 use Spatie\LaravelData\Support\Partials\PartialsCollection;
@@ -20,6 +21,11 @@ trait ContextableData
             $wrap = match (true) {
                 method_exists($this, 'defaultWrap') => new Wrap(WrapType::Defined, $this->defaultWrap()),
                 default => new Wrap(WrapType::UseGlobal),
+            };
+
+            $responseStatus = match (true) {
+                method_exists($this, 'defaultResponseStatus') => $this->defaultResponseStatus(),
+                default => null,
             };
 
             $includePartials = null;
@@ -67,6 +73,7 @@ trait ContextableData
                 $onlyPartials,
                 $exceptPartials,
                 $this instanceof WrappableDataContract ? $wrap : new Wrap(WrapType::UseGlobal),
+                $this instanceof ResponsableDataContract ? $responseStatus : null,
             );
         }
 

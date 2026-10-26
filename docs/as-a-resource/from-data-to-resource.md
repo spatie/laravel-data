@@ -182,6 +182,34 @@ SongData::empty(except: ['name']); // Will return the `artist` property
 
 When a resource is being returned from a controller, the status code of the response will automatically be set to `201 CREATED` when Laravel data detects that the request's method is `POST`.  In all other cases, `200 OK` will be returned.
 
+It is possible to set the status code of the response on a specific data instance:
+
+```php
+SongData::from(Song::first())->responseStatus(202);
+```
+
+This also works on data collections:
+
+```php
+SongData::collect(Song::all(), DataCollection::class)->responseStatus(202);
+```
+
+A default status code can be set for all responses of a data class by implementing the `defaultResponseStatus` method:
+
+```php
+class SongData extends Data
+{
+    // ...
+
+    public function defaultResponseStatus(): int
+    {
+        return 202;
+    }
+}
+```
+
+A status code set on a specific data instance always takes precedence over the default status code of the data class.
+
 ## Resource classes
 
 To make it a bit more clear that a data object is a resource, you can use the `Resource` class instead of the `Data` class:
