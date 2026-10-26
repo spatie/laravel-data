@@ -53,7 +53,7 @@ class DataMethod
                 return false;
             }
 
-            if (! $parameterProvided && $parameter->hasDefaultValue) {
+            if (! $parameterProvided) {
                 continue;
             }
 

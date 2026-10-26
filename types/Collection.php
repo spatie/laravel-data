@@ -2,7 +2,6 @@
 
 /** @noinspection PhpExpressionResultUnusedInspection */
 
-use Illuminate\Contracts\Pagination\CursorPaginator as CursorPaginatorContract;
 use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\AbstractCursorPaginator;
@@ -38,7 +37,7 @@ $collection = SimpleData::collect(FakeModel::query()->paginate());
 assertType(AbstractPaginator::class.'|'.Enumerable::class.'<(int|string), '.SimpleData::class.'>', $collection);
 
 $collection = SimpleData::collect(FakeModel::query()->cursorPaginate());
-assertType(CursorPaginatorContract::class . '|' . PaginatorContract::class.'|'.AbstractCursorPaginator::class.'|'.AbstractPaginator::class.'|'.Enumerable::class.'<(int|string), '.SimpleData::class.'>', $collection);
+assertType(PaginatorContract::class.'|'.AbstractCursorPaginator::class.'|'.Enumerable::class.'<(int|string), '.SimpleData::class.'>', $collection);
 
 # into
 

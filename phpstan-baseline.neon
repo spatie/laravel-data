@@ -1,6 +1,12 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Instanceof between Spatie\\LaravelData\\Support\\Validation\\Constraints\\DatabaseConstraint and Spatie\\LaravelData\\Support\\Validation\\Constraints\\DatabaseConstraint will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Attributes/Concerns/AppliesDatabaseConstraints.php
+
+		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1
@@ -17,12 +23,6 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: src/Attributes/Validation/Exclude.php
-
-		-
-			message: '#^Instanceof between Spatie\\LaravelData\\Support\\Validation\\Constraints\\DatabaseConstraint and Spatie\\LaravelData\\Support\\Validation\\Constraints\\DatabaseConstraint will always evaluate to true\.$#'
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: src/Attributes/Validation/Exists.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -65,12 +65,6 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: src/Attributes/Validation/StringValidationAttribute.php
-
-		-
-			message: '#^Instanceof between Spatie\\LaravelData\\Support\\Validation\\Constraints\\DatabaseConstraint and Spatie\\LaravelData\\Support\\Validation\\Constraints\\DatabaseConstraint will always evaluate to true\.$#'
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: src/Attributes/Validation/Unique.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -127,34 +121,10 @@ parameters:
 			path: src/CursorPaginatedDataCollection.php
 
 		-
-			message: '#^Call to function property_exists\(\) with \$this\(Spatie\\LaravelData\\Data\) and ''_dataContext'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/Data.php
-
-		-
-			message: '#^Instanceof between \*NEVER\* and Spatie\\LaravelData\\Contracts\\BaseDataCollectable will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: src/Data.php
-
-		-
-			message: '#^Method Spatie\\LaravelData\\Data\:\:__sleep\(\) should return array\<int, string\> but returns array\<string, mixed\>\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Data.php
-
-		-
 			message: '#^Method Spatie\\LaravelData\\DataCollection\:\:values\(\) should return static\(Spatie\\LaravelData\\DataCollection\<int, TValue\>\) but returns static\(Spatie\\LaravelData\\DataCollection\<TKey of \(int\|string\), TValue\>\)\.$#'
 			identifier: return.type
 			count: 1
 			path: src/DataCollection.php
-
-		-
-			message: '#^Method Spatie\\LaravelData\\Dto\:\:__sleep\(\) should return array\<int, string\> but returns array\<string, mixed\>\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Dto.php
 
 		-
 			message: '#^Call to an undefined static method Livewire\\Livewire\:\:propertySynthesizer\(\)\.$#'
@@ -239,24 +209,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: src/Resolvers/ValidatedPayloadResolver.php
-
-		-
-			message: '#^Call to function property_exists\(\) with \$this\(Spatie\\LaravelData\\Resource\) and ''_dataContext'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/Resource.php
-
-		-
-			message: '#^Instanceof between \*NEVER\* and Spatie\\LaravelData\\Contracts\\BaseDataCollectable will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: src/Resource.php
-
-		-
-			message: '#^Method Spatie\\LaravelData\\Resource\:\:__sleep\(\) should return array\<int, string\> but returns array\<string, mixed\>\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Resource.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
