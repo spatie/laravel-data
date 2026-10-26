@@ -132,7 +132,7 @@ class SongData extends Data
 }
 ```
 
-The `allowedClasses` parameter limits which classes can be created while unserializing. Any other class will become a `__PHP_Incomplete_Class` object. You can also pass `false` to only allow scalar values and arrays. When no `allowedClasses` are given, every class is allowed.
+The `allowedClasses` parameter limits which classes can be created while unserializing. Any other class will become a `__PHP_Incomplete_Class` object. This also applies to nested objects, so when `SongMetadata` holds a `Carbon` date, `Carbon` needs to be in the list as well. You can also pass `false` to only allow scalar values and arrays. When no `allowedClasses` are given, every class is allowed.
 
 Do not use this cast on user input, like request data. Unserializing user input can lead to security issues.
 
