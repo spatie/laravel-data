@@ -116,6 +116,33 @@ class SongData extends Data
 
 Tip: we can also remove the `EnumCast` since the package will automatically cast enums because they're a native PHP type, but this made the example easy to understand.
 
+## Unserializing values
+
+The package ships with an `UnserializeCast` which runs PHP's `unserialize` on a value. This is useful when you store serialized values yourself, for example in a database column or a cache:
+
+```php
+class SongData extends Data
+{
+    public function __construct(
+        public string $title,
+        #[WithCast(UnserializeCast::class, allowedClasses: [SongMetadata::class])]
+        public SongMetadata $metadata,
+    ) {
+    }
+}
+```
+
+The `allowedClasses` parameter limits which classes can be created while unserializing. Any other class will become a `__PHP_Incomplete_Class` object. This also applies to nested objects, so when `SongMetadata` holds a `Carbon` date, `Carbon` needs to be in the list as well. You can also pass `false` to only allow scalar values and arrays. When no `allowedClasses` are given, every class is allowed.
+
+Do not use this cast on user input, like request data. Unserializing user input can lead to security issues.
+
+When the value cannot be unserialized, an exception will be thrown. You can make the cast fail silently instead:
+
+```php
+#[WithCast(UnserializeCast::class, failSilently: true)]
+public SongMetadata $metadata
+```
+
 ## Creating your own casts
 
 It is possible to create your casts. You can read more about this in the [advanced chapter](/docs/laravel-data/v4/advanced-usage/creating-a-cast).

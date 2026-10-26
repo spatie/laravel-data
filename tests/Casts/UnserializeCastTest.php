@@ -5,6 +5,7 @@ use Spatie\LaravelData\Casts\UnserializeCast;
 use Spatie\LaravelData\Support\Creation\CreationContextFactory;
 use Spatie\LaravelData\Tests\Factories\FakeDataStructureFactory;
 use Spatie\LaravelData\Tests\Fakes\Enums\DummyBackedEnum;
+use Spatie\LaravelData\Tests\Fakes\SimpleData;
 
 it('will unserialize an object', function () {
     $class = new class () {
@@ -57,4 +58,35 @@ it('can fail silently', function () {
             CreationContextFactory::createFromConfig($class::class)->get()
         )
     )->toBeInstanceOf(Uncastable::class);
+});
+
+it('can restrict the classes which can be unserialized', function () {
+    $class = new class () {
+        public SimpleData $data;
+    };
+
+    $value = serialize(new SimpleData('Hello'));
+
+    $context = CreationContextFactory::createFromConfig($class::class)->get();
+
+    expect((new UnserializeCast(allowedClasses: [SimpleData::class]))->cast(
+        FakeDataStructureFactory::property($class, 'data'),
+        $value,
+        [],
+        $context
+    ))->toEqual(new SimpleData('Hello'));
+
+    expect((new UnserializeCast(allowedClasses: []))->cast(
+        FakeDataStructureFactory::property($class, 'data'),
+        $value,
+        [],
+        $context
+    ))->toBeInstanceOf(__PHP_Incomplete_Class::class);
+
+    expect((new UnserializeCast(allowedClasses: false))->cast(
+        FakeDataStructureFactory::property($class, 'data'),
+        $value,
+        [],
+        $context
+    ))->toBeInstanceOf(__PHP_Incomplete_Class::class);
 });
