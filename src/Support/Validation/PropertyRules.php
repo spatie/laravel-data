@@ -3,6 +3,7 @@
 namespace Spatie\LaravelData\Support\Validation;
 
 use Illuminate\Support\Arr;
+use Spatie\LaravelData\Attributes\Validation\Required;
 
 class PropertyRules
 {
@@ -21,7 +22,7 @@ class PropertyRules
 
     public function add(ValidationRule ...$rules): static
     {
-        $this->removeType(...$rules);
+        $this->removeDuplicateRules(...$rules);
 
         array_push($this->rules, ...$rules);
 
@@ -30,7 +31,7 @@ class PropertyRules
 
     public function prepend(ValidationRule ...$rules): static
     {
-        $this->removeType(...$rules);
+        $this->removeDuplicateRules(...$rules);
 
         $this->rules = Arr::prepend($this->rules, ...$rules);
 
@@ -48,6 +49,33 @@ class PropertyRules
                 }
 
                 if ($rule instanceof $class) {
+                    unset($this->rules[$i]);
+
+                    continue 2;
+                }
+            }
+        }
+
+        $this->rules = array_values($this->rules);
+
+        return $this;
+    }
+
+    protected function removeDuplicateRules(ValidationRule ...$rules): static
+    {
+        foreach ($this->rules as $i => $rule) {
+            foreach ($rules as $newRule) {
+                if ($newRule instanceof RequiringRule && ! $newRule instanceof Required) {
+                    if ($rule instanceof Required) {
+                        unset($this->rules[$i]);
+
+                        continue 2;
+                    }
+
+                    continue;
+                }
+
+                if ($rule instanceof $newRule) {
                     unset($this->rules[$i]);
 
                     continue 2;
