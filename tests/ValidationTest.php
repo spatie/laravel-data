@@ -28,6 +28,7 @@ use Spatie\LaravelData\Attributes\MergeValidationRules;
 use Spatie\LaravelData\Attributes\PropertyForMorph;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\Bail;
+use Spatie\LaravelData\Attributes\Validation\Between;
 use Spatie\LaravelData\Attributes\Validation\BooleanType;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\In;
@@ -391,6 +392,20 @@ it('will take care of mapping', function () {
                 'data_collection_cased_property' => [[]],
             ],
         ]);
+});
+
+it('will not use original property names for mapped properties during validated creation', function () {
+    $dataClass = new class () extends Data {
+        #[Between(1, 200)]
+        #[MapInputName('page.size')]
+        public int $size = 10;
+    };
+
+    expect($dataClass::from(['size' => 300])->size)->toBe(300);
+    expect($dataClass::validateAndCreate(['size' => 300])->size)->toBe(10);
+    expect($dataClass::validateAndCreate(['page' => ['size' => 100]])->size)->toBe(100);
+    expect(fn () => $dataClass::validateAndCreate(['page' => ['size' => 300]]))
+        ->toThrow(ValidationException::class);
 });
 
 it('can disable validation', function () {
