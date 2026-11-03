@@ -5,6 +5,7 @@ namespace Spatie\LaravelData\Resolvers;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Contracts\AppendableData;
 use Spatie\LaravelData\Contracts\BaseData;
+use Spatie\LaravelData\Contracts\BaseDataCollectable;
 use Spatie\LaravelData\Contracts\TransformableData;
 use Spatie\LaravelData\Contracts\WrappableData;
 use Spatie\LaravelData\Lazy;
@@ -183,6 +184,10 @@ class TransformedDataResolver
         }
 
         if ($currentContext->wrapExecutionType === WrapExecutionType::Enabled) {
+            return WrapExecutionType::Enabled;
+        }
+
+        if ($value instanceof BaseDataCollectable) {
             return WrapExecutionType::Enabled;
         }
 
