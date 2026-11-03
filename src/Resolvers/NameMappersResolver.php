@@ -11,13 +11,17 @@ use Spatie\LaravelData\Support\DataAttributesCollection;
 
 class NameMappersResolver
 {
-    public static function create(array $ignoredMappers = []): self
-    {
-        return new self($ignoredMappers);
+    public static function create(
+        array $ignoredMappers = [],
+        bool $fallbackToDefaults = true,
+    ): self {
+        return new self($ignoredMappers, $fallbackToDefaults);
     }
 
-    public function __construct(protected array $ignoredMappers = [])
-    {
+    public function __construct(
+        protected array $ignoredMappers = [],
+        protected bool $fallbackToDefaults = true,
+    ) {
     }
 
     public function execute(
@@ -26,6 +30,14 @@ class NameMappersResolver
         return [
             'inputNameMapper' => $this->resolveInputNameMapper($attributes),
             'outputNameMapper' => $this->resolveOutputNameMapper($attributes),
+        ];
+    }
+
+    public function resolveDefaults(): array
+    {
+        return [
+            'inputNameMapper' => $this->resolveDefaultNameMapper(config('data.name_mapping_strategy.input')),
+            'outputNameMapper' => $this->resolveDefaultNameMapper(config('data.name_mapping_strategy.output')),
         ];
     }
 
@@ -39,6 +51,10 @@ class NameMappersResolver
             return $this->resolveMapper($mapper->input);
         }
 
+        if (! $this->fallbackToDefaults) {
+            return null;
+        }
+
         return $this->resolveDefaultNameMapper(config('data.name_mapping_strategy.input'));
     }
 
@@ -50,6 +66,10 @@ class NameMappersResolver
 
         if ($mapper) {
             return $this->resolveMapper($mapper->output);
+        }
+
+        if (! $this->fallbackToDefaults) {
+            return null;
         }
 
         return $this->resolveDefaultNameMapper(config('data.name_mapping_strategy.output'));

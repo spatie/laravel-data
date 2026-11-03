@@ -364,3 +364,45 @@ it('has a mappers built in', function () {
         ->uppercase->toBe('UPPERCASE')
         ->provided->toBe('provided');
 });
+
+it('prefers a class level output mapper over the configured default', function () {
+    config()->set('data.name_mapping_strategy.output', SnakeCaseMapper::class);
+
+    $dataClass = new #[MapOutputName(CamelCaseMapper::class)] class () extends Data {
+        public string $some_property = 'value';
+    };
+
+    expect($dataClass->toArray())->toBe(['someProperty' => 'value']);
+});
+
+it('prefers a class level input mapper over the configured default', function () {
+    config()->set('data.name_mapping_strategy.input', SnakeCaseMapper::class);
+
+    $dataClass = new #[MapInputName(CamelCaseMapper::class)] class () extends Data {
+        public string $some_property;
+    };
+
+    expect($dataClass::from(['someProperty' => 'value']))
+        ->some_property->toBe('value');
+});
+
+it('prefers a property mapper over a class level mapper and the configured default', function () {
+    config()->set('data.name_mapping_strategy.output', SnakeCaseMapper::class);
+
+    $dataClass = new #[MapOutputName(CamelCaseMapper::class)] class () extends Data {
+        #[MapOutputName(UpperCaseMapper::class)]
+        public string $property = 'value';
+    };
+
+    expect($dataClass->toArray())->toBe(['PROPERTY' => 'value']);
+});
+
+it('falls back to the configured default when a class level mapper is ignored', function () {
+    config()->set('data.name_mapping_strategy.output', CamelCaseMapper::class);
+
+    $dataClass = new #[MapOutputName('ignored')] class () extends Data {
+        public string $some_property = 'value';
+    };
+
+    expect($dataClass->toArray())->toBe(['someProperty' => 'value']);
+});

@@ -45,19 +45,15 @@ class DataPropertyFactory
             $classDefinedDataIterableAnnotation
         );
 
-        $mappers = NameMappersResolver::create()->execute($attributes);
+        // The configured default only applies when neither the property nor the class maps the name
+        $mappers = NameMappersResolver::create(fallbackToDefaults: false)->execute($attributes);
+        $defaultMappers = NameMappersResolver::create()->resolveDefaults();
 
-        $inputMappedName = match (true) {
-            $mappers['inputNameMapper'] !== null => $mappers['inputNameMapper']->map($reflectionProperty->name),
-            $classInputNameMapper !== null => $classInputNameMapper->map($reflectionProperty->name),
-            default => null,
-        };
+        $inputMappedName = ($mappers['inputNameMapper'] ?? $classInputNameMapper ?? $defaultMappers['inputNameMapper'])
+            ?->map($reflectionProperty->name);
 
-        $outputMappedName = match (true) {
-            $mappers['outputNameMapper'] !== null => $mappers['outputNameMapper']->map($reflectionProperty->name),
-            $classOutputNameMapper !== null => $classOutputNameMapper->map($reflectionProperty->name),
-            default => null,
-        };
+        $outputMappedName = ($mappers['outputNameMapper'] ?? $classOutputNameMapper ?? $defaultMappers['outputNameMapper'])
+            ?->map($reflectionProperty->name);
 
         if (! $reflectionProperty->isPromoted()) {
             $hasDefaultValue = $reflectionProperty->hasDefaultValue();

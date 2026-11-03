@@ -59,7 +59,7 @@ class DataClassFactory
         $properties = $this->resolveProperties(
             $reflectionClass,
             $constructorReflectionMethod,
-            NameMappersResolver::create(ignoredMappers: [ProvidedNameMapper::class])->execute($attributes),
+            NameMappersResolver::create(ignoredMappers: [ProvidedNameMapper::class], fallbackToDefaults: false)->execute($attributes),
             $dataIterablePropertyAnnotations,
             $autoLazy
         );
