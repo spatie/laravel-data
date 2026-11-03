@@ -1,9 +1,11 @@
 <?php
 
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
@@ -247,6 +249,28 @@ it('can use a custom collection extended from collection to collect a collection
     expect($collection)->toBeInstanceOf(CustomCollection::class);
     expect($collection[0])->toBeInstanceOf(SimpleData::class);
     expect($collection[1])->toBeInstanceOf(SimpleData::class);
+});
+
+it('returns a base collection when collecting an eloquent collection of data objects', function () {
+    $collection = SimpleData::collect(new EloquentCollection([
+        ['string' => 'A'],
+        ['string' => 'B'],
+    ]));
+
+    expect($collection)->toBeInstanceOf(Collection::class);
+    expect($collection)->not->toBeInstanceOf(EloquentCollection::class);
+    expect($collection[0])->toBeInstanceOf(SimpleData::class);
+    expect($collection[1])->toBeInstanceOf(SimpleData::class);
+});
+
+it('can still collect into an eloquent collection when explicitly requested', function () {
+    $collection = SimpleData::collect([
+        ['string' => 'A'],
+        ['string' => 'B'],
+    ], EloquentCollection::class);
+
+    expect($collection)->toBeInstanceOf(EloquentCollection::class);
+    expect($collection[0])->toBeInstanceOf(SimpleData::class);
 });
 
 it('does not mutate wrapped paginators during transformation', function () {

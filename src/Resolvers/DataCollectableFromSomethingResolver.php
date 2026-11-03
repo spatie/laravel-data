@@ -6,9 +6,11 @@ use Closure;
 use Exception;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
@@ -48,6 +50,21 @@ class DataCollectableFromSomethingResolver
         $intoType = $into !== null
             ? $this->dataReturnTypeFactory->buildFromNamedType($into, $dataClass, nullable: false)->type
             : $this->dataReturnTypeFactory->buildFromValue($items, $dataClass, nullable: false)->type;
+
+        // Eloquent\Collection assumes items are Models (loadMissing, etc.). When
+        // collect() maps models to Data objects, keep Laravel's map() behaviour:
+        // return a base Support\Collection unless the caller asked for Eloquent.
+        // @see https://github.com/spatie/laravel-data/issues/1212
+        if (
+            $into === null
+            && is_a($intoType->name, EloquentCollection::class, true)
+        ) {
+            $intoType = $this->dataReturnTypeFactory->buildFromNamedType(
+                Collection::class,
+                $dataClass,
+                nullable: false,
+            )->type;
+        }
 
         $collectableMetaData = CollectableMetaData::fromOther($items);
 
