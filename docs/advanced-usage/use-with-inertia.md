@@ -21,7 +21,7 @@ be manually included or excluded.
 
 Inertia has a similar concept called [lazy data evaluation](https://inertiajs.com/partial-reloads#lazy-data-evaluation),
 where some properties wrapped in a closure only get evaluated and included in the response when explicitly asked.
-Inertia v2 introduced the concept of [deferred props](https://inertiajs.com/deferred-props), which allows to defer the
+Inertia v2 introduced the concept of [deferred props](https://inertiajs.com/deferred-props), which allows you to defer the
 loading of certain data until after the initial page render.
 
 This package can output specific properties as Inertia lazy or deferred props as such:
@@ -40,7 +40,7 @@ class SongData extends Data
     {
         return new self(
             Lazy::inertia(fn() => $song->title),
-            Lazy::closure(fn() => $song->artist)
+            Lazy::closure(fn() => $song->artist),
             Lazy::inertiaDeferred(fn() => $song->lyrics)
         );
     }
@@ -56,7 +56,7 @@ We provide three kinds of lazy properties:
 Now within your JavaScript code, you can include the properties as such:
 
 ```js
-router.reload((url, {
+router.reload({
     only: ['title'],
 });
 ```
@@ -80,7 +80,7 @@ class SongData extends Data
     {
         return new self(
             Lazy::inertiaDeferred(fn() => $song->title),
-            Lazy::inertiaDeferred(fn() => $song->artist, 'details')
+            Lazy::inertiaDeferred(fn() => $song->artist, 'details'),
             Lazy::inertiaDeferred(fn() => $song->lyrics, 'details')
         );
     }
