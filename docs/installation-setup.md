@@ -3,6 +3,8 @@ title: Installation & setup
 weight: 4
 ---
 
+This version requires PHP 8.4.1 or higher and Laravel 13.
+
 You can install the package via composer:
 
 ```bash
