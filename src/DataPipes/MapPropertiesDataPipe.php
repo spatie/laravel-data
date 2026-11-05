@@ -2,8 +2,10 @@
 
 namespace Spatie\LaravelData\DataPipes;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Spatie\LaravelData\Support\Creation\CreationContext;
+use Spatie\LaravelData\Support\Creation\ValidationStrategy;
 use Spatie\LaravelData\Support\DataClass;
 use Spatie\LaravelData\Support\DataProperty;
 
@@ -25,6 +27,10 @@ class MapPropertiesDataPipe implements DataPipe
             }
 
             if (! Arr::has($properties, $dataProperty->inputMappedName)) {
+                if ($this->shouldRemoveUnmappedPropertyName($payload, $properties, $creationContext, $dataProperty)) {
+                    unset($properties[$dataProperty->name]);
+                }
+
                 continue;
             }
 
@@ -38,6 +44,20 @@ class MapPropertiesDataPipe implements DataPipe
         }
 
         return $properties;
+    }
+
+    protected function shouldRemoveUnmappedPropertyName(
+        mixed $payload,
+        array $properties,
+        CreationContext $creationContext,
+        DataProperty $dataProperty
+    ): bool {
+        if (! array_key_exists($dataProperty->name, $properties)) {
+            return false;
+        }
+
+        return $creationContext->validationStrategy === ValidationStrategy::Always
+            || ($creationContext->validationStrategy === ValidationStrategy::OnlyRequests && $payload instanceof Request);
     }
 
     protected function addPropertyMappingToCreationContext(
