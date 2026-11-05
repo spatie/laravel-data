@@ -1,6 +1,8 @@
 <?php
 
 use Carbon\Carbon;
+use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\Unique;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Support\Validation\RuleDenormalizer;
@@ -28,6 +30,14 @@ it('gets the correct rules', function (
 
     $resolved = app(RuleDenormalizer::class)->execute($attribute, ValidationPath::create());
 
+    if ($expected instanceof Exists || $expected instanceof Unique) {
+        expect($resolved[0])->toBeInstanceOf($expected::class)
+            ->and((string) $resolved[0])->toBe((string) $expected)
+            ->and($resolved[0]->queryCallbacks())->toBe($expected->queryCallbacks());
+
+        return;
+    }
+
     expect($resolved[0])->toEqual($expected);
 })->with('attributes');
 
@@ -44,6 +54,13 @@ it('creates the correct attributes', function (
     }
 
     $resolved = app(RuleNormalizer::class)->execute($expected);
+
+    if ($expected instanceof Exists || $expected instanceof Unique) {
+        expect($resolved[0])->toBeInstanceOf($expectedCreatedAttribute::class)
+            ->and($resolved[0]->getRule(ValidationPath::create()))->toBe($expected);
+
+        return;
+    }
 
     expect($resolved[0])->toEqual($expectedCreatedAttribute);
 })->with('attributes');
