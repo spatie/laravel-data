@@ -83,8 +83,15 @@ class LivewireDataSynth extends Synth
         $payload = [];
 
         foreach ($this->dataConfig->getDataClass($dataClass)->properties as $name => $property) {
-            if (array_key_exists($name, $value) === false && $property->type->lazyType) {
-                $payload[$name] = new LivewireLostLazy($dataClass, $name);
+            if (array_key_exists($name, $value) === false) {
+                if ($property->type->lazyType) {
+                    $payload[$name] = new LivewireLostLazy($dataClass, $name);
+
+                    continue;
+                }
+
+                // Older Livewire snapshots may lack properties added in a newer component version.
+                // Leave them out so the data factory can apply its defaults.
 
                 continue;
             }
