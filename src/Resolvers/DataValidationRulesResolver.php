@@ -178,7 +178,9 @@ class DataValidationRulesResolver
         DataRules $dataRules,
     ): void {
         foreach ($collectionPayload as $key => $value) {
-            $itemPath = $propertyPath->property($key);
+            // A literal dot in the key (e.g. `en.greeting`) is otherwise read back
+            // by Laravel's validator as a nested path separator.
+            $itemPath = $propertyPath->property(str_replace('.', '\.', (string) $key));
 
             if (! is_array($value)) {
                 $dataRules->add($itemPath, ['array']);
